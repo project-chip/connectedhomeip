@@ -230,49 +230,22 @@ tests:
           "Step 9b: TH1 sends Groupcast JoinGroup command with GroupID=1,
           Endpoints=[EP1], KeySetID=0x01a1, Key=Key1 to TH2 endpoint 0."
       verification: |
-          Run this command for DUT in chip-tool:
-          ./chip-tool groupcast join-group 0x1 [] 0x1a1 74 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
+          ./chip-tool groupcast join-group 0x1 "[1]" 0x01a1 2 0 --Key hex:b0b1b2b3b4b5b6b7b8b9babbbcbdbebf --UseAuxiliaryACL 1
 
-          Run this command for lighting app TH2 in chip-tool:
-          ./chip-tool groupcast join-group 0x1 [1] 0x1a1 2 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
-          TH2 responds with SUCCESS
-
-          Run this commands on chip-tool TH1 so it can uses the Key also
-          ./chip-tool groupsettings add-group 0x1 grp1 --addressPolicy 0
-          ./chip-tool groupsettings add-keysets 0x01a1 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          ./chip-tool groupsettings bind-keyset 0x1 0x01a1
-
+          On TH1(Chip-tool), Verify the success response for JoinGroup
+        
+          [1775125551.899] [13658:13660] [DMG]                                 
+          [1775125551.899] [13658:13660] [DMG]                                 StatusIB =
+          [1775125551.899] [13658:13660] [DMG]                                 {
+          [1775125551.899] [13658:13660] [DMG]                                         status = 0x00 (SUCCESS),
+          [1775125551.899] [13658:13660] [DMG]                                 },
       disabled: true
 
     - label:
           "Step 10: TH1 writes Binding entry into DUT with Entry 1: Group = The
           Group ID in the AddGroup command sent from TH1 to TH2"
       verification: |
-          Before write the binding entries run the ACL Commands:
-
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
-
-           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 74 0
-
-          On TH1(Chip-tool), Verify the success response for Acl:
-
-          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
-          [1659075680.944052][2687:2692] CHIP:DMG:                         {
-          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-
-          Run this command for lighting app in chip-tool:
-
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 2 0
-
-          On TH1(Chip-tool), Verify the success response for Acl:
-
-          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
-          [1659075680.944052][2687:2692] CHIP:DMG:                         {
-          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-
-
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
-
+          
           ./chip-tool binding write binding '[{"group" : "0x0001"}]' 74 1
 
           On TH1(Chip-tool), Verify the success response for binding entry
@@ -287,6 +260,7 @@ tests:
           "Step 11: If the Groupcast cluster is enabled on the RootNode
           endpoint, skip this step. Otherwise, TH1 sets up group settings on DUT"
       verification: |
+          If the Groupcast cluster is enabled on the RootNode endpoint, skip this step. Otherwise, TH1 sets up group settings on DUT
 
       disabled: true
 
