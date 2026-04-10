@@ -88,16 +88,6 @@ class SmokeCoBaseTest(MatterBaseTest):
         else:
             self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
 
-    def process_pixit_attributes(self):
-        """ Scans instance attributes starting with 'pixit_'.
-        Converts values from bytes to big-endian integers."""
-        for attr_name in list(vars(self)):
-            if attr_name.startswith('pixit_'):
-                value = getattr(self, attr_name)
-                if isinstance(value, bytes):
-                    # Convert bytes to int (big-endian)
-                    converted_value = int.from_bytes(value, byteorder='big')
-                    setattr(self, attr_name, converted_value)
 
     async def alarm_primary_functionality_base_test(self, state_attribute, alarm_event, expressed_state_enum_value, pixit_warning, pixit_critical, pixit_clear):
         """Define what attributes,events,enum values and pixit to use depending if is smoke alarm or co alarm for tests SMOKECO 2.2 and SMOKECO 2.3."""

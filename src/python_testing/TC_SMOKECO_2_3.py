@@ -38,7 +38,7 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-from TC_SMOKECOTestBase import SmokeCoBaseTest
+from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
