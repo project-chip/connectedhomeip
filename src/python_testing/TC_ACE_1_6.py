@@ -106,7 +106,7 @@ class TC_ACE_1_6(MatterBaseTest):
             TestStep(23, "TH sends a AddGroup Command to Group 0x0103 to add Group 0x0105"),
             TestStep(24, "TH sends a ViewGroup Command for Group 0x0105 - expect NOT_FOUND"),
             TestStep(25, "TH sends the RemoveAllGroups Command"),
-            TestStep(26, "TH reads the Membership attribute from the Groupcast cluster"),
+            TestStep(26, "TH calls the GetGroupMembership command from the Groups cluster"),
             TestStep(27, "TH sends Groupcast LeaveGroup command with GroupID 0 to DUT over CASE"),
             TestStep(28, "TH resets the GroupKeyMap attribute list"),
             TestStep(29, "TH resets the key set 0x01a3"),
