@@ -36,6 +36,9 @@ config:
     G1:
         type: group_id
         defaultValue: 0x0001
+    hasGroupcast:
+        type: boolean
+        defaultValue: true
 
 tests:
     - label: "Commission DUT to TH1"
@@ -45,6 +48,20 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Set noGroupcast flag"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: hasGroupcast
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: noGroupcast
 
     - label: "TH1 reads the fabric index"
       cluster: "Operational Credentials"
@@ -112,6 +129,7 @@ tests:
           saveAs: th2FabricIndex
 
     - label: "TH1 sends a RemoveAllGroups command to DUT."
+      runIf: noGroupcast
       cluster: "Groups"
       command: "RemoveAllGroups"
 
@@ -136,6 +154,7 @@ tests:
                     }
 
     - label: "TH1 Map KeySets to GroupId."
+      runIf: noGroupcast
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -144,6 +163,7 @@ tests:
           value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
     - label: "TH1 sends a AddGroup command to DUT for G1."
+      runIf: noGroupcast
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -158,6 +178,20 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
+
+    - label: "TH1 sends a JoinGroup command to DUT for G1."
+      runIf: hasGroupcast
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label: "Preparation step : TH2 Add Group KeySet."
       identity: "beta"
@@ -190,6 +224,7 @@ tests:
           value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a2 }]
 
     - label: "TH2 sends a AddGroup command to DUT for G1."
+      runIf: noGroupcast
       identity: "beta"
       cluster: "Groups"
       command: "AddGroup"
@@ -205,6 +240,21 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
+
+    - label: "TH2 sends a JoinGroup command to DUT for G1."
+      runIf: hasGroupcast
+      endpoint: 0
+      identity: "beta"
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a2
 
     - label: "TH1 confirms its Scene table is empty and gets its capacity"
       command: "GetSceneMembership"

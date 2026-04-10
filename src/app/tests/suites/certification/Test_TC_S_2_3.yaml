@@ -31,7 +31,9 @@ config:
     GI:
         type: group_id
         defaultValue: 0x0099
-
+    hasGroupcast:
+        type: boolean
+        defaultValue: true
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -49,6 +51,20 @@ tests:
           values:
               - name: "SceneTableSize"
                 saveAs: maxScenes
+
+    - label: "Set noGroupcast flag"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: hasGroupcast
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: noGroupcast
 
     - label:
           "Step 0a: TH sends KeySetWrite command in the GroupKeyManagement
@@ -85,8 +101,7 @@ tests:
           2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
           d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 2220000
           5)EpochKey1: e0e1e2e3e4e5e6e7e8e9eaebecedeeef 6)EpochStartTime1:
-          2220001 7)EpochKey2: f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
-          8)EpochStartTime2: 2220002 9)GroupKeyMulticastPolicy: 0"
+          2220001"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
@@ -101,8 +116,8 @@ tests:
                         EpochStartTime0: 2220000,
                         EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
                         EpochStartTime1: 2220001,
-                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
-                        EpochStartTime2: 2220002,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
                         GroupKeyMulticastPolicy: 0,
                     }
 
@@ -111,6 +126,7 @@ tests:
           GroupKeyMap attribute list on GroupKeyManagement cluster by writing
           the GroupKeyMap attribute with one entry as follows: List item 1:
           1)FabricIndex: 1 2)GroupId :_G1_ 3)GroupKeySetId: 0x01a1"
+      runIf: noGroupcast
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -124,7 +140,8 @@ tests:
 
     - label:
           "Step 1a: TH sends a AddGroup command to DUT with the GroupID field
-          set to G1."
+          set to G1 (legacy path)."
+      runIf: noGroupcast
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -142,8 +159,27 @@ tests:
                 value: G1
 
     - label:
+          "Step 1a: TH sends Groupcast JoinGroup with GroupID G1 (Groupcast
+          path)."
+      runIf: hasGroupcast
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a1
+              - name: "McastAddrPolicy"
+                value: 1
+
+    - label:
           "Step 1b: TH sends a AddGroup command to DUT with the GroupID field
-          set to G2."
+          set to G2 (legacy path)."
+      runIf: noGroupcast
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -159,6 +195,24 @@ tests:
                 value: 0x00
               - name: "GroupID"
                 value: G2
+
+    - label:
+          "Step 1b: TH sends Groupcast JoinGroup with GroupID G2 (Groupcast
+          path)."
+      runIf: hasGroupcast
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a2
+              - name: "McastAddrPolicy"
+                value: 1
 
     - label: "Step 1c: Install ACLs"
       cluster: "Access Control"

@@ -27,7 +27,9 @@ config:
     G1:
         type: group_id
         defaultValue: 0x0001
-
+    hasGroupcast:
+        type: boolean
+        defaultValue: true
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -36,6 +38,20 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Set noGroupcast flag"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: hasGroupcast
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: noGroupcast
 
     - label:
           "Step 0a: TH sends KeySetWrite command in the GroupKeyManagement
@@ -71,6 +87,7 @@ tests:
           the GroupKeyMap attribute with one entry as follows: List item 1:
           1)FabricIndex: 1 2)GroupId: 0x0001 3)GroupKeySetId: 0x01a1"
       cluster: "Group Key Management"
+      runIf: noGroupcast
       endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -86,6 +103,7 @@ tests:
           "Step 2a: TH sends a AddGroup command to DUT with the GroupID field
           set to G1."
       PICS: G.S.C00.Rsp
+      runIf: noGroupcast
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -100,6 +118,21 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
+
+    - label:
+          "Step 2a: TH sends a JoinGroup command to DUT for G1 (Groupcast path)."
+      runIf: hasGroupcast
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label:
           "Step 2b: TH sends a RemoveAllScenes command to DUT with the GroupID

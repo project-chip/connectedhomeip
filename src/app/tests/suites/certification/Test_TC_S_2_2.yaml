@@ -31,6 +31,9 @@ config:
     GI:
         type: group_id
         defaultValue: 0x0099
+    hasGroupcast:
+        type: boolean
+        defaultValue: true
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -40,6 +43,34 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Set noGroupcast flag"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: hasGroupcast
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: noGroupcast
+
+    - label: "Set hasGroupcast flag"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: hasGroupcast
+              - name: "Value2"
+                value: true
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: hasGroupcast
 
     - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
       PICS: S.S.A0001
@@ -91,6 +122,7 @@ tests:
           0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster
           by writing the GroupKeyMap attribute with two entries as follows:"
       cluster: "Group Key Management"
+      runIf: noGroupcast
       endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -102,6 +134,7 @@ tests:
               ]
 
     - label: "Step 0d: TH sends a RemoveAllGroups command to DUT."
+      runIf: noGroupcast
       PICS: G.S.C04.Rsp
       cluster: "Groups"
       endpoint: endpoint
@@ -110,6 +143,7 @@ tests:
     - label:
           "Step 1a: TH sends a AddGroup command to DUT with the GroupID field
           set to G1."
+      runIf: noGroupcast
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -125,6 +159,21 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
+
+    - label:
+          "Step 1a: TH sends a JoinGroup command to DUT for G1 (Groupcast path)."
+      runIf: hasGroupcast
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label:
           "Step 1b: TH sends a RemoveAllScenes command to DUT with the GroupID
@@ -1474,10 +1523,68 @@ tests:
               - name: "SceneList"
                 value: [0x01, 0x02]
 
+    - label: "Initialize ContinueTestNoGroupcast to false"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: ContinueTestNoGroupcast
+
+    - label: "Initialize ContinueTestHasGroupcast to false"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: ContinueTestHasGroupcast
+
+    - label: "Set ContinueTestNoGroupcast if ContinueTest is true"
+      runIf: ContinueTest
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: noGroupcast
+              - name: "Value2"
+                value: true
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: ContinueTestNoGroupcast
+
+    - label: "Set ContinueTestHasGroupcast if ContinueTest is true"
+      runIf: ContinueTest
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: hasGroupcast
+              - name: "Value2"
+                value: true
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: ContinueTestHasGroupcast
+
     - label:
           "Step 13a: If capacity allows, TH sends a AddGroup command to DUT with
           the GroupID field set to G2."
-      runIf: ContinueTest
+      runIf: ContinueTestNoGroupcast
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -1493,6 +1600,22 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G2
+
+    - label:
+          "Step 13a: TH sends a JoinGroup command to DUT for G2 (Groupcast
+          path)."
+      runIf: ContinueTestHasGroupcast
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label:
           "Step 13b: TH sends a RemoveAllScenes command to DUT with the GroupID

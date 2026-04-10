@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
+#include <app/clusters/groups-server/StubbedGroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/level-control/LevelControlCluster.h>
 #include <app/clusters/level-control/LevelControlDelegate.h>
@@ -81,7 +81,7 @@ private:
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::LevelControlCluster> mLevelControlCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
+    LazyRegisteredServerCluster<Clusters::StubbedGroupsCluster> mGroupsCluster;
 };
 
 } // namespace app

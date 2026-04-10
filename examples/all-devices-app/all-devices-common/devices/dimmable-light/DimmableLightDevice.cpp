@@ -68,12 +68,7 @@ CHIP_ERROR DimmableLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
-    mGroupsCluster.Create(endpoint,
-                          GroupsCluster::Context{
-                              .groupDataProvider   = mContext.groupDataProvider,
-                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
-                              .identifyIntegration = &mIdentifyCluster.Cluster(),
-                          });
+    mGroupsCluster.Create(endpoint, StubbedGroupsCluster::Context{ .groupDataProvider = mContext.groupDataProvider });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

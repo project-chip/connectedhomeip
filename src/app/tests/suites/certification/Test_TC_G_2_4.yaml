@@ -33,7 +33,7 @@ config:
 
 tests:
     - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          "Step 0a: Commission DUT to TH (can be skipped if done in a preceding
           test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -42,9 +42,49 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Step 0b: TH reads ClusterRevision from DUT on PIXIT.G.ENDPOINT1"
+      endpoint: Groups.Endpoint1
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          saveAs: GroupsClusterRevision
+
+    - label:
+          "Step 0c: Check if Groups cluster revision is 5 (stubbed
+          implementation)"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: GroupsClusterRevision
+              - name: "Value2"
+                value: 5
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsStubbedRevision
+
+    - label:
+          "Step 0d: Determine if test should run (legacy Groups cluster revision
+          < 5)"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: IsStubbedRevision
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsLegacyGroupsRevision
+
     - label:
           "Step 1: Verify that PIXIT.G.ENDPOINT and PIXIT.G.ENDPOINT2 are
           different."
+      runIf: IsLegacyGroupsRevision
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
@@ -67,6 +107,7 @@ tests:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
           8)EpochStartTime2: 18446744073709551614 9)GroupKeyMulticastPolicy: 0"
+      runIf: IsLegacyGroupsRevision
       PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       command: "KeySetWrite"
@@ -90,6 +131,7 @@ tests:
           "Step 3: TH writes the GroupKeyMap attribute in the GroupKeyManagement
           cluster on EP0 with one entry binding GroupId(0x0001) with
           GroupKeySetID 1"
+      runIf: IsLegacyGroupsRevision
       PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       command: "writeAttribute"
@@ -100,18 +142,21 @@ tests:
     - label:
           "Step 4a: TH cleans up the groups by sending the RemoveAllGroups
           command to the DUT on PIXIT.G.ENDPOINT1"
+      runIf: IsLegacyGroupsRevision
       endpoint: Groups.Endpoint1
       command: "RemoveAllGroups"
 
     - label:
           "Step 4b: TH cleans up the groups by sending the RemoveAllGroups
           command to the DUT on PIXIT.G.ENDPOINT2"
+      runIf: IsLegacyGroupsRevision
       endpoint: Groups.Endpoint2
       command: "RemoveAllGroups"
 
     - label:
           "Step 5a: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT with
           the following fields:1) GroupID as 0x0001, 2)GroupName as 'Gp1'"
+      runIf: IsLegacyGroupsRevision
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       endpoint: Groups.Endpoint1
       command: "AddGroup"
@@ -131,6 +176,7 @@ tests:
     - label:
           "Step 5b: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT2 with
           the following fields: GroupID as 0x0001,GroupName as 'Gp2'"
+      runIf: IsLegacyGroupsRevision
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       endpoint: Groups.Endpoint2
       command: "AddGroup"
@@ -150,6 +196,7 @@ tests:
     - label:
           "Step 6: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0"
+      runIf: IsLegacyGroupsRevision
       PICS: GRPKEY.S.A0001
       cluster: "Group Key Management"
       command: "readAttribute"
@@ -168,6 +215,7 @@ tests:
           "Step 7: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0, Verify that the GroupTable contains an entry
           with the GroupName as 'Gp2'"
+      runIf: IsLegacyGroupsRevision
       PICS: GRPKEY.S.A0001 && G.S.F00
       cluster: "Group Key Management"
       command: "readAttribute"
@@ -186,6 +234,7 @@ tests:
     - label:
           "Step 8: TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT with
           the following fields: GroupID as 0x0001"
+      runIf: IsLegacyGroupsRevision
       PICS: G.S.C01.Rsp && G.S.C01.Tx
       endpoint: Groups.Endpoint1
       command: "ViewGroup"
@@ -204,6 +253,7 @@ tests:
           "Step 9: TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT with
           the following fields: GroupID as 0x0001. Verify that the
           ViewGroupResponse contains GroupName as 'GP2'"
+      runIf: IsLegacyGroupsRevision
       PICS: G.S.C01.Rsp && G.S.C01.Tx && G.S.F00
       endpoint: Groups.Endpoint1
       command: "ViewGroup"
@@ -223,6 +273,7 @@ tests:
     - label:
           "Step 10: TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT as
           unicast with the following field: GroupID as 0x0001"
+      runIf: IsLegacyGroupsRevision
       PICS: G.S.C03.Rsp && G.S.C03.Tx
       endpoint: Groups.Endpoint1
       command: "RemoveGroup"
@@ -240,6 +291,7 @@ tests:
     - label:
           "Step 11: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0"
+      runIf: IsLegacyGroupsRevision
       PICS: GRPKEY.S.A0001 && !G.S.F00
       cluster: "Group Key Management"
       command: "readAttribute"
@@ -258,6 +310,7 @@ tests:
     - label:
           "Step 11: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0"
+      runIf: IsLegacyGroupsRevision
       PICS: GRPKEY.S.A0001 && G.S.F00
       cluster: "Group Key Management"
       command: "readAttribute"
@@ -276,6 +329,7 @@ tests:
     - label:
           "Step 12: TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT2 as
           unicast with the following field: GroupID as 0x0001"
+      runIf: IsLegacyGroupsRevision
       PICS: G.S.C03.Rsp && G.S.C03.Tx
       endpoint: Groups.Endpoint2
       command: "RemoveGroup"
@@ -293,6 +347,7 @@ tests:
     - label:
           "Step 13: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0"
+      runIf: IsLegacyGroupsRevision
       PICS: GRPKEY.S.A0001
       cluster: "Group Key Management"
       command: "readAttribute"

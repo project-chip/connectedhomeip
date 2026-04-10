@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
+#include <app/clusters/groups-server/StubbedGroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffLightingCluster.h>
@@ -78,7 +78,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
+    LazyRegisteredServerCluster<Clusters::StubbedGroupsCluster> mGroupsCluster;
 };
 
 } // namespace chip::app

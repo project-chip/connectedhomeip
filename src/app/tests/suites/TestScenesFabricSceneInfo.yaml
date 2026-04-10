@@ -46,6 +46,9 @@ config:
     G2:
         type: group_id
         defaultValue: 0x0002
+    hasGroupcast:
+        type: boolean
+        defaultValue: true
 
 tests:
     - label: "Commission DUT to TH1"
@@ -55,6 +58,20 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Set noGroupcast flag"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: hasGroupcast
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: noGroupcast
 
     - label: "TH1 reads the fabric index"
       cluster: "Operational Credentials"
@@ -129,6 +146,7 @@ tests:
                     }
 
     - label: "Preparation step for using the Write Group Keys command."
+      runIf: hasGroupcast
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -141,10 +159,12 @@ tests:
               ]
 
     - label: "TH sends a RemoveAllGroups command to DUT."
+      runIf: noGroupcast
       cluster: "Groups"
       command: "RemoveAllGroups"
 
     - label: "TH sends a AddGroup command to DUT for G1."
+      runIf: noGroupcast
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -160,7 +180,22 @@ tests:
               - name: "GroupID"
                 value: G1
 
+    - label: "TH sends a JoinGroup command to DUT for G1."
+      runIf: hasGroupcast
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
+
     - label: "TH sends a AddGroup command to DUT for G2."
+      runIf: noGroupcast
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -175,6 +210,20 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G2
+
+    - label: "TH sends a JoinGroup command to DUT for G2."
+      runIf: hasGroupcast
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label: "TH confirms the Fabric Capacity is Maximum"
       command: "GetSceneMembership"
