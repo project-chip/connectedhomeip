@@ -198,9 +198,11 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
 CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSpan & outBuffer, bool & outIsEndOfLog)
 {
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnValue(mFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto & session              = mFiles[sessionHandle];
+    auto it = mFiles.find(sessionHandle);
+    VerifyOrReturnValue(it != mFiles.end(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto & session              = it->second;
     auto fp                     = session.fp;       // ← Extract FILE pointer
     const size_t fileSize       = session.fileSize; // ← Use cached file size
     const size_t bytesRequested = outBuffer.size();
