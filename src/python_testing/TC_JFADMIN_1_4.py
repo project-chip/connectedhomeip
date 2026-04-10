@@ -430,7 +430,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
             iterations=1000,
             salt=valid_32_byte_salt,
             expected_error_status=Status.Failure,
-            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kBusy,
+            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.ICACCSRResponseStatusCodeEnum.kBusy,
             expected_error_message="Expected BUSY cluster status while commissioning window is already open.",
         )
 

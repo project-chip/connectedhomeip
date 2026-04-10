@@ -53837,26 +53837,25 @@ class JointFabricDatastore(Cluster):
 
     class Enums:
         class DatastoreAccessControlEntryAuthModeEnum(MatterIntEnum):
-            kPase = 0x01
-            kCase = 0x02
-            kGroup = 0x03
+            kPase = 0x00
+            kCase = 0x01
+            kGroup = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0
+            kUnknownEnumValue = 3
 
         class DatastoreAccessControlEntryPrivilegeEnum(MatterIntEnum):
-            kView = 0x01
-            kProxyView = 0x02
-            kOperate = 0x03
-            kManage = 0x04
-            kAdminister = 0x05
+            kView = 0x00
+            kOperate = 0x02
+            kManage = 0x03
+            kAdminister = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0
+            kUnknownEnumValue = 1
 
         class DatastoreGroupKeyMulticastPolicyEnum(MatterIntEnum):
             kPerGroupID = 0x00
@@ -53923,9 +53922,9 @@ class JointFabricDatastore(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=2, Type=str),
-                        ClusterObjectFieldDescriptor(Label="commissioningStatusEntry", Tag=3, Type=JointFabricDatastore.Structs.DatastoreStatusEntryStruct),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="commissioningStatusEntry", Tag=2, Type=JointFabricDatastore.Structs.DatastoreStatusEntryStruct),
                     ])
 
             nodeID: 'uint' = 0
@@ -53950,32 +53949,15 @@ class JointFabricDatastore(Cluster):
             statusEntry: 'JointFabricDatastore.Structs.DatastoreStatusEntryStruct' = field(default_factory=lambda: JointFabricDatastore.Structs.DatastoreStatusEntryStruct())
 
         @dataclass
-        class DatastoreEndpointEntryStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=2, Type=str),
-                        ClusterObjectFieldDescriptor(Label="statusEntry", Tag=3, Type=JointFabricDatastore.Structs.DatastoreStatusEntryStruct),
-                    ])
-
-            endpointID: 'uint' = 0
-            nodeID: 'uint' = 0
-            friendlyName: 'str' = ""
-            statusEntry: 'JointFabricDatastore.Structs.DatastoreStatusEntryStruct' = field(default_factory=lambda: JointFabricDatastore.Structs.DatastoreStatusEntryStruct())
-
-        @dataclass
         class DatastoreBindingTargetStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="node", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="group", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=3, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="cluster", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="node", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="group", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="cluster", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             node: 'typing.Optional[uint]' = None
@@ -54023,10 +54005,10 @@ class JointFabricDatastore(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="privilege", Tag=1, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum),
-                        ClusterObjectFieldDescriptor(Label="authMode", Tag=2, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryAuthModeEnum),
-                        ClusterObjectFieldDescriptor(Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
-                        ClusterObjectFieldDescriptor(Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[JointFabricDatastore.Structs.DatastoreAccessControlTargetStruct]]),
+                        ClusterObjectFieldDescriptor(Label="privilege", Tag=0, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum),
+                        ClusterObjectFieldDescriptor(Label="authMode", Tag=1, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryAuthModeEnum),
+                        ClusterObjectFieldDescriptor(Label="subjects", Tag=2, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="targets", Tag=3, Type=typing.Union[Nullable, typing.List[JointFabricDatastore.Structs.DatastoreAccessControlTargetStruct]]),
                     ])
 
             privilege: 'JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum' = 0
@@ -54057,16 +54039,31 @@ class JointFabricDatastore(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=2, Type=str),
-                        ClusterObjectFieldDescriptor(Label="vendorID", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="icac", Tag=4, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="vendorID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="icac", Tag=3, Type=bytes),
                     ])
 
             nodeID: 'uint' = 0
             friendlyName: 'str' = ""
             vendorID: 'uint' = 0
             icac: 'bytes' = b""
+
+        @dataclass
+        class DatastoreEndpointEntryStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=2, Type=str),
+                    ])
+
+            endpointID: 'uint' = 0
+            nodeID: 'uint' = 0
+            friendlyName: 'str' = ""
 
         @dataclass
         class DatastoreGroupInformationEntryStruct(ClusterObject):
@@ -54207,7 +54204,7 @@ class JointFabricDatastore(Cluster):
                         ClusterObjectFieldDescriptor(Label="groupKeySetID", Tag=2, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="groupCAT", Tag=3, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="groupCATVersion", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="groupPermission", Tag=5, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum),
+                        ClusterObjectFieldDescriptor(Label="groupPermission", Tag=5, Type=typing.Union[Nullable, JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum]),
                     ])
 
             groupID: uint = 0
@@ -54215,7 +54212,7 @@ class JointFabricDatastore(Cluster):
             groupKeySetID: typing.Union[Nullable, uint] = NullValue
             groupCAT: typing.Union[Nullable, uint] = NullValue
             groupCATVersion: typing.Union[Nullable, uint] = NullValue
-            groupPermission: JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum = 0
+            groupPermission: typing.Union[Nullable, JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum] = NullValue
 
         @dataclass
         class RemoveGroup(ClusterCommand):
@@ -54266,14 +54263,14 @@ class JointFabricDatastore(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=0, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=1, Type=typing.Union[Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="icac", Tag=2, Type=typing.Union[Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="friendlyName", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="icac", Tag=2, Type=typing.Optional[bytes]),
                     ])
 
-            nodeID: typing.Union[Nullable, uint] = NullValue
-            friendlyName: typing.Union[Nullable, str] = NullValue
-            icac: typing.Union[Nullable, bytes] = NullValue
+            nodeID: uint = 0
+            friendlyName: typing.Optional[str] = None
+            icac: typing.Optional[bytes] = None
 
         @dataclass
         class RemoveAdmin(ClusterCommand):
@@ -54825,6 +54822,19 @@ class JointFabricAdministrator(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class ICACCSRResponseStatusCodeEnum(MatterIntEnum):
+            kOk = 0x00
+            kBusy = 0x01
+            kPAKEParameterError = 0x02
+            kWindowNotOpen = 0x03
+            kVIDNotVerified = 0x04
+            kInvalidAdministratorFabricIndex = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 6
+
         class ICACResponseStatusEnum(MatterIntEnum):
             kOk = 0x00
             kInvalidPublicKey = 0x01
@@ -54834,18 +54844,6 @@ class JointFabricAdministrator(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
-
-        class StatusCodeEnum(MatterIntEnum):
-            kBusy = 0x02
-            kPAKEParameterError = 0x03
-            kWindowNotOpen = 0x04
-            kVIDNotVerified = 0x05
-            kInvalidAdministratorFabricIndex = 0x06
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0
 
         class TransferAnchorResponseStatusEnum(MatterIntEnum):
             kOk = 0x00
@@ -54882,10 +54880,12 @@ class JointFabricAdministrator(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="icaccsr", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=JointFabricAdministrator.Enums.ICACCSRResponseStatusCodeEnum),
+                        ClusterObjectFieldDescriptor(Label="icaccsr", Tag=1, Type=typing.Optional[bytes]),
                     ])
 
-            icaccsr: bytes = b""
+            statusCode: JointFabricAdministrator.Enums.ICACCSRResponseStatusCodeEnum = 0
+            icaccsr: typing.Optional[bytes] = None
 
         @dataclass
         class AddICAC(ClusterCommand):

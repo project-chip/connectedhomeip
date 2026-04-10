@@ -5031,7 +5031,7 @@ namespace JointFabricDatastore {
 namespace Attributes {
 
 namespace AnchorRootCA {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // long_octet_string
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
 } // namespace AnchorRootCA
