@@ -36,6 +36,17 @@ tests:
       verification: |
           Group Member is commissioned with Admin
           DUT supports Groups Cluster
+
+          Execute the below mentioned command to put TH(Reference app) into a commissionable state in RPI platform, Pls use equivalent command on the respective platform
+          ./chip-all-clusters-app --trace_decode 1
+        
+          Once TH reach the  commissionable state pls send below mentioned command on DUT(chip-tool) in RPI platform. Pls use equivalent command on the respective platform
+        
+          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+        
+          Verify the commissioning completed with success on DUT(Chip-tool)
+        
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
     - label:
@@ -398,39 +409,35 @@ tests:
     - label: "Step 8: DUT sends KeySetRead Command to TH"
       PICS: GRPKEY.C.C01.Tx
       verification: |
-          ./chip-tool groupkeymanagement key-set-read 42 1 0
+          ./chip-tool groupkeymanagement key-set-read 1 1 0
 
           Verify TH recieves KeySetRead command on TH(Reference app)log:
-
-          [1651471175.521361][4012:4012] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:1040181 on exchange 26813r
-          [1651471175.521414][4012:4012] CHIP:EM: Handling via exchange: 26813r, Delegate: 0xaaaaca97a088
-          [1651471175.521500][4012:4012] CHIP:DMG: InvokeRequestMessage =
-          [1651471175.521527][4012:4012] CHIP:DMG: {
-          [1651471175.521614][4012:4012] CHIP:DMG:        suppressResponse = false,
-          [1651471175.521643][4012:4012] CHIP:DMG:        timedRequest = false,
-          [1651471175.521667][4012:4012] CHIP:DMG:        InvokeRequests =
-          [1651471175.521709][4012:4012] CHIP:DMG:        [
-          [1651471175.521734][4012:4012] CHIP:DMG:                CommandDataIB =
-          [1651471175.521771][4012:4012] CHIP:DMG:                {
-          [1651471175.521794][4012:4012] CHIP:DMG:                        CommandPathIB =
-          [1651471175.521838][4012:4012] CHIP:DMG:                        {
-          [1651471175.521878][4012:4012] CHIP:DMG:                                EndpointId = 0x0,
-          [1651471175.521909][4012:4012] CHIP:DMG:                                ClusterId = 0x3f,
-          [1651471175.521949][4012:4012] CHIP:DMG:                                CommandId = 0x1,
-          [1651471175.521978][4012:4012] CHIP:DMG:                        },
-          [1651471175.522020][4012:4012] CHIP:DMG:
-          [1651471175.522047][4012:4012] CHIP:DMG:                        CommandData =
-          [1651471175.522084][4012:4012] CHIP:DMG:                        {
-          [1651471175.522122][4012:4012] CHIP:DMG:                                0x0 = 42,
-          [1651471175.522153][4012:4012] CHIP:DMG:                        },
-          [1651471175.522189][4012:4012] CHIP:DMG:                },
-          [1651471175.522220][4012:4012] CHIP:DMG:
-          [1651471175.522254][4012:4012] CHIP:DMG:        ],
-          [1651471175.522285][4012:4012] CHIP:DMG:
-          [1651471175.522319][4012:4012] CHIP:DMG:        InteractionModelRevision = 1
-          [1651471175.522342][4012:4012] CHIP:DMG: },
-          [1651471175.522418][4012:4012] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003F e=0 p=a
-          [1651471175.522467][4012:4012] CHIP:DMG: AccessControl: allowed
+        
+          [1775644884.049] [2326190:2326190] [DMG] InvokeRequestMessage =
+          [1775644884.049] [2326190:2326190] [DMG] {
+          [1775644884.049] [2326190:2326190] [DMG]         suppressResponse = false, 
+          [1775644884.049] [2326190:2326190] [DMG]         timedRequest = false, 
+          [1775644884.049] [2326190:2326190] [DMG]         InvokeRequests =
+          [1775644884.049] [2326190:2326190] [DMG]         [
+          [1775644884.049] [2326190:2326190] [DMG]                 CommandDataIB =
+          [1775644884.049] [2326190:2326190] [DMG]                 {
+          [1775644884.049] [2326190:2326190] [DMG]                         CommandPathIB =
+          [1775644884.049] [2326190:2326190] [DMG]                         {
+          [1775644884.049] [2326190:2326190] [DMG]                                 EndpointId = 0x0,
+          [1775644884.049] [2326190:2326190] [DMG]                                 ClusterId = 0x3f,
+          [1775644884.049] [2326190:2326190] [DMG]                                 CommandId = 0x1,
+          [1775644884.049] [2326190:2326190] [DMG]                         },
+          [1775644884.049] [2326190:2326190] [DMG]                         
+          [1775644884.049] [2326190:2326190] [DMG]                         CommandFields = 
+          [1775644884.049] [2326190:2326190] [DMG]                         {
+          [1775644884.049] [2326190:2326190] [DMG]                                 0x0 = 1 (unsigned), 
+          [1775644884.050] [2326190:2326190] [DMG]                         },
+          [1775644884.050] [2326190:2326190] [DMG]                 },
+          [1775644884.050] [2326190:2326190] [DMG]                 
+          [1775644884.050] [2326190:2326190] [DMG]         ],
+          [1775644884.050] [2326190:2326190] [DMG]         
+          [1775644884.050] [2326190:2326190] [DMG]         InteractionModelRevision = 12
+          [1775644884.050] [2326190:2326190] [DMG] },
       disabled: true
 
     - label:
