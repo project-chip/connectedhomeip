@@ -23,6 +23,7 @@ from mobly import asserts
 
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.conformance import ConformanceException
+from matter.testing.decorators import _has_attribute
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.spec_parsing import dm_from_spec_version
 
@@ -224,7 +225,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             ret15 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductLabel)
             asserts.assert_true(isinstance(ret15, str), "ProductLabel should be a string")
             asserts.assert_equal(len(ret15) <= 64, True, "ProductLabel should be a string with max 64 bytes")
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorName):
+            await self._populate_wildcard()
+            if _has_attribute(wildcard=self.stored_global_wildcard, endpoint=self.endpoint, attribute=cluster.Attributes.VendorName):
                 asserts.assert_not_in(
                     vendor_name, ret15, "ProductLabel should not include the name of the vendor as defined within the VendorName attribute")
 
@@ -256,7 +258,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.UniqueID):
             ret19 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.UniqueID)
             asserts.assert_true(isinstance(ret19, str), "UniqueID should be a string")
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
+            await self._populate_wildcard()
+            if _has_attribute(wildcard=self.stored_global_wildcard, endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
                 asserts.assert_not_equal(
                     ret19, serial_number, "UniqueID should not be identical to SerialNumber attribute if SerialNumber attribute is supported")
 
