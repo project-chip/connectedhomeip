@@ -93,8 +93,8 @@ LogProvider::~LogProvider()
             continue;
         }
 
-        errno      = 0;
-        auto rv    = fclose(session.fp);
+        errno   = 0;
+        auto rv = fclose(session.fp);
         if (rv != 0)
         {
             int savedErrno = (errno == 0) ? EIO : errno;
