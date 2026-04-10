@@ -75,7 +75,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Credentials;
 
-extern const char TAG[] = "temperature-measurement-app";
+static const char TAG[] = "temperature-measurement-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 
@@ -133,7 +133,7 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS

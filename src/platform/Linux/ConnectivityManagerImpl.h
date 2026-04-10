@@ -99,6 +99,15 @@ struct GDBusWpaSupplicant
     GAutoPtr<WpaSupplicant1Interface> iface;
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
+
+    // Must be called synchronously on the GLib thread while the GLib main loop is still running.
+    void Reset()
+    {
+        iface.reset();
+        proxy.reset();
+        interfacePath.reset();
+        networkPath.reset();
+    }
 };
 #endif
 
@@ -163,6 +172,9 @@ public:
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
+    // Release GLib objects before the GLib main loop is quit.
+    // Must be called from PlatformManagerImpl::_Shutdown() before g_main_loop_quit().
+    void StopWiFiManagement();
     bool IsWiFiManagementStarted();
     void StartNonConcurrentWiFiManagement();
     int32_t GetDisconnectReason();
@@ -254,6 +266,7 @@ private:
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
     CHIP_ERROR _StartWiFiManagement();
+    CHIP_ERROR _StopWiFiManagement();
 
     bool mAssociationStarted             = false;
     unsigned int mAssociationRetriesLeft = 0;

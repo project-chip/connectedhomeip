@@ -17,12 +17,13 @@
  */
 
 #include "LightSwitch.h"
-#include "AppEvent.h"
 #include "BindingHandler.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
+
+#define CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM 254
 
 using namespace chip;
 using namespace chip::app;
@@ -73,6 +74,105 @@ void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t acti
             Platform::Delete(data);
             return;
         }
+        // ScheduleWork is asynchronous and returns immediately.
+        // Failure means the work couldn't be queued, but there's nothing
+        // we can do about it here, so the return value can be safely ignored.
+        RETURN_SAFELY_IGNORED(
+            DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
+    }
+}
+
+void LightSwitch::DimmerChangeBrightness(chip::EndpointId endpointId, uint8_t brightness)
+{
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
+    if (!bindingTable.Size())
+    {
+        ChipLogError(DeviceLayer, "bindingTable empty");
+        return;
+    }
+
+    BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
+
+    if (data)
+    {
+        data->EndpointId = endpointId;
+        data->CommandId  = Clusters::LevelControl::Commands::MoveToLevel::Id;
+        data->ClusterId  = Clusters::LevelControl::Id;
+        data->Value   = (brightness > CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM ? CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM : brightness);
+        data->IsGroup = false;
+
+        for (auto & entry : bindingTable)
+        {
+            if (endpointId == entry.local && Binding::MATTER_MULTICAST_BINDING == entry.type)
+            {
+                data->IsGroup = true;
+                break;
+            }
+        }
+
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    }
+}
+
+void LightSwitch::ColorChange(chip::EndpointId endpointId, uint16_t colorX, uint16_t colorY)
+{
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
+    if (!bindingTable.Size())
+    {
+        ChipLogError(DeviceLayer, "bindingTable empty");
+        return;
+    }
+
+    BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
+    if (data)
+    {
+        data->EndpointId = endpointId;
+        data->CommandId  = Clusters::ColorControl::Commands::MoveToColor::Id;
+        data->ClusterId  = Clusters::ColorControl::Id;
+        data->ColorXY.x  = colorX;
+        data->ColorXY.y  = colorY;
+        data->IsGroup    = false;
+
+        for (auto & entry : bindingTable)
+        {
+            if (endpointId == entry.local && Binding::MATTER_MULTICAST_BINDING == entry.type)
+            {
+                data->IsGroup = true;
+                break;
+            }
+        }
+
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    }
+}
+
+void LightSwitch::ColorTemperatureChange(chip::EndpointId endpointId, uint16_t colorTemperatureMireds)
+{
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
+    if (!bindingTable.Size())
+    {
+        ChipLogError(DeviceLayer, "bindingTable empty");
+        return;
+    }
+
+    BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
+    if (data)
+    {
+        data->EndpointId             = endpointId;
+        data->CommandId              = Clusters::ColorControl::Commands::MoveToColorTemperature::Id;
+        data->ClusterId              = Clusters::ColorControl::Id;
+        data->ColorTemperatureMireds = colorTemperatureMireds;
+        data->IsGroup                = false;
+
+        for (auto & entry : bindingTable)
+        {
+            if (endpointId == entry.local && Binding::MATTER_MULTICAST_BINDING == entry.type)
+            {
+                data->IsGroup = true;
+                break;
+            }
+        }
+
         DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     }
 }

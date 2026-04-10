@@ -385,6 +385,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
             return mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         }
     }
+
     return result;
 }
 

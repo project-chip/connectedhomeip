@@ -20,7 +20,7 @@
 #include "FreeRTOSConfig.h"
 #include "silabs_utils.h"
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
-#include <app/util/attribute-storage.h>
+
 #include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>

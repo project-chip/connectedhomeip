@@ -1784,7 +1784,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 9;
+  revision 11;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -2199,7 +2199,7 @@ cluster Thermostat = 513 {
     optional int16u timeout = 2;
   }
 
-  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
+  /** This command will raise or lower the setpoint based on the provided values. */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
@@ -2207,11 +2207,13 @@ cluster Thermostat = 513 {
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** This command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
+  /** This command will set the active schedule to the provided schedule handle. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
-  /** ID */
+  /** This command will set the active preset to the provided preset handle. */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command will add a new suggestion based on the specified values. */
   command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
@@ -3085,7 +3087,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -3153,7 +3155,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0006;
 
     handle command Step;
   }
@@ -3192,7 +3194,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
@@ -3211,7 +3213,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -3230,7 +3232,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -3249,7 +3251,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -3268,7 +3270,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -3287,7 +3289,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -3306,7 +3308,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -3325,7 +3327,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -3344,7 +3346,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -3363,7 +3365,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -3382,7 +3384,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 }
 endpoint 3 {
@@ -3464,7 +3466,7 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 }
 endpoint 5 {
