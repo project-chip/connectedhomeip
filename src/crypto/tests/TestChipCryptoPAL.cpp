@@ -676,15 +676,18 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataBuffer)
     EXPECT_EQ(buffer.Length(), buffer.Span().size());
 
     // Test sanitization of entire buffer (even though length < capacity)
+    [[maybe_unused]] const void * bufferStorage = buffer.ConstBytes();
+    buffer.~Buffer();
     // This check reads memory after the SensitiveDataBuffer destructor is called explicitly to verify secure erasure.
-    // MSan (correctly) flags the memcpy after destructor call as use-of-uninitialized-value, so skip under MSan.
+    // MSan (correctly) flags the memcmp after destructor call as use-of-uninitialized-value, so skip under MSan.
 #if !CHIP_MEMORY_SANITIZER_ENABLED
     const uint8_t kAllZeros[kCapacity] = { 0 };
-    const void * bufferStorage         = buffer.ConstBytes();
-    buffer.~Buffer();
     EXPECT_EQ(memcmp(bufferStorage, kAllZeros, kCapacity), 0);
     EXPECT_TRUE(memcmp(bufferStorage, testVector, kCapacity));
 #endif
+
+    // Reconstruct so the automatic destructor at scope exit does not double-destroy.
+    new (&buffer) Buffer();
 }
 
 TEST_F(TestChipCryptoPAL, TestSensitiveDataFixedBuffer)
@@ -706,13 +709,13 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataFixedBuffer)
     EXPECT_EQ(buffer.ConstBytes(), buffer.Span().data());
     EXPECT_EQ(memcmp(buffer.ConstBytes(), testVector, kCapacity), 0);
 
-    // Test sanitization
+    // Verify that the destructor clears sensitive data
+    [[maybe_unused]] const void * bufferStorage = buffer.ConstBytes();
+    buffer.~Buffer();
     // This check reads memory after the SensitiveDataBuffer destructor is called explicitly to verify secure erasure.
-    // MSan (correctly) flags the memcpy after destructor call as use-of-uninitialized-value, so skip under MSan.
+    // MSan (correctly) flags the memcmp after destructor call as use-of-uninitialized-value, so skip under MSan.
 #if !CHIP_MEMORY_SANITIZER_ENABLED
     const uint8_t kAllZeros[kCapacity] = { 0 };
-    const void * bufferStorage         = buffer.ConstBytes();
-    buffer.~Buffer();
     EXPECT_EQ(memcmp(bufferStorage, kAllZeros, kCapacity), 0);
     EXPECT_TRUE(memcmp(bufferStorage, testVector, kCapacity));
 #endif
