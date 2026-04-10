@@ -159,6 +159,7 @@ class TC_SC_5_2(MatterBaseTest):
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "11")
         else:
+            dev_ctrl.SetGroupInfo(0x0103, "Group #3")
             # Step 3: GroupKeyMap binding
             self.step("3")
             mapping = [
