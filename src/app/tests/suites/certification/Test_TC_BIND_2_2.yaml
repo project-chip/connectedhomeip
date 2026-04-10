@@ -268,12 +268,21 @@ tests:
           Endpoints=[EP1], KeySetID=1, Key=(randomly generated) key to TH2
           endpoint 0."
       verification: |
-          Run this command for DUT in chip-tool:
           ./chip-tool groupcast join-group 0x1 [] 0x1 74 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
 
-          Run this command for lighting app TH2 in chip-tool:
+          Verify the SUCCESS status response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+        
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+        
           ./chip-tool groupcast join-group 0x1 [1] 0x1 2 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
-          TH2 responds with SUCCESS
+        
+          Verify that TH2 responds with SUCCESS response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+        
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
 
           Run this commands on chip-tool TH1 so it can also use the Key also
           ./chip-tool groupsettings add-group 0x1 grp1 --addressPolicy 0
