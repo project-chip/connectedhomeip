@@ -787,8 +787,7 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
         if (mFailOnPasscodeMismatch)
         {
             // Stop all discovery and PASE attempts now instead of waiting for the discovery timeout.
-            ChipLogProgress(Controller,
-                            "SecurePairingFailed with mFailOnPasscodeMismatch set; aborting pairing immediately");
+            ChipLogProgress(Controller, "SecurePairingFailed with mFailOnPasscodeMismatch set; aborting pairing immediately");
             if (mWaitingForPASE)
             {
                 PASEEstablishmentComplete();
@@ -818,7 +817,6 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
                 return;
             }
         }
-
     }
 
     if (mPairingDelegate)
