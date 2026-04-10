@@ -97,6 +97,51 @@ unnecessary overhead.
         interactions. We recommend the term `Driver` to avoid confusion with the
         overloaded term `Delegate`.
 
+#### Cluster Initialization and Configuration (Builder Pattern)
+
+To ensure that a cluster is initialized correctly and that feature flags remain in sync with their mandatory attributes or parameters, all new code-driven clusters should use a **builder-style Config struct** pattern. This pattern prevents common errors where a feature is enabled but its mandatory parameters are missing.
+
+**Reference Example:** The [Level Control Cluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/level-control/LevelControlCluster.h) is the primary reference for this implementation pattern.
+
+**Pattern Principles:**
+*   **Nested Config Struct:** Define a `struct Config` within the main cluster class to hold all startup state.
+*   **Fluent Builder API:** Provide `With<Feature>(...)` methods that return a reference to the `Config` object to allow for chained configuration calls.
+*   **Atomic Configuration:** Methods must handle both the `FeatureMap` bit setting and the initialization of any associated attributes to prevent invalid states.
+*   **Encapsulated Logic:** This approach encapsulates the cluster's complex conformance logic directly into the configuration API, making it much harder for application developers to create an invalid configuration.
+
+**Example Implementation (from LevelControlCluster):**
+
+```cpp
+class LevelControlCluster : public DefaultServerCluster ...
+{
+public:
+    struct Config
+    {
+        Config(EndpointId endpoint, TimerDelegate & timerDelegate, LevelControlDelegate & delegate) :
+            mEndpointId(endpoint), mDelegate(delegate), mTimerDelegate(timerDelegate) {}
+
+        // Automatically sets the Lighting feature and sets required attribute values
+        Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
+        {
+            mFeatureMap.Set(LevelControl::Feature::kLighting);
+            WithMinLevel(1);   // Spec mandates MinLevel=1 for Lighting feature
+            WithMaxLevel(254); // Spec mandates MaxLevel=254 for Lighting feature
+            mStartUpCurrentLevel = startUpCurrentLevel;
+            return *this;
+        }
+
+        EndpointId mEndpointId;
+        LevelControlDelegate & mDelegate;
+        TimerDelegate & mTimerDelegate;
+        BitMask<LevelControl::Feature> mFeatureMap;
+        DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
+        // ... other members
+    };
+
+    LevelControlCluster(const Config & config);
+};
+```
+
 ### Design Principles
 
 When designing and implementing a cluster, adhere to the following principles to
