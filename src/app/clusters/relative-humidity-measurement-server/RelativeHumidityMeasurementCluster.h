@@ -24,49 +24,37 @@
 
 namespace chip::app::Clusters {
 
-class RelativeHumidityMeasurementCluster;
-
-// Fixed configuration for RelativeHumidityMeasurementCluster. MinMeasuredValue,
-// MaxMeasuredValue, and Tolerance reflect hardware characteristics and do not
-// change at runtime. Use WithTolerance() to enable the optional Tolerance
-// attribute — this ensures both the value and the attribute presence flag are
-// always set together.
-class RelativeHumidityMeasurementConfig
-{
-public:
-    DataModel::Nullable<uint16_t> minMeasuredValue{};
-    DataModel::Nullable<uint16_t> maxMeasuredValue{};
-
-    RelativeHumidityMeasurementConfig & WithTolerance(uint16_t value)
-    {
-        mTolerance = value;
-        mOptionalAttributeSet.template Set<RelativeHumidityMeasurement::Attributes::Tolerance::Id>();
-        return *this;
-    }
-
-private:
-    friend class RelativeHumidityMeasurementCluster;
-    app::OptionalAttributeSet<RelativeHumidityMeasurement::Attributes::Tolerance::Id> mOptionalAttributeSet{};
-    uint16_t mTolerance{};
-};
-
 class RelativeHumidityMeasurementCluster : public DefaultServerCluster
 {
 public:
     using OptionalAttributeSet = app::OptionalAttributeSet<RelativeHumidityMeasurement::Attributes::Tolerance::Id>;
-    using Config               = RelativeHumidityMeasurementConfig;
 
-    RelativeHumidityMeasurementCluster(EndpointId endpointId, const Config & config = {});
+    struct Config
+    {
+        Config() : minMeasuredValue(), maxMeasuredValue(), mOptionalAttributeSet(), mTolerance(0) {}
 
-    // ServerClusterInterface implementation
+        Config & WithTolerance(uint16_t value)
+        {
+            mTolerance = value;
+            mOptionalAttributeSet.template Set<RelativeHumidityMeasurement::Attributes::Tolerance::Id>();
+            return *this;
+        }
+
+        DataModel::Nullable<uint16_t> minMeasuredValue;
+        DataModel::Nullable<uint16_t> maxMeasuredValue;
+        OptionalAttributeSet mOptionalAttributeSet;
+        uint16_t mTolerance;
+    };
+
+    explicit RelativeHumidityMeasurementCluster(EndpointId endpointId);
+    RelativeHumidityMeasurementCluster(EndpointId endpointId, const Config & config);
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // Setter — intended for application use to push new sensor readings
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<uint16_t> measuredValue);
 
-    // Getters
     DataModel::Nullable<uint16_t> GetMeasuredValue() const { return mMeasuredValue; }
     DataModel::Nullable<uint16_t> GetMinMeasuredValue() const { return mMinMeasuredValue; }
     DataModel::Nullable<uint16_t> GetMaxMeasuredValue() const { return mMaxMeasuredValue; }

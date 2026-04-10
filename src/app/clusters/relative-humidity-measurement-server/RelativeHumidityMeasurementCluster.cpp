@@ -31,6 +31,10 @@ constexpr uint16_t kMeasuredValueMax = 10000;
 // Spec-defined upper bound for Tolerance
 constexpr uint16_t kMaxTolerance = 2048;
 
+RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId) :
+    RelativeHumidityMeasurementCluster(endpointId, Config{})
+{}
+
 RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, RelativeHumidityMeasurement::Id }), mOptionalAttributeSet(config.mOptionalAttributeSet)
 {
