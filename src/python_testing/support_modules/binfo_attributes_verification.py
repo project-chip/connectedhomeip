@@ -346,7 +346,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(24)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret24 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(isinstance(ret24, Nullable) or isinstance(ret24, Globals.Structs.LocationDescriptorStruct),
+            asserts.assert_true(isinstance(ret24, (Nullable, Globals.Structs.LocationDescriptorStruct)),
                                 "DeviceLocation should be a null or LocationDescriptorStruct")
             if not isinstance(ret24, Nullable):
                 asserts.assert_is_not_none(ret24.locationName, "LocationName should not be null")
