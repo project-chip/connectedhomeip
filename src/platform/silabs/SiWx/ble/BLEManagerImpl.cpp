@@ -85,6 +85,8 @@ const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00
                                               0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
+static uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
+
 // Used to send the Indication Confirmation
 uint8_t dev_address[RSI_DEV_ADDR_LEN];
 uint16_t rsi_ble_measurement_hndl;
@@ -244,6 +246,16 @@ void BLEManagerImpl::BlePostEvent(SilabsBleWrapper::BleEvent_t * event)
     }
 }
 
+CHIP_ERROR BLEManagerImpl::PrintBLEInfo() const
+{
+    ChipLogProgress(DeviceLayer, "BLE Info:");
+    ChipLogProgress(DeviceLayer, "  Service Mode: %d", mServiceMode);
+    ChipLogProgress(DeviceLayer, "  Device Name: %s", mDeviceName);
+    ChipLogProgress(DeviceLayer, "  Random Static Address: %02X:%02X:%02X:%02X:%02X:%02X", randomAddrBLE[5], randomAddrBLE[4],
+                    randomAddrBLE[3], randomAddrBLE[2], randomAddrBLE[1], randomAddrBLE[0]);
+    return CHIP_NO_ERROR;
+}
+
 void BLEManagerImpl::sl_ble_event_handling_task(void * args)
 {
     sl_status_t status;
@@ -269,8 +281,7 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
 
 void BLEManagerImpl::sl_ble_init()
 {
-    uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
-    uint64_t randomAddr                        = chip::Crypto::GetRandU64();
+    uint64_t randomAddr = chip::Crypto::GetRandU64();
     memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
     // Set the two least significant bits as the first 2 bits of the address has to be '11' to ensure the address is a random
     // non-resolvable private address

@@ -620,6 +620,34 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptInvalidNonceLen)
     EXPECT_GT(numOfTestsRan, 0);
 }
 
+TEST_F(TestChipCryptoPAL, TestSymmetricKeyHandleOpaqueBytesRoundTrip)
+{
+    HeapChecker heapChecker;
+
+    constexpr Symmetric128BitsKeyByteArray keyBytes = { 0xd0, 0x0f };
+    constexpr uint8_t nonce[NONCE_LENGTH]           = { 0xf0, 0x0d };
+    constexpr uint8_t plaintext[16]                 = { 0xca, 0xfe };
+
+    // Create an arbitrary Aes128KeyHandle
+    DefaultSessionKeystore keystore;
+    Aes128KeyHandle originalHandle;
+    ASSERT_SUCCESS(keystore.CreateKey(keyBytes, originalHandle));
+
+    // Simulate a roundtrip into a new handle via persistent storage using OpaqueBytes.
+    Aes128KeyHandle restoredHandle;
+    memcpy(restoredHandle.OpaqueBytes().data(), originalHandle.OpaqueBytes().data(), Aes128KeyHandle::Size());
+
+    // Verify the two handles reference the same key by round-tripping some data
+    uint8_t ciphertext[16];
+    ASSERT_SUCCESS(AES_CTR_crypt(plaintext, sizeof(plaintext), originalHandle, nonce, NONCE_LENGTH, ciphertext));
+    uint8_t recovered[16];
+    ASSERT_SUCCESS(AES_CTR_crypt(ciphertext, sizeof(ciphertext), restoredHandle, nonce, NONCE_LENGTH, recovered));
+    EXPECT_EQ(memcmp(recovered, plaintext, sizeof(plaintext)), 0);
+
+    // Destroy the key via the restored handle only
+    keystore.DestroyKey(restoredHandle);
+}
+
 TEST_F(TestChipCryptoPAL, TestSensitiveDataBuffer)
 {
     HeapChecker heapChecker;
