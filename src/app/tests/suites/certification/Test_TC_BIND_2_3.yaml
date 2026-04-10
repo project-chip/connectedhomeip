@@ -297,7 +297,7 @@ tests:
           [1775212536.718] [8171:8173] [DMG]                                 {
           [1775212536.718] [8171:8173] [DMG]                                         status = 0x00 (SUCCESS),
           [1775212536.718] [8171:8173] [DMG]                                 },
-    disabled: true
+      disabled: true
 
     - label: "Step 13b: TH1 reads OnOff attribute from TH2 (Endpoint 1)"
       verification: |
