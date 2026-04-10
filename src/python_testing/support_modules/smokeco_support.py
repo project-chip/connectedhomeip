@@ -35,7 +35,7 @@ class SmokeCoBaseTest(MatterBaseTest):
     pixit_test_event_critical_smoke_alarm = 0x005c00000000009c
     pixit_test_event_clear_smoke_alarm = 0x005c0000000000a0
 
-    pixit_test_event_warning_co_alarm =  0x005c000000000091
+    pixit_test_event_warning_co_alarm = 0x005c000000000091
     pixit_test_event_critical_co_alarm = 0x005c00000000009d
     pixit_test_event_clear_co_alarm = 0x005c0000000000a1
 
@@ -87,7 +87,6 @@ class SmokeCoBaseTest(MatterBaseTest):
             self.write_to_app_pipe(command_dict=command_dict)
         else:
             self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
-
 
     async def alarm_primary_functionality_base_test(self, state_attribute, alarm_event, expressed_state_enum_value, pixit_warning, pixit_critical, pixit_clear):
         """Define what attributes,events,enum values and pixit to use depending if is smoke alarm or co alarm for tests SMOKECO 2.2 and SMOKECO 2.3."""
