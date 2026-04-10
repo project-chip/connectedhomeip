@@ -842,14 +842,7 @@ PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::Devic
 
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    CommissioningParameters params;
-
-    /* This section is needed for --in-test-commissioning-method and SetSkipCommissioningComplete(True) */
-    if (auto skip = sCommissioningParameters.GetSkipCommissioningComplete(); skip.HasValue())
-    {
-        params.SetSkipCommissioningComplete(skip.Value());
-    }
-
+    CommissioningParameters params = sCommissioningParameters;
     return ToPyChipError(devCtrl->Commission(nodeid, params));
 }
 

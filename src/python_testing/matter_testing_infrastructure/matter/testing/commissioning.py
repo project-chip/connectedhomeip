@@ -126,7 +126,21 @@ class PairingStatus:
 
 
 class CommissioningMethod(ABC):
-    def __init__(self, dev_ctrl, node_id, info, commissioning_info):
+    def __init__(
+        self,
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+        node_id: int,
+        info: SetupPayloadInfo,
+        commissioning_info: CommissioningInfo
+    ):
+        """
+        Args:
+            dev_ctrl: Controller used to interact with the device.
+            node_id: Node ID assigned to the DUT.
+            info: Setup payload information (discriminator, passcode, etc). Used to establish PASE and identify the device.
+            commissioning_info: Additional commissioning parameters (WiFi credentials, Thread dataset, etc.).
+        """
+
         self.dev_ctrl = dev_ctrl
         self.node_id = node_id
         self.info = info
@@ -140,6 +154,14 @@ class CommissioningMethod(ABC):
         return await self._commission()
 
     def _set_tc_ack_if_needed(self):
+        """
+        Configure Terms & Conditions acknowledgements in the controller.
+
+        NOTE:
+        This does not need to be passed explicitly to Commission().
+        The controller internally uses this configuration during commissioning.
+        """
+
         if (
             self.commissioning_info.tc_version_to_simulate is not None
             and self.commissioning_info.tc_user_response_to_simulate is not None
@@ -347,14 +369,10 @@ async def commission_device(
         await commissioning.start()
         return PairingStatus()
 
-    except ChipStackError as e:  # chipstack-ok
-        LOGGER.exception("Commissioning failed")
-        return PairingStatus(exception=e)
     except Exception as e:
-        # Intentionally catch unexpected exceptions here and convert them to a
-        # PairingStatus failure so the test infrastructure reports commissioning
-        # failures uniformly instead of crashing the test runner.
-        LOGGER.exception("Commissioning failed")
+        # Catch unexpected errors to avoid crashing test infrastructure.
+        # These are surfaced as PairingStatus failures instead.
+        LOGGER.exception("Unexpected commissioning failure")
         return PairingStatus(exception=e)
 
 
