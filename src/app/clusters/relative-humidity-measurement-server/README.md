@@ -80,8 +80,9 @@ CHIP_ERROR err = chip::app::Clusters::RelativeHumidityMeasurement::SetMeasuredVa
 
 ## Configuring min/max range and tolerance
 
-`MinMeasuredValue`, `MaxMeasuredValue`, and `Tolerance` are fixed attributes. They are configured once at startup via the `Config` struct and
-cannot be changed at runtime.
+`MinMeasuredValue`, `MaxMeasuredValue`, and `Tolerance` are fixed attributes.
+They are configured once at startup via the `Config` struct and cannot be
+changed at runtime.
 
 If you need to set them via code (e.g. in tests or for dynamic endpoints), pass
 a `Config` at construction time:
