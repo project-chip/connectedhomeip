@@ -70,7 +70,7 @@ struct CommonTestElements
 
     CheckOnlyServer server;
     QueryResponder<10> queryResponder;
-    Inet::IPPacketInfo packetInfo;
+    Inet::IPPacketInfo packetInfo{};
 
     CommonTestElements(const char * tag) :
         recordWriter(&requestBufferWriter),
