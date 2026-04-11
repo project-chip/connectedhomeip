@@ -1340,11 +1340,14 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetTCPConnection() == conn)
         {
-            if (session->IsActiveSession())
+            bool isActive = session->IsActiveSession();
+            SessionHandle handle(*session);
+
+            if (isActive)
             {
-                SessionHandle handle(*session);
                 // Notify the SessionConnection delegate of the connection
-                // closure.
+                // closure before session eviction detaches holders and
+                // releases exchanges.
                 if (mConnDelegate != nullptr)
                 {
                     mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);

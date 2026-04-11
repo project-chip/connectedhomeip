@@ -273,12 +273,12 @@ TEST_F(TestTCPConnection, TestDefunctSecureSessionReleaseOnConnectionClose)
     // Drive IO to process TCP closure and session eviction logic
     mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(1), [&]() { return false; });
 
-    // 5. Exhaust the pool.
-    // Since kMaxTcpActiveConnectionCount = 2, we have 1 outgoing and 1 incoming slot total.
-    // If the defunct session still held the first connection's refcount (Slot 0),
-    // and we establish a second connection (Slot 1), a third attempt MUST fail.
-
-    // 5.1 Use the 2nd (and last) available slot
+    // Verify the closed connection's slot was released.
+    // With loopback and kMaxTcpActiveConnectionCount = 2,
+    // a new connection needs both slots.
+    // If the defunct secure session still retains the closed
+    // connection handle, this reconnect will fail due to pool
+    // exhaustion.
     ActiveTCPConnectionHandle secondConnHandle;
     EXPECT_SUCCESS(mTCP.TCPConnect(peerAddr, nullptr, secondConnHandle));
 
@@ -286,12 +286,6 @@ TEST_F(TestTCPConnection, TestDefunctSecureSessionReleaseOnConnectionClose)
                              [&]() { return !secondConnHandle.IsNull() && secondConnHandle->IsConnected(); });
     ASSERT_FALSE(secondConnHandle.IsNull());
     ASSERT_TRUE(secondConnHandle->IsConnected());
-
-    // 5.2 Attempt a 3rd connection. This MUST fail if there is a leak.
-    ActiveTCPConnectionHandle thirdConnHandle;
-    CHIP_ERROR err = mTCP.TCPConnect(peerAddr, nullptr, thirdConnHandle);
-    EXPECT_NE(err, CHIP_NO_ERROR);
-    EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
 }
 
 } // namespace
