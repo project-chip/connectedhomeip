@@ -1341,7 +1341,6 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
         if (session->GetTCPConnection() == conn)
         {
             bool isActive = session->IsActiveSession();
-            SessionHandle handle(*session);
 
             if (isActive)
             {
@@ -1350,6 +1349,7 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
                 // releases exchanges.
                 if (mConnDelegate != nullptr)
                 {
+                    SessionHandle handle(*session);
                     mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
                 }
             }
