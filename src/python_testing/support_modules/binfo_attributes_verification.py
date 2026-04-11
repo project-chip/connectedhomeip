@@ -23,7 +23,7 @@ from mobly import asserts
 
 from matter.clusters import Globals
 from matter.clusters.ClusterObjects import Cluster
-from matter.clusters.Types import Nullable
+from matter.clusters.Types import Nullable, NullValue
 from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.spec_parsing import dm_from_spec_version
@@ -362,7 +362,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(25)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             attr_val = cluster.Attributes.DeviceLocation(
-                Globals.Structs.LocationDescriptorStruct(locationName="", floorNumber=-1, areaType=None))
+                Globals.Structs.LocationDescriptorStruct(locationName="", floorNumber=-1, areaType=NullValue))
             await self.write_single_attribute(attribute_value=attr_val, endpoint_id=self.endpoint, expect_success=True)
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
@@ -375,7 +375,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                                 "DeviceLocation should be a LocationDescriptorStruct")
             asserts.assert_equal(ret26.locationName, "", "LocationName should be an empty string")
             asserts.assert_equal(ret26.floorNumber, -1, "FloorNumber should be -1")
-            asserts.assert_equal(ret26.areaType, None, "AreaType should be null")
+            asserts.assert_equal(ret26.areaType, NullValue, "AreaType should be null")
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
