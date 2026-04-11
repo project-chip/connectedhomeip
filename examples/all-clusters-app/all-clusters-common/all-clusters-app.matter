@@ -7417,6 +7417,8 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
+    callback attribute extAddress;
+    callback attribute rloc16;
     ram      attribute featureMap default = 0x000F;
     callback attribute clusterRevision;
 
@@ -8961,6 +8963,9 @@ endpoint 4 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+
+    handle command Identify;
+    handle command TriggerEffect;
   }
 
   server cluster Descriptor {
