@@ -232,4 +232,66 @@ TEST_F(TestTCPConnection, TestUnauthenticatedSessionReleaseOnConnectionClose)
     EXPECT_SUCCESS(mTCP.TCPConnect(peerAddr, nullptr, connHandle));
 }
 
+TEST_F(TestTCPConnection, TestDefunctSecureSessionReleaseOnConnectionClose)
+{
+    uint16_t port;
+    EXPECT_SUCCESS(InitTCP(port));
+    EXPECT_SUCCESS(InitSessionManager());
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    // Connect to self (loopback)
+    Transport::PeerAddress peerAddr = Transport::PeerAddress::TCP(addr, port);
+
+    // 1. Establish initial connection
+    ActiveTCPConnectionHandle connHandle;
+    EXPECT_SUCCESS(mTCP.TCPConnect(peerAddr, nullptr, connHandle));
+
+    mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5),
+                             [&]() { return !connHandle.IsNull() && connHandle->IsConnected(); });
+    ASSERT_FALSE(connHandle.IsNull());
+    ASSERT_TRUE(connHandle->IsConnected());
+
+    // 2. Inject a Secure CASE Session associated with this connection
+    SessionHolder sessionHolder;
+    EXPECT_SUCCESS(mSessionManager.InjectCaseSessionWithTestKey(sessionHolder, 1, 2, 1234, 5678, 1, peerAddr,
+                                                                CryptoContext::SessionRole::kInitiator));
+
+    // Manually link the TCP connection handle to the session
+    sessionHolder->AsSecureSession()->SetTCPConnection(connHandle);
+
+    // 3. Mark the session as DEFUNCT
+    sessionHolder->AsSecureSession()->MarkAsDefunct();
+    ASSERT_FALSE(sessionHolder->AsSecureSession()->IsActiveSession());
+
+    // 4. Simulate TCP connection closure
+    // Close TCP connection & release local handle
+    connHandle->ForceDisconnect();
+    connHandle.Release();
+
+    // Drive IO to process TCP closure and session eviction logic
+    mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(1), [&]() { return false; });
+
+    // 5. Exhaust the pool.
+    // Since kMaxTcpActiveConnectionCount = 2, we have 1 outgoing and 1 incoming slot total.
+    // If the defunct session still held the first connection's refcount (Slot 0),
+    // and we establish a second connection (Slot 1), a third attempt MUST fail.
+
+    // 5.1 Use the 2nd (and last) available slot
+    ActiveTCPConnectionHandle secondConnHandle;
+    EXPECT_SUCCESS(mTCP.TCPConnect(peerAddr, nullptr, secondConnHandle));
+
+    mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5),
+                             [&]() { return !secondConnHandle.IsNull() && secondConnHandle->IsConnected(); });
+    ASSERT_FALSE(secondConnHandle.IsNull());
+    ASSERT_TRUE(secondConnHandle->IsConnected());
+
+    // 5.2 Attempt a 3rd connection. This MUST fail if there is a leak.
+    ActiveTCPConnectionHandle thirdConnHandle;
+    CHIP_ERROR err = mTCP.TCPConnect(peerAddr, nullptr, thirdConnHandle);
+    EXPECT_NE(err, CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
+}
+
 } // namespace
