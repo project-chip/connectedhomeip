@@ -1033,8 +1033,8 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 TEST_F(TestGroupcastCluster, TestReplaceEndpointsSucceedsProperly)
 {
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
-    GroupId kGroup1   = 0xab01;
-    KeysetId kKeyset1 = 0xabcd;
+    GroupId kGroup1     = 0xab01;
+    KeysetId kKeyset1   = 0xabcd;
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
@@ -1055,37 +1055,33 @@ TEST_F(TestGroupcastCluster, TestReplaceEndpointsSucceedsProperly)
     app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
     ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership0[] = {
-        {
-            .groupID         = kGroup1,
-            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(initialEndpoints, MATTER_ARRAY_SIZE(initialEndpoints))),
-            .keySetID        = kKeyset1,
-            .hasAuxiliaryACL = MakeOptional(true),
-            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
-        }
-    };
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership0[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(initialEndpoints, MATTER_ARRAY_SIZE(initialEndpoints))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
     ValidateMembership(memberships, expectedMembership0, MATTER_ARRAY_SIZE(expectedMembership0));
 
     // Replace with 8 members
     EndpointId replacementEndpoints[8] = { 11, 12, 13, 14, 15, 16, 17, 18 };
     data.key.ClearValue();
     data.replaceEndpoints = MakeOptional(true);
-    data.endpoints = DataModel::List<const EndpointId>(replacementEndpoints, MATTER_ARRAY_SIZE(replacementEndpoints));
+    data.endpoints        = DataModel::List<const EndpointId>(replacementEndpoints, MATTER_ARRAY_SIZE(replacementEndpoints));
 
     result = tester.Invoke(Commands::JoinGroup::Id, data);
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
     ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership1[] = {
-        {
-            .groupID         = kGroup1,
-            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(replacementEndpoints, MATTER_ARRAY_SIZE(replacementEndpoints))),
-            .keySetID        = kKeyset1,
-            .hasAuxiliaryACL = MakeOptional(true),
-            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
-        }
-    };
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership1[] = { {
+        .groupID   = kGroup1,
+        .endpoints = MakeOptional(DataModel::List<const EndpointId>(replacementEndpoints, MATTER_ARRAY_SIZE(replacementEndpoints))),
+        .keySetID  = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
     ValidateMembership(memberships, expectedMembership1, MATTER_ARRAY_SIZE(expectedMembership1));
 
     // Add 40 endpoints (requires 2 JoinGroup commands)
@@ -1114,15 +1110,13 @@ TEST_F(TestGroupcastCluster, TestReplaceEndpointsSucceedsProperly)
     }
 
     ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership2[] = {
-        {
-            .groupID         = kGroup1,
-            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(expectedForty, MATTER_ARRAY_SIZE(expectedForty))),
-            .keySetID        = kKeyset1,
-            .hasAuxiliaryACL = MakeOptional(true),
-            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
-        }
-    };
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership2[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(expectedForty, MATTER_ARRAY_SIZE(expectedForty))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
     ValidateMembership(memberships, expectedMembership2, MATTER_ARRAY_SIZE(expectedMembership2));
 
     // JoinGroup with replace endpoints that adds only 1 endpoint
@@ -1133,15 +1127,13 @@ TEST_F(TestGroupcastCluster, TestReplaceEndpointsSucceedsProperly)
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
     ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership3[] = {
-        {
-            .groupID         = kGroup1,
-            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(oneEndpoint, MATTER_ARRAY_SIZE(oneEndpoint))),
-            .keySetID        = kKeyset1,
-            .hasAuxiliaryACL = MakeOptional(true),
-            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
-        }
-    };
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership3[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(oneEndpoint, MATTER_ARRAY_SIZE(oneEndpoint))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
     ValidateMembership(memberships, expectedMembership3, MATTER_ARRAY_SIZE(expectedMembership3));
 
     // Add 40 more endpoints
@@ -1162,15 +1154,13 @@ TEST_F(TestGroupcastCluster, TestReplaceEndpointsSucceedsProperly)
     }
 
     ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership4[] = {
-        {
-            .groupID         = kGroup1,
-            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(expectedFortyOne, MATTER_ARRAY_SIZE(expectedFortyOne))),
-            .keySetID        = kKeyset1,
-            .hasAuxiliaryACL = MakeOptional(true),
-            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
-        }
-    };
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership4[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(expectedFortyOne, MATTER_ARRAY_SIZE(expectedFortyOne))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
     ValidateMembership(memberships, expectedMembership4, MATTER_ARRAY_SIZE(expectedMembership4));
 }
 
