@@ -54,15 +54,15 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager   = mContext.configurationManager,       //
-                .deviceControlServer    = mContext.deviceControlServer,        //
-                .fabricTable            = mContext.fabricTable,                //
-                .failSafeContext        = mContext.failSafeContext,            //
-                .platformManager        = mContext.platformManager,            //
+            .configurationManager       = mContext.configurationManager,       //
+            .deviceControlServer        = mContext.deviceControlServer,        //
+            .fabricTable                = mContext.fabricTable,                //
+            .failSafeContext            = mContext.failSafeContext,            //
+            .platformManager            = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -94,12 +94,10 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     mGroupcastCluster.Create(
-        GroupcastContext{
-            .fabricTable       = mContext.fabricTable,
-            .groupDataProvider = mContext.groupDataProvider,
-            .timerDelegate     = mContext.timerDelegate,
-            .accessControl     = mContext.accessControl
-        },
+        GroupcastContext{ .fabricTable       = mContext.fabricTable,
+                          .groupDataProvider = mContext.groupDataProvider,
+                          .timerDelegate     = mContext.timerDelegate,
+                          .accessControl     = mContext.accessControl },
         BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender));
     ReturnErrorOnFailure(provider.AddCluster(mGroupcastCluster.Registration()));
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST

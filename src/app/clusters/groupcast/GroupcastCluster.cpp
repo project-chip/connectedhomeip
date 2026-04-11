@@ -108,7 +108,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
 
     const chip::Access::SubjectDescriptor subjectDescriptor = request.subjectDescriptor;
-    FabricIndex fabric_index = subjectDescriptor.fabricIndex;
+    FabricIndex fabric_index                                = subjectDescriptor.fabricIndex;
 
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
 
@@ -357,8 +357,8 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
                                    const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
-    GroupDataProvider & groups = Provider();
-    CHIP_ERROR err             = CHIP_NO_ERROR;
+    GroupDataProvider & groups    = Provider();
+    CHIP_ERROR err                = CHIP_NO_ERROR;
 
     // Check GroupID and KeySetID constraints.
     VerifyOrReturnError(data.groupID != kUndefinedGroupId, Status::ConstraintError);
@@ -372,8 +372,11 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
 
         // AuxiliaryACL state can only be touched if the client has admin privileges, but this is called from a command that only
         // require Manage privileges. We do the check here before touching AuxACL.
-        Access::RequestPath requestPath{path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest, std::make_optional<uint32_t>(path.mCommandId)};
-        VerifyOrReturnError(CHIP_NO_ERROR == mGroupcastContext.accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister), Status::UnsupportedAccess);
+        Access::RequestPath requestPath{ path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest,
+                                         std::make_optional<uint32_t>(path.mCommandId) };
+        VerifyOrReturnError(
+            CHIP_NO_ERROR == mGroupcastContext.accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister),
+            Status::UnsupportedAccess);
     }
 
     // ReplaceEndpoints can only be present if kListener feature is supported
@@ -503,8 +506,8 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
     return Status::Success;
 }
 
-Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                                    EndpointList & endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints,
+                                    const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
 
@@ -536,7 +539,9 @@ Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::Decod
     return err;
 }
 
-Status GroupcastCluster::UpdateGroupKey(const ConcreteCommandPath & path, const Groupcast::Commands::UpdateGroupKey::DecodableType & data, const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupcastCluster::UpdateGroupKey(const ConcreteCommandPath & path,
+                                        const Groupcast::Commands::UpdateGroupKey::DecodableType & data,
+                                        const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     // Check GroupID and KeySetID constraints.
     VerifyOrReturnError(data.groupID != kUndefinedGroupId, Status::ConstraintError);
@@ -557,14 +562,14 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::Config
                                                const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
-    GroupDataProvider & groups = Provider();
-    CHIP_ERROR err             = CHIP_NO_ERROR;
+    GroupDataProvider & groups    = Provider();
+    CHIP_ERROR err                = CHIP_NO_ERROR;
 
     // AuxiliaryACL can only be present if LN feature is supported
     VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
     VerifyOrReturnError(data.groupID != kUndefinedGroupId, Status::ConstraintError);
 
-     // Get group info
+    // Get group info
     GroupDataProvider::GroupInfo info;
     err = groups.GetGroupInfo(fabricIndex, data.groupID, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
@@ -590,19 +595,21 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::Config
 }
 
 Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip::Access::SubjectDescriptor & subjectDescriptor,
-                                   GroupId group_id, KeysetId keyset_id,
-                                   const chip::Optional<chip::ByteSpan> & key)
+                                   GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key)
 {
     const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
-    GroupDataProvider & groups = Provider();
+    GroupDataProvider & groups    = Provider();
     GroupDataProvider::KeySet ks;
 
     // Keys can only be touched if the client has admin privileges, but this is called from commands that only require
     // Manage privileges. We do the check here before touching the keys.
     if (key.HasValue())
     {
-        Access::RequestPath requestPath{path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest, std::make_optional<uint32_t>(path.mCommandId)};
-        VerifyOrReturnError(CHIP_NO_ERROR == mGroupcastContext.accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister), Status::UnsupportedAccess);
+        Access::RequestPath requestPath{ path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest,
+                                         std::make_optional<uint32_t>(path.mCommandId) };
+        VerifyOrReturnError(
+            CHIP_NO_ERROR == mGroupcastContext.accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister),
+            Status::UnsupportedAccess);
     }
 
     CHIP_ERROR err = groups.GetKeySet(fabricIndex, keyset_id, ks);
@@ -649,9 +656,8 @@ Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip:
     return Status::Success;
 }
 
-Status GroupcastCluster::RemoveGroup(GroupId group_id,
-                                     const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints,
-                                     const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                                     EndpointList * endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
 

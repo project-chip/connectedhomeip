@@ -63,20 +63,16 @@ using chip::app::DataModel::AttributeEntry;
 static constexpr size_t kMaxMembershipEndpoints = app::Clusters::GroupcastCluster::kMaxMembershipEndpoints;
 
 static constexpr FabricIndex kTestFabricIndex = Testing::kTestFabricIndex;
-static constexpr NodeId kNodeIdForAdmin = 1ULL;
-static constexpr NodeId kNodeIdForManage = 2ULL;
+static constexpr NodeId kNodeIdForAdmin       = 1ULL;
+static constexpr NodeId kNodeIdForManage      = 2ULL;
 
-static constexpr SubjectDescriptor kAdminSubjectDescriptor{
-    .fabricIndex = kTestFabricIndex,
-    .authMode = AuthMode::kCase,
-    .subject = kNodeIdForAdmin
-};
+static constexpr SubjectDescriptor kAdminSubjectDescriptor{ .fabricIndex = kTestFabricIndex,
+                                                            .authMode    = AuthMode::kCase,
+                                                            .subject     = kNodeIdForAdmin };
 
-static constexpr SubjectDescriptor kManageSubjectDescriptor{
-    .fabricIndex = kTestFabricIndex,
-    .authMode = AuthMode::kCase,
-    .subject = kNodeIdForManage
-};
+static constexpr SubjectDescriptor kManageSubjectDescriptor{ .fabricIndex = kTestFabricIndex,
+                                                             .authMode    = AuthMode::kCase,
+                                                             .subject     = kNodeIdForManage };
 
 template <typename DecodableListType>
 CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
@@ -129,32 +125,34 @@ struct TestGroupcastCluster : public ::testing::Test
     public:
         bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
         {
-            (void)deviceType;
-            (void)endpoint;
+            (void) deviceType;
+            (void) endpoint;
             return false;
         }
     };
 
-    class GroupcastTestingAccessControlDelegate : public Access::AccessControl::Delegate {
+    class GroupcastTestingAccessControlDelegate : public Access::AccessControl::Delegate
+    {
         CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
-                                 Privilege requestPrivilege) override
+                         Privilege requestPrivilege) override
         {
             if (subjectDescriptor.authMode != AuthMode::kCase)
             {
                 return CHIP_ERROR_ACCESS_DENIED;
             }
 
-            switch (subjectDescriptor.subject) {
-                case kNodeIdForAdmin:
-                    // Admin always has access
-                    return CHIP_NO_ERROR;
-                case kNodeIdForManage: {
-                    // Manage can access everything but Administer-level things
-                    CHIP_ERROR err = (requestPrivilege == Access::Privilege::kAdminister) ? CHIP_ERROR_ACCESS_DENIED : CHIP_NO_ERROR;
-                    return err;
-                }
-                default:
-                    return CHIP_ERROR_ACCESS_DENIED;
+            switch (subjectDescriptor.subject)
+            {
+            case kNodeIdForAdmin:
+                // Admin always has access
+                return CHIP_NO_ERROR;
+            case kNodeIdForManage: {
+                // Manage can access everything but Administer-level things
+                CHIP_ERROR err = (requestPrivilege == Access::Privilege::kAdminister) ? CHIP_ERROR_ACCESS_DENIED : CHIP_NO_ERROR;
+                return err;
+            }
+            default:
+                return CHIP_ERROR_ACCESS_DENIED;
             }
         }
     };
@@ -172,10 +170,10 @@ struct TestGroupcastCluster : public ::testing::Test
         // with our Mock DataModel Provider so we can test endpoints validations on JoinGroup command.
         ServerClusterContext context = mTestContext.Get();
         clusterContext               = std::make_unique<ServerClusterContext>(ServerClusterContext{
-                          .provider           = customDataModel,
-                          .storage            = context.storage,
-                          .attributeStorage   = context.attributeStorage,
-                          .interactionContext = context.interactionContext,
+            .provider           = customDataModel,
+            .storage            = context.storage,
+            .attributeStorage   = context.attributeStorage,
+            .interactionContext = context.interactionContext,
         });
 
         ASSERT_EQ(mSender.Startup(*clusterContext), CHIP_NO_ERROR);
@@ -312,12 +310,12 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
                                               }));
 }
 
-TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs) {
-    GroupId kGroup1   = 0xab01;
-    KeysetId kKeyset1 = 0xabcd;
+TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs)
+{
+    GroupId kGroup1     = 0xab01;
+    KeysetId kKeyset1   = 0xabcd;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const EndpointId kEndpoints[1] = { 1 };
-
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
@@ -354,7 +352,6 @@ TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs) {
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
     }
 
-
     // Constraint on keySetId >= 1 must be respected.
     {
         Commands::JoinGroup::Type joinGroupCmd;
@@ -390,36 +387,37 @@ TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs) {
 
         // Touching useAuxiliaryACL, even if false should fail if present --> cannot update the field.
         joinGroupCmd.useAuxiliaryACL = MakeOptional(false);
-        result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
         ASSERT_TRUE(result.GetStatusCode().has_value());
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedAccess);
 
         joinGroupCmd.useAuxiliaryACL = MakeOptional(true);
-        result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
         ASSERT_TRUE(result.GetStatusCode().has_value());
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedAccess);
 
         // Starts working after no longer touching AuxACL.
         joinGroupCmd.key             = NullOptional; // <-- Not touching key
         joinGroupCmd.useAuxiliaryACL = NullOptional; // <-- Not touching useAuxACL
-        result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
         ASSERT_TRUE(result.GetStatusCode().has_value());
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
 
         // If touching key, but not useAuxiliaryACL, still not legal.
 
         joinGroupCmd.key             = MakeOptional(ByteSpan(key)); // <-- Touching key
-        joinGroupCmd.useAuxiliaryACL = NullOptional; // <-- Not touching useAuxACL
-        result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        joinGroupCmd.useAuxiliaryACL = NullOptional;                // <-- Not touching useAuxACL
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
         ASSERT_TRUE(result.GetStatusCode().has_value());
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedAccess);
     }
 }
 
-TEST_F(TestGroupcastCluster, TestUpdateGroupKeyFailsOnBadAargs) {
-    GroupId kGroup1   = 0xab01;
-    KeysetId kKeyset1 = 0xabcd;
-    KeysetId kKeyset2 = 0xa123;
+TEST_F(TestGroupcastCluster, TestUpdateGroupKeyFailsOnBadAargs)
+{
+    GroupId kGroup1      = 0xab01;
+    KeysetId kKeyset1    = 0xabcd;
+    KeysetId kKeyset2    = 0xa123;
     const uint8_t key1[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const uint8_t key2[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const EndpointId kEndpoints[1] = { 1 };
@@ -441,8 +439,8 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKeyFailsOnBadAargs) {
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
     Commands::UpdateGroupKey::Type updateGroupKeyCmd;
-    updateGroupKeyCmd.groupID         = kGroup1;
-    updateGroupKeyCmd.keySetID        = kKeyset1;
+    updateGroupKeyCmd.groupID  = kGroup1;
+    updateGroupKeyCmd.keySetID = kKeyset1;
 
     // UpdateGroupKey from Admin access should succeed (no key update).
     result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
@@ -452,9 +450,9 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKeyFailsOnBadAargs) {
     // If changing a key, should fail with Manage, succeed with Admin
     tester.SetSubjectDescriptor(kManageSubjectDescriptor);
 
-    updateGroupKeyCmd.groupID         = kGroup1;
-    updateGroupKeyCmd.keySetID        = kKeyset2;
-    updateGroupKeyCmd.key             = MakeOptional(ByteSpan(key2));
+    updateGroupKeyCmd.groupID  = kGroup1;
+    updateGroupKeyCmd.keySetID = kKeyset2;
+    updateGroupKeyCmd.key      = MakeOptional(ByteSpan(key2));
 
     result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
     ASSERT_TRUE(result.GetStatusCode().has_value());
@@ -466,18 +464,18 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKeyFailsOnBadAargs) {
     EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
 
     // Constraint on groupId >= 1 must be respected.
-    updateGroupKeyCmd.groupID = 0;
-    updateGroupKeyCmd.keySetID        = kKeyset1;
-    updateGroupKeyCmd.key = NullOptional;
+    updateGroupKeyCmd.groupID  = 0;
+    updateGroupKeyCmd.keySetID = kKeyset1;
+    updateGroupKeyCmd.key      = NullOptional;
 
     result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
     ASSERT_TRUE(result.GetStatusCode().has_value());
     EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
 
     // Constraint on keySetId >= 1 must be respected.
-    updateGroupKeyCmd.groupID         = kGroup1;
-    updateGroupKeyCmd.keySetID        = 0;
-    updateGroupKeyCmd.key = NullOptional;
+    updateGroupKeyCmd.groupID  = kGroup1;
+    updateGroupKeyCmd.keySetID = 0;
+    updateGroupKeyCmd.key      = NullOptional;
 
     result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
     ASSERT_TRUE(result.GetStatusCode().has_value());
@@ -1312,7 +1310,8 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
 
     // Create a Listener and Sender capable group with 1 endpoint.
     // Remove the endpoint from the group. Verify that the group still exists for Sender.
-    app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
+    app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate,
+                                                         mAccessControl },
                                                        BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
     ASSERT_EQ(ListenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
     chip::Testing::ClusterTester listenerAndSenderTester(ListenerAndSender);

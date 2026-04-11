@@ -89,8 +89,9 @@ private:
     Protocols::InteractionModel::Status UpdateGroupKey(const ConcreteCommandPath & path,
                                                        const Groupcast::Commands::UpdateGroupKey::DecodableType & data,
                                                        const chip::Access::SubjectDescriptor & subjectDescriptor);
-    Protocols::InteractionModel::Status ConfigureAuxiliaryACL(const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
-                                                              const chip::Access::SubjectDescriptor & subjectDescriptor);
+    Protocols::InteractionModel::Status
+    ConfigureAuxiliaryACL(const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+                          const chip::Access::SubjectDescriptor & subjectDescriptor);
 
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
     void ResetDataModelProvider() { mDataModelProvider = nullptr; }
@@ -107,11 +108,10 @@ private:
     Credentials::GroupDataProvider & Provider() { return mGroupcastContext.groupDataProvider; }
     chip::FabricTable & Fabrics() { return mGroupcastContext.fabricTable; }
 
-    Protocols::InteractionModel::Status SetKeySet(const ConcreteCommandPath & path, const chip::Access::SubjectDescriptor & subjectDescriptor,
-                                                  GroupId group_id, KeysetId keyset_id,
-                                                  const chip::Optional<chip::ByteSpan> & key);
-    Protocols::InteractionModel::Status RemoveGroup(GroupId group_id,
-                                                    const Groupcast::Commands::LeaveGroup::DecodableType & data,
+    Protocols::InteractionModel::Status SetKeySet(const ConcreteCommandPath & path,
+                                                  const chip::Access::SubjectDescriptor & subjectDescriptor, GroupId group_id,
+                                                  KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
+    Protocols::InteractionModel::Status RemoveGroup(GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
                                                     EndpointList * endpoints,
                                                     const chip::Access::SubjectDescriptor & subjectDescriptor);
     Protocols::InteractionModel::Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,

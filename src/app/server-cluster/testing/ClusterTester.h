@@ -415,7 +415,7 @@ public:
 
     void SetFabricIndex(FabricIndex fabricIndex)
     {
-        auto subjectDescriptor = mHandler.GetSubjectDescriptor();
+        auto subjectDescriptor        = mHandler.GetSubjectDescriptor();
         subjectDescriptor.fabricIndex = fabricIndex;
         mHandler.SetSubjectDescriptor(subjectDescriptor);
         mHandler.SetFabricIndex(fabricIndex);
