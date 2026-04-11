@@ -97,7 +97,7 @@ Protocols::InteractionModel::Status ChefMicrowaveOvenDevice::HandleModifyCookTim
         if (mOperationalStateInstancePtr->GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kStopped) &&
             finalCookTimeSec < mOperationalStateDelegatePtr->GetCountdownTime().ValueOr(0))
         {
-            return Status::ConstraintError;
+            return Status::InvalidInState;
         }
     }
 
