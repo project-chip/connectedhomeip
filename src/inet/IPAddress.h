@@ -171,7 +171,7 @@ public:
     static constexpr uint16_t kMaxStringLength = OT_IP6_ADDRESS_STRING_SIZE;
 #endif
 
-    IPAddress() = default;
+    constexpr IPAddress() : Addr{} {}
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     explicit IPAddress(const ip6_addr_t & ipv6Addr);
@@ -710,7 +710,7 @@ public:
     static IPAddress Loopback(IPAddressType type);
 };
 
-static_assert(std::is_trivial<IPAddress>::value, "IPAddress is not trivial");
+static_assert(std::is_trivially_copyable_v<IPAddress>, "IPAddress is not trivially copyable");
 
 } // namespace Inet
 } // namespace chip
