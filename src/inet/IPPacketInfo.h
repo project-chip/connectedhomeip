@@ -37,11 +37,13 @@ public:
     IPAddress SrcAddress;  /**< The source IPAddress in the packet. */
     IPAddress DestAddress; /**< The destination IPAddress in the packet. */
     InterfaceId Interface; /**< The interface identifier for the connection. */
-    uint16_t SrcPort  = 0; /**< The source port in the packet. */
-    uint16_t DestPort = 0; /**< The destination port in the packet. */
+    uint16_t SrcPort;      /**< The source port in the packet. */
+    uint16_t DestPort;     /**< The destination port in the packet. */
 
     /**
      *  Reset the members of the IPPacketInfo object.
+     *  Clear() MUST be called before using a newly constructed IPPacketInfo,
+     *  as some members contain uninitialized memory after construction.
      */
     void Clear();
 };

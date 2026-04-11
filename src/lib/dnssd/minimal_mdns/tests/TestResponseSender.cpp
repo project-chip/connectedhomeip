@@ -70,7 +70,7 @@ struct CommonTestElements
 
     CheckOnlyServer server;
     QueryResponder<10> queryResponder;
-    Inet::IPPacketInfo packetInfo{};
+    Inet::IPPacketInfo packetInfo;
 
     CommonTestElements(const char * tag) :
         recordWriter(&requestBufferWriter),
@@ -80,6 +80,7 @@ struct CommonTestElements
         host(FlatAllocatedQName::Build(hostNameStorage, tag, "host")),
         txt(FlatAllocatedQName::Build(txtStorage, tag, "L1=something", "L2=other")), server()
     {
+        packetInfo.Clear();
         queryResponder.Init();
         header.SetQueryCount(1);
     }
