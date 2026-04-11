@@ -361,8 +361,9 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         # Step 25: Write empty DeviceLocation
         self.step(25)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
-            attr_val = cluster.Attributes.DeviceLocation(Globals.Structs.LocationDescriptorStruct(locationName="", floorNumber=-1, areaType=None))
-            await self.write_single_attribute(attribute_value = attr_val, endpoint=self.endpoint, expect_success = True)
+            attr_val = cluster.Attributes.DeviceLocation(
+                Globals.Structs.LocationDescriptorStruct(locationName="", floorNumber=-1, areaType=None))
+            await self.write_single_attribute(attribute_value=attr_val, endpoint=self.endpoint, expect_success=True)
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
@@ -381,8 +382,9 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         # Step 27: Write DeviceLocation with location name of 128 characters
         self.step(27)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
-            attr_val = cluster.Attributes.DeviceLocation(Globals.Structs.LocationDescriptorStruct(locationName="location" * 16, floorNumber=200, areaType=0x0002))
-            await self.write_single_attribute(attribute_value = attr_val, endpoint=self.endpoint, expect_success = True)
+            attr_val = cluster.Attributes.DeviceLocation(Globals.Structs.LocationDescriptorStruct(
+                locationName="location" * 16, floorNumber=200, areaType=0x0002))
+            await self.write_single_attribute(attribute_value=attr_val, endpoint=self.endpoint, expect_success=True)
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
