@@ -33,6 +33,14 @@ constexpr CommandId kGeneratedCommands[] = {
     Groupcast::Commands::LeaveGroupResponse::Id,
 };
 
+bool HasAdminPrivileges(Access::AccessControl & accessControl, const chip::Access::SubjectDescriptor & subjectDescriptor,
+                        const ConcreteCommandPath & path)
+{
+    Access::RequestPath requestPath{ path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest,
+                                     std::make_optional<uint32_t>(path.mCommandId) };
+    return CHIP_NO_ERROR == accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister);
+}
+
 } // namespace
 
 GroupcastCluster::GroupcastCluster(GroupcastContext && context) : GroupcastCluster(std::move(context), {}) {}
@@ -372,11 +380,8 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
 
         // AuxiliaryACL state can only be touched if the client has admin privileges, but this is called from a command that only
         // require Manage privileges. We do the check here before touching AuxACL.
-        Access::RequestPath requestPath{ path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest,
-                                         std::make_optional<uint32_t>(path.mCommandId) };
-        VerifyOrReturnError(
-            CHIP_NO_ERROR == mGroupcastContext.accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister),
-            Status::UnsupportedAccess);
+        VerifyOrReturnError(HasAdminPrivileges(mGroupcastContext.accessControl, subjectDescriptor, path),
+                            Status::UnsupportedAccess);
     }
 
     // ReplaceEndpoints can only be present if kListener feature is supported
@@ -605,11 +610,8 @@ Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip:
     // Manage privileges. We do the check here before touching the keys.
     if (key.HasValue())
     {
-        Access::RequestPath requestPath{ path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest,
-                                         std::make_optional<uint32_t>(path.mCommandId) };
-        VerifyOrReturnError(
-            CHIP_NO_ERROR == mGroupcastContext.accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister),
-            Status::UnsupportedAccess);
+        VerifyOrReturnError(HasAdminPrivileges(mGroupcastContext.accessControl, subjectDescriptor, path),
+                            Status::UnsupportedAccess);
     }
 
     CHIP_ERROR err = groups.GetKeySet(fabricIndex, keyset_id, ks);
