@@ -41,11 +41,12 @@ tests:
           the TH. GroupKeySet fields are as follows: * GroupKeySetID: 0x01a1 *
           GroupKeySecurityPolicy: TrustFirst (0) * EpochKey0:
           a0a1a2a3a4a5a6a7a8a9aaabacadaeaf * EpochStartTime0: 1110000 *
-          GroupKeyMulticastPolicy: 0"
+          EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf * EpochStartTime1: 1110001
+          * EpochKey2: null * EpochStartTime2: null * GroupKeyMulticastPolicy: 0"
       verification: |
           Please execute the below commands before starting the test case :
 
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1","groupKeySecurityPolicy": 0, "epochKey0":"a0a1a2a3a4a5a6a7a8a9aaabacadaeaf","epochStartTime0": 1110000}' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1", "groupKeySecurityPolicy": 0, "epochKey0": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "epochStartTime0": 1110000, "epochKey1": "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001, "epochKey2": null, "epochStartTime2": null, "groupKeyMulticastPolicy": 0}' 1 0
 
           Verify the KeySetWrite command  On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
 
@@ -104,62 +105,121 @@ tests:
 
           Please execute the below commands before starting the test case :
 
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": "0x0001", "groupKeySetID": "0x01a1", "fabricIndex": 1} ]' 1 0
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": "0x0001", "groupKeySetID": "0x01a1", "fabricIndex": 1}, {"groupId": "0x0002", "groupKeySetID": "0x01a1", "fabricIndex": 1}]' 1 0
 
           Verify the GroupKeyMap attribute On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
 
-          [1706722844.841613][5404:5404] CHIP:DMG: WriteRequestMessage =
-          [1706722844.841616][5404:5404] CHIP:DMG: {
-          [1706722844.841619][5404:5404] CHIP:DMG:         suppressResponse = false,
-          [1706722844.841621][5404:5404] CHIP:DMG:         timedRequest = false,
-          [1706722844.841625][5404:5404] CHIP:DMG:         AttributeDataIBs =
-          [1706722844.841629][5404:5404] CHIP:DMG:         [
-          [1706722844.841632][5404:5404] CHIP:DMG:                 AttributeDataIB =
-          [1706722844.841636][5404:5404] CHIP:DMG:                 {
-          [1706722844.841639][5404:5404] CHIP:DMG:                         AttributePathIB =
-          [1706722844.841643][5404:5404] CHIP:DMG:                         {
-          [1706722844.841646][5404:5404] CHIP:DMG:                                 Endpoint = 0x0,
-          [1706722844.841649][5404:5404] CHIP:DMG:                                 Cluster = 0x3f,
-          [1706722844.841652][5404:5404] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1706722844.841655][5404:5404] CHIP:DMG:                         }
-          [1706722844.841659][5404:5404] CHIP:DMG:
-          [1706722844.841662][5404:5404] CHIP:DMG:                         Data = [
-          [1706722844.841665][5404:5404] CHIP:DMG:
-          [1706722844.841668][5404:5404] CHIP:DMG:                         ],
-          [1706722844.841670][5404:5404] CHIP:DMG:                 },
-          [1706722844.841677][5404:5404] CHIP:DMG:
-          [1706722844.841680][5404:5404] CHIP:DMG:                 AttributeDataIB =
-          [1706722844.841682][5404:5404] CHIP:DMG:                 {
-          [1706722844.841685][5404:5404] CHIP:DMG:                         AttributePathIB =
-          [1706722844.841687][5404:5404] CHIP:DMG:                         {
-          [1706722844.841690][5404:5404] CHIP:DMG:                                 Endpoint = 0x0,
-          [1706722844.841693][5404:5404] CHIP:DMG:                                 Cluster = 0x3f,
-          [1706722844.841696][5404:5404] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1706722844.841699][5404:5404] CHIP:DMG:                                 ListIndex = Null,
-          [1706722844.841702][5404:5404] CHIP:DMG:                         }
-          [1706722844.841706][5404:5404] CHIP:DMG:
-          [1706722844.841708][5404:5404] CHIP:DMG:                         Data =
-          [1706722844.841711][5404:5404] CHIP:DMG:                         {
-          [1706722844.841715][5404:5404] CHIP:DMG:                                 0x1 = 1,
-          [1706722844.841718][5404:5404] CHIP:DMG:                                 0x2 = 417,
-          [1706722844.841721][5404:5404] CHIP:DMG:                         },
-          [1706722844.841723][5404:5404] CHIP:DMG:                 },
-          [1706722844.841727][5404:5404] CHIP:DMG:
-          [1706722844.841730][5404:5404] CHIP:DMG:         ],
-          [1706722844.841736][5404:5404] CHIP:DMG:
-          [1706722844.841738][5404:5404] CHIP:DMG:         moreChunkedMessages = false,
-          [1706722844.841741][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
-          [1706722844.841743][5404:5404] CHIP:DMG: },
+          [1775470727.508] [8298:8300] [DMG] WriteResponseMessage =
+          [1775470727.508] [8298:8300] [DMG] {
+          [1775470727.508] [8298:8300] [DMG] 	AttributeStatusIBs =
+          [1775470727.508] [8298:8300] [DMG] 	[
+          [1775470727.508] [8298:8300] [DMG] 		AttributeStatusIB =
+          [1775470727.508] [8298:8300] [DMG] 		{
+          [1775470727.508] [8298:8300] [DMG] 			AttributePathIB =
+          [1775470727.508] [8298:8300] [DMG] 			{
+          [1775470727.508] [8298:8300] [DMG] 				Endpoint = 0x0,
+          [1775470727.508] [8298:8300] [DMG] 				Cluster = 0x3f,
+          [1775470727.508] [8298:8300] [DMG] 				Attribute = 0x0000_0000,
+          [1775470727.508] [8298:8300] [DMG] 			}
+          [1775470727.508] [8298:8300] [DMG]
+          [1775470727.508] [8298:8300] [DMG] 			StatusIB =
+          [1775470727.508] [8298:8300] [DMG] 			{
+          [1775470727.508] [8298:8300] [DMG] 				status = 0x00 (SUCCESS),
+          [1775470727.508] [8298:8300] [DMG] 			},
+          [1775470727.508] [8298:8300] [DMG]
+          [1775470727.508] [8298:8300] [DMG] 		},
+          [1775470727.508] [8298:8300] [DMG]
+          [1775470727.508] [8298:8300] [DMG] 		AttributeStatusIB =
+          [1775470727.508] [8298:8300] [DMG] 		{
+          [1775470727.508] [8298:8300] [DMG] 			AttributePathIB =
+          [1775470727.508] [8298:8300] [DMG] 			{
+          [1775470727.508] [8298:8300] [DMG] 				Endpoint = 0x0,
+          [1775470727.508] [8298:8300] [DMG] 				Cluster = 0x3f,
+          [1775470727.508] [8298:8300] [DMG] 				Attribute = 0x0000_0000,
+          [1775470727.508] [8298:8300] [DMG] 				ListIndex = Null,
+          [1775470727.508] [8298:8300] [DMG] 			}
+          [1775470727.508] [8298:8300] [DMG]
+          [1775470727.508] [8298:8300] [DMG] 			StatusIB =
+          [1775470727.508] [8298:8300] [DMG] 			{
+          [1775470727.508] [8298:8300] [DMG] 				status = 0x00 (SUCCESS),
+          [1775470727.508] [8298:8300] [DMG] 			},
+          [1775470727.509] [8298:8300] [DMG]
+          [1775470727.509] [8298:8300] [DMG] 		},
+          [1775470727.509] [8298:8300] [DMG]
+          [1775470727.509] [8298:8300] [DMG] 		AttributeStatusIB =
+          [1775470727.509] [8298:8300] [DMG] 		{
+          [1775470727.509] [8298:8300] [DMG] 			AttributePathIB =
+          [1775470727.509] [8298:8300] [DMG] 			{
+          [1775470727.509] [8298:8300] [DMG] 				Endpoint = 0x0,
+          [1775470727.509] [8298:8300] [DMG] 				Cluster = 0x3f,
+          [1775470727.509] [8298:8300] [DMG] 				Attribute = 0x0000_0000,
+          [1775470727.509] [8298:8300] [DMG] 				ListIndex = Null,
+          [1775470727.509] [8298:8300] [DMG] 			}
+          [1775470727.509] [8298:8300] [DMG]
+          [1775470727.509] [8298:8300] [DMG] 			StatusIB =
+          [1775470727.509] [8298:8300] [DMG] 			{
+          [1775470727.509] [8298:8300] [DMG] 				status = 0x00 (SUCCESS),
+          [1775470727.509] [8298:8300] [DMG] 			},
+          [1775470727.509] [8298:8300] [DMG]
+          [1775470727.509] [8298:8300] [DMG] 		},
+          [1775470727.509] [8298:8300] [DMG]
+          [1775470727.509] [8298:8300] [DMG] 	],
+          [1775470727.509] [8298:8300] [DMG]
+          [1775470727.509] [8298:8300] [DMG] 	InteractionModelRevision = 12
+          [1775470727.509] [8298:8300] [DMG] }
+          [1775470727.509] [8298:8300] [DMG] WriteClient moving to [AwaitingDe]
       disabled: true
 
     - label:
           "Step 0d: Precondition 4: If the Groupcast cluster is enabled on the
+          RootNode endpoint, the TH reads the Groupcast _membership_ attribute
+          on the DUT."
+      verification: |
+          ./chip-tool groupcast read membership 1 0
+
+          If the membership attribute is empty, skip to step 5
+
+          [1775471571.340] [8350:8352] [TOO] Endpoint: 0 Cluster: 0x0000_0065 Attribute 0x0000_0000 DataVersion: 302855302
+          [1775471571.340] [8350:8352] [TOO]   Membership: 0 entries
+          [1775471571.340] [8350:8352] [EM] <<< [E:65251i S:5880 M:89967051 (Ack:254148)] (S) Msg TX from 000000000001B669 to 1:0000000000000001 [FEFE] [UDP:[fe80::7c12:46ff:fed7:416f%vethed6e1e0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+
+      disabled: true
+
+    - label:
+          "Step 0e: Precondition 5: If the Groupcast cluster is enabled on the
           RootNode endpoint, TH sends Groupcast LeaveGroup command with GroupID
           0. Otherwise, TH sends RemoveAllGroups to DUT."
       verification: |
           If the Groupcast cluster is enabled on the RootNode endpoint, TH sends Groupcast LeaveGroup command with GroupID 0. Otherwise, TH sends RemoveAllGroups:
 
-            ./chip-tool groupcast leave-group 0 0
+          ./chip-tool groupcast leave-group 0 1 0
+
+          Verify the LeaveGroup command On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
+
+          [1775017039.839] [41820:41820] [DMG] InvokeRequestMessage =
+          [1775017039.839] [41820:41820] [DMG] {
+          [1775017039.839] [41820:41820] [DMG]         suppressResponse = false,
+          [1775017039.839] [41820:41820] [DMG]         timedRequest = false,
+          [1775017039.839] [41820:41820] [DMG]         InvokeRequests =
+          [1775017039.839] [41820:41820] [DMG]         [
+          [1775017039.839] [41820:41820] [DMG]                 CommandDataIB =
+          [1775017039.839] [41820:41820] [DMG]                 {
+          [1775017039.839] [41820:41820] [DMG]                         CommandPathIB =
+          [1775017039.839] [41820:41820] [DMG]                         {
+          [1775017039.839] [41820:41820] [DMG]                                 EndpointId = 0x0,
+          [1775017039.839] [41820:41820] [DMG]                                 ClusterId = 0x65,
+          [1775017039.839] [41820:41820] [DMG]                                 CommandId = 0x1,
+          [1775017039.839] [41820:41820] [DMG]                         },
+          [1775017039.839] [41820:41820] [DMG]
+          [1775017039.839] [41820:41820] [DMG]                         CommandFields =
+          [1775017039.839] [41820:41820] [DMG]                         {
+          [1775017039.839] [41820:41820] [DMG]                                 0x0 = 0 (unsigned),
+          [1775017039.839] [41820:41820] [DMG]                         },
+          [1775017039.839] [41820:41820] [DMG]                 },
+          [1775017039.839] [41820:41820] [DMG]
+          [1775017039.839] [41820:41820] [DMG]         ],
+
+
           or:
             ./chip-tool groups remove-all-groups 1 1
 
@@ -192,7 +252,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 0e: Precondition 5: If the Groupcast cluster is enabled on the
+          "Step 0f: Precondition 6: If the Groupcast cluster is enabled on the
           RootNode endpoint, TH sends Groupcast JoinGroup command with GroupID,
           Endpoints, and KeySetID. Otherwise, TH sends AddGroup to DUT with the
           GroupID field set to G1."
@@ -200,7 +260,38 @@ tests:
           If the Groupcast cluster is enabled on the RootNode endpoint, TH sends Groupcast JoinGroup command with GroupID, Endpoints, and KeySetID. Otherwise, TH sends AddGroup:
 
           Please execute the below commands before starting the test case :
-          ./chip-tool groupcast join-group 0x01 [1] 0x01a1
+          ./chip-tool groupcast join-group 0x01 [1] 0x01a1 1 0
+
+          [1775017376.714] [41820:41820] [DMG] InvokeRequestMessage =
+          [1775017376.714] [41820:41820] [DMG] {
+          [1775017376.714] [41820:41820] [DMG]         suppressResponse = false,
+          [1775017376.714] [41820:41820] [DMG]         timedRequest = false,
+          [1775017376.714] [41820:41820] [DMG]         InvokeRequests =
+          [1775017376.714] [41820:41820] [DMG]         [
+          [1775017376.714] [41820:41820] [DMG]                 CommandDataIB =
+          [1775017376.714] [41820:41820] [DMG]                 {
+          [1775017376.714] [41820:41820] [DMG]                         CommandPathIB =
+          [1775017376.714] [41820:41820] [DMG]                         {
+          [1775017376.714] [41820:41820] [DMG]                                 EndpointId = 0x0,
+          [1775017376.714] [41820:41820] [DMG]                                 ClusterId = 0x65,
+          [1775017376.714] [41820:41820] [DMG]                                 CommandId = 0x0,
+          [1775017376.714] [41820:41820] [DMG]                         },
+          [1775017376.714] [41820:41820] [DMG]
+          [1775017376.714] [41820:41820] [DMG]                         CommandFields =
+          [1775017376.714] [41820:41820] [DMG]                         {
+          [1775017376.714] [41820:41820] [DMG]                                 0x0 = 1 (unsigned),
+          [1775017376.714] [41820:41820] [DMG]                                 0x1 = [
+          [1775017376.714] [41820:41820] [DMG]                                                 1 (unsigned),
+          [1775017376.714] [41820:41820] [DMG]                                 ],
+          [1775017376.714] [41820:41820] [DMG]                                 0x2 = 417 (unsigned),
+          [1775017376.714] [41820:41820] [DMG]                         },
+          [1775017376.714] [41820:41820] [DMG]                 },
+          [1775017376.714] [41820:41820] [DMG]
+          [1775017376.714] [41820:41820] [DMG]         ],
+          [1775017376.714] [41820:41820] [DMG]
+          [1775017376.714] [41820:41820] [DMG]         InteractionModelRevision = 12
+          [1775017376.714] [41820:41820] [DMG] },
+
           or:
           ./chip-tool groups add-group 0x01 Gp1 1 1
 

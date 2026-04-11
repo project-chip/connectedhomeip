@@ -232,6 +232,21 @@
 #endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
 
 /**
+ *  @def CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+ *
+ *  @brief
+ *    Size of a statically allocated P256 keypair handle in CryptoPAL.
+ *
+ *  If this is 0 (the default), then key handles are not supported and
+ *  serialized keypairs (containing the raw public and private keys) are used instead.
+ *
+ *  Platforms that use PSA can define this to match the size of psa_key_id_t (4).
+ */
+#ifndef CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+#define CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE (0)
+#endif // CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+
+/**
  * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
  *
  * @brief
@@ -2079,6 +2094,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_ZONES
 #define CHIP_CONFIG_MAX_NUM_ZONES 4
 #endif // CHIP_CONFIG_MAX_NUM_ZONES
+
+/**
+ * @def CHIP_MEMORY_SANITIZER_ENABLED
+ *
+ * @brief True when building with Clang MemorySanitizer (MSan).
+ */
+#ifndef CHIP_MEMORY_SANITIZER_ENABLED
+#define CHIP_MEMORY_SANITIZER_ENABLED 0
+#endif
+
 /**
  * @}
  */
