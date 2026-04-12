@@ -306,7 +306,7 @@ Darwin builds; others are Android-specific due to platform differences.
 
 | Optimization                   | Darwin applicability | Notes                                                                                                                                                                                                          |
 | ------------------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cluster trimming (11 clusters) | ✅ Applies           | The slim `casting-cluster-objects.cpp` is shared between Android and Darwin. Removing 11 non-essential infrastructure clusters reduces code in `libTvCastingCommon.a` identically.                             |
+| Cluster trimming (10 clusters) | ✅ Applies           | The slim `casting-cluster-objects.cpp` is shared between Android and Darwin. Removing 10 non-essential infrastructure clusters reduces code in `libTvCastingCommon.a` identically.                             |
 | ICD client removal             | ✅ Applies           | The `tv-casting-common/BUILD.gn` conditional excluding `icd/client:handler` and `icd/client:manager` applies to all platforms when `optimize_apk_size=true`. Darwin casting builds do not use ICD client APIs. |
 
 ### Optimizations that are Android-specific

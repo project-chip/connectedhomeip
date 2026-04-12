@@ -456,7 +456,6 @@ def generate_tlv_decoder(full_source_path, cluster_names, output_path, decoder_t
 
     if decoder_type == "attribute":
         error_macro = "CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB"
-        func_name = "DecodeAttributeValue"
         func_sig = "jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)"
         path_field = "mClusterId"
         includes = [
