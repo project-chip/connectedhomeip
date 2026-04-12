@@ -399,10 +399,10 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
         ChipLogProgress(DataManagement,
                         "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c r=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
-            ChipLogValueX64(subjectDescriptor.subject),
-            GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
+                        ChipLogValueX64(subjectDescriptor.subject),
+                        GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
                         ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege),
-            GetRequestTypeStringForLogging(requestPath.requestType));
+                        GetRequestTypeStringForLogging(requestPath.requestType));
     }
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
@@ -419,7 +419,7 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
             if (result != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
-                            (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+                                (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
             }
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
 
@@ -488,8 +488,7 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
 
                 if (IsOperationalNodeId(subject))
                 {
-                    if (authMode == AuthMode::kCase &&
-                        subject == subjectDescriptor.subject)
+                    if (authMode == AuthMode::kCase && subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
                         break;
@@ -497,8 +496,7 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
                 }
                 else if (IsCASEAuthTag(subject))
                 {
-                    if (authMode == AuthMode::kCase &&
-                        subjectDescriptor.cats.CheckSubjectAgainstCATs(subject))
+                    if (authMode == AuthMode::kCase && subjectDescriptor.cats.CheckSubjectAgainstCATs(subject))
                     {
                         subjectMatched = true;
                         break;
@@ -506,8 +504,7 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
                 }
                 else if (IsGroupId(subject))
                 {
-                    if (authMode == AuthMode::kGroup &&
-                        subject == subjectDescriptor.subject)
+                    if (authMode == AuthMode::kGroup && subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
                         break;
@@ -565,9 +562,7 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
                 {
                     continue;
                 }
-                if (hasDeviceType &&
-                    !mDeviceTypeResolver->IsDeviceTypeOnEndpoint(
-                        target.deviceType, requestPath.endpoint))
+                if (hasDeviceType && !mDeviceTypeResolver->IsDeviceTypeOnEndpoint(target.deviceType, requestPath.endpoint))
                 {
                     continue;
                 }
