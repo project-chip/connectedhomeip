@@ -446,8 +446,8 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
     {
         if (!entry.IsValid())
         {
-            continue; 
-        }        
+            continue;
+        }
         AuthMode authMode = AuthMode::kNone;
         ReturnErrorOnFailure(entry.GetAuthMode(authMode));
         // Operational PASE not supported for v1.0.
