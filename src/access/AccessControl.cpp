@@ -444,10 +444,8 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
     Entry entry;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
-        if (!entry.IsValid())
-        {
-            continue;
-        }
+        VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+
         AuthMode authMode = AuthMode::kNone;
         ReturnErrorOnFailure(entry.GetAuthMode(authMode));
         // Operational PASE not supported for v1.0.
