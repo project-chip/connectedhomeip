@@ -43,7 +43,6 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
-    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -849,7 +848,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
                         """
-                    ))
+                                            ))
                 if options.do_clean:
                     shell.run_cmd("make clean")
                 shell.run_cmd("make chef")
