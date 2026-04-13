@@ -62,9 +62,7 @@ coloredlogs==15.0.1
     #   bluezoo
     #   matter-idl
 cryptography==43.0.0
-    # via
-    #   -r requirements.all.txt
-    #   google-auth
+    # via -r requirements.all.txt
 cxxfilt==0.3.0
     # via -r requirements.memory.txt
 decorator==5.1.1
@@ -160,10 +158,6 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pyasn1==0.6.3
-    # via pyasn1-modules
-pyasn1-modules==0.4.2
-    # via google-auth
 pycparser==2.21
     # via cffi
 pygments==2.14.0
@@ -192,8 +186,7 @@ referencing==0.37.0
     #   jsonschema
     #   jsonschema-specifications
 requests==2.28.2
-    # via
-    #   -r requirements.cirque.txt
+    # via -r requirements.cirque.txt
 rpds-py==0.30.0
     # via
     #   jsonschema
@@ -278,3 +271,4 @@ pydantic-core>=2.20.0,<3.0.0; python_version >= "3.13"
 # These reside in ./third_party/pigweed/repo/pw_protobuf_compiler/py/setup.cfg and
 # corresponding constraints list
 
+# removed `-e` constraints that pip-compile adds
