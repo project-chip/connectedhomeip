@@ -94,13 +94,11 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     VerifyOrReturnError(aDirection != FanControl::StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpointId);
-    uint8_t speedMax       = 0;
-    DataModel::Nullable<uint8_t> speedSetting;
-    if (fc != nullptr && fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        speedMax     = fc->GetSpeedMax();
-        speedSetting = fc->GetSpeedSetting();
-    }
+    VerifyOrReturnError(fc != nullptr, Status::UnsupportedEndpoint);
+    VerifyOrReturnError(fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed), Status::Failure);
+
+    uint8_t speedMax       = fc->GetSpeedMax();
+    DataModel::Nullable<uint8_t> speedSetting = fc->GetSpeedSetting();
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
@@ -156,10 +154,6 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
         }
     }
 
-    if (fc == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
     return fc->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 

@@ -104,7 +104,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     uint8_t speedMax                          = cluster->GetSpeedMax();
     DataModel::Nullable<uint8_t> speedSetting = cluster->GetSpeedSetting();
 
-    uint8_t speedCurrent = speedSetting.IsNull() ? 0 : speedSetting.Value();
+    uint8_t speedCurrent = speedSetting.ValueOr(0);
 
     uint8_t newSpeedSetting    = speedSetting.ValueOr(0);
     uint8_t speedValue         = speedSetting.ValueOr(speedCurrent);
@@ -125,7 +125,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
         });
     }
 
-    return cluster->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
+    return cluster->SetSpeedSetting(MakeNullable(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 
 void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -238,7 +238,7 @@ void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
     Status status = Status::Success;
     if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
     {
-        status = fc->SetSpeedSetting(DataModel::Nullable<uint8_t>(aNewSpeedCurrent)).GetStatusCode().GetStatus();
+        status = fc->SetSpeedSetting(MakeNullable(aNewSpeedCurrent)).GetStatusCode().GetStatus();
     }
     else
     {
