@@ -269,6 +269,7 @@ def generate_usedMcastAddrCount_entry_matcher(expected_count: int) -> AttributeM
     description = f"UsedMcastAddrCount == {expected_count}"
     return AttributeMatcher.from_callable(description=description, matcher=predicate)
 
+
 @dataclass
 class OperateOnlyCommand:
     endpoint_id: int
@@ -276,7 +277,7 @@ class OperateOnlyCommand:
     command_object: Clusters.ClusterObjects.ClusterCommand
 
 
-async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool=True, endpoint_id_to_search:Optional[int]=None) -> list[OperateOnlyCommand]:
+async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: Optional[int] = None) -> list[OperateOnlyCommand]:
     """
     Reads all AcceptedCommandList attributes and the SpecificationVersion to determine all
     commands that only require Operate privilege.
@@ -333,12 +334,13 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
     operate_only_commands = []
 
     if endpoint_id_to_search is not None:
-        asserts.assert_false((exclude_ep0 and endpoint_id_to_search==0), "Endpoint 0 was both specified to be searched in and to be ignored.")
+        asserts.assert_false((exclude_ep0 and endpoint_id_to_search == 0),
+                             "Endpoint 0 was both specified to be searched in and to be ignored.")
         endpoint_data = attributes[endpoint_id_to_search]
         find_commands_on_endpoint_and_cluster(endpoint_id_to_search, endpoint_data, operate_only_commands)
     else:
         for endpoint_id, endpoint_data in attributes.items():
-            if exclude_ep0 and endpoint_id==0:
+            if exclude_ep0 and endpoint_id == 0:
                 continue
             find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands)
 

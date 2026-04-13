@@ -144,20 +144,24 @@ class TC_ACE_1_6(MatterBaseTest):
         pixit_g_endpoint = self.get_endpoint()
 
         if not gc_on_root:
-            asserts.assert_false(pixit_g_endpoint is None, "--endpoint <endpoint> with Groups cluster must be included on the command line.")
+            asserts.assert_false(pixit_g_endpoint is None,
+                                 "--endpoint <endpoint> with Groups cluster must be included on the command line.")
             asserts.assert_not_equal(pixit_g_endpoint, 0, "Not allowed to have groups clusters on endpoint 0.")
             log.info(f"Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: {pixit_g_endpoint}")
         else:
             # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later. This is an endpoint that must have at least
             # one cluster with a command that has operate priviliege.
             operate_only_command_list = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, self.get_endpoint())
-            asserts.assert_greater(len(operate_only_command_list), 0, "DUT must have at least 1 non-root endpoint with a cluster with commands requiring operate privilege.")
+            asserts.assert_greater(len(operate_only_command_list), 0,
+                                   "DUT must have at least 1 non-root endpoint with a cluster with commands requiring operate privilege.")
             operate_only_command = operate_only_command_list[0]
             ep1 = operate_only_command.endpoint_id
 
             log.info(f"Endpoint value for ep~1~ used for test steps with groupcast cluster: {ep1}")
-            log.info(f"Targeted cluster used for groupcast case is: {operate_only_command.cluster_object.__name__} ({operate_only_command.cluster_object.id})")
-            log.info(f"Targeted command with operate priviliege on the targeted cluster used for groupcast case is: {operate_only_command.command_object.__name__}")
+            log.info(
+                f"Targeted cluster used for groupcast case is: {operate_only_command.cluster_object.__name__} ({operate_only_command.cluster_object.id})")
+            log.info(
+                f"Targeted command with operate priviliege on the targeted cluster used for groupcast case is: {operate_only_command.command_object.__name__}")
 
         # Step 1a: KeySetWrite 0x01a3
         self.step("1a")
@@ -458,6 +462,7 @@ class TC_ACE_1_6(MatterBaseTest):
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
 
         # TODO(#71506): A step should be added in this test to restore a wildcard ACL entry.
+
 
 if __name__ == "__main__":
     default_matter_test_main()
