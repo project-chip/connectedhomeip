@@ -16,15 +16,15 @@
 #
 
 import logging
+from dataclasses import dataclass
 from typing import Optional
 
 from mobly import asserts
 
 import matter.clusters as Clusters
-from dataclasses import dataclass
+from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import AttributeMatcher
-from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.testing.spec_parsing import build_xml_clusters, dm_from_spec_version
 
 logger = logging.getLogger(__name__)

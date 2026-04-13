@@ -54,7 +54,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import is_groupcast_on_root_node
+from TC_GC_common import get_operate_only_commands, is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -63,7 +63,6 @@ from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from TC_GC_common import get_operate_only_commands
 
 log = logging.getLogger(__name__)
 
