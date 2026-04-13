@@ -336,7 +336,9 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
     if endpoint_id_to_search is not None:
         asserts.assert_false((exclude_ep0 and endpoint_id_to_search == 0),
                              "Endpoint 0 was both specified to be searched in and to be ignored.")
-        endpoint_data = attributes[endpoint_id_to_search]
+        endpoint_data = attributes.get(endpoint_id_to_search)
+        if endpoint_data is None:
+            asserts.fail(f"Endpoint {endpoint_id_to_search} not found on the device.")
         find_commands_on_endpoint_and_cluster(endpoint_id_to_search, endpoint_data, operate_only_commands)
     else:
         for endpoint_id, endpoint_data in attributes.items():
