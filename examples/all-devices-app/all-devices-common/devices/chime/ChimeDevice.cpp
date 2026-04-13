@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/SafeAttributePersistenceProvider.h>
 #include <devices/Types.h>
 #include <devices/chime/ChimeDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -36,11 +35,7 @@ CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    auto * safeAttributePersistenceProvider = GetSafeAttributePersistenceProvider();
-    VerifyOrReturnError(safeAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ChimeCluster::Context chimeContext{ .delegate                         = mDelegate,
-                                        .safeAttributePersistenceProvider = *safeAttributePersistenceProvider };
-    mChimeCluster.Create(endpoint, chimeContext);
+    mChimeCluster.Create(endpoint, mDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mChimeCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

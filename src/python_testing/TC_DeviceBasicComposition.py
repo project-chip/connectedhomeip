@@ -193,8 +193,6 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from test_testing.DeviceConformanceTests import get_supersets
-
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects
 import matter.tlv
@@ -206,6 +204,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
+from matter.testing.device_conformance_tests import get_supersets
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
@@ -339,6 +338,43 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
             if c not in root:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
+                self.fail_current_test()
+
+        self.print_step(6, "Verify that the specification version is 1.6 or above for the next steps")
+        specification_version = root[Clusters.BasicInformation].get(Clusters.BasicInformation.Attributes.SpecificationVersion, 0)
+        if specification_version >= 0x01060000:
+            groupcast_feature_map = 0
+            if Clusters.Groupcast in root:
+                groupcast_feature_map = root[Clusters.Groupcast][Clusters.Groupcast.Attributes.FeatureMap]
+            has_groupcast_listener = bool(groupcast_feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener)
+            has_groupcast_sender = bool(groupcast_feature_map & Clusters.Groupcast.Bitmaps.Feature.kSender)
+
+            self.print_step(7, "Verify GroupcastListenerCond: if any endpoint has Groups server, "
+                            "Groupcast with Listener feature must be on EP0")
+            has_groups_server = any(
+                Clusters.Groups in self.endpoints[ep_id]
+                for ep_id in self.endpoints if ep_id != 0
+            )
+            log.info(f"has_groups_server: {has_groups_server}, has_groupcast_listener: {has_groupcast_listener}")
+            if has_groups_server and not has_groupcast_listener:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem="Groups server found on an endpoint but Groupcast cluster with Listener "
+                                  "feature is not present on the root node (EP0)",
+                                  spec_location="Root node device type - GroupcastListenerCond")
+                self.fail_current_test()
+
+            self.print_step(8, "Verify GroupcastSenderCond: if any endpoint has Binding server, "
+                            "Groupcast with Sender feature must be on EP0")
+            has_binding_server = any(
+                Clusters.Binding in self.endpoints[ep_id]
+                for ep_id in self.endpoints if ep_id != 0
+            )
+            log.info(f"has_binding_server: {has_binding_server}, has_groupcast_sender: {has_groupcast_sender}")
+            if has_binding_server and not has_groupcast_sender:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem="Binding server found on an endpoint but Groupcast cluster with Sender "
+                                  "feature is not present on the root node (EP0)",
+                                  spec_location="Root node device type - GroupcastSenderCond")
                 self.fail_current_test()
 
     def test_TC_DT_1_1(self):

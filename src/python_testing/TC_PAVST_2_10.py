@@ -74,6 +74,11 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        super().teardown_test()
+
     def steps_TC_PAVST_2_10(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
@@ -108,7 +113,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Precondition
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(
             endpoint=endpoint, server=self.server, host_ip=host_ip)
 
         # Reads CurrentConnections attribute (step 1)
@@ -161,7 +166,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         for idx, (desc, url) in enumerate(invalid_cases, start=5):
             self.step(idx)
             status = await self.allocate_one_pushav_transport(
-                endpoint, tlsEndPoint=tlsEndpointId, url=url, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidURL, expiryTime=30)
+                endpoint, tlsEndPoint=self.tlsEndpointId, url=url, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidURL, expiryTime=30)
             asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidURL,
                                  f"Push AV Transport should return InvalidURL for {desc}")
 
