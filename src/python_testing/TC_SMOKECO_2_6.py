@@ -30,16 +30,6 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.WARNING:005c000000000095
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CLEAR:005c0000000000a5
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM:005c000000000092
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM.CLEAR:005c0000000000a2
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM:005c000000000094
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM.CLEAR:005c0000000000a4
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.WARNING:005c000000000090
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CLEAR:005c0000000000a0
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING:005c000000000091
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CLEAR:005c0000000000a1
 #       --int-arg PIXIT.SMOKECO.HIEST_PRI_ALARM_1:1
 #       --int-arg PIXIT.SMOKECO.HIEST_PRI_ALARM_2:7
 #       --int-arg PIXIT.SMOKECO.HIEST_PRI_ALARM_3:7
@@ -54,7 +44,7 @@
 import logging
 
 from mobly import asserts
-from TC_SMOKECOTestBase import SmokeCoBaseTest
+from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
@@ -69,40 +59,12 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
     @async_test_body
     async def setup_test(self):
         super().setup_test()
-        self.gd_cluster = Clusters.GeneralDiagnostics
-        self.pixit_test_event_battery_alert = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.ALERT", 0x005c000000000095)
-        self.pixit_test_event_battery_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CLEAR", 0x005c0000000000a5)
-
-        self.pixit_test_event_interconnected_smoke_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM", 0x005c000000000092)
-        self.pixit_test_event_interconnected_smoke_alarm_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM.CLEAR", 0x005c0000000000a2)
-
-        self.pixit_test_event_interconnect_co_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM", 0x005c000000000094)
-        self.pixit_test_event_interconnect_co_alarm_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM.CLEAR", 0x005c0000000000a4)
-
-        self.pixit_test_event_smoke_alarm_warning = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.WARNING", 0x005c000000000090)
-        self.pixit_test_event_smoke_alarm_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CLEAR", 0x005c0000000000a0)
-
-        self.pixit_test_event_co_alarm_warning = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING", 0x005c000000000091)
-        self.pixit_test_event_co_alarm_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CLEAR", 0x005c0000000000a1)
-
         # ALARM PRIORITY
         self.pixit_hiest_pri_alarm_1 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_1", 1)
         self.pixit_hiest_pri_alarm_2 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_2", 7)
         self.pixit_hiest_pri_alarm_3 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_3", 7)
         self.pixit_hiest_pri_alarm_4 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_4", 7)
         self.pixit_hiest_pri_alarm_5 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_5", 3)
-
-        self.process_pixit_attributes()
 
     def desc_TC_SMOKECO_2_6(self) -> str:
         return "[TC-SMOKECO-2.6] ExpressedState Attribute - Multiple Alarms with DUT as Server"
@@ -216,7 +178,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         asserts.assert_equal(test_event_trigger_enabled, True, "TestEventTriggersEnabled is not True")
 
         self.step(9)
-        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_battery_alert)
+        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_battery_warning)
 
         self.step(10)
         battery_report_data = battery_alert_handler.wait_for_attribute_report(timeout_sec=300)
@@ -231,7 +193,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
                           self.smokeco_cluster.Enums.AlarmStateEnum.kWarning, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
 
         self.step(13)
-        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_co_alarm)
+        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnected_co_alarm)
 
         self.step(14)
         interconnected_co_alarm_report_data = interconnected_co_alarm_handler.wait_for_attribute_report(timeout_sec=300)
@@ -239,14 +201,14 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
                           self.smokeco_cluster.Enums.AlarmStateEnum.kWarning, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
 
         self.step(15)
-        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_co_alarm_warning)
+        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_warning_co_alarm)
 
         self.step(16)
         co_state_report_data = co_state_handler.wait_for_attribute_report(timeout_sec=300)
         asserts.assert_equal(co_state_report_data.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(17)
-        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_smoke_alarm_warning)
+        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_warning_smoke_alarm)
 
         self.step(18)
         smoke_state_report_data = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
@@ -258,7 +220,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         asserts.assert_equal(expressed_state, self.pixit_hiest_pri_alarm_1)
 
         self.step(20)
-        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_smoke_alarm_clear)
+        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_clear_smoke_alarm)
 
         self.step(21)
         smoke_state_report_data = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
@@ -269,7 +231,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         asserts.assert_equal(expressed_state, self.pixit_hiest_pri_alarm_2)
 
         self.step(23)
-        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_co_alarm_clear)
+        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_clear_co_alarm)
 
         self.step(24)
         co_state_report_data = co_state_handler.wait_for_attribute_report(timeout_sec=300)
@@ -280,7 +242,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         asserts.assert_equal(expressed_state, self.pixit_hiest_pri_alarm_3)
 
         self.step(26)
-        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_co_alarm_clear)
+        await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnected_co_alarm_clear)
 
         self.step(27)
         interconnected_co_alarm_report_data = interconnected_co_alarm_handler.wait_for_attribute_report(timeout_sec=300)
