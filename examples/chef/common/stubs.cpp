@@ -769,7 +769,7 @@ void InitModeSelect()
         using namespace chip::app::Clusters::ModeSelect;
         using namespace chip::app::Clusters::ModeSelect::Chef;
         static ChefSupportedModesManager supportedModesManager;
-        static ModeOptionsProvider modeOptions(
+        static SupportedModesManager::ModeOptionsProvider modeOptions(
             kDefaultModeOptions, kDefaultModeOptions + (sizeof(kDefaultModeOptions) / sizeof(kDefaultModeOptions[0])));
         supportedModesManager.AddModeOptionsProvider(1, modeOptions);
         setSupportedModesManager(&supportedModesManager);
