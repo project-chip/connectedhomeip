@@ -45,9 +45,8 @@ static_assert(kOtaRequestorFixedClusterCount == 0 || kOtaRequestorFixedClusterCo
               "OTA requestor is a node-scoped utility cluster, so only one may be created");
 
 // The OTA requestor cluster may be registered by the application before the OTA requestor singleton instance is set.
-// Since the OTA requestor cluster uses the singleton as its data source, this means the cluster won't have meaningful
-// data to return for attributes, nor can it properly handle commands. When this happens, an empty OTA requestor cluster
-// is registered that returns default values. A real cluster object replaces the empty one when the singleton is set.
+// This class decouples the cluster and the singleton so the cluster doesn't need to know whether the singleton is set
+// when handling commands.
 class OTARequestorCommandForwarder : public OTARequestorCommandInterface
 {
 public:
