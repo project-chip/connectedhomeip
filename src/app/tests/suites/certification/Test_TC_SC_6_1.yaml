@@ -472,7 +472,7 @@ tests:
           [1708328664.952524][17247:17247] CHIP:DMG:
           [1708328664.952527][17247:17247] CHIP:DMG:         ],
           [1708328664.952531][17247:17247] CHIP:DMG:
-          [1708328664.952533][17247:17247] CHIP:DMG:         InteractionModelRevision = 11
+          [1708328664.952533][17247:17247] CHIP:DMG:         InteractionModelRevision = 12
           [1708328664.952536][17247:17247] CHIP:DMG: },
       disabled: true
 
