@@ -54,7 +54,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [259], "targets": null }]' 1 0
 
-          Verify ACL WrireRequestMessage on TH(Reference app)log and below is the sample log provided for the raspi platform:
+          Verify ACL WriteRequestMessage on TH(Reference app)log and below is the sample log provided for the raspi platform:
 
           [1775724413.777] [2627030:2627030] [DMG] WriteRequestMessage =
           [1775724413.777] [2627030:2627030] [DMG] {

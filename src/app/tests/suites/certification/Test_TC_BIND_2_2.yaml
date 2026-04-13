@@ -270,7 +270,7 @@ tests:
       verification: |
           ./chip-tool groupcast join-group 0x1 [] 0x1 74 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
 
-          Verify the SUCCESS status response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+          Verify the SUCCESS status response on the TH1 (chip-tool) log; below is the sample log provided for the raspi platform:
 
           [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
           [1659075680.944052][2687:2692] CHIP:DMG:                         {

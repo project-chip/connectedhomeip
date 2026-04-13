@@ -40,7 +40,7 @@ tests:
           Execute the below mentioned command to put TH(Reference app) into a commissionable state in RPI platform, Pls use equivalent command on the respective platform
           ./chip-all-clusters-app --trace_decode 1
 
-          Once TH reach the  commissionable state pls send below mentioned command on DUT(chip-tool) in RPI platform. Pls use equivalent command on the respective platform
+          Once TH reaches the  commissionable state please send below mentioned command on DUT(chip-tool) in RPI platform. Please use equivalent command on the respective platform
 
           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
@@ -153,7 +153,7 @@ tests:
           "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002,
           "groupKeyMulticastPolicy": 0}' 1 0
 
-          Verify TH recieves KeySetWrite command on TH(Reference app)log:
+          Verify TH receives KeySetWrite command on TH(Reference app)log:
 
           [1775644582.955] [2326190:2326190] [DMG] InvokeRequestMessage =
           [1775644582.955] [2326190:2326190] [DMG] {

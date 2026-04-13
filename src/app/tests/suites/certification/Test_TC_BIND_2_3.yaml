@@ -263,7 +263,7 @@ tests:
       verification: |
           If the Groupcast cluster is enabled on the RootNode endpoint, skip this step. Otherwise, TH1 sets up group settings on DUT
 
-          Run this commands on chip-tool TH1 so it can uses the Key also
+          Run these commands on chip-tool TH1 so it can use the key also
           ./chip-tool groupsettings add-group 0x1 grp1 --addressPolicy 0
           ./chip-tool groupsettings add-keysets 0x01a1 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
           ./chip-tool groupsettings bind-keyset 0x1 0x01a1
