@@ -19,6 +19,7 @@
 
 #include <access/ProviderDeviceTypeResolver.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 
 #include <app/AppConfig.h>
 #include <app/EventManagement.h>
@@ -310,10 +311,20 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
+    mGroupsProvider = initParams.groupDataProvider;
+    SetGroupDataProvider(mGroupsProvider);
+    mGroupsProvider->SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
+
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
     {
         SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
+    }
+    else if (mGroupsProvider->IsGroupcastEnabled())
+    {
+        // Provide a default group auxiliary access control delegate if not provided by the application when groupcast is enabled
+        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(mGroupsProvider, &mFabrics);
+        SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(&groupAuxDelegate));
     }
     Access::SetAccessControl(mAccessControl);
 
@@ -326,9 +337,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
-
-    mGroupsProvider = initParams.groupDataProvider;
-    SetGroupDataProvider(mGroupsProvider);
 
     mReportScheduler = initParams.reportScheduler;
 

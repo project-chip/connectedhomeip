@@ -21,7 +21,6 @@
 #include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
