@@ -404,6 +404,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
 
             auto location = mPolicy.GetDeviceLocation();
             return encoder.Encode(*location);
+        } else {
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         }
     }
     default:
@@ -454,6 +456,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
             DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> value;
             ReturnErrorOnFailure(decoder.Decode(value));
             return mPolicy.WriteDeviceLocation(value, persistence);
+        } else {
+            return Protocols::InteractionModel::Status::UnsupportedWrite;
         }
     }
     default:
@@ -470,7 +474,7 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
     // TODO: MetadataEntry for these are static constants in the generated code.
     // They are available as Attributes::X::kMetadataEntry
 
-    static constexpr DataModel::AttributeEntry optionalAttributes[] = {
+    static constexpr DataModel::AttributeEntry optionalAttributesWithDeviceLocation[] = {
         ManufacturingDate::kMetadataEntry,   //
         PartNumber::kMetadataEntry,          //
         ProductURL::kMetadataEntry,          //
@@ -486,6 +490,26 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
 
         DeviceLocation::kMetadataEntry, //
     };
+
+    static constexpr DataModel::AttributeEntry optionalAttributesNoDeviceLocation[] = {
+        ManufacturingDate::kMetadataEntry,   //
+        PartNumber::kMetadataEntry,          //
+        ProductURL::kMetadataEntry,          //
+        ProductLabel::kMetadataEntry,        //
+        SerialNumber::kMetadataEntry,        //
+        LocalConfigDisabled::kMetadataEntry, //
+        Reachable::kMetadataEntry,           //
+        ProductAppearance::kMetadataEntry,   //
+
+        // Optional because of forced multi-revision support for backwards compatibility
+        // emulation: we emulate revision 3 when uniqueid is not enabled.
+        UniqueID::kMetadataEntry, //
+
+        DeviceLocation::kMetadataEntry, //
+    };
+
+    static constexpr auto & optionalAttributes = 
+        Policy::kHasDeviceLocation ? optionalAttributesWithDeviceLocation : optionalAttributesNoDeviceLocation;
 
     // kMandatoryAttributes equivalent
     static constexpr DataModel::AttributeEntry mandatoryAttributes[] = {
