@@ -31,11 +31,11 @@ inline constexpr AttributeId kEndpoint{{endpoint_config.endpoint_number}}Enabled
 inline constexpr struct {
   {%- for attr in endpoint_config.instance.attributes | rejectattr('default', 'none') | sort(attribute="name") %}
   {%- if attr.default is boolean %}
-    Attributes::{{attr.name | upfirst}}::TypeInfo::Type {{attr.name}} { {{ 'true' if attr.default else 'false' }} };
+    Clusters::StaticApplicationConfig::RemoveNullableT<Attributes::{{attr.name | upfirst}}::TypeInfo::Type> {{attr.name}} { {{ 'true' if attr.default else 'false' }} };
   {%- elif attr.default is string %}
-    Attributes::{{attr.name | upfirst}}::TypeInfo::Type {{attr.name}} { "{{attr.default}}"_span };
+    Clusters::StaticApplicationConfig::RemoveNullableT<Attributes::{{attr.name | upfirst}}::TypeInfo::Type> {{attr.name}} { "{{attr.default}}"_span };
   {%- else %}
-    Attributes::{{attr.name | upfirst}}::TypeInfo::Type {{attr.name}} { {{attr.default}} };
+    Clusters::StaticApplicationConfig::RemoveNullableT<Attributes::{{attr.name | upfirst}}::TypeInfo::Type> {{attr.name}} { {{attr.default}} };
   {%- endif %}
   {%- endfor %}
 

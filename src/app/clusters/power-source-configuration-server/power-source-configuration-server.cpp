@@ -75,12 +75,20 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
                 {
                     break;
                 }
-                auto * cluster = FindClusterOnEndpoint(endpoint);
-                if (cluster == nullptr)
+                auto * wiredCluster = FindWiredClusterOnEndpoint(endpoint);
+                if (wiredCluster != nullptr)
                 {
-                    continue;
+                    order = wiredCluster->GetOrder();
                 }
-                order            = cluster->GetOrder();
+                else
+                {
+                    auto * batteryCluster = FindBatteryClusterOnEndpoint(endpoint);
+                    if (batteryCluster == nullptr)
+                    {
+                        continue;
+                    }
+                    order = batteryCluster->GetOrder();
+                }
                 orderEpPair[idx] = std::make_pair(endpoint, order);
                 idx++;
             }

@@ -49,9 +49,14 @@ public:
     // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
     // and that's not allowed in constexpr functions.
 
-    Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen)
+    constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen)
     {
-        VerifyOrDie(databuf != nullptr || datalen == 0); // not constexpr on some platforms
+        VerifyOrDie(databuf != nullptr || datalen == 0);
+        // This can call `abort()` which is non constexpr on some platforms.
+        // But if the input passes the check, the abort will not be reached and no error will be thrown at compile time.
+        // And if the input doesn't pass the check, error will be thrown about `abort()` not being a constexpr function.
+        // This is almosts exactly the behaviour we want.
+        // The only downside is that the error message will not be pretty.
     }
 
     // The only valid length for a span pointing to null is 0 (i.e. it's an empty span).  Disallow
@@ -123,34 +128,34 @@ public:
     constexpr pointer end() const { return data() + size(); }
 
     // Element accessors, matching the std::span API.
-    reference operator[](size_t index) const
+    constexpr reference operator[](size_t index) const
     {
-        VerifyOrDie(index < size()); // not constexpr on some platforms
+        VerifyOrDie(index < size());
         return data()[index];
     }
-    reference front() const { return (*this)[0]; }
-    reference back() const { return (*this)[size() - 1]; }
+    constexpr reference front() const { return (*this)[0]; }
+    constexpr reference back() const { return (*this)[size() - 1]; }
 
-    bool data_equal(const Span<const T> & other) const
+    constexpr bool data_equal(const Span<const T> & other) const
     {
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
 
-    Span SubSpan(size_t offset, size_t length) const
+    constexpr Span SubSpan(size_t offset, size_t length) const
     {
         VerifyOrDie(offset <= mDataLen);
         VerifyOrDie(length <= mDataLen - offset);
         return Span(mDataBuf + offset, length);
     }
 
-    Span SubSpan(size_t offset) const
+    constexpr Span SubSpan(size_t offset) const
     {
         VerifyOrDie(offset <= mDataLen);
         return Span(mDataBuf + offset, mDataLen - offset);
     }
 
     // Allow reducing the size of a span.
-    void reduce_size(size_t new_size)
+    constexpr void reduce_size(size_t new_size)
     {
         VerifyOrDie(new_size <= size());
         mDataLen = new_size;
@@ -161,7 +166,7 @@ public:
     template <class U,
               typename = std::enable_if_t<std::is_same<uint8_t, std::remove_const_t<U>>::value &&
                                           (std::is_same<const uint8_t, T>::value || std::is_same<const char, T>::value)>>
-    static Span fromZclString(U * bytes)
+    constexpr static Span fromZclString(U * bytes)
     {
         size_t length = bytes[0];
         // Treat 0xFF (aka "null string") as zero-length.
@@ -178,7 +183,7 @@ public:
     // Note that for string literals, the user-defined `_span` string
     // literal operator should be used instead, e.g. `"Hello"_span`.
     template <class U, typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<const char, T>::value>>
-    static Span fromCharString(U * chars)
+    constexpr static Span fromCharString(U * chars)
     {
         return Span(chars, strlen(chars));
     }
@@ -390,7 +395,7 @@ using MutableFixedByteSpan = FixedSpan<uint8_t, N>;
 using CharSpan        = Span<const char>;
 using MutableCharSpan = Span<char>;
 
-inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
+inline constexpr CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
 {
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -401,7 +406,7 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
     return CHIP_NO_ERROR;
 }
 
-inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
+inline constexpr CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
 {
     VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -418,7 +423,7 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
  * @param span_to_copy The CharSpan to copy.
  * @param out_span The MutableCharSpan in which span_to_copy is to be copied.
  */
-inline void CopyCharSpanToMutableCharSpanWithTruncation(CharSpan span_to_copy, MutableCharSpan & out_span)
+inline constexpr void CopyCharSpanToMutableCharSpanWithTruncation(CharSpan span_to_copy, MutableCharSpan & out_span)
 {
     size_t size_to_copy = std::min(span_to_copy.size(), out_span.size());
 

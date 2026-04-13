@@ -41,8 +41,12 @@ constexpr size_t kPowerSourceFixedClusterCount = kFixedClusterConfig.size();
 // invariant: endpointId is null IFF configOrCluster is std::monostate
 struct ConfigOrCluster
 {
-    TrivialConstexprOptional<EndpointId> endpointId;
-    std::variant<std::monostate, PowerSourceCluster::WiredConfiguration, PowerSourceCluster::BatteryConfiguration, RegisteredServerCluster<PowerSourceCluster>> configOrCluster;
+    ConstexprIntegralOptional<EndpointId> endpointId;
+    std::variant<std::monostate,
+                 WiredPowerSourceCluster::Configuration,
+                 BatteryPowerSourceCluster::Configuration,
+                 RegisteredServerCluster<WiredPowerSourceCluster>,
+                 RegisteredServerCluster<BatteryPowerSourceCluster>> configOrCluster;
 };
 
 template <size_t index>
@@ -51,7 +55,7 @@ constexpr auto GetClusterConfigFromIndex()
     if constexpr (index >= kPowerSourceFixedClusterCount)
     {
         // Dynamic endpoint, no config at compile time
-        return std::monostate{};
+        return std::pair(ConstexprIntegralOptional<EndpointId>{}, std::monostate{});
     }
     else
     {
@@ -59,9 +63,12 @@ constexpr auto GetClusterConfigFromIndex()
         constexpr auto endpointConfig = kFixedClusterConfig[index];
         constexpr auto defaults = GetAttributeDefaultValuesOnEndpoint<endpointConfig.endpointNumber>();
 
-        static_assert(endpointConfig.featureMap.Has(Feature::kWired) ^ endpointConfig.featureMap.Has(Feature::kBattery),
-                    "PowerSource cluster must have exactly one of Wired and Battery features.");
-        if constexpr (endpointConfig.featureMap.Has(Feature::kWired))
+        if constexpr(endpointConfig.featureMap.Has(Feature::kWired) ^ endpointConfig.featureMap.Has(Feature::kBattery))
+        {
+            // Invalid config, ignore, probably a dummy endpoint for dynamic endpoints zap code generation which will be disabled
+            return std::pair(ConstexprIntegralOptional<EndpointId>{}, std::monostate{});
+        }
+        else if constexpr (endpointConfig.featureMap.Has(Feature::kWired))
         {
             CharSpan description{};
             WiredCurrentTypeEnum currentType{};
@@ -73,7 +80,7 @@ constexpr auto GetClusterConfigFromIndex()
             static_assert(defaults.HasDefaultValue(WiredCurrentType::Id), "WiredCurrentType is required to have a default value when the Wired feature is enabled.");
             currentType = defaults.wiredCurrentType;
 
-            PowerSourceCluster::WiredConfiguration config(description, currentType);
+            WiredPowerSourceCluster::Configuration config(description, currentType);
             if constexpr (defaults.HasDefaultValue(Status::Id))
             {
                 config.status = defaults.status;
@@ -106,7 +113,7 @@ constexpr auto GetClusterConfigFromIndex()
             {
                 config.isPresent = defaults.wiredIsPresent;
             }
-            return config;
+            return std::pair(endpointConfig.endpointNumber, config);
         }
         else
         {
@@ -122,7 +129,7 @@ constexpr auto GetClusterConfigFromIndex()
                 replaceability = defaults.batReplaceability;
             }
 
-            PowerSourceCluster::BatteryConfiguration config(description, replaceability);
+            BatteryPowerSourceCluster::Configuration config(description, replaceability);
             if constexpr (defaults.HasDefaultValue(Status::Id))
             {
                 config.status = defaults.status;
@@ -219,7 +226,7 @@ constexpr auto GetClusterConfigFromIndex()
                     config.capacity = defaults.batCapacity;
                 }
             }
-            return config;
+            return std::pair(endpointConfig.endpointNumber, config);
         }
     }
 }
@@ -228,18 +235,13 @@ constexpr auto GetClusterConfigFromIndex()
 // This will make all the generated objects in the StaticClusterConfig to be used only at compile time, and thus can be optimized away.
 template <size_t I>
 constexpr auto kConfigForIndex = GetClusterConfigFromIndex<I>();
-template <size_t I>
-constexpr TrivialConstexprOptional<EndpointId> kEndpointIdForIndex =
-    (I < kPowerSourceFixedClusterCount) ?
-    TrivialConstexprOptional<EndpointId>{kFixedClusterConfig[I].endpointNumber} :
-    TrivialConstexprOptional<EndpointId>{};
 
 // Helper
 template <std::size_t... Is>
 auto GetClusterConfigArrayImpl(std::index_sequence<Is...>) {
     // If it is for a static endpoint, create the config using information from StaticClusterConfig.
     // For a dynamic endpoint, create empty std::monostate variant which can be replaced with a config later
-    return std::array{ ConfigOrCluster{kEndpointIdForIndex<Is>, kConfigForIndex<Is>}... };
+    return std::array{ ConfigOrCluster{kConfigForIndex<Is>.first, kConfigForIndex<Is>.second} ... };
 }
 
 template <std::size_t N>
@@ -250,12 +252,11 @@ std::array<ConfigOrCluster, N> GetClusterConfigArray() {
 constexpr size_t kPowerSourceMaxClusterCount   = kPowerSourceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 auto gConfigsOrClusters = GetClusterConfigArray<kPowerSourceMaxClusterCount>();
 
-
 bool FindIndexForEndpoint(EndpointId endpointId, size_t & index)
 {
     for (size_t i = 0; i < gConfigsOrClusters.size(); ++i)
     {
-        if (gConfigsOrClusters[i].endpointId.hasValue && gConfigsOrClusters[i].endpointId.value == endpointId)
+        if (gConfigsOrClusters[i].endpointId.HasValue() && gConfigsOrClusters[i].endpointId.value == endpointId)
         {
             index = i;
             return true;
@@ -270,23 +271,26 @@ void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
 {
     size_t index{};
     VerifyOrDieWithMsg(FindIndexForEndpoint(endpointId, index), Zcl, "Invalid endpoint for power source cluster: %u", endpointId);
-    VerifyOrDieWithMsg(!std::holds_alternative<RegisteredServerCluster<PowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster) &&
-                       !std::holds_alternative<std::monostate>(gConfigsOrClusters[index].configOrCluster),
+    VerifyOrDieWithMsg(!std::holds_alternative<RegisteredServerCluster<WiredPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster) &&
+                       !std::holds_alternative<RegisteredServerCluster<BatteryPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster),
                         Zcl, "PowerSource cluster for endpoint %u is already initialized", endpointId);
 
-    if (std::holds_alternative<PowerSourceCluster::WiredConfiguration>(gConfigsOrClusters[index].configOrCluster))
+    if (std::holds_alternative<WiredPowerSourceCluster::Configuration>(gConfigsOrClusters[index].configOrCluster))
     {
-        auto config = std::get<PowerSourceCluster::WiredConfiguration>(gConfigsOrClusters[index].configOrCluster);
-        gConfigsOrClusters[index].configOrCluster.emplace<RegisteredServerCluster<PowerSourceCluster>>(endpointId, DeviceLayer::SystemLayer(), config);
+        auto * pConfig = std::get_if<WiredPowerSourceCluster::Configuration>(&gConfigsOrClusters[index].configOrCluster);
+        gConfigsOrClusters[index].configOrCluster.emplace<RegisteredServerCluster<WiredPowerSourceCluster>>(endpointId, *pConfig);
+        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Register(
+            std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster)->Registration()));
+
     }
-    else if (std::holds_alternative<PowerSourceCluster::BatteryConfiguration>(gConfigsOrClusters[index].configOrCluster))
+    else if (std::holds_alternative<BatteryPowerSourceCluster::Configuration>(gConfigsOrClusters[index].configOrCluster))
     {
-        auto config = std::get<PowerSourceCluster::BatteryConfiguration>(gConfigsOrClusters[index].configOrCluster);
-        gConfigsOrClusters[index].configOrCluster.emplace<RegisteredServerCluster<PowerSourceCluster>>(endpointId, DeviceLayer::SystemLayer(), config);
+        auto * pConfig = std::get_if<BatteryPowerSourceCluster::Configuration>(&gConfigsOrClusters[index].configOrCluster);
+        gConfigsOrClusters[index].configOrCluster.emplace<RegisteredServerCluster<BatteryPowerSourceCluster>>(endpointId, DeviceLayer::SystemLayer(), *pConfig);
+        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Register(
+            std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster)->Registration()));
     }
 
-    SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Register(
-        std::get<RegisteredServerCluster<PowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster).Registration()));
 }
 
 void MatterPowerSourceClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
@@ -294,14 +298,23 @@ void MatterPowerSourceClusterShutdownCallback(EndpointId endpointId, MatterClust
     size_t index{};
     VerifyOrDieWithMsg(FindIndexForEndpoint(endpointId, index), Zcl, "Invalid endpoint for power source cluster: %u", endpointId);
 
-    if (!std::holds_alternative<RegisteredServerCluster<PowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster))
+    if (!std::holds_alternative<RegisteredServerCluster<WiredPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster) &&
+        !std::holds_alternative<RegisteredServerCluster<BatteryPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster))
     {
         // cluster was never created, nothing to do
         return;
     }
 
-    auto & cluster = std::get<RegisteredServerCluster<PowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster);
-    SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Unregister(&cluster.Cluster()));
+    auto * pWiredCluster = std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
+    if (pWiredCluster) // cluster is wired type
+    {
+        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Unregister(&pWiredCluster->Cluster()));
+    }
+    else // cluster is battery type
+    {
+        auto * pBatteryCluster = std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
+        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Unregister(&pBatteryCluster->Cluster()));
+    }
 
     gConfigsOrClusters[index].configOrCluster.emplace<std::monostate>(); // reset to default state
     gConfigsOrClusters[index].endpointId.reset();
@@ -311,53 +324,70 @@ void MatterPowerSourcePluginServerInitCallback() {}
 
 namespace chip::app::Clusters::PowerSource {
 
-PowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const PowerSourceCluster::WiredConfiguration & config)
+WiredPowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const WiredPowerSourceCluster::Configuration & config)
 {
     for (auto & configOrCluster : gConfigsOrClusters)
     {
-        if (!configOrCluster.endpointId.hasValue)
+        if (!configOrCluster.endpointId.HasValue())
         {
             configOrCluster.endpointId = id;
-            configOrCluster.configOrCluster.emplace<RegisteredServerCluster<PowerSourceCluster>>(id, DeviceLayer::SystemLayer(), config);
-            VerifyOrReturnValue(CodegenDataModelProvider::Instance().Registry().Register(
-                std::get<RegisteredServerCluster<PowerSourceCluster>>(configOrCluster.configOrCluster).Registration()) == CHIP_NO_ERROR, nullptr);
-            return &std::get<RegisteredServerCluster<PowerSourceCluster>>(configOrCluster.configOrCluster).Cluster();
+            configOrCluster.configOrCluster.emplace<RegisteredServerCluster<WiredPowerSourceCluster>>(id, config);
+            auto * pCluster = std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&configOrCluster.configOrCluster);
+            if (pCluster == nullptr || CodegenDataModelProvider::Instance().Registry().Register(pCluster->Registration()) != CHIP_NO_ERROR)
+            {
+                configOrCluster.configOrCluster.emplace<std::monostate>();
+                configOrCluster.endpointId.reset();
+                return nullptr;
+            }
+            return &pCluster->Cluster();
         }
     }
+
     ChipLogError(Zcl, "Dynamic endpoint count reached maximum for power source cluster");
     return nullptr;
 }
 
-PowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const PowerSourceCluster::BatteryConfiguration & config)
+BatteryPowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const BatteryPowerSourceCluster::Configuration & config)
 {
     for (auto & configOrCluster : gConfigsOrClusters)
     {
-        if (!configOrCluster.endpointId.hasValue)
+        if (!configOrCluster.endpointId.HasValue())
         {
             configOrCluster.endpointId = id;
-            configOrCluster.configOrCluster.emplace<RegisteredServerCluster<PowerSourceCluster>>(id, DeviceLayer::SystemLayer(), config);
-            VerifyOrReturnValue(CodegenDataModelProvider::Instance().Registry().Register(
-                std::get<RegisteredServerCluster<PowerSourceCluster>>(configOrCluster.configOrCluster).Registration()) == CHIP_NO_ERROR, nullptr);
-            return &std::get<RegisteredServerCluster<PowerSourceCluster>>(configOrCluster.configOrCluster).Cluster();
+            configOrCluster.configOrCluster.emplace<RegisteredServerCluster<BatteryPowerSourceCluster>>(id, DeviceLayer::SystemLayer(), config);
+            auto * pCluster = std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&configOrCluster.configOrCluster);
+            if (pCluster == nullptr || CodegenDataModelProvider::Instance().Registry().Register(pCluster->Registration()) != CHIP_NO_ERROR)
+            {
+                configOrCluster.configOrCluster.emplace<std::monostate>();
+                configOrCluster.endpointId.reset();
+                return nullptr;
+            }
+            return &pCluster->Cluster();
         }
     }
+
     ChipLogError(Zcl, "Dynamic endpoint count reached maximum for power source cluster");
     return nullptr;
 }
 
-PowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
+WiredPowerSourceCluster * FindWiredClusterOnEndpoint(EndpointId endpointId)
 {
     size_t index{};
     VerifyOrReturnValue(FindIndexForEndpoint(endpointId, index), nullptr);
 
-    if (!std::holds_alternative<RegisteredServerCluster<PowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster))
-    {
-        // cluster was never created, return null
-        return nullptr;
-    }
+    auto * pCluster = std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
+    VerifyOrReturnValue(pCluster, nullptr);
+    return &pCluster->Cluster();
+}
 
-    auto & cluster = std::get<RegisteredServerCluster<PowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster);
-    return static_cast<PowerSourceCluster *>(&cluster.Cluster());
+BatteryPowerSourceCluster * FindBatteryClusterOnEndpoint(EndpointId endpointId)
+{
+    size_t index{};
+    VerifyOrReturnValue(FindIndexForEndpoint(endpointId, index), nullptr);
+
+    auto * pCluster = std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
+    VerifyOrReturnValue(pCluster, nullptr);
+    return &pCluster->Cluster();
 }
 
 } // namespace chip::app::Clusters::PowerSource

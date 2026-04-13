@@ -403,7 +403,7 @@ public:
             else if (name == "Bat remaining")
             {
                 // update the battery percent remaining here for hardcoded endpoint 1
-                auto * powerSource = app::Clusters::PowerSource::FindClusterOnEndpoint(1);
+                auto * powerSource = app::Clusters::PowerSource::FindBatteryClusterOnEndpoint(1);
                 if (powerSource != nullptr)
                 {
                     CHIP_ERROR err = powerSource->SetBatPercentRemaining(MakeOptional(static_cast<uint8_t>(n * 2)));
@@ -477,7 +477,7 @@ public:
                 }
 
                 // update the battery charge level here for hardcoded endpoint 1
-                auto * powerSource = app::Clusters::PowerSource::FindClusterOnEndpoint(1);
+                auto * powerSource = app::Clusters::PowerSource::FindBatteryClusterOnEndpoint(1);
                 if (powerSource != nullptr)
                 {
                     CHIP_ERROR err = powerSource->SetBatChargeLevel(attributeValue);
@@ -793,7 +793,7 @@ void SetupPretendDevices()
     AddCluster("Power Source");
     AddAttribute("Bat remaining", "70");
     AddAttribute("Charge level", "0");
-    auto * powerSource = app::Clusters::PowerSource::FindClusterOnEndpoint(1);
+    auto * powerSource = app::Clusters::PowerSource::FindBatteryClusterOnEndpoint(1);
     if (powerSource != nullptr)
     {
         CHIP_ERROR err;
