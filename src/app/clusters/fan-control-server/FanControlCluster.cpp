@@ -64,11 +64,6 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
     attrPersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), restoredFanMode,
                                           mFanMode);
 
-    if (EnsureKnownEnumValue(restoredFanMode) == FanModeEnum::kUnknownEnumValue)
-    {
-        restoredFanMode = mFanMode;
-    }
-
     DataModel::ActionReturnStatus status = SetFanMode(restoredFanMode, /* syncOnOffDelegate = */ false);
     if (!status.IsSuccess())
     {
