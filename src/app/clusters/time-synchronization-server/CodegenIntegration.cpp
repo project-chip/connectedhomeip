@@ -93,6 +93,8 @@ public:
                                                                                   .delegate =
                                                                                       TimeSynchronization::GetDefaultDelegate() };
 
+        // TODO: Adding the interaction model engine to the context might not be ideal since this is a massive object,
+        // although we are just passing a reference to the object, we should consider a better solution in the future.
         TimeSynchronizationCluster::Context context = { .fabricTable            = Server::GetInstance().GetFabricTable(),
                                                         .caseSessionManager     = *Server::GetInstance().GetCASESessionManager(),
                                                         .platformManager        = DeviceLayer::PlatformMgr(),
