@@ -28,13 +28,13 @@ CHIP_ERROR ChefSupportedModesManager::AddModeOptionsProvider(EndpointId endpoint
 {
     if (mModeOptionsPerEndpoint.count(endpoint) > 0)
     {
-        return CHIP_ERROR_KEY_ALREADY_EXISTS;
+        return CHIP_ERROR_ENDPOINT_EXISTS;
     }
     mModeOptionsPerEndpoint[endpoint] = optionsProvider;
     return CHIP_NO_ERROR;
 }
 
-ModeOptionsProvider ChefSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
+SupportedModesManager::ModeOptionsProvider ChefSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
     auto it = mModeOptionsPerEndpoint.find(endpointId);
     if (it == mModeOptionsPerEndpoint.end())
@@ -47,7 +47,7 @@ ModeOptionsProvider ChefSupportedModesManager::getModeOptionsProvider(EndpointId
 Protocols::InteractionModel::Status ChefSupportedModesManager::getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                                                    const ModeOptionStructType ** dataPtr) const
 {
-    ModeOptionsProvider provider = getModeOptionsProvider(endpointId);
+    SupportedModesManager::ModeOptionsProvider provider = getModeOptionsProvider(endpointId);
     if (provider.begin() == nullptr || provider.end() == nullptr)
     {
         return Protocols::InteractionModel::Status::NotFound;
