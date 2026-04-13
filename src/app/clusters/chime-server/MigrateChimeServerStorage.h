@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,25 +15,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <access/AccessControl.h>
-#include <credentials/FabricTable.h>
-#include <credentials/GroupDataProvider.h>
-#include <lib/support/TimerDelegate.h>
+#include <app/clusters/chime-server/ChimeCluster.h>
+#include <app/persistence/AttributePersistenceMigration.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace Chime {
 
-struct GroupcastContext
-{
-    chip::FabricTable & fabricTable;
-    chip::Credentials::GroupDataProvider & groupDataProvider;
-    chip::TimerDelegate & timerDelegate;
-    chip::Access::AccessControl & accessControl;
-};
-
+CHIP_ERROR MigrateChimeServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
+                                     AttributePersistenceProvider & dstProvider);
+} // namespace Chime
 } // namespace Clusters
 } // namespace app
 } // namespace chip
