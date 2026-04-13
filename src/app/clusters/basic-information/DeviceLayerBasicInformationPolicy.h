@@ -230,7 +230,7 @@ public:
             mDeviceLocation.emplace(DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable));
         }
     }
-    
+
     static constexpr bool kHasDeviceLocation = true;
 
     // The code for supporting the DeviceLocation attribute was borrowed + adapted
