@@ -137,9 +137,13 @@ class TC_ACE_1_6(MatterBaseTest):
         # Check if Groupcast cluster is on RootNode (endpoint 0)
         gc_on_root = await is_groupcast_on_root_node(self)
 
-        # Indicate endpoints to be used for test
+        # Indicate endpoints to be used for test. These default values will be 
+        # verified or changed depending on use of groupcast or groups clusters
+        operate_only_command = None
+        ep1 = self.get_endpoint()
+        pixit_g_endpoint = self.get_endpoint()
+        
         if not gc_on_root:
-            pixit_g_endpoint = self.get_endpoint()
             asserts.assert_false(pixit_g_endpoint is None, "--endpoint <endpoint> with Groups cluster must be included on the command line.")
             asserts.assert_not_equal(pixit_g_endpoint, 0, "Not allowed to have groups clusters on endpoint 0.")
             log.info(f"Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: {pixit_g_endpoint}")
@@ -275,7 +279,6 @@ class TC_ACE_1_6(MatterBaseTest):
 
         if gc_on_root:
             # Cluster on ep1 with modified attributes
-            # TODO: fix possubly unbound
             target_cluster = operate_only_command.cluster_object.id
             target_endpoint = ep1
         else:

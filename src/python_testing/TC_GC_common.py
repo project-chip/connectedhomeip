@@ -311,13 +311,18 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
                 for cmd_id in command_list:
                     try:
                         xml_command = xml_clusters[cluster.id].accepted_commands[cmd_id]
-                        # TODO: Must also be a client -> server command, not a response
-                        # TODO: Need to find a way to instantiate it with default args if not the case!!!
                         if xml_command.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate:
                             cluster_object = Clusters.ClusterObjects.ALL_CLUSTERS[cluster.id]
                             command_object = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster.id][cmd_id]
+
+                            # Only client-to-server commands (no response commands)
+                            if not command_object.is_client:
+                                continue
+
+                            # In this codebase, all generated ClusterCommand subclasses have defaults for all fields.
                             operate_only_commands.append(OperateOnlyCommand(
                                 endpoint_id=endpoint_id, cluster_object=cluster_object, command_object=command_object))
+
                     except KeyError:
                         logger.warning(
                             f"Command ID {cmd_id} on cluster {cluster.id} not found in spec XMLs. This may be a manufacturer-specific command.")
