@@ -63,6 +63,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from TC_GC_common import get_operate_only_commands
 
 log = logging.getLogger(__name__)
 
@@ -143,16 +144,16 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_not_equal(pixit_g_endpoint, 0, "Not allowed to have groups clusters on endpoint 0.")
             log.info(f"Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: {pixit_g_endpoint}")
         else:
-            # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later
-            parts_list = await self.read_single_attribute_check_success(
-                cluster=Clusters.Descriptor,
-                attribute=Clusters.Descriptor.Attributes.PartsList,
-                endpoint=0
-            )
-            # TODO: ep~1~ should be fetched using code to find an endpoint with a cluster with attributes that can be modified by a cluster command,
-            # should replace hard-coded uses of OnOff
-            ep1 = parts_list[0] if (parts_list is not None and parts_list[0] is not None) else 1
+            # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later. This is an endpoint that must have at least 
+            # one cluster with a command that has operate priviliege.
+            operate_only_command_list = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, self.get_endpoint())
+            asserts.assert_greater(len(operate_only_command_list), 0, "DUT must have at least 1 non-root endpoint with a cluster with commands requiring operate privilege.")
+            operate_only_command = operate_only_command_list[0]
+            ep1 = operate_only_command.endpoint_id
+
             log.info(f"Endpoint value for ep~1~ used for test steps with groupcast cluster: {ep1}")
+            log.info(f"Targeted cluster used for groupcast case is: {operate_only_command.cluster_object.__name__} ({operate_only_command.cluster_object.id})")
+            log.info(f"Targeted command with operate priviliege on the targeted cluster used for groupcast case is: {operate_only_command.command_object.__name__}")
 
         # Step 1a: KeySetWrite 0x01a3
         self.step("1a")
@@ -273,9 +274,9 @@ class TC_ACE_1_6(MatterBaseTest):
         )
 
         if gc_on_root:
-            # Cluster on ep1 with modified attributes (using OnOff as example)
-            target_cluster = Clusters.OnOff.id
+            # Cluster on ep1 with modified attributes
             # TODO: fix possubly unbound
+            target_cluster = operate_only_command.cluster_object.id
             target_endpoint = ep1
         else:
             target_cluster = Clusters.Groups.id
@@ -339,7 +340,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 10: Group command to Group 0x0103
             self.step(10)
-            self.default_controller.SendGroupCommand(groupID3, Clusters.OnOff.Commands.Toggle())
+            self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
             await asyncio.sleep(3)
 
             # Step 11: Verify GroupcastTesting event (AccessAllowed: true)
@@ -351,7 +352,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 12: Group command to Group 0x0102
             self.step(12)
-            self.default_controller.SendGroupCommand(groupID2, Clusters.OnOff.Commands.Toggle())
+            self.default_controller.SendGroupCommand(groupID2, operate_only_command.command_object())
             await asyncio.sleep(3)
 
             # Step 13: Verify GroupcastTesting event (AccessAllowed: false)
@@ -375,7 +376,7 @@ class TC_ACE_1_6(MatterBaseTest):
             self.mark_step_range_skipped(15, 20)
         else:
             self.step(15)
-            self.default_controller.SendGroupCommand(groupID3, Clusters.OnOff.Commands.Toggle())
+            self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
             await asyncio.sleep(3)
 
             # Step 16: Verify GroupcastTesting event (AccessAllowed: false)
@@ -391,7 +392,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 18: Generic group command to Group 0x0103
             self.step(18)
-            self.default_controller.SendGroupCommand(groupID3, Clusters.OnOff.Commands.Toggle())
+            self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
             await asyncio.sleep(3)
 
             # Step 19: Verify GroupcastTesting event (AccessAllowed: true)
