@@ -303,7 +303,7 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
         dm = dm_from_spec_version(spec_version)
         xml_clusters, _ = build_xml_clusters(dm)
         return xml_clusters
-    
+
     def find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands):
         for cluster, cluster_data in endpoint_data.items():
             if cluster.Attributes.AcceptedCommandList in cluster_data:

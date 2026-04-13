@@ -137,18 +137,18 @@ class TC_ACE_1_6(MatterBaseTest):
         # Check if Groupcast cluster is on RootNode (endpoint 0)
         gc_on_root = await is_groupcast_on_root_node(self)
 
-        # Indicate endpoints to be used for test. These default values will be 
+        # Indicate endpoints to be used for test. These default values will be
         # verified or changed depending on use of groupcast or groups clusters
         operate_only_command = None
         ep1 = self.get_endpoint()
         pixit_g_endpoint = self.get_endpoint()
-        
+
         if not gc_on_root:
             asserts.assert_false(pixit_g_endpoint is None, "--endpoint <endpoint> with Groups cluster must be included on the command line.")
             asserts.assert_not_equal(pixit_g_endpoint, 0, "Not allowed to have groups clusters on endpoint 0.")
             log.info(f"Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: {pixit_g_endpoint}")
         else:
-            # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later. This is an endpoint that must have at least 
+            # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later. This is an endpoint that must have at least
             # one cluster with a command that has operate priviliege.
             operate_only_command_list = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, self.get_endpoint())
             asserts.assert_greater(len(operate_only_command_list), 0, "DUT must have at least 1 non-root endpoint with a cluster with commands requiring operate privilege.")
@@ -189,7 +189,7 @@ class TC_ACE_1_6(MatterBaseTest):
             )
         ))
 
-        # Must manually set the group key sets for the controller. 
+        # Must manually set the group key sets for the controller.
         self.default_controller.SetGroupKeySet(
             keyset_id=keySetID1,
             policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
