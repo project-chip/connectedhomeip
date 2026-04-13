@@ -7,9 +7,9 @@
 about-time==4.2.1
     # via alive-progress
 alive-progress==3.3.0
-    # via -r /workspace/scripts/tests/requirements.txt
+    # via -r ../tests/requirements.txt
 anytree==2.8.0
-    # via -r /workspace/scripts/setup/requirements.memory.txt
+    # via -r requirements.memory.txt
 appdirs==1.4.4
     # via -r requirements.all.txt
 appnope==0.1.3
@@ -23,15 +23,15 @@ attrs==26.1.0
 backcall==0.2.0
     # via ipython
 bluezoo==1.0.2 ; sys_platform == "linux"
-    # via -r /workspace/scripts/tests/requirements.txt
+    # via -r ../tests/requirements.txt
 build==0.8.0
     # via
     #   -r requirements.all.txt
     #   pip-tools
 cbor==1.0.0
-    # via -r /workspace/scripts/setup/requirements.zephyr.txt
+    # via -r requirements.zephyr.txt
 cbor2==5.4.6
-    # via -r /workspace/scripts/setup/requirements.zephyr.txt
+    # via -r requirements.zephyr.txt
 certifi==2022.12.7
     # via requests
 cffi==1.15.0 ; python_version < "3.13"
@@ -42,8 +42,8 @@ charset-normalizer==3.0.1
     # via requests
 click==8.1.6
     # via
-    #   -r /workspace/scripts/setup/requirements.build.txt
-    #   -r /workspace/scripts/tests/requirements.txt
+    #   -r ../tests/requirements.txt
+    #   -r requirements.build.txt
     #   click-option-group
     #   matter-idl
     #   pip-tools
@@ -51,14 +51,14 @@ click-option-group==0.5.9
     # via -r requirements.all.txt
 colorama==0.4.6
     # via
-    #   -r /workspace/scripts/tests/requirements.txt
+    #   -r ../tests/requirements.txt
     #   -r requirements.all.txt
     #   west
 coloredlogs==15.0.1
     # via
-    #   -r /workspace/scripts/setup/requirements.build.txt
-    #   -r /workspace/scripts/tests/requirements.txt
+    #   -r ../tests/requirements.txt
     #   -r requirements.all.txt
+    #   -r requirements.build.txt
     #   bluezoo
     #   matter-idl
 cryptography==43.0.0
@@ -66,11 +66,11 @@ cryptography==43.0.0
     #   -r requirements.all.txt
     #   google-auth
 cxxfilt==0.3.0
-    # via -r /workspace/scripts/setup/requirements.memory.txt
+    # via -r requirements.memory.txt
 decorator==5.1.1
     # via ipython
 diskcache==5.4.0
-    # via -r /workspace/scripts/tests/requirements.txt
+    # via -r ../tests/requirements.txt
 distlib==0.3.6
     # via virtualenv
 docopt==0.6.2
@@ -82,7 +82,7 @@ fastcore==1.5.28
 filelock==3.9.0
     # via virtualenv
 ghapi==1.0.3
-    # via -r /workspace/scripts/setup/requirements.memory.txt
+    # via -r requirements.memory.txt
 google-api-core==2.17.0
     # via -r requirements.all.txt
 google-auth==2.49.2
@@ -96,28 +96,28 @@ humanfriendly==10.0
 idna==3.4
     # via requests
 intelhex==2.3.0
-    # via -r /workspace/scripts/setup/requirements.zephyr.txt
+    # via -r requirements.zephyr.txt
 ipython==8.11.0
     # via -r requirements.all.txt
 jedi==0.18.2
     # via ipython
 jinja2==3.0.3
     # via
-    #   -r /workspace/scripts/setup/requirements.build.txt
+    #   -r requirements.build.txt
     #   matter-idl
 jsonschema==4.26.0
-    # via -r /workspace/scripts/setup/requirements.zephyr.txt
+    # via -r requirements.zephyr.txt
 jsonschema-specifications==2025.9.1
     # via jsonschema
 lark==1.1.5
     # via
-    #   -r /workspace/scripts/setup/requirements.build.txt
+    #   -r requirements.build.txt
     #   matter-idl
     #   matter-yamltests
 librt==0.9.0
     # via mypy
 lxml==6.0.4
-    # via -r /workspace/scripts/setup/requirements.build.txt
+    # via -r requirements.build.txt
 markupsafe==2.1.2
     # via jinja2
 matplotlib-inline==0.1.6
@@ -137,7 +137,7 @@ packaging==23.0
     #   ghapi
     #   west
 pandas==2.2.3 ; platform_machine != "aarch64" and platform_machine != "arm64"
-    # via -r /workspace/scripts/setup/requirements.memory.txt
+    # via -r requirements.memory.txt
 parso==0.8.3
     # via jedi
 pathspec==0.12.1
@@ -160,6 +160,10 @@ portpicker==1.5.2
     #   mobly
 prompt-toolkit==3.0.43
     # via ipython
+protobuf==4.25.9
+    # via
+    #   google-api-core
+    #   googleapis-common-protos
 psutil==5.9.4
     # via portpicker
 ptyprocess==0.7.0
@@ -183,7 +187,7 @@ python-dateutil==2.8.2
     #   pandas
     #   pykwalify
 python-path==0.1.3
-    # via -r /workspace/scripts/setup/requirements.build.txt
+    # via -r requirements.build.txt
 pytz==2022.7.1
     # via pandas
 pyventus==0.7.1
@@ -199,7 +203,7 @@ referencing==0.37.0
     #   jsonschema-specifications
 requests==2.28.2
     # via
-    #   -r /workspace/scripts/setup/requirements.cirque.txt
+    #   -r requirements.cirque.txt
     #   google-api-core
 rpds-py==0.30.0
     # via
@@ -209,7 +213,7 @@ ruamel-yaml==0.17.21
     # via pykwalify
 sdbus==0.14.1.post0 ; sys_platform == "linux"
     # via
-    #   -r /workspace/scripts/tests/requirements.txt
+    #   -r ../tests/requirements.txt
     #   bluezoo
 six==1.16.0
     # via
@@ -220,8 +224,8 @@ stack-data==0.6.2
     # via ipython
 tabulate==0.9.0
     # via
-    #   -r /workspace/scripts/setup/requirements.memory.txt
-    #   -r /workspace/scripts/tests/requirements.txt
+    #   -r ../tests/requirements.txt
+    #   -r requirements.memory.txt
 tornado==6.2
     # via -r requirements.all.txt
 traitlets==5.9.0
@@ -229,7 +233,7 @@ traitlets==5.9.0
     #   ipython
     #   matplotlib-inline
 types-pyyaml==6.0.12.20250915
-    # via -r /workspace/scripts/tests/requirements.txt
+    # via -r ../tests/requirements.txt
 typing-extensions==4.8.0
     # via
     #   mypy
@@ -248,7 +252,7 @@ wcwidth==0.2.6
 websockets==10.4
     # via matter-yamltests
 west==1.2.0
-    # via -r /workspace/scripts/setup/requirements.zephyr.txt
+    # via -r requirements.zephyr.txt
 wheel==0.38.4 ; sys_platform == "linux"
     # via
     #   -r requirements.all.txt
@@ -264,3 +268,24 @@ setuptools==68.0.0
     # via
     #   pip-tools
     #   west
+
+## MANUAL EDITS
+## These are here instead of "requirements" as they are not actually requirements
+## (otherwise some boostraps may fail) but rather real constraints: if they are
+## required, they MUST be like this for the reasons described.
+
+# Higher versions depend on proto-plus, which break
+# nanopb code generation (due to name conflict of the 'proto' module)
+google-api-core==2.17.0
+
+# pydantic-core < 2.20 uses PyO3 0.21.x which does not support Python 3.13+
+# See: https://github.com/pydantic/pydantic/issues/11524
+pydantic-core>=2.20.0,<3.0.0; python_version >= "3.13"
+
+# Removed constraints for
+#   mypy-protobuf
+#   protobuf
+#   types-protobuf
+# These reside in ./third_party/pigweed/repo/pw_protobuf_compiler/py/setup.cfg and
+# corresponding constraints list
+
