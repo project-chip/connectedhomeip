@@ -771,7 +771,8 @@ void InitModeSelect()
         static ChefSupportedModesManager supportedModesManager;
         static SupportedModesManager::ModeOptionsProvider modeOptions(
             kDefaultModeOptions, kDefaultModeOptions + (sizeof(kDefaultModeOptions) / sizeof(kDefaultModeOptions[0])));
-        supportedModesManager.AddModeOptionsProvider(1, modeOptions);
+        VerifyOrDieWithMsg(supportedModesManager.AddModeOptionsProvider(1, modeOptions) == CHIP_NO_ERROR, Zcl,
+                           "InitModeSelect: Failed to AddModeOptionsProvider");
         setSupportedModesManager(&supportedModesManager);
     }
 #endif // MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT
