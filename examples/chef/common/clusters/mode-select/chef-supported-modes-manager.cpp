@@ -53,11 +53,11 @@ Protocols::InteractionModel::Status ChefSupportedModesManager::getModeOptionByMo
         return Protocols::InteractionModel::Status::NotFound;
     }
 
-    for (auto it = provider.begin(); it != provider.end(); ++it)
+    for (const auto & option : provider)
     {
-        if (it->mode == mode)
+        if (option.mode == mode)
         {
-            *dataPtr = it;
+            *dataPtr = &option;
             return Protocols::InteractionModel::Status::Success;
         }
     }
