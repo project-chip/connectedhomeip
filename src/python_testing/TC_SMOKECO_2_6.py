@@ -175,7 +175,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
             attribute=self.gd_cluster.Attributes.TestEventTriggersEnabled,
             dev_ctrl=self.default_controller,
             endpoint=0)
-        asserts.assert_equal(test_event_trigger_enabled, True, "TestEventTriggersEnabled is not True")
+        asserts.assert_true(test_event_trigger_enabled, "TestEventTriggersEnabled are not enabled")
 
         self.step(9)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_battery_warning)
