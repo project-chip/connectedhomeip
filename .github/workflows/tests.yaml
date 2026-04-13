@@ -1271,7 +1271,7 @@ jobs:
     repl_tests_linux_report:
       name: REPL Tests - Linux (REPORT RESULTS)
       needs: repl_tests_linux_run
-      if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
+      if: ${{ !cancelled() && needs.repl_tests_linux_run.result != 'skipped' && github.actor != 'restyled-io[bot]' }}
 
       runs-on: ubuntu-latest
       concurrency:
