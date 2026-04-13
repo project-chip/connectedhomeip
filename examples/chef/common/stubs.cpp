@@ -199,7 +199,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { P
 #include "microwave-oven-control/chef-microwave-oven-control.h"
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 
-#ifdef MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT> 0
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "clusters/mode-select/chef-supported-modes-manager.h"
 #endif
 

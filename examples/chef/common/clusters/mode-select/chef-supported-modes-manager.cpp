@@ -18,7 +18,7 @@
 
 #include "chef-supported-modes-manager.h"
 
-#ifdef MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT> 0
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using namespace chip;
 using namespace chip::app::Clusters::ModeSelect;

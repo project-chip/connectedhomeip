@@ -24,7 +24,7 @@
 #include <lib/support/Span.h>
 #include <map>
 
-#ifdef MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT> 0
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace chip {
 namespace app {
