@@ -4,12 +4,6 @@
 #
 #    pip-compile --allow-unsafe --output-file=constraints.txt --strip-extras requirements.all.txt
 #
--e file:///workspace/scripts/py_matter_idl
-    # via
-    #   -r /workspace/scripts/tests/requirements.txt
-    #   matter-yamltests
--e file:///workspace/scripts/py_matter_yamltests
-    # via -r /workspace/scripts/tests/requirements.txt
 about-time==4.2.1
     # via alive-progress
 alive-progress==3.3.0
