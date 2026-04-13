@@ -49,12 +49,12 @@ class SmokeCoBaseTest(MatterBaseTest):
     pixit_test_event_clear_co_alarm = 0x005c0000000000a1
 
     # Interconnect smoke alarm
-    pixit_test_event_interconnect_smoke_alarm = 0x005c000000000092
-    pixit_test_event_interconnect_smoke_alarm_clear = 0x005c0000000000a2
+    pixit_test_event_interconnected_smoke_alarm = 0x005c000000000092
+    pixit_test_event_interconnected_smoke_alarm_clear = 0x005c0000000000a2
 
     # Interconnect co alarm triggers
-    pixit_test_event_interconnect_co_alarm = 0x005c000000000094
-    pixit_test_event_interconnect_co_alarm_clear = 0x005c0000000000a4
+    pixit_test_event_interconnected_co_alarm = 0x005c000000000094
+    pixit_test_event_interconnected_co_alarm_clear = 0x005c0000000000a4
 
     # Contamination State triggers
     pixit_test_event_contamination_state_high = 0x005c000000000096

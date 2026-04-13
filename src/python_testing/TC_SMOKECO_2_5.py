@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS /kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -208,7 +208,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             # Sends Event Trigger , Check Alarm State,  Check Expressed State, Send Clear Trigger, Executes 4 steps
             await self.assert_steps_event_trigger_report_event_actions(
                 steps=[5, 6, 7, 8],
-                pixit_event_trigger=self.pixit_test_event_interconnect_smoke_alarm,
+                pixit_event_trigger=self.pixit_test_event_interconnected_smoke_alarm,
                 smoke_report_handler=interconnected_smoke_alarm_handler,
                 smoke_event=self.smokeco_cluster.Events.InterconnectSmokeAlarm,
                 expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,
@@ -219,7 +219,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             # Sends Event Trigger , Check Alarm State,  Check Expressed State, Send Clear Trigger, Executes 4 steps
             await self.assert_steps_event_trigger_report_event_actions(
                 steps=[9, 10, 11, 12],
-                pixit_event_trigger=self.pixit_test_event_interconnect_smoke_alarm_clear,
+                pixit_event_trigger=self.pixit_test_event_interconnected_smoke_alarm_clear,
                 smoke_report_handler=interconnected_smoke_alarm_handler,
                 smoke_event=self.smokeco_cluster.Events.AllClear,
                 expected_report_data=self.smokeco_cluster.Enums.AlarmStateEnum.kNormal,
@@ -246,7 +246,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
             await self.assert_steps_event_trigger_report_event_actions(
                 steps=[15, 16, 17, 18],
-                pixit_event_trigger=self.pixit_test_event_interconnect_co_alarm,
+                pixit_event_trigger=self.pixit_test_event_interconnected_co_alarm,
                 smoke_report_handler=interconnected_co_alarm_handler,
                 smoke_event=self.smokeco_cluster.Events.InterconnectCOAlarm,
                 expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,
@@ -257,7 +257,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
             await self.assert_steps_event_trigger_report_event_actions(
                 steps=[19, 20, 21, 22],
-                pixit_event_trigger=self.pixit_test_event_interconnect_co_alarm_clear,
+                pixit_event_trigger=self.pixit_test_event_interconnected_co_alarm_clear,
                 smoke_report_handler=interconnected_co_alarm_handler,
                 smoke_event=self.smokeco_cluster.Events.AllClear,
                 expected_report_data=self.smokeco_cluster.Enums.AlarmStateEnum.kNormal,
