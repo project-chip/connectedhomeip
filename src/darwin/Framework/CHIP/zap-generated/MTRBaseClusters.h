@@ -7446,13 +7446,13 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command PresentMessagesRequest
  *
- * Command for requesting messages be presented
+ * Upon receipt, this SHALL cause the message in the passed fields to be appended to the Messages attribute.
  */
 - (void)presentMessagesRequestWithParams:(MTRMessagesClusterPresentMessagesRequestParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command CancelMessagesRequest
  *
- * Command for cancelling message present requests
+ * This command will cancel the message IDs specified.
  */
 - (void)cancelMessagesRequestWithParams:(MTRMessagesClusterCancelMessagesRequestParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 

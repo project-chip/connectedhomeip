@@ -968,7 +968,7 @@ def python_tests(
             f.write(f"{target.env_key}: {run_path}\n")
 
         # PushAV is special
-        f.write("PUSH_AV_SERVER: src/tools/push_av_server/server.py\n")
+        f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
 
         # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:
