@@ -141,7 +141,7 @@ public:
 
     /**
      * @brief Synchronizes the FanControl cluster with the OnOff cluster state.
-     * The application must call this method whenever the OnOff cluster state changes. 
+     * The application must call this method whenever the OnOff cluster state changes.
      * When turned off, this sets PercentCurrent and SpeedCurrent to 0.
      * When turned on, it restores them based on the current settings.
     */
