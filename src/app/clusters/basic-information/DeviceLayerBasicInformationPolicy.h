@@ -209,14 +209,7 @@ class DeviceLayerBasicInformationPolicy final : public DeviceLayerBasicInformati
 public:
     using DeviceLayerBasicInformationPolicyBase::DeviceLayerBasicInformationPolicyBase;
 
-    CHIP_ERROR WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> &, AttributePersistence &)
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
-    CHIP_ERROR LoadDeviceLocation(AttributePersistence &) { return CHIP_NO_ERROR; }
-
-    std::optional<DataModel::Nullable<LocationDescriptorStructType>> GetDeviceLocation() const { return std::nullopt; }
+    static constexpr bool kHasDeviceLocation = false;
 };
 
 template <>
@@ -237,6 +230,9 @@ public:
             mDeviceLocation.emplace(DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable));
         }
     }
+    
+    static constexpr bool kHasDeviceLocation = true;
+
     // The code for supporting the DeviceLocation attribute was borrowed + adapted
     // from the BridgedDeviceBasicInformation cluster. Try to keep the two in sync,
     // if any changes are required.

@@ -165,7 +165,11 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
 
     ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
 
-    (void) mPolicy.LoadDeviceLocation(persistence);
+    if constexpr (Policy::kHasDeviceLocation)
+    {
+        // the method below will always return CHIP_NO_ERROR
+        (void) mPolicy.LoadDeviceLocation(persistence);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -393,10 +397,14 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
     case Reachable::Id:
         return encoder.Encode<bool>(true);
     case DeviceLocation::Id: {
-        ChipLogDetail(Zcl, "Reading DeviceLocation");
 
-        auto location = mPolicy.GetDeviceLocation();
-        return encoder.Encode(*location);
+        if constexpr (Policy::kHasDeviceLocation)
+        {
+            ChipLogDetail(Zcl, "Reading DeviceLocation");
+
+            auto location = mPolicy.GetDeviceLocation();
+            return encoder.Encode(*location);
+        }
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -441,9 +449,12 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
         return decodeStatus;
     }
     case DeviceLocation::Id: {
-        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> value;
-        ReturnErrorOnFailure(decoder.Decode(value));
-        return mPolicy.WriteDeviceLocation(value, persistence);
+        if constexpr (Policy::kHasDeviceLocation)
+        {
+            DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> value;
+            ReturnErrorOnFailure(decoder.Decode(value));
+            return mPolicy.WriteDeviceLocation(value, persistence);
+        }
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
