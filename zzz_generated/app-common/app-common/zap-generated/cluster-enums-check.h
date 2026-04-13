@@ -118,6 +118,7 @@
 #include <clusters/PowerSourceConfiguration/EnumsCheck.h>
 #include <clusters/PowerTopology/EnumsCheck.h>
 #include <clusters/PressureMeasurement/EnumsCheck.h>
+#include <clusters/ProximityRanging/EnumsCheck.h>
 #include <clusters/ProxyConfiguration/EnumsCheck.h>
 #include <clusters/ProxyDiscovery/EnumsCheck.h>
 #include <clusters/ProxyValid/EnumsCheck.h>

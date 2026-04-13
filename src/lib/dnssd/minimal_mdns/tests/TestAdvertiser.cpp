@@ -217,7 +217,7 @@ TxtResourceRecord txtCommissionableNodeParamsEnhancedAsICDLIT =
 #endif
 
 // Our server doesn't do anything with this, blank is fine.
-Inet::IPPacketInfo packetInfo;
+Inet::IPPacketInfo packetInfo = {};
 
 CHIP_ERROR SendQuery(FullQName qname)
 {
