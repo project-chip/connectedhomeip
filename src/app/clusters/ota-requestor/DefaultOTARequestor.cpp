@@ -957,7 +957,10 @@ void DefaultOTARequestor::LoadCurrentUpdateInfo()
     }
 
     OTAUpdateStateEnum updateState = OTAUpdateStateEnum::kIdle;
-    TEMPORARY_RETURN_IGNORED mStorage->LoadCurrentUpdateState(updateState);
+    if (mStorage->LoadCurrentUpdateState(updateState) != CHIP_NO_ERROR)
+    {
+        updateState = OTAUpdateStateEnum::kIdle;
+    }
     mAttributes->SetUpdateState(updateState);
 
     if (mStorage->LoadTargetVersion(mTargetVersion) != CHIP_NO_ERROR)
