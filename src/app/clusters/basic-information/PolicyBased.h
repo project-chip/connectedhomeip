@@ -166,9 +166,9 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
 
     if constexpr (Policy::kHasDeviceLocation)
-    {
-        // the method below will always return CHIP_NO_ERROR
-        (void) mPolicy.LoadDeviceLocation(persistence);
+    {        
+        ReturnErrorAndLogOnFailure(mPolicy.LoadDeviceLocation(persistence), Zcl,
+            "Unexpected failure while attempting to load DeviceLocation from persistent storage");
     }
 
     return CHIP_NO_ERROR;
@@ -404,7 +404,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
 
             auto location = mPolicy.GetDeviceLocation();
             return encoder.Encode(*location);
-        } else {
+        } else 
+        {
             return Protocols::InteractionModel::Status::UnsupportedAttribute;
         }
     }
@@ -456,7 +457,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
             DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> value;
             ReturnErrorOnFailure(decoder.Decode(value));
             return mPolicy.WriteDeviceLocation(value, persistence);
-        } else {
+        } else 
+        {
             return Protocols::InteractionModel::Status::UnsupportedWrite;
         }
     }
