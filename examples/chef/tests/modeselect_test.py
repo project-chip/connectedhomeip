@@ -82,7 +82,7 @@ class TC_MODESELECT(MatterBaseTest):
             endpoint=self.ENDPOINT)
 
     @async_test_body
-    async def test_mode_select(self):
+    async def test_TC_MODESELECT(self):
         """Test Mode Select cluster functionality."""
 
         self.step(1)
