@@ -257,10 +257,10 @@ CHIP_ERROR Set(uint16_t id, const char * value, size_t size)
 
 CHIP_ERROR Get(uint16_t id, char * value, size_t max_size, size_t & size)
 {
+    // No room for a NUL-terminated C string; reject before max_size - 1 (avoids underflow) and skip storage.
+    VerifyOrReturnError(max_size > 0, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Get(id, (uint8_t *) value, max_size - 1, size));
     // Binary Get does not NUL-terminate; DeviceInstanceInfoProvider requires it on success.
-    VerifyOrReturnError(max_size > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(size < max_size, CHIP_ERROR_BUFFER_TOO_SMALL);
     value[size] = '\0';
     return CHIP_NO_ERROR;
 }
