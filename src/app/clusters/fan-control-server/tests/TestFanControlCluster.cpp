@@ -74,8 +74,8 @@ public:
 class NotifyingFanControlDelegate : public FanControl::Delegate
 {
 public:
-    int mPercentSettingNotifyCount = 0;
-    int mRockSettingNotifyCount    = 0;
+    int mFanDriveStateNotifyCount = 0;
+    int mRockSettingNotifyCount   = 0;
 
     NotifyingFanControlDelegate(EndpointId endpoint) : Delegate(endpoint) {}
 
@@ -84,7 +84,7 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
-    void OnPercentSettingChanged(DataModel::Nullable<chip::Percent>) override { mPercentSettingNotifyCount++; }
+    void OnFanDriveStateChanged(const FanDriveState &) override { mFanDriveStateNotifyCount++; }
     void OnRockSettingChanged(BitMask<RockBitmap> newValue) override
     {
         (void) newValue;
@@ -672,13 +672,13 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSetting_NotifiesDelegate)
     FanControlCluster cluster(
         FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-    delegate.mPercentSettingNotifyCount = 0;
+    delegate.mFanDriveStateNotifyCount = 0;
 
     ClusterTester tester(cluster);
     DataModel::Nullable<chip::Percent> percentSetting;
     percentSetting.SetNonNull(40);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
-    EXPECT_EQ(delegate.mPercentSettingNotifyCount, 1);
+    EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

@@ -30,6 +30,15 @@ namespace app {
 namespace Clusters {
 namespace FanControl {
 
+struct FanDriveState
+{
+    FanModeEnum mode;
+    DataModel::Nullable<chip::Percent> percentSetting;
+    chip::Percent percentCurrent;
+    DataModel::Nullable<uint8_t> speedSetting;
+    uint8_t speedCurrent;
+};
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the FanControl Cluster.
  */
@@ -54,15 +63,11 @@ public:
     /**
      * @brief Called when the fan transitions between on and off states.
      *        Implementations should update the OnOff cluster attribute accordingly.
-     *        This is separate from OnFanModeChanged to make the OnOff sync responsibility explicit.
+     *        This is separate from OnFanDriveStateChanged to make the OnOff sync responsibility explicit.
      */
     virtual void OnFanStateChanged(bool isOn) {}
 
-    virtual void OnFanModeChanged(FanModeEnum newValue) {}
-    virtual void OnPercentSettingChanged(DataModel::Nullable<chip::Percent> newValue) {}
-    virtual void OnPercentCurrentChanged(chip::Percent newValue) {}
-    virtual void OnSpeedSettingChanged(DataModel::Nullable<uint8_t> newValue) {}
-    virtual void OnSpeedCurrentChanged(uint8_t newValue) {}
+    virtual void OnFanDriveStateChanged(const FanDriveState & newState) {}
     virtual void OnRockSettingChanged(BitMask<RockBitmap> newValue) {}
     virtual void OnWindSettingChanged(BitMask<WindBitmap> newValue) {}
     virtual void OnAirflowDirectionChanged(AirflowDirectionEnum newValue) {}

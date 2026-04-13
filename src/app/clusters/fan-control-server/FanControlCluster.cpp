@@ -51,14 +51,8 @@ void FanControlCluster::NotifyDelegateFanDriveState()
     {
         return;
     }
-    mDelegate->OnFanModeChanged(mFanMode);
-    mDelegate->OnPercentSettingChanged(mPercentSetting);
-    mDelegate->OnPercentCurrentChanged(mPercentCurrent);
-    if (SupportsMultiSpeed())
-    {
-        mDelegate->OnSpeedSettingChanged(mSpeedSetting);
-        mDelegate->OnSpeedCurrentChanged(mSpeedCurrent);
-    }
+    const FanDriveState state{ mFanMode, mPercentSetting, mPercentCurrent, mSpeedSetting, mSpeedCurrent };
+    mDelegate->OnFanDriveStateChanged(state);
 }
 
 CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
