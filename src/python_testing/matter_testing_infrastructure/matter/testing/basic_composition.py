@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import asyncio
 import base64
 import copy
 import json
@@ -184,10 +185,25 @@ class BasicCompositionTests(MatterBaseTest):
 
         node_id = self.dut_node_id
 
-        # Consolidate parallel PASE/CASE session establishment logic
-        from matter.testing.commissioning import establish_pase_or_case_session
-        setup_code = self.first_setup_code if allow_pase else None
-        await establish_pase_or_case_session(dev_ctrl, node_id, setup_code)
+        task_list = []
+        if allow_pase and self.first_setup_code:
+            pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
+            task_list.append(asyncio.create_task(pase_future))
+
+        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
+        task_list.append(asyncio.create_task(case_future))
+
+        for task in task_list:
+            asyncio.ensure_future(task)
+
+        done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+
+        for task in pending:
+            try:
+                task.cancel()
+                await task
+            except asyncio.CancelledError:
+                pass
 
         wildcard_read = (await dev_ctrl.Read(node_id, [()]))  # type: ignore[list-item]
 
