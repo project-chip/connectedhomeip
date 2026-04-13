@@ -128,8 +128,6 @@ mypy==1.19.1
     # via -r requirements.all.txt
 mypy-extensions==1.0.0
     # via mypy
-mypy-protobuf==5.0.0
-    # via -r requirements.all.txt
 numpy==1.26.4
     # via pandas
 packaging==23.0
@@ -162,12 +160,6 @@ portpicker==1.5.2
     #   mobly
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==4.25.9
-    # via
-    #   -r requirements.all.txt
-    #   google-api-core
-    #   googleapis-common-protos
-    #   mypy-protobuf
 psutil==5.9.4
     # via portpicker
 ptyprocess==0.7.0
@@ -236,10 +228,6 @@ traitlets==5.9.0
     # via
     #   ipython
     #   matplotlib-inline
-types-protobuf==7.34.1.20260408
-    # via
-    #   -r requirements.all.txt
-    #   mypy-protobuf
 types-pyyaml==6.0.12.20250915
     # via -r /workspace/scripts/tests/requirements.txt
 typing-extensions==4.8.0
