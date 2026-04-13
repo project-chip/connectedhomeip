@@ -1662,7 +1662,7 @@ endpoint 1 {
     ram      attribute description default = "Mode Select Sample";
     ram      attribute standardNamespace default = 0x07;
     callback attribute supportedModes;
-    ram      attribute currentMode;
+    ram      attribute currentMode default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
