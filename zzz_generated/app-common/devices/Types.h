@@ -359,6 +359,16 @@ constexpr DataModel::DeviceTypeEntry kDoorbell = {
     .deviceTypeRevision = kDoorbellDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kAmbientContextSensor = {
+    .deviceTypeId       = kAmbientContextSensorDeviceTypeId,
+    .deviceTypeRevision = kAmbientContextSensorDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kProximityRanger = {
+    .deviceTypeId       = kProximityRangerDeviceTypeId,
+    .deviceTypeRevision = kProximityRangerDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kWindowCovering = {
     .deviceTypeId       = kWindowCoveringDeviceTypeId,
     .deviceTypeRevision = kWindowCoveringDeviceTypeRevision,

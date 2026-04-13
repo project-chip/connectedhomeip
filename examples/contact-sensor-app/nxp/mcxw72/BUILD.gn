@@ -120,7 +120,7 @@ mcxw72_executable("contact_sensor_app") {
   }
 
   if (nxp_use_low_power) {
-    defines += [ "CONFIG_LOW_POWER=1" ]
+    defines += [ "CONFIG_NXP_USE_LOW_POWER=1" ]
   } else {
     defines += [
       "CONFIG_ENABLE_FEEDBACK=1",
@@ -173,7 +173,6 @@ mcxw72_executable("contact_sensor_app") {
   }
 
   if (chip_enable_ota_requestor) {
-    defines += [ "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\"" ]
     include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
     sources += [
       "${common_example_dir}/../mcxw71/ota/OtaUtils.cpp",
@@ -196,7 +195,7 @@ mcxw72_executable("contact_sensor_app") {
 
   # Platform specific files
   if (chip_crypto == "platform") {
-    defines += [ "CONFIG_OPERATIONAL_KEYSTORE=1" ]
+    defines += [ "CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE=1" ]
     sources += [ "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp" ]
   }
 

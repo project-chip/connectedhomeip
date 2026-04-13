@@ -354,6 +354,12 @@ public:
      */
     static constexpr size_t Capacity() { return kCapacity; }
 
+    void Clear()
+    {
+        mLength = 0;
+        ClearSecretData(mBytes);
+    }
+
 private:
     uint8_t mBytes[kCapacity];
     size_t mLength = 0;
@@ -390,7 +396,7 @@ public:
     /**
      * @brief Returns fixed length of the buffer
      */
-    constexpr size_t Length() const { return kCapacity; }
+    static constexpr size_t Length() { return kCapacity; }
 
     /**
      * @brief Returns non-const pointer to start of the underlying buffer
@@ -411,6 +417,8 @@ public:
      * @brief Returns capacity of the buffer
      */
     static constexpr size_t Capacity() { return kCapacity; }
+
+    void Clear() { ClearSecretData(mBytes); }
 
 private:
     uint8_t mBytes[kCapacity];
@@ -506,6 +514,11 @@ public:
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
 
+    /**
+     * @brief A variant of ECDSA_sign_msg() that uses Deterministic ECDSA (RFC 6979).
+     */
+    virtual CHIP_ERROR ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
+
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
@@ -527,6 +540,19 @@ struct alignas(size_t) P256KeypairContext
  * A serialized P256 key pair is the concatenation of the public and private keys, in that order.
  */
 using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length>;
+
+/**
+ * A platform-specific P256 keypair handle that is suitable for persistence.
+ * On platforms that don't use PSA (or a similar API) this is simply a P256SerializedKeypair.
+ *
+ * Note that there are no general APIs in the CHIP Crypto PAL that operate on
+ * P256KeypairHandles; such APIs are the domain of the relevant key store interfaces.
+ */
+#if CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE > 0
+using P256KeypairHandle = SensitiveDataBuffer<CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE>;
+#else
+using P256KeypairHandle = P256SerializedKeypair;
+#endif
 
 // Base class of P256Keypair. Do not use directly.
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
@@ -584,6 +610,18 @@ public:
     CHIP_ERROR Deserialize(/* const */ P256SerializedKeypair & input) override;
 
     /**
+     * @brief Initializes this object from raw private key material in accordance with FIPS 186-5 appendix A.4.2.
+     * To be valid, the provided key material, when interpreted as a big endian integer x, must be in the range
+     * [0, N-2], where N is the order of the P-256 curve, and the resulting private key is d = x + 1.
+     *
+     * @return CHIP_NO_ERROR on success,
+     *         CHIP_ERROR_INVALID_ARGUMENT if the provided value is out of range,
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the platform does not support this operation,
+     *         or another CHIP_ERROR otherwise.
+     */
+    virtual CHIP_ERROR InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits);
+
+    /**
      * @brief Generates a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
@@ -601,6 +639,11 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
+
+    /**
+     * @brief A variant of ECDSA_sign_msg() that uses Deterministic ECDSA (RFC 6979).
+     */
+    CHIP_ERROR ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief Derives a shared secret using ECDH
@@ -694,6 +737,21 @@ public:
         return *SafePointerCast<T *>(&mContext);
     }
 
+    static constexpr size_t Size() { return ContextSize; }
+
+    /**
+     * @brief Access the raw opaque context bytes for persistence.
+     *
+     * The bytes may be either raw key material or a platform-specific key reference,
+     * depending on the crypto backend, and must be treated as opaque.
+     *
+     * @note Do NOT use this to pass key material to crypto primitives.
+     *       Backend-specific code should use As() / AsMutable() to access
+     *       the backend-specific concrete representation instead.
+     */
+    FixedByteSpan<ContextSize> OpaqueBytes() const { return FixedSpan(mContext.mOpaque); }
+    MutableFixedByteSpan<ContextSize> OpaqueBytes() { return FixedSpan(mContext.mOpaque); }
+
 protected:
     SymmetricKeyHandle() = default;
     ~SymmetricKeyHandle() { ClearSecretData(mContext.mOpaque); }
@@ -705,14 +763,14 @@ private:
     } mContext;
 };
 
-using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-
 /**
  * @brief Platform-specific 128-bit symmetric key handle
  */
 class Symmetric128BitsKeyHandle : public SymmetricKeyHandle<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>
 {
 };
+
+using Symmetric128BitsKeyByteArray = uint8_t[Symmetric128BitsKeyHandle::Size()];
 
 /**
  * @brief Platform-specific 128-bit AES key handle

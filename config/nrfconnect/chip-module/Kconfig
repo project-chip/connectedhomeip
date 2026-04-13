@@ -270,13 +270,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
 
-config CHIP_ENABLE_READ_CLIENT
-	bool "Enable Read Client in the Interaction Model"
-	help
-	  Enable support for Read Client in the Interaction Model.
-	  This config can be disabled for device types that do not require Read Client functionality.
-	  Disabling this config can save flash and RAM space.
-
 config CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
 	bool "Operational keys migration feature"
 	depends on CHIP_CRYPTO_PSA

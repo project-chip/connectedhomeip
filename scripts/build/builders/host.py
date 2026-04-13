@@ -88,7 +88,8 @@ class HostApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     NETWORK_MANAGER = auto()
     ENERGY_GATEWAY = auto()
-    ENERGY_MANAGEMENT = auto()
+    EVSE = auto()
+    WATER_HEATER = auto()
     WATER_LEAK_DETECTOR = auto()
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
@@ -125,7 +126,7 @@ class HostApp(Enum):
         if self == HostApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app/linux'
         if self == HostApp.ALL_DEVICES_APP:
-            return 'all-devices-app/linux'
+            return 'all-devices-app/posix'
         if self == HostApp.CHIP_TOOL:
             return 'chip-tool'
         if self == HostApp.CHIP_TOOL_DARWIN:
@@ -192,8 +193,10 @@ class HostApp(Enum):
             return 'network-manager-app/linux'
         if self == HostApp.ENERGY_GATEWAY:
             return 'energy-gateway-app/linux'
-        if self == HostApp.ENERGY_MANAGEMENT:
-            return 'energy-management-app/linux'
+        if self == HostApp.EVSE:
+            return 'evse-app/linux'
+        if self == HostApp.WATER_HEATER:
+            return 'water-heater-app/linux'
         if self == HostApp.WATER_LEAK_DETECTOR:
             return 'water-leak-detector-app/linux'
         if self == HostApp.TERMS_AND_CONDITIONS:
@@ -325,9 +328,12 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_GATEWAY:
             yield 'chip-energy-gateway-app'
             yield 'chip-energy-gateway-app.map'
-        elif self == HostApp.ENERGY_MANAGEMENT:
-            yield 'chip-energy-management-app'
-            yield 'chip-energy-management-app.map'
+        elif self == HostApp.EVSE:
+            yield 'chip-evse-app'
+            yield 'chip-evse-app.map'
+        elif self == HostApp.WATER_HEATER:
+            yield 'matter-water-heater-app'
+            yield 'matter-water-heater-app.map'
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
@@ -393,7 +399,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
-                 enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
+                 enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
@@ -405,7 +411,9 @@ class HostBuilder(GnBuilder):
                  use_googletest=False,
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
-                 unified=False
+                 openthread_endpoint=False,
+                 unified=False,
+                 chip_enable_endpoint_unique_id: Optional[bool] = None,
                  ):
         """
         Construct a host builder.
@@ -435,6 +443,9 @@ class HostBuilder(GnBuilder):
         if not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
 
+        if not enable_groupcast:
+            self.extra_gn_options.append('chip_config_enable_groupcast=false')
+
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
             self.extra_gn_options.append('chip_enable_ble=false')
@@ -454,7 +465,7 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_enable_wifi=false')
 
         if not enable_thread:
-            self.extra_gn_options.append('chip_enable_openthread=false')
+            self.extra_gn_options.append('chip_enable_thread=false')
 
         if disable_shell:
             self.extra_gn_options.append('chip_build_libshell=false')
@@ -536,6 +547,13 @@ class HostBuilder(GnBuilder):
             # include things added by the test_runner efr32 build
             self.extra_gn_options.append('silabs_board="BRD4187C"')
 
+            if "GSDK_ROOT" in os.environ:
+                # EFR32 SDK is very large. If the SDK path is already known (the
+                # case for pre-installed images), use it directly.
+                sdk_path = shlex.quote(os.environ['GSDK_ROOT'])
+                self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
+                self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/openthread_stack/util/third_party/openthread\"")
+
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
         if crypto_library:
@@ -559,6 +577,11 @@ class HostBuilder(GnBuilder):
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+            if chip_casting_simplified:
+                self.extra_gn_options.append(
+                    'chip_cluster_objects_source_override='
+                    '"${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"'
+                )
 
         if enable_webrtc:
             self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
@@ -568,6 +591,18 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_terms_and_conditions_required=true')
             else:
                 self.extra_gn_options.append('chip_terms_and_conditions_required=false')
+
+        if chip_enable_endpoint_unique_id is not None:
+            if chip_enable_endpoint_unique_id:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=true')
+            else:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
+
+        if openthread_endpoint:
+            if enable_wifi:
+                raise Exception("OpenThread EndPoint mode does not support Wifi")
+
+            self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -605,28 +640,24 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
-        if self.board == HostBoard.NATIVE:
-            return self.extra_gn_options
-        if self.board == HostBoard.ARM64:
-            self.extra_gn_options.extend(
-                [
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        match self.board:
+            case HostBoard.NATIVE:
+                pass
+            case HostBoard.ARM64:
+                args.extend([
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
-                ]
-            )
-
-            return self.extra_gn_options
-        if self.board == HostBoard.FAKE:
-            self.extra_gn_options.extend(
-                [
+                ])
+            case HostBoard.FAKE:
+                args.extend([
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
                     'chip_link_tests=true',
                     'chip_device_platform="fake"',
                     'chip_fake_platform=true',
-                ]
-            )
-            return self.extra_gn_options
-        raise Exception('Unknown host board type: %r' % self)
+                ])
+        return args
 
     def createJavaExecutable(self, java_program):
         self._Execute(

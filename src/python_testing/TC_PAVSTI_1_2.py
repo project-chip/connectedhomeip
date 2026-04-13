@@ -40,14 +40,14 @@ import logging
 
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -72,10 +72,19 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         )
         super().setup_class()
 
+    @property
+    def default_timeout(self) -> int:
+        return 4 * 60  # 4 minutes
+
     def teardown_class(self):
         if self.server is not None:
             self.server.terminate()
         super().teardown_class()
+
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        super().teardown_test()
 
     def steps_TC_PAVSTI_1_2(self) -> list[TestStep]:
         return [
@@ -162,6 +171,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     async def test_TC_PAVSTI_1_2(self):
         PICS_PRIVACY = "AVSM.S.F03"
         endpoint = self.get_endpoint()
+        self.endpoint = endpoint
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
         pushavAttr = Clusters.PushAvStreamTransport.Attributes
@@ -171,8 +181,8 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         # Commission DUT - already done
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
-        tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
-        uploadStreamId = self.server.create_stream()
+        self.tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.dash.value)
 
         self.step(1)
         currentConnections = await self.read_single_attribute_check_success(
@@ -248,14 +258,14 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
-                    "TLSEndpointID": tlsEndpointId,
+                    "TLSEndpointID": self.tlsEndpointId,
                     "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}/",
                     "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
                     "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
                     "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
                     "containerOptions": {
                         "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
+                        "CMAFContainerOptions": {"CMAFInterface": pushavCluster.Enums.CMAFInterfaceEnum.kInterface2DASH, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
                     },
                 }
             ),

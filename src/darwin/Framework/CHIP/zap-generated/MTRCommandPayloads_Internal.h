@@ -1069,13 +1069,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRGroupcastClusterExpireGracePeriodParams (InternalMethods)
+@interface MTRGroupcastClusterConfigureAuxiliaryACLParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRGroupcastClusterConfigureAuxiliaryACLParams (InternalMethods)
+@interface MTRGroupcastClusterGroupcastTestingParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1656,6 +1656,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRHumidistatClusterSetSettingsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRColorControlClusterMoveToHueParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1765,6 +1771,25 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRColorControlClusterStepColorTemperatureParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRProximityRangingClusterStartRangingRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRProximityRangingClusterStartRangingResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRProximityRangingClusterStopRangingRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

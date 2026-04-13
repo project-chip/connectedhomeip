@@ -14,27 +14,8 @@
 #   limitations under the License.
 #
 
-rsource "../../zephyr/Kconfig"
+if SOC_FAMILY_NXP_RW
+
 rsource "../cmake/Kconfig.matter.nxp"
 
-if CHIP
-
-config CHIP_MALLOC_SYS_HEAP
-	default y if !ARCH_POSIX
-
-# See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_SETTINGS
-	bool
-	default y
-
-endif
-
-config CHIP_OTA_REQUESTOR
-	bool
-	select BOOTLOADER_MCUBOOT
-
-config BOOTLOADER_MCUBOOT
-	bool
-	select IMG_MANAGER
-	select STREAM_FLASH
-	select STREAM_FLASH_ERASE
+endif # SOC_FAMILY_NXP_RW

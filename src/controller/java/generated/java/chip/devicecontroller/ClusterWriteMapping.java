@@ -2356,6 +2356,8 @@ public class ClusterWriteMapping {
     );
     writeThermostatUserInterfaceConfigurationInteractionInfo.put("writeScheduleProgrammingVisibilityAttribute", writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityAttributeInteractionInfo);
     writeAttributeMap.put("thermostatUserInterfaceConfiguration", writeThermostatUserInterfaceConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeHumidistatInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("humidistat", writeHumidistatInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControloptionsCommandParameterInfo =
@@ -2901,28 +2903,6 @@ public class ClusterWriteMapping {
       writeAmbientContextSensingSimultaneousDetectionLimitCommandParams
     );
     writeAmbientContextSensingInteractionInfo.put("writeSimultaneousDetectionLimitAttribute", writeAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeAmbientContextSensingCountThresholdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo ambientContextSensingcountThresholdCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeAmbientContextSensingCountThresholdCommandParams.put(
-        "value",
-        ambientContextSensingcountThresholdCommandParameterInfo
-    );
-    InteractionInfo writeAmbientContextSensingCountThresholdAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.AmbientContextSensingCluster) cluster).writeCountThresholdAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeAmbientContextSensingCountThresholdCommandParams
-    );
-    writeAmbientContextSensingInteractionInfo.put("writeCountThresholdAttribute", writeAmbientContextSensingCountThresholdAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeAmbientContextSensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo ambientContextSensingholdTimeCommandParameterInfo =
         new CommandParameterInfo(
@@ -2946,6 +2926,8 @@ public class ClusterWriteMapping {
     );
     writeAmbientContextSensingInteractionInfo.put("writeHoldTimeAttribute", writeAmbientContextSensingHoldTimeAttributeInteractionInfo);
     writeAttributeMap.put("ambientContextSensing", writeAmbientContextSensingInteractionInfo);
+    Map<String, InteractionInfo> writeProximityRangingInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proximityRanging", writeProximityRangingInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wiFiNetworkManagement", writeWiFiNetworkManagementInteractionInfo);
     Map<String, InteractionInfo> writeThreadBorderRouterManagementInteractionInfo = new LinkedHashMap<>();

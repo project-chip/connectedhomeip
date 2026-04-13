@@ -18,7 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/EnergyReportingTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/electrical-energy-measurement-server.h"
 )
 
@@ -28,4 +27,5 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/ElectricalEnergyMeasurementCluster.cpp"
     "${CLUSTER_DIR}/ElectricalEnergyMeasurementCluster.h"
+    "${CLUSTER_DIR}/EnergyReportingTestEventTriggerHandler.h"
 )

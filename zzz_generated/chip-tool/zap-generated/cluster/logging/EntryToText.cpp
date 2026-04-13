@@ -199,6 +199,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FanControl";
     case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id:
         return "ThermostatUserInterfaceConfiguration";
+    case chip::app::Clusters::Humidistat::Id:
+        return "Humidistat";
     case chip::app::Clusters::ColorControl::Id:
         return "ColorControl";
     case chip::app::Clusters::BallastConfiguration::Id:
@@ -239,6 +241,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "SoilMeasurement";
     case chip::app::Clusters::AmbientContextSensing::Id:
         return "AmbientContextSensing";
+    case chip::app::Clusters::ProximityRanging::Id:
+        return "ProximityRanging";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -602,6 +606,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpecificationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id:
             return "MaxPathsPerInvoke";
+        case chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::Id:
+            return "DeviceLocation";
         case chip::app::Clusters::BasicInformation::Attributes::ConfigurationVersion::Id:
             return "ConfigurationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::GeneratedCommandList::Id:
@@ -1291,6 +1297,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "UniqueID";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ProductAppearance::Id:
             return "ProductAppearance";
+        case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::DeviceLocation::Id:
+            return "DeviceLocation";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id:
             return "ConfigurationVersion";
         case chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::GeneratedCommandList::Id:
@@ -1393,6 +1401,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MaxGroupsPerFabric";
         case chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
             return "MaxGroupKeysPerFabric";
+        case chip::app::Clusters::GroupKeyManagement::Attributes::GroupcastAdoption::Id:
+            return "GroupcastAdoption";
         case chip::app::Clusters::GroupKeyManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GroupKeyManagement::Attributes::AcceptedCommandList::Id:
@@ -1905,6 +1915,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SmokeSensitivityLevel";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::ExpiryDate::Id:
             return "ExpiryDate";
+        case chip::app::Clusters::SmokeCoAlarm::Attributes::Unmounted::Id:
+            return "Unmounted";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::AcceptedCommandList::Id:
@@ -2086,6 +2098,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Membership";
         case chip::app::Clusters::Groupcast::Attributes::MaxMembershipCount::Id:
             return "MaxMembershipCount";
+        case chip::app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id:
+            return "MaxMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id:
+            return "UsedMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::FabricUnderTest::Id:
+            return "FabricUnderTest";
         case chip::app::Clusters::Groupcast::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Groupcast::Attributes::AcceptedCommandList::Id:
@@ -3189,6 +3207,45 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Humidistat::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
+            return "Mode";
+        case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
+            return "SystemState";
+        case chip::app::Clusters::Humidistat::Attributes::UserSetpoint::Id:
+            return "UserSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MinSetpoint::Id:
+            return "MinSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MaxSetpoint::Id:
+            return "MaxSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::Step::Id:
+            return "Step";
+        case chip::app::Clusters::Humidistat::Attributes::TargetSetpoint::Id:
+            return "TargetSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MistType::Id:
+            return "MistType";
+        case chip::app::Clusters::Humidistat::Attributes::Continuous::Id:
+            return "Continuous";
+        case chip::app::Clusters::Humidistat::Attributes::Sleep::Id:
+            return "Sleep";
+        case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
+            return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Humidistat::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Humidistat::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Humidistat::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ColorControl::Id: {
         switch (id)
         {
@@ -3505,6 +3562,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "HoldTime";
         case chip::app::Clusters::OccupancySensing::Attributes::HoldTimeLimits::Id:
             return "HoldTimeLimits";
+        case chip::app::Clusters::OccupancySensing::Attributes::PredictedOccupancy::Id:
+            return "PredictedOccupancy";
         case chip::app::Clusters::OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id:
             return "PIROccupiedToUnoccupiedDelay";
         case chip::app::Clusters::OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id:
@@ -3961,22 +4020,20 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AmbientContextType";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextTypeSupported::Id:
             return "AmbientContextTypeSupported";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
-            return "SimultaneousDetectionLimit";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThresholdReached::Id:
-            return "CountThresholdReached";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThreshold::Id:
-            return "CountThreshold";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountReached::Id:
+            return "ObjectCountReached";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountConfig::Id:
+            return "ObjectCountConfig";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
             return "ObjectCount";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
+            return "SimultaneousDetectionLimit";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTime::Id:
             return "HoldTime";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTimeLimits::Id:
             return "HoldTimeLimits";
         case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
             return "PredictedActivity";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::PrivacyModeEnabled::Id:
-            return "PrivacyModeEnabled";
         case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:
@@ -3986,6 +4043,37 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::AmbientContextSensing::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Attributes::RangingCapabilities::Id:
+            return "RangingCapabilities";
+        case chip::app::Clusters::ProximityRanging::Attributes::WiFiDevIK::Id:
+            return "WiFiDevIK";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLEDeviceID::Id:
+            return "BLEDeviceID";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTDevIK::Id:
+            return "BLTDevIK";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSSecurityLevel::Id:
+            return "BLTCSSecurityLevel";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSModeCapability::Id:
+            return "BLTCSModeCapability";
+        case chip::app::Clusters::ProximityRanging::Attributes::SessionIDList::Id:
+            return "SessionIDList";
+        case chip::app::Clusters::ProximityRanging::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ProximityRanging::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ProximityRanging::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ProximityRanging::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ProximityRanging::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5662,10 +5750,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LeaveGroup";
         case chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return "UpdateGroupKey";
-        case chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
-            return "ExpireGracePeriod";
         case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return "ConfigureAuxiliaryACL";
+        case chip::app::Clusters::Groupcast::Commands::GroupcastTesting::Id:
+            return "GroupcastTesting";
         default:
             return "Unknown";
         }
@@ -5962,6 +6050,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Humidistat::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Humidistat::Commands::SetSettings::Id:
+            return "SetSettings";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ColorControl::Id: {
         switch (id)
         {
@@ -6003,6 +6100,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveColorTemperature";
         case chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Id:
             return "StepColorTemperature";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::Id:
+            return "StartRangingRequest";
+        case chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Id:
+            return "StopRangingRequest";
         default:
             return "Unknown";
         }
@@ -6915,6 +7023,15 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::Id:
+            return "StartRangingResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -7323,6 +7440,10 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Camera Controller";
     case 0x00000148:
         return "Doorbell";
+    case 0x00000150:
+        return "Ambient Context Sensor";
+    case 0x00000152:
+        return "Proximity Ranger";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:

@@ -20,9 +20,9 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
-#include <minmdns/MinMdnsConfig.h>
 #include <tracing/macros.h>
 
 namespace chip {
@@ -143,6 +143,14 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
 {
     AutoInactiveResetter inactiveReset(*this);
 
+    // Reject non-matter service names before storing anything. Non-matter devices may use instance names larger than
+    // kMaxStoredNameLength, leading to errors such as CHIP_ERROR_NO_MEMORY.
+    mServiceNameType = ComputeServiceNameType(name);
+    if (mServiceNameType == ServiceNameType::kInvalid)
+    {
+        return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
+    }
+
     ReturnErrorOnFailure(mRecordName.Set(name));
     ReturnErrorOnFailure(mTargetHostName.Set(srv.GetName()));
     mCommonResolutionData.port = srv.GetPort();
@@ -164,8 +172,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         // only save the first part: the MAC or 802.15.4 Extended Address in hex
         Platform::CopyString(mCommonResolutionData.hostName, serverName.Value());
     }
-
-    mServiceNameType = ComputeServiceNameType(name);
 
     switch (mServiceNameType)
     {

@@ -16,10 +16,8 @@
  */
 
 #include <app/ConcreteClusterPath.h>
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/chime-server/chime-server.h>
-#include <app/server-cluster/testingClusterTester.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <gtest/gtest.h>
 
@@ -59,7 +57,7 @@ public:
         }
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    Protocols::InteractionModel::Status PlayChimeSound() override
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t) override
     {
         playChimeSoundCalled = true;
         return Protocols::InteractionModel::Status::Success;
@@ -73,21 +71,17 @@ struct TestChimeClusterBackwardsCompatibility : public ::testing::Test
 
     void SetUp() override
     {
-        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
         EXPECT_EQ(mChimeServer.Init(), CHIP_NO_ERROR);
         EXPECT_EQ(mChimeServer.mCluster.Cluster().Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+    void TearDown() override {}
 
     MockChimeDelegate mMockDelegate;
 
     ChimeServer mChimeServer{ kTestEndpointId, mMockDelegate };
 
     chip::Testing::ClusterTester mClusterTester{ mChimeServer.mCluster.Cluster() };
-
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacyInstantiation)
