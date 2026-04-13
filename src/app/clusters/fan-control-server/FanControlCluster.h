@@ -160,7 +160,11 @@ private:
     void ApplyFanModeOffSideEffects();
     void ApplyFanModeAutoSideEffects();
 
-    // Spec-required mode side effects
+    // Mandatory attribute side effects when FanMode becomes kLow, kMedium, or kHigh.
+    // PercentSetting is set to 33%, 66%, or 100% respectively; when MultiSpeed is supported,
+    // SpeedSetting is set to 1, the rounded midpoint of 1..SpeedMax, or SpeedMax.
+    // PercentCurrent and SpeedCurrent are updated to match only while On/Off is on (fan energized);
+    // otherwise only the *Setting attributes change.
     void ApplyFanModeLowSideEffects();
     void ApplyFanModeMediumSideEffects();
     void ApplyFanModeHighSideEffects();
