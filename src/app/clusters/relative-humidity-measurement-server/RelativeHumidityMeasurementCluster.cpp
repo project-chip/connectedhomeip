@@ -36,9 +36,12 @@ namespace {
 // Helper function to check if a value is within the allowed humidity bounds
 bool IsValueInHumidityRange(uint16_t value, const DataModel::Nullable<uint16_t> & min, const DataModel::Nullable<uint16_t> & max)
 {
-    if (value > kMeasuredValueMax) return false;
-    if (!min.IsNull() && value < min.Value()) return false;
-    if (!max.IsNull() && value > max.Value()) return false;
+    if (value > kMeasuredValueMax)
+        return false;
+    if (!min.IsNull() && value < min.Value())
+        return false;
+    if (!max.IsNull() && value > max.Value())
+        return false;
     return true;
 }
 
