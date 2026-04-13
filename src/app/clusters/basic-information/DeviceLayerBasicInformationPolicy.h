@@ -303,7 +303,7 @@ public:
         return SetDeviceLocationInternal(value, persistence, PersistenceMode::kPersist).GetUnderlyingError();
     }
 
-    CHIP_ERROR LoadDeviceLocation(AttributePersistence & persistence)
+    void LoadDeviceLocation(AttributePersistence & persistence)
     {
         const ConcreteAttributePath path{ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::DeviceLocation::Id };
 
@@ -334,7 +334,7 @@ public:
             }
         }
 
-        return CHIP_NO_ERROR;
+        return;
     }
 
     std::optional<DataModel::Nullable<LocationDescriptorStructType>> GetDeviceLocation() const

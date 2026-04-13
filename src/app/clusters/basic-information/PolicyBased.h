@@ -167,8 +167,7 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
 
     if constexpr (Policy::kHasDeviceLocation)
     {
-        ReturnErrorAndLogOnFailure(mPolicy.LoadDeviceLocation(persistence), Zcl,
-                                   "Unexpected failure while attempting to load DeviceLocation from persistent storage");
+        mPolicy.LoadDeviceLocation(persistence);
     }
 
     return CHIP_NO_ERROR;
@@ -396,12 +395,9 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
     }
     case Reachable::Id:
         return encoder.Encode<bool>(true);
-    case DeviceLocation::Id: {
-
+    case DeviceLocation::Id:
         if constexpr (Policy::kHasDeviceLocation)
         {
-            ChipLogDetail(Zcl, "Reading DeviceLocation");
-
             auto location = mPolicy.GetDeviceLocation();
             return encoder.Encode(*location);
         }
@@ -409,7 +405,6 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         {
             return Protocols::InteractionModel::Status::UnsupportedAttribute;
         }
-    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
