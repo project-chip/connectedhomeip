@@ -16,7 +16,6 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/InteractionModelEngine.h>
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
