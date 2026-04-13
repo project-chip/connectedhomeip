@@ -34,6 +34,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_NO_GROUPCAST_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -62,12 +76,13 @@ class TC_SC_5_2(MatterBaseTest):
 
     def steps_TC_SC_5_2(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0a", "Commissioning, already done", is_commissioning=True),
+            TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Manage privileges for group 0x0103."),
             TestStep("2", "TH sends KeySetWrite command with pre-installed key."),
             TestStep("3", "If Groupcast enabled on RootNode, skip to step 12. Otherwise, TH binds GroupId 0x0103 and 0x0101 with GroupKeySetID 0x01a3 in GroupKeyMap."),
-            TestStep("4", "TH sends RemoveAllGroups command to DUT on PIXIT.G.ENDPOINT."),
-            TestStep("5", "TH sends AddGroup Command with GroupID 0x0103 to DUT on PIXIT.G.ENDPOINT."),
+            TestStep("4", "TH sends RemoveAllGroups command to DUT on the current endpoint under test."),
+            TestStep("5", "TH sends AddGroup Command with GroupID 0x0103 to DUT on the current endpoint under test."),
             TestStep("6", "TH sends AddGroup command for GroupID 0x0101 as a group command using GroupID 0x0103."),
             TestStep("7", "TH sends ViewGroup with GroupID 0x0101 (GroupNames supported)."),
             TestStep("8", "TH sends ViewGroup with GroupID 0x0101 (GroupNames not supported)."),
@@ -85,13 +100,32 @@ class TC_SC_5_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_5_2(self):
+        self.step("0a")
+
+        self.step("0b")
+        endpoints = []
+        await self._populate_wildcard()
+        # TODO: there's something weird with the groups cluster on EP0 of all clusters. Also, that shouldn't be there.
+        # https://github.com/project-chip/matter-test-scripts/issues/770
+        endpoints = [endpoint for endpoint in self.stored_global_wildcard.attributes if endpoint !=
+                     0 and Clusters.Groups in self.stored_global_wildcard.attributes[endpoint]]
+        if not endpoints:
+            logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
+            logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
+                        "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
+            self.mark_all_remaining_steps_skipped("1")
+            return
+        logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
+        for endpoint in endpoints:
+            logger.info(f"Running test against endpoint {endpoint} groups cluster")
+            self.current_step_index = 2
+            await self.run_test_against_endpoint(endpoint)
+
+    async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller
         dev_ctrl.InitGroupTestingData()
-        groups_endpoint = self.matter_test_config.endpoint
         node_id = self.dut_node_id
         groupcast_enabled = await is_groupcast_on_root_node(self)
-
-        self.step("0")
 
         # Step 1: Write ACL
         self.step("1")
@@ -125,6 +159,7 @@ class TC_SC_5_2(MatterBaseTest):
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "11")
         else:
+            dev_ctrl.SetGroupInfo(0x0103, "Group #3")
             # Step 3: GroupKeyMap binding
             self.step("3")
             mapping = [
@@ -145,14 +180,14 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 6: AddGroup 0x0101 as group command via GroupID 0x0103
             self.step("6")
-            await dev_ctrl.SendGroupCommand(0x0103, Clusters.Groups.Commands.AddGroup(0x0101, "Test Group 0101"))
+            dev_ctrl.SendGroupCommand(0x0103, Clusters.Groups.Commands.AddGroup(0x0101, "Test Group 0101"))
             await asyncio.sleep(3)
 
             # Check if GroupNames are supported
-            group_feature_map = await dev_ctrl.read_single_attribute_check_success(
+            group_feature_map = await self.read_single_attribute_check_success(
                 cluster=Clusters.Groups,
                 attribute=Clusters.Groups.Attributes.FeatureMap,
-                endpoint=0)
+                endpoint=groups_endpoint)
             group_names_supported = bool(group_feature_map & Clusters.Groups.Bitmaps.Feature.kGroupNames)
 
             # Step 7: ViewGroup 0x0101 with GroupNames

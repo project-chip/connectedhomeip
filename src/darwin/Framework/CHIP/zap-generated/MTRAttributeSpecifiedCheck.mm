@@ -5480,6 +5480,52 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     }
     }
 }
+static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ProximityRanging;
+    switch (aAttributeId) {
+    case Attributes::RangingCapabilities::Id: {
+        return YES;
+    }
+    case Attributes::WiFiDevIK::Id: {
+        return YES;
+    }
+    case Attributes::BLEDeviceID::Id: {
+        return YES;
+    }
+    case Attributes::BLTDevIK::Id: {
+        return YES;
+    }
+    case Attributes::BLTCSSecurityLevel::Id: {
+        return YES;
+    }
+    case Attributes::BLTCSModeCapability::Id: {
+        return YES;
+    }
+    case Attributes::SessionIDList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ProximityRanging attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -7465,6 +7511,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::AmbientContextSensing::Id: {
         return AttributeIsSpecifiedInAmbientContextSensingCluster(aAttributeId);
+    }
+    case Clusters::ProximityRanging::Id: {
+        return AttributeIsSpecifiedInProximityRangingCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);

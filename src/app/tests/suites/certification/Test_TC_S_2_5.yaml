@@ -37,10 +37,10 @@ tests:
           GroupKeySet fields are as follows: GroupKeySetID: 0x01a1
           GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
           a0a1a2a3a4a5a6a7a8a9aaabacadaeaf EpochStartTime0: 1110000 EpochKey1:
-          b0b1b2b3b4b5b6b7b8b9babbbcbdbebf EpochStartTime1: 1110001
-          GroupKeyMulticastPolicy: 0"
+          b0b1b2b3b4b5b6b7b8b9babbbcbdbebf EpochStartTime1: 1110001 EpochKey2:
+          null EpochStartTime2: null GroupKeyMulticastPolicy: 0"
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1","groupKeySecurityPolicy": 0, "epochKey0":"a0a1a2a3a4a5a6a7a8a9aaabacadaeaf","epochStartTime0": 1110000,"epochKey1":"b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001, "groupKeyMulticastPolicy": 0 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1", "groupKeySecurityPolicy": 0, "epochKey0": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "epochStartTime0": 1110000, "epochKey1": "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001, "epochKey2": null, "epochStartTime2": null, "groupKeyMulticastPolicy": 0}' 1 0
 
           Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
 
@@ -57,6 +57,7 @@ tests:
           GroupKeyManagement cluster, by writing the GroupKeyMap attribute with
           one entry as follows: List item 1: FabricIndex: 1 GroupId: 0x0001
           GroupKeySetId: 0x01a1"
+      PICS: "!GC.S"
       verification: |
           If the Groupcast cluster is enabled on the RootNode endpoint, skip this step. Otherwise:
 
@@ -108,18 +109,43 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: If the Groupcast cluster is enabled on the RootNode endpoint,
-          the TH sends Groupcast LeaveGroup command with GroupID 0. Otherwise,
-          TH sends RemoveAllGroups."
-      PICS: G.S.C04.Rsp
+          "Step 1a: If the Groupcast cluster is enabled on the RootNode
+          endpoint, the TH reads the Groupcast _membership_ attribute on the DUT"
       verification: |
-          If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast LeaveGroup command with GroupID 0. Otherwise, TH sends RemoveAllGroups:
+          If the Groupcast cluster is enabled on the RootNode endpoint, the TH reads the Groupcast _membership_ attribute on the DUT
 
-          ./chip-tool groupcast leave-group 0 0
-          or:
+          ./chip-tool groupcast read membership 1 0
+
+          If the membership attribute is empty, skip to step 1b.
+
+          [1775471571.340] [8350:8352] [TOO] Endpoint: 0 Cluster: 0x0000_0065 Attribute 0x0000_0000 DataVersion: 302855302
+          [1775471571.340] [8350:8352] [TOO]   Membership: 0 entries
+          [1775471571.340] [8350:8352] [EM] <<< [E:65251i S:5880 M:89967051 (Ack:254148)] (S) Msg TX from 000000000001B669 to 1:0000000000000001 [FEFE] [UDP:[fe80::7c12:46ff:fed7:416f%vethed6e1e0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      disabled: true
+
+    - label:
+          "Step 1b: If the Groupcast cluster is enabled on the RootNode
+          endpoint, the TH sends Groupcast LeaveGroup command with GroupID 0.
+          Otherwise, TH sends RemoveAllGroups."
+      verification: |
+          If the Groupcast cluster is enabled on the RootNode endpoint and membership attribute is not empty in Step 1a, then TH sends LeaveGroup command from Groupcast cluster. Otherwise, TH sends RemoveAllGroups command from legacy Group cluster.
+
+          ./chip-tool groupcast leave-group 0 1 0
+
+          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+
+          [1775018049.464] [42664:42666] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0065 Command=0x0000_0002
+          [1775018049.464] [42664:42666] [TOO] Endpoint: 0 Cluster: 0x0000_0065 Command 0x0000_0002
+          [1775018049.464] [42664:42666] [TOO]   LeaveGroupResponse: {
+          [1775018049.464] [42664:42666] [TOO]     groupID: 0
+          [1775018049.464] [42664:42666] [TOO]     endpoints: 0 entries
+          [1775018049.464] [42664:42666] [TOO]    }
+
+
           ./chip-tool groups remove-all-groups 1 1
 
           Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+
           [1688019423.251524][1716:1718] CHIP:DMG:
           [1688019423.251561][1716:1718] CHIP:DMG:                                 StatusIB =
           [1688019423.251602][1716:1718] CHIP:DMG:                                 {
@@ -133,12 +159,19 @@ tests:
           the TH sends Groupcast JoinGroup command with GroupID, Endpoints, and
           KeySetID. Otherwise, TH sends AddGroup with the GroupID field set to
           Group 1."
-      PICS: G.S.C00.Rsp
       verification: |
-          If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast JoinGroup command with GroupID, Endpoints, and KeySetID. Otherwise, TH sends AddGroup:
+          If the Groupcast cluster is enabled on the RootNode endpoint, then TH sends JoinGroup command from Groupcast cluster. Otherwise, TH sends AddGroup command from  legacy Group cluster.
 
-          ./chip-tool groupcast join-group 0x01 [1] 0x01a1 0
-          or:
+          ./chip-tool groupcast join-group 0x01 [1] 0x01a1 1 0
+
+          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+
+          [1775018273.050] [42751:42753] [DMG]                                 StatusIB =
+          [1775018273.050] [42751:42753] [DMG]                                 {
+          [1775018273.050] [42751:42753] [DMG]                                         status = 0x00 (SUCCESS),
+          [1775018273.050] [42751:42753] [DMG]                                 },
+
+
           ./chip-tool groups add-group 0x0001 grp1 1 1
 
           Verify the AddGroupResponse with following fields:
