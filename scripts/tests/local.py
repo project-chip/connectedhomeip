@@ -165,6 +165,15 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     targets.append(
         ApplicationTarget(
             kind=SubprocessKind.APP,
+            env_key="ALL_CLUSTERS_NO_GROUPCAST_APP",
+            cli_key="all-clusters-no-groupcast",
+            target=f"{target_prefix}-all-clusters-no-groupcast-{suffix}",
+            binary="chip-all-clusters-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
             env_key="CHIP_LOCK_APP",
             cli_key="lock",
             target=f"{target_prefix}-lock-{suffix}",
@@ -959,7 +968,7 @@ def python_tests(
             f.write(f"{target.env_key}: {run_path}\n")
 
         # PushAV is special
-        f.write("PUSH_AV_SERVER: src/tools/push_av_server/server.py\n")
+        f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
 
         # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:

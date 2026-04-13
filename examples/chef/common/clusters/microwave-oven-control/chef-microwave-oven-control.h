@@ -38,9 +38,10 @@ namespace Clusters {
 class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate
 {
 public:
-    explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint);
-
-    void MicrowaveOvenInit();
+    explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
+                                     chip::app::Clusters::OperationalState::Instance * operationalStateInstancePtr,
+                                     chip::app::Clusters::OperationalState::OperationalStateDelegate * operationalStateDelegatePtr,
+                                     ModeBase::Instance * microwaveOvenModeInstancePtr);
 
     /**
      * handle command for microwave oven control: set cooking parameters
@@ -76,17 +77,17 @@ public:
 
     uint8_t GetCurrentWattIndex() const override { return mSelectedWattIndex; };
 
-    uint32_t GetMaxCookTimeSec() const override { return 100; }
+    uint32_t GetMaxCookTimeSec() const override { return 3600; }
 
     uint16_t GetWattRating() const override { return mWattRating; };
 
 private:
-    std::unique_ptr<chip::app::Clusters::OperationalState::OperationalStateDelegate> mOperationalStateDelegatePtr;
-    std::unique_ptr<chip::app::Clusters::OperationalState::Instance> mOperationalStateInstancePtr;
+    chip::app::Clusters::OperationalState::OperationalStateDelegate * mOperationalStateDelegatePtr;
+    chip::app::Clusters::OperationalState::Instance * mOperationalStateInstancePtr;
 
     chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
 
-    MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
+    std::unique_ptr<MicrowaveOvenControl::Instance> mMicrowaveOvenControlInstance;
 
     static constexpr uint8_t kMinPowerNum            = 20u;
     static constexpr uint8_t kMaxPowerNum            = 90u;

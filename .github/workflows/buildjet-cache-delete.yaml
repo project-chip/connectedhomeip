@@ -8,7 +8,7 @@ on:
         type: string
 jobs:
   manually-delete-buildjet-cache:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
