@@ -52,7 +52,7 @@ class OTARequestorCommandForwarder : public OTARequestorCommandInterface
 public:
     void HandleAnnounceOTAProvider(
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
+        const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
     {
         if (mDestination)
         {
