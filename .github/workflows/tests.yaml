@@ -1076,13 +1076,13 @@ jobs:
                 filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
                 include:
                     - filter: ""
-                      name: Other
+                      junitxml: out/junit-results/Other-results.xml
                     - filter: "TC_[A-C]"
-                      name: TC_A-C
+                      junitxml: out/junit-results/TC_A-C-results.xml
                     - filter: "TC_[D-O]"
-                      name: TC_D-O
+                      junitxml: out/junit-results/TC_D-O-results.xml
                     - filter: "!TC_[A-O]"
-                      name: TC_Non-A-O
+                      junitxml: out/junit-results/TC_Non-A-O-results.xml
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
@@ -1208,7 +1208,7 @@ jobs:
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json --junit-file out/junit-results/${{matrix.name}}-results.xml --junit-suite-name "REPL Tests Linux - ${{github.ref_name}}"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name "REPL Tests Linux - ${{github.ref_name}}"'
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
@@ -1228,7 +1228,7 @@ jobs:
               uses: actions/upload-artifact@v7
               with:
                   name: junit-results-repl-${{ matrix.filter }}
-                  path: out/junit-results/${{ matrix.name }}-results.xml
+                  path: ${{matrix.junitxml}}
                   retention-days: 30
                   if-no-files-found: warn
             - name: Execute Jupyter Notebooks
