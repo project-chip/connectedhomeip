@@ -20,6 +20,7 @@
 
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/data-model/List.h>
+#include <app/util/config.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <map>
