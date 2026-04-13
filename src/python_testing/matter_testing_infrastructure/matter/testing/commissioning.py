@@ -168,7 +168,7 @@ class CommissioningMethod(ABC):
         ):
             self.dev_ctrl.SetTCAcknowledgements(
                 self.commissioning_info.tc_version_to_simulate,
-                self.commissioning_info.tc_user_response_to_simulate,
+                self.commissioning_info.tc_user_response_to_simulate
             )
 
     async def _find_or_establish_pase_if_needed(self):
@@ -176,12 +176,12 @@ class CommissioningMethod(ABC):
         if setup_code is None:
             setup_code = self.dev_ctrl.CreateManualCode(
                 self.info.filter_value,
-                self.info.passcode,
+                self.info.passcode
             )
 
         commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
             setupCode=setup_code,
-            nodeId=self.node_id,
+            nodeId=self.node_id
         )
         if commissionee is None:
             raise RuntimeError("Failed to find or establish PASE session")
@@ -190,43 +190,29 @@ class CommissioningMethod(ABC):
     async def _prepare(self):
         pass
 
-    @abstractmethod
     async def _commission(self):
-        pass
+        return await self.dev_ctrl.Commission(self.node_id)
 
 
 class CommissioningNetworkOnNetwork(CommissioningMethod):
     async def _prepare(self):
         pass
 
-    async def _commission(self):
-        return await self.dev_ctrl.Commission(self.node_id)
-
 
 class CommissioningBleWiFi(CommissioningMethod):
     async def _prepare(self):
         asserts.assert_is_not_none(
             self.commissioning_info.wifi_ssid,
-            "WiFi SSID must be provided for ble-wifi commissioning",
+            "WiFi SSID must be provided for ble-wifi commissioning"
         )
         asserts.assert_is_not_none(
             self.commissioning_info.wifi_passphrase,
-            "WiFi Passphrase must be provided for ble-wifi commissioning",
+            "WiFi Passphrase must be provided for ble-wifi commissioning"
         )
 
         self.dev_ctrl.SetWiFiCredentials(
             self.commissioning_info.wifi_ssid,
-            self.commissioning_info.wifi_passphrase,
-        )
-
-    async def _commission(self):
-        return await self.dev_ctrl.ConnectBLE(
-            self.info.filter_value,
-            self.info.passcode,
-            self.node_id,
-            isShortDiscriminator=(
-                self.info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR
-            )
+            self.commissioning_info.wifi_passphrase
         )
 
 
@@ -234,21 +220,11 @@ class CommissioningBleThread(CommissioningMethod):
     async def _prepare(self):
         asserts.assert_is_not_none(
             self.commissioning_info.thread_operational_dataset,
-            "Thread dataset must be provided for ble-thread commissioning",
+            "Thread dataset must be provided for ble-thread commissioning"
         )
 
         self.dev_ctrl.SetThreadOperationalDataset(
-            self.commissioning_info.thread_operational_dataset,
-        )
-
-    async def _commission(self):
-        return await self.dev_ctrl.ConnectBLE(
-            self.info.filter_value,
-            self.info.passcode,
-            self.node_id,
-            isShortDiscriminator=(
-                self.info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR
-            )
+            self.commissioning_info.thread_operational_dataset
         )
 
 
@@ -256,50 +232,67 @@ class CommissioningNfcThread(CommissioningMethod):
     async def _prepare(self):
         asserts.assert_is_not_none(
             self.commissioning_info.thread_operational_dataset,
-            "Thread dataset must be provided for nfc-thread commissioning",
+            "Thread dataset must be provided for nfc-thread commissioning"
         )
 
         self.dev_ctrl.SetThreadOperationalDataset(
-            self.commissioning_info.thread_operational_dataset,
+            self.commissioning_info.thread_operational_dataset
         )
 
+    async def _find_or_establish_pase_if_needed(self):
+        pass
+
     async def _commission(self):
-        return await self.dev_ctrl.ConnectNFC(self.info.filter_value, self.info.passcode, self.node_id)
+        return await self.dev_ctrl.CommissionNfcThread(
+            self.info.filter_value,
+            self.info.passcode,
+            self.node_id,
+            self.commissioning_info.thread_operational_dataset
+        )
 
 
 class CommissioningNfcWiFi(CommissioningMethod):
     async def _prepare(self):
         asserts.assert_is_not_none(
             self.commissioning_info.wifi_ssid,
-            "WiFi SSID must be provided for nfc-wifi commissioning",
+            "WiFi SSID must be provided for nfc-wifi commissioning"
         )
         asserts.assert_is_not_none(
             self.commissioning_info.wifi_passphrase,
-            "WiFi Passphrase must be provided for nfc-wifi commissioning",
+            "WiFi Passphrase must be provided for nfc-wifi commissioning"
         )
 
         self.dev_ctrl.SetWiFiCredentials(
             self.commissioning_info.wifi_ssid,
-            self.commissioning_info.wifi_passphrase,
+            self.commissioning_info.wifi_passphrase
         )
 
+    async def _find_or_establish_pase_if_needed(self):
+        pass
+
     async def _commission(self):
-        return await self.dev_ctrl.ConnectNFC(self.info.filter_value, self.info.passcode, self.node_id)
+        return await self.dev_ctrl.CommissionNfcWiFi(
+            self.info.filter_value,
+            self.info.passcode,
+            self.node_id,
+            self.commissioning_info.wifi_ssid,
+            self.commissioning_info.wifi_passphrase
+        )
 
 
 class CommissioningThreadMeshcop(CommissioningMethod):
     async def _prepare(self):
         asserts.assert_is_not_none(
             self.commissioning_info.thread_operational_dataset,
-            "Thread dataset must be provided for thread-meshcop commissioning",
+            "Thread dataset must be provided for thread-meshcop commissioning"
         )
         asserts.assert_is_not_none(
             self.commissioning_info.thread_ba_host,
-            "thread_ba_host must be provided for thread-meshcop commissioning",
+            "thread_ba_host must be provided for thread-meshcop commissioning"
         )
         asserts.assert_is_not_none(
             self.commissioning_info.thread_ba_port,
-            "thread_ba_port must be provided for thread-meshcop commissioning",
+            "thread_ba_port must be provided for thread-meshcop commissioning"
         )
 
     async def _find_or_establish_pase_if_needed(self):
@@ -313,7 +306,7 @@ class CommissioningThreadMeshcop(CommissioningMethod):
             self.info.filter_value,
             self.commissioning_info.thread_ba_host,
             self.commissioning_info.thread_ba_port,
-            self.commissioning_info.thread_operational_dataset,
+            self.commissioning_info.thread_operational_dataset
         )
 
 
