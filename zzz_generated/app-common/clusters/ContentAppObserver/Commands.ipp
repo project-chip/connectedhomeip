@@ -61,7 +61,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ContentAppMessage.
+} // namespace ContentAppMessage
 namespace ContentAppMessageResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -99,7 +99,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ContentAppMessageResponse.
+} // namespace ContentAppMessageResponse
 } // namespace Commands
 } // namespace ContentAppObserver
 } // namespace Clusters

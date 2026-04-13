@@ -413,7 +413,14 @@ public:
         return std::find(list.begin(), list.end(), target) != list.end();
     }
 
-    void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
+    void SetFabricIndex(FabricIndex fabricIndex)
+    {
+        auto subjectDescriptor        = mHandler.GetSubjectDescriptor();
+        subjectDescriptor.fabricIndex = fabricIndex;
+        mHandler.SetSubjectDescriptor(subjectDescriptor);
+        mHandler.SetFabricIndex(fabricIndex);
+    }
+
     void SetSubjectDescriptor(const Access::SubjectDescriptor & subjectDescriptor)
     {
         mHandler.SetSubjectDescriptor(subjectDescriptor);

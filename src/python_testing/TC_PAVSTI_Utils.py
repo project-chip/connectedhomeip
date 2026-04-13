@@ -50,7 +50,7 @@ class PushAvServerProcess(Subprocess):
 
     # By default this points to the push_av_server in Test Harness
     # TCs utilizing this should expect th_server_app_path otherwise
-    DEFAULT_SERVER_PATH = "/root/apps/push_av_server/server.py"
+    DEFAULT_SERVER_PATH = "/root/apps/push_av_server/src/server.py"
 
     def __init__(
         self,
@@ -210,3 +210,17 @@ class PAVSTIUtils:
             ccdid=csr_result.ccdid,
         )
         return result.endpointID, host_ip
+
+    async def postcondition_remove_tls_endpoint(self, endpointID, tlsEndPoint):
+
+        # Make sure the passed in values are not None.
+        # This could happen in the unlikely event the test script fails prior to setting of any of these values (which would
+        # be prior to the TLS EP being set).
+
+        if endpointID is None or tlsEndPoint is None:
+            return
+
+        tls_utils = TLSUtils(self, endpoint=endpointID)
+        await tls_utils.send_remove_tls_endpoint_command(
+            endpoint_id=tlsEndPoint
+        )
