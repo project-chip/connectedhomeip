@@ -97,7 +97,7 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     VerifyOrReturnError(fc != nullptr, Status::UnsupportedEndpoint);
     VerifyOrReturnError(fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed), Status::Failure);
 
-    uint8_t speedMax       = fc->GetSpeedMax();
+    uint8_t speedMax                          = fc->GetSpeedMax();
     DataModel::Nullable<uint8_t> speedSetting = fc->GetSpeedSetting();
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
