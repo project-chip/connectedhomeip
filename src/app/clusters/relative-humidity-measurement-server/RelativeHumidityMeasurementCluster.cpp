@@ -31,6 +31,19 @@ constexpr uint16_t kMeasuredValueMax = 10000;
 // Spec-defined upper bound for Tolerance
 constexpr uint16_t kMaxTolerance = 2048;
 
+namespace {
+
+// Helper function to check if a value is within the allowed humidity bounds
+bool IsValueInHumidityRange(uint16_t value, const DataModel::Nullable<uint16_t> & min, const DataModel::Nullable<uint16_t> & max)
+{
+    if (value > kMeasuredValueMax) return false;
+    if (!min.IsNull() && value < min.Value()) return false;
+    if (!max.IsNull() && value > max.Value()) return false;
+    return true;
+}
+
+} // namespace
+
 RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId) :
     RelativeHumidityMeasurementCluster(endpointId, Config{})
 {}
@@ -98,17 +111,8 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::SetMeasuredValue(DataModel::Nulla
 {
     if (!measuredValue.IsNull())
     {
-        VerifyOrReturnError(measuredValue.Value() <= kMeasuredValueMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-        if (!mMinMeasuredValue.IsNull())
-        {
-            VerifyOrReturnError(measuredValue.Value() >= mMinMeasuredValue.Value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        }
-
-        if (!mMaxMeasuredValue.IsNull())
-        {
-            VerifyOrReturnError(measuredValue.Value() <= mMaxMeasuredValue.Value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        }
+        VerifyOrReturnError(IsValueInHumidityRange(measuredValue.Value(), mMinMeasuredValue, mMaxMeasuredValue),
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     SetAttributeValue(mMeasuredValue, measuredValue, MeasuredValue::Id);
