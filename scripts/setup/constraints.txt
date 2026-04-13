@@ -83,12 +83,6 @@ filelock==3.9.0
     # via virtualenv
 ghapi==1.0.3
     # via -r requirements.memory.txt
-google-api-core==2.17.0
-    # via -r requirements.all.txt
-google-auth==2.49.2
-    # via google-api-core
-googleapis-common-protos==1.74.0
-    # via google-api-core
 graphemeu==0.7.2
     # via alive-progress
 humanfriendly==10.0
@@ -160,10 +154,6 @@ portpicker==1.5.2
     #   mobly
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==4.25.9
-    # via
-    #   google-api-core
-    #   googleapis-common-protos
 psutil==5.9.4
     # via portpicker
 ptyprocess==0.7.0
@@ -204,7 +194,6 @@ referencing==0.37.0
 requests==2.28.2
     # via
     #   -r requirements.cirque.txt
-    #   google-api-core
 rpds-py==0.30.0
     # via
     #   jsonschema
