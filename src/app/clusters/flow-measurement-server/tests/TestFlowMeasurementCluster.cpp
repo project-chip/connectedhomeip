@@ -129,6 +129,86 @@ TEST_F(TestFlowMeasurementCluster, ReadAttributeTest)
     }
 }
 
+TEST_F(TestFlowMeasurementCluster, ReadUnsupportedAttribute)
+{
+    FlowMeasurementCluster cluster(kRootEndpointId);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    // Reading an attribute not in the cluster should fail
+    uint16_t dummy{};
+    EXPECT_NE(tester.ReadAttribute(0xFFF0, dummy), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestFlowMeasurementCluster, ConstructorVariants)
+{
+    // Only min set (max null)
+    {
+        FlowMeasurementCluster::Config config;
+        config.minMeasuredValue.SetNonNull(10);
+        FlowMeasurementCluster cluster(kRootEndpointId, config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        EXPECT_EQ(cluster.GetMinMeasuredValue().Value(), 10);
+        EXPECT_TRUE(cluster.GetMaxMeasuredValue().IsNull());
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Only max set (min null)
+    {
+        FlowMeasurementCluster::Config config;
+        config.maxMeasuredValue.SetNonNull(500);
+        FlowMeasurementCluster cluster(kRootEndpointId, config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(cluster.GetMinMeasuredValue().IsNull());
+        EXPECT_EQ(cluster.GetMaxMeasuredValue().Value(), 500);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // With tolerance
+    {
+        FlowMeasurementCluster::Config config;
+        config.minMeasuredValue.SetNonNull(0);
+        config.maxMeasuredValue.SetNonNull(2048);
+        config.WithTolerance(2048);
+        FlowMeasurementCluster cluster(kRootEndpointId, config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        ClusterTester tester(cluster);
+        uint16_t tolerance{};
+        ASSERT_EQ(tester.ReadAttribute(Tolerance::Id, tolerance), CHIP_NO_ERROR);
+        EXPECT_EQ(tolerance, 2048);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestFlowMeasurementCluster, InvalidRangeDefaultsToNull)
+{
+    // min == max == 0 is invalid (max must be >= min + 1).
+    // SetMeasuredValueRange should reject this.
+    FlowMeasurementCluster cluster(kRootEndpointId);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint16_t> min;
+    DataModel::Nullable<uint16_t> max;
+    min.SetNonNull(0);
+    max.SetNonNull(0);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    // Verify the range was not changed (still null from default)
+    EXPECT_TRUE(cluster.GetMinMeasuredValue().IsNull());
+    EXPECT_TRUE(cluster.GetMaxMeasuredValue().IsNull());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestFlowMeasurementCluster, MeasuredValue)
 {
     FlowMeasurementCluster::Config config;
