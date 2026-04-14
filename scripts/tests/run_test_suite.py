@@ -645,7 +645,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 log.error("%s", error)
                 raise SystemExit(2)
             case _:
-                raise RuntimeError("Caught an exception during test execution") from error
+                # Reraise the single exception with its original traceback preserved.
+                raise error.with_traceback(error.__traceback__)
 
     if errors:
         raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
