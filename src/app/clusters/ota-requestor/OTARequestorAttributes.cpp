@@ -27,6 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/LockTracker.h>
 
 namespace chip {
 
@@ -35,9 +36,17 @@ using namespace app::Clusters::OtaSoftwareUpdateRequestor::Events;
 
 constexpr ClusterId kClusterId = app::Clusters::OtaSoftwareUpdateRequestor::Id;
 
+OTARequestorAttributes::OTAUpdateStateEnum OTARequestorAttributes::GetUpdateState() const
+{
+    assertChipStackLockedByCurrentThread();
+    return mUpdateState;
+}
+
 void OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState, OTAChangeReasonEnum reason,
                                             app::DataModel::Nullable<uint32_t> targetSoftwareVersion)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturn(updateState != mUpdateState);
 
     OTAUpdateStateEnum previousState = mUpdateState;
@@ -57,8 +66,16 @@ void OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState, OTAC
     }
 }
 
+app::DataModel::Nullable<uint8_t> OTARequestorAttributes::GetUpdateStateProgress() const
+{
+    assertChipStackLockedByCurrentThread();
+    return mUpdateStateProgress;
+}
+
 CHIP_ERROR OTARequestorAttributes::SetUpdateStateProgress(app::DataModel::Nullable<uint8_t> updateStateProgress)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(updateStateProgress.IsNull() || updateStateProgress.Value() <= 100, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (mUpdateStateProgress.Update(updateStateProgress) && mDataModelChangeListener)
@@ -68,8 +85,16 @@ CHIP_ERROR OTARequestorAttributes::SetUpdateStateProgress(app::DataModel::Nullab
     return CHIP_NO_ERROR;
 }
 
+bool OTARequestorAttributes::GetUpdatePossible() const
+{
+    assertChipStackLockedByCurrentThread();
+    return mUpdatePossible;
+}
+
 void OTARequestorAttributes::SetUpdatePossible(bool updatePossible)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturn(updatePossible != mUpdatePossible);
 
     mUpdatePossible = updatePossible;
@@ -83,16 +108,19 @@ CHIP_ERROR OTARequestorAttributes::SetInteractionModelContext(EndpointId endpoin
                                                               app::DataModel::ProviderChangeListener & dataModelChangeListener,
                                                               app::DataModel::EventsGenerator & eventsGenerator)
 {
+    assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(IsValidEndpointId(endpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
-    mDataModelChangeListener = &dataModelChangeListener;
     mEndpointId              = endpointId;
+    mDataModelChangeListener = &dataModelChangeListener;
     mEventsGenerator         = &eventsGenerator;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTARequestorAttributes::RemoveDefaultOtaProvider(FabricIndex fabricIndex)
 {
+    assertChipStackLockedByCurrentThread();
+
     CHIP_ERROR error = mProviders.Delete(fabricIndex);
     // If no entry for the associated fabric index was found then the attribute hasn't changed and no further processing is needed.
     if (error == CHIP_ERROR_NOT_FOUND)
@@ -114,6 +142,8 @@ CHIP_ERROR OTARequestorAttributes::RemoveDefaultOtaProvider(FabricIndex fabricIn
 
 CHIP_ERROR OTARequestorAttributes::AddDefaultOtaProvider(const ProviderLocationType & providerLocation)
 {
+    assertChipStackLockedByCurrentThread();
+
     // Look for an entry with the same fabric index indicated
     auto iterator = mProviders.Begin();
     while (iterator.Next())
@@ -142,11 +172,13 @@ CHIP_ERROR OTARequestorAttributes::AddDefaultOtaProvider(const ProviderLocationT
 
 ProviderLocationList::Iterator OTARequestorAttributes::GetDefaultOtaProviderListIterator()
 {
+    assertChipStackLockedByCurrentThread();
     return mProviders.Begin();
 }
 
 CHIP_ERROR OTARequestorAttributes::SetStorageAndLoadAttributes(OTARequestorStorage & storage)
 {
+    assertChipStackLockedByCurrentThread();
     mStorage = &storage;
     if (mStorage->LoadCurrentUpdateState(mUpdateState) != CHIP_NO_ERROR)
     {
