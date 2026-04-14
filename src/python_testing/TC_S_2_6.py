@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-# Python port of src/app/tests/suites/certification/Test_TC_S_2_6.yaml
 # [TC-S-2.6] RemainingCapacity multi-fabric (DUT as Server)
 #
 # === BEGIN CI TEST ARGUMENTS ===
@@ -36,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import random
 import time
 from typing import List, Optional
 
@@ -54,17 +54,14 @@ log = logging.getLogger(__name__)
 S = Clusters.ScenesManagement
 OC = Clusters.OperationalCredentials
 
-# Group and subscription parameters from Test_TC_S_2_6.yaml
+# Group and subscription parameters
 GROUP_ID = 0
 SUB_MIN_S = 100
 SUB_MAX_S = 200
 # wait_next_report must block at least through the subscription MinIntervalFloor (and allow MaxIntervalCeiling).
 SUB_REPORT_CHUNK_SEC = float(SUB_MAX_S) + 60.0
 TRANSITION_TH1_MS = 20000
-TRANSITION_TH23_MS = 20  # 0x0014 in YAML for TH2/TH3 AddScene
-# Preconditions in YAML (open-commissioning-window discriminators)
-DISCRIMINATOR_TH2 = 3841
-DISCRIMINATOR_TH3 = 3842
+TRANSITION_TH23_MS = 20  # 0x0014 for TH2/TH3 AddScene
 
 
 def _remaining_capacity_for_fabric(fabric_scene_info: List[S.Structs.SceneInfoStruct], fabric_index: int) -> Optional[int]:
@@ -187,17 +184,16 @@ class TC_S_2_6(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ResourceExhausted, "StoreScene should fail with RESOURCE_EXHAUSTED")
 
-    async def _expect_copy_scene_resource_exhausted(self, dev_ctrl: ChipDeviceCtrl, ep: int) -> None:
-        # YAML uses destination scene 0x02, but TH1 already has scene 2 after step 4a. Per HandleCopyScene in
-        # ScenesManagementCluster.cpp, copying onto an existing scene only overwrites (no new slot) → Success.
-        # Use a non-existent scene ID (8: AddScene 8 failed with RESOURCE_EXHAUSTED) so the server checks
-        # remaining capacity and returns RESOURCE_EXHAUSTED.
+    async def _expect_copy_scene_resource_exhausted(
+        self, dev_ctrl: ChipDeviceCtrl, ep: int, destination_scene_id: int
+    ) -> None:
+        # Copy onto a scene ID that was never stored (same ID TH1 AddScene failed with in step 4b).
         cmd = S.Commands.CopyScene(
             mode=0,
             groupIdentifierFrom=GROUP_ID,
             sceneIdentifierFrom=1,
             groupIdentifierTo=GROUP_ID,
-            sceneIdentifierTo=8,
+            sceneIdentifierTo=destination_scene_id,
         )
         try:
             r = await dev_ctrl.SendCommand(self.dut_node_id, ep, cmd)
@@ -206,6 +202,36 @@ class TC_S_2_6(MatterBaseTest):
             asserts.assert_equal(r.sceneIdentifierFrom, 1, "CopySceneResponse sceneIdentifierFrom")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ResourceExhausted, "CopyScene should fail with RESOURCE_EXHAUSTED")
+
+    async def _add_scenes_until_remaining_zero(
+        self,
+        ctrl: ChipDeviceCtrl,
+        handler: AttributeSubscriptionHandler,
+        fabric_index: int,
+        ep: int,
+        transition_ms: int,
+        first_scene_id: int,
+        log_label: str,
+    ) -> int:
+        """AddScene until this fabric's RemainingCapacity reaches 0; return next unused scene ID in this sequence."""
+        next_scene_id = first_scene_id
+        while True:
+            rc_before = await self._read_remaining_capacity(ctrl, ep, fabric_index)
+            if rc_before == 0:
+                break
+            r = await ctrl.SendCommand(
+                self.dut_node_id,
+                ep,
+                S.Commands.AddScene(
+                    GROUP_ID, next_scene_id, transition_ms, f"{log_label}_scene_{next_scene_id}", []
+                ),
+            )
+            asserts.assert_equal(r.status, Status.Success, f"{log_label} AddScene {next_scene_id}")
+            asserts.assert_equal(r.groupID, GROUP_ID, f"{log_label} AddScene groupID")
+            asserts.assert_equal(r.sceneID, next_scene_id, f"{log_label} AddScene sceneID")
+            self._wait_remaining_capacity(handler, fabric_index, rc_before - 1)
+            next_scene_id += 1
+        return next_scene_id
 
     @async_test_body
     async def teardown_test(self):
@@ -240,11 +266,21 @@ class TC_S_2_6(MatterBaseTest):
         self._teardown_remove_fabric_indices = []
         ep = self.matter_test_config.endpoint
 
+        # ECM discriminators: 12-bit in spec (0..4095). Distinct from each other and from harness DUT discriminators.
+        reserved = set(self.matter_test_config.discriminators or [])
+        discriminator_th2 = random.randint(0, 4095)
+        while discriminator_th2 in reserved:
+            discriminator_th2 = random.randint(0, 4095)
+        discriminator_th3 = random.randint(0, 4095)
+        while discriminator_th3 in reserved or discriminator_th3 == discriminator_th2:
+            discriminator_th3 = random.randint(0, 4095)
+        log.info("OpenCommissioningWindow discriminators TH2=%s TH3=%s", discriminator_th2, discriminator_th3)
+
         self.TH2 = await self._commission_secondary_fabric(
-            self.TH1, DISCRIMINATOR_TH2, new_node_id=2, fabric_id=self.TH1.fabricId + 1
+            self.TH1, discriminator_th2, new_node_id=2, fabric_id=self.TH1.fabricId + 1
         )
         self.TH3 = await self._commission_secondary_fabric(
-            self.TH1, DISCRIMINATOR_TH3, new_node_id=3, fabric_id=self.TH1.fabricId + 2
+            self.TH1, discriminator_th3, new_node_id=3, fabric_id=self.TH1.fabricId + 2
         )
 
         f1 = await self.read_single_attribute_check_success(
@@ -272,9 +308,12 @@ class TC_S_2_6(MatterBaseTest):
         )
         asserts.assert_greater_equal(scene_table_size, 2, "SceneTableSize should be at least 2 for this test")
         max_rc = (scene_table_size - 1) // 2
+        asserts.assert_greater_equal(
+            max_rc,
+            1,
+            "TC-S-2.6 requires RemainingCapacity >= 1 per fabric after RemoveAllScenes (increase SceneTableSize)",
+        )
         log.info("SceneTableSize=%s MaxRemainingCapacity=%s", scene_table_size, max_rc)
-        expected_th3_rc_after_th2 = scene_table_size - 2 * max_rc
-        asserts.assert_greater_equal(expected_th3_rc_after_th2, 0, "TH3 remaining capacity formula invalid for this DUT")
 
         self.step("2b")
 
@@ -314,9 +353,21 @@ class TC_S_2_6(MatterBaseTest):
         )
         self._fabric_scene_subs = [sub1, sub2, sub3]
 
-        for ctrl, fx in ((self.TH1, f1), (self.TH2, f2), (self.TH3, f3)):
-            baseline = await self._read_remaining_capacity(ctrl, ep, fx)
+        f1_baseline_rc = await self._read_remaining_capacity(self.TH1, ep, f1)
+        f2_baseline_rc = await self._read_remaining_capacity(self.TH2, ep, f2)
+        f3_baseline_rc = await self._read_remaining_capacity(self.TH3, ep, f3)
+        for baseline, fx in (
+            (f1_baseline_rc, f1),
+            (f2_baseline_rc, f2),
+            (f3_baseline_rc, f3),
+        ):
             asserts.assert_equal(baseline, max_rc, f"Baseline RemainingCapacity for fabric {fx}")
+        log.info(
+            "Stored RemainingCapacity from 2b: TH1=%s TH2=%s TH3=%s",
+            f1_baseline_rc,
+            f2_baseline_rc,
+            f3_baseline_rc,
+        )
 
         self.step("3a")
         r = await self.TH1.SendCommand(
@@ -327,45 +378,33 @@ class TC_S_2_6(MatterBaseTest):
         asserts.assert_equal(r.sceneID, 1, "AddScene sceneID")
 
         self.step("3b")
-        self._wait_remaining_capacity(sub1, f1, max_rc - 1)
+        self._wait_remaining_capacity(sub1, f1, f1_baseline_rc - 1)
 
         self.step("4a")
-        for sid in range(2, 8):
-            r = await self.TH1.SendCommand(
-                self.dut_node_id, ep, S.Commands.AddScene(GROUP_ID, sid, TRANSITION_TH1_MS, f"scene{sid}", [])
-            )
-            asserts.assert_equal(r.status, Status.Success, f"TH1 AddScene {sid}")
-            self._wait_remaining_capacity(sub1, f1, max_rc - sid)
+        th1_next_scene_id = await self._add_scenes_until_remaining_zero(
+            self.TH1, sub1, f1, ep, TRANSITION_TH1_MS, 2, "TH1"
+        )
 
         self.step("4b")
-        await self._expect_add_scene_resource_exhausted(self.TH1, ep, GROUP_ID, 8, TRANSITION_TH1_MS, "scene9")
+        await self._expect_add_scene_resource_exhausted(
+            self.TH1, ep, GROUP_ID, th1_next_scene_id, TRANSITION_TH1_MS, "th1_exhaust"
+        )
 
         self.step("5a")
-        th2_scene_names = ["scene1", "scene2", "scene3", "scene4", "scene5", "scene6", "scene7"]
-        for i, sid in enumerate(range(2, 9)):
-            r = await self.TH2.SendCommand(
-                self.dut_node_id, ep, S.Commands.AddScene(GROUP_ID, sid, TRANSITION_TH23_MS, th2_scene_names[i], [])
-            )
-            asserts.assert_equal(r.status, Status.Success, f"TH2 AddScene {sid}")
-            self._wait_remaining_capacity(sub2, f2, max_rc - (sid - 1))
-
-        self._wait_remaining_capacity(sub3, f3, expected_th3_rc_after_th2)
+        th2_next_scene_id = await self._add_scenes_until_remaining_zero(
+            self.TH2, sub2, f2, ep, TRANSITION_TH23_MS, 2, "TH2"
+        )
+        th3_rc_after_th2 = await self._read_remaining_capacity(self.TH3, ep, f3)
+        log.info("After TH2 exhausted RC: TH3 RemainingCapacity=%s", th3_rc_after_th2)
+        self._wait_remaining_capacity(sub3, f3, th3_rc_after_th2)
 
         self.step("5b")
-        await self._expect_add_scene_resource_exhausted(self.TH2, ep, GROUP_ID, 9, TRANSITION_TH23_MS, "scene8")
+        await self._expect_add_scene_resource_exhausted(
+            self.TH2, ep, GROUP_ID, th2_next_scene_id, TRANSITION_TH23_MS, "th2_exhaust"
+        )
 
         self.step("6a")
-        r = await self.TH3.SendCommand(
-            self.dut_node_id, ep, S.Commands.AddScene(GROUP_ID, 2, TRANSITION_TH23_MS, "scene1", [])
-        )
-        asserts.assert_equal(r.status, Status.Success, "TH3 AddScene 2")
-        self._wait_remaining_capacity(sub3, f3, expected_th3_rc_after_th2 - 1)
-
-        r = await self.TH3.SendCommand(
-            self.dut_node_id, ep, S.Commands.AddScene(GROUP_ID, 3, TRANSITION_TH23_MS, "scene2", [])
-        )
-        asserts.assert_equal(r.status, Status.Success, "TH3 AddScene 3")
-        self._wait_remaining_capacity(sub3, f3, 0)
+        await self._add_scenes_until_remaining_zero(self.TH3, sub3, f3, ep, TRANSITION_TH23_MS, 2, "TH3")
 
         self.step("6b")
         await self._expect_add_scene_resource_exhausted(self.TH3, ep, GROUP_ID, 1, TRANSITION_TH1_MS, "scene")
@@ -375,7 +414,7 @@ class TC_S_2_6(MatterBaseTest):
 
         self.step(8)
         if await self.command_guard(ep, S.Commands.CopyScene):
-            await self._expect_copy_scene_resource_exhausted(self.TH1, ep)
+            await self._expect_copy_scene_resource_exhausted(self.TH1, ep, th1_next_scene_id)
 
         th2_rc_before_9 = await self._read_remaining_capacity(self.TH2, ep, f2)
 
@@ -385,7 +424,7 @@ class TC_S_2_6(MatterBaseTest):
         asserts.assert_equal(r.groupID, GROUP_ID, "TH1 RemoveAllScenes groupID")
 
         self.step("9b")
-        self._wait_remaining_capacity(sub1, f1, max_rc)
+        self._wait_remaining_capacity(sub1, f1, f1_baseline_rc)
         th2_rc_after_9 = await self._read_remaining_capacity(self.TH2, ep, f2)
         asserts.assert_equal(
             th2_rc_after_9,
@@ -398,7 +437,7 @@ class TC_S_2_6(MatterBaseTest):
         asserts.assert_equal(r.status, Status.Success, "TH2 RemoveAllScenes")
 
         self.step("10b")
-        self._wait_remaining_capacity(sub2, f2, max_rc)
+        self._wait_remaining_capacity(sub2, f2, f2_baseline_rc)
 
         self.step("11a")
         res_a = await self.TH1.SendCommand(self.dut_node_id, 0, OC.Commands.RemoveFabric(fabricIndex=f2))
