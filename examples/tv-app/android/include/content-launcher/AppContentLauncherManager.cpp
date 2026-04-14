@@ -17,9 +17,11 @@
  */
 
 #include "AppContentLauncherManager.h"
+
 #include "../../java/ContentAppAttributeDelegate.h"
 #include <app/util/config.h>
 #include <json/json.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
@@ -28,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
+using namespace chip::literals;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate,

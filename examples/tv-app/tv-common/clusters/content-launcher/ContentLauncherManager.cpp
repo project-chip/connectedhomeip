@@ -19,6 +19,7 @@
 #include "ContentLauncherManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
@@ -27,6 +28,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
+using namespace chip::literals;
 
 ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {

@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <app/util/config.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
@@ -24,6 +25,7 @@
 #include <algorithm>
 #include <iostream>
 
+using namespace chip::literals;
 using chip::to_underlying;
 
 LockManager LockManager::instance;
@@ -117,8 +119,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     uint16_t userIndex(1);
     chip::FabricIndex creator(1);
     chip::FabricIndex modifier(1);
-    const chip::CharSpan userName = "user1"_span; // default
-                                                  // username
+    const chip::CharSpan userName{ "user1"_span }; // default username
     uint32_t uniqueId         = 0xFFFFFFFF;       // null
     UserStatusEnum userStatus = UserStatusEnum::kOccupiedEnabled;
     // Set to programming user instead of unrestrict user to perform

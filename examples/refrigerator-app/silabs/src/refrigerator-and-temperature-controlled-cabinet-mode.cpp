@@ -15,11 +15,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/support/Span.h>
 #include <refrigerator-and-temperature-controlled-cabinet-mode.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
+using namespace chip::literals;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;

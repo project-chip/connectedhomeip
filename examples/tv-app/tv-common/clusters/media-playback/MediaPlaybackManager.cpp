@@ -16,15 +16,17 @@
  */
 
 #include "MediaPlaybackManager.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <lib/support/Span.h>
 
 #include <string>
 
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
+using namespace chip::literals;
 using namespace chip::Uint8;
-using chip::CharSpan;
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {

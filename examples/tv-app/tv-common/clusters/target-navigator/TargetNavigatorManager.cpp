@@ -16,13 +16,16 @@
  */
 
 #include "TargetNavigatorManager.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <lib/support/Span.h>
 
 #include <string>
 
 using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
+using namespace chip::literals;
 
 TargetNavigatorManager::TargetNavigatorManager(std::list<std::string> targets, uint8_t currentTarget)
 {

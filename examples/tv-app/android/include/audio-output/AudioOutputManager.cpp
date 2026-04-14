@@ -18,8 +18,11 @@
 
 #include "AudioOutputManager.h"
 
+#include <lib/support/Span.h>
+
 using namespace chip::app;
 using namespace chip::app::Clusters::AudioOutput;
+using namespace chip::literals;
 
 AudioOutputManager::AudioOutputManager()
 {

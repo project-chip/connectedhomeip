@@ -19,12 +19,14 @@
 #ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "TargetNavigatorManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
 
 using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
+using namespace chip::literals;
 
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;

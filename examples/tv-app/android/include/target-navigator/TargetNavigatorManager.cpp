@@ -16,15 +16,18 @@
  */
 
 #include "TargetNavigatorManager.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <json/json.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
 
 using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
+using namespace chip::literals;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 TargetNavigatorManager::TargetNavigatorManager(ContentAppAttributeDelegate * attributeDelegate, std::list<std::string> targets,
