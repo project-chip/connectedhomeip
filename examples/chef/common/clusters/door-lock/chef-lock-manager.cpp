@@ -117,9 +117,9 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     uint16_t userIndex(1);
     chip::FabricIndex creator(1);
     chip::FabricIndex modifier(1);
-    const chip::CharSpan userName = "user1"_span;                            // default
-                                                                             // username
-    uint32_t uniqueId         = 0xFFFFFFFF;                                  // null
+    const chip::CharSpan userName = "user1"_span; // default
+                                                  // username
+    uint32_t uniqueId         = 0xFFFFFFFF;       // null
     UserStatusEnum userStatus = UserStatusEnum::kOccupiedEnabled;
     // Set to programming user instead of unrestrict user to perform
     // priviledged function
