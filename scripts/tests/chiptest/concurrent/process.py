@@ -242,7 +242,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
                 raise TimeoutError("Timeout when waiting for initialization")
 
             with self.state:
-                # Propagate KerboardInterrupt as is.
+                # Propagate KeyboardInterrupt as is.
                 if isinstance(self.state.exception, KeyboardInterrupt):
                     raise self.state.exception
 
