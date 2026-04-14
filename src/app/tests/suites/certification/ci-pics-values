@@ -3176,6 +3176,43 @@ WEBRTCR.S.A0000=1    # CurrentSessions attribute
 
 # Commands Received
 WEBRTCR.S.C00.Rsp=1  # Offer
-WEBRTCR.S.C01.Rsp=1  # Answer  
+WEBRTCR.S.C01.Rsp=1  # Answer
 WEBRTCR.S.C02.Rsp=1  # ICECandidates
 WEBRTCR.S.C03.Rsp=1  # End
+
+# Commissioning Proxy Cluster
+# Server
+COMPRO.S=1
+
+# Features
+COMPRO.S.F00=1    # WiFiNetworkInterface (WI)
+COMPRO.S.F01=1    # BackgroundScan (BGS)
+
+# Mandatory Attributes
+COMPRO.S.A0000=1  # Transport
+COMPRO.S.A0001=1  # ScanMaxTime
+COMPRO.S.A0002=1  # MaxSessions
+
+# BGS Feature Attributes
+COMPRO.S.A0003=1  # MaxCachedResults
+COMPRO.S.A0004=1  # NumCachedResults
+COMPRO.S.A0005=1  # CacheTimeout
+COMPRO.S.A0006=1  # CachedResults
+
+# WI Feature Attribute
+COMPRO.S.A0007=1  # WiFiBand
+
+# Commands Received (mandatory)
+COMPRO.S.C00.Rsp=1  # ProxyConnectRequest
+COMPRO.S.C02.Rsp=1  # ProxyDisconnectRequest
+COMPRO.S.C03.Rsp=1  # ProxyScanRequest
+COMPRO.S.C07.Rsp=1  # ProxyMessageRequest
+
+# Commands Received (BGS feature)
+COMPRO.S.C05.Rsp=1  # ProxyBackGroundScanStartRequest
+COMPRO.S.C06.Rsp=1  # ProxyBackGroundScanStopRequest
+
+# Commands Generated
+COMPRO.S.C01.Tx=1   # ProxyConnectResponse
+COMPRO.S.C04.Tx=1   # ProxyScanResponse
+COMPRO.S.C08.Tx=1   # ProxyMessageResponse

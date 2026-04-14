@@ -10676,3 +10676,74 @@ PICS:
 
     - label: "Does the device implement the End command?"
       id: WEBRTCR.S.C03.Rsp
+
+    #
+    # Commissioning Proxy Cluster
+    #
+    - label: "Does the device implement the Commissioning Proxy Cluster as a server?"
+      id: COMPRO.S
+
+    # Features
+    - label: "Does the device support the WiFiNetworkInterface (WI) feature?"
+      id: COMPRO.S.F00
+
+    - label: "Does the device support the BackgroundScan (BGS) feature?"
+      id: COMPRO.S.F01
+
+    # Mandatory attributes
+    - label: "Does the device implement the Transport attribute?"
+      id: COMPRO.S.A0000
+
+    - label: "Does the device implement the ScanMaxTime attribute?"
+      id: COMPRO.S.A0001
+
+    - label: "Does the device implement the MaxSessions attribute?"
+      id: COMPRO.S.A0002
+
+    # BGS feature-gated attributes
+    - label: "Does the device implement the MaxCachedResults attribute?"
+      id: COMPRO.S.A0003
+
+    - label: "Does the device implement the NumCachedResults attribute?"
+      id: COMPRO.S.A0004
+
+    - label: "Does the device implement the CacheTimeout attribute?"
+      id: COMPRO.S.A0005
+
+    - label: "Does the device implement the CachedResults attribute?"
+      id: COMPRO.S.A0006
+
+    # WI feature-gated attribute
+    - label: "Does the device implement the WiFiBand attribute?"
+      id: COMPRO.S.A0007
+
+    # Commands received (mandatory)
+    - label: "Does the device implement receiving the ProxyConnectRequest command?"
+      id: COMPRO.S.C00.Rsp
+
+    - label: "Does the device implement receiving the ProxyDisconnectRequest command?"
+      id: COMPRO.S.C02.Rsp
+
+    - label: "Does the device implement receiving the ProxyScanRequest command?"
+      id: COMPRO.S.C03.Rsp
+
+    # Commands received (BGS feature)
+    - label: "Does the device implement receiving the ProxyBackGroundScanStartRequest command?"
+      id: COMPRO.S.C05.Rsp
+
+    - label: "Does the device implement receiving the ProxyBackGroundScanStopRequest command?"
+      id: COMPRO.S.C06.Rsp
+
+    # Commands received (mandatory)
+    - label: "Does the device implement receiving the ProxyMessageRequest command?"
+      id: COMPRO.S.C07.Rsp
+
+    # Commands generated
+    - label: "Does the device implement sending the ProxyConnectResponse command?"
+      id: COMPRO.S.C01.Tx
+
+    - label: "Does the device implement sending the ProxyScanResponse command?"
+      id: COMPRO.S.C04.Tx
+
+    - label: "Does the device implement sending the ProxyMessageResponse command?"
+      id: COMPRO.S.C08.Tx

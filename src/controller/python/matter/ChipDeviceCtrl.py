@@ -2487,6 +2487,18 @@ class ChipDeviceControllerBase():
                 c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_CommissionViaProxy.argtypes = [
+                c_void_p,   # devCtrl
+                c_void_p,   # pairingDelegate
+                c_uint64,   # proxyNodeId
+                c_uint64,   # remoteNodeId
+                c_uint16,   # proxySessionId
+                c_uint16,   # proxyEndpoint
+                c_uint16,   # discriminator
+                c_uint32,   # setupPinCode
+            ]
+            self._dmLib.pychip_DeviceController_CommissionViaProxy.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
@@ -3101,6 +3113,41 @@ class ChipDeviceController(ChipDeviceControllerBase):
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
+    async def CommissionViaProxy(self, proxyNodeId: int, proxySessionId: int,
+                                 remoteNodeId: int, discriminator: int,
+                                 setupPinCode: int, proxyEndpoint: int = 1) -> int:
+        '''Commission a device through a Commissioning Proxy.
+
+        The proxy CASE session must already exist (proxyNodeId is commissioned
+        to this controller's fabric) and a ProxyConnectRequest must have been
+        sent separately to obtain proxySessionId.
+
+        WiFi credentials must be set via SetWiFiCredentials() before calling
+        this method (same pattern as CommissionOnNetwork).
+
+        Args:
+            proxyNodeId:    Node ID of the Commissioning Proxy (DUT).
+            proxySessionId: SessionId from the ProxyConnectResponse.
+            remoteNodeId:   Node ID to assign to the commissioned ED.
+            discriminator:  Long discriminator of the ED.
+            setupPinCode:   PASE passcode of the ED.
+            proxyEndpoint:  Endpoint on which the CommissioningProxy cluster is hosted (default 1).
+
+        Returns:
+            Effective Node ID of the commissioned ED.
+        '''
+        self.CheckIsActive()
+
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_CommissionViaProxy(
+                    self.devCtrl, self.pairingDelegate,
+                    proxyNodeId, remoteNodeId, proxySessionId, proxyEndpoint, discriminator, setupPinCode)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
