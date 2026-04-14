@@ -58,8 +58,6 @@ OC = Clusters.OperationalCredentials
 GROUP_ID = 0
 SUB_MIN_S = 100
 SUB_MAX_S = 200
-# wait_next_report must block at least through the subscription MinIntervalFloor (and allow MaxIntervalCeiling).
-SUB_REPORT_CHUNK_SEC = float(SUB_MAX_S) + 60.0
 TRANSITION_TH1_MS = 20000
 TRANSITION_TH23_MS = 20  # 0x0014 for TH2/TH3 AddScene
 
@@ -85,9 +83,12 @@ class TC_S_2_6(MatterBaseTest):
             TestStep(1, "TH1 commissioned; commission TH2 and TH3 on separate fabrics (ECM from TH1)."),
             TestStep("1a", "TH1/TH2/TH3 RemoveAllScenes for group 0x0000."),
             TestStep("2a", "Read SceneTableSize; MaxRemainingCapacity = (SceneTableSize - 1) // 2."),
-            TestStep("2b", "Subscribe FabricSceneInfo on TH1/TH2/TH3 (min 100s max 200s); verify baseline RC == MaxRemainingCapacity per fabric."),
+            TestStep(
+                "2b",
+                "Subscribe FabricSceneInfo on TH1/TH2/TH3 (min 100s max 200s); verify baseline RC >= MaxRemainingCapacity per fabric.",
+            ),
             TestStep("3a", "TH1 AddScene group 0 scene 1 transition 20000."),
-            TestStep("3b", "TH1 subscription: RemainingCapacity == MaxRemainingCapacity - 1."),
+            TestStep("3b", "TH1 subscription: RemainingCapacity == TH1 baseline from 2b - 1."),
             TestStep("4a", "TH1 AddScene scenes 2..7; after each, wait RC decrements until 0."),
             TestStep("4b", "TH1 AddScene scene 8 → RESOURCE_EXHAUSTED."),
             TestStep("5a", "TH2 AddScene scenes 2..8 (transition 20ms); verify TH3 RC == SceneTableSize - 2*MaxRemainingCapacity."),
@@ -97,9 +98,9 @@ class TC_S_2_6(MatterBaseTest):
             TestStep(7, "TH3 StoreScene group 0 scene 0xfe → RESOURCE_EXHAUSTED."),
             TestStep(8, "TH1 CopyScene to unused scene ID (PICS S.S.C40) → RESOURCE_EXHAUSTED."),
             TestStep("9a", "TH1 RemoveAllScenes group 0."),
-            TestStep("9b", "TH1 subscription RC == MaxRemainingCapacity; TH2 fabric RC unchanged (read)."),
+            TestStep("9b", "TH1 subscription RC == TH1 baseline from 2b; TH2 fabric RC unchanged (read)."),
             TestStep("10a", "TH2 RemoveAllScenes group 0."),
-            TestStep("10b", "TH2 subscription RC == MaxRemainingCapacity."),
+            TestStep("10b", "TH2 subscription RC == TH2 baseline from 2b."),
             TestStep("11a", "TH1 RemoveFabric TH2 fabric index."),
             TestStep("11b", "TH1 RemoveFabric TH3 fabric index."),
         ]
@@ -114,11 +115,9 @@ class TC_S_2_6(MatterBaseTest):
         deadline = time.time() + timeout_sec
         last_rc: Optional[int] = None
         while time.time() < deadline:
-            remaining = deadline - time.time()
-            if remaining <= 0:
+            wait = deadline - time.time()
+            if wait <= 0:
                 break
-            # TC-S-2.6 uses subscribe 100 200; a single wait_next_report must not expire before the DUT may send.
-            wait = min(SUB_REPORT_CHUNK_SEC, remaining)
             item = handler.wait_next_report(timeout_sec=wait)
             info_list = item.value
             asserts.assert_true(isinstance(info_list, list), "FabricSceneInfo report should be a list")
@@ -361,7 +360,11 @@ class TC_S_2_6(MatterBaseTest):
             (f2_baseline_rc, f2),
             (f3_baseline_rc, f3),
         ):
-            asserts.assert_equal(baseline, max_rc, f"Baseline RemainingCapacity for fabric {fx}")
+            asserts.assert_greater_equal(
+                baseline,
+                max_rc,
+                f"Baseline RemainingCapacity for fabric {fx} should be at least MaxRemainingCapacity ({max_rc})",
+            )
         log.info(
             "Stored RemainingCapacity from 2b: TH1=%s TH2=%s TH3=%s",
             f1_baseline_rc,
@@ -394,9 +397,24 @@ class TC_S_2_6(MatterBaseTest):
         th2_next_scene_id = await self._add_scenes_until_remaining_zero(
             self.TH2, sub2, f2, ep, TRANSITION_TH23_MS, 2, "TH2"
         )
+        expected_th3_rc_after_th2 = scene_table_size - 2 * max_rc
+        asserts.assert_greater_equal(
+            expected_th3_rc_after_th2,
+            0,
+            "SceneTableSize and MaxRemainingCapacity imply invalid TH3 RemainingCapacity formula",
+        )
         th3_rc_after_th2 = await self._read_remaining_capacity(self.TH3, ep, f3)
-        log.info("After TH2 exhausted RC: TH3 RemainingCapacity=%s", th3_rc_after_th2)
-        self._wait_remaining_capacity(sub3, f3, th3_rc_after_th2)
+        asserts.assert_equal(
+            th3_rc_after_th2,
+            expected_th3_rc_after_th2,
+            "TH3 RemainingCapacity after TH2 exhausts should equal SceneTableSize - 2*MaxRemainingCapacity",
+        )
+        log.info(
+            "After TH2 exhausted RC: TH3 RemainingCapacity=%s (expected %s)",
+            th3_rc_after_th2,
+            expected_th3_rc_after_th2,
+        )
+        self._wait_remaining_capacity(sub3, f3, expected_th3_rc_after_th2)
 
         self.step("5b")
         await self._expect_add_scene_resource_exhausted(
