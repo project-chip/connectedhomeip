@@ -97,12 +97,12 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
         for func in APPS_RPC_FUNCS:
             self._server_manager.register_function(self._create_func(func), self._to_camel_case(func))
 
+        # Set the log level for the process with the dedicated log level for RPC.
+        self._config.log_config.set_fmt(level=self._config.log_config.level_rpc)
+
         # Run the server loop in a separate thread.
         self._server_thread_manager = threading.Thread(target=self._server_manager.serve_forever, name="Server")
         self._server_thread_manager.start()
-
-        # Set the log level for the server thread with the dedicated log level for RPC.
-        self._config.log_config.set_fmt(level=self._config.log_config.level_rpc)
 
     def _proc_cleanup(self):
         if hasattr(self, '_server_manager'):
