@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-# Python port of src/app/tests/suites/certification/Test_TC_S_2_5.yaml
 # [TC-S-2.5] RemainingCapacity functionality with DUT as Server
 #
 # === BEGIN CI TEST ARGUMENTS ===
@@ -81,7 +80,7 @@ class TC_S_2_5(MatterBaseTest):
 
     def steps_TC_S_2_5(self) -> list[TestStep]:
         return [
-            TestStep(1, "Precondition: DUT commissioned; scene table usage per test plan (see YAML)."),
+            TestStep(1, "Precondition: DUT commissioned; scene table usage per test plan."),
             TestStep("0a", "TH sends KeySetWrite (GroupKeySetID 0x01a1) on GroupKeyManagement."),
             TestStep("0b", "If Groupcast not on root: write GroupKeyMap binding group 0x0001 to key set 0x01a1."),
             TestStep("1", "LeaveGroup(0) or RemoveAllGroups per Groupcast presence."),
