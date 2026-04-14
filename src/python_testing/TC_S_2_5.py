@@ -129,6 +129,7 @@ class TC_S_2_5(MatterBaseTest):
         asserts.fail(
             f"Timeout waiting for RemainingCapacity=={expected_rc} (fabric {fabric_index}), last={last_rc}"
         )
+        raise AssertionError("unreachable")
 
     async def _read_remaining_capacity(self, ep: int, fabric_index: int) -> int:
         """Read FabricSceneInfo and return RemainingCapacity for the given fabric index."""

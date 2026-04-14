@@ -130,6 +130,7 @@ class TC_S_2_6(MatterBaseTest):
         asserts.fail(
             f"Timeout waiting for RemainingCapacity=={expected_rc} (fabric {fabric_index}), last={last_rc}"
         )
+        raise AssertionError("unreachable")  # asserts.fail raises
 
     async def _read_remaining_capacity(self, dev_ctrl: ChipDeviceCtrl, ep: int, fabric_index: int) -> int:
         info_list = await self.read_single_attribute_check_success(
@@ -316,9 +317,8 @@ class TC_S_2_6(MatterBaseTest):
 
         self.step("2b")
 
-        def _start_sub(ctrl: ChipDeviceCtrl) -> AttributeSubscriptionHandler:
-            h = AttributeSubscriptionHandler(expected_cluster=S, expected_attribute=S.Attributes.FabricSceneInfo)
-            return h
+        def _start_sub(_ctrl: ChipDeviceCtrl) -> AttributeSubscriptionHandler:
+            return AttributeSubscriptionHandler(expected_cluster=S, expected_attribute=S.Attributes.FabricSceneInfo)
 
         sub1 = _start_sub(self.TH1)
         sub2 = _start_sub(self.TH2)
