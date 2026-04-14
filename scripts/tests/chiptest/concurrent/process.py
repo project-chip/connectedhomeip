@@ -310,6 +310,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
 
             raise TimeoutError(f"Failed to terminate the process {self.name}. May become a zombie")
         finally:
+            self._stopped = True
             if raise_on_proc_error and self.state.exception is not None:
                 raise RuntimeError("Process reported an exception during execution") from self.state.exception
 
