@@ -621,27 +621,33 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 break
 
             time.sleep(0.5)
-    except KeyboardInterrupt as e:
-        log.info("Interrupting execution on user request")
-        errors.append(e)
-    except ResultError as e:
-        # We just print the message without stack trace, as the actual failure with stack trace has already been logged.
-        log.error("%s", e)
-        errors.append(SystemExit(2))
-    except Exception as e:
-        log.error("Caught exception during test execution: %r", e, exc_info=True)
+    except BaseException as e:
         errors.append(e)
     finally:
         for item in reversed(to_terminate):
+            item_name = item.__class__.__name__
             try:
-                log.info("Cleaning up %s", item.__class__.__name__)
+                log.info("Cleaning up %s", item_name)
                 item.terminate()
             except Exception as e:
-                log.warning("Encountered exception during cleanup: %r", e, exc_info=True)
+                log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
                 errors.append(e)
 
+    # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
+    # encountered during execution and cleanup.
     if len(errors) == 1:
-        raise errors[0]
+        match error := errors[0]:
+            case KeyboardInterrupt():
+                log.info("Interrupting execution on user request")
+                raise error
+            case ResultError():
+                # We just print the message, as the actual test failure with stack trace has already been logged.
+                log.error("%s", error)
+                raise SystemExit(2)
+            case _:
+                # Reraise the single exception with its original traceback preserved.
+                raise error.with_traceback(error.__traceback__)
+
     if errors:
         raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
 
