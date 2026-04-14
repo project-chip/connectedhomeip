@@ -29,8 +29,8 @@ MediaInputManager::MediaInputManager()
     for (int i = 1; i < 3; ++i)
     {
         InputInfoType inputInfo;
-        inputInfo.description = chip::CharSpan::fromCharString("High-Definition Multimedia Interface");
-        inputInfo.name        = chip::CharSpan::fromCharString("HDMI");
+        inputInfo.description = "High-Definition Multimedia Interface"_span;
+        inputInfo.name        = "HDMI"_span;
         inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
         inputInfo.index       = static_cast<uint8_t>(i);
         mInputs.push_back(inputInfo);
