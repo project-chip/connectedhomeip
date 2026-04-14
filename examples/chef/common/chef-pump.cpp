@@ -100,7 +100,8 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
-        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : chip::app::DataModel::Nullable<uint16_t>(0);
+        // Use null when off: spec says null indicates unknown measurement, and 0 may violate MinMeasuredValue constraint.
+        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : chip::app::DataModel::Nullable<uint16_t>();
         LogErrorOnFailure(FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow));
     }
 

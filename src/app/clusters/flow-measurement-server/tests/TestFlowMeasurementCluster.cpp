@@ -31,6 +31,14 @@ using namespace chip::app::Clusters::FlowMeasurement;
 using namespace chip::app::Clusters::FlowMeasurement::Attributes;
 using namespace chip::Testing;
 
+// Exposes protected SetMeasuredValueRange for testing
+class TestableFlowMeasurementCluster : public FlowMeasurementCluster
+{
+public:
+    using FlowMeasurementCluster::FlowMeasurementCluster;
+    using FlowMeasurementCluster::SetMeasuredValueRange;
+};
+
 struct TestFlowMeasurementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -193,7 +201,7 @@ TEST_F(TestFlowMeasurementCluster, InvalidRangeDefaultsToNull)
 {
     // min == max == 0 is invalid (max must be >= min + 1).
     // SetMeasuredValueRange should reject this.
-    FlowMeasurementCluster cluster(kRootEndpointId);
+    TestableFlowMeasurementCluster cluster(kRootEndpointId);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     DataModel::Nullable<uint16_t> min;
@@ -214,7 +222,7 @@ TEST_F(TestFlowMeasurementCluster, MeasuredValue)
     FlowMeasurementCluster::Config config;
     config.minMeasuredValue.SetNonNull(1);
     config.maxMeasuredValue.SetNonNull(3);
-    FlowMeasurementCluster cluster(kRootEndpointId, config);
+    TestableFlowMeasurementCluster cluster(kRootEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     DataModel::Nullable<uint16_t> measuredValue{};
@@ -284,7 +292,7 @@ TEST_F(TestFlowMeasurementCluster, MeasuredValue)
 
 TEST_F(TestFlowMeasurementCluster, MeasuredValueRange)
 {
-    FlowMeasurementCluster cluster(kRootEndpointId);
+    TestableFlowMeasurementCluster cluster(kRootEndpointId);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     DataModel::Nullable<uint16_t> minMeasuredValue{};
