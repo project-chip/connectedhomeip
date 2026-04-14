@@ -18,15 +18,15 @@
  */
 
 #include "demo-ui-bitmaps.h"
-#include <LcdPainter.h>
 #include <AppConfig.h>
+#include <LcdPainter.h>
 #include <cstdint>
 #include <cstdio>
 
 using namespace chip::app::Clusters::WindowCovering;
 
-SilabsLCD * LcdPainter::sLcd       = nullptr;
-bool LcdPainter::mLcdCleared      = false;
+SilabsLCD * LcdPainter::sLcd = nullptr;
+bool LcdPainter::mLcdCleared = false;
 
 namespace {
 static const uint8_t sSilabsLogoSmall[] = { SILABS_LOGO_SMALL };
