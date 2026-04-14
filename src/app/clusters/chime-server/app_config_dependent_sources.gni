@@ -14,5 +14,7 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "MigrateChimeServerStorage.cpp",
+  "MigrateChimeServerStorage.h",
   "chime-server.h",
 ]

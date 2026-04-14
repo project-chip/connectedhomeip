@@ -1074,6 +1074,15 @@ jobs:
                 # This list is empirically created to have a reasonable time split. The "" that runs the "other"
                 # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
                 filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
+                include:
+                    - filter: ""
+                      junitxml: out/junit-results/Other-results.xml
+                    - filter: "TC_[A-C]"
+                      junitxml: out/junit-results/TC_A-C-results.xml
+                    - filter: "TC_[D-O]"
+                      junitxml: out/junit-results/TC_D-O-results.xml
+                    - filter: "!TC_[A-O]"
+                      junitxml: out/junit-results/TC_Non-A-O-results.xml
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
@@ -1154,7 +1163,7 @@ jobs:
                   echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
                   echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-clang-test-unified/chip-ota-provider-app" >> /tmp/test_env.yaml
                   echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
-                  echo "PUSH_AV_SERVER: src/tools/push_av_server/server.py" >> /tmp/test_env.yaml
+                  echo "PUSH_AV_SERVER: src/tools/push_av_server/src/server.py" >> /tmp/test_env.yaml
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
@@ -1199,7 +1208,7 @@ jobs:
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name "REPL Tests Linux - ${{github.ref_name}}"'
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
@@ -1214,6 +1223,14 @@ jobs:
                   path: test-summaries/python-tests.json
                   retention-days: 30
 
+            - name: Upload JUnit XML Results
+              if: always() && matrix.filter != ''
+              uses: actions/upload-artifact@v7
+              with:
+                  name: junit-results-repl-${{ matrix.filter }}
+                  path: ${{matrix.junitxml}}
+                  retention-days: 30
+                  if-no-files-found: warn
             - name: Execute Jupyter Notebooks
               if: ${{matrix.filter == ''}}
               run: |
@@ -1250,10 +1267,75 @@ jobs:
             #   with:
             #     duration: 30m
             #     authorized-users: andy31415
+    # TODO, factor out this job and the one in nightly.yaml into a separate action that can be called
+    repl_tests_linux_report:
+      name: REPL Tests - Linux (REPORT RESULTS)
+      needs: repl_tests_linux_run
+      if: ${{ !cancelled() && needs.repl_tests_linux_run.result != 'skipped' && github.actor != 'restyled-io[bot]' }}
+
+      runs-on: ubuntu-latest
+      concurrency:
+          group: gh-pages-deploy
+          cancel-in-progress: false
+      permissions:
+          contents: write
+          checks: write
+
+      steps:
+          - name: Checkout
+            uses: actions/checkout@v6
+
+          - name: Download all JUnit XML results
+            uses: actions/download-artifact@v7
+            with:
+                pattern: junit-results-*
+                path: junit-results
+                merge-multiple: true
+
+          - name: Publish test results to GitHub Actions
+            uses: mikepenz/action-junit-report@v5
+            with:
+                report_paths: junit-results/**/*.xml
+                detailed_summary: true
+                require_tests: false
+
+          - name: Checkout gh-pages for Allure history
+            uses: actions/checkout@v6
+            with:
+                ref: gh-pages
+                path: gh-pages
+
+          - name: Generate Allure Report
+            uses: simple-elf/allure-report-action@v1.13
+            with:
+                allure_results: junit-results
+                allure_report: allure-report
+                gh_pages: gh-pages
+                allure_history: allure-history
+                subfolder: allure-report/ci_tests
+                keep_reports: 200
+                # This is the name that will show up in the Dashboard Overview
+                report_name: "CI Tests"
+
+          - name: Upload Allure Report
+            uses: actions/upload-artifact@v7
+            with:
+                name: allure-report-ci-repl
+                path: allure-report
+                retention-days: 30
+                if-no-files-found: warn
+
+          - name: Deploy to GitHub Pages
+            if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+            uses: peaceiris/actions-gh-pages@v4
+            with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: allure-history/allure-report/ci_tests
+                destination_dir: allure-report/ci_tests
+                keep_files: true
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
-
         strategy:
             matrix:
                 include:

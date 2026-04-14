@@ -38,9 +38,10 @@ tests:
       verification: |
           TH1 enables DUT to handle group communication
           TH2 supports On/Off server on Endpoint 1
-          TH2 supports Groups server on Endpoint 1
+          TH2 supports Groupcast Listener on the RootNode endpoint or Groups server on Endpoint 1.
           TH2 should have an ACL entry with the AuthMode as Group by TH1
           DUT supports On/Off client
+          DUT supports Groupcast Sender on the RootNode endpoint or Groups server on Endpoint 1.
       disabled: true
 
     - label: "Step 1: Factory Reset DUT"
@@ -230,48 +231,21 @@ tests:
           "Step 9b: TH1 sends Groupcast JoinGroup command with GroupID=1,
           Endpoints=[EP1], KeySetID=0x01a1, Key=Key1 to TH2 endpoint 0."
       verification: |
-          Run this command for DUT in chip-tool:
-          ./chip-tool groupcast join-group 0x1 [] 0x1a1 74 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
+          ./chip-tool groupcast join-group 0x1 "[1]" 0x01a1 2 0 --Key hex:b0b1b2b3b4b5b6b7b8b9babbbcbdbebf --UseAuxiliaryACL 1
 
-          Run this command for lighting app TH2 in chip-tool:
-          ./chip-tool groupcast join-group 0x1 [1] 0x1a1 2 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
-          TH2 responds with SUCCESS
+          On TH1(Chip-tool), Verify the success response for JoinGroup
 
-          Run this commands on chip-tool TH1 so it can uses the Key also
-          ./chip-tool groupsettings add-group 0x1 grp1 --addressPolicy 0
-          ./chip-tool groupsettings add-keysets 0x01a1 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          ./chip-tool groupsettings bind-keyset 0x1 0x01a1
-
+          [1775125551.899] [13658:13660] [DMG]
+          [1775125551.899] [13658:13660] [DMG]                                 StatusIB =
+          [1775125551.899] [13658:13660] [DMG]                                 {
+          [1775125551.899] [13658:13660] [DMG]                                         status = 0x00 (SUCCESS),
+          [1775125551.899] [13658:13660] [DMG]                                 },
       disabled: true
 
     - label:
           "Step 10: TH1 writes Binding entry into DUT with Entry 1: Group = The
           Group ID in the AddGroup command sent from TH1 to TH2"
       verification: |
-          Before write the binding entries run the ACL Commands:
-
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
-
-           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 74 0
-
-          On TH1(Chip-tool), Verify the success response for Acl:
-
-          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
-          [1659075680.944052][2687:2692] CHIP:DMG:                         {
-          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-
-          Run this command for lighting app in chip-tool:
-
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 2 0
-
-          On TH1(Chip-tool), Verify the success response for Acl:
-
-          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
-          [1659075680.944052][2687:2692] CHIP:DMG:                         {
-          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-
-
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
 
           ./chip-tool binding write binding '[{"group" : "0x0001"}]' 74 1
 
@@ -287,7 +261,12 @@ tests:
           "Step 11: If the Groupcast cluster is enabled on the RootNode
           endpoint, skip this step. Otherwise, TH1 sets up group settings on DUT"
       verification: |
+          If the Groupcast cluster is enabled on the RootNode endpoint, skip this step. Otherwise, TH1 sets up group settings on DUT
 
+          Run these commands on chip-tool TH1 so it can use the key also
+          ./chip-tool groupsettings add-group 0x1 grp1 --addressPolicy 0
+          ./chip-tool groupsettings add-keysets 0x01a1 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          ./chip-tool groupsettings bind-keyset 0x1 0x01a1
       disabled: true
 
     - label:
@@ -296,23 +275,38 @@ tests:
           command with GroupID=1, Endpoints=[], KeySetID=0x01a1, Key=Key1 to DUT
           endpoint 0."
       verification: |
+          If the Groupcast cluster is NOT enabled on the RootNode endpoint, skip this step
 
+          ./chip-tool groupcast join-group 0x1 [] 0x01a1 74 0 --Key hex:b0b1b2b3b4b5b6b7b8b9babbbcbdbebf
+
+          On TH1(Chip-tool), Verify the success response for JoinGroup
+
+          [1775805858.740] [3827:3829] [DMG]                                 StatusIB =
+          [1775805858.740] [3827:3829] [DMG]                                 {
+          [1775805858.740] [3827:3829] [DMG]                                         status = 0x00 (SUCCESS),
+          [1775805858.740] [3827:3829] [DMG]                                 },
       disabled: true
 
     - label: "Step 13a: TH1 sends a unicast Off command to TH2 (Endpoint 1)"
       verification: |
-          Example:
-
           ./chip-tool onoff off 2 1
+
+          On TH1(Chip-tool), Verify the success response for On command:
+
+          [1775212536.718] [8171:8173] [DMG]                                 StatusIB =
+          [1775212536.718] [8171:8173] [DMG]                                 {
+          [1775212536.718] [8171:8173] [DMG]                                         status = 0x00 (SUCCESS),
+          [1775212536.718] [8171:8173] [DMG]                                 },
       disabled: true
 
     - label: "Step 13b: TH1 reads OnOff attribute from TH2 (Endpoint 1)"
       verification: |
-          Run this command for lighting app in chip-tool:
-
           ./chip-tool onoff read on-off 2 1
 
-          On TH1(Chip-tool), verify that OnOff value is OFF (FALSE).
+          On TH1(Chip-tool), Verify the onoff value is set to Off(FALSE)
+
+          [1775212621.071] [8186:8188] [TOO] Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4239233835
+          [1775212621.071] [8186:8188] [TOO]   OnOff: FALSE
       disabled: true
 
     - label:
@@ -320,7 +314,7 @@ tests:
           its binding entries"
       PICS: OO.C.C01.Tx
       verification: |
-          Press button no.2 on nrf52840 DK thread board
+          Press button no.1 on nrf54L15-DK thread board
       disabled: true
 
     - label: "Step 14b: TH1 reads OnOff attribute from TH2 (Endpoint 1)"
@@ -338,7 +332,7 @@ tests:
 
     - label: "Step 15: TH1 removes all the binding entries from DUT"
       verification: |
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
+          Run this command for [ nrf54L15-DK ]Thread device in chip-tool:
 
           ./chip-tool binding write binding '[]' 74 1
 
@@ -355,7 +349,7 @@ tests:
           its binding entries"
       PICS: OO.C.C00.Tx
       verification: |
-          Press button no.2 on nrf52840 DK thread board
+          Press button no.1 on nrf54L15-DK thread board
       disabled: true
 
     - label: "Step 16b: TH1 reads OnOff attribute from TH2 (Endpoint 1)"

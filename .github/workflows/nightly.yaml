@@ -48,9 +48,7 @@ env:
 jobs:
     su_repl_tests_linux_build:
         name: REPL Tests - Linux Software Update (BUILD)
-        if: |
-            github.actor != 'restyled-io[bot]' &&
-            (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
+        if: github.actor != 'restyled-io[bot]'
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -250,6 +248,9 @@ jobs:
         if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
 
         runs-on: ubuntu-latest
+        concurrency:
+          group: gh-pages-deploy
+          cancel-in-progress: false
         permissions:
             contents: write
             checks: write
@@ -259,39 +260,41 @@ jobs:
               uses: actions/checkout@v6
 
             - name: Download all JUnit XML results
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   pattern: junit-results-*
                   path: junit-results
                   merge-multiple: true
 
             - name: Publish test results to GitHub Actions
-              uses: mikepenz/action-junit-report@v5
+              uses: mikepenz/action-junit-report@v6
               with:
                   report_paths: junit-results/**/*.xml
                   detailed_summary: true
                   require_tests: false
 
-            - name: Load Allure test report history
-              uses: actions/cache@v5
+            - name: Checkout gh-pages for Allure history
+              uses: actions/checkout@v6
               with:
-                  path: allure-history
-                  key: allure-history-su-repl-${{ github.run_number }}
-                  restore-keys: |
-                      allure-history-su-repl-
+                  ref: gh-pages
+                  path: gh-pages
 
             - name: Generate Allure Report
               uses: simple-elf/allure-report-action@v1.13
               with:
                   allure_results: junit-results
                   allure_report: allure-report
+                  gh_pages: gh-pages
                   allure_history: allure-history
-                  keep_reports: 30
+                  subfolder: allure-report/nightly
+                  keep_reports: 120
+                  # This is the name that will show up in the Dashboard Overview
+                  report_name: "Nightly CI Tests"
 
             - name: Upload Allure Report
               uses: actions/upload-artifact@v7
               with:
-                  name: allure-report-su-repl
+                  name: allure-report-nightly
                   path: allure-report
                   retention-days: 30
                   if-no-files-found: warn
@@ -301,6 +304,6 @@ jobs:
               uses: peaceiris/actions-gh-pages@v4
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: allure-report
-                  destination_dir: allure-report
+                  publish_dir: allure-history/allure-report/nightly
+                  destination_dir: allure-report/nightly
                   keep_files: true

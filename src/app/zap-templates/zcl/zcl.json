@@ -378,6 +378,11 @@
             "FeatureMap",
             "MeasuredValue"
         ],
+        "Relative Humidity Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",

@@ -193,8 +193,6 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from test_testing.DeviceConformanceTests import get_supersets
-
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects
 import matter.tlv
@@ -206,6 +204,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
+from matter.testing.device_conformance_tests import get_supersets
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
