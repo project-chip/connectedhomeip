@@ -94,9 +94,11 @@ CHIP_ERROR OTARequestorAttributes::SetInteractionModelContext(EndpointId endpoin
 CHIP_ERROR OTARequestorAttributes::RemoveDefaultOtaProvider(FabricIndex fabricIndex)
 {
     CHIP_ERROR error = mProviders.Delete(fabricIndex);
-
-    // Ignore the error if no entry for the associated fabric index has been found.
-    VerifyOrReturnError(error != CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
+    // If no entry for the associated fabric index was found then the attribute hasn't changed and no further processing is needed.
+    if (error == CHIP_ERROR_NOT_FOUND)
+    {
+        return CHIP_NO_ERROR;
+    }
     ReturnErrorOnFailure(error);
 
     if (mDataModelChangeListener)
