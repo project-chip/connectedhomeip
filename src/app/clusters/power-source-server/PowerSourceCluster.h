@@ -20,14 +20,12 @@
 #include <algorithm>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <bitset>
 #include <clusters/PowerSource/Attributes.h>
 #include <clusters/PowerSource/Commands.h>
 #include <clusters/PowerSource/Enums.h>
 #include <clusters/PowerSource/Events.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 
-#include <variant>
 #include <limits>
 
 namespace chip {
@@ -289,23 +287,7 @@ public:
     CHIP_ERROR SetActiveWiredFaults(Span<const WiredFaultEnum> val);
     CHIP_ERROR AddActiveWiredFault(WiredFaultEnum val);
     CHIP_ERROR RemoveActiveWiredFault(WiredFaultEnum val);
-    CHIP_ERROR SetEndpointList(Span<const EndpointId> val)
-    {
-        if (GetEndpointList().data_equal(val))
-        {
-            return CHIP_NO_ERROR; // no-op if equal
-        }
-
-        if (!mEndpointList.Alloc(val.size()))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        std::copy(val.begin(), val.end(), mEndpointList.Get());
-        mEndpointListCount = static_cast<uint16_t>(val.size());
-
-        NotifyAttributeChanged(PowerSource::Attributes::EndpointList::Id);
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR SetEndpointList(Span<const EndpointId> val);
 
 private:
 
@@ -621,23 +603,7 @@ public:
     CHIP_ERROR SetActiveBatChargeFaults(Span<const BatChargeFaultEnum> val);
     CHIP_ERROR AddActiveBatChargeFault(BatChargeFaultEnum val);
     CHIP_ERROR RemoveActiveBatChargeFault(BatChargeFaultEnum val);
-    CHIP_ERROR SetEndpointList(Span<const EndpointId> val)
-    {
-        if (GetEndpointList().data_equal(val))
-        {
-            return CHIP_NO_ERROR; // no-op if equal
-        }
-
-        if (!mEndpointList.Alloc(val.size()))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        std::copy(val.begin(), val.end(), mEndpointList.Get());
-        mEndpointListCount = static_cast<uint16_t>(val.size());
-
-        NotifyAttributeChanged(PowerSource::Attributes::EndpointList::Id);
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR SetEndpointList(Span<const EndpointId> val);
 
 private:
 

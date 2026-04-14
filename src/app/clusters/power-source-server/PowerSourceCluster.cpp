@@ -107,6 +107,24 @@ CHIP_ERROR WiredPowerSourceCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WiredPowerSourceCluster::SetEndpointList(Span<const EndpointId> val)
+{
+    if (GetEndpointList().data_equal(val))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (!mEndpointList.Alloc(val.size()))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    std::copy(val.begin(), val.end(), mEndpointList.Get());
+    mEndpointListCount = static_cast<uint16_t>(val.size());
+    NotifyAttributeChanged(PowerSource::Attributes::EndpointList::Id);
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus WiredPowerSourceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                 AttributeValueEncoder & encoder)
 {
@@ -236,6 +254,24 @@ void WiredPowerSourceCluster::GenerateEventAndSetAndNotify(uint8_t newBitSet)
 BatteryPowerSourceCluster::BatteryPowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const Configuration & config) :
     DefaultServerCluster({ endpointId, PowerSource::Id }), mConfig(config), mSystemLayer(systemLayer)
 {}
+
+CHIP_ERROR BatteryPowerSourceCluster::SetEndpointList(Span<const EndpointId> val)
+{
+    if (GetEndpointList().data_equal(val))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (!mEndpointList.Alloc(val.size()))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    std::copy(val.begin(), val.end(), mEndpointList.Get());
+    mEndpointListCount = static_cast<uint16_t>(val.size());
+    NotifyAttributeChanged(PowerSource::Attributes::EndpointList::Id);
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR BatteryPowerSourceCluster::Startup(ServerClusterContext & context)
 {
