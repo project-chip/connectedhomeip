@@ -64,6 +64,9 @@ class LogConfig:
     level_tests: int | str = logging.INFO
     """Logger level used during execution of a test."""
 
+    level_rpc: int | str = logging.INFO
+    """Logger level used for RPC-related logging."""
+
     timestamps: bool = True
     """Enable timestamps in the log output."""
 

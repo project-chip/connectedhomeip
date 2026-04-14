@@ -272,6 +272,7 @@ class IsolatedNetworkNamespace:
 
         self.app_ns = NetworkNamespace(f"ns-{app_link_name}-{index}")
         self.tool_ns = NetworkNamespace(f"ns-{tool_link_name}-{index}")
+        self.mgmt_ns = NetworkNamespace(f"ns-{mgmt_link_name}-{index}")
 
         app_ipv6 = ["fe80::1/64"]
         if add_ula:
@@ -287,7 +288,8 @@ class IsolatedNetworkNamespace:
         mgmt_ipv6 = ["fe80::5/64"]
         if add_ula:
             mgmt_ipv6.append("fd00:0:1:1::5/64")
-        self.mgmt_link = NetworkLink(f"{mgmt_link_name}-{index}", ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6)
+        self.mgmt_link = NetworkLink(f"{mgmt_link_name}-{index}",
+                                     ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6, ns=self.mgmt_ns)
 
         self.bridge = NetworkBridge(f"br-{index}")
         self.bridge.attach_link(self.app_link)
@@ -297,6 +299,7 @@ class IsolatedNetworkNamespace:
         try:
             self.app_ns.setup()
             self.tool_ns.setup()
+            self.mgmt_ns.setup()
 
             self.app_link.setup()
             self.tool_link.setup()
@@ -326,6 +329,8 @@ class IsolatedNetworkNamespace:
                 return self.app_ns
             case SubprocessKind.TOOL:
                 return self.tool_ns
+            case SubprocessKind.MGMT:
+                return self.mgmt_ns
             case _:
                 raise ValueError(f"Subprocess kind {kind} doesn't map to a network namespace.")
 
@@ -334,7 +339,7 @@ class IsolatedNetworkNamespace:
         for obj in (
             self.bridge,
             self.app_link, self.tool_link, self.mgmt_link,
-            self.app_ns, self.tool_ns
+            self.app_ns, self.tool_ns, self.mgmt_ns
         ):
             try:
                 obj.teardown()

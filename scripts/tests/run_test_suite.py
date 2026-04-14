@@ -19,6 +19,7 @@ import functools
 import logging
 import os
 import random
+import shlex
 import sys
 import time
 import warnings
@@ -29,12 +30,12 @@ from typing import Any, Protocol
 import chiptest
 import click
 from chiptest.accessories import AppsRegister
+from chiptest.concurrent.work_queue import CancellableQueue
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
-from chiptest.work_queue import CancellableQueue
 from chiptest.worker import TaskQueueT, WorkerThread
 from chipyaml.paths_finder import PathsFinder
 
@@ -112,6 +113,10 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     type=click.Choice(LOG_LEVELS, case_sensitive=False),
     help='Set the verbosity of logger during test execution. Use --log-level if not defined')
 @click.option(
+    '--log-level-rpc',
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger for RPC-related logging. Use --log-level if not defined')
+@click.option(
     '--target',
     default=['all'],
     multiple=True,
@@ -178,13 +183,13 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, log_level_tests: str | None, target: str, target_glob: str, target_skip_glob: str,
-         log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: TestRunTime,
-         chip_tool: Path | None) -> None:
+def main(context: click.Context, log_level: str, log_level_tests: str | None, log_level_rpc: str | None, target: str,
+         target_glob: str, target_skip_glob: str, log_timestamps: bool, root: str, internal_inside_unshare: bool,
+         include_tags: tuple[TestTag, ...], exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str],
+         runner: TestRunTime, chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_config = LogConfig(log_level, log_level_tests if log_level_tests is not None else log_level, log_timestamps)
+    log_config = LogConfig(log_level, log_level_tests or log_level, log_level_rpc or log_level, log_timestamps)
     log_config.set_fmt()
 
     if sys.platform == "linux":
@@ -529,6 +534,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         to_terminate.append(result_thread := ResultProcessingThread(iterations, len(context.obj.tests), expected_failures,
                                                                     keep_going, summary_file))
 
+        mgmt_ns_wrapper: str | None = None
         if sys.platform == 'linux':
             app_name = 'wlx-app' if wifi_required else 'eth-app'
             tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
@@ -542,6 +548,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 # depending on the commissioning method used.
                 app_link_name='wlx-app' if wifi_required else 'eth-app',
                 tool_link_name=tool_name))
+            mgmt_ns_wrapper = shlex.join(ns.mgmt_ns.netns_cmd_wrapper)
 
             match commissioning_method:
                 case CommissioningMethod.BLE_WIFI:
@@ -573,7 +580,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
         runner = chiptest.runner.Runner(executor=executor)
 
-        to_terminate.append(apps_register := AppsRegister())
+        to_terminate.append(apps_register := AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
         apps_register.init()
 
         # Initialize the worker thread last, to ensure it's terminated first.

@@ -15,7 +15,39 @@
 import contextlib
 import queue
 import threading
-from typing import Generic, TypeVar
+import time
+from multiprocessing.managers import SyncManager
+from typing import Generic, Protocol, TypeVar
+
+
+class Waitable(Protocol):
+    def wait(self, timeout: float | None = None) -> bool: ...
+
+
+def wait_for_mp_managed(waitable: Waitable, timeout: float | None = None, polling_interval: float = 0.1) -> bool:
+    """
+    Wait for a resource managed by multiprocessing.Manager.
+
+    Required because otherwise we wouldn't be able to catch a KeyboardInterrupt for a resource managed by multiprocessing.Manager,
+    as the manager process explicitly ignores SIGINT.
+    """
+    # Blocking wait with no timeout. Cancellable only with a KeyboardInterrupt.
+    if timeout is None:
+        while not waitable.wait(polling_interval):
+            pass
+        return True
+
+    # Special case for non-positive timeout, to avoid waiting at all and return immediately.
+    if timeout <= 0:
+        return waitable.wait(timeout)
+
+    # Countdown wait with polling, so that we can catch KeyboardInterrupt.
+    end = time.monotonic() + timeout
+    while (time_left := end - time.monotonic()) > 0:
+        if waitable.wait(min(polling_interval, time_left)):
+            return True
+
+    return False
 
 
 class QueueCancelled(Exception):
@@ -42,11 +74,22 @@ class CancellableQueue(Generic[QueueElementT]):
     It's not possible to "uncancel" or "un-close" a queue.
     """
 
-    def __init__(self) -> None:
-        self._cond = threading.Condition()
-        self._queue: queue.Queue[QueueElementT] = queue.Queue()
-        self._cancel_event = threading.Event()
-        self._end_of_queue = threading.Event()
+    _cond: threading.Condition
+    _queue: queue.Queue[QueueElementT]
+    _cancel_event: threading.Event
+    _end_of_queue: threading.Event
+
+    def __init__(self, mp_manager: SyncManager | None = None) -> None:
+        if mp_manager is None:
+            self._cond = threading.Condition()
+            self._queue = queue.Queue()
+            self._cancel_event = threading.Event()
+            self._end_of_queue = threading.Event()
+        else:
+            self._cond = mp_manager.Condition()
+            self._queue = mp_manager.Queue()
+            self._cancel_event = mp_manager.Event()
+            self._end_of_queue = mp_manager.Event()
 
     def put(self, item: QueueElementT) -> None:
         """
@@ -111,6 +154,10 @@ class CancellableQueue(Generic[QueueElementT]):
             self._cancel_event.set()
             self._cond.notify_all()
 
+    def wait_for_cancelled(self) -> bool:
+        """Wait until the queue is cancelled."""
+        return wait_for_mp_managed(self._cancel_event)
+
     def close(self) -> None:
         """Set end-of-queue event and notify all consumers."""
         with self._cond:
@@ -119,3 +166,7 @@ class CancellableQueue(Generic[QueueElementT]):
 
             self._end_of_queue.set()
             self._cond.notify_all()
+
+    def wait_for_closed(self) -> bool:
+        """Wait until the queue is closed."""
+        return wait_for_mp_managed(self._end_of_queue)
