@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/data-model-provider/NodeConfigurationListener.h>
 #include <app/data-model-provider/Provider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -32,6 +33,14 @@ class EmptyProvider : public app::DataModel::Provider
 {
 public:
     using ActionReturnStatus = app::DataModel::ActionReturnStatus;
+
+    CHIP_ERROR Shutdown() override;
+
+    /// Functions for managing the configuration version
+    void SetNodeConfigurationListener(app::DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
+    void NotifyNodeConfigurationListener() override;
+    CHIP_ERROR GetNodeDataModelConfiguration(app::DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
+    CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
 
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder) override;
 
@@ -59,6 +68,17 @@ public:
                                       app::AttributeValueDecoder & decoder) override;
     std::optional<ActionReturnStatus> InvokeCommand(const app::DataModel::InvokeRequest & request,
                                                     chip::TLV::TLVReader & input_arguments, app::CommandHandler * handler) override;
+
+protected:
+    /// Function for managing the configuration version
+    CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
+
+private:
+    // The registered listener for changes to the data model configuration
+    DataModel::NodeConfigurationListener * mNodeConfigurationListener;
+
+    // The local cached configuration version value
+    uint32_t mConfigurationVersion = 1;
 };
 
 } // namespace Testing

@@ -1029,7 +1029,7 @@ void BridgeAppCommandHandler::HandleCommand(intptr_t context)
 
     VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
 
-    if (name == "SimulateConfigurationVersionChange")
+    if (name == "SimulateConfigurationChange")
     {
         Light1.IncreaseConfigurationVersion();
     }

@@ -79,6 +79,12 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
+    /// Functions for managing the configuration version
+    void SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
+    void NotifyNodeConfigurationListener() override;
+    CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
+    CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
+
     /* ProviderMetadataTree implementation */
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
     CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) override;
@@ -198,6 +204,10 @@ public:
     CHIP_ERROR RemoveCluster(ServerClusterInterface * entry,
                              ClusterShutdownType shutdownType = ClusterShutdownType::kClusterShutdown);
 
+protected:
+    /// Function for managing the configuration version
+    CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
+
 private:
     EndpointInterfaceRegistry mEndpointInterfaceRegistry;
     ServerClusterInterfaceRegistry mServerClusterRegistry;
@@ -205,6 +215,12 @@ private:
     std::optional<DataModel::InteractionModelContext> mInteractionModelContext;
     PersistentStorageDelegate & mPersistentStorageDelegate;
     AttributePersistenceProvider & mAttributePersistenceProvider;
+
+    // The registered listener for changes to the data model configuration
+    DataModel::NodeConfigurationListener * mNodeConfigurationListener;
+
+    // The local cached configuration version value
+    uint32_t mConfigurationVersion = 1;
 
     /// Return the interface registered for the given endpoint ID or nullptr if one does not exist
     EndpointInterface * GetEndpointInterface(EndpointId endpointId);

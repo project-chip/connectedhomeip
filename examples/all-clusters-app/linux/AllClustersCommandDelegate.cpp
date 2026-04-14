@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/CodegenIntegration.h>
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
@@ -29,6 +30,7 @@
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
+#include <app/clusters/valve-configuration-and-control-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
@@ -363,6 +365,55 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
     LogErrorOnFailure(switchCluster->SetCurrentPosition(0));
 }
 
+/**
+ * Named pipe handler for simulating a configuration change
+ * by changing the MaxSpeed value in the PumpConfigurationAndControl cluster
+ * and incrementing the ConfigurationVersion
+ *
+ * Usage example:
+ *   echo '{"Name":"SimulateConfigurationChange"}' > /tmp/chip_all_clusters_fifo_53713
+ */
+
+void HandleSimulateConfigurationChange(void)
+{
+    EndpointId endpoint = 1;
+
+    // Change a F attribute to simulate a change in configuration of the device
+    DataModel::Nullable<uint16_t> pumpMaxSpeed = 0;
+
+    Protocols::InteractionModel::Status status = PumpConfigurationAndControl::Attributes::MaxSpeed::Get(endpoint, pumpMaxSpeed);
+    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+    if (pumpMaxSpeed.IsNull())
+    {
+        // If the attribute value is null, set it to a default value of 10000
+        pumpMaxSpeed.SetNonNull(10000);
+    }
+    else if (pumpMaxSpeed.Value() == 10000)
+    {
+        // Change fixed MaxSpeed value to 15000
+        pumpMaxSpeed.SetNonNull(15000);
+    }
+    else
+    {
+        // Change fixed MaxSpeed value back to 10000
+        pumpMaxSpeed.SetNonNull(10000);
+    }
+
+    status = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(endpoint, pumpMaxSpeed);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "Failed to set MaxSpeed value");
+    }
+    else
+    {
+        // MaxSpeed in PumpConfigurationAndControl has been modified,so bump ConfigurationVersion
+        // by calling the getter function to obtain a ScopedConfigurationVersionUpdater
+        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfigurationVersionUpdater();
+    }
+}
+
 } // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
@@ -546,17 +597,9 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         SetRefrigeratorDoorStatusHandler(self->mJsonValue);
     }
-    else if (name == "SimulateConfigurationVersionChange")
+    else if (name == "SimulateConfigurationChange")
     {
-        Clusters::BasicInformationCluster * cluster = Clusters::BasicInformation::GetClusterInstance();
-        if (cluster == nullptr)
-        {
-            ChipLogError(NotSpecified, "No basic information cluster available. Invalid state.");
-        }
-        else
-        {
-            LogErrorOnFailure(cluster->IncreaseConfigurationVersion());
-        }
+        HandleSimulateConfigurationChange();
     }
     else if (name == "SetSimulatedSoilMoisture")
     {

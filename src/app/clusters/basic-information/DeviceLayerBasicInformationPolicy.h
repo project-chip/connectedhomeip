@@ -16,7 +16,9 @@
  */
 #pragma once
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/BasicInformationOptionalAttributes.h>
+#include <app/data-model-provider/ProviderMetadataTree.h>
 #include <cstddef>
 #include <cstdint>
 #include <lib/support/Span.h>
@@ -36,9 +38,9 @@ public:
                                       DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
                                       DeviceLayer::ConfigurationManager & configurationManager,
                                       DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
-        mOptionalAttributes(optionalAttributes),
-        mDeviceInstanceInfoProvider(deviceInstanceInfoProvider), mConfigurationManager(configurationManager),
-        mPlatformManager(platformManager), mSubscriptionsPerFabric(subscriptionsPerFabric)
+        mOptionalAttributes(optionalAttributes), mDeviceInstanceInfoProvider(deviceInstanceInfoProvider),
+        mConfigurationManager(configurationManager), mPlatformManager(platformManager),
+        mSubscriptionsPerFabric(subscriptionsPerFabric)
     {
         // UniqueID is mandatory as of spec revision 4. We force it on here regardless
         // of what optionalAttributeSet says, to prevent accidental non-certifiable configs.
@@ -137,12 +139,12 @@ public:
 
     CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion)
     {
-        return mConfigurationManager.GetConfigurationVersion(configurationVersion);
-    }
+        DataModel::NodeDataModelConfiguration nodeConfig;
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance() -> GetDataModelProvider()->GetNodeDataModelConfiguration(
+            nodeConfig);
 
-    CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion)
-    {
-        return mConfigurationManager.StoreConfigurationVersion(configurationVersion);
+        configurationVersion = nodeConfig.configurationVersion;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)

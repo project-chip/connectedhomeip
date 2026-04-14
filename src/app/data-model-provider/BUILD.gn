@@ -48,6 +48,7 @@ source_set("data-model-provider") {
     "EventsGenerator.h",
     "MetadataLookup.cpp",
     "MetadataLookup.h",
+    "NodeConfigurationListener.h",
     "Provider.h",
     "ProviderChangeListener.h",
     "ProviderMetadataTree.cpp",

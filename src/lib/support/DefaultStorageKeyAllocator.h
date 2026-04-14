@@ -334,6 +334,10 @@ public:
     {
         return StorageKeyName::Formatted("g/tlse/g/%x", endpoint);
     }
+
+    // ConfigutationVersion Key
+    // Stores the configuration version of the device
+    static StorageKeyName ConfigurationVersion() { return StorageKeyName::FromConst("g/cv"); }
 };
 
 } // namespace chip

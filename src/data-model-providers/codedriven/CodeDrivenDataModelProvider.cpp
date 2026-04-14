@@ -15,12 +15,14 @@
  *    limitations under the License.
  */
 #include "CodeDrivenDataModelProvider.h"
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -137,6 +139,74 @@ std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::Invoke
     ServerClusterInterface * serverCluster = GetServerClusterInterface(request.path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->InvokeCommand(request, input_arguments, handler);
+}
+
+void CodeDrivenDataModelProvider::SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener)
+{
+    mNodeConfigurationListener = nodeConfigurationListener;
+};
+
+void CodeDrivenDataModelProvider::NotifyNodeConfigurationListener()
+{
+    if (mNodeConfigurationListener != nullptr)
+    {
+        // Notify the listener that the configuration version has been updated
+        mNodeConfigurationListener->OnConfigurationVersionChanged();
+    }
+};
+
+CHIP_ERROR
+CodeDrivenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration)
+{
+    // Grab the related data and return the node data model configuration
+    nodeDataModelConfiguration.configurationVersion = mConfigurationVersion;
+    nodeDataModelConfiguration.dataModelVersion     = Revision::kDataModelRevision;
+    nodeDataModelConfiguration.specVersion          = Revision::kSpecificationVersion;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodeDrivenDataModelProvider::Internal_BumpNodeDataModelConfigurationVersion()
+{
+    uint32_t tempConfigurationVersion = mConfigurationVersion;
+    uint16_t size                     = sizeof(tempConfigurationVersion);
+    StorageKeyName kStorageKey        = DefaultStorageKeyAllocator::ConfigurationVersion();
+
+    // Bump the configuration version and write to persistent storage
+    tempConfigurationVersion++;
+    ReturnErrorOnFailure(mPersistentStorageDelegate.SyncSetKeyValue(kStorageKey.KeyName(), &tempConfigurationVersion, size));
+
+    // If successful, update local cache
+    mConfigurationVersion = tempConfigurationVersion;
+
+    // Nofity the registered listener
+    NotifyNodeConfigurationListener();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodeDrivenDataModelProvider::ResetNodeDataModelConfigurationVersion()
+{
+    // This will (or at least should) only be called in the case of a factory reset,
+    // in the case a device is able to do a factory reset without rebooting,
+    // the implementation will still notify the listener, but it is assumed that
+    // any clients will not be informed of this change, since the factory reset
+    // will also remove all fabrics.
+
+    uint32_t tempConfigurationVersion = 1;
+    uint16_t size                     = sizeof(tempConfigurationVersion);
+    StorageKeyName kStorageKey        = DefaultStorageKeyAllocator::ConfigurationVersion();
+
+    // Write the reset configuration value to persisten storage
+    ReturnErrorOnFailure(mPersistentStorageDelegate.SyncSetKeyValue(kStorageKey.KeyName(), &tempConfigurationVersion, size));
+
+    // If successful, update local cache
+    mConfigurationVersion = tempConfigurationVersion;
+
+    // Nofity the registered listener
+    NotifyNodeConfigurationListener();
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out)

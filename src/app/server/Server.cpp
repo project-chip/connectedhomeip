@@ -696,12 +696,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                   .SetListenPort(mCdcListenPort)
                                                   .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
-                                                  ,
-                                              Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                                  .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                  .SetListenPort(mCdcListenPort)
+                                     ,
+                                 Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                     .SetAddressType(Inet::IPAddressType::kIPv4)
+                                     .SetListenPort(mCdcListenPort)
 #endif // INET_CONFIG_ENABLE_IPV4
-                 );
+    );
 #endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
     SuccessOrExit(err);
 
@@ -871,6 +871,10 @@ void Server::ScheduleFactoryReset()
     PostFactoryResetEvent();
 
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) {
+        // Reset the ConfigurationVersion to 1
+        TEMPORARY_RETURN_IGNORED app::InteractionModelEngine::GetInstance() -> GetDataModelProvider()
+            ->ResetNodeDataModelConfigurationVersion();
+
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();
         PlatformMgr().HandleServerShuttingDown();

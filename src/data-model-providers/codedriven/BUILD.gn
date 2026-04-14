@@ -20,6 +20,7 @@ source_set("codedriven") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app:constants",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/app/server-cluster:registry",

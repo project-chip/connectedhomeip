@@ -34,6 +34,7 @@ source_set("testing") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app:constants",
     "${chip_root}/src/app:command-handler",
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app:paths",
