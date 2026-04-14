@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import concurrent.futures
 import dataclasses
 import logging
 import os
@@ -295,24 +296,24 @@ class IsolatedNetworkNamespace:
         self.bridge.attach_link(self.mgmt_link)
 
         try:
-            self.app_ns.setup()
-            self.tool_ns.setup()
+            # Bring up selected links in parallel to reduce wait time.
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3, thread_name_prefix="NetnsSetup") as executor:
+                concurrent.futures.wait((executor.submit(self.app_ns.setup),
+                                         executor.submit(self.tool_ns.setup)))
 
-            self.app_link.setup()
-            self.tool_link.setup()
-            self.mgmt_link.setup()
+                concurrent.futures.wait((executor.submit(self.app_link.setup),
+                                         executor.submit(self.tool_link.setup),
+                                         executor.submit(self.mgmt_link.setup)))
 
-            self.bridge.setup()
+                self.bridge.setup()
 
-            # Bring up selected links.
-            if mgmt_link_up:
-                self.mgmt_link.up()
-            if tool_link_up:
-                self.tool_link.up()
-            if app_link_up:
-                self.app_link.up()
+                concurrent.futures.wait(executor.submit(link.up)
+                                        for link, should_up in ((self.app_link, app_link_up),
+                                                                (self.tool_link, tool_link_up),
+                                                                (self.mgmt_link, mgmt_link_up))
+                                        if should_up)
 
-            self.bridge.up()
+                self.bridge.up()
 
         except BaseException:
             log.exception("Encountered error while setting up network namespaces")
