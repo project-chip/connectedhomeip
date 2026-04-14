@@ -39,7 +39,7 @@ void RefrigeratorAndTemperatureControlledCabinetModeDelegate::HandleChangeToMode
     if (gRefrigeratorAndTemperatureControlledCabinetModeDelegate == nullptr)
     {
         response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Delegate not initialized"));
+        response.statusText.SetValue("Delegate not initialized"_span);
         return;
     }
     uint8_t currentMode = GetInstance()->GetCurrentMode();
@@ -48,8 +48,7 @@ void RefrigeratorAndTemperatureControlledCabinetModeDelegate::HandleChangeToMode
     if ((currentMode == ModeNormal && NewMode == ModeRapidFreeze) || (currentMode == ModeRapidFreeze && NewMode == ModeNormal))
     {
         response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(
-            chip::CharSpan::fromCharString("Direct transition between Normal and Rapid Freeze not allowed"));
+        response.statusText.SetValue("Direct transition between Normal and Rapid Freeze not allowed"_span);
         return;
     }
 

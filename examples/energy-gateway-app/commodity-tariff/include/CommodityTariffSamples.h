@@ -32,8 +32,8 @@ namespace Sample1 {
 // Tariff Information
 static inline Structs::TariffInformationStruct::Type TariffInfo()
 {
-    return { .tariffLabel  = DataModel::MakeNullable(CharSpan::fromCharString("Full Tariff One")),
-             .providerName = DataModel::MakeNullable(CharSpan::fromCharString("Default Provider")),
+    return { .tariffLabel  = DataModel::MakeNullable("Full Tariff One"_span),
+             .providerName = DataModel::MakeNullable("Default Provider"_span),
              .currency     = MakeOptional(
                  DataModel::MakeNullable<Globals::Structs::CurrencyStruct::Type>({ .currency = 120, .decimalPoints = 0 })),
              .blockMode = DataModel::MakeNullable(static_cast<BlockModeEnum>(0)) };
@@ -144,11 +144,11 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
     { .tariffComponentID = 10,
       .price             = MakeOptional(
           DataModel::Nullable<Structs::TariffPriceStruct::Type>({ .priceType  = static_cast<Globals::TariffPriceTypeEnum>(0),
-                                                                              .price      = MakeOptional(static_cast<int64_t>(15)),
-                                                                              .priceLevel = MakeOptional(static_cast<int16_t>(1)) })),
+                                                                  .price      = MakeOptional(static_cast<int64_t>(15)),
+                                                                  .priceLevel = MakeOptional(static_cast<int16_t>(1)) })),
       .friendlyCredit = MakeOptional(false),
       .auxiliaryLoad  = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
-           .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
+          .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
       .peakPeriod =
           MakeOptional(Structs::PeakPeriodStruct::Type{ .severity = static_cast<PeakPeriodSeverityEnum>(1), .peakPeriod = 1 }),
       .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
@@ -156,16 +156,16 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
           .apparentPowerThreshold = MakeOptional(120),
           .powerThresholdSource   = static_cast<Globals::PowerThresholdSourceEnum>(0) }),
       .threshold      = NullOptional,
-      .label          = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 1"))),
+      .label          = MakeOptional(DataModel::MakeNullable("Tariff Component 1"_span)),
       .predicted      = MakeOptional(false) },
     { .tariffComponentID = 20,
       .price             = MakeOptional(
           DataModel::Nullable<Structs::TariffPriceStruct::Type>({ .priceType  = static_cast<Globals::TariffPriceTypeEnum>(0),
-                                                                              .price      = MakeOptional(static_cast<int64_t>(20)),
-                                                                              .priceLevel = MakeOptional(static_cast<int16_t>(0)) })),
+                                                                  .price      = MakeOptional(static_cast<int64_t>(20)),
+                                                                  .priceLevel = MakeOptional(static_cast<int16_t>(0)) })),
       .friendlyCredit = MakeOptional(false),
       .auxiliaryLoad  = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
-           .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
+          .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
       .peakPeriod =
           MakeOptional(Structs::PeakPeriodStruct::Type{ .severity = static_cast<PeakPeriodSeverityEnum>(1), .peakPeriod = 1 }),
       .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
@@ -173,7 +173,7 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
           .apparentPowerThreshold = MakeOptional(240),
           .powerThresholdSource   = static_cast<Globals::PowerThresholdSourceEnum>(0) }),
       .threshold      = NullOptional,
-      .label          = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 2"))),
+      .label          = MakeOptional(DataModel::MakeNullable("Tariff Component 2"_span)),
       .predicted      = MakeOptional(false) }
 };
 
@@ -189,19 +189,19 @@ static const uint32_t period5DayEntries[] = { 30 };
 static const uint32_t period5Components[] = { 10 };
 
 static inline Structs::TariffPeriodStruct::Type TariffPeriods[] = {
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 1")),
+    { .label              = DataModel::MakeNullable("Period 1"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period1DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period1Components) },
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 2")),
+    { .label              = DataModel::MakeNullable("Period 2"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period2DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period2Components) },
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 3")),
+    { .label              = DataModel::MakeNullable("Period 3"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period3DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period3Components) },
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 4")),
+    { .label              = DataModel::MakeNullable("Period 4"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period4DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period4Components) },
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 5")),
+    { .label              = DataModel::MakeNullable("Period 5"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period5DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period5Components) }
 };
@@ -214,8 +214,8 @@ namespace Sample2 {
 // Tariff Information
 static inline Structs::TariffInformationStruct::Type TariffInfo()
 {
-    return { .tariffLabel  = DataModel::MakeNullable(CharSpan::fromCharString("Full Tariff Two")),
-             .providerName = DataModel::MakeNullable(CharSpan::fromCharString("Example Provider")),
+    return { .tariffLabel  = DataModel::MakeNullable("Full Tariff Two"_span),
+             .providerName = DataModel::MakeNullable("Example Provider"_span),
              .currency =
                  MakeOptional(DataModel::Nullable<Globals::Structs::CurrencyStruct::Type>({ .currency = 200, .decimalPoints = 1 })),
              .blockMode = DataModel::MakeNullable(static_cast<BlockModeEnum>(1)) };
@@ -279,11 +279,11 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
     { .tariffComponentID = 10,
       .price             = MakeOptional(
           DataModel::Nullable<Structs::TariffPriceStruct::Type>({ .priceType  = static_cast<Globals::TariffPriceTypeEnum>(0),
-                                                                              .price      = MakeOptional(static_cast<int64_t>(15)),
-                                                                              .priceLevel = MakeOptional(static_cast<int16_t>(1)) })),
+                                                                  .price      = MakeOptional(static_cast<int64_t>(15)),
+                                                                  .priceLevel = MakeOptional(static_cast<int16_t>(1)) })),
       .friendlyCredit = MakeOptional(false),
       .auxiliaryLoad  = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
-           .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
+          .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
       .peakPeriod =
           MakeOptional(Structs::PeakPeriodStruct::Type{ .severity = static_cast<PeakPeriodSeverityEnum>(1), .peakPeriod = 1 }),
       .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
@@ -291,16 +291,16 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
           .apparentPowerThreshold = MakeOptional(120),
           .powerThresholdSource   = static_cast<Globals::PowerThresholdSourceEnum>(0) }),
       .threshold      = DataModel::Nullable<int64_t>(120),
-      .label          = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 1"))),
+      .label          = MakeOptional(DataModel::MakeNullable("Tariff Component 1"_span)),
       .predicted      = MakeOptional(false) },
     { .tariffComponentID = 20,
       .price             = MakeOptional(
           DataModel::Nullable<Structs::TariffPriceStruct::Type>({ .priceType  = static_cast<Globals::TariffPriceTypeEnum>(0),
-                                                                              .price      = MakeOptional(static_cast<int64_t>(20)),
-                                                                              .priceLevel = MakeOptional(static_cast<int16_t>(0)) })),
+                                                                  .price      = MakeOptional(static_cast<int64_t>(20)),
+                                                                  .priceLevel = MakeOptional(static_cast<int16_t>(0)) })),
       .friendlyCredit = MakeOptional(false),
       .auxiliaryLoad  = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
-           .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
+          .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
       .peakPeriod =
           MakeOptional(Structs::PeakPeriodStruct::Type{ .severity = static_cast<PeakPeriodSeverityEnum>(1), .peakPeriod = 1 }),
       .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
@@ -308,16 +308,16 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
           .apparentPowerThreshold = MakeOptional(240),
           .powerThresholdSource   = static_cast<Globals::PowerThresholdSourceEnum>(0) }),
       .threshold      = DataModel::Nullable<int64_t>(240),
-      .label          = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 2"))),
+      .label          = MakeOptional(DataModel::MakeNullable("Tariff Component 2"_span)),
       .predicted      = MakeOptional(false) },
     { .tariffComponentID = 30,
       .price             = MakeOptional(
           DataModel::Nullable<Structs::TariffPriceStruct::Type>({ .priceType  = static_cast<Globals::TariffPriceTypeEnum>(0),
-                                                                              .price      = MakeOptional(static_cast<int64_t>(50)),
-                                                                              .priceLevel = MakeOptional(static_cast<int16_t>(0)) })),
+                                                                  .price      = MakeOptional(static_cast<int64_t>(50)),
+                                                                  .priceLevel = MakeOptional(static_cast<int16_t>(0)) })),
       .friendlyCredit = MakeOptional(true),
       .auxiliaryLoad  = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
-           .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
+          .number = 1, .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0) }),
       .peakPeriod =
           MakeOptional(Structs::PeakPeriodStruct::Type{ .severity = static_cast<PeakPeriodSeverityEnum>(1), .peakPeriod = 1 }),
       .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
@@ -325,7 +325,7 @@ static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
           .apparentPowerThreshold = MakeOptional(320),
           .powerThresholdSource   = static_cast<Globals::PowerThresholdSourceEnum>(0) }),
       .threshold      = DataModel::Nullable<int64_t>(320),
-      .label          = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 3"))),
+      .label          = MakeOptional(DataModel::MakeNullable("Tariff Component 3"_span)),
       .predicted      = MakeOptional(true) }
 };
 
@@ -338,13 +338,13 @@ static const uint32_t period3Components[] = { 30 };
 
 // Tariff Periods
 static inline Structs::TariffPeriodStruct::Type TariffPeriods[] = {
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 1")),
+    { .label              = DataModel::MakeNullable("Period 1"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period1DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period1Components) },
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 2")),
+    { .label              = DataModel::MakeNullable("Period 2"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period2DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period2Components) },
-    { .label              = DataModel::MakeNullable(CharSpan::fromCharString("Period 3")),
+    { .label              = DataModel::MakeNullable("Period 3"_span),
       .dayEntryIDs        = DataModel::List<const uint32_t>(period3DayEntries),
       .tariffComponentIDs = DataModel::List<const uint32_t>(period3Components) }
 };
