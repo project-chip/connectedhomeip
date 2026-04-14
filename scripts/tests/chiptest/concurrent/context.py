@@ -38,7 +38,6 @@ class StartStopContextMixin(ABC):
     - Exit-time logging varies by outcome:
         - Normal exit: debug log for stopping.
         - `KeyboardInterrupt`: warning log indicating user interruption.
-        - `QueueCancelled`: debug log and exception suppression (`__exit__` returns `True`).
         - Other exceptions: error log with traceback/details, then propagation.
     """
 
