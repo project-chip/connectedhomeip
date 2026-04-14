@@ -1005,8 +1005,17 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
 
     ReadClient * foundSubscription = nullptr;
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    // Save next pointer before invoking callbacks: OnUnsolicitedMessageFromPublisher() may
+    // synchronously remove the current readClient from the list via TriggerResubscribeIfScheduled()
+    // -> Close() -> RemoveReadClient(). The callback only ever removes the current readClient
+    // (it operates on `this`), so saving nextClient before the callback is sufficient.
+    // If that invariant changes, an active-iterator pattern would be needed
+    // (see ObjectPool::ForEachActiveObject).
+    ReadClient * nextClient = nullptr;
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = nextClient)
     {
+        nextClient = readClient->GetNextClient();
+
         auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
         if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId())
         {
