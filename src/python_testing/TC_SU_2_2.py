@@ -162,15 +162,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         return ["MCORE.OTA.Requestor"]
 
     def steps_TC_SU_2_2(self) -> list[TestStep]:
-        # Steps are executed in this order: 0, 2, 3, 7, 5, 1, 4, 6.
+        # Steps are executed in this order: 0, 2, 3, 4, 7, 5, 1, 6.
         #
         # Steps 2, 3, 7 do not trigger an OTA image transfer — the provider is killed immediately
-        # after each verification. Step 1 triggers a download but the provider is killed right
-        # after confirming it starts (download aborted, no apply). Step 4 is the single step
-        # where the full OTA update is allowed to complete (DUT upgrades to V2). Step 6 runs
-        # last so the same V2 image is served as a "same version" update — the DUT has just
-        # applied V2 and will reject it. This means only one firmware image (V2) is needed
-        # for the entire test.
+        # after each verification. Step 4 triggers a download after the 180s delay but the
+        # provider is killed right after confirming kDownloading (download aborted, no apply).
+        # Step 1 is the single step where the full OTA update is allowed to complete (DUT
+        # upgrades to V2). Step 6 runs last so the same V2 image is served as a "same version"
+        # update — the DUT has just applied V2 and will reject it. This means only one firmware
+        # image (V2) is needed for the entire test.
         return [
             TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider)",
                      is_commissioning=True),
@@ -182,6 +182,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                      "QueryStatus is set to 'NotAvailable'.",
                      "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
                      "which is 2 minutes (120 seconds) from the last QueryImage command."),
+            TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+                     "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, "
+                     "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
+                     "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P. "
+                     "Verify that there is a transfer of the software image after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."),
             TestStep(7, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'UpdateAvailable', ImageURI field contains an invalid BDX ImageURI.",
                      "Verify that the DUT does not start transferring the software image."),
@@ -192,11 +197,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                      "QueryStatus is set to 'UpdateAvailable'. "
                      "Set ImageURI to the location where the image is located.",
                      "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."),
-            TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
-                     "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, "
-                     "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
-                     "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P. "
-                     "Verify that there is a transfer of the software image after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."),
             TestStep(6, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
                      "Software Version is set to the same version the DUT just applied (V2), which is numerically equal to the current version.",
                      "Verify that the DUT does not start transferring the software image."),
@@ -473,6 +473,118 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s3}: Step #3.5 - Closed Provider process.')
         self.current_provider_app_proc.terminate()
 
+        self.step(4)
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Prerequisites - Setup Provider
+        # The provider is started with busy/180s args. The provider is killed immediately after
+        # confirming kDownloading so the download is aborted and no full OTA update is applied
+        # in this step. The full OTA update happens in Step 1.
+        # ------------------------------------------------------------------------------------
+        step_number_s4 = "[STEP_4]"
+        logger.info(f'{step_number_s4}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
+
+        provider_extra_args_busy_180 = [
+            "-q", "busy",
+            "-t", "180"
+        ]
+
+        self.start_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
+            setup_pincode=provider_setup_pincode,
+            discriminator=provider_discriminator,
+            port=provider_port,
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            extra_args=provider_extra_args_busy_180,
+        )
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.1 - Matcher for OTA records logs
+        # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
+        # Attributes: UpdateState (Busy, 180s DelayedActionTime)
+        # ------------------------------------------------------------------------------------
+        subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+
+        await subscription_attr_state_busy_180s.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0.5,
+            max_interval_sec=0.5,
+            keepSubscriptions=False
+        )
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.0 - Controller sends AnnounceOTAProvider command
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number_s4}: Step #4.0 - sent cmd AnnounceOTAProvider.')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.2 - Track OTA attributes: UpdateState (Busy, 180s DelayedActionTime sequence)
+        # Allowed states during 180s interval: Idle, DelayedOnQuery, Querying.
+        # After the interval, kDownloading is verified as the final state.
+        # ------------------------------------------------------------------------------------
+        logger.info(
+            f'{step_number_s4}: Step #4.1 - Started subscription for UpdateState attribute '
+            '(Busy, 180s DelayedActionTime sequence). '
+            'Waiting for the device to start downloading the image. This step may take several minutes to complete.')
+
+        matcher_busy_state_delayed_180s_obj, state_sequence_busy_180, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
+            step_name=step_number_s4,
+            start_states=[
+                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
+            ],
+            allowed_states=[
+                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
+                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+            ],
+            min_interval_sec=180,
+            final_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        )
+
+        subscription_attr_state_busy_180s.await_all_expected_report_matches(
+            [matcher_busy_state_delayed_180s_obj], timeout_sec=980.0)
+        logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
+        subscription_attr_state_busy_180s.cancel()
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.4 - Verify Busy, 180s DelayedActionTime sequence
+        # ------------------------------------------------------------------------------------
+        logger.info(
+            f'{step_number_s4}: Step #4.4 - Full OTA UpdateState (Busy, 180s DelayedActionTime sequence) observed: {state_sequence_busy_180}')
+
+        interval_duration_busy_180 = interval_duration_ref[0]
+        logger.info(f'{step_number_s4}: Step #4.4 - 180s interval: {interval_duration_busy_180:.2f}s, '
+                    f'unexpected states: {list(observed_states_during_interval)}')
+
+        expected_start_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
+        expected_final_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+
+        asserts.assert_true(expected_start_state in state_sequence_busy_180,
+                            f"Expected start state {expected_start_state} not found in observed sequence: {state_sequence_busy_180}")
+        asserts.assert_true(expected_final_state in state_sequence_busy_180,
+                            f"Expected final state {expected_final_state} not found in observed sequence: {state_sequence_busy_180}")
+        asserts.assert_true(interval_duration_busy_180 >= 180,
+                            f"Expected interval >= 180s, observed: {interval_duration_busy_180:.2f}s")
+        asserts.assert_equal(list(observed_states_during_interval), [],
+                             f"Unexpected states: {list(observed_states_during_interval)}")
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.5 - Close Provider Process
+        # Kill immediately after download start is confirmed so the download is aborted.
+        # The single full OTA update is reserved for Step 1.
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s4}: Step #4.5 - Close Provider Process')
+        self.current_provider_app_proc.terminate()
+
         self.step(7)
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Prerequisites - Setup Provider
@@ -695,121 +807,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Step #1.4 - UpdateStateProgress has valid value(s) in range 1-100')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.5 - Close Provider Process
-        # Kill immediately after download start is confirmed so the download is aborted.
-        # The single full OTA update is reserved for Step 4.
+        # [STEP_1]: Step #1.5 - Provider stays running so the download completes and the DUT
+        # applies V2 firmware. This is the single full OTA update in the entire test.
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number}: Step #1.5 - Close Provider Process')
-        self.current_provider_app_proc.terminate()
-
-        self.step(4)
-        # ------------------------------------------------------------------------------------
-        # [STEP_4]: Prerequisites - Setup Provider
-        # This is the final download step and the only step where the full OTA update is allowed
-        # to complete (download -> apply -> reboot). The provider is kept running until kDownloading
-        # is confirmed after the 180s DelayedActionTime.
-        # ------------------------------------------------------------------------------------
-        step_number_s4 = "[STEP_4]"
-        logger.info(f'{step_number_s4}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
-
-        provider_extra_args_busy_180 = [
-            "-q", "busy",
-            "-t", "180"
-        ]
-
-        self.start_provider(
-            provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image,
-            setup_pincode=provider_setup_pincode,
-            discriminator=provider_discriminator,
-            port=provider_port,
-            kvs_path=self.KVS_PATH,
-            log_file=self.LOG_FILE_PATH,
-            extra_args=provider_extra_args_busy_180,
-        )
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.1 - Matcher for OTA records logs
-        # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Attributes: UpdateState (Busy, 180s DelayedActionTime)
-        # ------------------------------------------------------------------------------------
-        subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-
-        await subscription_attr_state_busy_180s.start(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0.5,
-            max_interval_sec=0.5,
-            keepSubscriptions=False
-        )
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.0 - Controller sends AnnounceOTAProvider command
-        # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
-        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info(f'{step_number_s4}: Step #4.0 - sent cmd AnnounceOTAProvider.')
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.2 - Track OTA attributes: UpdateState (Busy, 180s DelayedActionTime sequence)
-        # Allowed states during 180s interval: Idle, DelayedOnQuery, Querying.
-        # After the interval, kDownloading is verified as the final state.
-        # ------------------------------------------------------------------------------------
-        logger.info(
-            f'{step_number_s4}: Step #4.1 - Started subscription for UpdateState attribute '
-            '(Busy, 180s DelayedActionTime sequence). '
-            'Waiting for the device to start downloading the image. This step may take several minutes to complete.')
-
-        matcher_busy_state_delayed_180s_obj, state_sequence_busy_180, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
-            step_name=step_number_s4,
-            start_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
-            ],
-            allowed_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-            ],
-            min_interval_sec=180,
-            final_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
-        )
-
-        subscription_attr_state_busy_180s.await_all_expected_report_matches(
-            [matcher_busy_state_delayed_180s_obj], timeout_sec=980.0)
-        logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
-        subscription_attr_state_busy_180s.cancel()
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.4 - Verify Busy, 180s DelayedActionTime sequence
-        # ------------------------------------------------------------------------------------
-        logger.info(
-            f'{step_number_s4}: Step #4.4 - Full OTA UpdateState (Busy, 180s DelayedActionTime sequence) observed: {state_sequence_busy_180}')
-
-        interval_duration_busy_180 = interval_duration_ref[0]
-        logger.info(f'{step_number_s4}: Step #4.4 - 180s interval: {interval_duration_busy_180:.2f}s, '
-                    f'unexpected states: {list(observed_states_during_interval)}')
-
-        expected_start_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
-        expected_final_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
-
-        asserts.assert_true(expected_start_state in state_sequence_busy_180,
-                            f"Expected start state {expected_start_state} not found in observed sequence: {state_sequence_busy_180}")
-        asserts.assert_true(expected_final_state in state_sequence_busy_180,
-                            f"Expected final state {expected_final_state} not found in observed sequence: {state_sequence_busy_180}")
-        asserts.assert_true(interval_duration_busy_180 >= 180,
-                            f"Expected interval >= 180s, observed: {interval_duration_busy_180:.2f}s")
-        asserts.assert_equal(list(observed_states_during_interval), [],
-                             f"Unexpected states: {list(observed_states_during_interval)}")
+        logger.info(f'{step_number}: Step #1.5 - Provider kept running — full OTA update in progress.')
 
         self.step(6)
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Prerequisites - Setup Provider
-        # The DUT has just applied the V2 firmware in Step 4. By serving the same V2 image here
+        # The DUT has just applied the V2 firmware in Step 1. By serving the same V2 image here
         # with updateAvailable, the DUT sees it as "same version" and rejects the download.
         # No separate firmware image is needed — the single V2 image (ota_image) is reused,
         # meaning only one firmware image is required for the entire test.
