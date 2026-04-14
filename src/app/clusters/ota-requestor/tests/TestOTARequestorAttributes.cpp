@@ -19,10 +19,14 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ota-requestor/OTARequestorStorage.h>
+#include <app/common/CompatEnumNames.h>
 #include <app/data-model/Nullable.h>
+#include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
+#include <clusters/OtaSoftwareUpdateRequestor/EventIds.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -31,6 +35,7 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
 
 using chip::app::DataModel::Nullable;
+using chip::app::DataModel::NullNullable;
 
 namespace {
 
@@ -87,68 +92,114 @@ TEST_F(TestOTARequestorAttributes, SetChangeListenerRejectsInvalidEndpointId)
     chip::Testing::TestServerClusterContext context;
     OTARequestorAttributes attributes;
 
-    EXPECT_NE(attributes.SetChangeListener(kInvalidEndpointId, context.ChangeListener()), CHIP_NO_ERROR);
+    EXPECT_NE(attributes.SetInteractionModelContext(kInvalidEndpointId, context.ChangeListener(), context.EventsGenerator()),
+              CHIP_NO_ERROR);
 }
 
 TEST_F(TestOTARequestorAttributes, SetUpdateStateChangesValue)
 {
     OTARequestorAttributes attributes;
+    OTAChangeReasonEnum reason = OTAChangeReasonEnum::kSuccess;
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kUnknown);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kUnknown, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kUnknown);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kIdle);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kQuerying);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kQuerying, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kQuerying);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnQuery);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnQuery, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnQuery);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDownloading);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDownloading, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kDownloading);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kApplying);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnApply);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnApply, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnApply);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kRollingBack);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kRollingBack, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kRollingBack);
 
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnUserConsent);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnUserConsent, reason, NullNullable);
     EXPECT_EQ(attributes.GetUpdateState(), OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnUserConsent);
 }
 
 TEST_F(TestOTARequestorAttributes, SetUpdateStateMarksChangedWhenDifferent)
 {
     chip::Testing::TestServerClusterContext context;
-    auto & changeListener = context.ChangeListener();
+    auto & changeListener      = context.ChangeListener();
+    OTAChangeReasonEnum reason = OTAChangeReasonEnum::kSuccess;
 
     OTARequestorAttributes attributes;
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kUnknown);
-    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kUnknown, reason, NullNullable);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
     changeListener.DirtyList().clear();
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, reason, NullNullable);
     ASSERT_EQ(changeListener.DirtyList().size(), 1u);
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdateState::Id);
 
     changeListener.DirtyList().clear();
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, reason, NullNullable);
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+}
+
+TEST_F(TestOTARequestorAttributes, SetUpdateStateSendsEventWhenDifferent)
+{
+    chip::Testing::TestServerClusterContext context;
+    Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
+
+    OTARequestorAttributes attributes;
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kUnknown, OTAChangeReasonEnum::kUnknown, NullNullable);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, context.ChangeListener(), eventsGenerator), CHIP_NO_ERROR);
+    ASSERT_FALSE(eventsGenerator.GetNextEvent().has_value());
+
+    // Verify setting a state with a target version sends a matching event.
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess,
+                              Nullable<uint32_t>(1234u));
+    auto event = eventsGenerator.GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    EXPECT_EQ(event->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, Events::StateTransition::Id));
+    Events::StateTransition::DecodableType decodedEvent;
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedEvent.previousState, OTARequestorAttributes::OTAUpdateStateEnum::kUnknown);
+    EXPECT_EQ(decodedEvent.newState, OTARequestorAttributes::OTAUpdateStateEnum::kDownloading);
+    EXPECT_EQ(decodedEvent.reason, OTAChangeReasonEnum::kSuccess);
+    EXPECT_EQ(decodedEvent.targetSoftwareVersion, Nullable<uint32_t>(1234u));
+
+    // Verify setting a state without a target version sends a matching event.
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kTimeOut, NullNullable);
+    event = eventsGenerator.GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    EXPECT_EQ(event->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, Events::StateTransition::Id));
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedEvent.previousState, OTARequestorAttributes::OTAUpdateStateEnum::kDownloading);
+    EXPECT_EQ(decodedEvent.newState, OTARequestorAttributes::OTAUpdateStateEnum::kIdle);
+    EXPECT_EQ(decodedEvent.reason, OTAChangeReasonEnum::kTimeOut);
+    EXPECT_TRUE(decodedEvent.targetSoftwareVersion.IsNull());
+
+    // Verify setting the same state doesn't send an event.
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess, NullNullable);
+    EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
 }
 
 TEST_F(TestOTARequestorAttributes, SetUpdateStateProgressChangesValue)
 {
     OTARequestorAttributes attributes;
 
-    EXPECT_EQ(attributes.SetUpdateStateProgress(DataModel::NullNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(attributes.GetUpdateStateProgress(), DataModel::NullNullable);
+    EXPECT_EQ(attributes.SetUpdateStateProgress(NullNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.GetUpdateStateProgress(), NullNullable);
 
     EXPECT_EQ(attributes.SetUpdateStateProgress(0), CHIP_NO_ERROR);
     EXPECT_EQ(attributes.GetUpdateStateProgress(), Nullable<uint8_t>(0));
@@ -172,8 +223,8 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateProgressMarksChangedWhenDiffere
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    EXPECT_EQ(attributes.SetUpdateStateProgress(DataModel::NullNullable), CHIP_NO_ERROR);
-    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.SetUpdateStateProgress(NullNullable), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
     changeListener.DirtyList().clear();
     EXPECT_EQ(attributes.SetUpdateStateProgress(42), CHIP_NO_ERROR);
@@ -193,12 +244,12 @@ TEST_F(TestOTARequestorAttributes, InvalidUpdateStateProgressDoesNotChangeValueO
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    EXPECT_EQ(attributes.SetUpdateStateProgress(DataModel::NullNullable), CHIP_NO_ERROR);
-    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.SetUpdateStateProgress(NullNullable), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
     changeListener.DirtyList().clear();
     EXPECT_NE(attributes.SetUpdateStateProgress(200), CHIP_NO_ERROR);
-    EXPECT_EQ(attributes.GetUpdateStateProgress(), DataModel::NullNullable);
+    EXPECT_EQ(attributes.GetUpdateStateProgress(), NullNullable);
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 }
 
@@ -220,7 +271,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStatePossibleMarksChangedWhenDiffere
 
     OTARequestorAttributes attributes;
     attributes.SetUpdatePossible(false);
-    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
     changeListener.DirtyList().clear();
     attributes.SetUpdatePossible(true);
@@ -347,7 +398,7 @@ TEST_F(TestOTARequestorAttributes, ChangingProvidersMarksChanged)
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
     changeListener.DirtyList().clear();
     OTARequestorAttributes::ProviderLocationType location;
@@ -381,7 +432,7 @@ TEST_F(TestOTARequestorAttributes, CannotAddProviderForFabricWithProvider)
     location.fabricIndex    = 1;
     EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
 
-    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
     changeListener.DirtyList().clear();
     location.providerNodeID = 0x5678;

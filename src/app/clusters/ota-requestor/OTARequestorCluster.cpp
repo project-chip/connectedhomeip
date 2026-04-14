@@ -39,14 +39,15 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands,
                                          OTARequestorAttributes & attributes) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
-    mOtaCommands(otaCommands), mAttributes(attributes)
+    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaCommands(otaCommands),
+    mAttributes(attributes)
 {}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    return mAttributes.SetChangeListener(mPath.mEndpointId, context.interactionContext.dataModelChangeListener);
+    return mAttributes.SetInteractionModelContext(mPath.mEndpointId, context.interactionContext.dataModelChangeListener,
+                                         context.interactionContext.eventsGenerator);
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

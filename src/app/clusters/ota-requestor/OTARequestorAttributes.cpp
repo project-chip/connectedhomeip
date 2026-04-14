@@ -23,6 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -30,17 +31,29 @@
 namespace chip {
 
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
+using namespace app::Clusters::OtaSoftwareUpdateRequestor::Events;
 
 constexpr ClusterId kClusterId = app::Clusters::OtaSoftwareUpdateRequestor::Id;
 
-void OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState)
+void OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState, OTAChangeReasonEnum reason,
+                                            app::DataModel::Nullable<uint32_t> targetSoftwareVersion)
 {
     VerifyOrReturn(updateState != mUpdateState);
 
-    mUpdateState = updateState;
+    OTAUpdateStateEnum previousState = mUpdateState;
+    mUpdateState                     = updateState;
     if (mDataModelChangeListener)
     {
         mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, UpdateState::Id });
+    }
+    if (mEventsGenerator)
+    {
+        StateTransition::Type event;
+        event.previousState         = previousState;
+        event.newState              = updateState;
+        event.reason                = reason;
+        event.targetSoftwareVersion = targetSoftwareVersion;
+        mEventsGenerator->GenerateEvent(event, mEndpointId);
     }
 }
 
@@ -66,13 +79,15 @@ void OTARequestorAttributes::SetUpdatePossible(bool updatePossible)
     }
 }
 
-CHIP_ERROR OTARequestorAttributes::SetChangeListener(EndpointId endpointId,
-                                                     app::DataModel::ProviderChangeListener & dataModelChangeListener)
+CHIP_ERROR OTARequestorAttributes::SetInteractionModelContext(EndpointId endpointId,
+                                                              app::DataModel::ProviderChangeListener & dataModelChangeListener,
+                                                              app::DataModel::EventsGenerator & eventsGenerator)
 {
     VerifyOrReturnError(IsValidEndpointId(endpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     mDataModelChangeListener = &dataModelChangeListener;
     mEndpointId              = endpointId;
+    mEventsGenerator         = &eventsGenerator;
     return CHIP_NO_ERROR;
 }
 

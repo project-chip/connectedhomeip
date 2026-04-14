@@ -676,25 +676,7 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
 
     OTAUpdateStateEnum prevState = mAttributes->GetUpdateState();
     // Update the new state before handling the state transition
-    mAttributes->SetUpdateState(newState);
-
-    if (prevState != newState)
-    {
-        DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-        VerifyOrDie(dataModelProvider != nullptr);
-        OtaSoftwareUpdateRequestor::Events::StateTransition::Type event{ prevState, newState, reason, targetSoftwareVersion };
-
-        for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
-        {
-            for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
-            {
-                if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
-                {
-                    static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
-                }
-            }
-        }
-    }
+    mAttributes->SetUpdateState(newState, reason, targetSoftwareVersion);
 
     if ((newState == OTAUpdateStateEnum::kIdle) && (prevState != OTAUpdateStateEnum::kIdle))
     {

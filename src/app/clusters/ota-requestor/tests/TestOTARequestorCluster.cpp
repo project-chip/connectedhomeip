@@ -255,7 +255,8 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     EXPECT_TRUE(updatePossible);
 
     // Read and verify UpdateState.
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle,
+                              OTARequestorAttributes::OTAChangeReasonEnum::kSuccess, DataModel::NullNullable);
     OtaSoftwareUpdateRequestor::UpdateStateEnum updateState;
     EXPECT_EQ(tester.ReadAttribute(UpdateState::Id, updateState), CHIP_NO_ERROR);
     EXPECT_EQ(updateState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
@@ -369,7 +370,8 @@ TEST_F(TestOTARequestorCluster, ChangingAttributesMarksAsChanged)
     auto & changeListener = context.ChangeListener();
 
     changeListener.DirtyList().clear();
-    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying);
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying,
+                              OTARequestorAttributes::OTAChangeReasonEnum::kSuccess, DataModel::NullNullable);
     ASSERT_EQ(changeListener.DirtyList().size(), 1u);
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
