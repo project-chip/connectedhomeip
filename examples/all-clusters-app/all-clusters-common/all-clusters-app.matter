@@ -8383,12 +8383,12 @@ endpoint 1 {
   }
 
   server cluster FlowMeasurement {
-    ram      attribute measuredValue default = 5;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 100;
     ram      attribute tolerance default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {
