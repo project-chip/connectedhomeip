@@ -75,7 +75,7 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
         log.debug("Call: %s%r", name, args)
         self._work_queue.put(XmlRpcFuncCall(name, args))
 
-        # Get the result from the response queue. If there was an execption, propagate it to the RPC server process, so that it can
+        # Get the result from the response queue. If there was an exception, propagate it to the RPC server process, so that it can
         # be handled by it, and in turn propagated back to the caller of the RPC function.
         rsp = self._rsp_queue.get()
         log.debug("Response for %s: %r", name, rsp)
