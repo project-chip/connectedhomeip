@@ -106,7 +106,7 @@ public:
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override
     {
-        return mAttributes->GetDefaultOtaProviderListIterator();
+        return mAttributes ? mAttributes->GetDefaultOtaProviderListIterator() : ProviderLocationList::Iterator(nullptr, 0);
     }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
