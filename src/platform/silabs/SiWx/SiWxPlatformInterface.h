@@ -103,7 +103,7 @@ void sl_si91x_uart_power_requirement_handler()
 {
 #ifdef ENABLE_CHIP_SHELL
 #ifdef RTE_UULP_GPIO_3_PIN
-    // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
+    // Checking the UULP PIN 3 status to reinit the UART and not allow the device to go to sleep
     if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_3_PIN))
     {
         if (!ps_requirement_added)

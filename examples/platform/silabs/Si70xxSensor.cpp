@@ -32,6 +32,7 @@ constexpr uint16_t kSensorTemperatureOffset = 475;
 #include "sl_si91x_gpio.h"
 #include "sl_si91x_i2c.h"
 #include "sl_si91x_si70xx.h"
+#include <cmsis_os2.h>
 #if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
 #include "sl_si91x_power_manager.h"
 #endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
@@ -43,27 +44,25 @@ constexpr uint16_t kSensorTemperatureOffset = 475;
 #define RX_THRESHOLD 0 // rx threshold value
 #define OUTPUT_VALUE 1 // GPIO output value
 
-/*******************************************************************************
- * Function to provide 1 ms Delay
- *******************************************************************************/
-static void delay(uint32_t idelay)
-{
-    for (uint32_t x = 0; x < 4600 * idelay; x++) // 1.002ms delay
-    {
-        __NOP();
-    }
-}
-
 namespace Si70xxSensor {
+
+namespace {
+
+sl_i2c_config_t kI2cDriverConfig = [] {
+    sl_i2c_config_t cfg{};
+    cfg.mode           = SL_I2C_LEADER_MODE;
+    cfg.transfer_type  = SL_I2C_USING_NON_DMA;
+    cfg.operating_mode = SL_I2C_STANDARD_MODE;
+    cfg.i2c_callback   = nullptr;
+    return cfg;
+}();
+
+} // namespace
 
 sl_status_t Init()
 {
     sl_status_t status = SL_STATUS_OK;
-    sl_i2c_config_t i2c_config;
-    i2c_config.mode           = SL_I2C_LEADER_MODE;
-    i2c_config.transfer_type  = SL_I2C_USING_NON_DMA;
-    i2c_config.operating_mode = SL_I2C_STANDARD_MODE;
-    i2c_config.i2c_callback   = NULL;
+    sl_i2c_config_t i2c_config = kI2cDriverConfig;
 
 #if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
     if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) != 1)
@@ -111,7 +110,7 @@ sl_status_t Init()
 #endif
 
     /* Wait for sensor to become ready */
-    delay(80);
+    osDelay(80);
 
     // Initialize I2C bus
     status = sl_i2c_driver_init(SI70XX_I2C_INSTANCE, &i2c_config);
@@ -125,7 +124,7 @@ sl_status_t Init()
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     // Wait for sensor to recover after reset (Si70xx needs ~15ms to recover)
-    delay(15);
+    osDelay(15);
 
     // Initializes sensor and reads electronic ID 1st byte
     status = sl_si91x_si70xx_init(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, SL_EID_FIRST_BYTE);
