@@ -130,7 +130,7 @@ class XmlRpcServerProcessManager(threading.Thread):
     - `start()` launches the manager thread and waits for initialization (`_init_done`) or failure (`_exception`).
     - `run()` creates the wrapped spawn context, starts `XmlRpcServerProcess`, then consumes requests and executes validated
       `AppsRegister` methods.
-    - `cancel()` signals shutdown by closing queues, joins the thread, and always shuts down the multiprocessing manager.
+    - `stop()` signals shutdown by closing queues, joins the thread, and always shuts down the multiprocessing manager.
 
     Return values and exceptions from `AppsRegister` execution are written to the response queue so the XML-RPC subprocess can
     propagate them back to the RPC caller.
