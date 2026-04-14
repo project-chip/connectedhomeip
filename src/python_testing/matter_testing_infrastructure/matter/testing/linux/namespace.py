@@ -298,20 +298,25 @@ class IsolatedNetworkNamespace:
         try:
             # Bring up selected links in parallel to reduce wait time.
             with concurrent.futures.ThreadPoolExecutor(max_workers=3, thread_name_prefix="NetnsSetup") as executor:
-                concurrent.futures.wait((executor.submit(self.app_ns.setup),
-                                         executor.submit(self.tool_ns.setup)))
+                list(executor.map(lambda x: x(), (
+                    self.app_ns.setup,
+                    self.tool_ns.setup,
+                )))
 
-                concurrent.futures.wait((executor.submit(self.app_link.setup),
-                                         executor.submit(self.tool_link.setup),
-                                         executor.submit(self.mgmt_link.setup)))
+                list(executor.map(lambda x: x(), (
+                    self.app_link.setup,
+                    self.tool_link.setup,
+                    self.mgmt_link.setup,
+                )))
 
                 self.bridge.setup()
 
-                concurrent.futures.wait(executor.submit(link.up)
-                                        for link, should_up in ((self.app_link, app_link_up),
-                                                                (self.tool_link, tool_link_up),
-                                                                (self.mgmt_link, mgmt_link_up))
-                                        if should_up)
+                list(executor.map(lambda x: x(), (
+                    link.up for link, should_up in (
+                        (self.app_link, app_link_up),
+                        (self.tool_link, tool_link_up),
+                        (self.mgmt_link, mgmt_link_up)
+                    ) if should_up)))
 
                 self.bridge.up()
 
