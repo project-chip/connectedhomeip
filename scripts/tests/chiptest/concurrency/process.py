@@ -143,7 +143,8 @@ class ProcessState:
 
                 # Traceback is not automatically propagated across process boundaries, so we need to add it to the exception
                 # manually as a note.
-                value.add_note("".join(traceback.format_tb(value.__traceback__)))
+                if (tb := value.__traceback__) is not None:
+                    value.add_note("".join(traceback.format_tb(tb)))
             self._exception.set(value)
             self._state_changed.notify_all()
 
