@@ -61,7 +61,7 @@ sl_i2c_config_t kI2cDriverConfig = [] {
 
 sl_status_t Init()
 {
-    sl_status_t status = SL_STATUS_OK;
+    sl_status_t status         = SL_STATUS_OK;
     sl_i2c_config_t i2c_config = kI2cDriverConfig;
 
 #if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
