@@ -52,6 +52,12 @@ struct MockOTARequestorStorage : public OTARequestorStorage
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR LoadCurrentUpdateState(OTAUpdateStateEnum & currentUpdateState) override
+    {
+        loadCurrentUpdateStateCalled = true;
+        return CHIP_NO_ERROR;
+    }
+
     // Unrelated methods.
     CHIP_ERROR StoreCurrentProviderLocation(const ProviderLocationType & provider) override { return CHIP_NO_ERROR; }
     CHIP_ERROR ClearCurrentProviderLocation() override { return CHIP_NO_ERROR; }
@@ -60,14 +66,14 @@ struct MockOTARequestorStorage : public OTARequestorStorage
     CHIP_ERROR LoadUpdateToken(MutableByteSpan & updateToken) override { return CHIP_NO_ERROR; }
     CHIP_ERROR ClearUpdateToken() override { return CHIP_NO_ERROR; }
     CHIP_ERROR StoreCurrentUpdateState(OTAUpdateStateEnum currentUpdateState) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR LoadCurrentUpdateState(OTAUpdateStateEnum & currentUpdateState) override { return CHIP_NO_ERROR; }
     CHIP_ERROR ClearCurrentUpdateState() override { return CHIP_NO_ERROR; }
     CHIP_ERROR StoreTargetVersion(uint32_t targetVersion) override { return CHIP_NO_ERROR; }
     CHIP_ERROR LoadTargetVersion(uint32_t & targetVersion) override { return CHIP_NO_ERROR; }
     CHIP_ERROR ClearTargetVersion() override { return CHIP_NO_ERROR; }
 
-    bool storeDefaultProvidersCalled = false;
-    bool loadDefaultProvidersCalled  = false;
+    bool storeDefaultProvidersCalled  = false;
+    bool loadDefaultProvidersCalled   = false;
+    bool loadCurrentUpdateStateCalled = false;
 };
 
 struct TestOTARequestorAttributes : public ::testing::Test
@@ -391,8 +397,18 @@ TEST_F(TestOTARequestorAttributes, DefaultProvidersAreLoadedWhenSettingStorage)
     OTARequestorAttributes attributes;
 
     storage.loadDefaultProvidersCalled = false;
-    EXPECT_EQ(attributes.SetStorageAndLoadDefaultOtaProviders(storage), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.SetStorageAndLoadAttributes(storage), CHIP_NO_ERROR);
     EXPECT_TRUE(storage.loadDefaultProvidersCalled);
+}
+
+TEST_F(TestOTARequestorAttributes, UpdateStateIsLoadedWhenSettingStorage)
+{
+    MockOTARequestorStorage storage;
+    OTARequestorAttributes attributes;
+
+    storage.loadCurrentUpdateStateCalled = false;
+    EXPECT_EQ(attributes.SetStorageAndLoadAttributes(storage), CHIP_NO_ERROR);
+    EXPECT_TRUE(storage.loadCurrentUpdateStateCalled);
 }
 
 TEST_F(TestOTARequestorAttributes, AddingProviderUpdatesDefaultProviders)
@@ -403,7 +419,7 @@ TEST_F(TestOTARequestorAttributes, AddingProviderUpdatesDefaultProviders)
     location.providerNodeID = 0x1234;
     location.endpoint       = 10;
     location.fabricIndex    = 1;
-    ASSERT_EQ(attributes.SetStorageAndLoadDefaultOtaProviders(storage), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetStorageAndLoadAttributes(storage), CHIP_NO_ERROR);
 
     storage.storeDefaultProvidersCalled = false;
     EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
@@ -418,7 +434,7 @@ TEST_F(TestOTARequestorAttributes, RemovingProviderUpdatesDefaultProviders)
     location.providerNodeID = 0x1234;
     location.endpoint       = 10;
     location.fabricIndex    = 1;
-    ASSERT_EQ(attributes.SetStorageAndLoadDefaultOtaProviders(storage), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetStorageAndLoadAttributes(storage), CHIP_NO_ERROR);
     EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
 
     storage.storeDefaultProvidersCalled = false;

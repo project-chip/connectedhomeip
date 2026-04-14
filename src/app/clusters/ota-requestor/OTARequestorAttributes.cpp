@@ -127,9 +127,13 @@ ProviderLocationList::Iterator OTARequestorAttributes::GetDefaultOtaProviderList
     return mProviders.Begin();
 }
 
-CHIP_ERROR OTARequestorAttributes::SetStorageAndLoadDefaultOtaProviders(OTARequestorStorage & storage)
+CHIP_ERROR OTARequestorAttributes::SetStorageAndLoadAttributes(OTARequestorStorage & storage)
 {
     mStorage = &storage;
+    if (mStorage->LoadCurrentUpdateState(mUpdateState) != CHIP_NO_ERROR)
+    {
+        mUpdateState = OTAUpdateStateEnum::kIdle;
+    }
     return mStorage->LoadDefaultProviders(mProviders);
 }
 

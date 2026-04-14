@@ -56,7 +56,8 @@ public:
     ProviderLocationList::Iterator GetDefaultOtaProviderListIterator();
 
     CHIP_ERROR SetChangeListener(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener);
-    CHIP_ERROR SetStorageAndLoadDefaultOtaProviders(OTARequestorStorage & storage);
+    // This loads the default OTA provider and update state attributes from storage.
+    CHIP_ERROR SetStorageAndLoadAttributes(OTARequestorStorage & storage);
 
 private:
     ProviderLocationList mProviders;

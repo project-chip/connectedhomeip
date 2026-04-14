@@ -942,7 +942,7 @@ void DefaultOTARequestor::StoreCurrentUpdateInfo()
 
 void DefaultOTARequestor::LoadCurrentUpdateInfo()
 {
-    TEMPORARY_RETURN_IGNORED mAttributes->SetStorageAndLoadDefaultOtaProviders(*mStorage);
+    TEMPORARY_RETURN_IGNORED mAttributes->SetStorageAndLoadAttributes(*mStorage);
 
     ProviderLocationType providerLocation;
     if (mStorage->LoadCurrentProviderLocation(providerLocation) == CHIP_NO_ERROR)
@@ -955,13 +955,6 @@ void DefaultOTARequestor::LoadCurrentUpdateInfo()
     {
         mUpdateToken = updateToken;
     }
-
-    OTAUpdateStateEnum updateState = OTAUpdateStateEnum::kIdle;
-    if (mStorage->LoadCurrentUpdateState(updateState) != CHIP_NO_ERROR)
-    {
-        updateState = OTAUpdateStateEnum::kIdle;
-    }
-    mAttributes->SetUpdateState(updateState);
 
     if (mStorage->LoadTargetVersion(mTargetVersion) != CHIP_NO_ERROR)
     {
