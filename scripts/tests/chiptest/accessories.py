@@ -27,9 +27,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from chiptest.concurrent.context import StartStopContextMixin, mp_wrapped_spawn_context
-from chiptest.concurrent.process import ProcessConfig, WrappedProcess, with_annotated_exception
-from chiptest.concurrent.work_queue import CancellableQueue, QueueCancelled
+from chiptest.concurrency.context import StartStopContextMixin, mp_wrapped_spawn_context
+from chiptest.concurrency.process import ProcessConfig, WrappedProcess, with_annotated_exception
+from chiptest.concurrency.work_queue import CancellableQueue, QueueCancelled
 from chiptest.log_config import LogConfig
 
 if TYPE_CHECKING:

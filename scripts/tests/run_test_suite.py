@@ -30,7 +30,7 @@ from typing import Any, Protocol
 import chiptest
 import click
 from chiptest.accessories import AppsRegister
-from chiptest.concurrent.work_queue import CancellableQueue
+from chiptest.concurrency.work_queue import CancellableQueue
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult

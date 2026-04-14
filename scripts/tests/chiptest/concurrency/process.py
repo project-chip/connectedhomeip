@@ -28,7 +28,7 @@ from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
 from typing import ClassVar, Concatenate, Generic, ParamSpec, Protocol, Self, TypeVar
 
-from chiptest.concurrent.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
+from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
 from chiptest.log_config import LogConfig
 
 log = logging.getLogger(__name__)
