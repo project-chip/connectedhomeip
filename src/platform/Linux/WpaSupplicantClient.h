@@ -29,6 +29,8 @@
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
 #include <system/SystemMutex.h>
 
+#define CONNECTIVITY_MANAGER_WPA_SUPPLICANT_LOG_PREFIX "wpa_supplicant: "
+
 namespace chip {
 
 template <>
