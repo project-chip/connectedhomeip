@@ -101,7 +101,7 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     if (epIndex < kFlowMeasurementCount)
     {
         auto updatedFlow = onOff ? FlowRangeMax[epIndex] : chip::app::DataModel::Nullable<uint16_t>(0);
-        FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow);
+        LogErrorOnFailure(FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow));
     }
 
     DataModel::Nullable<int16_t> capacity = onOff ? DataModel::Nullable<int16_t>(kMaxCapacity) : DataModel::Nullable<int16_t>(0);
