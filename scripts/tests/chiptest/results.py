@@ -218,13 +218,6 @@ class RunSummary(RunStats):
         """Estimate the current iteration based on the number of recorded results."""
         return len(self.exceptions)
 
-    @property
-    def passed_failed_tests(self) -> tuple[int, int]:
-        """Estimate the number of passed and failed tests based on the recorded results."""
-        passed = sum(exception is None for exceptions in self.exceptions.values() for exception in exceptions.values())
-        failed = len(self.results) - passed
-        return passed, failed
-
     def write_json(self, path: Path) -> None:
         """Write the test run summary to a JSON file."""
         def encode(obj: Any) -> Any:

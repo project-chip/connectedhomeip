@@ -52,7 +52,8 @@ class PeriodicStatusThread(threading.Thread):
             with self.run_summary:
                 current_iteration = self.run_summary.current_iteration
                 iterations = self.run_summary.iterations
-                successful_tests, failed_tests = self.run_summary.passed_failed_tests
+                successful_tests = self.run_summary.passed
+                failed_tests = self.run_summary.failed
                 expected_test_count = self.run_summary.expected_test_count
 
             test_status: list[str] = []
