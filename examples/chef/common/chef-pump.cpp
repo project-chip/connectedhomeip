@@ -169,7 +169,7 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     if (epIndex < kFlowMeasurementCount)
     {
         DataModel::Nullable<uint16_t> updatedFlow = LevelToSetpoint(level, FlowRangeMin[epIndex], FlowRangeMax[epIndex]);
-        FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow);
+        LogErrorOnFailure(FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow));
     }
 
     DataModel::Nullable<int16_t> capacity =
