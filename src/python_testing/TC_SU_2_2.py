@@ -685,9 +685,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.step(1)
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Prerequisites - Setup Provider
-        # The provider is started with updateAvailable args. The provider is killed immediately
-        # after confirming that kDownloading is observed, so the download is aborted and no full
-        # OTA update is applied in this step. The full OTA update is deferred to Step 4.
+        # The provider is started with updateAvailable args. The provider is kept running until
+        # kApplyingUpdate is observed (BDX transfer complete), then killed. This is the single
+        # full OTA update in the entire test — the DUT applies V2 and reboots.
         # ------------------------------------------------------------------------------------
         step_number = "[STEP_1]"
         logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
@@ -807,10 +807,41 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Step #1.4 - UpdateStateProgress has valid value(s) in range 1-100')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.5 - Provider stays running so the download completes and the DUT
-        # applies V2 firmware. This is the single full OTA update in the entire test.
+        # [STEP_1]: Step #1.5 - Wait for kApplyingUpdate to confirm the BDX transfer is fully
+        # complete, then kill the provider. The DUT will finish applying and reboot on its own.
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number}: Step #1.5 - Provider kept running — full OTA update in progress.')
+        logger.info(f'{step_number}: Step #1.5 - Waiting for kApplyingUpdate to confirm download complete.')
+
+        subscription_attr_applying = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+
+        await subscription_attr_applying.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0,
+            max_interval_sec=20,
+            keepSubscriptions=True
+        )
+
+        def matcher_applying(report):
+            val = report.value
+            return val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplyingUpdate
+
+        matcher_applying_obj = AttributeMatcher.from_callable(
+            description=f"{step_number} - Wait for kApplyingUpdate",
+            matcher=matcher_applying
+        )
+
+        subscription_attr_applying.await_all_expected_report_matches([matcher_applying_obj], timeout_sec=800.0)
+        logger.info(f'{step_number}: Step #1.5 - kApplyingUpdate observed — BDX transfer complete.')
+        subscription_attr_applying.cancel()
+
+        logger.info(f'{step_number}: Step #1.5 - Killing provider (download done, DUT applying firmware).')
+        self.current_provider_app_proc.terminate()
 
         self.step(6)
         # ------------------------------------------------------------------------------------
