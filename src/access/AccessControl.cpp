@@ -445,50 +445,34 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
         AuthMode authMode = AuthMode::kNone;
-        if (entry.GetAuthMode(authMode) != CHIP_NO_ERROR)
-        {
-            continue;
-        }
-        if (authMode != AuthMode::kCase && authMode != AuthMode::kGroup)
-        {
-            continue;
-        }
+        ReturnErrorOnFailure(entry.GetAuthMode(authMode));
+        // Operational PASE not supported for v1.0.
+        VerifyOrReturnError(authMode == AuthMode::kCase || authMode == AuthMode::kGroup, CHIP_ERROR_INCORRECT_STATE);
         if (authMode != subjectDescriptor.authMode)
         {
             continue;
         }
 
         Privilege privilege = Privilege::kView;
-        if (entry.GetPrivilege(privilege) != CHIP_NO_ERROR)
-        {
-            continue;
-        }
+        ReturnErrorOnFailure(entry.GetPrivilege(privilege));
         if (!CheckRequestPrivilegeAgainstEntryPrivilege(requestPrivilege, privilege))
         {
             continue;
         }
 
         size_t subjectCount = 0;
-        if (entry.GetSubjectCount(subjectCount) != CHIP_NO_ERROR)
-        {
-            continue;
-        }
-
+        ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
         if (subjectCount > 0)
         {
             bool subjectMatched = false;
-
             for (size_t i = 0; i < subjectCount; ++i)
             {
                 NodeId subject = kUndefinedNodeId;
-                if (entry.GetSubject(i, subject) != CHIP_NO_ERROR)
-                {
-                    continue;
-                }
-
+                ReturnErrorOnFailure(entry.GetSubject(i, subject));
                 if (IsOperationalNodeId(subject))
                 {
-                    if (authMode == AuthMode::kCase && subject == subjectDescriptor.subject)
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INCORRECT_STATE);
+                    if (subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
                         break;
@@ -496,7 +480,8 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
                 }
                 else if (IsCASEAuthTag(subject))
                 {
-                    if (authMode == AuthMode::kCase && subjectDescriptor.cats.CheckSubjectAgainstCATs(subject))
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INCORRECT_STATE);
+                    if (subjectDescriptor.cats.CheckSubjectAgainstCATs(subject))
                     {
                         subjectMatched = true;
                         break;
@@ -504,7 +489,8 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
                 }
                 else if (IsGroupId(subject))
                 {
-                    if (authMode == AuthMode::kGroup && subject == subjectDescriptor.subject)
+                    VerifyOrReturnError(authMode == AuthMode::kGroup, CHIP_ERROR_INCORRECT_STATE);
+                    if (subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
                         break;
@@ -523,46 +509,24 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
         }
 
         size_t targetCount = 0;
-        if (entry.GetTargetCount(targetCount) != CHIP_NO_ERROR)
-        {
-            continue;
-        }
-
+        ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
         if (targetCount > 0)
         {
             bool targetMatched = false;
-
             for (size_t i = 0; i < targetCount; ++i)
             {
                 Entry::Target target;
-                if (entry.GetTarget(i, target) != CHIP_NO_ERROR)
+                ReturnErrorOnFailure(entry.GetTarget(i, target));
+                if ((target.flags & Entry::Target::kCluster) && target.cluster != requestPath.cluster)
                 {
                     continue;
                 }
-
-                const bool hasCluster    = (target.flags & Entry::Target::kCluster) != 0;
-                const bool hasEndpoint   = (target.flags & Entry::Target::kEndpoint) != 0;
-                const bool hasDeviceType = (target.flags & Entry::Target::kDeviceType) != 0;
-
-                // Reject malformed target flag combinations
-                if (!(hasCluster || hasEndpoint || hasDeviceType))
+                if ((target.flags & Entry::Target::kEndpoint) && target.endpoint != requestPath.endpoint)
                 {
                     continue;
                 }
-                if (hasEndpoint && hasDeviceType)
-                {
-                    continue;
-                }
-
-                if (hasCluster && target.cluster != requestPath.cluster)
-                {
-                    continue;
-                }
-                if (hasEndpoint && target.endpoint != requestPath.endpoint)
-                {
-                    continue;
-                }
-                if (hasDeviceType && !mDeviceTypeResolver->IsDeviceTypeOnEndpoint(target.deviceType, requestPath.endpoint))
+                if (target.flags & Entry::Target::kDeviceType &&
+                    !mDeviceTypeResolver->IsDeviceTypeOnEndpoint(target.deviceType, requestPath.endpoint))
                 {
                     continue;
                 }
