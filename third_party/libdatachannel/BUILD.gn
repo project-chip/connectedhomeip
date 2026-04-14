@@ -58,21 +58,17 @@ config("datachannel_config") {
     "usrsctp",
     "srtp2",
     "juice-static",
+
+    # We build static libraries and srtp2 depends on openssl
+    # TODO: can we somehow query this dynamically?
+    "ssl",
+    "crypto",
   ]
 
   cflags_cc = [ "-Wno-shadow" ]
 
   # suppress known `libdatachannel` int conversion issues
   cflags = [ "-Wno-implicit-int-conversion" ]
-
-  if (is_clang) {
-    # We build static libraries and srtp2 depends on openssl
-    # TODO: can we somehow query this dynamically?
-    libs += [
-      "ssl",
-      "crypto",
-    ]
-  }
 
   lib_dirs = [
     rebase_path("${_output_dir}"),
