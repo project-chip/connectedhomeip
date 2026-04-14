@@ -52,12 +52,13 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                           get_setup_payload_info_config)
-from matter.testing.decorators import _has_attribute, _has_command, _has_feature
+from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
@@ -169,6 +170,21 @@ class SetupParameters:
                                                         self.custom_flow, self.capabilities, self.version)
 
 
+@dataclass
+class TestCleanupConfig:
+    disarm_failsafes: bool = True
+    reset_acls_to_default: bool = True
+    close_commissioning_windows: bool = True
+    remove_extra_fabrics: bool = True
+    purge_scenes: bool = True
+    purge_groups: bool = True
+    purge_group_memberships: bool = True
+    purge_doorlock: bool = True
+    purge_tls_endpoints: bool = True
+    unregister_icd_clients: bool = True
+    shutdown_extra_controllers: bool = True
+
+
 class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
@@ -177,6 +193,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.problems = []
         self.is_commissioning = False
         self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cleanup_config = TestCleanupConfig()
+        self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
+        self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
+        self._original_acl = None
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -209,6 +229,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         super().setup_class()
 
+        # Set a hook on FabricAdmin so every NewController() call during this test automatically
+        # populates self._extra_controllers. This is used during cleanup in teardown_class.
+        matter.FabricAdmin.FabricAdmin._new_controller_hook = self._on_new_controller_created
+
         # Mappings of cluster IDs to names and metadata.
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
@@ -230,6 +254,9 @@ class MatterBaseTest(base_test.BaseTestClass):
              custom teardown code.
 
         """
+        # Clear the hook set in setup_class, self._extra_controllers, if any, is fully populated by now.
+        matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+
         if len(self.problems) > 0:
             # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
             if self.matter_test_config.debug:
@@ -243,6 +270,393 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("###########################################################")
         self._log_execution_parameters_summary()
         super().teardown_class()
+
+    async def _run_framework_cleanup(self):
+        """Runs all enabled cleanup steps at the end of each test method.
+
+        DUT-side cleanup runs first (while the default controller is still active),
+        followed by controller-side cleanup. Each step is gated by TestCleanupConfig
+        so individual steps can be disabled by test authors when needed.
+
+        Wildcard attributes are pre-fetched once so all cluster-presence checks within
+        a single cleanup pass share the same read.
+        """
+        try:
+            await self._populate_wildcard()
+        except Exception as e:
+            LOGGER.warning(f"[CLN] could not populate wildcard, cluster-specific cleanup will be skipped: {e}")
+
+        # DUT cleanup (run first as controller must still be alive to send commands)
+        # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
+        #   group to still exist on the DUT, so group memberships cannot be cleared first.
+        if self.cleanup_config.disarm_failsafes:
+            await self._disarm_failsafes()
+        if self.cleanup_config.reset_acls_to_default:
+            await self._reset_acls_to_default()
+        if self.cleanup_config.close_commissioning_windows:
+            await self._close_commissioning_windows()
+        if self.cleanup_config.remove_extra_fabrics:
+            await self._remove_extra_fabrics()
+        if self.cleanup_config.purge_scenes:
+            await self._purge_scenes()
+        if self.cleanup_config.purge_groups:
+            await self._purge_groups()
+        if self.cleanup_config.purge_group_memberships:
+            await self._purge_group_memberships()
+        if self.cleanup_config.purge_doorlock:
+            await self._purge_doorlock()
+        if self.cleanup_config.purge_tls_endpoints:
+            await self._purge_tls_endpoints()
+        if self.cleanup_config.unregister_icd_clients:
+            await self._unregister_icd_clients()
+
+        # Controller cleanup
+        if self.cleanup_config.shutdown_extra_controllers:
+            self._shutdown_extra_controllers()
+
+    def _on_new_controller_created(self, controller):
+        """Hook set and fired by FabricAdmin for every NewController() call.
+
+        Skips the default controller.
+
+        Args:
+            controller: The controller that was created.
+        """
+        if not getattr(controller, '_is_default_controller', False):
+
+            # Track controller for shutdown in teardown_class
+            self._extra_controllers.append(controller)
+
+            # Track the controller's CA so it can be removed from
+            # persistent storage after controller shutdown
+            ca = controller.fabricAdmin.certificateAuthority
+            if ca not in self._extra_cas:
+                self._extra_cas.append(ca)
+
+    def _shutdown_extra_controllers(self):
+        """Shuts down all extra controllers created during the test run and
+        removes their CAs from persistent storage (admin_storage.json).
+        """
+        for ctrl in self._extra_controllers:
+            try:
+                LOGGER.info(f"[CLN] shutting down controller nodeId={ctrl.nodeId:#x}")
+                ctrl.Shutdown()
+                LOGGER.info(f"[CLN] controller nodeId={ctrl.nodeId:#x} shut down successfully")
+            except Exception as e:
+                self.problems.append(f"Controller shutdown failed: {e}")
+        self._extra_controllers.clear()
+
+        # Controller shutdown does not update persistent storage
+        # Remove each extra CA explicitly so that admin_storage.json
+        # does not accumulate stale caList entries and credential keys
+        for ca in self._extra_cas:
+            try:
+                LOGGER.info(f"[CLN] removing CA index {ca.caIndex} from persistent storage")
+                self.certificate_authority_manager.RemoveCertificateAuthority(ca)
+                LOGGER.info(f"[CLN] CA index {ca.caIndex} removed successfully")
+            except Exception as e:
+                self.problems.append(f"CA removal failed: {e}")
+        self._extra_cas.clear()
+
+    async def _disarm_failsafes(self):
+        """Sends ArmFailSafe(expiryLengthSeconds=0) to disarm any active failsafe on the DUT."""
+        LOGGER.info("[CLN] sending ArmFailSafe(0) to disarm any active failsafe")
+        try:
+            resp = await self.send_single_cmd(
+                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0),
+                endpoint=0
+            )
+            if resp.errorCode != Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
+                LOGGER.warning(f"[CLN] disarm failsafe returned errorCode {resp.errorCode}")
+            else:
+                LOGGER.info("[CLN] failsafe disarmed successfully")
+        except Exception as e:
+            LOGGER.warning(f"[CLN] disarm failsafe failed: {e}")
+
+    async def _reset_acls_to_default(self):
+        """Restores the ACL on endpoint 0 to the state captured before the test ran.
+
+        Uses the ACL saved in setup_test (_original_acl).
+        """
+        if self._original_acl is None:
+            LOGGER.warning("[CLN] no pre-test ACL captured, skipping ACL restore")
+            return
+        LOGGER.info("[CLN] restoring ACL to pre-test state")
+        try:
+            result = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(0, Clusters.AccessControl.Attributes.Acl(self._original_acl))]
+            )
+            if result[0].Status != Status.Success:
+                LOGGER.warning(f"[CLN] ACL reset returned status {result[0].Status}")
+            else:
+                LOGGER.info("[CLN] ACL restored successfully")
+        except Exception as e:
+            LOGGER.warning(f"[CLN] ACL reset failed: {e}")
+
+    async def _remove_extra_fabrics(self):
+        """Removes any fabric on the DUT that is not the default controller's fabric."""
+        try:
+            # Read TH1's fabric index on the DUT via the default controller
+            th1_fabric_index = await self.read_single_attribute_check_success(
+                cluster=Clusters.OperationalCredentials,
+                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
+                endpoint=0
+            )
+
+            # Read all fabrics unfiltered so we see every fabric, not just TH1's
+            fabrics = await self.read_single_attribute_check_success(
+                cluster=Clusters.OperationalCredentials,
+                attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+                endpoint=0,
+                fabric_filtered=False
+            )
+        except Exception as e:
+            LOGGER.warning(
+                f"[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: {e}")
+            return
+
+        extra_fabric_indices = [f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
+
+        if not extra_fabric_indices:
+            LOGGER.info("[CLN] no extra fabrics to remove")
+            return
+
+        LOGGER.info(f"[CLN] removing {len(extra_fabric_indices)} extra fabric(s) from DUT")
+        for fabric_index in extra_fabric_indices:
+            LOGGER.info(f"[CLN] sending RemoveFabric(fabricIndex={fabric_index})")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_index),
+                    endpoint=0
+                )
+                LOGGER.info(f"[CLN] fabric index {fabric_index} removed successfully")
+            except Exception as e:
+                LOGGER.warning(f"[CLN] RemoveFabric({fabric_index}) failed: {e}")
+
+    async def _purge_groups(self):
+        """Removes all non-IPK group key sets and clears the group key map on the DUT.
+
+        Key set 0 (IPK) is skipped as it cannot be removed.
+        """
+        LOGGER.info("[CLN] purging group key sets and key map")
+        try:
+            resp = await self.send_single_cmd(
+                cmd=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
+                endpoint=0
+            )
+
+            # Remove all non-IPK key sets, key set 0 (IPK) cannot be removed
+            for key_set_id in resp.groupKeySetIDs:
+                if key_set_id != 0:
+                    LOGGER.info(f"[CLN] removing group key set {key_set_id}")
+                    await self.send_single_cmd(
+                        cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=key_set_id),
+                        endpoint=0
+                    )
+        except Exception as e:
+            LOGGER.warning(f"[CLN] key set removal failed: {e}")
+
+        # Clear all group key mappings
+        try:
+            result = await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))]
+            )
+            if result[0].Status != Status.Success:
+                LOGGER.warning(f"[CLN] GroupKeyMap clear returned status {result[0].Status}")
+            else:
+                LOGGER.info("[CLN] group key map cleared successfully")
+        except Exception as e:
+            LOGGER.warning(f"[CLN] GroupKeyMap clear failed: {e}")
+
+    async def _purge_scenes(self):
+        """Removes all scenes from all groups on every endpoint that has ScenesManagement.
+
+        Must run before _purge_group_memberships since RemoveAllScenes needs the group to
+        still exist on the DUT.
+        """
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
+            return
+
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.ScenesManagement):
+                continue
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.Groups):
+                continue
+            try:
+                resp = await self.send_single_cmd(
+                    cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[]),
+                    endpoint=endpoint_id
+                )
+                group_ids = resp.groupList
+                if not group_ids:
+                    continue
+                LOGGER.info(f"[CLN] removing scenes for groups {group_ids} on endpoint {endpoint_id}")
+                for gid in group_ids:
+                    await self.send_single_cmd(
+                        cmd=Clusters.ScenesManagement.Commands.RemoveAllScenes(groupID=gid),
+                        endpoint=endpoint_id
+                    )
+                LOGGER.info(f"[CLN] scenes cleared on endpoint {endpoint_id}")
+            except Exception as e:
+                LOGGER.warning(f"[CLN] scene removal failed on endpoint {endpoint_id}: {e}")
+
+    async def _purge_group_memberships(self):
+        """Removes all group memberships from the DUT's group table.
+
+        Must run after _purge_scenes since scenes need their groups to still exist for RemoveAllScenes.
+        """
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping group membership cleanup")
+            return
+
+        found_any = False
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.Groups):
+                continue
+            found_any = True
+            LOGGER.info(f"[CLN] sending RemoveAllGroups on endpoint {endpoint_id}")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Groups.Commands.RemoveAllGroups(),
+                    endpoint=endpoint_id
+                )
+                LOGGER.info(f"[CLN] group memberships cleared on endpoint {endpoint_id}")
+            except Exception as e:
+                LOGGER.warning(f"[CLN] RemoveAllGroups failed on endpoint {endpoint_id}: {e}")
+        if not found_any:
+            LOGGER.info("[CLN] Groups cluster not present on any endpoint, skipping group membership cleanup")
+
+    async def _purge_doorlock(self):
+        """Clears all DoorLock users and credentials on every endpoint with the DoorLock cluster."""
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
+            return
+
+        found_any = False
+        for endpoint_id in self.stored_global_wildcard.attributes:
+            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+                                cluster=Clusters.DoorLock):
+                continue
+            found_any = True
+            LOGGER.info(f"[CLN] clearing DoorLock users and credentials on endpoint {endpoint_id}")
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.DoorLock.Commands.ClearCredential(credential=NullValue),
+                    endpoint=endpoint_id,
+                    timedRequestTimeoutMs=1000
+                )
+                await self.send_single_cmd(
+                    cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=0xFFFE),
+                    endpoint=endpoint_id,
+                    timedRequestTimeoutMs=1000
+                )
+                LOGGER.info(f"[CLN] DoorLock users and credentials cleared on endpoint {endpoint_id}")
+            except Exception as e:
+                LOGGER.warning(f"[CLN] DoorLock cleanup failed on endpoint {endpoint_id}: {e}")
+        if not found_any:
+            LOGGER.info("[CLN] DoorLock cluster not present on any endpoint, skipping DoorLock cleanup")
+
+    async def _purge_tls_endpoints(self):
+        """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
+
+        Uses a targeted Descriptor cluster read across all endpoints to locate
+        TlsClientManagement via ServerList.
+        """
+        try:
+            descriptor_read = await asyncio.wait_for(
+                self.default_controller.Read(self.dut_node_id, [Clusters.Descriptor]),
+                timeout=60
+            )
+        except Exception as e:
+            LOGGER.warning(f"[CLN] could not read Descriptor — skipping TLS endpoint [CLN] {e}")
+            return
+
+        tls_cluster_id = Clusters.TlsClientManagement.id
+        found_any = False
+        for endpoint_id, clusters in descriptor_read.attributes.items():
+            server_list = clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
+            if server_list is None or tls_cluster_id not in server_list:
+                continue
+            found_any = True
+            try:
+                provisioned = await self.read_single_attribute_check_success(
+                    cluster=Clusters.TlsClientManagement,
+                    attribute=Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints,
+                    endpoint=endpoint_id
+                )
+                if not provisioned:
+                    LOGGER.info(f"[CLN] no TLS endpoints provisioned on endpoint {endpoint_id}")
+                    continue
+                LOGGER.info(f"[CLN] removing {len(provisioned)} TLS endpoint(s) on endpoint {endpoint_id}")
+                for tls_ep in provisioned:
+                    await self.send_single_cmd(
+                        cmd=Clusters.TlsClientManagement.Commands.RemoveEndpoint(endpointID=tls_ep.endpointID),
+                        endpoint=endpoint_id,
+                        payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
+                    )
+                LOGGER.info(f"[CLN] TLS endpoints removed on endpoint {endpoint_id}")
+            except Exception as e:
+                LOGGER.warning(f"[CLN] TLS endpoint cleanup failed on endpoint {endpoint_id}: {e}")
+        if not found_any:
+            LOGGER.info("[CLN] TlsClientManagement cluster not present on any endpoint — skipping TLS endpoint cleanup")
+
+    async def _close_commissioning_windows(self):
+        """Sends RevokeCommissioning to close any open commissioning window on the DUT.
+
+        If no window is open the DUT returns an error, which is expected and logged as info.
+        """
+        LOGGER.info("[CLN] revoking any open commissioning window")
+        try:
+            await self.send_single_cmd(
+                cmd=Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(),
+                endpoint=0,
+                timedRequestTimeoutMs=6000
+            )
+            LOGGER.info("[CLN] commissioning window revoked successfully")
+        except Exception as e:
+            LOGGER.info(f"[CLN] RevokeCommissioning skipped (likely no window open): {e}")
+
+    async def _unregister_icd_clients(self):
+        """Unregisters all ICD clients registered on the DUT via the default controller"""
+        # Check if the ICD Management cluster is present on the DUT.
+        # Wildcard is pre-populated by _run_framework_cleanup; guard for standalone calls.
+        if self.stored_global_wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
+            return
+        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0,
+                              attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
+            LOGGER.info("[CLN] ICD Management cluster not present, skipping ICD client cleanup")
+            return
+
+        # Read the RegisteredClients attribute
+        registered_clients = await self.read_single_attribute_check_success(
+            cluster=Clusters.IcdManagement,
+            attribute=Clusters.IcdManagement.Attributes.RegisteredClients,
+            endpoint=0
+        )
+
+        if not registered_clients:
+            LOGGER.info("[CLN] no ICD clients registered, skipping")
+            return
+
+        LOGGER.info(f"[CLN] unregistering {len(registered_clients)} ICD client(s)")
+        for entry in registered_clients:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.IcdManagement.Commands.UnregisterClient(
+                        checkInNodeID=entry.checkInNodeID
+                    ),
+                    endpoint=0
+                )
+                LOGGER.info(f"[CLN] unregistered ICD client {entry.checkInNodeID:#x}")
+            except Exception as e:
+                LOGGER.warning(f"[CLN] UnregisterClient({entry.checkInNodeID:#x}) failed: {e}")
 
     def _format_summary_value(self, key: str, value: Any) -> str:
         """Format values for end-of-test summary logs."""
@@ -366,6 +780,30 @@ class MatterBaseTest(base_test.BaseTestClass):
             # to indicates how it is proceeding
             if steps is None:
                 self.step(1)
+
+        # Capture the ACL before the test runs so _reset_acls_to_default
+        # in teardown_test can restore it
+        try:
+            self._original_acl = self.event_loop.run_until_complete(self.read_single_attribute_check_success(
+                cluster=Clusters.AccessControl,
+                attribute=Clusters.AccessControl.Attributes.Acl,
+                endpoint=0
+            ))
+        except Exception:
+            self._original_acl = None
+
+    def teardown_test(self):
+        """Runs DUT and controller cleanup after each individual test method.
+
+        Called by the Mobly framework after every test_ method, ensuring the DUT is
+        restored to a known-clean state before the next test runs.
+
+        Test authors may overwrite this method to add custom per-test teardown.
+        Implementations should call super().teardown_test() at the end so that
+        framework cleanup always runs.
+        """
+        self.event_loop.run_until_complete(self._run_framework_cleanup())
+        super().teardown_test()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.

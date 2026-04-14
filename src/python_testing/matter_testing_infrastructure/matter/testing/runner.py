@@ -427,6 +427,7 @@ def run_tests_no_exit(
                 catTags=matter_test_config.controller_cat_tags,
                 dacRevocationSetPath=matter_test_config.dac_revocation_set_path if matter_test_config.dac_revocation_set_path else ""
             )
+        default_controller._is_default_controller = True
         test_config.user_params["default_controller"] = global_stash.stash_globally(
             default_controller)
         test_config.user_params["matter_test_config"] = global_stash.stash_globally(
