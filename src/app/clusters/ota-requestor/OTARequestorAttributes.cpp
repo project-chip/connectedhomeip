@@ -121,7 +121,8 @@ CHIP_ERROR OTARequestorAttributes::AddDefaultOtaProvider(const ProviderLocationT
         ProviderLocationType location = iterator.GetValue();
         if (location.GetFabricIndex() == providerLocation.GetFabricIndex())
         {
-            ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", location.GetFabricIndex());
+            ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric index %d already exists",
+                         location.GetFabricIndex());
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
