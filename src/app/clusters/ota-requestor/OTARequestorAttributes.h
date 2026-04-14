@@ -57,6 +57,8 @@ public:
 
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation);
     CHIP_ERROR RemoveDefaultOtaProvider(FabricIndex fabricIndex);
+    // Retrieves an iterator to the list of default OTA providers. This iterator is no longer safe to use after a call to
+    // AddDefaultOtaProvider or RemoveDefaultOtaProvider.
     ProviderLocationList::Iterator GetDefaultOtaProviderListIterator();
 
     CHIP_ERROR SetInteractionModelContext(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener,
