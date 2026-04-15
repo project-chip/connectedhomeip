@@ -79,11 +79,13 @@ class TC_DeviceConformance(DeviceConformanceTests):
             self.xml_clusters[groups_id].revision = 4
         if self.xml_clusters[group_key_management_id].revision == 3:
             gcast_mask = Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast
-            self.xml_clusters[group_key_management_id].features[gcast_mask] = XmlFeature(code='GCAST', name='Groupcast', conformance=optional())
+            self.xml_clusters[group_key_management_id].features[gcast_mask] = XmlFeature(
+                code='GCAST', name='Groupcast', conformance=optional())
             gcast_adoption_id = Clusters.GroupKeyManagement.Attributes.GroupcastAdoption
             # Conformance for this attribute needs to be wrapped in provisional as the intent it to let this remain provisional post 1.6
             current_conformance = self.xml_clusters[group_key_management_id].attributes[gcast_adoption_id].conformance
-            self.xml_clusters[group_key_management_id].attributes[gcast_adoption_id].conformance = otherwise([provisional, current_conformance])
+            self.xml_clusters[group_key_management_id].attributes[gcast_adoption_id].conformance = otherwise([
+                                                                                                             provisional, current_conformance])
         if self.xml_clusters[on_off_id].revision == 7:
             self.xml_clusters[on_off_id].revision = 6
 
