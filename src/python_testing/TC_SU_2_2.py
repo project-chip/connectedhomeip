@@ -529,63 +529,135 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s4}: Step #4.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.2 - Track OTA attributes: UpdateState (Busy, 180s DelayedActionTime sequence)
-        # Allowed states during 180s interval: Idle, DelayedOnQuery, Querying.
-        # After the interval, kDownloading is verified as the final state.
+        # [STEP_4]: Phase A — Wait for kDelayedOnQuery.
+        # The provider responds Busy/180s on the first query and then auto-switches to
+        # UpdateAvailable for the next query (see OTAProviderExample.cpp line ~484).
+        # Record the timestamp when kDelayedOnQuery is first seen.
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s4}: Step #4.1 - Started subscription for UpdateState attribute '
-            '(Busy, 180s DelayedActionTime sequence). '
-            'Waiting for the device to start downloading the image. This step may take several minutes to complete.')
+            f'{step_number_s4}: Step #4.1 (Phase A) - Waiting for kDelayedOnQuery to confirm '
+            'the DUT received the Busy/180s response.')
 
-        matcher_busy_state_delayed_180s_obj, state_sequence_busy_180, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
-            step_name=step_number_s4,
-            start_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
-            ],
-            allowed_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-            ],
-            min_interval_sec=180,
-            final_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        t_delayed_on_query_s4 = [None]
+        kDelayedOnQuery = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
+
+        def matcher_delayed_s4(report):
+            if report.value == kDelayedOnQuery and t_delayed_on_query_s4[0] is None:
+                t_delayed_on_query_s4[0] = time.time()
+                logger.info(f'{step_number_s4}: kDelayedOnQuery observed at {t_delayed_on_query_s4[0]:.2f}')
+                return True
+            return False
+
+        matcher_delayed_s4_obj = AttributeMatcher.from_callable(
+            description=f"{step_number_s4} - Phase A: Wait for kDelayedOnQuery",
+            matcher=matcher_delayed_s4
         )
 
         subscription_attr_state_busy_180s.await_all_expected_report_matches(
-            [matcher_busy_state_delayed_180s_obj], timeout_sec=980.0)
-        logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
+            [matcher_delayed_s4_obj], timeout_sec=620.0)
+        logger.info(f'{step_number_s4}: Step #4.2 (Phase A) - kDelayedOnQuery confirmed, 180s delay started.')
         subscription_attr_state_busy_180s.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.4 - Verify Busy, 180s DelayedActionTime sequence
+        # [STEP_4]: Phase B — Wait for kDownloading after the 180s delay expires.
+        # After 180s the provider auto-switched to UpdateAvailable so the next query triggers
+        # a download. Assert the elapsed time since kDelayedOnQuery is >= 180s.
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s4}: Step #4.4 - Full OTA UpdateState (Busy, 180s DelayedActionTime sequence) observed: {state_sequence_busy_180}')
+            f'{step_number_s4}: Step #4.3 (Phase B) - Waiting for kDownloading (after ~180s delay). '
+            'This will take at least 3 minutes.')
 
-        interval_duration_busy_180 = interval_duration_ref[0]
-        logger.info(f'{step_number_s4}: Step #4.4 - 180s interval: {interval_duration_busy_180:.2f}s, '
-                    f'unexpected states: {list(observed_states_during_interval)}')
+        subscription_attr_state_downloading_s4 = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
 
-        expected_start_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
-        expected_final_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        await subscription_attr_state_downloading_s4.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0.5,
+            max_interval_sec=0.5,
+            keepSubscriptions=False
+        )
 
-        asserts.assert_true(expected_start_state in state_sequence_busy_180,
-                            f"Expected start state {expected_start_state} not found in observed sequence: {state_sequence_busy_180}")
-        asserts.assert_true(expected_final_state in state_sequence_busy_180,
-                            f"Expected final state {expected_final_state} not found in observed sequence: {state_sequence_busy_180}")
-        asserts.assert_true(interval_duration_busy_180 >= 180,
-                            f"Expected interval >= 180s, observed: {interval_duration_busy_180:.2f}s")
-        asserts.assert_equal(list(observed_states_during_interval), [],
-                             f"Unexpected states: {list(observed_states_during_interval)}")
+        t_downloading_s4 = [None]
+        kDownloading = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+
+        def matcher_downloading_s4(report):
+            if report.value == kDownloading and t_downloading_s4[0] is None:
+                t_downloading_s4[0] = time.time()
+                logger.info(f'{step_number_s4}: kDownloading observed at {t_downloading_s4[0]:.2f}')
+                return True
+            return False
+
+        matcher_downloading_s4_obj = AttributeMatcher.from_callable(
+            description=f"{step_number_s4} - Phase B: Wait for kDownloading",
+            matcher=matcher_downloading_s4
+        )
+
+        subscription_attr_state_downloading_s4.await_all_expected_report_matches(
+            [matcher_downloading_s4_obj], timeout_sec=400.0)
+        logger.info(f'{step_number_s4}: Step #4.4 (Phase B) - kDownloading confirmed.')
+        subscription_attr_state_downloading_s4.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.5 - Close Provider Process
+        # [STEP_4]: Step #4.5 - Verify the DUT respected the 180s DelayedActionTime.
+        # ------------------------------------------------------------------------------------
+        asserts.assert_true(t_delayed_on_query_s4[0] is not None,
+                            f"{step_number_s4}: kDelayedOnQuery timestamp was never recorded.")
+        asserts.assert_true(t_downloading_s4[0] is not None,
+                            f"{step_number_s4}: kDownloading timestamp was never recorded.")
+
+        elapsed_s4 = t_downloading_s4[0] - t_delayed_on_query_s4[0]
+        logger.info(f'{step_number_s4}: Step #4.5 - Elapsed since kDelayedOnQuery → kDownloading: '
+                    f'{elapsed_s4:.2f}s (expected >= 180s)')
+        asserts.assert_true(elapsed_s4 >= 180,
+                            f"{step_number_s4}: DUT re-queried too soon. "
+                            f"Elapsed: {elapsed_s4:.2f}s, expected >= 180s.")
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.6 - Close Provider Process
         # Kill immediately after download start is confirmed so the download is aborted.
         # The single full OTA update is reserved for Step 1.
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s4}: Step #4.5 - Close Provider Process')
+        logger.info(f'{step_number_s4}: Step #4.6 - Close Provider Process (aborting download)')
         self.current_provider_app_proc.terminate()
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.6 - Wait for DUT to return to kIdle after the aborted download.
+        # Without this, Step 7's EventSubscriptionHandler receives the stale
+        # kDownloading -> kIdle StateTransition event and fails the Idle -> Querying check.
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s4}: Step #4.6 - Waiting for DUT UpdateState to return to kIdle.')
+
+        subscription_wait_idle_s4 = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+
+        await subscription_wait_idle_s4.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0.5,
+            max_interval_sec=0.5,
+            keepSubscriptions=False
+        )
+
+        def matcher_idle_s4(report):
+            return report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+
+        matcher_idle_s4_obj = AttributeMatcher.from_callable(
+            description=f"{step_number_s4} - Wait for kIdle after aborted download",
+            matcher=matcher_idle_s4
+        )
+
+        subscription_wait_idle_s4.await_all_expected_report_matches([matcher_idle_s4_obj], timeout_sec=120.0)
+        logger.info(f'{step_number_s4}: Step #4.6 - DUT returned to kIdle, safe to proceed.')
+        subscription_wait_idle_s4.cancel()
 
         self.step(7)
         # ------------------------------------------------------------------------------------
