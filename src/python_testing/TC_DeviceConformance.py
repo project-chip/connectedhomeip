@@ -67,8 +67,7 @@ class TC_DeviceConformance(DeviceConformanceTests):
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper()
-        # TODO: Remove once the parser is updated to correctly parse this conformance
-        print("adding feature to acl")
+        # TODO (#71577): Remove once the parser is updated to correctly parse this conformance
         acl_id = Clusters.AccessControl.id
         aux_mask = Clusters.AccessControl.Bitmaps.Feature.kAuxiliary
         self.xml_clusters[acl_id].features[aux_mask] = XmlFeature(code='AUX', name='Auxiliary', conformance=optional())
