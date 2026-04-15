@@ -69,9 +69,21 @@ class TC_DeviceConformance(DeviceConformanceTests):
         await self.setup_class_helper()
         # TODO (#71577): Remove once the parser is updated to correctly parse this conformance
         acl_id = Clusters.AccessControl.id
-        aux_mask = Clusters.AccessControl.Bitmaps.Feature.kAuxiliary
-        self.xml_clusters[acl_id].features[aux_mask] = XmlFeature(code='AUX', name='Auxiliary', conformance=optional())
-        self.xml_clusters[acl_id].feature_map['AUX'] = aux_mask
+        groups_id = Clusters.Groups.id
+        group_key_management_id = Clusters.GroupKeyManagement.id
+        on_off_id = Clusters.OnOff.id
+        if self.xml_clusters[acl_id].revision >= 3:
+            aux_mask = Clusters.AccessControl.Bitmaps.Feature.kAuxiliary
+            self.xml_clusters[acl_id].features[aux_mask] = XmlFeature(code='AUX', name='Auxiliary', conformance=optional())
+            self.xml_clusters[acl_id].feature_map['AUX'] = aux_mask
+        if self.xml_clusters[groups_id].revision == 5:
+            self.xml_clusters[groups_id].revision = 4
+        if self.xml_clusters[group_key_management_id].revision == 3:
+            gcast_mask = Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast
+            self.xml_clusters[group_key_management_id].features[gcast_mask] = XmlFeature(code='GCAST', name='Groupcast', conformance=optional())
+        if self.xml_clusters[on_off_id].revision == 7:
+            self.xml_clusters[on_off_id].revision = 6
+
 
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
