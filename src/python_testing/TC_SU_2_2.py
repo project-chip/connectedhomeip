@@ -1009,10 +1009,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             '(DUT should reject the same-version image without downloading)')
 
         kIdle_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-        kQuerying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         kDownloading_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
 
-        querying_seen_s6 = [False]
+        # The first report from the subscription is always the current state (kIdle, since
+        # the DUT just rebooted). kQuerying is transient — the DUT may complete the entire
+        # kIdle→kQuerying→kIdle cycle before its reporting engine sends the intermediate
+        # kQuerying update, so we cannot rely on seeing it. Instead, skip the initial kIdle
+        # (priming report) and accept the next kIdle as confirmation the query cycle
+        # completed without a download.
+        initial_idle_skipped_s6 = [False]
         downloading_seen_s6 = [False]
 
         def matcher_s6(report):
@@ -1021,12 +1026,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 downloading_seen_s6[0] = True
                 logger.info(f'{step_number_s6}: UNEXPECTED kDownloading — DUT started download of same-version image!')
                 return False
-            if val == kQuerying_s6 and not querying_seen_s6[0]:
-                querying_seen_s6[0] = True
-                logger.info(f'{step_number_s6}: kQuerying observed (DUT is querying provider)')
-                return False
-            if val == kIdle_s6 and querying_seen_s6[0]:
-                logger.info(f'{step_number_s6}: kIdle after kQuerying — no download started (expected)')
+            if val == kIdle_s6:
+                if not initial_idle_skipped_s6[0]:
+                    initial_idle_skipped_s6[0] = True
+                    logger.info(f'{step_number_s6}: Initial kIdle (priming report) — skipping')
+                    return False
+                logger.info(f'{step_number_s6}: kIdle after query cycle — no download started (expected)')
                 return True
             return False
 
@@ -1036,7 +1041,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         subscription_s6.await_all_expected_report_matches([matcher_s6_obj], timeout_sec=120.0)
-        logger.info(f'{step_number_s6}: Step #6.2 - kQuerying→kIdle sequence confirmed.')
+        logger.info(f'{step_number_s6}: Step #6.2 - Query cycle completed (kIdle observed after announce).')
         subscription_s6.cancel()
 
         # ------------------------------------------------------------------------------------
