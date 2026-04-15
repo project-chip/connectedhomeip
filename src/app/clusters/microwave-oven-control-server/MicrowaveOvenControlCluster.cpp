@@ -76,9 +76,10 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
 
 MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
                                                          const OptionalAttributeSet & optionalAttributeSet, const Context context) :
-    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(feature), mOptionalAttributeSet(optionalAttributeSet),
-    mDelegate(context.delegate), mOpStateInstance(context.opStateInstance),
-    mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance), mCookTimeSec(kDefaultCookTimeSec)
+    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }),
+    mFeature(feature), mOptionalAttributeSet(optionalAttributeSet), mDelegate(context.delegate),
+    mOpStateInstance(context.opStateInstance), mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance),
+    mCookTimeSec(kDefaultCookTimeSec)
 {}
 
 CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
@@ -284,7 +285,7 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
-        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance() -> GetDataModelProvider()->AcceptedCommands(
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(commandPath.mEndpointId, OperationalState::Id), acceptedCommandsList);
         auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 
