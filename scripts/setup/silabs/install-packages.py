@@ -223,9 +223,11 @@ def update_slt_cli(slt_cli_path):
         subprocess.run(update_cmd, check=True)
         logger.info("SLT CLI updated successfully")
     except subprocess.CalledProcessError as e:
-        logger.warning("Failed to update slt-cli: %s", e)
+        logger.error("Failed to update slt-cli: %s", e)
+        sys.exit(1)
     except FileNotFoundError:
-        logger.warning("SLT CLI not found at %s, skipping update", slt_cli_path)
+        logger.error("SLT CLI not found at %s", slt_cli_path)
+        sys.exit(1)
 
 
 def get_pkg_manifest_paths():

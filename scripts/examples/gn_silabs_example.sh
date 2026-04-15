@@ -348,8 +348,9 @@ EOF
                     break
                     ;; # Case for yes/Y
                 [Nn]*)
-                    echo "You won't be asked again"
+                    echo "You won't be asked again, cannot proceed with build. Exiting..."
                     touch "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages"
+                    exit 1
                     break
                     ;;                                                  # Case for no/N
                 *) echo "Invalid response. Please answer yes or no." ;; # Case for invalid input
