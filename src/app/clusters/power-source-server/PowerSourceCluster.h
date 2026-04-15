@@ -40,6 +40,18 @@ struct ConstexprIntegralOptional
     constexpr ConstexprIntegralOptional(): value(std::numeric_limits<T>::max()) {}
     constexpr ConstexprIntegralOptional(const T& val) : value(val) {}
     constexpr ConstexprIntegralOptional(const ConstexprIntegralOptional & other) = default;
+    template<class U, class = std::enable_if_t<std::is_integral_v<U> && std::is_convertible_v<U, T>, void>>
+    constexpr ConstexprIntegralOptional(const ConstexprIntegralOptional<U> & other)
+    {
+        if (other.HasValue())
+        {
+            value = static_cast<T>(other.value);
+        }
+        else
+        {
+            reset();
+        }
+    }
     constexpr ConstexprIntegralOptional & operator=(const T & val)
     {
         value    = val;

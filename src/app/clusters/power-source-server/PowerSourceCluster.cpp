@@ -25,21 +25,7 @@ using namespace app;
 using namespace app::Clusters;
 
 namespace {
-template <typename T>
-inline CHIP_ERROR EncodeValue(AttributeValueEncoder & encoder, const T & value, CHIP_ERROR err)
-{
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        return encoder.EncodeNull();
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        return encoder.EncodeNull();
-    }
-    return encoder.Encode(value);
-}
-template <typename T>
-inline CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const ConstexprIntegralOptional<T> & value, CHIP_ERROR err = CHIP_NO_ERROR)
+CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const ConstexprIntegralOptional<uint32_t> & value, CHIP_ERROR err = CHIP_NO_ERROR)
 {
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
@@ -57,7 +43,7 @@ inline CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const Constexp
 }
 
 template <typename T>
-inline CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueList, CHIP_ERROR err = CHIP_NO_ERROR)
+CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueList, CHIP_ERROR err = CHIP_NO_ERROR)
 {
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
@@ -157,7 +143,7 @@ DataModel::ActionReturnStatus WiredPowerSourceCluster::ReadAttribute(const DataM
     case EndpointList::Id:
         return EncodeListOfValues(encoder, GetEndpointList());
     case Globals::Attributes::FeatureMap::Id:
-        return encoder.Encode(BitFlags(Feature::kWired));
+        return encoder.Encode(BitFlags(Feature::kWired).Raw());
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(kRevision);
     default:
@@ -346,7 +332,7 @@ DataModel::ActionReturnStatus BatteryPowerSourceCluster::ReadAttribute(const Dat
         return encoder.Encode(
             BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery)
                 .Set(PowerSource::Feature::kReplaceable,  mConfig.replaceable)
-                .Set(PowerSource::Feature::kRechargeable, mConfig.rechargeable));
+                .Set(PowerSource::Feature::kRechargeable, mConfig.rechargeable).Raw());
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(kRevision);
     default:
