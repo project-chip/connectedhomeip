@@ -30,33 +30,33 @@ using namespace chip::Uint8;
 ChannelManager::ChannelManager()
 {
     ChannelInfoType abc;
-    abc.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KAAL"));
-    abc.callSign          = MakeOptional(chip::CharSpan::fromCharString("KAAL-TV"));
-    abc.name              = MakeOptional(chip::CharSpan::fromCharString("ABC"));
+    abc.affiliateCallSign = MakeOptional("KAAL"_span);
+    abc.callSign          = MakeOptional("KAAL-TV"_span);
+    abc.name              = MakeOptional("ABC"_span);
     abc.majorNumber       = static_cast<uint8_t>(6);
     abc.minorNumber       = static_cast<uint16_t>(0);
     mChannels.push_back(abc);
 
     ChannelInfoType pbs;
-    pbs.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
-    pbs.callSign          = MakeOptional(chip::CharSpan::fromCharString("KCTS-TV"));
-    pbs.name              = MakeOptional(chip::CharSpan::fromCharString("PBS"));
+    pbs.affiliateCallSign = MakeOptional("KCTS"_span);
+    pbs.callSign          = MakeOptional("KCTS-TV"_span);
+    pbs.name              = MakeOptional("PBS"_span);
     pbs.majorNumber       = static_cast<uint8_t>(9);
     pbs.minorNumber       = static_cast<uint16_t>(1);
     mChannels.push_back(pbs);
 
     ChannelInfoType pbsKids;
-    pbsKids.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
-    pbsKids.callSign          = MakeOptional(chip::CharSpan::fromCharString("KCTS-TV"));
-    pbsKids.name              = MakeOptional(chip::CharSpan::fromCharString("PBS Kids"));
+    pbsKids.affiliateCallSign = MakeOptional("KCTS"_span);
+    pbsKids.callSign          = MakeOptional("KCTS-TV"_span);
+    pbsKids.name              = MakeOptional("PBS Kids"_span);
     pbsKids.majorNumber       = static_cast<uint8_t>(9);
     pbsKids.minorNumber       = static_cast<uint16_t>(2);
     mChannels.push_back(pbsKids);
 
     ChannelInfoType worldChannel;
-    worldChannel.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("KCTS"));
-    worldChannel.callSign          = MakeOptional(chip::CharSpan::fromCharString("KCTS-TV"));
-    worldChannel.name              = MakeOptional(chip::CharSpan::fromCharString("World Channel"));
+    worldChannel.affiliateCallSign = MakeOptional("KCTS"_span);
+    worldChannel.callSign          = MakeOptional("KCTS-TV"_span);
+    worldChannel.name              = MakeOptional("World Channel"_span);
     worldChannel.majorNumber       = static_cast<uint8_t>(9);
     worldChannel.minorNumber       = static_cast<uint16_t>(3);
     mChannels.push_back(worldChannel);
@@ -65,40 +65,40 @@ ChannelManager::ChannelManager()
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
 
     ProgramType program1;
-    program1.identifier = chip::CharSpan::fromCharString("progid-abc1");
+    program1.identifier = "progid-abc1"_span;
     program1.channel    = abc;
-    program1.title      = chip::CharSpan::fromCharString("ABC Title1");
-    program1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
+    program1.title      = "ABC Title1"_span;
+    program1.subtitle   = MakeOptional("My Program Subtitle1"_span);
     program1.startTime  = 0;
     program1.endTime    = 30 * 60;
 
     mPrograms.push_back(program1);
 
     ProgramType program_pbs1;
-    program_pbs1.identifier = chip::CharSpan::fromCharString("progid-pbs1");
+    program_pbs1.identifier = "progid-pbs1"_span;
     program_pbs1.channel    = pbs;
-    program_pbs1.title      = chip::CharSpan::fromCharString("PBS Title1");
-    program_pbs1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
+    program_pbs1.title      = "PBS Title1"_span;
+    program_pbs1.subtitle   = MakeOptional("My Program Subtitle1"_span);
     program_pbs1.startTime  = 0;
     program_pbs1.endTime    = 30 * 60;
 
     mPrograms.push_back(program_pbs1);
 
     ProgramType program2;
-    program2.identifier = chip::CharSpan::fromCharString("progid-abc2");
+    program2.identifier = "progid-abc2"_span;
     program2.channel    = abc;
-    program2.title      = chip::CharSpan::fromCharString("My Program Title2");
-    program2.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle2"));
+    program2.title      = "My Program Title2"_span;
+    program2.subtitle   = MakeOptional("My Program Subtitle2"_span);
     program2.startTime  = 30 * 60;
     program2.endTime    = 60 * 60;
 
     mPrograms.push_back(program2);
 
     ProgramType program3;
-    program3.identifier = chip::CharSpan::fromCharString("progid-abc3");
+    program3.identifier = "progid-abc3"_span;
     program3.channel    = abc;
-    program3.title      = chip::CharSpan::fromCharString("My Program Title3");
-    program3.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle3"));
+    program3.title      = "My Program Title3"_span;
+    program3.subtitle   = MakeOptional("My Program Subtitle3"_span);
     program3.startTime  = 0;
     program3.endTime    = 60 * 60;
 
@@ -120,9 +120,9 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
 CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 {
     LineupInfoType lineup;
-    lineup.operatorName   = chip::CharSpan::fromCharString("Comcast");
-    lineup.lineupName     = MakeOptional(chip::CharSpan::fromCharString("Comcast King County"));
-    lineup.postalCode     = MakeOptional(chip::CharSpan::fromCharString("98052"));
+    lineup.operatorName   = "Comcast"_span;
+    lineup.lineupName     = MakeOptional("Comcast King County"_span);
+    lineup.postalCode     = MakeOptional("98052"_span);
     lineup.lineupInfoType = chip::app::Clusters::Channel::LineupInfoTypeEnum::kMso;
 
     return aEncoder.Encode(lineup);
@@ -184,7 +184,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     else
     {
         response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
-        response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.data        = chip::MakeOptional("data response"_span);
         mCurrentChannel      = matchedChannels[0];
         mCurrentChannelIndex = index;
         TEMPORARY_RETURN_IGNORED helper.Success(response);
@@ -246,8 +246,8 @@ void ChannelManager::HandleGetProgramGuide(
 
     // PageTokenType paging;
     // paging.limit  = MakeOptional(static_cast<uint16_t>(10));
-    // paging.after  = MakeOptional(chip::CharSpan::fromCharString("after-token"));
-    // paging.before = MakeOptional(chip::CharSpan::fromCharString("before-token"));
+    // paging.after  = MakeOptional("after-token"_span);
+    // paging.before = MakeOptional("before-token"_span);
 
     // ChannelPagingStructType channelPaging;
     // channelPaging.nextToken = MakeOptional<DataModel::Nullable<Structs::PageTokenStruct::Type>>(paging);

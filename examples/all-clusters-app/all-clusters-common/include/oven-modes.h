@@ -55,31 +55,26 @@ private:
     ModeTagStructType ModeTagsProofing[1]        = { { .value = to_underlying(ModeTag::kProofing) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[9] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Bake"),
-                                                 .mode     = ModeBake,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsBake) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Bake"_span, .mode = ModeBake, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsBake) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Convection"_span,
                                                  .mode     = ModeConvection,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsConvection) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Grill"),
-                                                 .mode     = ModeGrill,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsGrill) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Roast"),
-                                                 .mode     = ModeRoast,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsRoast) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Clean"),
-                                                 .mode     = ModeClean,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsClean) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection Bake"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Grill"_span, .mode = ModeGrill, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsGrill) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Roast"_span, .mode = ModeRoast, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsRoast) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Clean"_span, .mode = ModeClean, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsClean) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Convection Bake"_span,
                                                  .mode     = ModeConvectionBake,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsConvectionBake) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection Roast"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Convection Roast"_span,
                                                  .mode     = ModeConvectionRoast,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsConvectionRoast) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Warming"),
-                                                 .mode     = ModeWarming,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsWarming) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Proofing"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Warming"_span, .mode = ModeWarming, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsWarming) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Proofing"_span,
                                                  .mode     = ModeProofing,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsProofing) },
     };

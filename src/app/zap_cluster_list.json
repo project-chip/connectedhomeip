@@ -237,7 +237,7 @@
         "FAN_CONTROL_CLUSTER": ["fan-control-server"],
         "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
         "FIXED_LABEL_CLUSTER": ["fixed-label-server"],
-        "FLOW_MEASUREMENT_CLUSTER": [],
+        "FLOW_MEASUREMENT_CLUSTER": ["flow-measurement-server"],
         "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

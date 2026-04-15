@@ -29,6 +29,25 @@ struct AttrMigrationData
     size_t valueSize;
     bool isScalar;
 };
+
+/**
+ * Returns the largest valueSize across an array of AttrMigrationData entries.
+ */
+template <size_t N>
+constexpr size_t MaxAttrMigrationValueSize(const AttrMigrationData (&attrs)[N])
+{
+    static_assert(N > 0, "Migration attributes array must not be empty");
+    size_t maxSize = 0;
+    for (size_t i = 0; i < N; i++)
+    {
+        if (attrs[i].valueSize > maxSize)
+        {
+            maxSize = attrs[i].valueSize;
+        }
+    }
+    return maxSize;
+}
+
 /**
  * @brief
  * This function migrates attribute values from the SafeAttributeProvider to the standard provider mechanism.
