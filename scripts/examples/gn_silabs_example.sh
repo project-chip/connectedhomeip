@@ -345,7 +345,7 @@ EOF
             case $yn in
                 "" | [Yy]*)
                     INSTALL_EVERYTHING=true
-                    python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" > /dev/null 2>&1 || true
+                    python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" >/dev/null 2>&1 || true
                     break
                     ;; # Case for yes/Y (Enter accepts default)
                 [Nn]*)
