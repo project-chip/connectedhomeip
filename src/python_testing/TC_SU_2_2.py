@@ -303,8 +303,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=0.5,
-            max_interval_sec=0.5,
+            min_interval_sec=5,
+            max_interval_sec=5,
             keepSubscriptions=False
         )
 
@@ -408,8 +408,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=0.5,
-            max_interval_sec=0.5,
+            min_interval_sec=5,
+            max_interval_sec=5,
             keepSubscriptions=False
         )
 
@@ -643,8 +643,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=0.5,
-            max_interval_sec=0.5,
+            min_interval_sec=5,
+            max_interval_sec=5,
             keepSubscriptions=False
         )
 
@@ -697,8 +697,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=1,
-            max_interval_sec=1
+            min_interval_sec=5,
+            max_interval_sec=5
         )
 
         # ------------------------------------------------------------------------------------
@@ -794,7 +794,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=0,
+            min_interval_sec=5,
             max_interval_sec=20,
             keepSubscriptions=True
         )
@@ -897,7 +897,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=0,
+            min_interval_sec=5,
             max_interval_sec=20,
             keepSubscriptions=True
         )
@@ -979,8 +979,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=1,
-            max_interval_sec=1
+            min_interval_sec=5,
+            max_interval_sec=5
         )
 
         # ------------------------------------------------------------------------------------
