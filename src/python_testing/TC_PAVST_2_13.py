@@ -348,18 +348,16 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+        event_callback.flush_events()
 
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         # Clip duration is augmented
         await asyncio.to_thread(time.sleep, initDuration + augDuration + 1)
 
-        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
-        await event_callback.start(self.default_controller,
-                                   self.dut_node_id,
-                                   self.get_endpoint())
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+        event_callback.flush_events()
 
         # Previous Recording stops and now new trigger came for which blind period is ignored and new recording should start because previous recording started due to manual trigger
         self.step(10)
@@ -368,6 +366,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+        event_callback.flush_events()
 
         # Motion Trigger - Motion Trigger case (Check Augment duration and blind duration)
         # Motion Trigger -> Recording Start -> Motion Trigger -> Clip Duration extended -> Recording stop -> Trigger motion event without waiting for blind period -> Recording should not start
@@ -376,12 +375,8 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+        event_callback.flush_events()
         await asyncio.to_thread(time.sleep, blindDuration + 1)
-
-        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
-        await event_callback.start(self.default_controller,
-                                   self.dut_node_id,
-                                   self.get_endpoint())
 
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
 
