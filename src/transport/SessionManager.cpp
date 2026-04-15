@@ -1169,14 +1169,27 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     iter.Release();
     // Groupcast Testing
     auto & testing = chip::Groupcast::GetTesting();
-    if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+    if (testing.IsEnabled())
     {
-        testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
-        if (!decrypted)
+        if (decrypted)
         {
-            testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+            if (testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+            }
+        }
+        else
+        {
+            // If decryption failed, we use the fabric index stored in the testing singleton
+            // since we couldn't find a matching group session for the incoming message.
+            if (testing.IsFabricUnderTest(testing.GetFabricIndex()))
+            {
+                testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+                testing.NotifyDelegate();
+            }
         }
     }
+
     if (!decrypted)
     {
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");

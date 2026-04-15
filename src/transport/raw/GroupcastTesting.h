@@ -36,6 +36,13 @@ namespace Groupcast {
 class Testing
 {
 public:
+    class Delegate
+    {
+    public:
+        virtual ~Delegate()               = default;
+        virtual void OnTestingCompleted() = 0;
+    };
+
     /**
      * @brief Test result enum matching GroupcastTestResultEnum from the Groupcast cluster.
      * This cannot point to the raw code-generated type due to build deps, so it is copied for convenience.
@@ -54,6 +61,16 @@ public:
 
     Testing()  = default;
     ~Testing() = default;
+
+    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
+
+    void NotifyDelegate()
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnTestingCompleted();
+        }
+    }
 
     // Getters for optional fields
     const chip::Optional<chip::GroupId> & GetGroupID() const { return mGroupID; }
@@ -191,6 +208,7 @@ public:
     }
 
 private:
+    Delegate * mDelegate = nullptr;
     bool mEnabled = false;
     // IP addresses stored as IPv6 address bytes (16 bytes) in network byte order (RFC 4291)
     uint8_t mSourceIpAddress[kIPv6AddressLength];

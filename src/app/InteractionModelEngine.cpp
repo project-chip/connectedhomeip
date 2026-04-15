@@ -216,6 +216,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
+    Groupcast::GetTesting().SetDelegate(this);
+
     TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
                                                                                 : &EventManagement::GetInstance());
 
@@ -228,6 +230,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 void InteractionModelEngine::Shutdown()
 {
     VerifyOrReturn(State::kUninitialized != mState);
+
+    Groupcast::GetTesting().SetDelegate(nullptr);
 
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
@@ -1053,6 +1057,23 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedMessageReceived(const PayloadHea
     return CHIP_NO_ERROR;
 }
 
+void InteractionModelEngine::OnTestingCompleted()
+{
+    auto & testing = Groupcast::GetTesting();
+    VerifyOrReturn(testing.IsEnabled());
+
+    Clusters::Groupcast::Events::GroupcastTesting::Type event;
+
+    // Convert to event type
+    testing.ToEventType(event);
+    testing.Clear();
+
+    // Generate event
+    DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
+    eventGenerator.GenerateEvent(event, kRootEndpointId);
+    eventGenerator.ScheduleUrgentEventDeliverySync();
+}
+
 CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
                                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
@@ -1111,18 +1132,11 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         auto & testing = Groupcast::GetTesting();
         if (testing.IsEnabled() && testing.IsFabricUnderTest(apExchangeContext->GetSessionHandle()->GetFabricIndex()))
         {
-            Clusters::Groupcast::Events::GroupcastTesting::Type event;
             if ((testing.GetTestResultEnum() == Groupcast::Testing::Result::kSuccess) && (status != Status::Success))
             {
                 testing.SetTestResult(Groupcast::Testing::Result::kGeneralError);
             }
-            // Convert to event type
-            testing.ToEventType(event);
-            testing.Clear();
-            // Generate event
-            DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
-            eventGenerator.GenerateEvent(event, kRootEndpointId);
-            eventGenerator.ScheduleUrgentEventDeliverySync();
+            testing.NotifyDelegate();
         }
     }
 

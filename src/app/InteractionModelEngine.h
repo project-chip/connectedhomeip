@@ -70,6 +70,7 @@
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/MessageStats.h>
+#include <transport/raw/GroupcastTesting.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -95,7 +96,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public SubscriptionsInfoProvider,
                                public TimedHandlerDelegate,
                                public WriteHandlerDelegate,
-                               public DeviceLoadStatusProvider
+                               public DeviceLoadStatusProvider,
+                               public Groupcast::Testing::Delegate
 {
 public:
     /**
@@ -436,6 +438,9 @@ public:
     MessageStats GetMessageStats() override;
 
     SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override;
+
+    // Groupcast::Testing::Delegate implementation
+    void OnTestingCompleted() override;
 
 private:
     /* DataModel::ActionContext implementation */
