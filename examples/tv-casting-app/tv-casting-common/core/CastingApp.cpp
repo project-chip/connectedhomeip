@@ -170,8 +170,12 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
     // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        CommissionerDeclarationHandler::GetInstance());
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * client =
+        chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(CommissionerDeclarationHandler::GetInstance());
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
@@ -185,7 +189,12 @@ CHIP_ERROR CastingApp::Stop()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * client =
+        chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(nullptr);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     // Shutdown the Matter server

@@ -120,8 +120,12 @@ JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
     // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        CommissionerDeclarationHandler::GetInstance());
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * client =
+        chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(CommissionerDeclarationHandler::GetInstance());
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
@@ -134,7 +138,12 @@ JNI_METHOD(void, finishStopping)(JNIEnv *, jobject)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * client =
+        chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(nullptr);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 }
 
