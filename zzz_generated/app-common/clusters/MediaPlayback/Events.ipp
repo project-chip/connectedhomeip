@@ -100,7 +100,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace StateChanged.
+} // namespace StateChanged
 } // namespace Events
 } // namespace MediaPlayback
 } // namespace Clusters

@@ -80,6 +80,7 @@
 #include <clusters/Groupcast/Enums.h>
 #include <clusters/Groups/Enums.h>
 #include <clusters/HepaFilterMonitoring/Enums.h>
+#include <clusters/Humidistat/Enums.h>
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/Identify/Enums.h>
 #include <clusters/IlluminanceMeasurement/Enums.h>
@@ -117,6 +118,7 @@
 #include <clusters/PowerSourceConfiguration/Enums.h>
 #include <clusters/PowerTopology/Enums.h>
 #include <clusters/PressureMeasurement/Enums.h>
+#include <clusters/ProximityRanging/Enums.h>
 #include <clusters/ProxyConfiguration/Enums.h>
 #include <clusters/ProxyDiscovery/Enums.h>
 #include <clusters/ProxyValid/Enums.h>

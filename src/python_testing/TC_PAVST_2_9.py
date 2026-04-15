@@ -75,6 +75,11 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        super().teardown_test()
+
     def steps_TC_PAVST_2_9(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
@@ -106,7 +111,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
 
         self.step(1)
@@ -148,7 +153,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(5)
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/", expiryTime=5)
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/", expiryTime=5)
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )

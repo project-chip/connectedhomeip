@@ -601,7 +601,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
 
         uint16_t chunkDuration = containerOptions.CMAFContainerOptions.Value().chunkDuration;
 
-        VerifyOrReturnValue(chunkDuration >= 0 && chunkDuration <= segmentDuration / 2, Status::ConstraintError,
+        VerifyOrReturnValue(chunkDuration <= segmentDuration / 2, Status::ConstraintError,
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: CMAF Container Options Chunk "
                                          "Duration field not within allowed range",
@@ -826,7 +826,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
 
             // Create new video stream entry with name 'video' and the provided or selected VideoStreamID i.e; finalVideoStreamID
             Structs::VideoStreamStruct::Type newVideoStream;
-            newVideoStream.videoStreamName = CharSpan::fromCharString("video");
+            newVideoStream.videoStreamName = "video"_span;
             newVideoStream.videoStreamID   = finalVideoStreamID;
 
             // Add to storage and update the list
@@ -868,7 +868,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
 
             // Create new audio stream entry with name 'audio' and the provided or selected AudioStreamID i.e; finalAudioStreamID
             Structs::AudioStreamStruct::Type newAudioStream;
-            newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
+            newAudioStream.audioStreamName = "audio"_span;
             newAudioStream.audioStreamID   = finalAudioStreamID;
 
             // Add to storage and update the list

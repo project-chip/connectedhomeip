@@ -177,6 +177,14 @@ void MatterTemperatureMeasurementClusterInitCallback(chip::EndpointId endpointId
 
 void MatterTemperatureMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterFlowMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterFlowMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterRelativeHumidityMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterRelativeHumidityMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
