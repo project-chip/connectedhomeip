@@ -934,9 +934,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 logger.info(f'{step_number}: Step #1.6 - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
                 break
             except Exception:
-                logger.info(f'{step_number}: Step #1.6 - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
+                logger.info(
+                    f'{step_number}: Step #1.6 - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
 
-        asserts.assert_true(reconnected, f'{step_number}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')
+        asserts.assert_true(
+            reconnected, f'{step_number}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')
 
         # Allow the DUT to finish post-OTA housekeeping (attribute writes, data-version
         # bumps on the OTA Requestor cluster) before Step 6 establishes a subscription.
