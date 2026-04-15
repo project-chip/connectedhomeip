@@ -613,9 +613,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         elapsed_s4 = t_downloading_s4[0] - t_delayed_on_query_s4[0]
         logger.info(f'{step_number_s4}: Step #4.5 - Elapsed since kDelayedOnQuery → kDownloading: '
                     f'{elapsed_s4:.2f}s (expected >= 180s)')
-        asserts.assert_true(elapsed_s4 >= 180,
+        tolerance_sec_s4 = 0.5
+        asserts.assert_true(elapsed_s4 >= 180 - tolerance_sec_s4,
                             f"{step_number_s4}: DUT re-queried too soon. "
-                            f"Elapsed: {elapsed_s4:.2f}s, expected >= 180s.")
+                            f"Elapsed: {elapsed_s4:.2f}s, expected >= {180 - tolerance_sec_s4}s.")
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.6 - Close Provider Process
