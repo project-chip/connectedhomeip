@@ -26,4 +26,5 @@ chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 matter_enable_tracing_support = true
 
-chip_app_data_model_target = "${chip_root}/examples/rvc-app/rvc-common:rvc-common"
+chip_app_data_model_target =
+    "${chip_root}/examples/rvc-app/rvc-common:rvc-common"
