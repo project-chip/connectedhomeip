@@ -53,14 +53,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import matter.clusters as Clusters
+from matter.testing.conformance import optional
 from matter.testing.decorators import async_test_body
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.spec_parsing import XmlFeature
-from matter.testing.conformance import optional
-
-import matter.clusters as Clusters
 
 
 class TC_DeviceConformance(DeviceConformanceTests):
