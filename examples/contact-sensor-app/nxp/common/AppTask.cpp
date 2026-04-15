@@ -31,6 +31,11 @@
 // It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
+#endif
+
+
 #ifndef APP_DEVICE_TYPE_ENDPOINT
 #define APP_DEVICE_TYPE_ENDPOINT 1
 #endif
@@ -44,6 +49,10 @@ void ContactSensorApp::AppTask::PreInitMatterStack()
 
 void ContactSensorApp::AppTask::PostInitMatterStack()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().Init();
+#endif
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 
 #if CONFIG_CHIP_APP_BATTERY_MANAGER
