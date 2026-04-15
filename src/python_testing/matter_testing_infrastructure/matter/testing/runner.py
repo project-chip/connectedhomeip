@@ -490,10 +490,13 @@ def run_tests_no_exit(
         #
         # Populate the global wildcard
         #
-        if not matter_test_config.dut_node_ids:
-            LOGGER.error("No DUT node IDs were provided; cannot populate global wildcard.")
-            ok = False
-        if ok and not matter_test_config.in_test_commissioning_method:
+        should_populate_global_wildcard = (
+            ok
+            and matter_test_config.dut_node_ids
+            and matter_test_config.commissioning_method is not None
+            and getattr(matter_test_config, "in_test_commissioning_method", None) is None
+        )
+        if should_populate_global_wildcard:
             try:
                 global_wildcard = event_loop.run_until_complete(
                     asyncio.wait_for(
