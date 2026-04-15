@@ -32,13 +32,13 @@ import asyncio
 import contextlib
 import sys
 from dataclasses import dataclass
-from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from python_path import PythonPath
+
 # Add the python_testing directory to path so mdns_discovery module can be found
-PYTHON_TESTING_DIR = Path(__file__).parent.parent
-if str(PYTHON_TESTING_DIR) not in sys.path:
-    sys.path.insert(0, str(PYTHON_TESTING_DIR))
+with PythonPath('..', relative_to=__file__):
+    import mdns_discovery.mdns_discovery  # noqa: F401
 
 # Test constants
 TEST_NODE_ID = 1234

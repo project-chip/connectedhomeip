@@ -46,11 +46,10 @@ with a real Matter application server.
 import asyncio
 import logging
 import os
-import sys
 import tempfile
-from pathlib import Path
 
 from mobly import asserts
+from python_path import PythonPath
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
@@ -60,9 +59,8 @@ from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 # Add python_testing directory to path so mdns_discovery module is available
-PYTHON_TESTING_DIR = Path(__file__).parent.parent
-if str(PYTHON_TESTING_DIR) not in sys.path:
-    sys.path.insert(0, str(PYTHON_TESTING_DIR))
+with PythonPath('..', relative_to=__file__):
+    import mdns_discovery.mdns_discovery  # noqa: F401
 
 LOGGER = logging.getLogger(__name__)
 
