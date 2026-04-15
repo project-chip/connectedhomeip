@@ -341,12 +341,13 @@ else
 EOF
 
         while true; do
-            read -p "Do you want to proceed? (y/n): " yn
+            read -p "Do you want to proceed? [Y/n]: " yn
             case $yn in
-                [Yy]*)
+                "" | [Yy]*)
                     INSTALL_EVERYTHING=true
+                    python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" > /dev/null 2>&1 || true
                     break
-                    ;; # Case for yes/Y
+                    ;; # Case for yes/Y (Enter accepts default)
                 [Nn]*)
                     echo "You won't be asked again, cannot proceed with build. Exiting..."
                     touch "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages"
@@ -360,7 +361,6 @@ EOF
 
     # Local Silabs package install when agreed (INSTALL_EVERYTHING). Never under Docker.
     if [ "$INSTALL_EVERYTHING" == true ] && [ "$USE_DOCKER" != true ]; then # run install-packages
-        pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" || exit 1
         python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
     fi # run install-packages
 
