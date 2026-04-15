@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023-2024 Project CHIP Authors
+#   Copyright (c) 2023-2026 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -30,14 +30,12 @@ config CHIP_TELINK_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_NFC_ONBOARDING_PAYLOAD
-	bool "Share onboarding payload in NFC tag"
 	default n
 	imply I2C
 	imply ST25DVXXKC
 	imply NFC
-	help
-	  Enables sharing the onboarding payload in the NFC tag.
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
@@ -107,10 +105,6 @@ config CHIP_ROTATING_DEVICE_ID
 	  Enables the rotating device identifier that provides a non-trackable
 	  identifier. The identifier is unique per device and rotates at pre-defined
 	  moments.
-
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
 
 config CHIP_FACTORY_DATA
 	bool "Enable Factory Data support"
@@ -196,15 +190,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 
 endif
 
-config CHIP_IPV4
-	bool "IPv4 support for Matter"
-	default n
-	depends on NET_IPV4
-	help
-	  If disabled, it allows to build Telink SDK application
-	  with IPv4 support independently of the Matter stack still
-	  running over IPv6.
-
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
 	default y if BOARD_TLSR9118BDK40D
@@ -253,13 +238,14 @@ config CHIP_PERSISTENT_SUBSCRIPTIONS
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
 
-if CHIP_PERSISTENT_SUBSCRIPTIONS
-
 config CHIP_MAX_FABRICS
 	int "Maximum number of Matter fabrics"
+	default 3 if BOARD_TL3218X_RETENTION
 	default 5
 	help
 	  The maximum number of Matter fabrics that device can be joined to.
+
+if CHIP_PERSISTENT_SUBSCRIPTIONS
 
 config CHIP_MAX_ACTIVE_CASE_CLIENTS
 	int "Maximum number of outgoing CASE sessions"
@@ -293,3 +279,50 @@ endif
 config TFLM_FEATURE
 	bool "Enable the TFLM micro speech feature"
 	default n
+
+choice CHIP_LAST_FABRIC_REMOVED_ACTION
+	prompt "An action to perform after removing the last fabric"
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+	bool "After removing the last fabric erase NVS and reboot"
+	help
+	  After removing the last fabric the device will perform the factory reset and
+	  then reboot. The current RAM state will be removed and the new commissioning to
+	  the new fabric will use the initial fabric index. This option is the most safe.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
+	bool "After removing the last fabric erase NVS and start Bluetooth LE advertising"
+	depends on !PM
+	help
+	  After removing the last fabric the device will perform the factory reset without 
+	  rebooting and start the Bluetooth LE advertisement automatically.
+	  The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index. This option should not be used for
+	  devices that normally do not advertise Bluetooth LE on boot to keep their original 
+	  behavior.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+	bool "After removing the last fabric erase NVS only"
+	help
+	  After removing the last fabric the device will perform the factory reset only without
+	  rebooting. The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index.
+
+	config CHIP_LAST_FABRIC_REMOVED_NONE
+	bool "After removing the last fabric do not perform any action"
+	help
+	  After removing the last fabric the device will not perform factory reset
+	  or reboot. The current state will be left as it is and the BLE advertising
+	  will not start automatically.
+
+endchoice
+
+config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
+	int "After removing the last fabric wait defined time [in milliseconds] to perform an action"
+	depends on !CHIP_LAST_FABRIC_REMOVED_NONE
+	default 1000
+	help
+	  After removing the last fabric the device will wait for the defined time and then perform
+	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
+	  avoiding race conditions before the device removes non-volatile data.

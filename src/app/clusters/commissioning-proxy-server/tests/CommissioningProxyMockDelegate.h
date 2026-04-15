@@ -92,6 +92,7 @@ public:
 
     uint8_t GetScanMaxTime() override;
     void SetScanMaxTime(uint8_t seconds) override;
+    chip::BitMask<WiFiBandBitmap> GetSupportedWiFiBands() override { return chip::BitMask<WiFiBandBitmap>(); }
 #if 0
     /**
      * @brief Handle PowerAdjustRequest command

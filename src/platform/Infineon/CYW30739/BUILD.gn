@@ -19,7 +19,7 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "cyw30739")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -66,7 +66,7 @@ static_library("CYW30739") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.h",

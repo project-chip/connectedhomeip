@@ -68,7 +68,7 @@ static_library("freertos") {
 
   public_configs = []
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "//src/platform/OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "//src/platform/OpenThread/GenericNetworkCommissioningThreadDriver.h",

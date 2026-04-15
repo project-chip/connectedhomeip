@@ -312,12 +312,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
         wiFiBands = static_cast<WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
     }
 
-    chip::FabricIndex fabricIndex = request.subjectDescriptor != nullptr
-        ? request.subjectDescriptor->fabricIndex
-        : chip::kUndefinedFabricIndex;
-    chip::NodeId nodeId = request.subjectDescriptor != nullptr
-        ? request.subjectDescriptor->subject
-        : chip::kUndefinedNodeId;
+    chip::FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
+    chip::NodeId nodeId           = request.subjectDescriptor.subject;
 
     auto delegateStatus = mDelegate.ProxyBackgroundScanStartRequest(
         commandData.transport, commandData.timeout, wiFiBands, fabricIndex, nodeId, handler, request);
@@ -366,12 +362,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
         wiFiBands = static_cast<WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
     }
 
-    chip::FabricIndex fabricIndex = request.subjectDescriptor != nullptr
-        ? request.subjectDescriptor->fabricIndex
-        : chip::kUndefinedFabricIndex;
-    chip::NodeId nodeId = request.subjectDescriptor != nullptr
-        ? request.subjectDescriptor->subject
-        : chip::kUndefinedNodeId;
+    chip::FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
+    chip::NodeId nodeId           = request.subjectDescriptor.subject;
 
     auto delegateStatus = mDelegate.ProxyBackgroundScanStopRequest(
         commandData.transport, wiFiBands, fabricIndex, nodeId);

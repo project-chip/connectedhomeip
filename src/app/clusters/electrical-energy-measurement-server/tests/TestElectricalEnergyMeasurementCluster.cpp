@@ -17,12 +17,9 @@
  */
 
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model-provider/tests/ReadTesting.h>
-#include <app/data-model-provider/tests/WriteTesting.h>
-#include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -41,6 +38,21 @@ using namespace chip::Testing;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
+
+const Structs::MeasurementAccuracyRangeStruct::Type kTestAccuracyRanges[] = {
+    { .rangeMin   = 0,
+      .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+      .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
+};
+
+const Structs::MeasurementAccuracyStruct::Type kTestAccuracy = {
+    .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 1'000'000'000'000'000,
+    .accuracyRanges   = DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type>(kTestAccuracyRanges)
+};
 
 struct TestElectricalEnergyMeasurementCluster : public ::testing::Test
 {
@@ -62,6 +74,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
             .optionalAttributes = static_cast<ElectricalEnergyMeasurement::OptionalAttributes>(0),
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -81,6 +94,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -108,6 +122,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -132,6 +147,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -181,6 +197,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
             .optionalAttributes = static_cast<ElectricalEnergyMeasurement::OptionalAttributes>(0),
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -212,56 +229,41 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        Span<const ConcreteClusterPath> paths = cluster.GetPaths();
-        ASSERT_EQ(paths.size(), 1u);
+        ClusterTester tester(cluster);
 
         // Test CumulativeEnergyImported (requires kCumulativeEnergy + kImportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyImported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyImported::Id, value).IsSuccess());
         }
 
         // Test CumulativeEnergyExported (requires kCumulativeEnergy + kExportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyExported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyExported::Id, value).IsSuccess());
         }
 
         // Test PeriodicEnergyImported (requires kPeriodicEnergy + kImportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyImported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyImported::Id, value).IsSuccess());
         }
 
         // Test PeriodicEnergyExported (requires kPeriodicEnergy + kExportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyExported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyExported::Id, value).IsSuccess());
         }
 
         // Test CumulativeEnergyReset (requires kCumulativeEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyReset::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::CumulativeEnergyResetStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyReset::Id, value).IsSuccess());
         }
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -280,6 +282,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
         .endpointId         = kTestEndpointId,
         .featureFlags       = allFeatures,
         .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+        .accuracyStruct     = kTestAccuracy,
     });
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -335,6 +338,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
         .endpointId         = kTestEndpointId,
         .featureFlags       = allFeatures,
         .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+        .accuracyStruct     = kTestAccuracy,
     });
 
     EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -370,15 +374,11 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
         ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(event.value().eventOptions.mPath,
+        EXPECT_EQ((*event).eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
 
-        // Check again for Tidy
-        ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ((*event).GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);
@@ -406,15 +406,11 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
         ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(event.value().eventOptions.mPath,
+        EXPECT_EQ((*event).eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
 
-        // Check again for Tidy
-        ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ((*event).GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);

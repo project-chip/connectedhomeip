@@ -18,13 +18,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/MigrateChimeServerStorage.h"
+    "${CLUSTER_DIR}/MigrateChimeServerStorage.cpp"
     "${CLUSTER_DIR}/chime-server.h"
-)
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/ChimeCluster.cpp"
-    "${CLUSTER_DIR}/ChimeCluster.h"
 )

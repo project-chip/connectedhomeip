@@ -50,12 +50,12 @@ namespace Internal {
 
 namespace {
 
-System::LayerSocketsLoop & SystemLayerSocketsLoop()
+System::LayerSelectLoop & SystemLayerSelectLoop()
 {
-    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+    return static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer());
 }
 
-K_WORK_DEFINE(sSignalWork, [](k_work *) { SystemLayerSocketsLoop().Signal(); });
+K_WORK_DEFINE(sSignalWork, [](k_work *) { SystemLayerSelectLoop().Signal(); });
 
 } // anonymous namespace
 
@@ -151,7 +151,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
     }
     else
     {
-        SystemLayerSocketsLoop().Signal();
+        SystemLayerSelectLoop().Signal();
     }
     return CHIP_NO_ERROR;
 }
@@ -180,20 +180,20 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
     }
     mShouldRunEventLoop = true;
 
-    SystemLayerSocketsLoop().EventLoopBegins();
+    SystemLayerSelectLoop().EventLoopBegins();
     while (mShouldRunEventLoop)
     {
-        SystemLayerSocketsLoop().PrepareEvents();
+        SystemLayerSelectLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        SystemLayerSocketsLoop().WaitForEvents();
+        SystemLayerSelectLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        SystemLayerSocketsLoop().HandleEvents();
+        SystemLayerSelectLoop().HandleEvents();
 
         ProcessDeviceEvents();
     }
-    SystemLayerSocketsLoop().EventLoopEnds();
+    SystemLayerSelectLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }

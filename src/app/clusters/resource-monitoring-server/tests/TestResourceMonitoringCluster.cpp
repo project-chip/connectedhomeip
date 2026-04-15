@@ -19,7 +19,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
@@ -117,11 +116,6 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(activatedCarbonFilterMonitoring.Attributes(ConcreteClusterPath(kRootEndpointId, ActivatedCarbonFilterMonitoring::Id),
-                                                         attributes),
-              CHIP_NO_ERROR);
-
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(
         activatedCarbonFilterMonitoring,
         { ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry,
@@ -169,15 +163,15 @@ TEST_F(TestResourceMonitoringCluster, ReadAttributeTest)
 
     auto it = replacementProductList.begin();
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_0")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_0"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_1")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_1"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_2")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_2"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_3")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_3"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_4")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_4"_span));
 
     ASSERT_FALSE(it.Next());
 }

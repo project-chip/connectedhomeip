@@ -23,9 +23,8 @@ import logging
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
-from mobly import asserts, base_test, signals
+from mobly import asserts
 
-import matter.testing.global_stash as global_stash
 from matter import ChipDeviceCtrl, discovery
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
@@ -87,6 +86,8 @@ class CommissioningInfo:
     wifi_ssid: Optional[str] = None
     tc_version_to_simulate: Optional[int] = None
     tc_user_response_to_simulate: Optional[int] = None
+    thread_ba_host: Optional[str] = None
+    thread_ba_port: Optional[int] = None
 
 
 @dataclass
@@ -156,7 +157,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
@@ -176,7 +177,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
@@ -193,7 +194,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "nfc-thread":
         try:
@@ -209,7 +210,53 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "nfc-wifi":
+        try:
+            asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for nfc-wifi commissioning")
+            asserts.assert_is_not_none(commissioning_info.wifi_passphrase,
+                                       "WiFi Passphrase must be provided for nfc-wifi commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.wifi_ssid is not None
+            assert commissioning_info.wifi_passphrase is not None
+            await dev_ctrl.CommissionNfcWiFi(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.wifi_ssid,
+                commissioning_info.wifi_passphrase,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "thread-meshcop":
+        try:
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
+                                       "Thread dataset must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_operational_dataset is not None
+            asserts.assert_is_not_none(commissioning_info.thread_ba_host,
+                                       "thread_ba_host must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_ba_host is not None
+            asserts.assert_is_not_none(commissioning_info.thread_ba_port,
+                                       "thread_ba_port must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_ba_port is not None
+
+            await dev_ctrl.CommissionThreadMeshcop(
+                node_id,
+                info.passcode,
+                info.filter_value,
+                commissioning_info.thread_ba_host,
+                commissioning_info.thread_ba_port,
+                commissioning_info.thread_operational_dataset,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
@@ -298,53 +345,6 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
             infos.append(info)
 
     return infos
-
-
-class CommissionDeviceTest(base_test.BaseTestClass):
-    """Test class auto-injected at the start of test list to commission a device when requested"""
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        # This class is used to commission the device so is set to True
-        self.is_commissioning = True
-        # Save the stashed values into attributes to avoid mobly conflic with ctypes when mobly performs copy().
-        test_config = args[0]
-        self.default_controller = test_config.user_params['default_controller']
-        meta_config = test_config.user_params['meta_config']
-        self.dut_node_ids: List[int] = meta_config['dut_node_ids']
-        self.commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=meta_config['commissionee_ip_address_just_for_testing'],
-            commissioning_method=meta_config['commissioning_method'],
-            thread_operational_dataset=meta_config['thread_operational_dataset'],
-            wifi_passphrase=meta_config['wifi_passphrase'],
-            wifi_ssid=meta_config['wifi_ssid'],
-            tc_version_to_simulate=meta_config['tc_version_to_simulate'],
-            tc_user_response_to_simulate=meta_config['tc_user_response_to_simulate'],
-        )
-        self.setup_payloads: List[SetupPayloadInfo] = get_setup_payload_info_config(
-            global_stash.unstash_globally(test_config.user_params['matter_test_config']))
-
-    def test_run_commissioning(self):
-        """This method is the test called by mobly, which try to commission the device until is complete or raises an error.
-        Raises:
-            signals.TestAbortAll: Failed to commission node(s)
-        """
-        if not self.event_loop.run_until_complete(commission_devices(
-            dev_ctrl=self.default_controller,
-            dut_node_ids=self.dut_node_ids,
-            setup_payloads=self.setup_payloads,
-            commissioning_info=self.commissioning_info
-        )):
-            raise signals.TestAbortAll("Failed to commission node(s)")
-
-    # Default controller is used by commission_devices
-    @property
-    def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
-        return global_stash.unstash_globally(self._default_controller)
-
-    @default_controller.setter
-    def default_controller(self, tmp_default_controller):
-        self._default_controller = tmp_default_controller
 
 
 @dataclass

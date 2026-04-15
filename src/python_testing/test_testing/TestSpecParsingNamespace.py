@@ -17,13 +17,14 @@
 
 import xml.etree.ElementTree as ElementTree
 import zipfile
-from importlib.abc import Traversable
+from importlib.resources.abc import Traversable
 
 from jinja2 import Template
 from mobly import asserts
 
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import NamespacePathLocation, ProblemNotice, ProblemSeverity
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
                                          parse_namespace)
 
@@ -226,12 +227,14 @@ class TestSpecParsingNamespace(MatterBaseTest):
         one_four_one, one_four_one_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_4_1)
         one_four_two, one_four_two_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_4_2)
         one_five, one_five_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
+        one_six, one_six_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_6)
 
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
         asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
         asserts.assert_equal(len(one_four_one_problems), 0, "Problems found when parsing 1.4.1 spec")
         asserts.assert_equal(len(one_four_two_problems), 0, "Problems found when parsing 1.4.2 spec")
         asserts.assert_equal(len(one_five_problems), 0, "Problems found when parsing 1.5 spec")
+        asserts.assert_equal(len(one_six_problems), 0, "Problems found when parsing 1.6 spec")
 
         # Check version relationships
         asserts.assert_greater(len(set(one_five.keys()) - set(one_three.keys())),
@@ -242,6 +245,8 @@ class TestSpecParsingNamespace(MatterBaseTest):
                                0, "1.5 dir contains less namespaces than 1.4.1")
         asserts.assert_greater(len(set(one_five.keys()) - set(one_four_two.keys())),
                                0, "1.5 dir contains less namespaces than 1.4.2")
+        asserts.assert_greater(len(set(one_six.keys()) - set(one_five.keys())),
+                               0, "1.6 dir contains less namespaces than 1.5")
 
         # Complete namespace version checks for 1.3, 1.4, 1.4.1, 1.4.2, 1.5, known differences and relationships:
         # 1.3: has Common Position

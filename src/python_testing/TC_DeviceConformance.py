@@ -26,20 +26,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
-#       --bool-arg ignore_in_progress:True allow_provisional:True
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1
-#     factory-reset: true
-#     quiet: true
-#   run2:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --bool-arg ignore_in_progress:True allow_provisional:True
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -47,12 +34,29 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --device on-off-light
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1 test_TC_IDM_10_5
+#       --debug
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from matter.testing.decorators import async_test_body
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
-from test_testing.DeviceConformanceTests import DeviceConformanceTests
-
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.device_conformance_tests import DeviceConformanceTests
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_DeviceConformance(DeviceConformanceTests):
@@ -64,24 +68,31 @@ class TC_DeviceConformance(DeviceConformanceTests):
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
-        ignore_in_progress = self.user_params.get("ignore_in_progress", True)
-        allow_provisional = self.user_params.get("allow_provisional", False)
-        success, problems = self.check_conformance(ignore_in_progress, self.is_pics_sdk_ci_only, allow_provisional)
+        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification", True)
+        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_only_disallowed_for_certification", False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification,
+                                                   self.is_pics_sdk_ci_only,
+                                                   allow_provisional_test_event_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")
 
     def test_TC_IDM_10_3(self):
-        ignore_in_progress = self.user_params.get("ignore_in_progress", False)
-        success, problems = self.check_revisions(ignore_in_progress)
+        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification", False)
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with cluster revision on at least one cluster")
 
     def test_TC_IDM_10_5(self):
         fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
-        allow_provisional = self.user_params.get("allow_provisional", False)
-        success, problems = self.check_device_type(fail_on_extra_clusters, allow_provisional)
+        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_only_disallowed_for_certification", False)
+        success, problems = self.check_device_type(fail_on_extra_clusters,
+                                                   allow_provisional_test_event_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")

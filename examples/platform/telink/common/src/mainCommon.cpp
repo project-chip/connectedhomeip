@@ -41,6 +41,20 @@
 #include "Rpc.h"
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+K_SEM_DEFINE(gThreadPrescanDoneSem, 0, 1);
+
+class InitScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
+{
+public:
+    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
+                    NetworkCommissioning::ThreadScanResponseIterator * networks) override
+    {
+        k_sem_give(&gThreadPrescanDoneSem);
+    }
+};
+#endif
+
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -66,7 +80,7 @@ static k_timer FactoryResetUsualBootTimer;
 static void FactoryResetUsualBoot(struct k_timer * dummy)
 {
     (void) dummy;
-    (void) chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey);
+    LogErrorOnFailure(chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey));
     LOG_INF("Schedule factory counter deleted");
 }
 
@@ -175,10 +189,19 @@ int main(void)
         goto exit;
     }
 
-    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+    LogErrorOnFailure(sThreadNetworkDriver.Init());
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        static InitScanCallback sInitScanCallback;
+        LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInitScanCallback));
+        k_sem_take(&gThreadPrescanDoneSem, K_SECONDS(15));
+    }
+#endif
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    TEMPORARY_RETURN_IGNORED sWiFiCommissioningInstance.Init();
+    LogErrorOnFailure(sWiFiCommissioningInstance.Init());
 #else
     err = CHIP_ERROR_INTERNAL;
     goto exit;

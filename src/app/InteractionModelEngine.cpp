@@ -51,12 +51,15 @@
 #include <lib/support/FibonacciUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/raw/GroupcastTesting.h>
 
 #include <cinttypes>
 
 namespace chip {
 namespace app {
 namespace {
+
+inline constexpr uint16_t kMaxNumSubscriptionsPerFabric = 10000;
 
 /**
  * Helper to handle wildcard events in the event path.
@@ -168,8 +171,15 @@ class AutoReleaseSubscriptionInfoIterator
 {
 public:
     AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
-    ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
+    ~AutoReleaseSubscriptionInfoIterator()
+    {
+        if (mIterator)
+        {
+            mIterator->Release();
+        }
+    }
 
+    explicit operator bool() const { return mIterator != nullptr; }
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
 
 private:
@@ -274,7 +284,6 @@ void InteractionModelEngine::Shutdown()
             writeHandler.Close();
         }
     }
-
     mReportingEngine.Shutdown();
     mAttributePathPool.ReleaseAll();
     mEventPathPool.ReleaseAll();
@@ -778,6 +787,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
                 auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+                VerifyOrReturnError(nullptr != iterator, Status::ResourceExhausted);
 
                 while (iterator->Next(subscriptionInfo))
                 {
@@ -1097,6 +1107,27 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         status = Status::InvalidAction;
     }
 
+    // Groupcast Testing
+    if (apExchangeContext->IsGroupExchangeContext())
+    {
+        auto & testing = Groupcast::GetTesting();
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(apExchangeContext->GetSessionHandle()->GetFabricIndex()))
+        {
+            Clusters::Groupcast::Events::GroupcastTesting::Type event;
+            if ((testing.GetTestResultEnum() == Groupcast::Testing::Result::kSuccess) && (status != Status::Success))
+            {
+                testing.SetTestResult(Groupcast::Testing::Result::kGeneralError);
+            }
+            // Convert to event type
+            testing.ToEventType(event);
+            testing.Clear();
+            // Generate event
+            DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
+            eventGenerator.GenerateEvent(event, kRootEndpointId);
+            eventGenerator.ScheduleUrgentEventDeliverySync();
+        }
+    }
+
     if (status != Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         return StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
@@ -1206,7 +1237,7 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
             candidateEventPathsUsed     = eventPathsUsed;
         }
         // This handler is older than the one we picked before.
-        else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().Before(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
                   (candidateAttributePathsUsed > perFabricPathCapacity || candidateEventPathsUsed > perFabricPathCapacity)))
@@ -1384,7 +1415,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
             candidate = handler;
         }
         // Read Handlers are "first come first served", so we give eariler read transactions a higher priority.
-        else if (handler->GetTransactionStartGeneration() > candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().After(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
                   (candidateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
@@ -1778,10 +1809,8 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 {
     Access::SubjectDescriptor subjectDescriptor = apCommandObj.GetSubjectDescriptor();
 
-    DataModel::InvokeRequest request;
-    request.path = aCommandPath;
+    DataModel::InvokeRequest request(aCommandPath, subjectDescriptor);
     request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, apCommandObj.IsTimedInvoke());
-    request.subjectDescriptor = &subjectDescriptor;
 
     std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->InvokeCommand(request, apPayload, &apCommandObj);
 
@@ -1823,6 +1852,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     Access::Privilege privilegeToCheck = commandExists ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
     Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
+    // Groupcast Testing
+    auto & testing = Groupcast::GetTesting();
+    if (testing.IsEnabled() && testing.IsFabricUnderTest(request.GetAccessingFabricIndex()))
+    {
+        testing.SetAccessAllowed(Status::Success == accessStatus);
+        if (!testing.GetAccessAllowed().ValueOr(false))
+        {
+            testing.SetTestResult(Groupcast::Testing::Result::kFailedAuth);
+        }
+    }
     VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
 
     if (!commandExists)
@@ -1838,17 +1877,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
                                                                                const Access::Privilege aRequiredPrivilege)
 {
-    if (aRequest.subjectDescriptor == nullptr)
-    {
-        return Status::UnsupportedAccess; // we require a subject for invoke
-    }
-
     Access::RequestPath requestPath{ .cluster     = aRequest.path.mClusterId,
                                      .endpoint    = aRequest.path.mEndpointId,
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, aRequiredPrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(aRequest.subjectDescriptor, requestPath, aRequiredPrivilege);
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
@@ -1934,6 +1968,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     DataModel::Provider * oldModel = mDataModelProvider;
     if (oldModel != nullptr)
     {
+        oldModel->UnregisterAttributeChangeListener(mReportingEngine);
         CHIP_ERROR err = oldModel->Shutdown();
         if (err != CHIP_NO_ERROR)
         {
@@ -1945,14 +1980,16 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     if (mDataModelProvider != nullptr)
     {
         CHIP_ERROR err = mDataModelProvider->Startup({
-            .eventsGenerator         = EventManagement::GetInstance(),
-            .dataModelChangeListener = mReportingEngine,
-            .actionContext           = *this,
+            .eventsGenerator = EventManagement::GetInstance(),
+            .actionContext   = *this,
         });
+
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
         }
+        // Register to the new model
+        mDataModelProvider->RegisterAttributeChangeListener(mReportingEngine);
     }
 
     return oldModel;
@@ -2032,10 +2069,10 @@ bool InteractionModelEngine::HasActiveRead()
 uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    return UINT16_MAX;
+    return kMaxNumSubscriptionsPerFabric;
 #else
-    return static_cast<uint16_t>(
-        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+    return static_cast<uint16_t>(std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(),
+                                          static_cast<size_t>(kMaxNumSubscriptionsPerFabric)));
 #endif
 }
 
@@ -2118,9 +2155,11 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator             = mpSubscriptionResumptionStorage->IterateSubscriptions();
     mNumOfSubscriptionsToResume = 0;
     uint16_t minInterval        = 0;
+
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    VerifyOrReturnError(nullptr != iterator, CHIP_ERROR_NO_MEMORY);
     while (iterator->Next(subscriptionInfo))
     {
         mNumOfSubscriptionsToResume++;
@@ -2157,6 +2196,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     AutoReleaseSubscriptionInfoIterator iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
+    VerifyOrReturn(iterator, ChipLogError(InteractionModel, "Failed to allocate subscription resumption iterator"));
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
@@ -2229,7 +2269,9 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
 
     // Look through persisted subscriptions and see if any aren't already in mReadHandlers pool
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator                = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    // Conservatively assume there may be subscriptions to resume if we cannot get an iterator.
+    VerifyOrReturnValue(iterator != nullptr, true);
     bool foundSubscriptionToResume = false;
     while (iterator->Next(subscriptionInfo))
     {

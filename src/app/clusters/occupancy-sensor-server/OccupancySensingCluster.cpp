@@ -120,6 +120,15 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
+void OccupancySensingCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    if (mHoldTimeDelegate)
+    {
+        mHoldTimeDelegate->CancelTimer(this);
+    }
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
 DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
@@ -196,13 +205,27 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
     VerifyOrReturnError(holdTime >= mHoldTimeLimits.holdTimeMin, Protocols::InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(holdTime <= mHoldTimeLimits.holdTimeMax, Protocols::InteractionModel::Status::ConstraintError);
 
-    if (mHoldTime == holdTime)
+    if (!SetAttributeValue(mHoldTime, holdTime, Attributes::HoldTime::Id))
     {
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
     }
 
-    mHoldTime = holdTime;
-    NotifyAttributeChanged(Attributes::HoldTime::Id);
+    /// HoldTime is reported as aliases in several attributes, so notify all of them.
+    if (mShowDeprecatedAttributes)
+    {
+        if (mFeatureMap.Has(Feature::kPassiveInfrared))
+        {
+            NotifyAttributeChanged(Attributes::PIROccupiedToUnoccupiedDelay::Id);
+        }
+        if (mFeatureMap.Has(Feature::kUltrasonic))
+        {
+            NotifyAttributeChanged(Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id);
+        }
+        if (mFeatureMap.Has(Feature::kPhysicalContact))
+        {
+            NotifyAttributeChanged(Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id);
+        }
+    }
 
     // If a timer is currently active, we need to adjust its duration to reflect the new hold time.
     if (mHoldTimeDelegate->IsTimerActive(this))
@@ -334,7 +357,7 @@ const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCl
     return mHoldTimeLimits;
 }
 
-BitMask<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
+BitFlags<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
 {
     return mFeatureMap;
 }

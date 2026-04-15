@@ -24,7 +24,7 @@ import("${matter_support_root}/provision/args.gni")
 
 assert(chip_device_platform == "efr32")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -48,6 +48,7 @@ static_library("efr32") {
     "${silabs_platform_dir}/CHIPDevicePlatformEvent.h",
     "${silabs_platform_dir}/CHIPMem-Platform.cpp",
     "${silabs_platform_dir}/CHIPPlatformConfig.h",
+    "${silabs_platform_dir}/ChipDie.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.h",
     "${silabs_platform_dir}/ConnectivityManagerImpl.h",
@@ -108,7 +109,7 @@ static_library("efr32") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
     deps += [

@@ -3,6 +3,8 @@
 -   [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
 -   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
 -   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
+-   [CI REPL Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/ci_tests/)
+-   [Nightly Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/nightly/)
 
 # Matter
 
@@ -21,7 +23,7 @@
 [![ESP32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ESP32/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-esp32.yaml)
 [![Infineon](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-infineon.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-infineon.yaml)
 [![i.MX Linux](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20i.MX%20Linux/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-imx.yaml)
-[![K32W with SE051](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20K32W%20with%20SE051/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-k32w.yaml)
+[![NXP FreeRTOS/Zephyr](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nxp.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nxp.yaml)
 [![Linux ARM](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20ARM/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-arm.yaml)
 [![Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
 [![nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nrfconnect.yaml)
@@ -32,10 +34,12 @@
 
 **Tests**
 
-[![Tests](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml)
+[![Tests-Master](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml)
+[![Tests-LTS](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg?branch=v1.4.2-branch)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml?query=branch:v1.4.2-branch)
 [![Unit / Integration Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Integration%20Tests/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/unit_integration_test.yaml)
 [![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
 [![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/qemu.yaml)
+[![Nightly Run](https://github.com/project-chip/connectedhomeip/actions/workflows/nightly.yaml/badge.svg?branch=master)](https://github.com/project-chip/connectedhomeip/actions/workflows/nightly.yaml)
 
 **Tools**
 

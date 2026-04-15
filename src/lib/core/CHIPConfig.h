@@ -232,6 +232,21 @@
 #endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
 
 /**
+ *  @def CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+ *
+ *  @brief
+ *    Size of a statically allocated P256 keypair handle in CryptoPAL.
+ *
+ *  If this is 0 (the default), then key handles are not supported and
+ *  serialized keypairs (containing the raw public and private keys) are used instead.
+ *
+ *  Platforms that use PSA can define this to match the size of psa_key_id_t (4).
+ */
+#ifndef CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+#define CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE (0)
+#endif // CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+
+/**
  * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
  *
  * @brief
@@ -748,26 +763,6 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER
- *
- * @brief Enable support functions for parsing command-line arguments
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 0
-#endif
-
-/**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
- *
- * @brief Enable validity checking of command-line argument definitions.
- *
- * // TODO: Determine why we wouldn't need this
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-#define CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS 1
-#endif
-
-/**
  * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking Matter unauthenticated
@@ -1127,6 +1122,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
  *
  * Binds to number of GroupMapping entries per fabric
+ * TODO cleanup this config #43166
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
@@ -1142,11 +1138,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+ *
+ * @brief Defines the maximum number of group memberships
+ */
+#ifndef CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+#define CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT 10
+#endif // CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
  *
  * Binds to number of GroupState entries to support per fabric
+ * TODO cleanup this config #43166
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)
@@ -1164,7 +1170,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 3
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC (3 + 1) // support 3 KeySets + IPK per fabric
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
@@ -2034,6 +2040,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 
 /**
+ * @def CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+ *
+ * @brief The default maximum number of TLS endpoints that can be provisioned in the
+ *        TLS Client Management cluster when using the code-driven implementation. The Matter spec
+ *        requires this to be between 5 and 254. Applications can override this by providing a custom delegate.
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+#define CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS 5
+#endif // CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+
+/**
  * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
  *
  * @brief The maximum number of video streams per device
@@ -2059,6 +2076,34 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 #define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
 #endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+ *
+ * @brief The maximum number of PushAV transports per device per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+#define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 4
+#endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_ZONES
+ *
+ * @brief The maximum number of zones
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_ZONES
+#define CHIP_CONFIG_MAX_NUM_ZONES 4
+#endif // CHIP_CONFIG_MAX_NUM_ZONES
+
+/**
+ * @def CHIP_MEMORY_SANITIZER_ENABLED
+ *
+ * @brief True when building with Clang MemorySanitizer (MSan).
+ */
+#ifndef CHIP_MEMORY_SANITIZER_ENABLED
+#define CHIP_MEMORY_SANITIZER_ENABLED 0
+#endif
+
 /**
  * @}
  */

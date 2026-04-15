@@ -14,7 +14,7 @@ namespace BasicInformation {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 29;
+inline constexpr uint32_t kAttributesCount = 30;
 
 namespace DataModelRevision {
 inline constexpr AttributeId Id = 0x00000000;
@@ -107,6 +107,10 @@ inline constexpr AttributeId Id = 0x00000015;
 namespace MaxPathsPerInvoke {
 inline constexpr AttributeId Id = 0x00000016;
 } // namespace MaxPathsPerInvoke
+
+namespace DeviceLocation {
+inline constexpr AttributeId Id = 0x00000017;
+} // namespace DeviceLocation
 
 namespace ConfigurationVersion {
 inline constexpr AttributeId Id = 0x00000018;

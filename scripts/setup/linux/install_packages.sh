@@ -39,6 +39,7 @@ apt-get install -fy \
     unzip \
     wget \
     libdbus-1-dev \
+    libevent-dev \
     libmbedtls-dev \
     python3.8-dev \
     python3.8-venv

@@ -1,0 +1,5 @@
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_command_arguments}}{{asStructPropertyName label}}:%@; {{/zcl_command_arguments}}>", NSStringFromClass([self class]) {{#zcl_command_arguments}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_command_arguments}}];
+  return descriptionString;
+}

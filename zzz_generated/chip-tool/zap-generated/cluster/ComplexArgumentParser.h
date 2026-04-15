@@ -321,6 +321,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagem
 static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request,
                         Json::Value & value);
 
@@ -587,6 +593,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OccupancySensin
 static void Finalize(chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type & request,
                         Json::Value & value);
 
@@ -599,10 +611,63 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ProximityRanging::Structs::RDRStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RDRStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request,
@@ -875,6 +940,16 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request,

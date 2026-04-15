@@ -307,9 +307,8 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
-    app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return FabricTableImpl::RemoveFabric(*provider, fabric_index);
+    VerifyOrReturnError(mDataModel != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return FabricTableImpl::RemoveFabric(*mDataModel, fabric_index);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
@@ -327,12 +326,6 @@ void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
 {
     FabricTableImpl::SetTableSize(endpointSceneTableSize, static_cast<uint16_t>((endpointSceneTableSize - 1) / 2));
 }
-
-namespace {
-
-static DefaultSceneTableImpl gSceneTableImpl;
-
-} // namespace
 
 template <>
 CHIP_ERROR Serializer::SerializeId(TLV::TLVWriter & writer, const SceneStorageId & id)
@@ -398,6 +391,7 @@ CHIP_ERROR Serializer::DeserializeData(TLV::TLVReader & reader, SceneData & data
 /// @return Default global scene table implementation
 DefaultSceneTableImpl * chip::scenes::GetSceneTableImpl(EndpointId endpoint, uint16_t endpointTableSize)
 {
+    static DefaultSceneTableImpl gSceneTableImpl;
     gSceneTableImpl.SetEndpoint(endpoint);
     gSceneTableImpl.SetTableSize(endpointTableSize);
 

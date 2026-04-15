@@ -19,12 +19,12 @@ import logging
 from enum import StrEnum
 from typing import Any
 
-from DeviceConformanceTests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import arls_populated
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
@@ -134,14 +134,18 @@ class TestConformanceTest(DeviceConformanceTests):
 
         # The CI flag here is to deal with example code that improperly implements the network commissioning cluster.
         # It does not apply here.
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         asserts.assert_false(success, "Unexpected success parsing endpoint with provisional cluster")
 
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
-        asserts.assert_true(success, "Unexpected failure parsing endpoint with provisional cluster and allow_provisional enabled")
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
+        asserts.assert_true(
+            success, "Unexpected failure parsing endpoint with provisional cluster and allow_provisional_test_event_only_disallowed_for_certification enabled")
 
         self.xml_clusters[Clusters.ScenesManagement.id].is_provisional = False
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         asserts.assert_true(success, "Unexpected failure parsing endpoint with no clusters marked as provisional")
 
     def add_macl(self, root_endpoint: dict[int, dict[int, Any]], populate_arl: bool = False, populate_commissioning_arl: bool = False):
@@ -178,20 +182,23 @@ class TestConformanceTest(DeviceConformanceTests):
         self.endpoints = {0: root_no_tlv, 1: nim_no_tlv}
         asserts.assert_true(self._has_device_type_supporting_macl(), "Did not find supported device in generated device")
 
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
         self.problems.extend(problems)
         asserts.assert_true(success, "Unexpected failure parsing minimal dt")
 
         self.add_macl(root)
         # A MACL is allowed when there is a NIM, so this should succeed as well
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
         self.problems.extend(problems)
         asserts.assert_true(success, "Unexpected failure with NIM and MACL")
 
         # A MACL is not allowed when there is no NIM
         self.endpoints[1] = create_minimal_dt(self.xml_clusters, self.xml_device_types,
                                               device_type_id=on_off_id, is_tlv_endpoint=False)
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
         self.problems.extend(problems)
         asserts.assert_false(success, "Unexpected success with On/Off and MACL")
 
@@ -245,7 +252,8 @@ class TestConformanceTest(DeviceConformanceTests):
         eevse = create_minimal_dt(self.xml_clusters, self.xml_device_types, device_type_id=eevse_id)
         self.endpoints_tlv = {0: root, 1: on_off, 2: eevse}
 
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         for p in problems:
             log.info(p)
         asserts.assert_true(success, "Unexpected failure on minimal on/off device")
@@ -259,7 +267,8 @@ class TestConformanceTest(DeviceConformanceTests):
             kChoice = "choice"
 
         def run_check_with_expected_failure(msg_suffix: str, expected_location: ProblemLocation, problem_type: ProblemType):
-            success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+            success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                       is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
             asserts.assert_false(success, f"Unexpected success on minimal on/off device {msg_suffix}")
             log.info("Problems reported (expect at least 1)")
             for p in problems:
@@ -307,7 +316,8 @@ class TestConformanceTest(DeviceConformanceTests):
         # This will have no features populated by default - mark ethernet - this doesn't require any additional attributes or commands
         feature_map_id = Clusters.NetworkCommissioning.Attributes.FeatureMap.attribute_id
         self.endpoints_tlv[0][cluster_id][feature_map_id] = Clusters.NetworkCommissioning.Bitmaps.Feature.kEthernetNetworkInterface
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         for p in problems:
             log.info(p)
         asserts.assert_true(success, f"Unexpected failure on device {msg_suffix}")
