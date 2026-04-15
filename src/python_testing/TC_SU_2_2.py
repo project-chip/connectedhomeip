@@ -27,6 +27,7 @@
 #       --passcode 20202021
 #       --KVS /tmp/chip_kvs_requestor
 #       --trace-to json:${TRACE_APP}.json
+#       --autoApplyImage
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -43,6 +44,7 @@
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import time
@@ -686,7 +688,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Prerequisites - Setup Provider
         # The provider is started with updateAvailable args. The provider is kept running until
-        # kApplyingUpdate is observed (BDX transfer complete), then killed. This is the single
+        # kApplying is observed (BDX transfer complete), then killed. This is the single
         # full OTA update in the entire test — the DUT applies V2 and reboots.
         # ------------------------------------------------------------------------------------
         step_number = "[STEP_1]"
@@ -807,10 +809,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Step #1.4 - UpdateStateProgress has valid value(s) in range 1-100')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.5 - Wait for kApplyingUpdate to confirm the BDX transfer is fully
+        # [STEP_1]: Step #1.5 - Wait for kApplying to confirm the BDX transfer is fully
         # complete, then kill the provider. The DUT will finish applying and reboot on its own.
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number}: Step #1.5 - Waiting for kApplyingUpdate to confirm download complete.')
+        logger.info(f'{step_number}: Step #1.5 - Waiting for kApplying to confirm download complete.')
 
         subscription_attr_applying = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -829,19 +831,42 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         def matcher_applying(report):
             val = report.value
-            return val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplyingUpdate
+            return val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
 
         matcher_applying_obj = AttributeMatcher.from_callable(
-            description=f"{step_number} - Wait for kApplyingUpdate",
+            description=f"{step_number} - Wait for kApplying",
             matcher=matcher_applying
         )
 
         subscription_attr_applying.await_all_expected_report_matches([matcher_applying_obj], timeout_sec=800.0)
-        logger.info(f'{step_number}: Step #1.5 - kApplyingUpdate observed — BDX transfer complete.')
+        logger.info(f'{step_number}: Step #1.5 - kApplying observed — BDX transfer complete.')
         subscription_attr_applying.cancel()
 
         logger.info(f'{step_number}: Step #1.5 - Killing provider (download done, DUT applying firmware).')
         self.current_provider_app_proc.terminate()
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_1]: Step #1.6 - Wait for DUT to reboot after applying V2 firmware.
+        # Expire the stale session so the controller reconnects cleanly, then poll until
+        # GetConnectedDevice succeeds (DUT is back online).
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number}: Step #1.6 - Expiring stale session and waiting for DUT to reboot.')
+        controller.ExpireSessions(requestor_node_id)
+
+        reboot_timeout_sec = 120
+        poll_interval_sec = 5
+        reconnected = False
+        for attempt in range(reboot_timeout_sec // poll_interval_sec):
+            await asyncio.sleep(poll_interval_sec)
+            try:
+                await controller.GetConnectedDevice(requestor_node_id, allowPASE=False)
+                reconnected = True
+                logger.info(f'{step_number}: Step #1.6 - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
+                break
+            except Exception:
+                logger.info(f'{step_number}: Step #1.6 - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
+
+        asserts.assert_true(reconnected, f'{step_number}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')
 
         self.step(6)
         # ------------------------------------------------------------------------------------
