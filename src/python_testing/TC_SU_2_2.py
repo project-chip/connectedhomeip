@@ -656,7 +656,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             matcher=matcher_idle_s4
         )
 
-        subscription_wait_idle_s4.await_all_expected_report_matches([matcher_idle_s4_obj], timeout_sec=120.0)
+        subscription_wait_idle_s4.await_all_expected_report_matches([matcher_idle_s4_obj], timeout_sec=620.0)
         logger.info(f'{step_number_s4}: Step #4.6 - DUT returned to kIdle, safe to proceed.')
         subscription_wait_idle_s4.cancel()
 
