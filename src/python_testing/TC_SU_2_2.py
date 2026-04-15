@@ -961,23 +961,28 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.1 - Matcher for OTA event logs
-        # Start EventSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Events: StateTransition (UpdateState should stay Idle because the offered version equals
-        # the version the DUT just installed)
+        # [STEP_6]: Step #6.1 - Subscribe to UpdateState attribute.
+        # Attribute subscription is used instead of event subscription because:
+        #   1. After the Step 1 OTA reboot the DUT's event buffer contains stale
+        #      StateTransition events (kApplying→kIdle etc.) that arrive first.
+        #   2. Event subscriptions have no keepalive when no events are generated —
+        #      the CASE session goes idle and expires, breaking the re-announce call.
+        # Attribute subscriptions always send keepalives (current value every max_interval),
+        # keeping the session alive and avoiding stale-event issues entirely.
         # ------------------------------------------------------------------------------------
-        subscription_state_no_download = EventSubscriptionHandler(
+        subscription_s6 = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        await subscription_state_no_download.start(
+        await subscription_s6.start(
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=1,
-            max_interval_sec=1
+            min_interval_sec=5,
+            max_interval_sec=5,
+            keepSubscriptions=False
         )
 
         # ------------------------------------------------------------------------------------
@@ -988,70 +993,51 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s6}: Step #6.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.2 - Track OTA StateTransition events
-        #     First event: Idle > Querying
-        #     Second event: Querying > Idle
-        #
-        # Stale-event handling: Step 1's OTA apply leaves buffered StateTransition events
-        # (e.g. kApplying → kIdle) that this subscription will receive before the Step 6
-        # events. The loop below discards non-matching events until Idle→Querying is found.
+        # [STEP_6]: Step #6.2 - Wait for kQuerying then kIdle; assert kDownloading never seen.
+        # The DUT is on V2 and the provider offers V2 — same version — so the DUT should
+        # query (kQuerying) but reject the image and return to kIdle without downloading.
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s6}: Step #6.1 - Waiting for StateTransition events '
-            '(DUT should reject the image because the offered version equals the installed version)')
+            f'{step_number_s6}: Step #6.1 - Waiting for kQuerying→kIdle sequence '
+            '(DUT should reject the same-version image without downloading)')
 
         kIdle_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         kQuerying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        kDownloading_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
 
-        # --- Transition 1: Idle → Querying ---
-        event1_s6 = None
-        s6_timeout = 620
-        t_s6_start = time.time()
+        querying_seen_s6 = [False]
+        downloading_seen_s6 = [False]
 
-        while time.time() - t_s6_start < s6_timeout:
-            remaining = s6_timeout - (time.time() - t_s6_start)
-            try:
-                evt = subscription_state_no_download.wait_for_event_report(
-                    Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-                    timeout_sec=min(60.0, remaining)
-                )
-            except Exception:
-                logger.info(f"{step_number_s6}: No event in 60s, re-sending AnnounceOTAProvider "
-                            f"(elapsed: {time.time() - t_s6_start:.0f}s / {s6_timeout}s)")
-                await self.announce_ota_provider(
-                    controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-                continue
+        def matcher_s6(report):
+            val = report.value
+            if val == kDownloading_s6:
+                downloading_seen_s6[0] = True
+                logger.info(f'{step_number_s6}: UNEXPECTED kDownloading — DUT started download of same-version image!')
+                return False
+            if val == kQuerying_s6 and not querying_seen_s6[0]:
+                querying_seen_s6[0] = True
+                logger.info(f'{step_number_s6}: kQuerying observed (DUT is querying provider)')
+                return False
+            if val == kIdle_s6 and querying_seen_s6[0]:
+                logger.info(f'{step_number_s6}: kIdle after kQuerying — no download started (expected)')
+                return True
+            return False
 
-            if evt.previousState == kIdle_s6 and evt.newState == kQuerying_s6:
-                event1_s6 = evt
-                logger.info(f"{step_number_s6}: Event 1 (Idle→Querying): {event1_s6}")
-                break
-
-            logger.info(f"{step_number_s6}: Discarding stale event: "
-                        f"{evt.previousState} → {evt.newState}")
-
-        asserts.assert_true(event1_s6 is not None,
-                            f"{step_number_s6}: Idle→Querying transition not found within {s6_timeout}s")
-
-        # --- Transition 2: Querying → Idle ---
-        event2_s6 = subscription_state_no_download.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-            timeout_sec=60
-        )
-        logger.info(f"{step_number_s6}: Event 2 (Querying→Idle): {event2_s6}")
-
-        self.verify_state_transition_event(
-            event2_s6,
-            kQuerying_s6,
-            kIdle_s6
+        matcher_s6_obj = AttributeMatcher.from_callable(
+            description=f"{step_number_s6} - kQuerying then kIdle, no kDownloading",
+            matcher=matcher_s6
         )
 
-        subscription_state_no_download.cancel()
+        subscription_s6.await_all_expected_report_matches([matcher_s6_obj], timeout_sec=120.0)
+        logger.info(f'{step_number_s6}: Step #6.2 - kQuerying→kIdle sequence confirmed.')
+        subscription_s6.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.4 - Verify NO image transfer occurs (same version already installed)
+        # [STEP_6]: Step #6.4 - Verify NO image transfer occurred (same version already installed)
         # ------------------------------------------------------------------------------------
-        logger.info(f"{step_number_s6}: No image transfer occurred (expected - DUT already on V2).")
+        asserts.assert_false(downloading_seen_s6[0],
+                             f"{step_number_s6}: DUT started downloading the same-version image (kDownloading seen).")
+        logger.info(f"{step_number_s6}: No image transfer occurred (expected — DUT already on V2).")
 
 
 if __name__ == "__main__":
