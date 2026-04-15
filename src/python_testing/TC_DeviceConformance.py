@@ -85,7 +85,7 @@ class TC_DeviceConformance(DeviceConformanceTests):
             # Conformance for this attribute needs to be wrapped in provisional as the intent it to let this remain provisional post 1.6
             current_conformance = self.xml_clusters[group_key_management_id].attributes[gcast_adoption_id].conformance
             self.xml_clusters[group_key_management_id].attributes[gcast_adoption_id].conformance = otherwise([
-                                                                                                             provisional, current_conformance])
+                                                                                                             provisional(), current_conformance])
         if self.xml_clusters[on_off_id].revision == 7:
             self.xml_clusters[on_off_id].revision = 6
 
