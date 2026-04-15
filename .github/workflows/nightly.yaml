@@ -46,8 +46,8 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    su_repl_tests_linux_build:
-        name: REPL Tests - Linux Software Update (BUILD)
+    nightly_repl_tests_linux_build:
+        name: Nightly REPL Tests - Linux (BUILD)
         if: github.actor != 'restyled-io[bot]'
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
@@ -76,7 +76,6 @@ jobs:
         steps:
             - name: Set up additional environment
               run: |
-                echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v6
@@ -205,9 +204,9 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
-    su_repl_tests_linux_run:
-        name: Software Update REPL Tests - Linux (RUN)
-        needs: su_repl_tests_linux_build
+    nightly_repl_tests_linux_run:
+        name: Nightly REPL Tests - Linux (RUN)
+        needs: nightly_repl_tests_linux_build
         if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 45
         strategy:
@@ -244,8 +243,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v6
-            # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
 
+            # NOTE: we need bootstrap to be able to use ASAN symbolizer and get ASAN Stack traces
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -307,9 +306,9 @@ jobs:
                   retention-days: 30
                   if-no-files-found: warn
 
-    su_repl_tests_report:
-        name: Software Update REPL Tests - Test Report
-        needs: su_repl_tests_linux_run
+    nightly_repl_tests_report:
+        name: Nightly REPL Tests - Test Report
+        needs: nightly_repl_tests_linux_run
         if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
 
         runs-on: ubuntu-latest
