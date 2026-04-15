@@ -319,11 +319,7 @@ jobs:
             - name:
                   Check for use of 'SafeAttributePersistenceProvider' and
                   'AttributePersistenceProvider' symbols
-              # Keep this check running so violations remain visible in CI
-              # while the underlying issue is being addressed.
-              # https://github.com/project-chip/connectedhomeip/issues/71540
               if: always()
-              continue-on-error: true
               run: |
                   scripts/find_attribute_persistence_provider_usage.sh \
                   --skip-subtree .github/ \
