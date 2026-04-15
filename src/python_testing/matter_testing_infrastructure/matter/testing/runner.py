@@ -488,32 +488,34 @@ def run_tests_no_exit(
                     ok = False
 
         #
-        # Populate the global wildcard only after commissioning has completed,
-        # so the DUT is reachable for operational reads.
+        # Populate the global wildcard
         #
-        try:
-            global_wildcard = event_loop.run_until_complete(
-                asyncio.wait_for(
-                    default_controller.Read(
-                        matter_test_config.dut_node_ids[0],
-                        [
-                            (Clusters.Descriptor),
-                            Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                            Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                            Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                        ]
-                    ),
-                    timeout=60
+        if not matter_test_config.dut_node_ids:
+            LOGGER.error("No DUT node IDs were provided; cannot populate global wildcard.")
+            ok = False
+        if ok:
+            try:
+                global_wildcard = event_loop.run_until_complete(
+                    asyncio.wait_for(
+                        default_controller.Read(
+                            matter_test_config.dut_node_ids[0],
+                            [
+                                (Clusters.Descriptor),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                            ]
+                        ),
+                        timeout=60
+                    )
                 )
-            )
-            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
-                global_wildcard)
-        except TimeoutError:
-            ok = False
-        except Exception:
-            LOGGER.exception('Exception when populating global wildcard for %s.',
-                             test_config.testbed_name)
-            ok = False
+                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(global_wildcard)
+            except TimeoutError:
+                ok = False
+            except Exception:
+                LOGGER.exception('Exception when populating global wildcard for %s.',
+                                 test_config.testbed_name)
+                ok = False
 
         #
         # Run the actual test class unless we have a commission-only request.

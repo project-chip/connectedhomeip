@@ -174,7 +174,7 @@ class CommissioningMethod(ABC):
         setup_code = self.info.setup_code
         if setup_code is None:
             setup_code = self.dev_ctrl.CreateManualCode(
-                self.info.filter_value >> 8 if self.info.filter_type == discovery.FilterType.LONG_DISCRIMINATOR else self.info.filter_value,
+                self.info.filter_value,
                 self.info.passcode
             )
 
