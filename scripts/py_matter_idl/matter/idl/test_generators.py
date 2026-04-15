@@ -18,6 +18,7 @@ import os
 import sys
 import unittest
 from dataclasses import dataclass, field
+from importlib import import_module
 from pathlib import Path
 from typing import List
 
@@ -33,9 +34,22 @@ from matter.idl.generators.cpp.application import CppApplicationGenerator
 from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter.idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter.idl.generators.storage import GeneratorStorage
-from matter.idl.matter_idl_types import Idl
+from matter.idl.matter_idl_types import (
+    Cluster,
+    Command,
+    DataType,
+    Field,
+    FieldQuality,
+    Idl,
+    Struct,
+)
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
+EXAMPLES_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../examples'))
+ALL_CLUSTERS_APP_MATTER = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../../..',
+                 'examples/all-clusters-app/all-clusters-common/all-clusters-app.matter'))
 REGENERATE_GOLDEN_IMAGES = False
 
 
@@ -175,6 +189,151 @@ class TestGenerators(unittest.TestCase):
         for test in build_tests(yaml_data):
             with self.subTest(generator=test.generator_name):
                 test.run_test_cases(self)
+
+
+class TestMatterIdlPluginHelpers(unittest.TestCase):
+    def _import_plugin(self):
+        if EXAMPLES_DIR not in sys.path:
+            sys.path.append(EXAMPLES_DIR)
+        return import_module("matter_idl_plugin")
+
+    def test_to_protobuf_type_aliases_and_named_types(self):
+        plugin = self._import_plugin()
+        toProtobufType = plugin.toProtobufType
+
+        # Primitive and legacy aliases should map to protobuf primitives.
+        self.assertEqual(toProtobufType("boolean"), "bool")
+        self.assertEqual(toProtobufType("single"), "float")
+        self.assertEqual(toProtobufType("double"), "double")
+        self.assertEqual(toProtobufType("char_string"), "string")
+        self.assertEqual(toProtobufType("long_octet_string"), "bytes")
+        self.assertEqual(toProtobufType("uint32"), "uint32")
+        self.assertEqual(toProtobufType("int64"), "int64")
+
+        # Derived/sized integer aliases should normalize into protobuf ints.
+        self.assertEqual(toProtobufType("int16u"), "uint32")
+        self.assertEqual(toProtobufType("int40u"), "uint64")
+        self.assertEqual(toProtobufType("int16s"), "int32")
+        self.assertEqual(toProtobufType("int40s"), "int64")
+        self.assertEqual(toProtobufType("temperature"), "int32")
+
+        # Cluster-local enum/bitmap names should stay as named types.
+        self.assertEqual(toProtobufType("MyEnum"), "MyEnum")
+        self.assertEqual(toProtobufType("LevelControlOptions"), "LevelControlOptions")
+        self.assertEqual(toProtobufType("CustomStruct"), "CustomStruct")
+
+    def test_to_enum_entry_name_uses_enum_acronym_prefix(self):
+        plugin = self._import_plugin()
+        toEnumEntryName = plugin.toEnumEntryName
+
+        self.assertEqual(toEnumEntryName("kKnown", "MyEnum"), "ME_KNOWN")
+        self.assertEqual(toEnumEntryName("Known", "MyEnum"), "ME_KNOWN")
+        self.assertEqual(
+            toEnumEntryName("kCoupleColorTempToLevel", "LevelControlOptions"),
+            "LCO_COUPLE_COLOR_TEMP_TO_LEVEL")
+
+    def test_encoding_type_and_field_helpers(self):
+        plugin = self._import_plugin()
+        EncodingDataType = plugin.EncodingDataType
+
+        self.assertEqual(plugin.EncodingDataType.fromType("uint32"), EncodingDataType.UINT)
+        self.assertEqual(plugin.EncodingDataType.fromType("uint64"), EncodingDataType.UINT)
+        self.assertEqual(plugin.EncodingDataType.fromType("int32"), EncodingDataType.INT)
+        self.assertEqual(plugin.EncodingDataType.fromType("int64"), EncodingDataType.INT)
+        self.assertEqual(plugin.EncodingDataType.fromType("bool"), EncodingDataType.BOOL)
+        self.assertEqual(plugin.EncodingDataType.fromType("string"), EncodingDataType.CHAR_STRING)
+        self.assertEqual(plugin.EncodingDataType.fromType("bytes"), EncodingDataType.OCT_STRING)
+        self.assertEqual(plugin.EncodingDataType.fromType("float"), EncodingDataType.FLOAT)
+        self.assertEqual(plugin.EncodingDataType.fromType("double"), EncodingDataType.DOUBLE)
+        self.assertEqual(plugin.EncodingDataType.fromType("MyEnum"), EncodingDataType.STRUCT)
+
+        simple_field = Field(data_type=DataType(name="int16u"), code=1, name="someInteger")
+        list_field = Field(data_type=DataType(name="int16u"), code=2, name="someList", is_list=True)
+        optional_field = Field(
+            data_type=DataType(name="int16s"),
+            code=3,
+            name="optionalCount",
+            qualities=FieldQuality.OPTIONAL,
+        )
+        named_field = Field(data_type=DataType(name="LevelControlOptions"), code=20, name="options")
+
+        self.assertEqual(plugin.toProtobufFullType(simple_field), "uint32")
+        self.assertEqual(plugin.toProtobufFullType(list_field), "repeated uint32")
+        self.assertEqual(plugin.toProtobufFullType(optional_field), "optional int32")
+        self.assertEqual(plugin.toFieldTag(simple_field), 524289)
+        self.assertEqual(plugin.toFieldTag(named_field), 3145748)
+        self.assertEqual(
+            plugin.toFieldComment(simple_field),
+            "/** int16u Type: 1 IsList: 0 FieldId: 1 */",
+        )
+        self.assertEqual(
+            plugin.toFieldComment(named_field),
+            "/** LevelControlOptions Type: 6 IsList: 0 FieldId: 20 */",
+        )
+
+    def test_command_helpers(self):
+        plugin = self._import_plugin()
+
+        request_fields = [Field(data_type=DataType(name="int16u"), code=1, name="request")]
+        response_fields = [Field(data_type=DataType(name="int16u"), code=2, name="response")]
+        cluster = Cluster(
+            name="TestCluster",
+            code=1,
+            structs=[
+                Struct(name="RequestType", fields=request_fields),
+                Struct(name="ResponseType", fields=response_fields),
+            ],
+        )
+
+        command = Command(name="DoThing", code=1, input_param="RequestType", output_param="ResponseType")
+        missing = Command(name="Missing", code=2, input_param=None, output_param="UnknownType")
+
+        self.assertEqual(plugin.commandArgs(command, cluster), request_fields)
+        self.assertEqual(plugin.commandResponseArgs(command, cluster), response_fields)
+        self.assertEqual(plugin.commandArgs(missing, cluster), [])
+        self.assertEqual(plugin.commandResponseArgs(missing, cluster), [])
+
+    def test_custom_generator_requires_package_option(self):
+        plugin = self._import_plugin()
+
+        with self.assertRaisesRegex(Exception, "Please provide a \"--option package:<name>\" argument"):
+            plugin.CustomGenerator(GeneratorStorage(), Idl())
+
+    def test_custom_generator_real_world_all_clusters_sample(self):
+        plugin = self._import_plugin()
+
+        class MemoryStorage(GeneratorStorage):
+            def __init__(self):
+                super().__init__()
+                self.outputs = {}
+
+            def get_existing_data(self, relative_path: str):
+                return self.outputs.get(relative_path, "")
+
+            def write_new_data(self, relative_path: str, content: str):
+                self.outputs[relative_path] = content
+
+        with open(ALL_CLUSTERS_APP_MATTER) as stream:
+            idl = CreateParser().parse(stream.read(), file_name=ALL_CLUSTERS_APP_MATTER)
+
+        storage = MemoryStorage()
+        plugin.CustomGenerator(storage, idl, package='com.matter.example.proto').render(dry_run=False)
+
+        self.assertEqual(len(storage.outputs), len(idl.clusters))
+        self.assertIn("proto/unit_testing_cluster.proto", storage.outputs)
+        self.assertIn("proto/access_control_cluster.proto", storage.outputs)
+
+        unit_testing_output = storage.outputs["proto/unit_testing_cluster.proto"]
+        access_control_output = storage.outputs["proto/access_control_cluster.proto"]
+
+        # Real-IDL regression checks: enum naming, integer normalization, and tag encoding.
+        self.assertIn("SE_VALUE_A = 1;", unit_testing_output)
+        self.assertIn("/** int16u Type: 1 IsList: 0 FieldId:", unit_testing_output)
+        self.assertIn("/** AccessRestrictionTypeEnum Type: 6 IsList: 0 FieldId: 0 */", access_control_output)
+        self.assertIn("AccessRestrictionTypeEnum type = 3145728;", access_control_output)
+        self.assertIn("/** cluster_id Type: 1 IsList: 0 FieldId: 1 */", access_control_output)
+        self.assertIn("uint32 cluster = 524289;", access_control_output)
+        self.assertIn("repeated AccessRestrictionStruct restrictions = 3145730;", access_control_output)
 
 
 if __name__ == '__main__':

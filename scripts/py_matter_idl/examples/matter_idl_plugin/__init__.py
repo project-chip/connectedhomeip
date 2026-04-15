@@ -57,9 +57,14 @@ def toLowerSnakeCase(s):
     return toUpperSnakeCase(s).lower()
 
 
+def toUpperAcronym(s):
+    """Remove lowercase letters and keep acronym numerals in uppercase."""
+    return ''.join([i for i in s if i.isupper() or i.isnumeric()]).upper()
+
+
 def toEnumEntryName(enumEntry, enumName):
     """Create enum entry name with a stable cluster-local unique prefix."""
-    prefix = toUpperSnakeCase(enumName)
+    prefix = toUpperAcronym(enumName)
     if (enumEntry[0] == 'k'):
         enumEntry = enumEntry[1:]
     return prefix + '_' + toUpperSnakeCase(enumEntry)
