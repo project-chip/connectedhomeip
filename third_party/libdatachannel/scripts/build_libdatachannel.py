@@ -97,7 +97,6 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
     print(f"Running: {shlex.join(cmake_cmd)}")
     subprocess.run(cmake_cmd, check=True)
 
-    # Build with Make
     make_cmd = ["cmake", "--build", str(build_dir), "--target", "datachannel-static", f"-j{os.cpu_count()}"]
     print(f"Running: {shlex.join(make_cmd)}")
     subprocess.run(make_cmd, check=True)
