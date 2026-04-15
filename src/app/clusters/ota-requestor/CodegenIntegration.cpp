@@ -18,6 +18,7 @@
 
 #include <app/clusters/ota-requestor/CodegenIntegration.h>
 
+#include <app/clusters/ota-requestor/CodegenIntegrationInternal.h>
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/AttributeListBuilder.h>

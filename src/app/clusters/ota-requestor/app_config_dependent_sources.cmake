@@ -53,3 +53,10 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/OTARequestorStorage.h"
     "${CLUSTER_DIR}/OTARequestorUserConsentDelegate.h"
 )
+
+# This is equivalent to BUILD.gn's codegen-integration-internal source set.
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration2.h"
+)

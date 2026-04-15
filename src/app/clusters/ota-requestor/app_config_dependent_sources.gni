@@ -16,6 +16,7 @@ app_config_dependent_sources = [
   "BDXDownloader.h",
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "CodegenIntegration2.h",
   "DefaultOTARequestor.cpp",
   "DefaultOTARequestor.h",
   "DefaultOTARequestorDriver.cpp",
