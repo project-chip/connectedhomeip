@@ -94,22 +94,23 @@ class TC_MODESELECT(MatterBaseTest):
         description = await self._read_description()
         asserts.assert_equal(description, "Mode Select Sample", "Description should be 'Mode Select Sample'")
 
-        # Step 3: Read StandardNamespace and check it is equal to 0x07
+        # Step 3: Read StandardNamespace and check it is equal to Null
         self.step(3)
         standard_namespace = await self._read_standard_namespace()
-        asserts.assert_equal(standard_namespace, NullValue, "StandardNamespace should be 0x07")
+        asserts.assert_equal(standard_namespace, NullValue, "StandardNamespace should be Null")
 
         # Step 4: Read SupportedModes and check it matches default modes
         self.step(4)
         supported_modes = await self._read_supported_modes()
         asserts.assert_equal(supported_modes, self.EXPECTED_MODES, "SupportedModes should match expected default modes")
 
-        # Step 5: Read CurrentMode and check it is equal to 1
+        # Step 5: Read CurrentMode and check it is equal to the first mode.
         self.step(5)
         current_mode = await self._read_current_mode()
-        asserts.assert_equal(current_mode, 1, "Initial CurrentMode should be 1")
+        asserts.assert_equal(current_mode, self.EXPECTED_MODES[0].mode,
+                             f"Initial CurrentMode should be {self.EXPECTED_MODES[0].mode}")
 
-        # Step 6: Loop over modes 1, 2, 3 and run ChangeToMode command
+        # Step 6: Loop over modes and run ChangeToMode command
         self.step(6)
         for mode_option in self.EXPECTED_MODES:
             mode = mode_option.mode
