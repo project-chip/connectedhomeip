@@ -338,7 +338,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             final_state=None
         )
 
-        subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=920.0)
+        subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=200.0)
         logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (Busy sequence) matcher has completed.')
         subscription_attr_state_busy.cancel()
 
@@ -443,7 +443,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         subscription_attr_state_updatenotavailable.await_all_expected_report_matches(
-            [matcher_not_available_state_obj], timeout_sec=920.0)
+            [matcher_not_available_state_obj], timeout_sec=200.0)
         logger.info(f'{step_number_s3}: Step #3.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
         subscription_attr_state_updatenotavailable.cancel()
 
@@ -554,7 +554,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         subscription_attr_state_busy_180s.await_all_expected_report_matches(
-            [matcher_delayed_s4_obj], timeout_sec=620.0)
+            [matcher_delayed_s4_obj], timeout_sec=60.0)
         logger.info(f'{step_number_s4}: Step #4.2 (Phase A) - kDelayedOnQuery confirmed, 180s delay started.')
         subscription_attr_state_busy_180s.cancel()
 
@@ -598,7 +598,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         subscription_attr_state_downloading_s4.await_all_expected_report_matches(
-            [matcher_downloading_s4_obj], timeout_sec=400.0)
+            [matcher_downloading_s4_obj], timeout_sec=250.0)
         logger.info(f'{step_number_s4}: Step #4.4 (Phase B) - kDownloading confirmed.')
         subscription_attr_state_downloading_s4.cancel()
 
@@ -980,7 +980,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=5,
+            min_interval_sec=0,
             max_interval_sec=5,
             keepSubscriptions=False
         )
