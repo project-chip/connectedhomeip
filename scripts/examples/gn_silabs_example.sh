@@ -319,7 +319,7 @@ else
         } &>/dev/null
     fi
 
-# After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).
+    # After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).
     if [ -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then # INSTALL_EVERYTHING
         INSTALL_EVERYTHING=true
     else
