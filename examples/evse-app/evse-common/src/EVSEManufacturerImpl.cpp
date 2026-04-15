@@ -451,7 +451,7 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
  */
 CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpointId)
 {
-    PowerSourceCluster * cluster = PowerSource::FindClusterOnEndpoint(endpointId);
+    WiredPowerSourceCluster * cluster = PowerSource::FindWiredClusterOnEndpoint(endpointId);
 
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
