@@ -361,6 +361,7 @@ EOF
 
     # Local Silabs package install when agreed (INSTALL_EVERYTHING). Never under Docker.
     if [ "$INSTALL_EVERYTHING" == true ] && [ "$USE_DOCKER" != true ]; then # run install-packages
+        python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
         python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
     fi # run install-packages
 
