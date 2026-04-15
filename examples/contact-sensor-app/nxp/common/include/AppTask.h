@@ -18,14 +18,20 @@
 
 #pragma once
 
-#include "AppConfig.h"
+#if CONFIG_APP_FREERTOS_OS
 #include "AppTaskFreeRTOS.h"
+#else
+#include "AppTaskZephyr.h"
+#endif
 
 #include <platform/CHIPDeviceLayer.h>
 
 namespace ContactSensorApp {
-
+#if CONFIG_APP_FREERTOS_OS
 class AppTask : public chip::NXP::App::AppTaskFreeRTOS
+#else
+class AppTask : public chip::NXP::App::AppTaskZephyr
+#endif
 {
 public:
     // AppTaskBase virtual methods
