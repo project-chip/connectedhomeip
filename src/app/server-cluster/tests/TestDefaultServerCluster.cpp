@@ -258,7 +258,7 @@ TEST(TestDefaultServerCluster, SetAttributeValueNullable)
     ASSERT_FALSE(attr.IsNull());
     ASSERT_EQ(attr.Value(), 123u);
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 1));
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 1));
     context.ChangeListener().DirtyList().clear();
 
     // Set to same value -> should return false, no change
