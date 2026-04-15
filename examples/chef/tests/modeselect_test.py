@@ -34,11 +34,11 @@ class TC_MODESELECT(MatterBaseTest):
     ENDPOINT = 1
     EXPECTED_MODES: typing.List[Clusters.Objects.ModeSelect.Structs.ModeOptionStruct] = [
         Clusters.Objects.ModeSelect.Structs.ModeOptionStruct(
-            label="One", mode=1, semanticTags=[Clusters.Objects.ModeSelect.Structs.SemanticTagStruct(mfgCode=0xFFF1, value=1)]),
+            label="3.5s", mode=35, semanticTags=[Clusters.Objects.ModeSelect.Structs.SemanticTagStruct(mfgCode=0xFFF1, value=0)]),
         Clusters.Objects.ModeSelect.Structs.ModeOptionStruct(
-            label="Two", mode=2, semanticTags=[Clusters.Objects.ModeSelect.Structs.SemanticTagStruct(mfgCode=0xFFF1, value=2)]),
+            label="4s", mode=40, semanticTags=[Clusters.Objects.ModeSelect.Structs.SemanticTagStruct(mfgCode=0xFFF1, value=0)]),
         Clusters.Objects.ModeSelect.Structs.ModeOptionStruct(
-            label="Three", mode=3, semanticTags=[Clusters.Objects.ModeSelect.Structs.SemanticTagStruct(mfgCode=0xFFF1, value=3)])
+            label="5s", mode=50, semanticTags=[Clusters.Objects.ModeSelect.Structs.SemanticTagStruct(mfgCode=0xFFF1, value=0)])
     ]
 
     def desc_TC_MODESELECT(self) -> str:

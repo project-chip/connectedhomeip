@@ -35,25 +35,24 @@ namespace Chef {
 
 using chip::operator""_span;
 
-static const Structs::SemanticTagStruct::Type kModeOneTags[]   = { { .mfgCode = static_cast<chip::VendorId>(0xFFF1), .value = 1 } };
-static const Structs::SemanticTagStruct::Type kModeTwoTags[]   = { { .mfgCode = static_cast<chip::VendorId>(0xFFF1), .value = 2 } };
-static const Structs::SemanticTagStruct::Type kModeThreeTags[] = { { .mfgCode = static_cast<chip::VendorId>(0xFFF1), .value = 3 } };
+static const Structs::SemanticTagStruct::Type kDefaultSemanticTagForModes[] = { { .mfgCode = static_cast<chip::VendorId>(0xFFF1),
+                                                                                  .value   = 0 } };
 
 static const Structs::ModeOptionStruct::Type kDefaultModeOptions[] = {
     {
-        .label        = "One"_span,
-        .mode         = 1,
-        .semanticTags = chip::app::DataModel::List<const Structs::SemanticTagStruct::Type>(kModeOneTags),
+        .label        = "3.5s"_span,
+        .mode         = 35,
+        .semanticTags = chip::app::DataModel::List<const Structs::SemanticTagStruct::Type>(kDefaultSemanticTagForModes),
     },
     {
-        .label        = "Two"_span,
-        .mode         = 2,
-        .semanticTags = chip::app::DataModel::List<const Structs::SemanticTagStruct::Type>(kModeTwoTags),
+        .label        = "4s"_span,
+        .mode         = 40,
+        .semanticTags = chip::app::DataModel::List<const Structs::SemanticTagStruct::Type>(kDefaultSemanticTagForModes),
     },
     {
-        .label        = "Three"_span,
-        .mode         = 3,
-        .semanticTags = chip::app::DataModel::List<const Structs::SemanticTagStruct::Type>(kModeThreeTags),
+        .label        = "5s"_span,
+        .mode         = 50,
+        .semanticTags = chip::app::DataModel::List<const Structs::SemanticTagStruct::Type>(kDefaultSemanticTagForModes),
     }
 };
 
