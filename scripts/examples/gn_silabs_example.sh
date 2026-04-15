@@ -319,10 +319,15 @@ else
         } &>/dev/null
     fi
 
-    # Run install-packages once (creates .install-packages-done when done); skip when using Docker (SDK is in image)
-    if [ "$USE_DOCKER" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then
-
+    # After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).
+    if [ -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then # INSTALL_EVERYTHING
+        INSTALL_EVERYTHING=true
+    else
         INSTALL_EVERYTHING=false
+    fi # INSTALL_EVERYTHING
+
+    # First-time local install: INSTALL_EVERYTHING is false until .install-packages-done (see above); respect opt-out. No prompt in Docker.
+    if [ "$USE_DOCKER" != true ] && [ "$INSTALL_EVERYTHING" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages" ]; then # first-time install prompt
         cat <<'EOF'
         !!!!!!!!! FIRST TIME INSTALL !!!!!!!!!
         Do you agree to install SILICON LABS PACKAGES MANAGER?
@@ -332,30 +337,33 @@ else
 
         Most of the files will be located under ~/.silabs,
         some symbolic link will be created and it will replace simplicity_sdk submodule
+        This is required for the build to succeed.
 EOF
 
         while true; do
-            read -p "Do you want to proceed? (y/n): " yn
+            read -p "Do you want to proceed? [Y/n]: " yn
             case $yn in
-                [Yy]*)
+                "" | [Yy]*)
                     INSTALL_EVERYTHING=true
+                    python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt" >/dev/null 2>&1 || true
                     break
-                    ;; # Case for yes/Y
+                    ;; # Case for yes/Y (Enter accepts default)
                 [Nn]*)
-                    echo "You won't be asked again"
+                    echo "You won't be asked again, cannot proceed with build. Exiting..."
+                    touch "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages"
+                    exit 1
                     break
                     ;;                                                  # Case for no/N
                 *) echo "Invalid response. Please answer yes or no." ;; # Case for invalid input
             esac
         done
+    fi # first-time install prompt
 
-        if [ "$INSTALL_EVERYTHING" == true ]; then
-            pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
-            python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
-        else
-            touch "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done"
-        fi
-    fi
+    # Local Silabs package install when agreed (INSTALL_EVERYTHING). Never under Docker.
+    if [ "$INSTALL_EVERYTHING" == true ] && [ "$USE_DOCKER" != true ]; then # run install-packages
+        python3 -m pip install -q -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
+        python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+    fi # run install-packages
 
     # Zap generation requires activation
     source "$CHIP_ROOT/scripts/activate.sh"
