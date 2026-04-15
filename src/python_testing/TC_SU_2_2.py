@@ -938,6 +938,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         asserts.assert_true(reconnected, f'{step_number}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')
 
+        # Allow the DUT to finish post-OTA housekeeping (attribute writes, data-version
+        # bumps on the OTA Requestor cluster) before Step 6 establishes a subscription.
+        # Without this sleep, the subscription is invalidated immediately by a data-version
+        # mismatch (Error 50) triggered by the DUT's own post-apply cluster updates.
+        logger.info(f'{step_number}: Step #1.6 - Waiting 15s for DUT to stabilize after OTA reboot.')
+        await asyncio.sleep(15)
+
         self.step(6)
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Prerequisites - Setup Provider
