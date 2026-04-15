@@ -626,39 +626,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s4}: Step #4.6 - Close Provider Process (aborting download)')
         self.current_provider_app_proc.terminate()
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.6 - Wait for DUT to return to kIdle after the aborted download.
-        # Without this, Step 7's EventSubscriptionHandler receives the stale
-        # kDownloading -> kIdle StateTransition event and fails the Idle -> Querying check.
-        # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s4}: Step #4.6 - Waiting for DUT UpdateState to return to kIdle.')
-
-        subscription_wait_idle_s4 = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-
-        await subscription_wait_idle_s4.start(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0.5,
-            max_interval_sec=0.5,
-            keepSubscriptions=False
-        )
-
-        def matcher_idle_s4(report):
-            return report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-
-        matcher_idle_s4_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s4} - Wait for kIdle after aborted download",
-            matcher=matcher_idle_s4
-        )
-
-        subscription_wait_idle_s4.await_all_expected_report_matches([matcher_idle_s4_obj], timeout_sec=620.0)
-        logger.info(f'{step_number_s4}: Step #4.6 - DUT returned to kIdle, safe to proceed.')
-        subscription_wait_idle_s4.cancel()
+        # kIdle wait removed: when the provider is killed mid-BDX the DUT can take many
+        # minutes to recover (BDX timeout + retry backoff). Step 7 handles any stale
+        # StateTransition events by filtering them in a loop (see Option B comments there).
 
         self.step(7)
         # ------------------------------------------------------------------------------------
@@ -709,35 +679,62 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s7}: Step #7.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step #7.2 - Track OTA StateTransition event: should stay Idle due to invalid BDX ImageURI.
-        #     First event: Idle > Querying
-        #     Second event: Querying > Idle
+        # [STEP_7]: Step #7.2 - Track OTA StateTransition events: Idle→Querying→Idle.
+        #
+        # Option B stale-event handling: Step 4 killed the provider during an active BDX
+        # download. The DUT may take a long time to recover (BDX timeout + retry backoff),
+        # emitting stale StateTransition events (kDownloading→kIdle, kIdle→kQuerying from
+        # retries, etc.) that arrive in this subscription's queue before the Step 7 events.
+        # The loop below discards any events that do not match the expected transitions and
+        # re-sends AnnounceOTAProvider every 60 s so the DUT queries as soon as it recovers.
         # ------------------------------------------------------------------------------------
 
-        # Transition 1: Idle > Querying
-        event1 = subscription_state_invalid_uri.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-            timeout_sec=620
-        )
-        logger.info(f"{step_number_s7}: Event 1: {event1}")
+        kIdle = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        kQuerying = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
 
-        self.verify_state_transition_event(
-            event1,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-        )
+        # --- Transition 1: Idle → Querying ---
+        event1 = None
+        s7_timeout = 900  # 15 min: accommodates DUT recovering from a stuck BDX transfer
+        t_s7_start = time.time()
 
-        # Transition 2: Querying > Idle
+        while time.time() - t_s7_start < s7_timeout:
+            remaining = s7_timeout - (time.time() - t_s7_start)
+            try:
+                evt = subscription_state_invalid_uri.wait_for_event_report(
+                    Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+                    timeout_sec=min(60.0, remaining)
+                )
+            except Exception:
+                # No event for 60 s — DUT may have missed AnnounceOTAProvider while busy.
+                # Re-send so the DUT queries as soon as it returns to kIdle.
+                logger.info(f"{step_number_s7}: No event in 60s, re-sending AnnounceOTAProvider "
+                            f"(elapsed: {time.time() - t_s7_start:.0f}s / {s7_timeout}s)")
+                await self.announce_ota_provider(
+                    controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+                continue
+
+            if evt.previousState == kIdle and evt.newState == kQuerying:
+                event1 = evt
+                logger.info(f"{step_number_s7}: Event 1 (Idle→Querying): {event1}")
+                break
+
+            logger.info(f"{step_number_s7}: Discarding stale event: "
+                        f"{evt.previousState} → {evt.newState}")
+
+        asserts.assert_true(event1 is not None,
+                            f"{step_number_s7}: Idle→Querying transition not found within {s7_timeout}s")
+
+        # --- Transition 2: Querying → Idle ---
         event2 = subscription_state_invalid_uri.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-            timeout_sec=30
+            timeout_sec=60
         )
-        logger.info(f"{step_number_s7}: Event 2: {event2}")
+        logger.info(f"{step_number_s7}: Event 2 (Querying→Idle): {event2}")
 
         self.verify_state_transition_event(
             event2,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+            kQuerying,
+            kIdle
         )
 
         subscription_state_invalid_uri.cancel()
@@ -994,35 +991,59 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_6]: Step #6.2 - Track OTA StateTransition events
         #     First event: Idle > Querying
         #     Second event: Querying > Idle
+        #
+        # Stale-event handling: Step 1's OTA apply leaves buffered StateTransition events
+        # (e.g. kApplying → kIdle) that this subscription will receive before the Step 6
+        # events. The loop below discards non-matching events until Idle→Querying is found.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s6}: Step #6.1 - Waiting for StateTransition events '
             '(DUT should reject the image because the offered version equals the installed version)')
 
-        # Transition 1: Idle > Querying
-        event1 = subscription_state_no_download.wait_for_event_report(
+        kIdle_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        kQuerying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+
+        # --- Transition 1: Idle → Querying ---
+        event1_s6 = None
+        s6_timeout = 620
+        t_s6_start = time.time()
+
+        while time.time() - t_s6_start < s6_timeout:
+            remaining = s6_timeout - (time.time() - t_s6_start)
+            try:
+                evt = subscription_state_no_download.wait_for_event_report(
+                    Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+                    timeout_sec=min(60.0, remaining)
+                )
+            except Exception:
+                logger.info(f"{step_number_s6}: No event in 60s, re-sending AnnounceOTAProvider "
+                            f"(elapsed: {time.time() - t_s6_start:.0f}s / {s6_timeout}s)")
+                await self.announce_ota_provider(
+                    controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+                continue
+
+            if evt.previousState == kIdle_s6 and evt.newState == kQuerying_s6:
+                event1_s6 = evt
+                logger.info(f"{step_number_s6}: Event 1 (Idle→Querying): {event1_s6}")
+                break
+
+            logger.info(f"{step_number_s6}: Discarding stale event: "
+                        f"{evt.previousState} → {evt.newState}")
+
+        asserts.assert_true(event1_s6 is not None,
+                            f"{step_number_s6}: Idle→Querying transition not found within {s6_timeout}s")
+
+        # --- Transition 2: Querying → Idle ---
+        event2_s6 = subscription_state_no_download.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-            timeout_sec=30
+            timeout_sec=60
         )
-        logger.info(f"{step_number_s6}: Event 1: {event1}")
+        logger.info(f"{step_number_s6}: Event 2 (Querying→Idle): {event2_s6}")
 
         self.verify_state_transition_event(
-            event1,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-        )
-
-        # Transition 2: Querying > Idle
-        event2 = subscription_state_no_download.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-            timeout_sec=30
-        )
-        logger.info(f"{step_number_s6}: Event 2: {event2}")
-
-        self.verify_state_transition_event(
-            event2,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+            event2_s6,
+            kQuerying_s6,
+            kIdle_s6
         )
 
         subscription_state_no_download.cancel()
