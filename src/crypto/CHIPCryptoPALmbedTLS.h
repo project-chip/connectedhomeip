@@ -19,7 +19,10 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
+#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 #include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
+
 #include <mbedtls/error.h>
 #include <mbedtls/version.h>
 
@@ -66,6 +69,7 @@ static inline void _log_PSA_error(psa_status_t status)
 }
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
+#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 static inline mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
 {
     switch (keyType)
@@ -76,6 +80,7 @@ static inline mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
         return MBEDTLS_ECP_DP_NONE;
     }
 }
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
 
 } // namespace Crypto
 } // namespace chip
