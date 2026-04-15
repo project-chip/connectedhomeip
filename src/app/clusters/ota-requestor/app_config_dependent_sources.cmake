@@ -58,5 +58,5 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration2.h"
+    "${CLUSTER_DIR}/CodegenIntegrationInternal.h"
 )
