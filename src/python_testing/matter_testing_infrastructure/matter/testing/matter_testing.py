@@ -215,10 +215,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = 0
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
-        # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
-        # Because setup_class can be called before commissioning, this variable is lazy-initialized
-        # where the read is deferred until the first guard function call that requires global attributes.
-        self.stored_global_wildcard = None
 
     def teardown_class(self):
         """Final teardown after all tests: log all problems and dump device attributes if available.
@@ -526,6 +522,11 @@ class MatterBaseTest(base_test.BaseTestClass):
     def runner_hook(self) -> TestRunnerHooks:
         """Accesses the Test Runner Hooks for external reporting."""
         return global_stash.unstash_globally(self.user_params.get("hooks"))
+
+    @property
+    def stored_global_wildcard(self) -> Any:
+        """Accesses the stored global wildcard instance."""
+        return global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
@@ -854,14 +855,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
-    async def _populate_wildcard(self):
-        """ Populates self.stored_global_wildcard if not already filled. """
-        if self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
-            self.stored_global_wildcard = await global_wildcard
-
-    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
+    def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
            For example can be used to check if a test step should be run:
@@ -874,13 +868,12 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        await self._populate_wildcard()
         attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
         return attr_condition
 
-    async def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
+    def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
         """Similar to attribute_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using command id against AcceptedCmdsList, otherwise returns True.
            For example can be used to check if a test step should be run:
@@ -893,13 +886,12 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.command_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        await self._populate_wildcard()
         cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
             self.mark_current_step_skipped()
         return cmd_condition
 
-    async def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
+    def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
         """Similar to command_guard and attribute_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using feature id against feature_map, otherwise returns True.
            For example can be used to check if a test step should be run:
@@ -912,7 +904,6 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        await self._populate_wildcard()
         feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
             self.mark_current_step_skipped()

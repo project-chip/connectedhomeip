@@ -89,7 +89,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
     async def check_protocol_version_attribute(self, endpoint, attribute_value=None):
 
         if not attribute_value:
-            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+            if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
                 attribute_value = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
                 )
@@ -100,7 +100,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
     async def check_power_threshold_attribute(self, endpoint, attribute_value=None):
 
         if not attribute_value:
-            if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+            if self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
                 attribute_value = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
                 )

@@ -98,7 +98,7 @@ class TC_DGSW_2_1(MatterBaseTest):
 
         # STEP 2: TH reads from the DUT the ThreadMetrics attribute
         self.step(2)
-        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.ThreadMetrics)
+        attr_condition = self.attribute_guard(endpoint=endpoint, attribute=attributes.ThreadMetrics)
         if attr_condition:
             thread_metrics_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
 
@@ -145,7 +145,7 @@ class TC_DGSW_2_1(MatterBaseTest):
 
         # STEP 3: TH reads from the DUT the CurrentHeapFree attribute
         self.step(3)
-        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
+        attr_condition = self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
         if attr_condition:
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
             logger.info(f"CurrentHeapFree: {current_heap_free_attr}")
@@ -157,7 +157,7 @@ class TC_DGSW_2_1(MatterBaseTest):
         self.step(4)
 
         current_heap_used_attr = 0
-        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
+        attr_condition = self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
         if attr_condition:
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
             logger.info(f"CurrentHeapUsed: {current_heap_used_attr}")
@@ -167,7 +167,7 @@ class TC_DGSW_2_1(MatterBaseTest):
 
         # STEP 5: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(5)
-        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
+        attr_condition = self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
         if attr_condition:
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
             logger.info(f"CurrentHeapHighWatermark: {current_heap_high_watermark_attr}")

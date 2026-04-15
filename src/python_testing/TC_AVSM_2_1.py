@@ -166,7 +166,7 @@ class TC_AVSM_2_1(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(2)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxConcurrentEncoders):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MaxConcurrentEncoders):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders
             )
@@ -175,7 +175,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_uint8(value, "MaxConcurrentEncoders")
 
         self.step(3)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxEncodedPixelRate):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MaxEncodedPixelRate):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
             )
@@ -184,7 +184,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_uint32(value, "MaxEncodedPixelRate")
 
         self.step(4)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.VideoSensorParams):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.VideoSensorParams):
             videoSensorParams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
             )
@@ -193,7 +193,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             self.assert_video_sensor_params_struct(videoSensorParams)
 
         self.step(5)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionUsesInfrared):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionUsesInfrared):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionUsesInfrared
             )
@@ -201,7 +201,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "NightVisionUsesInfrared is None")
 
         self.step(6)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MinViewportResolution):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MinViewportResolution):
             minViewportResolution = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
             )
@@ -210,7 +210,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             self.assert_video_resolution_struct(minViewportResolution)
 
         self.step(7)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.RateDistortionTradeOffPoints):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.RateDistortionTradeOffPoints):
             rateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
             )
@@ -223,7 +223,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
 
         self.step(8)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxContentBufferSize):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MaxContentBufferSize):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxContentBufferSize
             )
@@ -231,7 +231,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_uint32(value, "MaxContentBufferSize")
 
         self.step(9)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneCapabilities):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneCapabilities):
             microphoneCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
             )
@@ -240,7 +240,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             self.assert_audio_capabilities_struct(microphoneCapabilities)
 
         self.step(10)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerCapabilities):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerCapabilities):
             speakerCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerCapabilities
             )
@@ -249,7 +249,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             self.assert_audio_capabilities_struct(speakerCapabilities)
 
         self.step(11)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.TwoWayTalkSupport):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.TwoWayTalkSupport):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoWayTalkSupport
             )
@@ -262,7 +262,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
 
         self.step(12)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SnapshotCapabilities):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SnapshotCapabilities):
             snapshotCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
             )
@@ -275,7 +275,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
 
         self.step(13)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MaxNetworkBandwidth):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MaxNetworkBandwidth):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxNetworkBandwidth
             )
@@ -283,7 +283,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_uint32(value, "MaxNetworkBandwidth")
 
         self.step(14)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.CurrentFrameRate):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.CurrentFrameRate):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
             )
@@ -292,7 +292,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_uint16(value, "CurrentFrameRate")
 
         self.step(15)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HDRModeEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.HDRModeEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled
             )
@@ -300,7 +300,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "HDRModeEnabled is None")
 
         self.step(16)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SupportedStreamUsages):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SupportedStreamUsages):
             supportedStreamUsages = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
             )
@@ -314,7 +314,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
 
         self.step(17)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedVideoStreams):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedVideoStreams):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
             )
@@ -323,7 +323,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(18)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedAudioStreams):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedAudioStreams):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
             )
@@ -332,7 +332,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(19)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedSnapshotStreams):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.AllocatedSnapshotStreams):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
             )
@@ -341,7 +341,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(20)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StreamUsagePriorities):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.StreamUsagePriorities):
             streamUsagePriorities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
             )
@@ -355,7 +355,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
 
         self.step(21)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SoftRecordingPrivacyModeEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SoftRecordingPrivacyModeEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
             )
@@ -363,7 +363,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "SoftRecordingPrivacyModeEnabled is None")
 
         self.step(22)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SoftLivestreamPrivacyModeEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SoftLivestreamPrivacyModeEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
             )
@@ -371,7 +371,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "SoftLivestreamPrivacyModeEnabled is None")
 
         self.step(23)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HardPrivacyModeOn
             )
@@ -379,7 +379,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "HardPrivacyModeOn is None")
 
         self.step(24)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVision):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.NightVision):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVision)
             log.info(f"Rx'd NightVision: {value}")
             asserts.assert_is_not_none(value, "NightVision is None")
@@ -390,7 +390,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
 
         self.step(25)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionIllum):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.NightVisionIllum):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum
             )
@@ -403,20 +403,20 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
 
         self.step(26)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.Viewport):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.Viewport):
             viewport = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
             log.info(f"Rx'd Viewport: {viewport}")
             asserts.assert_is_not_none(viewport, "Viewport is None")
             self.assert_viewport_struct(viewport)
 
         self.step(27)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMuted):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMuted):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMuted)
             log.info(f"Rx'd SpeakerMuted: {value}")
             asserts.assert_is_not_none(value, "SpeakerMuted is None")
 
         self.step(28)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerVolumeLevel):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerVolumeLevel):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel
             )
@@ -426,7 +426,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             # TODO asserts depend on reading SpeakerMaxLevel and SpeakerMinLevel first
 
         self.step(29)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMaxLevel):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMaxLevel):
             speakerMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel
             )
@@ -436,7 +436,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_less_equal(speakerMaxLevel, 254, "SpeakerMaxLevel is > 254")
 
         self.step(30)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMinLevel):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.SpeakerMinLevel):
             speakerMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel
             )
@@ -446,7 +446,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_less_equal(speakerMinLevel, speakerMaxLevel, "SpeakerMinLevel is > SpeakerMaxLevel")
 
         self.step(31)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMuted):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMuted):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted
             )
@@ -454,7 +454,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "MicrophoneMuted is None")
 
         self.step(32)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneVolumeLevel):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneVolumeLevel):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel
             )
@@ -464,7 +464,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             # TODO asserts depend on reading MicrophoneMaxLevel and MicrophoneMinLevel first
 
         self.step(33)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMaxLevel):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMaxLevel):
             microphoneMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel
             )
@@ -474,7 +474,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_less_equal(microphoneMaxLevel, 254, "MicrophoneMaxLevel is > 254")
 
         self.step(34)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMinLevel):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneMinLevel):
             microphoneMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel
             )
@@ -484,7 +484,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_less_equal(microphoneMinLevel, microphoneMaxLevel, "MicrophoneMinLevel is > MicrophoneMaxLevel")
 
         self.step(35)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneAGCEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.MicrophoneAGCEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled
             )
@@ -492,7 +492,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "MicrophoneAGCEnabled is None")
 
         self.step(36)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageRotation):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.ImageRotation):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
             log.info(f"Rx'd ImageRotation: {value}")
             asserts.assert_is_not_none(value, "ImageRotation is None")
@@ -500,7 +500,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_less_equal(value, 359, "ImageRotation is > 359")
 
         self.step(37)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipHorizontal):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipHorizontal):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal
             )
@@ -508,7 +508,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "ImageFlipHorizontal is None")
 
         self.step(38)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipVertical):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.ImageFlipVertical):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical
             )
@@ -516,7 +516,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "ImageFlipVertical is None")
 
         self.step(39)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.LocalVideoRecordingEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.LocalVideoRecordingEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled
             )
@@ -524,7 +524,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "LocalVideoRecordingEnabled is None")
 
         self.step(40)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.LocalSnapshotRecordingEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.LocalSnapshotRecordingEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
             )
@@ -532,7 +532,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "LocalSnapshotRecordingEnabled is None")
 
         self.step(41)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightEnabled):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightEnabled):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled
             )
@@ -540,7 +540,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             asserts.assert_is_not_none(value, "StatusLightEnabled is None")
 
         self.step(42)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightBrightness):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.StatusLightBrightness):
             value = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness
             )

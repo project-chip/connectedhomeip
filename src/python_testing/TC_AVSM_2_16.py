@@ -203,7 +203,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             )
             asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeEnabled should be False")
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
+        if self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
             # For CI: Use app pipe to simulate physical privacy switch being turned on
             # For manual testing: User should physically turn on the privacy switch
             log.info("HardPrivacy is supported")
