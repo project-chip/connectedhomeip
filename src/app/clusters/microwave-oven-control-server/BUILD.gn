@@ -25,7 +25,6 @@ source_set("microwave-oven-control-server") {
     "${chip_root}/examples/rvc-app/rvc-common:rvc-common",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/zzz_generated/app-common/clusters/MicrowaveOvenControl",
   ]
 }
