@@ -23,7 +23,7 @@ TEST(JointFabricDatastoreTest, AddPendingNodeNotifiesListener)
     store.AddListener(listener);
 
     // Add a pending node — should notify the listener via MarkNodeListChange
-    CHIP_ERROR err = store.AddPendingNode(123, CharSpan::fromCharString("controller-a"));
+    CHIP_ERROR err = store.AddPendingNode(123, "controller-a"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_TRUE(listener.mNotified);
@@ -38,7 +38,7 @@ TEST(JointFabricDatastoreTest, RemoveListenerPreventsNotification)
     store.RemoveListener(listener);
     listener.Reset();
 
-    CHIP_ERROR err = store.AddPendingNode(456, CharSpan::fromCharString("controller-b"));
+    CHIP_ERROR err = store.AddPendingNode(456, "controller-b"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_FALSE(listener.mNotified);
@@ -166,7 +166,7 @@ TEST(JointFabricDatastoreTest, RefreshNodeUpdatesExistingNode)
     store.AddListener(listener);
 
     // Add initial pending node
-    err = store.AddPendingNode(123, CharSpan::fromCharString("controller-a"));
+    err = store.AddPendingNode(123, "controller-a"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(listener.mNotified);
 
@@ -204,11 +204,11 @@ TEST(JointFabricDatastoreTest, UpdateNodeChangesNameAndNotifies)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     store.AddListener(listener);
 
-    err = store.AddPendingNode(123, CharSpan::fromCharString("original-name"));
+    err = store.AddPendingNode(123, "original-name"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     listener.Reset();
 
-    err = store.UpdateNode(123, CharSpan::fromCharString("updated-name"));
+    err = store.UpdateNode(123, "updated-name"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(listener.mNotified);
 }
@@ -223,7 +223,7 @@ TEST(JointFabricDatastoreTest, RemoveNodeDeletesAndNotifies)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     store.AddListener(listener);
 
-    err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(123, "test-node"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     listener.Reset();
 
@@ -314,7 +314,7 @@ TEST(JointFabricDatastoreTest, UpdateAdmin)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     uint8_t icacData[] = { 0x01, 0x02 };
-    err                = store.UpdateAdmin(100, CharSpan::fromCharString("new-name"), ByteSpan(icacData));
+    err                = store.UpdateAdmin(100, "new-name"_span, ByteSpan(icacData));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -333,17 +333,17 @@ TEST(JointFabricDatastoreTest, RemoveGroupIDFromEndpoint)
     err = store.TestAddNodeKeySetEntry(groupId, groupKeySetId, nodeId);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("test-endpoint"));
+    err = store.TestAddEndpointEntry(endpointId, nodeId, "test-endpoint"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addGroupData;
     addGroupData.groupID       = groupId;
-    addGroupData.friendlyName  = CharSpan::fromCharString("test-group");
+    addGroupData.friendlyName  = "test-group"_span;
     addGroupData.groupKeySetID = groupKeySetId;
     err                        = store.AddGroup(addGroupData);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test"));
+    err = store.AddPendingNode(nodeId, "test"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     err = store.AddGroupIDToEndpointForNode(nodeId, endpointId, groupId);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -408,13 +408,13 @@ TEST(JointFabricDatastoreTest, UpdateEndpointForNode)
     NodeId nodeId         = 123;
     EndpointId endpointId = 1;
 
-    err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(nodeId, "test-node"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("initial-endpoint"));
+    err = store.TestAddEndpointEntry(endpointId, nodeId, "initial-endpoint"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.UpdateEndpointForNode(nodeId, endpointId, CharSpan::fromCharString("endpoint-name"));
+    err = store.UpdateEndpointForNode(nodeId, endpointId, "endpoint-name"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -425,7 +425,7 @@ TEST(JointFabricDatastoreTest, UpdateEndpointForNonExistentNodeFails)
     CHIP_ERROR err = store.SetDelegate(&delegate);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.UpdateEndpointForNode(999, 1, CharSpan::fromCharString("endpoint-name"));
+    err = store.UpdateEndpointForNode(999, 1, "endpoint-name"_span);
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
@@ -439,10 +439,10 @@ TEST(JointFabricDatastoreTest, AddBindingToEndpointForNode)
     NodeId nodeId         = 123;
     EndpointId endpointId = 1;
 
-    err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(nodeId, "test-node"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("test-endpoint"));
+    err = store.TestAddEndpointEntry(endpointId, nodeId, "test-endpoint"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type binding;
@@ -461,10 +461,10 @@ TEST(JointFabricDatastoreTest, RemoveBindingFromEndpointForNode)
     EndpointId endpointId = 1;
     uint16_t listId       = 0;
 
-    err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(nodeId, "test-node"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("test-endpoint"));
+    err = store.TestAddEndpointEntry(endpointId, nodeId, "test-endpoint"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type binding;
@@ -493,7 +493,7 @@ TEST(JointFabricDatastoreTest, AddACLToNode)
     CHIP_ERROR err = store.SetDelegate(&delegate);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(123, "test-node"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
@@ -520,7 +520,7 @@ TEST(JointFabricDatastoreTest, RemoveACLFromNode)
     CHIP_ERROR err = store.SetDelegate(&delegate);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(123, "test-node"_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;

@@ -181,7 +181,6 @@ not_automated:
     - name: TC_JFADMIN_1_4
       reason: Moved to Nightly runs instead of CI.
 
-
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
 # to consider improving. May not be exhaustive

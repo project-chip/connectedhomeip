@@ -24,8 +24,8 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/testing/EmptyProvider.h>
+#include <app/server-cluster/testing/TestAttributeChangeListener.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
-#include <app/server-cluster/testing/TestProviderChangeListener.h>
 #include <app/server/Server.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -54,9 +54,8 @@ class TestServerClusterContext
 public:
     TestServerClusterContext() :
         mTestContext{
-            .eventsGenerator         = mTestEventsGenerator,
-            .dataModelChangeListener = mTestDataModelChangeListener,
-            .actionContext           = mNullActionContext,
+            .eventsGenerator = mTestEventsGenerator,
+            .actionContext   = mNullActionContext,
         },
         mContext{
             .provider           = mTestProvider,
@@ -67,6 +66,7 @@ public:
         mFabricTable(Server::GetInstance().GetFabricTable()), mCaseSessionManager(*Server::GetInstance().GetCASESessionManager()),
         mPlatformManager(DeviceLayer::PlatformMgr()), mInteractionModelEngine(*app::InteractionModelEngine::GetInstance())
     {
+        mTestProvider.RegisterAttributeChangeListener(mChangeListener);
         SuccessOrDie(mDefaultAttributePersistenceProvider.Init(&mTestStorage));
     }
 
@@ -74,7 +74,7 @@ public:
     app::ServerClusterContext & Get() { return mContext; }
 
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
-    TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
+    TestAttributeChangeListener & ChangeListener() { return mChangeListener; };
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
     app::DefaultAttributePersistenceProvider & AttributePersistenceProvider() { return mDefaultAttributePersistenceProvider; }
     app::DataModel::InteractionModelContext & ImContext() { return mTestContext; }
@@ -83,10 +83,21 @@ public:
     DeviceLayer::PlatformManager & GetPlatformManager() { return mPlatformManager; }
     app::InteractionModelEngine & GetInteractionModelEngine() { return mInteractionModelEngine; }
 
+    TestAttributeChangeListener & ReleaseListener()
+    {
+        mTestProvider.UnregisterAttributeChangeListener(mChangeListener);
+        return mChangeListener;
+    }
+
+    void AddProviderListener(app::DataModel::AttributeChangeListener & listener)
+    {
+        mTestProvider.RegisterAttributeChangeListener(listener);
+    }
+
 private:
     NullActionContext mNullActionContext;
     LogOnlyEvents mTestEventsGenerator;
-    TestProviderChangeListener mTestDataModelChangeListener;
+    TestAttributeChangeListener mChangeListener;
     EmptyProvider mTestProvider;
     TestPersistentStorageDelegate mTestStorage;
     app::DefaultAttributePersistenceProvider mDefaultAttributePersistenceProvider;
@@ -96,6 +107,33 @@ private:
     CASESessionManager & mCaseSessionManager;
     DeviceLayer::PlatformManager & mPlatformManager;
     app::InteractionModelEngine & mInteractionModelEngine;
+};
+
+/// RAII class to register a TestAttributeChangeListener from a TestServerClusterContext
+/// with a specific DataModel::Provider for the scope of this object's lifetime.
+class ScopedAttributeChangeListenerRegistration
+{
+public:
+    ScopedAttributeChangeListenerRegistration(app::DataModel::Provider & provider, TestServerClusterContext & context) :
+        mProvider(provider), mContext(context)
+    {
+        mProvider.RegisterAttributeChangeListener(mContext.ReleaseListener());
+    }
+
+    ~ScopedAttributeChangeListenerRegistration()
+    {
+        // restore the previous state. We assume only one registration
+        mProvider.UnregisterAttributeChangeListener(mContext.ChangeListener());
+        mContext.AddProviderListener(mContext.ChangeListener());
+    }
+
+    // Non-copyable
+    ScopedAttributeChangeListenerRegistration(const ScopedAttributeChangeListenerRegistration &)             = delete;
+    ScopedAttributeChangeListenerRegistration & operator=(const ScopedAttributeChangeListenerRegistration &) = delete;
+
+private:
+    app::DataModel::Provider & mProvider;
+    TestServerClusterContext & mContext;
 };
 
 } // namespace Testing
