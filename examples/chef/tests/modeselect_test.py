@@ -21,6 +21,7 @@ import typing
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
@@ -47,7 +48,7 @@ class TC_MODESELECT(MatterBaseTest):
     def steps_TC_MODESELECT(self):
         return [TestStep(1, "Commissioning already done.", is_commissioning=True),
                 TestStep(2, "Read Description and check it is equal to 'Mode Select Sample'."),
-                TestStep(3, "Read StandardNamespace and check it is equal to 0x07."),
+                TestStep(3, "Read StandardNamespace and check it is equal to Null."),
                 TestStep(4, "Read SupportedModes and check it matches default modes."),
                 TestStep(5, "Read CurrentMode and check it is equal to 1."),
                 TestStep(6, "Loop over modes 1, 2, 3 and run ChangeToMode command.")]
@@ -96,7 +97,7 @@ class TC_MODESELECT(MatterBaseTest):
         # Step 3: Read StandardNamespace and check it is equal to 0x07
         self.step(3)
         standard_namespace = await self._read_standard_namespace()
-        asserts.assert_equal(standard_namespace, 0x07, "StandardNamespace should be 0x07")
+        asserts.assert_equal(standard_namespace, NullValue, "StandardNamespace should be 0x07")
 
         # Step 4: Read SupportedModes and check it matches default modes
         self.step(4)
