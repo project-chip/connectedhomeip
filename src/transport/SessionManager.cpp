@@ -1327,13 +1327,13 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
 {
     // Mark the corresponding secure sessions for eviction
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
+        if (session->GetTCPConnection() == conn)
         {
-            SessionHandle handle(*session);
-            // Notify the SessionConnection delegate of the connection
-            // closure.
-            if (mConnDelegate != nullptr)
+            bool isActive = session->IsActiveSession();
+
+            if (isActive)
             {
+<<<<<<< HEAD
                 mConnDelegate->OnTCPConnectionClosed(handle, conErr);
             }
 
@@ -1341,6 +1341,22 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
             // nullptr.
             session->SetTCPConnection(nullptr);
             // Mark session for eviction.
+=======
+                // Notify the SessionConnection delegate of the connection
+                // closure before session eviction detaches holders and
+                // releases exchanges.
+                if (mConnDelegate != nullptr)
+                {
+                    SessionHandle handle(*session);
+                    mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                }
+            }
+
+            // Explicitly release the TCP connection handle to ensure the transport resource is reclaimed immediately.
+            session->ReleaseTCPConnection();
+
+            // Mark session for eviction regardless of its current state (Active, Defunct, or Establishing).
+>>>>>>> 8655197b86 (Fix TCP connection leak for non-active secure sessions (#71514))
             session->MarkForEviction();
         }
 
