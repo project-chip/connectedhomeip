@@ -28,6 +28,8 @@ import sys
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from xml.dom.minidom import parseString
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 import click
 import coloredlogs
@@ -41,6 +43,7 @@ class TestResult:
     name: str
     status: str          # "passed" | "failed" | "dry_run"
     duration_seconds: float
+    error_message: str | None = None
 
 
 @dataclass
@@ -51,8 +54,8 @@ class RunSummary:
     failed: int = 0
     results: list[TestResult] = field(default_factory=list)
 
-    def record(self, name: str, status: str, duration: float) -> None:
-        self.results.append(TestResult(name=name, status=status, duration_seconds=round(duration, 3)))
+    def record(self, name: str, status: str, duration: float, error_message: str | None = None) -> None:
+        self.results.append(TestResult(name=name, status=status, duration_seconds=round(duration, 3), error_message=error_message))
         if status == "passed":
             self.passed += 1
         elif status == "failed":
@@ -64,6 +67,40 @@ class RunSummary:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data, indent=2))
         log.info("Test run summary written to %s", path)
+
+    def write_junit_xml(self, suite_name: str, path: Path) -> None:
+        failures = sum(1 for r in self.results if r.status == "failed")
+        skipped = sum(1 for r in self.results if r.status == "dry_run")
+        total_time = sum(r.duration_seconds for r in self.results)
+
+        suite = Element("testsuite", {
+            "name": suite_name,
+            "tests": str(len(self.results)),
+            "failures": str(failures),
+            "skipped": str(skipped),
+            "errors": "0",
+            "time": f"{total_time:.3f}",
+            "timestamp": self.run_timestamp.strftime("%Y-%m-%dT%H:%M:%S"),
+        })
+
+        for r in self.results:
+            tc = SubElement(suite, "testcase", {
+                "name": r.name,
+                "classname": suite_name,
+                "time": f"{r.duration_seconds:.3f}",
+            })
+            if r.status == "failed":
+                failure = SubElement(tc, "failure", {"message": f"{r.name} failed"})
+                if r.error_message:
+                    failure.text = r.error_message
+                    SubElement(tc, "system-out").text = r.error_message
+            elif r.status == "dry_run":
+                SubElement(tc, "skipped", {"message": "dry run"})
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+        xml_str = parseString(tostring(suite, encoding="unicode")).toprettyxml(indent="  ")
+        path.write_text(xml_str)
+        log.info("JUnit XML written to %s", path)
 
 
 def load_env_from_yaml(file_path):
@@ -123,12 +160,29 @@ def main():
     help="Regex the tests to pick. Use `!` to negate the expression. Expressions FILTERS out non-matching (i.e. you can use it to restrict more and more, but not to add)",
 )
 @click.option(
+    "--nightly",
+    is_flag=True,
+    help="If set only run tests under the nightly section.",
+)
+@click.option(
     "--summary-file",
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
     help="If provided, write a JSON test-run summary to this file at the end of the run.",
 )
-def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], summary_file: Path | None):
+@click.option(
+    "--junit-file",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="If provided, write test results as JUnit XML to this file at the end of the run.",
+)
+@click.option(
+    "--junit-suite-name",
+    type=str,
+    default="execute_python_tests script",
+    help="Name for the JUnit XML test suite (default: execute_python_tests script).",
+)
+def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     load_env_from_yaml(env_file)
@@ -138,6 +192,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
     with open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")) as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
+    nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
 
@@ -157,7 +212,19 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+    # If nightly flag is set that mean only super slow tests are going to run, some of these test may be in the not_automated
+    # section as tests are super slow and they should not run on each PR, only on nightly runs.
+    if nightly and nightly_tests is not None:
+        python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
+
+    if not nightly:
+        # Filter out the files matching the excluded patterns
+        python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+
+    if len(python_files) == 0:
+        # No files match
+        log.error("No tests to execute")
+        sys.exit(1)
 
     run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.timezone.utc))
 
@@ -174,8 +241,8 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
                     print(f"Running command: {full_command}", flush=True)
                     subprocess.run(full_command, shell=True, check=True)
                     run_summary.record(os.path.basename(script), "passed", time.monotonic() - test_start)
-            except Exception:
-                run_summary.record(os.path.basename(script), "failed", time.monotonic() - test_start)
+            except Exception as e:
+                run_summary.record(os.path.basename(script), "failed", time.monotonic() - test_start, error_message=str(e))
                 if keep_going:
                     failed_scripts.append(script)
                 else:
@@ -184,6 +251,8 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         run_summary.total_runs = len(run_summary.results)
         if summary_file is not None:
             run_summary.write_json(summary_file)
+        if junit_file is not None:
+            run_summary.write_junit_xml(junit_suite_name, junit_file)
 
     if failed_scripts:
         log.error("FAILURES detected:")

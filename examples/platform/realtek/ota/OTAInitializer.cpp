@@ -40,7 +40,12 @@ void OTAInitializer::InitOTARequestor(void)
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    CHIP_ERROR err = gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to initialize OTA Requestor: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);

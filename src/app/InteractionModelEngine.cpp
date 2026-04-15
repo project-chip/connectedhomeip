@@ -171,8 +171,15 @@ class AutoReleaseSubscriptionInfoIterator
 {
 public:
     AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
-    ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
+    ~AutoReleaseSubscriptionInfoIterator()
+    {
+        if (mIterator)
+        {
+            mIterator->Release();
+        }
+    }
 
+    explicit operator bool() const { return mIterator != nullptr; }
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
 
 private:
@@ -277,7 +284,6 @@ void InteractionModelEngine::Shutdown()
             writeHandler.Close();
         }
     }
-
     mReportingEngine.Shutdown();
     mAttributePathPool.ReleaseAll();
     mEventPathPool.ReleaseAll();
@@ -781,6 +787,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
                 auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+                VerifyOrReturnError(nullptr != iterator, Status::ResourceExhausted);
 
                 while (iterator->Next(subscriptionInfo))
                 {
@@ -1950,6 +1957,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     DataModel::Provider * oldModel = mDataModelProvider;
     if (oldModel != nullptr)
     {
+        oldModel->UnregisterAttributeChangeListener(mReportingEngine);
         CHIP_ERROR err = oldModel->Shutdown();
         if (err != CHIP_NO_ERROR)
         {
@@ -1961,14 +1969,16 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     if (mDataModelProvider != nullptr)
     {
         CHIP_ERROR err = mDataModelProvider->Startup({
-            .eventsGenerator         = EventManagement::GetInstance(),
-            .dataModelChangeListener = mReportingEngine,
-            .actionContext           = *this,
+            .eventsGenerator = EventManagement::GetInstance(),
+            .actionContext   = *this,
         });
+
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
         }
+        // Register to the new model
+        mDataModelProvider->RegisterAttributeChangeListener(mReportingEngine);
     }
 
     return oldModel;
@@ -2134,9 +2144,11 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator             = mpSubscriptionResumptionStorage->IterateSubscriptions();
     mNumOfSubscriptionsToResume = 0;
     uint16_t minInterval        = 0;
+
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    VerifyOrReturnError(nullptr != iterator, CHIP_ERROR_NO_MEMORY);
     while (iterator->Next(subscriptionInfo))
     {
         mNumOfSubscriptionsToResume++;
@@ -2173,6 +2185,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     AutoReleaseSubscriptionInfoIterator iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
+    VerifyOrReturn(iterator, ChipLogError(InteractionModel, "Failed to allocate subscription resumption iterator"));
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
@@ -2245,7 +2258,9 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
 
     // Look through persisted subscriptions and see if any aren't already in mReadHandlers pool
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator                = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    // Conservatively assume there may be subscriptions to resume if we cannot get an iterator.
+    VerifyOrReturnValue(iterator != nullptr, true);
     bool foundSubscriptionToResume = false;
     while (iterator->Next(subscriptionInfo))
     {

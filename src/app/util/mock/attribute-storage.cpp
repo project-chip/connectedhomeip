@@ -30,10 +30,10 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
@@ -391,16 +391,17 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsig
     return GetMockNodeConfig().endpoints[index].deviceTypes();
 }
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             DataModel::ProviderChangeListener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     dataVersion++;
-    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
-}
 
-void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
-{
-    listener->MarkDirty(AttributePathParams(endpoint));
+    InteractionModelEngine * interactionmodelEngine = InteractionModelEngine::GetInstance();
+    VerifyOrReturn(interactionmodelEngine != nullptr);
+
+    DataModel::Provider * dataModelProvider = interactionmodelEngine->GetDataModelProvider();
+    VerifyOrReturn(dataModelProvider != nullptr);
+
+    dataModelProvider->NotifyAttributeChanged({ endpoint, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
 }
 
 unsigned emberAfMetadataStructureGeneration()

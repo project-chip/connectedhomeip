@@ -152,7 +152,7 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/src/app/clusters/microwave-oven-control-server/microwave-oven-control-server.cpp
+    ${chip_dir}/src/app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp

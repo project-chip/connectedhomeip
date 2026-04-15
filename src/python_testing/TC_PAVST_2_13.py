@@ -79,6 +79,11 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        super().teardown_test()
+
     def steps_TC_PAVST_2_13(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
@@ -213,7 +218,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
 
         self.step(1)
@@ -293,7 +298,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+                                                              tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must responds with Status Code Success.")
         except InteractionModelError as e:
@@ -458,7 +463,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+                                                              tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must responds with Status Code Success.")
         except InteractionModelError as e:

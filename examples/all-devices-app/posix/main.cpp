@@ -204,6 +204,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
+    SuccessOrDie(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
