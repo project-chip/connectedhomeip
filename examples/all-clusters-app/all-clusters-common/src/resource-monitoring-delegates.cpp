@@ -152,23 +152,23 @@ CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct
     {
     case 0: {
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
-        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("111112222233"_span);
         break;
     case 1:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
-        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("gtin8xxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("gtin8xxx"_span);
         break;
     case 2:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
-        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("4444455555666"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("4444455555666"_span);
         break;
     case 3:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
-        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("gtin14xxxxxxxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("gtin14xxxxxxxx"_span);
         break;
     case 4:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
-        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("oem20xxxxxxxxxxxxxxx"_span);
         break;
     default:
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;

@@ -379,6 +379,11 @@
             "FeatureMap",
             "MeasuredValue"
         ],
+        "Relative Humidity Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -436,6 +441,7 @@
             "global_struct",
             "nullable_global_struct"
         ],
+        "Flow Measurement": ["ClusterRevision", "FeatureMap", "MeasuredValue"],
         "Temperature Measurement": [
             "ClusterRevision",
             "FeatureMap",
