@@ -16,9 +16,9 @@ import("//build_overrides/chip.gni")
 
 source_set("microwave-oven-control-server") {
   sources = [
+    "Delegate.h",
     "MicrowaveOvenControlCluster.cpp",
     "MicrowaveOvenControlCluster.h",
-    "Delegate.h",
   ]
 
   public_deps = [
