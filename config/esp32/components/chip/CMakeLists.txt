@@ -78,6 +78,15 @@ chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
 
+# Use PSA Crypto backend for esp-idf v6.0 and onwards
+# esp-idf v6.0 and onwards migrated to mbedTLS 4.x where PSA is the crypto backend primary interface
+if (IDF_VERSION_MAJOR GREATER_EQUAL 6)
+    chip_gn_arg_append("chip_crypto"                    "\"psa\"")
+    # keep using older mbedTLS APIs for spake2p, PSA driver for PSA_ALG_SPAKE2P_MATTER is not yet available in mbedtls v4.x
+    chip_gn_arg_append("chip_crypto_spake2p"            "\"mbedtls\"")
+    chip_gn_arg_bool("chip_crypto_psa_aead_single_part" "true")
+endif()
+
 # If ccache was enabled by IDF and the ccache executable was found,
 # use it as the command launcher for GN to speed up subsequent builds.
 if (CCACHE_ENABLE AND CCACHE_FOUND)
