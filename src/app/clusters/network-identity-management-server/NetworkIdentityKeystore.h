@@ -21,8 +21,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 
-namespace chip {
-namespace Crypto {
+namespace chip::Crypto {
 
 /**
  * @brief Cryptographic keystore interface for the Network Identity Management cluster.
@@ -73,5 +72,4 @@ public:
     virtual void DestroyNetworkIdentityKeypair(P256KeypairHandle & handle) = 0;
 };
 
-} // namespace Crypto
-} // namespace chip
+} // namespace chip::Crypto

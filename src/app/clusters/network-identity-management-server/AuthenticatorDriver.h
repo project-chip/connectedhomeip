@@ -21,10 +21,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace NetworkIdentityManagement {
+namespace chip::app::Clusters::NetworkIdentityManagement {
 
 /**
  * @brief Callback interface provided to the AuthenticatorDriver by the cluster
@@ -151,7 +148,4 @@ public:
     virtual void OnClientRemoved(uint16_t clientIndex, ByteSpan clientIdentifier) {}
 };
 
-} // namespace NetworkIdentityManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::NetworkIdentityManagement

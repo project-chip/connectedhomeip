@@ -25,8 +25,7 @@
 
 #include <type_traits>
 
-namespace chip {
-namespace Crypto {
+namespace chip::Crypto {
 
 struct RawNassHkdfKeyHandle
 {
@@ -106,5 +105,4 @@ void RawKeyNetworkIdentityKeystore::DestroyNetworkIdentityKeypair(P256KeypairHan
     handle.Clear();
 }
 
-} // namespace Crypto
-} // namespace chip
+} // namespace chip::Crypto
