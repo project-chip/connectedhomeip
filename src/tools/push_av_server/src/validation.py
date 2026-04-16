@@ -20,7 +20,8 @@ class MatterCMAFUploadValidator:
         self.dash_manifest_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/index$")
         self.hls_multi_variant_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/index$")
         self.hls_media_playlist_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/(?P<trackName>[^/]+)/index$")
-        self.segment_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/(?P<trackName>[^/]+)/segment_(?P<segmentNumber>\d+)$")
+        self.segment_path_regex = re.compile(
+            r"^session_(?P<sessionNumber>\d+)/(?P<trackName>[^/]+)/segment_(?P<segmentNumber>\d+)$")
         self.init_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/(?P<trackName>[^/]+)/(?P<initName>[^/]+)$")
 
     def validate_upload(

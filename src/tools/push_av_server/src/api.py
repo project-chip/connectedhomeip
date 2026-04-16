@@ -52,7 +52,8 @@ class PushAvServer:
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}.{ext}", self.handle_upload, methods=["PUT"])
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_download, methods=["GET"])
-        self.router.add_api_route("/streams/{stream_id}/expectedTrackNames", self.update_expected_track_names, methods=["POST"], status_code=202)
+        self.router.add_api_route("/streams/{stream_id}/expectedTrackNames",
+                                  self.update_expected_track_names, methods=["POST"], status_code=202)
 
         # Certificate routes
         self.router.add_api_route("/certs", self.list_certs, methods=["GET"], status_code=200)
