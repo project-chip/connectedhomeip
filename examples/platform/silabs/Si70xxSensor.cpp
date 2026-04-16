@@ -53,15 +53,6 @@ constexpr uint16_t kSensorTemperatureOffset = 475;
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 
-sl_i2c_config_t kI2cDriverConfig = [] {
-    sl_i2c_config_t cfg{};
-    cfg.mode           = SL_I2C_LEADER_MODE;
-    cfg.transfer_type  = SL_I2C_USING_NON_DMA;
-    cfg.operating_mode = SL_I2C_STANDARD_MODE;
-    cfg.i2c_callback   = nullptr;
-    return cfg;
-}();
-
 sl_status_t Si70xxSensorEnableGpio()
 {
     sl_status_t status = SL_STATUS_OK;
@@ -124,7 +115,11 @@ sl_status_t Init()
 {
     sl_status_t status = SL_STATUS_OK;
 #ifdef SLI_SI91X_MCU_INTERFACE
-    sl_i2c_config_t i2c_config = kI2cDriverConfig;
+    sl_i2c_config_t i2c_config;
+    i2c_config.mode           = SL_I2C_LEADER_MODE;
+    i2c_config.transfer_type  = SL_I2C_USING_NON_DMA;
+    i2c_config.operating_mode = SL_I2C_STANDARD_MODE;
+    i2c_config.i2c_callback   = NULL;
 
     // Drive the sensor enable GPIO high (UULP NPSS or ULP/M4 pin, per board config) so the Si70xx is powered before I2C.
     status = Si70xxSensorEnableGpio();
@@ -155,7 +150,7 @@ sl_status_t Init()
     status = sl_si91x_si70xx_init(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, SL_EID_SECOND_BYTE);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
-#else // For EFR/MG Devices
+#else  // For EFR/MG Devices
     status = sl_board_enable_sensor(SL_BOARD_SENSOR_RHT);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
