@@ -26,8 +26,7 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
-    mAudioStreamParams(audioStreamParams),
-    mVideoStreamParams(videoStreamParams)
+    mAudioStreamParams(audioStreamParams), mVideoStreamParams(videoStreamParams)
 {
     mConnectionID                      = connectionID;
     mTransportStatus                   = TransportStatusEnum::kInactive;
@@ -388,6 +387,11 @@ bool PushAVTransport::HandleTriggerDetected()
     // Use the current motion detected duration which represents when this recording session will end
     mBlindStartTime = mClipInfo.mActivationTime + std::chrono::seconds(mClipInfo.mMotionDetectedDurationS);
 
+    if (mRecorder.get() == nullptr)
+    {
+        InitializeRecorder();
+    }
+
     if (mRecorder.get() != nullptr)
     {
         mRecorder->mClipInfo.mMotionDetectedDurationS = mClipInfo.mMotionDetectedDurationS;
@@ -670,7 +674,6 @@ bool PushAVTransport::CanSendPacketsToRecorder()
     {
         ChipLogProgress(Camera, "Current clip is completed, Next clip will start on trigger");
         mRecorder.reset(); // Redundant cleanup to make sure no dangling pointer left
-        InitializeRecorder();
         mStreaming = false;
         UpdateSendFlags();
         return false;

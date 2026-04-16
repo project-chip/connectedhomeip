@@ -51,8 +51,7 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo),
-    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext          = nullptr;
     mInputFormatContext     = nullptr;
@@ -96,6 +95,7 @@ PushAVClipRecorder::~PushAVClipRecorder()
 {
     ChipLogDetail(Camera, "PushAVClipRecorder destructor called for sessionID: %" PRIu64 " Track name: %s",
                   mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
+
     Stop();
     if (mWorkerThread.joinable())
     {
@@ -367,7 +367,8 @@ void PushAVClipRecorder::Stop()
         // Call the cluster server's NotifyTransportStopped method asynchronously to prevent blocking
         if (mPushAvStreamTransportServer != nullptr)
         {
-            ChipLogProgress(Camera, "PushAVClipRecorder::Stop - Scheduling async cluster server API call for connection %u",
+            ChipLogProgress(Camera,
+                            "PushAVClipRecorder::~PushAVClipRecorder - Scheduling async cluster server API call for connection %u",
                             mConnectionID);
 
             uint16_t connectionID = mConnectionID;
@@ -384,9 +385,9 @@ void PushAVClipRecorder::Stop()
         }
         else
         {
-            ChipLogError(Camera, "PushAVClipRecorder::Stop - Cluster server reference is null for connection %u", mConnectionID);
+            ChipLogError(Camera, "PushAVClipRecorder::~PushAVClipRecorder - Cluster server reference is null for connection %u",
+                        mConnectionID);
         }
-
         SetRecorderStatus(false);
         mCondition.notify_one();
         while (!mVideoQueue.empty())
