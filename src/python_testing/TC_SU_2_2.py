@@ -682,7 +682,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.2 - Track OTA StateTransition events: Idle→Querying→Idle.
         #
-        # Option B stale-event handling: Step 4 killed the provider during an active BDX
+        # Option B stale-event handling: Step 3 killed the provider during an active BDX
         # download. The DUT may take a long time to recover (BDX timeout + retry backoff),
         # emitting stale StateTransition events (kDownloading→kIdle, kIdle→kQuerying from
         # retries, etc.) that arrive in this subscription's queue before the Step 7 events.
@@ -837,7 +837,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         def matcher_combined(report):
             """
-            Combined matcher for Step 1:
+            Combined matcher for Step 6:
             - Validates UpdateState reaches kDownloading
             - UpdateStateProgress has any value 1-100
             """
@@ -990,7 +990,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.1 - Subscribe to UpdateState attribute.
         # Attribute subscription is used instead of event subscription because:
-        #   1. After the Step 1 OTA reboot the DUT's event buffer contains stale
+        #   1. After the Step 6 OTA reboot the DUT's event buffer contains stale
         #      StateTransition events (kApplying→kIdle etc.) that arrive first.
         #   2. Event subscriptions have no keepalive when no events are generated —
         #      the CASE session goes idle and expires, breaking the re-announce call.
