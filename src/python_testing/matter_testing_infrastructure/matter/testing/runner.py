@@ -467,14 +467,24 @@ def run_tests_no_exit(
         # Run commissioning first, if requested.
         #
 
-        should_run_pre_commissioning = (
-            getattr(matter_test_config, "in_test_commissioning_method", None) is None
-            and (
-                matter_test_config.commissioning_method is not None
-                or bool(getattr(matter_test_config, "manual_code", []))
-                or bool(getattr(matter_test_config, "qr_code_content", []))
-            )
+        in_test_commissioning = (
+            getattr(matter_test_config, "in_test_commissioning_method", None) is not None
         )
+
+        has_commissioning_inputs = (
+            matter_test_config.commissioning_method is not None
+            or bool(getattr(matter_test_config, "manual_code", []))
+            or bool(getattr(matter_test_config, "qr_code_content", []))
+        )
+
+        is_discovery_test = test_class.__name__.startswith("TC_DD_")
+
+        should_run_pre_commissioning = (
+            not in_test_commissioning
+            and not is_discovery_test
+            and has_commissioning_inputs
+        )
+
         if should_run_pre_commissioning:
             runner = TestRunner(log_dir=test_config.log_path,
                                 testbed_name=test_config.testbed_name)
@@ -499,7 +509,12 @@ def run_tests_no_exit(
         #
         # Populate the global wildcard
         #
-        if ok and should_run_pre_commissioning:
+        should_populate_global_wildcard = (
+            ok
+            and should_run_pre_commissioning
+            and matter_test_config.dut_node_ids
+        )
+        if ok and should_populate_global_wildcard:
             try:
                 global_wildcard = event_loop.run_until_complete(
                     asyncio.wait_for(
