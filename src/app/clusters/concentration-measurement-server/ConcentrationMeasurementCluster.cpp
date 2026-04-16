@@ -20,7 +20,7 @@
 #include "ConcentrationMeasurementDelegate.h"
 #include <app/server-cluster/AttributeListBuilder.h>
  #include <lib/core/CHIPError.h>
-  
+
 
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
@@ -47,7 +47,7 @@ CHIP_ERROR ConcentrationMeasurementCluster::Startup(ServerClusterContext & conte
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Wire the delegate back to this cluster instance so 
+    // Wire the delegate back to this cluster instance so
     // Delegate::NotifyChanged() → NotifyAttributeChanged() works.
     mDelegate.SetCluster(this);
 
@@ -70,7 +70,7 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(kClusterRevision);
 
-    // ── Feature::kNumericMeasurement 
+    // ── Feature::kNumericMeasurement
     case MeasuredValue::Id:
         VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement),
                             Status::UnsupportedAttribute);
@@ -96,7 +96,7 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(
                             Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMeasurementUnit());
 
-    // ── Feature::kPeakMeasurement  
+    // ── Feature::kPeakMeasurement
     case PeakMeasuredValue::Id:
         VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement),
                             Status::UnsupportedAttribute);
@@ -107,7 +107,7 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(
                             Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetPeakMeasuredValueWindow());
 
-    // ── Feature::kAverageMeasurement  
+    // ── Feature::kAverageMeasurement
     case AverageMeasuredValue::Id:
         VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement),
                             Status::UnsupportedAttribute);
@@ -118,7 +118,7 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(
                             Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetAverageMeasuredValueWindow());
 
-    // ── Feature::kLevelIndication  
+    // ── Feature::kLevelIndication
     case LevelValue::Id:
         VerifyOrReturnError(mFeatures.Has(Feature::kLevelIndication),
                             Status::UnsupportedAttribute);

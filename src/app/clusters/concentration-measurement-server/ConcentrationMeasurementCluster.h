@@ -45,7 +45,7 @@ namespace ConcentrationMeasurement {
 
  * This cluster stores NO attribute data. Every Read request is forwarded
  * to the Delegate, which provides values on demand.
- * 
+ *
  * Cluster takes BitFlags<Feature> at construction. The same flags drive three things:
  *   1. Attributes() — which attribute IDs are advertised to the DataModel layer
  *   2. ReadAttribute() — which attributes are readable (returns UnsupportedAttribute
@@ -131,7 +131,7 @@ private:
     BitFlags<Feature> mFeatures;
     Delegate &        mDelegate;
 
-   
+
     static bool CheckConstraintMinMax(DataModel::Nullable<float> value,
                                       DataModel::Nullable<float> minValue,
                                       DataModel::Nullable<float> maxValue)

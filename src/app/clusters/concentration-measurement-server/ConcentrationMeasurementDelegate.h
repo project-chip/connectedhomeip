@@ -65,7 +65,7 @@ public:
  * DefaultDelegate — the recommended delegate for most applications.
  *
  * DefaultDelegate  handles all 10 aliased
- * concentration clusters. 
+ * concentration clusters.
  * Full example — three pollutants, one file, no subclassing:
  *
  *   static ConcentrationMeasuremntCluster gCO2(ep, CarbonDioxideConcentrationMeasurement::Id,
@@ -85,7 +85,7 @@ public:
  *   gCO2.GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
  *   gPM25.GetDelegate().HandleNewPeakMeasuredValue(DataModel::MakeNullable(18.0f));
  *
-   For better RAM usage you can also choose to implement your own delegate class and only 
+   For better RAM usage you can also choose to implement your own delegate class and only
    implement the features you need, then pass an instance of that to ConcentrationMeasurementCluster.
    class CO2SensorDelegate : public ConcentrationMeasurement::Delegate
    {
