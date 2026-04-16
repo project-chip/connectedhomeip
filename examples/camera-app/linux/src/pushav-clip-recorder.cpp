@@ -116,7 +116,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
 {
     // Base output path
     std::filesystem::path basePath(path);
-    mUploadFileBasePath = basePath / ("session_" + std::to_string(mClipInfo.mSessionNumber));
+    std::filesystem::path uploadFileBasePath = basePath / ("session_" + std::to_string(mClipInfo.mSessionNumber));
 
     // Helper lambda to ensure a directory exists and is writable, creating it with mode 0755
     auto ensure = [&](const std::filesystem::path & p) -> bool {
@@ -160,15 +160,17 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
     }
 
     // Clean up previous session directory if it exists
-    std::filesystem::remove_all(mUploadFileBasePath);
+    std::filesystem::remove_all(uploadFileBasePath);
 
     // Create session and track directories
-    if (!ensure(mUploadFileBasePath))
+    if (!ensure(uploadFileBasePath))
     {
-        ChipLogError(Camera, "Failed to ensure session directory exists: %s", mUploadFileBasePath.c_str());
+        ChipLogError(Camera, "Failed to ensure session directory exists: %s", uploadFileBasePath.c_str());
         return false;
     }
 
+    // Only update the member variable after all operations succeed
+    mUploadFileBasePath = uploadFileBasePath;
     return true;
 }
 
