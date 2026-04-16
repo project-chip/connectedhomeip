@@ -31,8 +31,7 @@ namespace chip::app::Clusters::MicrowaveOvenControl {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
@@ -126,5 +125,7 @@ void Instance::SetCookTimeSec(uint32_t cookTimeSec)
 
 } // namespace chip::app::Clusters::MicrowaveOvenControl
 
+void MatterMicrowaveOvenControlClusterInitCallback(EndpointId) {}
+void MatterMicrowaveOvenControlClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 void MatterMicrowaveOvenControlPluginServerInitCallback() {}
 void MatterMicrowaveOvenControlPluginServerShutdownCallback() {}
