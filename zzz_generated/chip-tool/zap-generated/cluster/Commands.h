@@ -143,6 +143,7 @@
 | RadonConcentrationMeasurement                                       | 0x042F |
 | SoilMeasurement                                                     | 0x0430 |
 | AmbientContextSensing                                               | 0x0431 |
+| ProximityRanging                                                    | 0x0433 |
 | WiFiNetworkManagement                                               | 0x0451 |
 | ThreadBorderRouterManagement                                        | 0x0452 |
 | ThreadNetworkDirectory                                              | 0x0453 |
@@ -11675,6 +11676,130 @@ private:
 | * AmbientContextDetectStarted                                       | 0x0000 |
 | * AmbientContextDetectEnded                                         | 0x0001 |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ProximityRanging                                            | 0x0433 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * StartRangingRequest                                               |   0x00 |
+| * StopRangingRequest                                                |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * RangingCapabilities                                               | 0x0000 |
+| * WiFiDevIK                                                         | 0x0001 |
+| * BLEDeviceID                                                       | 0x0002 |
+| * BLTDevIK                                                          | 0x0003 |
+| * BLTCSSecurityLevel                                                | 0x0004 |
+| * BLTCSModeCapability                                               | 0x0005 |
+| * SessionIDList                                                     | 0x0006 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * RangingResult                                                     | 0x0000 |
+| * RangingSessionStatus                                              | 0x0001 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command StartRangingRequest
+ */
+class ProximityRangingStartRangingRequest : public ClusterCommand
+{
+public:
+    ProximityRangingStartRangingRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("start-ranging-request", credsIssuerConfig),
+        mComplex_WiFiRangingDeviceRoleConfig(&mRequest.wiFiRangingDeviceRoleConfig),
+        mComplex_BLERangingDeviceRoleConfig(&mRequest.BLERangingDeviceRoleConfig),
+        mComplex_BLTChannelSoundingDeviceRoleConfig(&mRequest.BLTChannelSoundingDeviceRoleConfig),
+        mComplex_Trigger(&mRequest.trigger), mComplex_ReportingCondition(&mRequest.reportingCondition)
+    {
+        AddArgument("Technology", 0, UINT8_MAX, &mRequest.technology);
+        AddArgument("WiFiRangingDeviceRoleConfig", &mComplex_WiFiRangingDeviceRoleConfig, "", Argument::kOptional);
+        AddArgument("BLERangingDeviceRoleConfig", &mComplex_BLERangingDeviceRoleConfig, "", Argument::kOptional);
+        AddArgument("BLTChannelSoundingDeviceRoleConfig", &mComplex_BLTChannelSoundingDeviceRoleConfig, "", Argument::kOptional);
+        AddArgument("FrequencyBand", 0, UINT16_MAX, &mRequest.frequencyBand);
+        AddArgument("Bandwidth", 0, UINT32_MAX, &mRequest.bandwidth);
+        AddArgument("SecurityMode", 0, UINT8_MAX, &mRequest.securityMode);
+        AddArgument("Trigger", &mComplex_Trigger);
+        AddArgument("ReportingCondition", &mComplex_ReportingCondition, "", Argument::kOptional);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type>>
+        mComplex_WiFiRangingDeviceRoleConfig;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::Type>>
+        mComplex_BLERangingDeviceRoleConfig;
+    TypedComplexArgument<
+        chip::Optional<chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type>>
+        mComplex_BLTChannelSoundingDeviceRoleConfig;
+    TypedComplexArgument<chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type> mComplex_Trigger;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::Type>>
+        mComplex_ReportingCondition;
+};
+
+/*
+ * Command StopRangingRequest
+ */
+class ProximityRangingStopRangingRequest : public ClusterCommand
+{
+public:
+    ProximityRangingStopRangingRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("stop-ranging-request", credsIssuerConfig)
+    {
+        AddArgument("SessionID", 0, UINT8_MAX, &mRequest.sessionID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster WiFiNetworkManagement                                       | 0x0451 |
@@ -29679,6 +29804,90 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterProximityRanging(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ProximityRanging;
+
+    const char * clusterName = "ProximityRanging";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                  //
+        make_unique<ProximityRangingStartRangingRequest>(credsIssuerConfig), //
+        make_unique<ProximityRangingStopRangingRequest>(credsIssuerConfig),  //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "ranging-capabilities", Attributes::RangingCapabilities::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "wi-fi-dev-ik", Attributes::WiFiDevIK::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "bledevice-id", Attributes::BLEDeviceID::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "bltdev-ik", Attributes::BLTDevIK::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type>>>(
+            Id, "ranging-capabilities", Attributes::RangingCapabilities::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "wi-fi-dev-ik", Attributes::WiFiDevIK::Id, WriteCommandType::kForceWrite,
+                                                    credsIssuerConfig), //
+        make_unique<WriteAttribute<uint64_t>>(Id, "bledevice-id", 0, UINT64_MAX, Attributes::BLEDeviceID::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "bltdev-ik", Attributes::BLTDevIK::Id, WriteCommandType::kForceWrite,
+                                                    credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>>(
+            Id, "bltcssecurity-level", 0, UINT8_MAX, Attributes::BLTCSSecurityLevel::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>>(
+            Id, "bltcsmode-capability", 0, UINT8_MAX, Attributes::BLTCSModeCapability::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>>>(
+            Id, "session-idlist", Attributes::SessionIDList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "ranging-capabilities", Attributes::RangingCapabilities::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "wi-fi-dev-ik", Attributes::WiFiDevIK::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "bledevice-id", Attributes::BLEDeviceID::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "bltdev-ik", Attributes::BLTDevIK::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                  //
+        make_unique<ReadEvent>(Id, "ranging-result", Events::RangingResult::Id, credsIssuerConfig),                     //
+        make_unique<ReadEvent>(Id, "ranging-session-status", Events::RangingSessionStatus::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                             //
+        make_unique<SubscribeEvent>(Id, "ranging-result", Events::RangingResult::Id, credsIssuerConfig),                //
+        make_unique<SubscribeEvent>(Id, "ranging-session-status", Events::RangingSessionStatus::Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::WiFiNetworkManagement;
@@ -32958,6 +33167,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterRadonConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterSoilMeasurement(commands, credsIssuerConfig);
     registerClusterAmbientContextSensing(commands, credsIssuerConfig);
+    registerClusterProximityRanging(commands, credsIssuerConfig);
     registerClusterWiFiNetworkManagement(commands, credsIssuerConfig);
     registerClusterThreadBorderRouterManagement(commands, credsIssuerConfig);
     registerClusterThreadNetworkDirectory(commands, credsIssuerConfig);

@@ -145,6 +145,12 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::TemperatureMeasurement::Id:
         MatterTemperatureMeasurementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::FlowMeasurement::Id:
+        MatterFlowMeasurementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::RelativeHumidityMeasurement::Id:
+        MatterRelativeHumidityMeasurementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterInitCallback(endpoint);
         break;
@@ -280,6 +286,12 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::TemperatureMeasurement::Id:
         MatterTemperatureMeasurementClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::FlowMeasurement::Id:
+        MatterFlowMeasurementClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::RelativeHumidityMeasurement::Id:
+        MatterRelativeHumidityMeasurementClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterShutdownCallback(endpoint, shutdownType);

@@ -50,7 +50,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MfgSpecificPing.
+} // namespace MfgSpecificPing
 } // namespace Commands
 } // namespace BasicInformation
 } // namespace Clusters
