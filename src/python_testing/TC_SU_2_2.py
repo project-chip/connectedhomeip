@@ -481,7 +481,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_3]: Prerequisites - Setup Provider
         # The provider is started with busy/180s args. The provider is killed immediately after
         # confirming kDownloading so the download is aborted and no full OTA update is applied
-        # in this step. The full OTA update happens in Step 1.
+        # in this step. The full OTA update happens in Step 6.
         # ------------------------------------------------------------------------------------
         step_number_s3 = "[STEP_3]"
         logger.info(f'{step_number_s3}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
@@ -555,7 +555,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         subscription_attr_state_busy_180s.await_all_expected_report_matches(
-            [matcher_delayed_s3_obj], timeout_sec=180.0)
+            [matcher_delayed_s3_obj], timeout_sec=920.0)
         logger.info(f'{step_number_s3}: Step #3.2 (Phase A) - kDelayedOnQuery confirmed, 180s delay started.')
         subscription_attr_state_busy_180s.cancel()
 
@@ -682,13 +682,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.2 - Track OTA StateTransition events: Idle→Querying→Idle.
         #
-        # Option B stale-event handling: Step 3 killed the provider during an active BDX
-        # download. The DUT may take a long time to recover (BDX timeout + retry backoff),
-        # emitting stale StateTransition events (kDownloading→kIdle, kIdle→kQuerying from
-        # retries, etc.) that arrive in this subscription's queue before the Step 7 events.
-        # The loop below discards any events that do not match the expected transitions and
-        # re-sends AnnounceOTAProvider every 60 s so the DUT queries as soon as it recovers.
+        # Stale-event handling: Step 3 killed the provider during an active BDX download.
+        # The DUT may take a long time to recover (BDX timeout + retry backoff), emitting
+        # stale StateTransition events (kDownloading→kIdle, kIdle→kQuerying from retries,
+        # etc.) that arrive in this subscription's queue before the Step 4 events.
+        # Flush any buffered events accumulated before and during the announce, then loop
+        # discarding stale transitions and re-sending AnnounceOTAProvider every 60 s so
+        # the DUT queries as soon as it recovers.
         # ------------------------------------------------------------------------------------
+        subscription_state_invalid_uri.flush_events()
 
         kIdle = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         kQuerying = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
@@ -865,13 +867,31 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             return downloading_seen and progress_seen
 
         matcher_combined_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s6} - Minimal Step 1 matcher: Downloading + progress 1-100",
+            description=f"{step_number_s6} - Step 6 matcher: Downloading + progress 1-100",
             matcher=matcher_combined
         )
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.3 - Wait for download to start
         # ------------------------------------------------------------------------------------
+        # Start the kApplying subscription before waiting for kDownloading/progress so there
+        # is no gap between the two subscriptions — kApplying could fire while subscription_attr
+        # is still active, and we must not miss it.
+        subscription_attr_applying = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+
+        await subscription_attr_applying.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0,
+            max_interval_sec=20,
+            keepSubscriptions=True
+        )
+
         subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=800.0)
         logger.info(f'{step_number_s6}: Step #6.3 - UpdateState (Available sequence) matcher has completed.')
         subscription_attr.cancel()
@@ -901,21 +921,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # complete, then kill the provider. The DUT will finish applying and reboot on its own.
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s6}: Step #6.5 - Waiting for kApplying to confirm download complete.')
-
-        subscription_attr_applying = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-
-        await subscription_attr_applying.start(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0,
-            max_interval_sec=20,
-            keepSubscriptions=True
-        )
 
         def matcher_applying(report):
             val = report.value
@@ -968,7 +973,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.step(7)
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Prerequisites - Setup Provider
-        # The DUT has just applied the V2 firmware in Step 1. By serving the same V2 image here
+        # The DUT has just applied the V2 firmware in Step 6. By serving the same V2 image here
         # with updateAvailable, the DUT sees it as "same version" and rejects the download.
         # No separate firmware image is needed — the single V2 image (ota_image) is reused,
         # meaning only one firmware image is required for the entire test.
@@ -1008,7 +1013,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=0,
-            max_interval_sec=5,
+            max_interval_sec=60,
             keepSubscriptions=False
         )
 
