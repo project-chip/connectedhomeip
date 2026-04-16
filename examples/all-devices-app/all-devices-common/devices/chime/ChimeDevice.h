@@ -21,14 +21,21 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
 
-class ChimeDevice : public SingleEndpointDevice
+class ChimeDevice : public SingleEndpointDevice, public Clusters::ChimeDelegate
 {
 public:
-    ChimeDevice(Clusters::ChimeDelegate & delegate, TimerDelegate & timerDelegate);
+    struct Sound
+    {
+        uint8_t id;
+        CharSpan name;
+    };
+
+    ChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds);
     ~ChimeDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -37,9 +44,14 @@ public:
 
     Clusters::ChimeCluster & ChimeCluster();
 
+    // ChimeDelegate
+    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name) override;
+    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
+    virtual Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
+
 protected:
-    Clusters::ChimeDelegate & mDelegate;
     TimerDelegate & mTimerDelegate;
+    Span<const Sound> mSounds;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ChimeCluster> mChimeCluster;
 };
