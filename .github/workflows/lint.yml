@@ -247,6 +247,7 @@ jobs:
             - name: Check for hand-edited Alchemy XML files
               if: always() && github.event_name == 'pull_request'
               run: |
+                  git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
                   scripts/tools/zap/check_alchemy_metadata.py --root . \
                     --diff-base origin/${{ github.base_ref }}
 
