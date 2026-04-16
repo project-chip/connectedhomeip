@@ -26,7 +26,6 @@ public:
     void UpdateKeyAttributes(psa_key_attributes_t & attrs) override
     {
         using namespace chip::Crypto;
-        psa_key_id_t keyId          = psa_get_key_id(&attrs);
         psa_key_lifetime_t lifetime = psa_get_key_lifetime(&attrs);
         psa_key_type_t keyType      = psa_get_key_type(&attrs);
 
