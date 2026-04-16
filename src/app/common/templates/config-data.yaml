@@ -129,6 +129,7 @@ CodeDrivenClusters:
     - Energy EVSE
     - Ethernet Network Diagnostics
     - Fixed Label
+    - Flow Measurement
     - General Commissioning
     - General Diagnostics
     - Group Key Management
@@ -144,6 +145,7 @@ CodeDrivenClusters:
     - Operational Credentials
     - Power Topology
     - Push AV Stream Transport
+    - Relative Humidity Measurement
     - Scenes Management
     - Software Diagnostics
     - Switch

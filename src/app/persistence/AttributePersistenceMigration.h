@@ -23,14 +23,31 @@
 
 namespace chip::app {
 
-using SafeAttributeMigrator = CHIP_ERROR (*)(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
-                                             MutableByteSpan & buffer);
-
 struct AttrMigrationData
 {
     AttributeId attributeId;
-    SafeAttributeMigrator migrator;
+    size_t valueSize;
+    bool isScalar;
 };
+
+/**
+ * Returns the largest valueSize across an array of AttrMigrationData entries.
+ */
+template <size_t N>
+constexpr size_t MaxAttrMigrationValueSize(const AttrMigrationData (&attrs)[N])
+{
+    static_assert(N > 0, "Migration attributes array must not be empty");
+    size_t maxSize = 0;
+    for (size_t i = 0; i < N; i++)
+    {
+        if (attrs[i].valueSize > maxSize)
+        {
+            maxSize = attrs[i].valueSize;
+        }
+    }
+    return maxSize;
+}
+
 /**
  * @brief
  * This function migrates attribute values from the SafeAttributeProvider to the standard provider mechanism.
@@ -61,22 +78,5 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
                                                          AttributePersistenceProvider & dstProvider,
                                                          const ConcreteClusterPath & cluster,
                                                          Span<const AttrMigrationData> attributes, MutableByteSpan buffer);
-
-namespace DefaultMigrators {
-template <class T>
-CHIP_ERROR ScalarValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
-                       MutableByteSpan & buffer)
-{
-    VerifyOrReturnError(sizeof(T) <= buffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    T value;
-    ReturnErrorOnFailure(provider.ReadScalarValue(attrPath, value));
-    buffer.reduce_size(sizeof(T));
-    memcpy(buffer.data(), &value, sizeof(T));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SafeValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer);
-}; // namespace DefaultMigrators
 
 } // namespace chip::app

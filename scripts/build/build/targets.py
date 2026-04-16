@@ -301,6 +301,7 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('smoke-co-alarm', app=Efr32App.SMOKE_CO_ALARM),
         TargetPart('switch', app=Efr32App.SWITCH),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),

@@ -2057,14 +2057,14 @@ endpoint 1 {
   }
 
   server cluster FlowMeasurement {
-    ram      attribute measuredValue default = 5;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 1;
     ram      attribute maxMeasuredValue default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 
