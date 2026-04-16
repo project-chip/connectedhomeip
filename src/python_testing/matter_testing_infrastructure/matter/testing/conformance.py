@@ -144,11 +144,11 @@ class EmptyClusterGlobalAttributes(ConformanceAssessmentData):
 EMPTY_CLUSTER_GLOBAL_ATTRIBUTES = EmptyClusterGlobalAttributes()
 
 
-def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional: bool):
+def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional_test_event_only_disallowed_for_certification: bool):
     if conformance_decision.decision in [ConformanceDecision.NOT_APPLICABLE, ConformanceDecision.DISALLOWED]:
         return False
     if conformance_decision.decision == ConformanceDecision.PROVISIONAL:
-        return allow_provisional
+        return allow_provisional_test_event_only_disallowed_for_certification
     return True
 
 

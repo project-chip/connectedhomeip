@@ -32,6 +32,9 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+[[maybe_unused]] constexpr uint32_t kGroupKeyClusterRevisionBeforeGroupcast = 2;
+
 struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
@@ -208,7 +211,9 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
         VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         {
-            auto iter     = provider.IterateGroupKeys(fabric_index);
+            auto iter = provider.IterateGroupKeys(fabric_index);
+            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+
             current_count = iter->Count();
             iter->Release();
         }
@@ -634,7 +639,8 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
     switch (request.path.mAttributeId)
     {
     case GroupKeyManagement::Attributes::ClusterRevision::Id:
-        return encoder.Encode(GroupKeyManagement::kRevision);
+        return encoder.Encode(Credentials::GetGroupDataProvider()->IsGroupcastEnabled() ? kRevision
+                                                                                        : kGroupKeyClusterRevisionBeforeGroupcast);
     case Attributes::FeatureMap::Id: {
         BitFlags<GroupKeyManagement::Feature> features;
         features.Set(Clusters::GroupKeyManagement::Feature::kGroupcast);

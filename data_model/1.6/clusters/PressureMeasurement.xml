@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0403" name="Pressure Measurement Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0403" name="Pressure Measurement Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2241 2370"/>
     <revision revision="3" summary="New data model format and notation"/>
     <revision revision="4" summary="Removed P quality"/>
+    <revision revision="5" summary="Added F quality to MinMeasuredValue, MaxMeasuredValue, Tolerance and Scaled attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0403" name="Pressure Measurement"/>
@@ -91,7 +92,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
         <max value="32766"/>
@@ -99,7 +100,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
         <between>
@@ -118,6 +119,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint>
         <max value="2048"/>
@@ -142,7 +144,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="MinScaledValue" type="int16">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
@@ -152,7 +154,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="MaxScaledValue" type="int16">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
@@ -173,6 +175,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="ScaledTolerance" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="EXT"/>
       </optionalConform>
@@ -182,6 +185,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0014" name="Scale" type="int8">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>

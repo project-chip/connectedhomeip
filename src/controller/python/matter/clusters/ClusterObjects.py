@@ -210,7 +210,7 @@ class ClusterObject:
 
     @ChipUtility.classproperty
     def descriptor(cls):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 # The below dictionaries will be filled dynamically
@@ -243,15 +243,15 @@ class ClusterCommand(ClusterObject):
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def command_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def is_client(self) -> bool:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
@@ -334,15 +334,15 @@ class ClusterAttributeDescriptor:
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def attribute_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def must_use_timed_write(cls) -> bool:
@@ -382,8 +382,8 @@ class ClusterEvent(ClusterObject):
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def event_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError

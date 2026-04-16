@@ -134,8 +134,7 @@ public:
 
     ReadOperation(const app::ConcreteAttributePath & path)
     {
-        mRequest.path              = path;
-        mRequest.subjectDescriptor = &kDenySubjectDescriptor;
+        mRequest.emplace(app::DataModel::ReadAttributeRequest(path, kDenySubjectDescriptor));
     }
 
     ReadOperation(EndpointId endpoint, ClusterId cluster, AttributeId attribute) :
@@ -145,28 +144,24 @@ public:
     ReadOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
     {
         VerifyOrDie(mState == State::kInitializing);
-        mRequest.subjectDescriptor = &descriptor;
+        auto path  = mRequest->path;
+        auto flags = mRequest->readFlags;
+        mRequest.emplace(app::DataModel::ReadAttributeRequest(path, descriptor));
+        mRequest->readFlags = flags;
         return *this;
     }
 
     ReadOperation & SetReadFlags(const BitFlags<app::DataModel::ReadFlags> & flags)
     {
         VerifyOrDie(mState == State::kInitializing);
-        mRequest.readFlags = flags;
-        return *this;
-    }
-
-    ReadOperation & SetOperationFlags(const BitFlags<app::DataModel::OperationFlags> & flags)
-    {
-        VerifyOrDie(mState == State::kInitializing);
-        mRequest.operationFlags = flags;
+        mRequest->readFlags = flags;
         return *this;
     }
 
     ReadOperation & SetPathExpanded(bool value)
     {
         VerifyOrDie(mState == State::kInitializing);
-        mRequest.path.mExpanded = value;
+        mRequest->path.mExpanded = value;
         return *this;
     }
 
@@ -183,8 +178,7 @@ public:
     /// the underlying `GetEncodedIBs`
     CHIP_ERROR FinishEncoding();
 
-    /// Get the underlying read request (i.e. path and flags) for this request
-    const app::DataModel::ReadAttributeRequest & GetRequest() const { return mRequest; }
+    const app::DataModel::ReadAttributeRequest & GetRequest() const { return *mRequest; }
 
     /// Once encoding has finished, you can get access to the underlying
     /// written data via GetEncodedIBs.
@@ -204,7 +198,7 @@ private:
     };
     State mState = State::kInitializing;
 
-    app::DataModel::ReadAttributeRequest mRequest;
+    std::optional<app::DataModel::ReadAttributeRequest> mRequest;
 
     // encoded-used classes
     EncodedReportIBs mEncodedIBs;

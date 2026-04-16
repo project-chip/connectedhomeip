@@ -311,6 +311,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
+    if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
+    {
+        SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
+    }
     Access::SetAccessControl(mAccessControl);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS

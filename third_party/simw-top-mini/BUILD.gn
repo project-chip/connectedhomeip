@@ -35,7 +35,9 @@ config("se05x_config") {
   }
 
   if (chip_se05x_host_gpio == "rpi") {
-    defines += [ "SE05X_HOST_GPIO_RPI = 1" ]
+    defines += [ "CONFIG_SE05X_HOST_GPIO_RPI = 1" ]
+  } else if (chip_se05x_host_gpio == "frdm_imx93") {
+    defines += [ "CONFIG_SE05X_HOST_GPIO_FRDM_IMX93 = 1" ]
   }
 
   # defines += ["FLOW_VERBOSE"]
@@ -55,10 +57,27 @@ config("se05x_config") {
     "repo/hostlib/hostLib/libCommon/smCom/T1oI2C",
     "repo/hostlib/hostLib/accessManager/inc",
     "repo/demos/se05x_host_gpio",
+    "repo/demos/se051h_nfc_comm_prov/common",
   ]
 
+  if (chip_se05x_host_gpio == "frdm_imx93") {
+    include_dirs += [ "sysroot/usr/include" ]
+  }
+
   if (chip_se05x_auth == "scp03") {
-    include_dirs += [ "repo/scp03_ftr" ]
+    include_dirs += [ "repo/feature_file/scp03_ftr" ]
+  } else if (chip_se05x_auth == "user_id") {
+    include_dirs += [ "repo/feature_file/user_id_ftr" ]
+  } else if (chip_se05x_auth == "aes_key") {
+    include_dirs += [ "repo/feature_file/aes_key_ftr" ]
+  } else if (chip_se05x_auth == "ec_key") {
+    include_dirs += [ "repo/feature_file/ec_key_ftr" ]
+  } else if (chip_se05x_auth == "scp03_user_id") {
+    include_dirs += [ "repo/feature_file/scp03_user_id_ftr" ]
+  } else if (chip_se05x_auth == "scp03_aes_key") {
+    include_dirs += [ "repo/feature_file/scp03_aes_key_ftr" ]
+  } else if (chip_se05x_auth == "scp03_ec_key") {
+    include_dirs += [ "repo/feature_file/scp03_ec_key_ftr" ]
   } else {
     include_dirs += [ "repo" ]
   }
@@ -93,7 +112,10 @@ static_library("se05x") {
     "repo/sss/src/se05x/fsl_sss_se05x_policy.c",
   ]
 
-  if (chip_se05x_auth == "scp03") {
+  if (chip_se05x_auth == "scp03" || chip_se05x_auth == "user_id" ||
+      chip_se05x_auth == "aes_key" || chip_se05x_auth == "ec_key" ||
+      chip_se05x_auth == "scp03_user_id" ||
+      chip_se05x_auth == "scp03_aes_key" || chip_se05x_auth == "scp03_ec_key") {
     sources += [
       "repo/hostlib/hostLib/libCommon/nxScp/nxScp03_Com.c",
       "repo/sss/ex/src/ex_sss_scp03_auth.c",
@@ -127,6 +149,11 @@ static_library("se05x") {
         "repo/hostlib/hostLib/platform/linux/i2c_a7.c",
       ]
     }
+  }
+
+  if (chip_se05x_host_gpio == "frdm_imx93") {
+    lib_dirs = [ "sysroot/usr/lib" ]
+    libs = [ "gpiod" ]
   }
 
   public_configs = [ ":se05x_config" ]

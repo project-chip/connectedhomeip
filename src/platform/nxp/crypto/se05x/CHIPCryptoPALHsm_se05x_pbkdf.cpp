@@ -28,15 +28,9 @@
 namespace chip {
 namespace Crypto {
 
-extern CHIP_ERROR pbkdf2_sha256_h(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                                  unsigned int iteration_count, uint32_t key_length, uint8_t * output);
-
-CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                                        unsigned int iteration_count, uint32_t key_length, uint8_t * output)
+CHIP_ERROR PBKDF2_sha256_SE05x::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                                              unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
-#if !ENABLE_SE05X_PBKDF2_SHA256
-    return pbkdf2_sha256_h(password, plen, salt, slen, iteration_count, key_length, output);
-#else
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrReturnError(password != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(plen > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -70,24 +64,28 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
     policy_for_hmac_key.policies[0] = &hmac_withPol;
     policy_for_hmac_key.policies[1] = &commonPol;
 
-    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
-
     sss_object_t hmacKeyObj = {
         0,
     };
-    sss_status_t status = sss_key_object_init(&hmacKeyObj, &gex_sss_chip_ctx.ks);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    smStatus_t smStatus = SM_NOT_OK;
+    sss_status_t status = kStatus_SSS_Fail;
+
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
+
+    status = sss_key_object_init(&hmacKeyObj, &gex_sss_chip_ctx.ks);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_allocate_handle(&hmacKeyObj, keyid, kSSS_KeyPart_Default, kSSS_CipherType_HMAC, sizeof(password),
                                             kKeyObject_Mode_Transient);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &hmacKeyObj, password, plen, plen * 8, &policy_for_hmac_key,
                                    sizeof(policy_for_hmac_key));
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    const smStatus_t smStatus = Se05x_API_PBKDF2_extended(
+    smStatus = Se05x_API_PBKDF2_extended(
         &((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, salt, slen, 0, /*saltID*/
         (uint16_t) iteration_count, kSE05x_MACAlgo_HMAC_SHA256, (uint16_t) key_length, 0,  /* derivedSessionKeyID */
         output, (size_t *) &key_length);
@@ -99,10 +97,11 @@ exit:
     {
         sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
     }
-
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
-
-#endif // ENABLE_SE05X_PBKDF2_SHA256
 }
 
 } // namespace Crypto

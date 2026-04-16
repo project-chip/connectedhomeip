@@ -48,6 +48,7 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TracingStructs.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 
@@ -1166,7 +1167,16 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter.Release();
-
+    // Groupcast Testing
+    auto & testing = chip::Groupcast::GetTesting();
+    if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+    {
+        testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+        if (!decrypted)
+        {
+            testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+        }
+    }
     if (!decrypted)
     {
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");

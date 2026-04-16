@@ -35,12 +35,13 @@ extern "C" {
 namespace chip {
 namespace DeviceLayer {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     bflb_efuse_read_mac_address_opt(0, buf, 1);
 
     return CHIP_NO_ERROR;
 }
-
+#endif
 } // namespace DeviceLayer
 } // namespace chip

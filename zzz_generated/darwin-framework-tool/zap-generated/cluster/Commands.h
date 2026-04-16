@@ -10050,6 +10050,7 @@ public:
 | * ProductAppearance                                                 | 0x0014 |
 | * SpecificationVersion                                              | 0x0015 |
 | * MaxPathsPerInvoke                                                 | 0x0016 |
+| * DeviceLocation                                                    | 0x0017 |
 | * ConfigurationVersion                                              | 0x0018 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -12073,6 +12074,150 @@ public:
     }
 };
 
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute DeviceLocation
+ */
+class ReadBasicInformationDeviceLocation : public ReadAttribute {
+public:
+    ReadBasicInformationDeviceLocation()
+        : ReadAttribute("device-location")
+    {
+    }
+
+    ~ReadBasicInformationDeviceLocation()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BasicInformation::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterBasicInformation alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeDeviceLocationWithCompletion:^(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BasicInformation.DeviceLocation response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("BasicInformation DeviceLocation read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class WriteBasicInformationDeviceLocation : public WriteAttribute {
+public:
+    WriteBasicInformationDeviceLocation()
+        : WriteAttribute("device-location")
+        , mComplex(&mValue)
+    {
+        AddArgument("attr-name", "device-location");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteBasicInformationDeviceLocation()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BasicInformation::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterBasicInformation alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRWriteParams alloc] init];
+        params.timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
+        params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
+        MTRDataTypeLocationDescriptorStruct * _Nullable value;
+        if (mValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRDataTypeLocationDescriptorStruct new];
+            value.locationName = [[NSString alloc] initWithBytes:mValue.Value().locationName.data() length:mValue.Value().locationName.size() encoding:NSUTF8StringEncoding];
+            if (mValue.Value().floorNumber.IsNull()) {
+                value.floorNumber = nil;
+            } else {
+                value.floorNumber = [NSNumber numberWithShort:mValue.Value().floorNumber.Value()];
+            }
+            if (mValue.Value().areaType.IsNull()) {
+                value.areaType = nil;
+            } else {
+                value.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(mValue.Value().areaType.Value())];
+            }
+        }
+
+        [cluster writeAttributeDeviceLocationWithValue:value params:params completion:^(NSError * _Nullable error) {
+            if (error != nil) {
+                LogNSError("BasicInformation DeviceLocation write Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type>> mComplex;
+};
+
+class SubscribeAttributeBasicInformationDeviceLocation : public SubscribeAttribute {
+public:
+    SubscribeAttributeBasicInformationDeviceLocation()
+        : SubscribeAttribute("device-location")
+    {
+    }
+
+    ~SubscribeAttributeBasicInformationDeviceLocation()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BasicInformation::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterBasicInformation alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeDeviceLocationWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"BasicInformation.DeviceLocation response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
 
 /*
@@ -36531,6 +36676,7 @@ public:
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
 | * ProductAppearance                                                 | 0x0014 |
+| * DeviceLocation                                                    | 0x0017 |
 | * ConfigurationVersion                                              | 0x0018 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -38030,6 +38176,150 @@ public:
     }
 };
 
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute DeviceLocation
+ */
+class ReadBridgedDeviceBasicInformationDeviceLocation : public ReadAttribute {
+public:
+    ReadBridgedDeviceBasicInformationDeviceLocation()
+        : ReadAttribute("device-location")
+    {
+    }
+
+    ~ReadBridgedDeviceBasicInformationDeviceLocation()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BridgedDeviceBasicInformation::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::DeviceLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterBridgedDeviceBasicInformation alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeDeviceLocationWithCompletion:^(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"BridgedDeviceBasicInformation.DeviceLocation response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("BridgedDeviceBasicInformation DeviceLocation read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class WriteBridgedDeviceBasicInformationDeviceLocation : public WriteAttribute {
+public:
+    WriteBridgedDeviceBasicInformationDeviceLocation()
+        : WriteAttribute("device-location")
+        , mComplex(&mValue)
+    {
+        AddArgument("attr-name", "device-location");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteBridgedDeviceBasicInformationDeviceLocation()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BridgedDeviceBasicInformation::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::DeviceLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterBridgedDeviceBasicInformation alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRWriteParams alloc] init];
+        params.timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
+        params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
+        MTRDataTypeLocationDescriptorStruct * _Nullable value;
+        if (mValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRDataTypeLocationDescriptorStruct new];
+            value.locationName = [[NSString alloc] initWithBytes:mValue.Value().locationName.data() length:mValue.Value().locationName.size() encoding:NSUTF8StringEncoding];
+            if (mValue.Value().floorNumber.IsNull()) {
+                value.floorNumber = nil;
+            } else {
+                value.floorNumber = [NSNumber numberWithShort:mValue.Value().floorNumber.Value()];
+            }
+            if (mValue.Value().areaType.IsNull()) {
+                value.areaType = nil;
+            } else {
+                value.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(mValue.Value().areaType.Value())];
+            }
+        }
+
+        [cluster writeAttributeDeviceLocationWithValue:value params:params completion:^(NSError * _Nullable error) {
+            if (error != nil) {
+                LogNSError("BridgedDeviceBasicInformation DeviceLocation write Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type>> mComplex;
+};
+
+class SubscribeAttributeBridgedDeviceBasicInformationDeviceLocation : public SubscribeAttribute {
+public:
+    SubscribeAttributeBridgedDeviceBasicInformationDeviceLocation()
+        : SubscribeAttribute("device-location")
+    {
+    }
+
+    ~SubscribeAttributeBridgedDeviceBasicInformationDeviceLocation()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BridgedDeviceBasicInformation::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::DeviceLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterBridgedDeviceBasicInformation alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeDeviceLocationWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"BridgedDeviceBasicInformation.DeviceLocation response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
 
 /*
@@ -195755,6 +196045,11 @@ void registerClusterBasicInformation(Commands & commands)
         make_unique<ReadBasicInformationMaxPathsPerInvoke>(), //
         make_unique<SubscribeAttributeBasicInformationMaxPathsPerInvoke>(), //
 #if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadBasicInformationDeviceLocation>(), //
+        make_unique<WriteBasicInformationDeviceLocation>(), //
+        make_unique<SubscribeAttributeBasicInformationDeviceLocation>(), //
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         make_unique<ReadBasicInformationConfigurationVersion>(), //
         make_unique<SubscribeAttributeBasicInformationConfigurationVersion>(), //
 #endif // MTR_ENABLE_PROVISIONAL
@@ -196662,6 +196957,11 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands)
         make_unique<SubscribeAttributeBridgedDeviceBasicInformationUniqueID>(), //
         make_unique<ReadBridgedDeviceBasicInformationProductAppearance>(), //
         make_unique<SubscribeAttributeBridgedDeviceBasicInformationProductAppearance>(), //
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadBridgedDeviceBasicInformationDeviceLocation>(), //
+        make_unique<WriteBridgedDeviceBasicInformationDeviceLocation>(), //
+        make_unique<SubscribeAttributeBridgedDeviceBasicInformationDeviceLocation>(), //
+#endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadBridgedDeviceBasicInformationConfigurationVersion>(), //
         make_unique<SubscribeAttributeBridgedDeviceBasicInformationConfigurationVersion>(), //

@@ -173,7 +173,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
 
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
@@ -182,7 +182,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 {
     isComissioningStarted = false;
 
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
@@ -191,7 +191,7 @@ void BaseApplicationDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERRO
 {
     isComissioningStarted = false;
 
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
@@ -266,7 +266,7 @@ CHIP_ERROR BaseApplication::Init()
     CHIP_ERROR err = BaseInit();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("BaseInit() failed");
+        ChipLogError(DeviceLayer, "BaseInit() failed");
         appError(err);
         return err;
     }
@@ -274,7 +274,7 @@ CHIP_ERROR BaseApplication::Init()
     err = AppInit();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppInit() failed");
+        ChipLogError(DeviceLayer, "AppInit() failed");
         appError(err);
         return err;
     }
@@ -295,12 +295,12 @@ CHIP_ERROR BaseApplication::BaseInit()
     /*
      * Wait for the WiFi to be initialized
      */
-    ChipLogProgress(AppServer, "APP: Wait WiFi Init");
+    ChipLogDetail(AppServer, "APP: Wait WiFi Init");
     while (!WifiInterface::GetInstance().IsStationReady())
     {
         osDelay(pdMS_TO_TICKS(10));
     }
-    ChipLogProgress(AppServer, "APP: Done WiFi Init");
+    ChipLogDetail(AppServer, "APP: Done WiFi Init");
 #endif
 
     // Create cmsis os sw timer for Function Selection.
@@ -330,7 +330,9 @@ CHIP_ERROR BaseApplication::BaseInit()
     ChipLogProgress(AppServer, "Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     ChipLogProgress(AppServer, "Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-    ConfigurationMgr().LogDeviceConfig();
+    // TODO FIXME: ConfigurationMgr().LogDeviceConfig() fills the UART log queue.
+    // Write an optimized version to reduce the number of calls to ChipLogProgress.
+    // ConfigurationMgr().LogDeviceConfig();
 
     OutputQrCode(true /*refreshLCD at init*/);
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
@@ -857,13 +859,13 @@ void BaseApplication::PostEvent(const AppEvent * aEvent)
 
 void BaseApplication::DispatchEvent(AppEvent * aEvent)
 {
-    if (aEvent->Handler)
+    if (aEvent != nullptr && aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }
     else
     {
-        ChipLogProgress(AppServer, "Event received with no handler. Dropping event.");
+        ChipLogError(AppServer, "Nullptr event received or no handler. Dropping it.");
     }
 }
 
@@ -875,7 +877,7 @@ void BaseApplication::ScheduleFactoryReset()
         {
             TEMPORARY_RETURN_IGNORED Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
         // Removing the matter services on factory reset
         TEMPORARY_RETURN_IGNORED chip::Dnssd::ServiceAdvertiser::Instance().RemoveServices();
 #endif
@@ -902,7 +904,6 @@ void BaseApplication::DoProvisioningReset()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-        ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
         chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
@@ -914,12 +915,12 @@ void BaseApplication::DoProvisioningReset()
     });
 }
 
-#if SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 void BaseApplication::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
     OTAConfig::Init();
 }
-#endif
+#endif // defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 
 void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 {
@@ -954,7 +955,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||
             (event->InternetConnectivityChange.IPv6 == kConnectivity_Established))
         {
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
             chip::app::DnssdServer::Instance().StartServer();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -963,26 +964,26 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
-#if SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
             ChipLogProgress(AppServer, "Scheduling OTA Requestor initialization");
             TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
                 chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
-#endif // SILABS_OTA_ENABLED
+#endif // defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
         }
     }
     break;
 
     case DeviceEventType::kDnssdInitialized: {
-#if SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
         ChipLogProgress(AppServer, "DNS-SD initialized, scheduling OTA Requestor initialization");
         TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
             chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
-#endif // SILABS_OTA_ENABLED
+#endif // defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
     }
     break;
 
     case DeviceEventType::kCommissioningComplete: {
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
         TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().VerifyAndTransitionToLowPowerMode(
             WifiSleepManager::PowerEvent::kCommissioningComplete);
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER

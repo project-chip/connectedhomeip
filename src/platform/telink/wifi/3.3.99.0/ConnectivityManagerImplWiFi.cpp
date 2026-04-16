@@ -95,10 +95,7 @@ void ConnectivityManagerImplWiFi::_ClearWiFiStationProvision(void)
 {
     if (_IsWiFiStationProvisioned())
     {
-        if (CHIP_NO_ERROR != WiFiManager().Instance().ClearStationProvisioningData())
-        {
-            ChipLogError(DeviceLayer, "Cannot clear WiFi station provisioning data");
-        }
+        WiFiManager().Instance().ClearStationProvisioningData();
     }
 }
 

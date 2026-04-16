@@ -65,7 +65,7 @@ class TC_IDM_2_3(BasicCompositionTests):
 
     def steps_TC_IDM_2_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH reads from the DUT the CapabilityMinima attribute from the Basic Information Cluster."),
+            TestStep(1, "TH reads from the DUT the CapabilityMinima attribute from the Basic Information Cluster.", is_commissioning=True),
             TestStep(2, "TH reads from the DUT all attributes from all clusters on all endpoints, to collect valid AttributePaths."),
             TestStep(3, "TH sends a Read Request Message to the DUT with a number of paths up to the ReadPathsSupported value."),
             TestStep(4, "TH sends a Subscribe Request Message to the DUT with a number of paths up to the SubscribePathsSupported value. TH then modifies one of the subscribed attributes and waits for a Report Data Action."),

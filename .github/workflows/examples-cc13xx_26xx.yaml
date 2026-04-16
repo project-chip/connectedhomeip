@@ -29,7 +29,7 @@ concurrency:
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     cc13xx_26xx:

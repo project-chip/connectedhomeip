@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,37 +18,4 @@
 
 #pragma once
 
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/DataModelTypes.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ClosureDimension {
-
-/** @brief
- *    Interface to allow interaction with interaction model and ember layers. Can be faked for unit testing.
- */
-class MatterContext
-{
-public:
-    MatterContext(EndpointId endpoint) : mEndpoint(endpoint) {}
-
-    /**
-     * @brief calls the attribute change callback
-     * @param[in] attributeId Attribute ID whose value needs to be marked dirty.
-     */
-    virtual void MarkDirty(AttributeId attributeId);
-
-    virtual ~MatterContext() = default;
-
-    EndpointId GetEndpointId() const { return mEndpoint; }
-
-private:
-    EndpointId mEndpoint;
-};
-
-} // namespace ClosureDimension
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#include <app/clusters/closure-dimension-server/ClosureDimensionClusterMatterContext.h>

@@ -65,11 +65,7 @@ CHIP_ERROR GetPeerAddress(Inet::TCPEndPoint & endPoint, PeerAddress & outAddr)
 
 } // namespace
 
-TCPBase::~TCPBase()
-{
-    // Call Close to free the listening socket and close all active connections.
-    Close();
-}
+TCPBase::~TCPBase() = default;
 
 void TCPBase::CloseActiveConnections()
 {
@@ -319,9 +315,9 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
     activeConnection->mAppState        = appState;
     activeConnection->mConnectionState = TCPState::kConnecting;
 
-    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
-
     mUsedEndPointCount++;
+
+    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
 
     // Set the return value of the peer connection state to the allocated
     // connection.

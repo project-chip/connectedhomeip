@@ -207,16 +207,23 @@
             "ProductAppearance",
             "SpecificationVersion",
             "MaxPathsPerInvoke",
+            "DeviceLocation",
             "ConfigurationVersion"
         ],
         "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
-        "Bridged Device Basic Information": ["ProductAppearance"],
+        "Bridged Device Basic Information": [
+            "DeviceLocation",
+            "ProductAppearance"
+        ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
+            "MainState",
+            "CurrentErrorList",
             "OverallCurrentState",
             "OverallTargetState",
+            "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
         ],
@@ -422,6 +429,11 @@
             "nullable_global_struct"
         ],
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Temperature Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",
@@ -531,7 +543,10 @@
             "DSTOffsetListMaxSize",
             "ClusterRevision"
         ],
-        "Temperature Control": ["SupportedTemperatureLevels"],
+        "Temperature Control": [
+            "SupportedTemperatureLevels",
+            "ClusterRevision"
+        ],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
@@ -735,7 +750,7 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Air Quality": ["AirQuality", "ClusterRevision", "FeatureMap"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",

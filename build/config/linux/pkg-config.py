@@ -107,10 +107,7 @@ def GetPkgConfigPrefixToStrip(options, args):
 def MatchesAnyRegexp(flag, list_of_regexps):
     """Returns true if the first argument matches any regular expression in the
     given list."""
-    for regexp in list_of_regexps:
-        if regexp.search(flag) is not None:
-            return True
-    return False
+    return any(regexp.search(flag) is not None for regexp in list_of_regexps)
 
 
 def RewritePath(path, strip_prefix, sysroot):

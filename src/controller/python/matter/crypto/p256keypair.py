@@ -120,11 +120,11 @@ class P256Keypair:
 
         For P256Keypair, the output length should be exactly 65 bytes.
         '''
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abc.abstractmethod
     def ECDSA_sign_msg(self, message: bytes) -> bytes:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abc.abstractmethod
     def ECDH_derive_secret(self, remote_pubkey: bytes) -> bytes:
@@ -133,7 +133,7 @@ class P256Keypair:
         remote_pubkey will be a public key conforms with the uncompressed
         format of section 2.3.3 of the SECG SEC 1 standard.
         '''
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class TestP256Keypair(P256Keypair):

@@ -106,3 +106,6 @@
  *
  */
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
+
+// Enable groupcast
+#define CHIP_CONFIG_ENABLE_GROUPCAST 1

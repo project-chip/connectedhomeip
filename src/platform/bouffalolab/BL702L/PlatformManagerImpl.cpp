@@ -54,7 +54,6 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
-    TaskHandle_t backup_eventLoopTask;
 
     otRadio_opt_t opt;
     opt.byte = 0;
@@ -83,11 +82,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    /** weiyin, backup mEventLoopTask which is reset in _InitChipStack */
-    backup_eventLoopTask = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask;
-    err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
 
 exit:
     return err;

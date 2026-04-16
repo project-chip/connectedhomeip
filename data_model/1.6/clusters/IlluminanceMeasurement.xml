@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0400" name="Illuminance Measurement Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0400" name="Illuminance Measurement Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 2048 2049 2050"/>
     <revision revision="2" summary="CCB 2167"/>
     <revision revision="3" summary="New data model format and notation"/>
     <revision revision="4" summary="Removed P quality"/>
+    <revision revision="5" summary="Added F quality to MinMeasuredValue, MaxMeasuredValue, Tolerance and LightSensorType attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0400" name="Illuminance Measurement"/>
@@ -99,7 +100,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
         <between>
@@ -110,7 +111,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
         <min>
@@ -126,6 +127,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint>
         <max value="2048"/>
@@ -133,7 +135,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="LightSensorType" type="LightSensorTypeEnum" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <optionalConform/>
     </attribute>
   </attributes>

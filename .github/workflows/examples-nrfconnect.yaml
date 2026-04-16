@@ -27,7 +27,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     nrfconnect:
@@ -53,7 +53,7 @@ jobs:
               with:
                 platform: nrfconnect
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@v4
               id: changed_paths
               with:
                   filters: |
@@ -169,7 +169,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "source $ZEPHYR_BASE/zephyr-env.sh && pip3 install -r scripts/setup/requirements.build.txt && ./scripts/build/build_examples.py --target nrf-native-sim-tests build"
             - name: Uploading Failed Test Logs
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: test-log

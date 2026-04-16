@@ -102,6 +102,7 @@ Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
+DefaultTimerDelegate gTimerDelegate;
 
 void DeInitBLEIfCommissioned()
 {
@@ -238,6 +239,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
                 .eventManagement                  = EventManagement::GetInstance(),                          //
                 .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
+                .timerDelegate                    = gTimerDelegate,                                          //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -273,11 +275,10 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
 void InitServer(intptr_t context)
 {
-    static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = timerDelegate,                          //
+        .timerDelegate     = gTimerDelegate,                         //
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;

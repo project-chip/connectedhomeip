@@ -35,22 +35,14 @@ import alive_progress
 import click
 import colorama
 import coloredlogs
+import python_path
 import tabulate
 import yaml
-from chiptest.runner import SubprocessKind
 
-try:
-    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
-except ImportError:
-    # Fallback to manual import from source tree
-    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
-        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
-    if _MATTER_TESTING_PATH not in sys.path:
-        sys.path.insert(0, _MATTER_TESTING_PATH)
-    try:
-        from matter.testing.metadata import extract_runs_args
-    except ImportError:
-        extract_runs_args = None  # filtering by app (--app-filter) will not work.
+with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
+    from matter.testing.metadata import extract_runs_args
+    from matter.testing.tasks import SubprocessKind
+
 
 log = logging.getLogger(__name__)
 

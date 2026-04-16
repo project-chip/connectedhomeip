@@ -28,7 +28,7 @@ using namespace ::chip::System;
 
 extern "C" void ChipTestShutdown(void)
 {
-    ChipLogProgress(DeviceLayer, "Lighting APP Demo! Shutdown Now!");
+    ChipLogProgress(DeviceLayer, "All Clusters APP Demo! Shutdown Now!");
     CHIPDeviceManager::GetInstance().Shutdown();
 }
 

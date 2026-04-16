@@ -115,53 +115,71 @@ TEST_F(TestUserLabelCluster, ReadAttributeTest)
 
 TEST_F(TestUserLabelCluster, WriteValidLabelListTest)
 {
-    ClusterTester tester(userLabel);
-    Structs::LabelStruct::Type labels[] = {
-        { .label = "room"_span, .value = "bedroom 2"_span },
-        { .label = "orientation"_span, .value = "North"_span },
-    };
-    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_NO_ERROR);
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        ClusterTester tester(userLabel);
+        Structs::LabelStruct::Type labels[] = {
+            { .label = "room"_span, .value = "bedroom 2"_span },
+            { .label = "orientation"_span, .value = "North"_span },
+        };
+        ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels), listWritingPattern), CHIP_NO_ERROR);
+    }
 }
 
 TEST_F(TestUserLabelCluster, WriteLabelWithLabelTooLongTest)
 {
-    ClusterTester tester(userLabel);
-    constexpr auto tooLongLabel = "this_label_is_way_too_long"_span;
-    static_assert(tooLongLabel.size() > UserLabelCluster::kMaxLabelSize);
-    Structs::LabelStruct::Type labels[] = {
-        { .label = tooLongLabel, .value = "value"_span },
-    };
-    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        ClusterTester tester(userLabel);
+        constexpr auto tooLongLabel = "this_label_is_way_too_long"_span;
+        static_assert(tooLongLabel.size() > UserLabelCluster::kMaxLabelSize);
+        Structs::LabelStruct::Type labels[] = {
+            { .label = tooLongLabel, .value = "value"_span },
+        };
+        ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels), listWritingPattern),
+                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
 }
 
 TEST_F(TestUserLabelCluster, WriteLabelWithValueTooLongTest)
 {
-    ClusterTester tester(userLabel);
-    constexpr auto tooLongValue = "this_value_is_way_too_long"_span;
-    static_assert(tooLongValue.size() > UserLabelCluster::kMaxValueSize);
-    Structs::LabelStruct::Type labels[] = {
-        { .label = "room"_span, .value = tooLongValue },
-    };
-    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        ClusterTester tester(userLabel);
+        constexpr auto tooLongValue = "this_value_is_way_too_long"_span;
+        static_assert(tooLongValue.size() > UserLabelCluster::kMaxValueSize);
+        Structs::LabelStruct::Type labels[] = {
+            { .label = "room"_span, .value = tooLongValue },
+        };
+        ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels), listWritingPattern),
+                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
 }
 
 TEST_F(TestUserLabelCluster, WriteEmptyLabelsTest)
 {
-    ClusterTester tester(userLabel);
-    Structs::LabelStruct::Type labels[] = {
-        { .label = ""_span, .value = ""_span }, // empty label and value are allowed per spec
-    };
-    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_NO_ERROR);
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        ClusterTester tester(userLabel);
+        Structs::LabelStruct::Type labels[] = {
+            { .label = ""_span, .value = ""_span }, // empty label and value are allowed per spec
+        };
+        ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels), listWritingPattern), CHIP_NO_ERROR);
+    }
 }
 
 TEST_F(TestUserLabelCluster, WriteMaxSizeLabelListTest)
 {
-    ClusterTester tester(userLabel);
-    std::array<Structs::LabelStruct::Type, chip::DeviceLayer::kMaxUserLabelListLength> labels;
-    for (size_t i = 0; i < labels.size(); i++)
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
     {
-        labels[i].label = "label"_span;
-        labels[i].value = "value"_span;
+        ClusterTester tester(userLabel);
+        std::array<Structs::LabelStruct::Type, chip::DeviceLayer::kMaxUserLabelListLength> labels;
+        for (size_t i = 0; i < labels.size(); i++)
+        {
+            labels[i].label = "label"_span;
+            labels[i].value = "value"_span;
+        }
+        ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels.data(), labels.size()), listWritingPattern),
+                  CHIP_NO_ERROR);
     }
-    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels.data(), labels.size())), CHIP_NO_ERROR);
 }

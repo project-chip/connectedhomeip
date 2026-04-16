@@ -41,13 +41,11 @@ tests:
           the TH. GroupKeySet fields are as follows: * GroupKeySetID: 0x01a1 *
           GroupKeySecurityPolicy: TrustFirst (0) * EpochKey0:
           a0a1a2a3a4a5a6a7a8a9aaabacadaeaf * EpochStartTime0: 1110000 *
-          EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf * EpochStartTime1: 1110001
-          * EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf * EpochStartTime2:
-          1110002 * GroupKeyMulticastPolicy: 0"
+          GroupKeyMulticastPolicy: 0"
       verification: |
           Please execute the below commands before starting the test case :
 
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1","groupKeySecurityPolicy": 0, "epochKey0":"a0a1a2a3a4a5a6a7a8a9aaabacadaeaf","epochStartTime0": 1110000,"epochKey1":"b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001,"epochKey2":"c0c1c2c3c4c5c6c7c8c9cacbcccdcecf", "epochStartTime2": 1110002, "groupKeyMulticastPolicy": 0 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1","groupKeySecurityPolicy": 0, "epochKey0":"a0a1a2a3a4a5a6a7a8a9aaabacadaeaf","epochStartTime0": 1110000}' 1 0
 
           Verify the KeySetWrite command  On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
 
@@ -95,12 +93,15 @@ tests:
       disabled: true
 
     - label:
-          "Step 0c: Precondition 3: TH binds GroupIds 0x0001 and 0x0002 with
-          GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on
+          "Step 0c: Precondition 3: If the Groupcast cluster is enabled on the
+          RootNode endpoint, skip this step. Otherwise, TH binds GroupIds 0x0001
+          and 0x0002 with GroupKeySetID 0x01a1, in the GroupKeyMap attribute of
           GroupKeyManagement cluster by writing the GroupKeyMap attribute with
           two entries as follows: * List item 1: - FabricIndex: 1 - GroupId:
           0x0001 - GroupKeySetId: 0x01a1"
       verification: |
+          If the Groupcast cluster is enabled on the RootNode endpoint, skip this step. Otherwise:
+
           Please execute the below commands before starting the test case :
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": "0x0001", "groupKeySetID": "0x01a1", "fabricIndex": 1} ]' 1 0
@@ -152,9 +153,15 @@ tests:
       disabled: true
 
     - label:
-          "Step 0d: Precondition 4: TH sends a RemoveAllGroups command to DUT."
+          "Step 0d: Precondition 4: If the Groupcast cluster is enabled on the
+          RootNode endpoint, TH sends Groupcast LeaveGroup command with GroupID
+          0. Otherwise, TH sends RemoveAllGroups to DUT."
       verification: |
-          ./chip-tool groups remove-all-groups 1 1
+          If the Groupcast cluster is enabled on the RootNode endpoint, TH sends Groupcast LeaveGroup command with GroupID 0. Otherwise, TH sends RemoveAllGroups:
+
+            ./chip-tool groupcast leave-group 0 0
+          or:
+            ./chip-tool groups remove-all-groups 1 1
 
           Verify the RemoveAllGroups attribute On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
 
@@ -185,11 +192,16 @@ tests:
       disabled: true
 
     - label:
-          "Step 0e: Precondition 5: TH sends a AddGroup command to DUT with the
+          "Step 0e: Precondition 5: If the Groupcast cluster is enabled on the
+          RootNode endpoint, TH sends Groupcast JoinGroup command with GroupID,
+          Endpoints, and KeySetID. Otherwise, TH sends AddGroup to DUT with the
           GroupID field set to G1."
       verification: |
-          Please execute the below commands before starting the test case :
+          If the Groupcast cluster is enabled on the RootNode endpoint, TH sends Groupcast JoinGroup command with GroupID, Endpoints, and KeySetID. Otherwise, TH sends AddGroup:
 
+          Please execute the below commands before starting the test case :
+          ./chip-tool groupcast join-group 0x01 [1] 0x01a1
+          or:
           ./chip-tool groups add-group 0x01 Gp1 1 1
 
           Verify the AddGroup Command  on TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:

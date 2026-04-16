@@ -16,7 +16,6 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -99,12 +98,12 @@ TEST_F(TestUnitLocalizationCluster, ReadSupportedTemperatureUnits)
 
 TEST_F(TestUnitLocalizationCluster, WriteAndReadTemperatureUnit)
 {
-    app::DefaultSafeAttributePersistenceProvider persistenceProvider;
+    chip::Testing::TestServerClusterContext context;
     const BitFlags<Feature> features{ Feature::kTemperatureUnit };
     UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, features };
+    EXPECT_EQ(unitLocalizationCluster.Startup(context.Get()), CHIP_NO_ERROR);
+
     ClusterTester tester(unitLocalizationCluster);
-    VerifyOrDie(persistenceProvider.Init(&tester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
 
     // Set supported units as Kelvin and Celsius
     TempUnitEnum supportedUnits[2] = { TempUnitEnum::kCelsius, TempUnitEnum::kKelvin };
@@ -128,6 +127,4 @@ TEST_F(TestUnitLocalizationCluster, WriteAndReadTemperatureUnit)
     // Fahrenheit not supported, should return error
     temperatureUnit = TempUnitEnum::kFahrenheit;
     ASSERT_EQ(tester.WriteAttribute(TemperatureUnit::Id, temperatureUnit), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    app::SetSafeAttributePersistenceProvider(nullptr);
 }

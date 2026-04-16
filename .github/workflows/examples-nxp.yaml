@@ -30,7 +30,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     FreeRTOS:
@@ -56,7 +56,7 @@ jobs:
                   extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@v4
               id: changed_paths
               with:
                   filters: |
@@ -127,7 +127,7 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory \
-                      --target nxp-rw61x-freertos-thermostat-wifi-se05x \
+                      --target nxp-rw61x-freertos-thermostat-wifi-se05x-factory \
                       build \
                   "
             - name: Build RW61X thermostat ethernet example app
@@ -163,7 +163,7 @@ jobs:
               with:
                   platform: nxp
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@v4
               id: changed_paths
               with:
                   filters: |
@@ -183,5 +183,15 @@ jobs:
                       --target nxp-rw61x-zephyr-thermostat \
                       --target nxp-rw61x-zephyr-thermostat-thread \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
+                      build \
+                  "
+            - name: Build NXP Zephyr Unit Tests
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-zephyr-unit-test \
                       build \
                   "

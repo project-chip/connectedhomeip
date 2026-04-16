@@ -302,6 +302,7 @@ public class ChipDeviceController {
   }
 
   /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceWithAddress(long, String, int, int, long, CommissionParameters)}. */
+  @Deprecated
   public void pairDeviceWithAddress(
       long deviceId,
       String address,

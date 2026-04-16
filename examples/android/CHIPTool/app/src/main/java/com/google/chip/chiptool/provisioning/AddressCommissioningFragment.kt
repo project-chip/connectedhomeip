@@ -52,6 +52,7 @@ class AddressCommissioningFragment : Fragment() {
       val discriminator = binding.discriminatorEditText.text.toString()
       val pincode = binding.pincodeEditText.text.toString()
       val port = binding.portEditText.text.toString()
+      val isLIT = binding.enableLITCommissioningSwitchInAddress.isChecked
 
       if (address.isEmpty() || discriminator.isEmpty() || pincode.isEmpty()) {
         Log.e(TAG, "Address, discriminator, or pincode was empty: $address $discriminator $pincode")
@@ -64,7 +65,8 @@ class AddressCommissioningFragment : Fragment() {
             discriminator = discriminator.toInt(),
             setupPinCode = pincode.toLong(),
             ipAddress = address,
-            port = port.toInt()
+            port = port.toInt(),
+            isLIT = isLIT
           )
         )
     }

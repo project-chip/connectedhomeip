@@ -39,6 +39,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/AutoRelease.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
@@ -49,6 +50,7 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
+#include <transport/SecureSession.h>
 
 namespace chip {
 namespace app {
@@ -60,6 +62,17 @@ using namespace DeviceLayer::NetworkCommissioning;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
 namespace {
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
+bool IsConnectNetworkRequestOverPASE(CommandHandler & handler)
+{
+    Messaging::ExchangeContext * exchangeCtx = handler.GetExchangeContext();
+    return exchangeCtx && exchangeCtx->HasSessionHandle() && exchangeCtx->GetSessionHandle()->IsSecureSession() &&
+        exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kPASE;
+}
+
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 // Note: CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE can be 0, this disables debug text
 using DebugTextStorage = std::array<char, CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE>;
@@ -638,11 +651,22 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
 
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 #else
-    // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
-    // network has been fully brought up and kOperationalNetworkStarted is delivered.
-    // mConnectingNetworkIDLen and mConnectingNetworkID contain the received SSID
-    // As per spec, send the ConnectNetworkResponse(Success) prior to releasing the commissioning channel
-    SendNonConcurrentConnectNetworkResponse();
+    mConnectNetworkResponseSentEarly = false;
+    // In non-concurrent mode there are two execution paths:
+    // 1) PASE/BLE: send ConnectNetworkResponse early before tearing down the commissioning
+    //    transport; actual connect is started later from OnPlatformEventHandler.
+    // 2) CASE: start connect immediately here and send ConnectNetworkResponse from OnResult
+    //    after attach finishes.
+    if (IsConnectNetworkRequestOverPASE(handler))
+    {
+        // PASE path must respond before commissioning transport is torn down.
+        mConnectNetworkResponseSentEarly = true;
+        SendNonConcurrentConnectNetworkResponse();
+    }
+    else
+    {
+        HandleNonConcurrentConnectNetwork();
+    }
 #endif
     return std::nullopt;
 }
@@ -650,8 +674,26 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
 std::optional<ActionReturnStatus> NetworkCommissioningCluster::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s",
-                    NullTerminated(mConnectingNetworkID, mConnectingNetworkIDLen).c_str());
+    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
+    {
+        constexpr size_t kThreadNetworkIdHexMax = (2 * kMaxNetworkIDLen) + 1;
+        char threadNetworkIdHex[kThreadNetworkIdHexMax];
+        if (Encoding::BytesToUppercaseHexString(nonConcurrentNetworkID.data(), nonConcurrentNetworkID.size(), threadNetworkIdHex,
+                                                sizeof(threadNetworkIdHex)) == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Thread Network ID=%s", threadNetworkIdHex);
+        }
+        else
+        {
+            ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Thread Network ID (len=%u)",
+                            static_cast<unsigned>(nonConcurrentNetworkID.size()));
+        }
+    }
+    else
+    {
+        ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Wi-Fi SSID=%s",
+                        NullTerminated(mConnectingNetworkID, mConnectingNetworkIDLen).c_str());
+    }
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
     return std::nullopt;
 }
@@ -790,12 +832,11 @@ void NetworkCommissioningCluster::DisconnectLingeringConnection()
 void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {
     auto commandHandleRef = std::move(mAsyncCommandHandle);
-
+    auto commandHandle    = commandHandleRef.Get();
     // In Non-concurrent mode the commandHandle will be null here, the ConnectNetworkResponse
     // has already been sent and the BLE will have been stopped, however the other functionality
     // is still required
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    auto commandHandle = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
         // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
@@ -825,14 +866,23 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     SetLastNetworkId(ByteSpan{ mConnectingNetworkID, mConnectingNetworkIDLen });
     SetLastNetworkingStatusValue(MakeNullable(commissioningError));
 
+    bool shouldSendConnectNetworkResponse = true;
 #if (CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP) && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
-    // Do not send the ConnectNetworkResponse if in non-concurrent mode
-    // TODO(#30576) raised to modify CommandHandler to notify it if no response required
-    // -----> Is this required here: commandHandle->FinishCommand();
-#else
-    commandHandle->AddResponse(mAsyncCommandPath, response);
-#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mConnectNetworkResponseSentEarly)
+    {
+        ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse was already sent");
+        shouldSendConnectNetworkResponse = false;
+    }
+#endif
+
+    if (shouldSendConnectNetworkResponse && commandHandle != nullptr)
+    {
+        commandHandle->AddResponse(mAsyncCommandPath, response);
+    }
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    mConnectNetworkResponseSentEarly = false;
+#endif
 
     if (commissioningError == Status::kSuccess)
     {
@@ -931,6 +981,10 @@ void NetworkCommissioningCluster::OnCommissioningComplete()
 void NetworkCommissioningCluster::OnFailSafeTimerExpired()
 {
     VerifyOrReturn(mpWirelessDriver != nullptr);
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    mConnectNetworkResponseSentEarly = false;
+#endif
 
     ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
     TEMPORARY_RETURN_IGNORED mpWirelessDriver->RevertConfiguration();

@@ -19,6 +19,8 @@ from enum import Enum, auto
 from .builder import BuilderOutput
 from .gn import Builder
 
+log = logging.getLogger(__name__)
+
 
 class NuttXApp(Enum):
     LIGHT = auto()
@@ -77,12 +79,12 @@ class NuttXBuilder(Builder):
                       title='Configuring ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling NuttX %s at %s, ',
-                     self.board.board_config, self.output_dir)
+        log.info('Compiling NuttX %s at %s, ',
+                 self.board.board_config, self.output_dir)
         self._Execute(['cmake', '--build', self.output_dir])
 
     def build_outputs(self):
-        logging.info('Compiling outputs NuttX at %s', self.output_dir)
+        log.info('Compiling outputs NuttX at %s', self.output_dir)
         extensions = ["out"]
         if self.options.enable_link_map_file:
             extensions.append("out.map")

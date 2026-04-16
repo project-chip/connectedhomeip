@@ -441,6 +441,9 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
     case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
+    case Attributes::DeviceLocation::Id: {
+        return YES;
+    }
     case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
@@ -1464,6 +1467,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
         return YES;
     }
     case Attributes::ProductAppearance::Id: {
+        return YES;
+    }
+    case Attributes::DeviceLocation::Id: {
         return YES;
     }
     case Attributes::ConfigurationVersion::Id: {

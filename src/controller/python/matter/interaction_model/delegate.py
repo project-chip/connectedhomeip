@@ -123,7 +123,7 @@ class SessionParameters:
     sessionActiveThreshold: Optional[int]
     dataModelRevision: Optional[int]
     interactionModelRevision: Optional[int]
-    specficiationVersion: Optional[int]
+    specificationVersion: Optional[int]
     maxPathsPerInvoke: int
 
 

@@ -92,6 +92,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         #####################################################################################################################################
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
+        self.jfadmin_fabric_a_node_id = 1
 
         # Start Fabric A JF-Administrator App
         self.fabric_a_admin = AppServerSubprocess(
@@ -118,8 +119,8 @@ class TC_JFDS_2_3(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            message=f"pairing onnetwork {self.jfadmin_fabric_a_node_id} {self.jfadmin_fabric_a_passcode} --anchor true",
+            expected_output=f"[JF] Anchor Administrator (nodeId={self.jfadmin_fabric_a_node_id}) commissioned with success",
             timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
@@ -199,6 +200,9 @@ class TC_JFDS_2_3(MatterBaseTest):
                      "Verify that the DUT responds with Status code CONSTRAINT_ERROR"),
         ]
 
+    def pics_TC_JFDS_2_3(self) -> list[str]:
+        return ["JFDS.S"]
+
     @async_test_body
     async def test_TC_JFDS_2_3(self):
         # Creating a Controller for Ecosystem A
@@ -213,12 +217,26 @@ class TC_JFDS_2_3(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
+        # Discover endpoint with JointFabricDatastore cluster via Descriptor
+        descriptor_response = await self.devCtrlEcoA.ReadAttribute(
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(Clusters.Descriptor)],
+            returnClusterObject=True)
+
+        jfds_endpoint = None
+        for endpoint_id, endpoint_data in descriptor_response.items():
+            if Clusters.JointFabricDatastore.id in endpoint_data[Clusters.Descriptor].serverList:
+                jfds_endpoint = endpoint_id
+                log.info(f"Found JointFabricDatastore cluster on endpoint {jfds_endpoint}")
+                break
+
+        asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
+
         self.step("1")
         # Read GroupList attribute from DUT
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
             returnClusterObject=True)
-        groupList = response[1][Clusters.JointFabricDatastore].groupList
+        groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
 
         # Note the number of entries returned
         num_entries = len(groupList)
@@ -267,14 +285,18 @@ class TC_JFDS_2_3(MatterBaseTest):
             groupPermission=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kView)
 
         # Send AddGroup command to DUT
-        await self.send_single_cmd(cmd=step2_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+        try:
+            await self.send_single_cmd(cmd=step2_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id,
+                                       endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when adding Group: {e}")
 
         self.step("3")
         # Read GroupList attribute again to verify the new entry was added
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
             returnClusterObject=True)
-        groupList = response[1][Clusters.JointFabricDatastore].groupList
+        groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
 
         # Verify that one entry has been added
         asserts.assert_greater(len(groupList), num_entries,
@@ -308,14 +330,18 @@ class TC_JFDS_2_3(MatterBaseTest):
             groupCAT=0x0001,
             groupCATVersion=0x0002,
             groupPermission=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kOperate)
-        await self.send_single_cmd(cmd=step4_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+        try:
+            await self.send_single_cmd(cmd=step4_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id,
+                                       endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when updating Group: {e}")
 
         self.step("5")
         # Read GroupList attribute to verify the update
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
             returnClusterObject=True)
-        groupList = response[1][Clusters.JointFabricDatastore].groupList
+        groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
 
         # Find and verify the updated entry with GroupID=0x000a
         found_entry = None
@@ -339,14 +365,18 @@ class TC_JFDS_2_3(MatterBaseTest):
         self.step("6")
         # Send RemoveGroup command
         cmd = Clusters.JointFabricDatastore.Commands.RemoveGroup(0x000A)
-        await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id,
+                                       endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when removing Group: {e}")
 
         self.step("7")
         # Read GroupList attribute to verify the entry was removed
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
             returnClusterObject=True)
-        groupList = response[1][Clusters.JointFabricDatastore].groupList
+        groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
 
         # Verify that no entry with GroupID=0x000a exists
         found_entry = False
@@ -368,7 +398,7 @@ class TC_JFDS_2_3(MatterBaseTest):
             groupPermission=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kView)
 
         try:
-            await self.send_single_cmd(cmd=step8_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            await self.send_single_cmd(cmd=step8_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
@@ -385,7 +415,7 @@ class TC_JFDS_2_3(MatterBaseTest):
             groupPermission=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kAdminister)
 
         try:
-            await self.send_single_cmd(cmd=step9_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            await self.send_single_cmd(cmd=step9_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
@@ -395,7 +425,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         # Try to remove the Admin CAT group - should fail with CONSTRAINT_ERROR
         cmd = Clusters.JointFabricDatastore.Commands.RemoveGroup(self.admin_cat_group_id)
         try:
-            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
@@ -412,7 +442,7 @@ class TC_JFDS_2_3(MatterBaseTest):
             groupPermission=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kView)
 
         try:
-            await self.send_single_cmd(cmd=step11_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            await self.send_single_cmd(cmd=step11_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
@@ -430,7 +460,7 @@ class TC_JFDS_2_3(MatterBaseTest):
 
         cmd = step12_cmd
         try:
-            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
@@ -440,7 +470,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         # Try to remove the Anchor CAT group - should fail with CONSTRAINT_ERROR
         cmd = Clusters.JointFabricDatastore.Commands.RemoveGroup(self.anchor_cat_group_id)
         try:
-            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,

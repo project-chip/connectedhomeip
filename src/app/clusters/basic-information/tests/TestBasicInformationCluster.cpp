@@ -133,12 +133,6 @@ public:
 struct TestBasicInformationCluster : public ::testing::Test
 {
     MockDeviceInstanceInfoProvider mDeviceInfoProvider;
-    BasicInformationCluster::Context mContext = {
-        .deviceInstanceInfoProvider = mDeviceInfoProvider,
-        .configurationManager       = chip::DeviceLayer::ConfigurationMgr(),
-        .platformManager            = chip::DeviceLayer::PlatformMgr(),
-        .subscriptionsPerFabric     = app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
-    };
 
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
@@ -146,95 +140,109 @@ struct TestBasicInformationCluster : public ::testing::Test
 
 TEST_F(TestBasicInformationCluster, TestAttributes)
 {
-
-    // check without optional attributes
+    // check with default optional attributes (unique ID forced on)
     {
-        const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, mContext);
+        const BasicInformationOptionalAttributesSet optionalAttributeSet;
+        BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
+                                        chip::DeviceLayer::PlatformMgr(),
+                                        app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(
-            cluster,
-            {
-
-                DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry,
-                ProductName::kMetadataEntry, ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry,
-                HardwareVersion::kMetadataEntry, HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry,
-                SoftwareVersionString::kMetadataEntry, CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry,
-                MaxPathsPerInvoke::kMetadataEntry, ConfigurationVersion::kMetadataEntry,
-                UniqueID::kMetadataEntry, // required in latest spec
-            }));
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
+                                                     {
+                                                         DataModelRevision::kMetadataEntry,     //
+                                                         VendorName::kMetadataEntry,            //
+                                                         VendorID::kMetadataEntry,              //
+                                                         ProductName::kMetadataEntry,           //
+                                                         ProductID::kMetadataEntry,             //
+                                                         NodeLabel::kMetadataEntry,             //
+                                                         Location::kMetadataEntry,              //
+                                                         HardwareVersion::kMetadataEntry,       //
+                                                         HardwareVersionString::kMetadataEntry, //
+                                                         SoftwareVersion::kMetadataEntry,       //
+                                                         SoftwareVersionString::kMetadataEntry, //
+                                                         CapabilityMinima::kMetadataEntry,      //
+                                                         SpecificationVersion::kMetadataEntry,  //
+                                                         MaxPathsPerInvoke::kMetadataEntry,     //
+                                                         ConfigurationVersion::kMetadataEntry,  //
+                                                         UniqueID::kMetadataEntry,              // required in latest spec
+                                                     }));
     }
 
     // Check that disabling unique id works
     {
-        const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, mContext);
+        BasicInformationOptionalAttributesSet optionalAttributeSet;
+        BasicInformationCluster cluster2(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
+                                         chip::DeviceLayer::PlatformMgr(),
+                                         app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
-        // UniqueID is EXPLICITLY NOT SET
-        cluster.OptionalAttributes() = BasicInformationCluster::OptionalAttributesSet();
+        // Forcing unique id to off is done for backwards compatibility testing.
+        // It is NOT a valid configuration for new devices.
+        cluster2.GetOptionalAttributes().Set<BasicInformation::Attributes::UniqueID::Id>(false);
 
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster2,
                                                      {
-                                                         DataModelRevision::kMetadataEntry,
-                                                         VendorName::kMetadataEntry,
-                                                         VendorID::kMetadataEntry,
-                                                         ProductName::kMetadataEntry,
-                                                         ProductID::kMetadataEntry,
-                                                         NodeLabel::kMetadataEntry,
-                                                         Location::kMetadataEntry,
-                                                         HardwareVersion::kMetadataEntry,
-                                                         HardwareVersionString::kMetadataEntry,
-                                                         SoftwareVersion::kMetadataEntry,
-                                                         SoftwareVersionString::kMetadataEntry,
-                                                         CapabilityMinima::kMetadataEntry,
-                                                         SpecificationVersion::kMetadataEntry,
-                                                         MaxPathsPerInvoke::kMetadataEntry,
-                                                         ConfigurationVersion::kMetadataEntry,
+                                                         DataModelRevision::kMetadataEntry,     //
+                                                         VendorName::kMetadataEntry,            //
+                                                         VendorID::kMetadataEntry,              //
+                                                         ProductName::kMetadataEntry,           //
+                                                         ProductID::kMetadataEntry,             //
+                                                         NodeLabel::kMetadataEntry,             //
+                                                         Location::kMetadataEntry,              //
+                                                         HardwareVersion::kMetadataEntry,       //
+                                                         HardwareVersionString::kMetadataEntry, //
+                                                         SoftwareVersion::kMetadataEntry,       //
+                                                         SoftwareVersionString::kMetadataEntry, //
+                                                         CapabilityMinima::kMetadataEntry,      //
+                                                         SpecificationVersion::kMetadataEntry,  //
+                                                         MaxPathsPerInvoke::kMetadataEntry,     //
+                                                         ConfigurationVersion::kMetadataEntry,  //
                                                      }));
     }
 
     // All attributes
     {
-        const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet = BasicInformationCluster::OptionalAttributesSet()
-                                                                                        .Set<ManufacturingDate::Id>()
-                                                                                        .Set<PartNumber::Id>()
-                                                                                        .Set<ProductURL::Id>()
-                                                                                        .Set<ProductLabel::Id>()
-                                                                                        .Set<SerialNumber::Id>()
-                                                                                        .Set<LocalConfigDisabled::Id>()
-                                                                                        .Set<Reachable::Id>()
-                                                                                        .Set<ProductAppearance::Id>()
-                                                                                        .Set<UniqueID::Id>();
+        const BasicInformationOptionalAttributesSet optionalAttributeSet = BasicInformationOptionalAttributesSet()
+                                                                               .template Set<ManufacturingDate::Id>()
+                                                                               .template Set<PartNumber::Id>()
+                                                                               .template Set<ProductURL::Id>()
+                                                                               .template Set<ProductLabel::Id>()
+                                                                               .template Set<SerialNumber::Id>()
+                                                                               .template Set<LocalConfigDisabled::Id>()
+                                                                               .template Set<Reachable::Id>()
+                                                                               .template Set<ProductAppearance::Id>()
+                                                                               .template Set<UniqueID::Id>();
 
-        BasicInformationCluster cluster(optionalAttributeSet, mContext);
+        BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
+                                        chip::DeviceLayer::PlatformMgr(),
+                                        app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
 
                                                      {
-                                                         DataModelRevision::kMetadataEntry,
-                                                         VendorName::kMetadataEntry,
-                                                         VendorID::kMetadataEntry,
-                                                         ProductName::kMetadataEntry,
-                                                         ProductID::kMetadataEntry,
-                                                         NodeLabel::kMetadataEntry,
-                                                         Location::kMetadataEntry,
-                                                         HardwareVersion::kMetadataEntry,
-                                                         HardwareVersionString::kMetadataEntry,
-                                                         SoftwareVersion::kMetadataEntry,
-                                                         SoftwareVersionString::kMetadataEntry,
-                                                         CapabilityMinima::kMetadataEntry,
-                                                         SpecificationVersion::kMetadataEntry,
-                                                         MaxPathsPerInvoke::kMetadataEntry,
-                                                         ConfigurationVersion::kMetadataEntry,
-                                                         UniqueID::kMetadataEntry,
-                                                         ManufacturingDate::kMetadataEntry,
-                                                         PartNumber::kMetadataEntry,
-                                                         ProductURL::kMetadataEntry,
-                                                         ProductLabel::kMetadataEntry,
-                                                         SerialNumber::kMetadataEntry,
-                                                         LocalConfigDisabled::kMetadataEntry,
-                                                         Reachable::kMetadataEntry,
-                                                         ProductAppearance::kMetadataEntry,
+                                                         DataModelRevision::kMetadataEntry,     //
+                                                         VendorName::kMetadataEntry,            //
+                                                         VendorID::kMetadataEntry,              //
+                                                         ProductName::kMetadataEntry,           //
+                                                         ProductID::kMetadataEntry,             //
+                                                         NodeLabel::kMetadataEntry,             //
+                                                         Location::kMetadataEntry,              //
+                                                         HardwareVersion::kMetadataEntry,       //
+                                                         HardwareVersionString::kMetadataEntry, //
+                                                         SoftwareVersion::kMetadataEntry,       //
+                                                         SoftwareVersionString::kMetadataEntry, //
+                                                         CapabilityMinima::kMetadataEntry,      //
+                                                         SpecificationVersion::kMetadataEntry,  //
+                                                         MaxPathsPerInvoke::kMetadataEntry,     //
+                                                         ConfigurationVersion::kMetadataEntry,  //
+                                                         UniqueID::kMetadataEntry,              //
+                                                         ManufacturingDate::kMetadataEntry,     //
+                                                         PartNumber::kMetadataEntry,            //
+                                                         ProductURL::kMetadataEntry,            //
+                                                         ProductLabel::kMetadataEntry,          //
+                                                         SerialNumber::kMetadataEntry,          //
+                                                         LocalConfigDisabled::kMetadataEntry,   //
+                                                         Reachable::kMetadataEntry,             //
+                                                         ProductAppearance::kMetadataEntry,     //
                                                      }));
     }
 }

@@ -110,30 +110,52 @@ class TestGroupKeyManagementCluster : public ::testing::Test
 
 ```
 
-### Writing Attributes (Lists & Structs)
+### Writing Attributes (Structs)
 
-The tester handles complex types like Lists and Structs automatically.
+The tester handles complex types like Structs automatically, with the exception
+of lists.
 
 ```cpp
-TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 {
-    // Create a vector of Structs
-    std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> keys;
+    ...
 
-    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key;
-    key.groupId = 0x1234;
-    key.groupKeySetID = 1;
-    key.fabricIndex = kTestFabricIndex;
-    keys.push_back(key);
+    // Write a valid new value
+    Attributes::Viewport::TypeInfo::Type newViewport = { 0, 0, 1280, 720 };
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::Viewport::Id, newViewport), CHIP_NO_ERROR);
 
-    // Wrap in DataModel::List
-    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+}
+```
 
-    // Write the attribute
-    // The tester automatically handles EncodeForWrite for fabric-scoped attributes
-    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
+### Writing List Attributes
 
-    ASSERT_EQ(err, CHIP_NO_ERROR);
+-   There are (Mainly) two patterns used to write list attributes, and cluster
+    servers usually support both of them.
+-   For that reason, ClusterTester provides a `WriteAttribute` overload for
+    lists that takes a `ListWritingPattern`
+-   Tests for list attributes should exercise both patterns to ensure future
+    proofing. One way of doing that could be through a range-for loop as in the
+    example below.
+
+```cpp
+TEST_F(TestUserLabelCluster, WriteValidLabelListTest)
+{
+    // Repeating the testcase twice, once for each List Writing Pattern
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        ClusterTester tester(userLabel);
+        Structs::LabelStruct::Type labels[] = {
+            { .label = "room"_span, .value = "bedroom 2"_span },
+            { .label = "orientation"_span, .value = "North"_span },
+        };
+
+        // Wrap in DataModel::List
+        auto listToWrite = DataModel::List(labels);
+
+        // Write the attribute
+        // The tester automatically handles EncodeForWrite for fabric-scoped attributes
+        ASSERT_EQ(tester.WriteAttribute(LabelList::Id, listToWrite, listWritingPattern), CHIP_NO_ERROR);
+    }
 }
 
 ```

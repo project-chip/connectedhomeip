@@ -31,10 +31,10 @@
  *  3. Enable spake HSM class in src\protocols\secure_channel\PASESession.h (change Crypto::Spake2p_P256_SHA256_HKDF_HMAC
  * mSpake2p; to Crypto::Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;). Also include the header
  * <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h> in PASESession.h.
- *  4. Define ENABLE_SE05X_SPAKE_VERIFIER in  src/app/server/BUILD.gn, src/controller/BUILD.gn,
- * src/protocols/secure_channel/BUILD.gn . add the following lines in BUILD.gn file -
- * import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni") and if (chip_se05x_spake_verifier) { defines += [
- * "ENABLE_SE05X_SPAKE_VERIFIER=1" ]}
+ *  4. Modify build files -
+ *    4a - Define ENABLE_SE05X_SPAKE_VERIFIER in  src/app/server/BUILD.gn,
+ *    4b - Define ENABLE_SE05X_SPAKE_VERIFIER in  src/controller/BUILD.gn,
+ *    4c - Define ENABLE_SE05X_SPAKE_VERIFIER in  src/protocols/secure_channel/BUILD.gn.
  */
 
 #ifndef ENABLE_SE05X_SPAKE_VERIFIER
@@ -68,67 +68,10 @@
 #endif // ENABLE_SE05X_RND_GEN
 
 /*
- * Enable se05x for Generate EC Key
- */
-#ifndef ENABLE_SE05X_GENERATE_EC_KEY
-#ifdef CONFIG_CHIP_SE05X_GENERATE_EC_KEY
-#define ENABLE_SE05X_GENERATE_EC_KEY CONFIG_CHIP_SE05X_GENERATE_EC_KEY
-#else
-#define ENABLE_SE05X_GENERATE_EC_KEY 0
-#endif
-#endif // ENABLE_SE05X_GENERATE_EC_KEY
-
-/*
- * Enable ECDSA Verify using se05x
- */
-#ifndef ENABLE_SE05X_ECDSA_VERIFY
-#ifdef CONFIG_CHIP_SE05X_ECDSA_VERIFY
-#define ENABLE_SE05X_ECDSA_VERIFY CONFIG_CHIP_SE05X_ECDSA_VERIFY
-#else
-#define ENABLE_SE05X_ECDSA_VERIFY 0
-#endif
-#endif // ENABLE_SE05X_ECDSA_VERIFY
-
-/*
- * Enable se05x for PBKDF SHA256
- * Note: Not supported for SE052F.
- */
-#ifndef ENABLE_SE05X_PBKDF2_SHA256
-#ifdef CONFIG_CHIP_SE05X_PBKDF2_SHA256
-#define ENABLE_SE05X_PBKDF2_SHA256 CONFIG_CHIP_SE05X_PBKDF2_SHA256
-#else
-#define ENABLE_SE05X_PBKDF2_SHA256 0
-#endif
-#endif // ENABLE_SE05X_PBKDF2_SHA256
-
-/*
- * Enable se05x for HKDF SHA256
- * Note: Not supported for SE052F.
- */
-#ifndef ENABLE_SE05X_HKDF_SHA256
-#ifdef CONFIG_CHIP_SE05X_HKDF_SHA256
-#define ENABLE_SE05X_HKDF_SHA256 CONFIG_CHIP_SE05X_HKDF_SHA256
-#else
-#define ENABLE_SE05X_HKDF_SHA256 0
-#endif
-#endif // ENABLE_SE05X_HKDF_SHA256
-
-/*
- * Enable se05x for HMAC SHA256
- */
-#ifndef ENABLE_SE05X_HMAC_SHA256
-#ifdef CONFIG_CHIP_SE05X_HMAC_SHA256
-#define ENABLE_SE05X_HMAC_SHA256 CONFIG_CHIP_SE05X_HMAC_SHA256
-#else
-#define ENABLE_SE05X_HMAC_SHA256 0
-#endif
-#endif // ENABLE_SE05X_HMAC_SHA256
-
-/*
  * Enable se05x for DA
  * Ensure to run the provision example (one time) `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to provision the
-   device attestation key at id - 0x7D300000 and
-   device attestation certificate at id - 0x7D300001.
+   device attestation key at id - 0x7FFF3007 and
+   device attestation certificate at id - 0x7FFF3003.
  */
 #ifndef ENABLE_SE05X_DEVICE_ATTESTATION
 #ifdef CONFIG_CHIP_SE05X_DEVICE_ATTESTATION
@@ -137,3 +80,36 @@
 #define ENABLE_SE05X_DEVICE_ATTESTATION 0
 #endif
 #endif // ENABLE_SE05X_DEVICE_ATTESTATION
+
+/*
+ * Enable se05x for SPAKE VERIFIER by using Trust provisioned W0 and L values
+ */
+#ifndef ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+#ifdef CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+#define ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+#else
+#define ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES 0
+#endif
+#endif // ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+
+/*
+ * SE05X TRUST PROVISIONED SPAKE VERIFIER SET NUMBER
+ */
+#ifndef SE05X_SPAKE_VERIFIER_TP_SET_NO
+#ifdef CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO
+#define SE05X_SPAKE_VERIFIER_TP_SET_NO CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO
+#else
+#define SE05X_SPAKE_VERIFIER_TP_SET_NO 1
+#endif
+#endif // SE05X_SPAKE_VERIFIER_TP_SET_NO
+
+/*
+ * SE05X TRUST PROVISIONED SPAKE VERIFIER ITERATION COUNT
+ */
+#ifndef SE05X_SPAKE_VERIFIER_TP_ITER_CNT
+#ifdef CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT
+#define SE05X_SPAKE_VERIFIER_TP_ITER_CNT CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT
+#else
+#define SE05X_SPAKE_VERIFIER_TP_ITER_CNT 1000
+#endif
+#endif // SE05X_SPAKE_VERIFIER_TP_ITER_CNT

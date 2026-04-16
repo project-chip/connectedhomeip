@@ -35,7 +35,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(ContactActionEventHandler);
-    TEMPORARY_RETURN_IGNORED InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, ContactSensorMgr().IsContactClosed());
 
@@ -127,12 +127,12 @@ void AppTask::ContactActionEventHandler(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(void)
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0));
 }
 
 void AppTask::UpdateDeviceState(void)
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0));
 }
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)

@@ -152,6 +152,12 @@ void WebRTCProviderManager::Init()
 
 void WebRTCProviderManager::CloseConnection()
 {
+    // Cancel all pending connection timers and freeing their contexts to avoid leaks
+    while (!mConnectionTimerContexts.empty() && DeviceLayer::SystemLayer().IsInitialized())
+    {
+        CancelConnectionTimer(mConnectionTimerContexts.begin()->first);
+    }
+
     // Clean up all the Webrtc Transports
     mWebrtcTransportMap.clear();
     mSessionIdMap.clear();
@@ -236,6 +242,21 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     }
 
     transport->SetRequestArgs(requestArgs);
+
+    // Populate videoStreams and audioStreams in outSession using stable data stored in the transport.
+    // DataModel::List is a non-owning span, so we point it at the transport's vectors which remain
+    // valid for the entire session lifetime (transport is always destroyed before session is removed).
+    const auto & storedArgs = transport->GetRequestArgs();
+    if (!storedArgs.videoStreams.empty())
+    {
+        outSession.videoStreams.SetValue(
+            DataModel::List<const uint16_t>(storedArgs.videoStreams.data(), storedArgs.videoStreams.size()));
+    }
+    if (!storedArgs.audioStreams.empty())
+    {
+        outSession.audioStreams.SetValue(
+            DataModel::List<const uint16_t>(storedArgs.audioStreams.data(), storedArgs.audioStreams.size()));
+    }
 
     // Store SFrameConfig in Transport base class if provided for later use in frame encryption
     if (args.sFrameConfig.HasValue())

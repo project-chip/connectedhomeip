@@ -241,41 +241,37 @@ void BoltLockManager::CancelTimer(void)
 
 void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
 {
-    // Get lock obj context from timer id.
-    BoltLockManager * lock = static_cast<BoltLockManager *>(pvTimerGetTimerID(xTimer));
-
     // The timer event handler will be called in the context of the timer task
     // once sLockTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
-    AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = lock;
-    event.Handler            = ActuatorMovementTimerEventHandler;
-    GetAppTask().PostEvent(&event);
+    T_IO_MSG timer_msg;
+
+    timer_msg.type    = IO_MSG_TYPE_TIMER;
+    timer_msg.subtype = BOLT_LOCK_TIMER_ID;
+
+    GetAppTask().PostMessage(&timer_msg);
 }
 
-void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
+void BoltLockManager::ActuatorMovementTimerEventHandler()
 {
     Action_t actionCompleted = INVALID_ACTION;
 
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-
-    if (lock->mState == kState_LockingInitiated)
+    if (mState == kState_LockingInitiated)
     {
-        lock->mState    = kState_LockingCompleted;
+        mState          = kState_LockingCompleted;
         actionCompleted = LOCK_ACTION;
     }
-    else if (lock->mState == kState_UnlockingInitiated)
+    else if (mState == kState_UnlockingInitiated)
     {
-        lock->mState    = kState_UnlockingCompleted;
+        mState          = kState_UnlockingCompleted;
         actionCompleted = UNLOCK_ACTION;
     }
 
     if (actionCompleted != INVALID_ACTION)
     {
-        if (lock->mActionCompleted_CB)
+        if (mActionCompleted_CB)
         {
-            lock->mActionCompleted_CB(actionCompleted);
+            mActionCompleted_CB(actionCompleted);
         }
     }
 }

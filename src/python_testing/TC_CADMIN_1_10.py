@@ -35,6 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -44,12 +45,15 @@ from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_CADMIN_1_10(CADMINBaseTest):
 
     def steps_TC_CADMIN_1_10(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition-1", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition-2", "TH1 reads SpecificationVersion attribute from Basic Information cluster on DUT, to check if Matter version is 1.5.1 or above. If not, skip the test"),
             TestStep(1, "TH1 sends an OpenCommissioningWindow command, to allow TH2 to establish a PASE session with the DUT"),
             TestStep(2, "TH2 establishes a PASE session with DUT"),
             TestStep(3, "Read VendorName from BasicInformation Cluster using TH2 over PASE, to ensure PASE session is established",
@@ -80,8 +84,29 @@ class TC_CADMIN_1_10(CADMINBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
         )
 
-        self.step("precondition")
+        self.step("precondition-1")
         # Commission DUT - already done
+
+        self.step("precondition-2")
+        MATTER_1_5_1 = 0x01050100
+        spec_version_attribute = Clusters.BasicInformation.Attributes.SpecificationVersion
+
+        if await self.attribute_guard(endpoint=0, attribute=spec_version_attribute):
+            spec_version = await self.read_single_attribute_check_success(
+                dev_ctrl=self.TH1,
+                cluster=Clusters.BasicInformation,
+                attribute=spec_version_attribute)
+
+            if spec_version < MATTER_1_5_1:
+                log.info(
+                    f"Skipping this test as the DUT's SpecificationVersion is less than 1.5.1, DUT's SpecificationVersion value = 0x{spec_version:08X}")
+                self.mark_all_remaining_steps_skipped(1)
+                return
+        else:
+            log.info("SpecificationVersion attribute was not found. The DUT's Basic Information Cluster has a ClusterRevision "
+                     "less than 3, meaning it is older than Matter 1.5.1. Skipping test.")
+            self.mark_all_remaining_steps_skipped(1)
+            return
 
         self.step(1)
         resp = await self.open_commissioning_window()

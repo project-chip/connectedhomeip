@@ -23,7 +23,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/bouffalolab/common/BLConfig.h>
+#include <platform/bouffalolab/common/BflbConfig.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
@@ -106,15 +106,13 @@ void StartAppTask(void)
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #if CHIP_DEVICE_LAYER_TARGET_BL616
-CHIP_ERROR AppTask::StartAppShellTask()
+void AppTask::StartAppShellTask()
 {
     Engine::Root().Init();
 
     cmd_misc_init();
 
     Engine::Root().RunMainLoop();
-
-    return CHIP_NO_ERROR;
 }
 #else
 void AppTask::AppShellTask(void * args)
@@ -122,7 +120,7 @@ void AppTask::AppShellTask(void * args)
     Engine::Root().RunMainLoop();
 }
 
-CHIP_ERROR AppTask::StartAppShellTask()
+void AppTask::StartAppShellTask()
 {
     static TaskHandle_t shellTask;
 
@@ -131,8 +129,6 @@ CHIP_ERROR AppTask::StartAppShellTask()
     cmd_misc_init();
 
     xTaskCreate(AppTask::AppShellTask, "chip_shell", 1024 / sizeof(configSTACK_DEPTH_TYPE), NULL, APP_TASK_PRIORITY, &shellTask);
-
-    return CHIP_NO_ERROR;
 }
 #endif
 #endif
@@ -164,8 +160,8 @@ void AppTask::AppTaskMain(void * pvParameter)
     ButtonInit();
 #else
     uint32_t resetCnt = 0;
-    Internal::BLConfig::ReadConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
-    Internal::BLConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
+    Internal::BflbConfig::ReadConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
+    Internal::BflbConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
     GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
     ChipLogProgress(NotSpecified, "AppTaskMain %lld, resetCnt %ld", GetAppTask().mButtonPressedTime, resetCnt);
 #endif
@@ -238,7 +234,7 @@ void AppTask::AppTaskMain(void * pvParameter)
                 }
                 ChipLogProgress(NotSpecified, "APP_REBOOT_RESET_COUNT_KEY resetCnt %ld", resetCnt);
                 resetCnt = 0;
-                Internal::BLConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
+                Internal::BflbConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
             }
 #endif
             if (APP_EVENT_IDENTIFY_MASK & appEvent)

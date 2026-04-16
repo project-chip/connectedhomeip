@@ -1634,7 +1634,7 @@ class ChipDeviceControllerBase():
             sessionActiveThreshold=sessionParametersStruct.SessionActiveThreshold if sessionParametersStruct.SessionActiveThreshold != 0 else None,
             dataModelRevision=sessionParametersStruct.DataModelRevision if sessionParametersStruct.DataModelRevision != 0 else None,
             interactionModelRevision=sessionParametersStruct.InteractionModelRevision if sessionParametersStruct.InteractionModelRevision != 0 else None,
-            specficiationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
+            specificationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
             maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
 
     async def TestOnlySendBatchCommands(self, nodeId: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],

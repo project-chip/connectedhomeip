@@ -37,6 +37,7 @@
 #include "matter_shell.h"
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <static-supported-temperature-levels.h>
 
 namespace {
@@ -134,7 +135,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId,
                                         Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 
     /* Delete task */
     lega_rtos_delete_thread(NULL);

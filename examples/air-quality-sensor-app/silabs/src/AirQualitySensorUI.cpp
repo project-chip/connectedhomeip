@@ -25,7 +25,7 @@
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
 #include <air-quality-sensor-manager.h>
-#if DISPLAY_ENABLED
+#if defined(DISPLAY_ENABLED) && DISPLAY_ENABLED
 #include "glib.h"
 #include "lcd.h"
 #endif
@@ -64,13 +64,13 @@ void AirQualitySensorUI::DrawUI(GLIB_Context_t * glibContext)
     DrawCurrentAirQuality(glibContext);
     DrawFooter(glibContext);
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 }
 
 void AirQualitySensorUI::DrawHeader(GLIB_Context_t * glibContext)
@@ -84,13 +84,13 @@ void AirQualitySensorUI::DrawHeader(GLIB_Context_t * glibContext)
                     WIFI_BITMAP_HEIGHT, (UI_WIFI) ? wifiLogo : threadLogo);
     // Draw Matter Icon
     GLIB_drawBitmap(glibContext, MATTER_ICON_POSITION_X, STATUS_ICON_LINE, MATTER_LOGO_WIDTH, MATTER_LOGO_HEIGHT, matterLogoBitmap);
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 }
 
 void AirQualitySensorUI::DrawFooter(GLIB_Context_t * glibContext)
@@ -122,13 +122,13 @@ void AirQualitySensorUI::DrawFooter(GLIB_Context_t * glibContext)
         break;
     }
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 }
 
 /**

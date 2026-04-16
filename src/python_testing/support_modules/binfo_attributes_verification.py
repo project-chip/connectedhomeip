@@ -224,7 +224,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             ret15 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductLabel)
             asserts.assert_true(isinstance(ret15, str), "ProductLabel should be a string")
             asserts.assert_equal(len(ret15) <= 64, True, "ProductLabel should be a string with max 64 bytes")
-            if vendor_name:
+            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorName):
                 asserts.assert_not_in(
                     vendor_name, ret15, "ProductLabel should not include the name of the vendor as defined within the VendorName attribute")
 

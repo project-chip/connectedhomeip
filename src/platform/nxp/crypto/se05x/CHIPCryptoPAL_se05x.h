@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "CHIPCryptoPALHsm_se05x_config.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h>
 
 #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 typedef struct hsm_pake_context_s
@@ -79,6 +79,97 @@ public:
 };
 
 #endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
+
+/**
+ * @brief P256 derived class to use SE05x secure element for P256 Operations.
+ *
+ */
+class P256KeypairSE05x : public P256Keypair
+{
+public:
+    ~P256KeypairSE05x() override;
+    CHIP_ERROR Initialize(ECPKeyTarget key_target) override;
+    CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
+    CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
+    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
+    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
+};
+
+class P256PublicKeySE05x final // final due to being copyable
+    : public ECPKey<P256ECDSASignature>
+{
+public:
+    P256PublicKeySE05x() = default;
+
+    template <size_t N>
+    constexpr P256PublicKeySE05x(const uint8_t (&raw_value)[N])
+    {
+        static_assert(N == kP256_PublicKey_Length, "Can only array-initialize from proper bounds");
+        memcpy(&bytes[0], &raw_value[0], N);
+    }
+
+    template <size_t N>
+    constexpr P256PublicKeySE05x(const FixedByteSpan<N> & value)
+    {
+        static_assert(N == kP256_PublicKey_Length, "Can only initialize from proper sized byte span");
+        memcpy(&bytes[0], value.data(), N);
+    }
+
+    template <size_t N>
+    P256PublicKeySE05x & operator=(const FixedByteSpan<N> & value)
+    {
+        static_assert(N == kP256_PublicKey_Length, "Can only initialize from proper sized byte span");
+        memcpy(&bytes[0], value.data(), N);
+        return *this;
+    }
+
+    SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
+    size_t Length() const override { return kP256_PublicKey_Length; }
+    operator uint8_t *() override { return bytes; }
+    operator const uint8_t *() const override { return bytes; }
+    const uint8_t * ConstBytes() const override { return &bytes[0]; }
+    uint8_t * Bytes() override { return &bytes[0]; }
+    bool IsUncompressed() const override
+    {
+        constexpr uint8_t kUncompressedPointMarker = 0x04;
+        // SEC1 definition of an uncompressed point is (0x04 || X || Y) where X and Y are
+        // raw zero-padded big-endian large integers of the group size.
+        return (Length() == ((kP256_FE_Length * 2) + 1)) && (ConstBytes()[0] == kUncompressedPointMarker);
+    }
+
+    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
+                                            const P256ECDSASignature & signature) const override;
+    CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
+                                             const P256ECDSASignature & signature) const override;
+
+private:
+    uint8_t bytes[kP256_PublicKey_Length];
+};
+
+class HKDF_sha_SE05x : public HKDF_sha
+{
+public:
+    CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
+                           const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length) override;
+};
+
+class HMAC_sha_SE05x : public HMAC_sha
+{
+public:
+    virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length) override;
+
+    virtual CHIP_ERROR HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length) override;
+};
+
+class PBKDF2_sha256_SE05x : public PBKDF2_sha256
+{
+public:
+    virtual CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                                     unsigned int iteration_count, uint32_t key_length, uint8_t * output) override;
+};
 
 } // namespace Crypto
 } // namespace chip

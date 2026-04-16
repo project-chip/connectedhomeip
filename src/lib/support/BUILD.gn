@@ -299,7 +299,7 @@ static_library("support") {
     "SafePointerCast.h",
     "SafeString.h",
     "Scoped.h",
-    "ScopedBuffer.h",
+    "ScopedMemoryBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
     "SpanSearchValue.h",

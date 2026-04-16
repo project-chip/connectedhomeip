@@ -17,10 +17,11 @@
 import logging
 import os
 import re
-import shlex
 import subprocess
 import threading
 from typing import Optional, Pattern
+
+from matter.testing.tasks import SubprocessKind
 
 from .namespace import IsolatedNetworkNamespace
 
@@ -36,17 +37,13 @@ class ThreadBorderRouter:
         self._event = threading.Event()
         self._pattern: Optional[Pattern[str]] = None
         self._event.set()
-        self._netns_app = f'app-{ns.index}'
-        self._netns_tool = f'tool-{ns.index}'
-        self._link_name_app = f'{ns.app_link_name}-{ns.index}'
-        self._link_name_tool = f'{ns.tool_link_name}-{ns.index}'
+        self._netns_app = ns.netns_for_subprocess_kind(SubprocessKind.APP)
+        self._link_name_app = ns.app_link.name
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
-        args = [
-            'ip', 'netns', 'exec', self._netns_app, 'otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url
-        ]
+        cmd = self._netns_app.wrap_cmd(['otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url])
 
-        self._otbr = subprocess.Popen(args,
+        self._otbr = subprocess.Popen(cmd,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT,
                                       text=True,
@@ -94,8 +91,8 @@ class ThreadBorderRouter:
                 self._event.set()
 
     def get_border_agent_port(self) -> int:
-        cmd = f'ip netns exec {self._netns_app} ot-ctl ba port'
-        output = subprocess.check_output(shlex.split(cmd), text=True)
+        cmd = self._netns_app.wrap_cmd('ot-ctl ba port')
+        output = subprocess.check_output(cmd, text=True)
         # ot-ctl output includes the port number followed by "Done"
         # Using regex to find the first number in the output
         match = re.search(r'(\d+)', output)

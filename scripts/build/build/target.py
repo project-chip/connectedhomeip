@@ -47,6 +47,8 @@ from typing import Any, Dict, Iterable, List, Optional
 
 from builders.builder import BuilderOptions
 
+log = logging.getLogger(__name__)
+
 report_rejected_parts = True
 
 
@@ -83,14 +85,14 @@ class TargetPart:
             if self.except_if_re.search(full_input):
                 if report_rejected_parts:
                     # likely nothing will match when we get such an error
-                    logging.error(f"'{self.name}' does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
+                    log.error(f"'{self.name}' does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
                 return False
 
         if self.only_if_re:
             if not self.only_if_re.search(full_input):
                 if report_rejected_parts:
                     # likely nothing will match when we get such an error
-                    logging.error(f"'{self.name}' does not support '{full_input}' due to rule ONLY IF '{self.only_if_re.pattern}'")
+                    log.error(f"'{self.name}' does not support '{full_input}' due to rule ONLY IF '{self.only_if_re.pattern}'")
                 return False
 
         return True
@@ -140,6 +142,7 @@ def _HasVariantPrefix(value: str, prefix: str):
 
     if value.startswith(prefix + '-'):
         return value[len(prefix)+1:]
+    return None
 
 
 def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[List[TargetPart]], modifiers: List[TargetPart]):
@@ -224,10 +227,7 @@ class BuildTarget:
 
     def isUnifiedBuild(self, parts: List[TargetPart]):
         """Checks if the given parts combine into a unified build."""
-        for part in parts:
-            if part.build_arguments.get('unified', False):
-                return True
-        return False
+        return any(part.build_arguments.get('unified', False) for part in parts)
 
     def AppendFixedTargets(self, parts: List[TargetPart]):
         """Append a list of potential targets/variants.
@@ -283,7 +283,7 @@ class BuildTarget:
         result = self.name
         for fixed in self.fixed_targets:
             if len(fixed) > 1:
-                result += '-{' + ",".join(sorted(map(lambda x: x.name, fixed))) + '}'
+                result += '-{' + ",".join(sorted(x.name for x in fixed)) + '}'
             else:
                 result += '-' + fixed[0].name
 
@@ -411,9 +411,7 @@ class BuildTarget:
 
         while True:
 
-            prefix = "-".join(map(
-                lambda p: self.fixed_targets[p[0]][p[1]].name, enumerate(fixed_indices)
-            ))
+            prefix = "-".join(self.fixed_targets[i][n].name for i, n in enumerate(fixed_indices))
 
             for n in range(len(self.modifiers) + 1):
                 for c in itertools.combinations(self.modifiers, n):
@@ -462,7 +460,7 @@ class BuildTarget:
         for part in parts:
             kargs.update(part.build_arguments)
 
-        logging.info("Preparing builder '%s'" % (name,))
+        log.info("Preparing builder '%s'" % (name,))
 
         builder = self.builder_class(repository_path, runner=runner, **kargs)
         builder.target = self

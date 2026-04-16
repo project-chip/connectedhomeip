@@ -17,10 +17,18 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <NetworkCommissioningDriver.h>
-
 #include <platform/DiagnosticDataProvider.h>
+
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
+#endif
+
+extern "C" {
+#undef IS_ENABLED
+#include <wifi_mgmr.h>
+#include <wifi_mgmr_ext.h>
+}
 
 #include <bl_fw_api.h>
 
@@ -31,8 +39,8 @@ namespace DeviceLayer {
 
 void ConnectivityManagerImpl::OnWiFiStationDisconnected()
 {
-    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
-    uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
+    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BflbWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    uint16_t reason = NetworkCommissioning::BflbWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();

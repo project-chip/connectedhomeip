@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
@@ -81,20 +80,19 @@ private:
  * @class ClosureDimensionEndpoint
  * @brief Represents a Closure Dimension cluster endpoint.
  *
- * This class encapsulates the logic and interfaces required to manage a Closure Dimension cluster endpoint.
- * It integrates the delegate, context, logic, and interface components for the endpoint.
+ * This class encapsulates the interfaces required to manage a Closure Dimension cluster endpoint.
+ * It integrates the delegate, context, and interface components for the endpoint.
  *
  * @param mEndpoint The endpoint ID associated with this Closure Dimension endpoint.
  * @param mContext The Matter context for the endpoint.
  * @param mDelegate The delegate instance for handling commands.
- * @param mLogic The cluster logic associated with the endpoint.
  * @param mInterface The interface for interacting with the cluster.
  */
 class ClosureDimensionEndpoint
 {
 public:
     ClosureDimensionEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mInterface(mEndpoint, mDelegate, mContext)
     {}
 
     /**
@@ -112,11 +110,11 @@ public:
     ClosureDimensionDelegate & GetDelegate() { return mDelegate; }
 
     /**
-     * @brief Returns a reference to the associated ClusterLogic instance.
+     * @brief Retrieves the cluster instance associated with this Closure Dimension endpoint.
      *
-     * @return ClusterLogic& Reference to the internal ClusterLogic object.
+     * @return Reference to the Interface instance.
      */
-    ClusterLogic & GetLogic() { return mLogic; }
+    Interface & GetClusterInstance() { return mInterface; }
 
     /**
      * @brief Handles the completion of a stop motion action.
@@ -176,7 +174,6 @@ private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
     ClosureDimensionDelegate mDelegate;
-    ClusterLogic mLogic;
     Interface mInterface;
 
     /**

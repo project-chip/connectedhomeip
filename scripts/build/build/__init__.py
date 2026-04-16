@@ -3,12 +3,13 @@ import os
 import shutil
 import time
 from enum import Enum, auto
-from multiprocessing.pool import ThreadPool
-from typing import Optional, Sequence
+from typing import Sequence
 
 from builders.builder import BuilderOptions
 
-from .targets import BUILD_TARGETS, BuildTarget
+from .targets import BUILD_TARGETS
+
+log = logging.getLogger(__name__)
 
 
 class BuildSteps(Enum):
@@ -32,10 +33,10 @@ class BuildTimer:
 
     def print_timing_report(self):
         total_time = self._total_end_time - self._total_start_time
-        logging.info("Build Time Summary:")
+        log.info("Build Time Summary:")
         for target, duration in self._build_times.items():
-            logging.info(f"  - {target}: {self._format_duration(duration)}")
-        logging.info(f"Total build time: {self._format_duration(total_time)}")
+            log.info(f"  - {target}: {self._format_duration(duration)}")
+        log.info(f"Total build time: {self._format_duration(total_time)}")
 
     def _format_duration(self, seconds):
         minutes = int(seconds // 60)
@@ -81,7 +82,7 @@ class Context:
                     break
 
             if found_choice is None:
-                logging.error(f"Target '{target}' could not be found. Nothing executed for it")
+                log.error(f"Target '{target}' could not be found. Nothing executed for it")
                 continue
 
             parts = found_choice.StringIntoTargetParts(target)
@@ -109,7 +110,7 @@ class Context:
         self.runner.StartCommandExecution()
 
         for builder in self.builders:
-            logging.info('Generating %s', builder.output_dir)
+            log.info('Generating %s', builder.output_dir)
             builder.generate()
 
         self.completed_steps.add(BuildSteps.GENERATED)
@@ -123,7 +124,7 @@ class Context:
 
     def CleanOutputDirectories(self):
         for builder in self.builders:
-            logging.warning('Cleaning %s', builder.output_dir)
+            log.warning('Cleaning %s', builder.output_dir)
             if os.path.exists(builder.output_dir):
                 shutil.rmtree(builder.output_dir)
 
@@ -131,7 +132,7 @@ class Context:
         self.completed_steps.discard(BuildSteps.GENERATED)
 
     def CreateArtifactArchives(self, directory: str):
-        logging.info('Copying build artifacts to %s', directory)
+        log.info('Copying build artifacts to %s', directory)
         if not os.path.exists(directory):
             os.makedirs(directory)
         for builder in self.builders:
@@ -140,7 +141,7 @@ class Context:
                 directory, f'{builder.identifier}.tar.gz'))
 
     def CopyArtifactsTo(self, path: str):
-        logging.info('Copying build artifacts to %s', path)
+        log.info('Copying build artifacts to %s', path)
         if not os.path.exists(path):
             os.makedirs(path)
 

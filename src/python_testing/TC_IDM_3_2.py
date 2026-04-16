@@ -60,6 +60,12 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
 
+    # This test can take some time to run in heavily congested test environments, adding a longer timeout.
+
+    @property
+    def default_timeout(self) -> int:
+        return 300
+
     def steps_TC_IDM_3_2(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
@@ -148,9 +154,10 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
                              f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}")
 
         self.step(3)
-        # Write an unsupported attribute to DUT
-        unsupported_endpoint = None
-        unsupported_attribute = None
+        # Write an unsupported attribute to DUT.
+        # Build a flat list of all candidate (endpoint_id, attr_class) pairs first so we can
+        # iterate without nested-loop break complexity.
+        unsupported_candidates = []
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster_data in endpoint.items():
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
@@ -159,28 +166,41 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
                 all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
                 dut_attrs = set(cluster_data.get(cluster_type.Attributes.AttributeList, []))
 
-                unsupported = [
-                    attr_id for attr_id in (all_attrs - dut_attrs)
-                    if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal
-                ]
-                if unsupported:
-                    unsupported_attribute = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
-                    unsupported_endpoint = endpoint_id
-                    log.info(f"Found unsupported attribute: {unsupported_attribute} in cluster {cluster_type.id}")
+                for attr_id in all_attrs - dut_attrs:
+                    if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal:
+                        unsupported_candidates.append(
+                            (endpoint_id, cluster_type.id, ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][attr_id])
+                        )
+
+        # Iterate candidates until we find one whose type can be serialized.
+        # Some attribute types cannot accept a numeric dummy value (0), so try a small
+        # fallback set that also covers string/octet-string shapes.
+        test_values = (0, "", b"")
+        write_status2 = None
+        found_unsupported_attr = False
+        for endpoint_id, cluster_id, candidate_attr in unsupported_candidates:
+            for test_value in test_values:
+                try:
+                    write_status2 = await self.write_single_attribute(
+                        attribute_value=candidate_attr(test_value),
+                        endpoint_id=endpoint_id,
+                        expect_success=False
+                    )
+                    log.info(
+                        "Testing unsupported attribute: %s, cluster_id=%s, endpoint_id=%s, test_value=%r",
+                        candidate_attr, cluster_id, endpoint_id, test_value
+                    )
+                    found_unsupported_attr = True
                     break
-            if unsupported_attribute:
-                log.info(f"Unsupported attribute: {unsupported_attribute}")
+                except (TypeError, ValueError) as e:
+                    log.info(
+                        "Attribute %s not serializable with test value %r (%s): %s",
+                        candidate_attr, test_value, type(e).__name__, e
+                    )
+            if found_unsupported_attr:
                 break
 
-        if not unsupported_attribute:
-            log.warning("No unsupported attributes found - this may be OK for non-commissionable devices")
-        else:
-            write_status2 = await self.write_single_attribute(
-                attribute_value=unsupported_attribute(0),
-                endpoint_id=unsupported_endpoint,
-                expect_success=False
-            )
-            log.info(f"Writing unsupported attribute: {unsupported_attribute}")
+        if found_unsupported_attr:
             asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                                  f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 

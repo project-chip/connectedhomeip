@@ -37,11 +37,11 @@ class ClusterMinimalElements:
 
 
 class MinimalRepresentationChecker(DeviceConformanceTests):
-    def GenerateMinimals(self, ignore_in_progress: bool, is_ci: bool) -> dict[uint, dict[uint, ClusterMinimalElements]]:
+    def GenerateMinimals(self, ignore_in_progress_test_event_only_disallowed_for_certification: bool, is_ci: bool) -> dict[uint, dict[uint, ClusterMinimalElements]]:
         if not self.xml_clusters:
             self.setup_class_helper()
 
-        success, _ = self.check_conformance(ignore_in_progress, is_ci)
+        success, _ = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification, is_ci)
         if not success:
             self.fail_current_test("Problems with conformance")
 
@@ -133,8 +133,10 @@ class MinimalRunner(MatterBaseTest, MinimalRepresentationChecker):
     def test_MinimalRepresentation(self):
         # Before we can generate a minimal representation, we need to make sure that the device is conformant.
         # Otherwise, the values we extract aren't fully informative.
-        ignore_in_progress = self.user_params.get("ignore_in_progress", False)
-        representation = self.GenerateMinimals(ignore_in_progress, self.is_pics_sdk_ci_only)
+        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification", False)
+        representation = self.GenerateMinimals(ignore_in_progress_test_event_only_disallowed_for_certification,
+                                               self.is_pics_sdk_ci_only)
         print(type(representation[0]))
         self.PrettyPrintRepresentation(representation)
 

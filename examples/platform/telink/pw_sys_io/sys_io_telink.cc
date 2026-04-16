@@ -43,7 +43,11 @@ extern "C" void pw_sys_io_Init()
 
 #ifdef CONFIG_USB_DEVICE_STACK
     output_enable = false;
-    (void) usb_enable(usb_dc_status_change);
+    int errUsb    = usb_enable(usb_dc_status_change);
+    if (errUsb != 0)
+    {
+        LOG_ERR("USB enable err: %d", errUsb);
+    }
 #endif
 
     err = console_init();

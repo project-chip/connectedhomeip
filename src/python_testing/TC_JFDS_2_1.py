@@ -168,6 +168,9 @@ class TC_JFDS_2_1(MatterBaseTest):
                      "Verify that the Status attribute shows 'Pending' state")
         ]
 
+    def pics_TC_JFDS_2_1(self) -> list[str]:
+        return ["JFDS.S"]
+
     @async_test_body
     async def test_TC_JFDS_2_1(self):
         # Creating a Controller for Ecosystem A
@@ -248,6 +251,7 @@ class TC_JFDS_2_1(MatterBaseTest):
                 Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kPending,
                 Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitted,
                 Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kDeletePending,
+                Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitFailed
             ])
 
         # Shutdown the Python Controllers started at the beginning of this script

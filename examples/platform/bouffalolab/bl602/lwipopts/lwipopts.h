@@ -54,29 +54,17 @@
 a lot of data that needs to be copied, this should be set high. */
 #define MEM_SIZE (12 * 1024)
 
-/* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
-   sends a lot of data out of ROM (or other static memory), this
-   should be set high. */
-#define MEMP_NUM_PBUF 26
-
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
-#define MEMP_NUM_UDP_PCB 12
-
-/* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
-   connections. */
-#define MEMP_NUM_TCP_PCB 10
-/* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
-   connections. */
-#define MEMP_NUM_TCP_PCB_LISTEN 5
-/* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
-   segments. */
-#define MEMP_NUM_TCP_SEG 32
+#define MEMP_NUM_UDP_PCB 10
 
 /* NUM of sys_timeout pool*/
 #define MEMP_NUM_SYS_TIMEOUT (LWIP_NUM_SYS_TIMEOUT_INTERNAL + 8 + 3)
 
 #define MEMP_NUM_NETCONN (MEMP_NUM_TCP_PCB + MEMP_NUM_UDP_PCB + MEMP_NUM_TCP_PCB_LISTEN)
+
+/* ---------- Pbuf options ---------- */
+#define PBUF_POOL_SIZE 0
 
 /* ---------- TCP options ---------- */
 #define LWIP_TCP 1
@@ -146,6 +134,12 @@ a lot of data that needs to be copied, this should be set high. */
 /* ---------- Statistics options ---------- */
 #define LWIP_STATS 1
 #define LWIP_PROVIDE_ERRNO 1
+
+/* ---------- link callback options ---------- */
+/* LWIP_NETIF_LINK_CALLBACK==1: Support a callback function from an interface
+ * whenever the link changes (i.e., link down)
+ */
+#define LWIP_NETIF_LINK_CALLBACK 1
 
 /*
    --------------------------------------
@@ -235,7 +229,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 #define LWIP_COMPAT_MUTEX 0
 #define LWIP_TCPIP_CORE_LOCKING 1
-#define LWIP_NETCONN_SEM_PER_THREAD 0
+#define LWIP_SOCKET_SET_ERRNO 1
 #define LWIP_SOCKET_SET_ERRNO 1
 #define SO_REUSE 1
 #define LWIP_TCP_KEEPALIVE 1
@@ -243,7 +237,6 @@ a lot of data that needs to be copied, this should be set high. */
 /*Enable Status callback and link callback*/
 #define LWIP_NETIF_STATUS_CALLBACK 1
 #define LWIP_NETIF_LINK_CALLBACK 1
-
 /*Enable dns*/
 #define LWIP_DNS_SERVER 0
 #define LWIP_DNS 1
@@ -253,10 +246,11 @@ a lot of data that needs to be copied, this should be set high. */
 #define LWIP_SUPPORT_CUSTOM_PBUF 1
 
 #define PBUF_LINK_ENCAPSULATION_HLEN 48u
+#define PBUF_POOL_BUFSIZE LWIP_MEM_ALIGN_SIZE(TCP_MSS + 40 + PBUF_LINK_ENCAPSULATION_HLEN + PBUF_LINK_HLEN)
 
 #define LWIP_RAW 1
 
-#define LWIP_IPV4 1
+#define LWIP_IPV6 1
 #define LWIP_IPV6_DHCP6 1
 #define LWIP_AUTOIP 1
 #define LWIP_IPV6_MLD 1
@@ -265,37 +259,11 @@ a lot of data that needs to be copied, this should be set high. */
 
 #define LWIP_NETIF_EXT_STATUS_CALLBACK 1
 
-#define PBUF_POOL_BUFSIZE LWIP_MEM_ALIGN_SIZE(TCP_MSS + 40 + PBUF_LINK_ENCAPSULATION_HLEN + PBUF_LINK_HLEN)
-
 /*
    ---------------------------------
    ---------- MISC. options ----------
    ---------------------------------
 */
-
-#if defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM) && CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
-#define PBUF_POOL_SIZE 0
-#define MEM_LIBC_MALLOC 0
-#define MEM_USE_POOLS 0
-#define MEMP_USE_CUSTOM_POOLS 0
-
-#include <lwip/arch.h>
-#include <lwip/mem.h>
-#define LWIP_PBUF_CUSTOM_DATA mem_size_t pool;
-
-#if defined(__cplusplus)
-extern "C" const mem_size_t * memp_sizes;
-extern "C" struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
-#else
-extern const mem_size_t * memp_sizes;
-extern struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
-#endif
-#else
-
-#define PBUF_POOL_SIZE 20
-#define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
-#endif
-
 #if defined(__cplusplus)
 extern "C" int bl_rand(void);
 extern "C" int * __errno(void);

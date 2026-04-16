@@ -332,11 +332,7 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
 
-    Access::SubjectDescriptor subjectDescriptor;
-    if (request.subjectDescriptor != nullptr)
-    {
-        subjectDescriptor = *request.subjectDescriptor;
-    }
+    Access::SubjectDescriptor subjectDescriptor = request.subjectDescriptor;
 
     CHIP_ERROR err =
         ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), mAllowInfiniteReads,

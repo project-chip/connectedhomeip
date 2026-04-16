@@ -104,9 +104,9 @@ std::unique_ptr<app::AttributeValueEncoder> ReadOperation::StartEncoding(const E
         return nullptr;
     }
 
-    // mRequest.subjectDescriptor is known non-null because it is set in the constructor
+    // mRequest->subjectDescriptor is known non-null because it is set in the constructor
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    return std::make_unique<app::AttributeValueEncoder>(mAttributeReportIBsBuilder, *mRequest.subjectDescriptor, mRequest.path,
+    return std::make_unique<app::AttributeValueEncoder>(mAttributeReportIBsBuilder, mRequest->subjectDescriptor, mRequest->path,
                                                         params.GetDataVersion(), params.GetIsFabricFiltered(),
                                                         params.GetAttributeEncodeState());
 }

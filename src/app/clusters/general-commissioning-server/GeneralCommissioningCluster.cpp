@@ -422,7 +422,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
         // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
         if (!failSafeContext.IsFailSafeArmed() && mClusterContext.commissioningWindowManager.IsCommissioningWindowOpen() &&
-            request.subjectDescriptor->authMode == Access::AuthMode::kCase)
+            request.subjectDescriptor.authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
         }
@@ -525,23 +525,6 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
         CheckSuccess(err, Failure);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-
-    // Check if mContext is valid before accessing it (can be null during app shutdown/restart)
-    if (mContext == nullptr)
-    {
-        ChipLogError(FailSafe, "GeneralCommissioning: mContext is NULL, cluster not initialized");
-        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
-        handler->AddResponse(request.path, response);
-        return std::nullopt;
-    }
-
-    if (!mContext->interactionContext.actionContext.CurrentExchange())
-    {
-        ChipLogError(FailSafe, "GeneralCommissioning: Invalid exchange during commissioning complete");
-        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
-        handler->AddResponse(request.path, response);
-        return std::nullopt;
-    }
 
     SessionHandle handle = mContext->interactionContext.actionContext.CurrentExchange()->GetSessionHandle();
 

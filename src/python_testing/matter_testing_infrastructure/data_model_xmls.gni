@@ -1810,7 +1810,6 @@ data_model_XMLS_1_6 = [
   "${chip_root}/data_model/1.6/device_types/Aggregator.xml",
   "${chip_root}/data_model/1.6/device_types/AirPurifier.xml",
   "${chip_root}/data_model/1.6/device_types/AirQualitySensor.xml",
-  "${chip_root}/data_model/1.6/device_types/AmbientContextSensor.xml",
   "${chip_root}/data_model/1.6/device_types/AudioDoorbell.xml",
   "${chip_root}/data_model/1.6/device_types/BaseDeviceType.xml",
   "${chip_root}/data_model/1.6/device_types/BasicVideoPlayer.xml",

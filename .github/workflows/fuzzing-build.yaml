@@ -23,7 +23,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     build_linux_fuzzing:
@@ -58,7 +58,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ !env.ACT }}
               with:
                   name: objdir-linux
@@ -92,7 +92,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ !env.ACT }}
               with:
                   name: crash-darwin

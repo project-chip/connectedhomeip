@@ -22,8 +22,8 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/bouffalolab/BL702/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
@@ -44,8 +44,8 @@ void ConnectivityManagerImpl::OnWiFiStationDisconnected()
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     PlatformMgr().PostEventOrDie(&event);
 
-    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
-    uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
+    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BflbWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    uint16_t reason = NetworkCommissioning::BflbWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
@@ -111,42 +111,35 @@ extern "C" void wifiInterface_eventScanDone(struct netif * interface, netbus_fs_
     ChipLogProgress(DeviceLayer, "wifiInterface_eventScanDone");
 
     memset(&event, 0, sizeof(ChipDeviceEvent));
-    NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone(pmsg);
+    NetworkCommissioning::BflbWiFiDriver::GetInstance().OnScanWiFiNetworkDone(pmsg);
 
     event.Type = kWiFiOnScanDone;
     PlatformMgr().PostEventOrDie(&event);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-extern "C" void ethernetInterface_eventGotIP(struct netif * interface)
-{
-    ChipLogProgress(DeviceLayer, "ethernetInterface_eventGotIP");
-    ConnectivityMgrImpl().OnConnectivityChanged(interface);
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args)
 {
-    ChipDeviceEvent event;
-
-    memset(&event, 0, sizeof(ChipDeviceEvent));
-
-    if ((LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason) && args)
+    if (nullptr == args || nullptr == nif)
     {
-        if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES ||
-            ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index)))
+        return;
+    }
+
+    if ((LWIP_NSC_IPV4_SETTINGS_CHANGED) &reason)
+    {
+        if (memcmp(netif_ip4_addr(nif), args->ipv4_changed.old_address, sizeof(ip4_addr_t)) ||
+            memcmp(netif_ip4_netmask(nif), args->ipv4_changed.old_netmask, sizeof(ip4_addr_t)) ||
+            memcmp(netif_ip4_gw(nif), args->ipv4_changed.old_gw, sizeof(ip4_addr_t)))
         {
+            ConnectivityMgrImpl().OnConnectivityChanged(nif);
             return;
         }
+    }
 
-        if (netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index) != args->ipv6_addr_state_changed.old_state &&
-            ip6_addr_ispreferred(netif_ip6_addr_state(nif, args->ipv6_addr_state_changed.addr_index)))
-        {
-            event.Type = kGotIpv6Address;
-            PlatformMgr().PostEventOrDie(&event);
-        }
+    if (LWIP_NSC_IPV6_ADDR_STATE_CHANGED & reason)
+    {
+        ConnectivityMgrImpl().OnConnectivityChanged(nif);
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET

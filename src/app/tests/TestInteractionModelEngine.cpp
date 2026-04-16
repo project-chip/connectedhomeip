@@ -68,6 +68,7 @@ public:
     void TestSubjectHasActiveSubscriptionSubWithCAT();
     void TestSubscriptionResumptionTimer();
     void TestDecrementNumSubscriptionsToResume();
+    void TestHasSubscriptionsToResumeHandlesNullIterator();
     void TestFabricHasAtLeastOneActiveSubscription();
     void TestFabricHasAtLeastOneActiveSubscriptionWithMixedStates();
     static int GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apattributePathParamsList);
@@ -826,6 +827,56 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestFabricHasAtLeastOneActiveSub
     // Verify that the fabric has no active subscriptions
     EXPECT_FALSE(engine->FabricHasAtLeastOneActiveSubscription(fabricIndex));
 }
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+// Mock SubscriptionResumptionStorage that always returns nullptr from IterateSubscriptions(). Used to test null-check handling in
+// the InteractionModelEngine.
+class NullIteratorSubscriptionResumptionStorage : public chip::app::SubscriptionResumptionStorage
+{
+public:
+    SubscriptionInfoIterator * IterateSubscriptions() override { return nullptr; }
+    CHIP_ERROR Save(SubscriptionInfo & subscriptionInfo) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Delete(chip::NodeId nodeId, chip::FabricIndex fabricIndex, chip::SubscriptionId subscriptionId) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR DeleteAll(chip::FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
+};
+
+// Test verifies that ResumeSubscriptions handles a nullptr iterator gracefully by returning CHIP_ERROR_NO_MEMORY and not crashing
+TEST_F(TestInteractionModelEngine, TestResumeSubscriptionsHandlesNullIterators)
+{
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+
+    NullIteratorSubscriptionResumptionStorage nullIteratorStorage;
+
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr,
+                           &nullIteratorStorage));
+
+    EXPECT_EQ(engine->ResumeSubscriptions(), CHIP_ERROR_NO_MEMORY);
+}
+
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+// Test verifies that HasSubscriptionsToResume handles a nullptr iterator gracefully by returning true and not crashing.
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHandlesNullIterator)
+{
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+
+    NullIteratorSubscriptionResumptionStorage nullIteratorStorage;
+
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr,
+                           &nullIteratorStorage));
+
+    EXPECT_TRUE(engine->HasSubscriptionsToResume());
+}
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 } // namespace app
 } // namespace chip

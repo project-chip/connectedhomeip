@@ -12,14 +12,16 @@ known_first_party = "matter"
 line-length = 132
 target-version = "py311"
 exclude = [
-    ".environment",
-    ".git",
-    ".github",
     ".*",
-    "build",
     "out",
+    "scripts/py_matter_yamltests/build",
+    "scripts/py_matter_idl/build",
+    "src/python_testing/matter_testing_infrastructure/build",
+    # Exclude submodules since we do not maintain them
+    # TODO: Use exact paths once we will have a way to sync and validate them in CI
+    "examples/common/QRCode/repo",
+    "examples/common/m5stack-tft/repo",
     "third_party",
-    "examples/common/QRCode/",
     # TODO(#37698)
     "docs/development_controllers/matter-repl/*.ipynb",
 ]
@@ -30,7 +32,7 @@ reportMissingTypeStubs = "warning"
 [tool.ruff.lint]
 select = [
     # Standard errors and warnings
-    "E", "W", "F",
+    "E", "PLE", "W", "F",
     # Ensure that async is used properly
     "ASYNC",
     # Consistent commas
@@ -39,6 +41,8 @@ select = [
     "C4", "RET", "SIM",
     # Ensure that scripts are executable
     "EXE",
+    # Check for common exception issues
+    "RSE",
     # Check for common logging issues
     "LOG",
     # Check for common optimization issues

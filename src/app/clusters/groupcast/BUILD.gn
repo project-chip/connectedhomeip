@@ -18,8 +18,6 @@ source_set("groupcast") {
   sources = [
     "GroupcastCluster.cpp",
     "GroupcastCluster.h",
-    "GroupcastLogic.cpp",
-    "GroupcastLogic.h",
   ]
   public_deps = [
     "${chip_root}/src/app/server",

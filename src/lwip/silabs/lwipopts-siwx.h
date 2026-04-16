@@ -54,7 +54,7 @@
 #define LWIP_DHCP_AUTOIP_COOP (0)
 #define LWIP_SOCKET_SET_ERRNO 0
 #define IP_REASS_MAX_PBUFS 0
-#define IP_REASSEMBLY 1
+#define IP_REASSEMBLY 0
 #define IP_FRAG 1
 #define IP_OPTIONS_ALLOWED 1
 #define MEMP_NUM_REASSDATA 0
@@ -110,13 +110,12 @@
 #ifndef LWIP_ICMP
 #define LWIP_ICMP (LWIP_IPV4)
 #endif /* LWIP_ICMP */
-#ifndef LWIP_IGMP
-#define LWIP_IGMP (LWIP_IPV4)
-#endif /* LWIP_IGMP */
 #ifndef LWIP_DHCP
 #define LWIP_DHCP (LWIP_IPV4)
 #endif /* LWIP_DHCP */
 
+// IGMP is disabled by default as multicast is handled using IPv6.
+#define LWIP_IGMP 0
 // IPv6 should be enabled by default
 #define LWIP_IPV6 1
 #define LWIP_NETIF_API 1
@@ -174,9 +173,8 @@
 #define DEFAULT_TCP_RECVMBOX_SIZE 6
 
 #if SL_ICD_ENABLED
-#define SL_LWIP_ECO_TIMERS 1
-#define SL_LWIP_MLD6_TIMERS_ONDEMAND 1
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#define SL_LWIP_ADAPTIVE_TIMERS 1
+#endif // SL_ICD_ENABLED
 
 #ifdef LWIP_DEBUG
 

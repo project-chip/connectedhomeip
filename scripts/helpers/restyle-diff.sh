@@ -57,8 +57,30 @@ restyle-paths() {
 
 }
 
+version_lt() {
+    local v1="$1" v2="$2"
+    local num1 num2 i=0
+    while :; do
+        num1="${v1%%.*}" v1="${v1#"$num1"}" v1="${v1#.}"
+        num2="${v2%%.*}" v2="${v2#"$num2"}" v2="${v2#.}"
+        num1=${num1:-0} num2=${num2:-0}
+        if [ "$num1" -lt "$num2" ] 2>/dev/null; then return 0; fi
+        if [ "$num1" -gt "$num2" ] 2>/dev/null; then return 1; fi
+        if [ -z "$v1" ] && [ -z "$v2" ]; then return 1; fi
+    done
+}
+
 ensure_restyle_installed() {
     if command -v restyle >/dev/null 2>&1; then
+        local version
+        version=$(restyle --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0.0")
+        if version_lt "$version" "0.8.1.0"; then
+            echo "[restyle-diff.sh] WARNING: restyle version $version is older than the version 0.8.1.0 which is faster and most stable"
+            echo "[restyle-diff.sh] Please UPGRADE to a newer restyle CLI by running"
+            echo "[restyle-diff.sh] 1. rm -f \"\$(command -v restyle)\""
+            echo "[restyle-diff.sh] 2. re-run this script without using sudo (it will automatically download latest restyle-CLI version)."
+            exit 1
+        fi
         return 0
     fi
 

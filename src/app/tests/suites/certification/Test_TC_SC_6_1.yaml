@@ -190,8 +190,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: DUT binds GroupID with GroupKeySetID in the GroupKeyMap
-          attribute list on GroupKeyManagement cluster"
+          "Step 3: If Groupcast cluster is enabled on the RootNode endpoint of
+          the TH, skip to step 6. Otherwise, DUT binds GroupID with
+          GroupKeySetID in the GroupKeyMap attribute list on GroupKeyManagement
+          cluster"
       PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 1 0
@@ -288,7 +290,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 5: DUT sends ViewGroup command with the GroupID and GroupName to
+          "Step 5: DUT sends ViewGroup command with GroupID 1, and GroupName to
           the Group cluster on the TH on EP0"
       PICS: G.C.C01.Tx
       verification: |
@@ -327,7 +329,24 @@ tests:
           [1651471144.502628][4012:4012] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "Step 6: DUT sends KeySetRead Command to TH"
+    - label:
+          "Step 6: If Groupcast cluster is not enabled on the RootNode endpoint
+          of the TH, skip to step 8. Otherwise, DUT sends Groupcast JoinGroup
+          command to the TH on EP0 with GroupID=1, Endpoints=[any endpoint from
+          TH's PartsList], KeySetID=1."
+      verification: |
+          Verify the TH receives the Groupcast JoinGroup command as specified
+          in the step label.
+      disabled: true
+
+    - label:
+          "Step 7: DUT reads the Groupcast 'membership' attribute on the TH on
+          EP0."
+      verification: |
+          Test Harness receives the Membership attribute read from DUT
+      disabled: true
+
+    - label: "Step 8: DUT sends KeySetRead Command to TH"
       PICS: GRPKEY.C.C01.Tx
       verification: |
           ./chip-tool groupkeymanagement key-set-read 42 1 0
@@ -366,7 +385,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 7: DUT reads GroupKeyMap Attribute from the GroupKeyManagement
+          "Step 9: DUT reads GroupKeyMap Attribute from the GroupKeyManagement
           cluster from TH"
       PICS: GRPKEY.C.A0000
       verification: |
@@ -402,7 +421,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 8: DUT reads GroupTable attribute from GroupKeyManagement
+          "Step 10: DUT reads GroupTable attribute from GroupKeyManagement
           cluster on TH"
       PICS: GRPKEY.C.A0001
       verification: |

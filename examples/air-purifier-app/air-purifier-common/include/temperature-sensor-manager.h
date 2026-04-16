@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -30,22 +31,11 @@ class TemperatureSensorManager
 public:
     TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
 
-    void Init()
-    {
-        Protocols::InteractionModel::Status status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, -500);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
-
-        status = TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 6000);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
-    }
+    void Init() { LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValueRange(mEndpointId, -500, 6000)); }
 
     void OnTemperatureChangeHandler(int16_t newValue)
     {
-        Protocols::InteractionModel::Status status = TemperatureMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue attribute"));
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(mEndpointId, newValue));
         ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
     }
 

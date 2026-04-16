@@ -8611,6 +8611,87 @@ public:
                                      completion:completion];
 }
 
+- (void)readAttributeDeviceLocationWithCompletion:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = BasicInformation::Attributes::DeviceLocation::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable)value completion:(MTRStatusCompletion)completion
+{
+    [self writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable) value params:nil completion:completion];
+}
+- (void)writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    value = [value copy];
+
+    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+        chip::Optional<uint16_t> timedWriteTimeout;
+        if (params != nil) {
+          if (params.timedWriteTimeout != nil){
+            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
+          }
+        }
+
+        ListFreer listFreer;
+        using TypeInfo = BasicInformation::Attributes::DeviceLocation::TypeInfo;
+        TypeInfo::Type cppValue;
+          if (value == nil) {
+            cppValue.SetNull();
+          } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+                 nonNullValue_0.locationName = AsCharSpan(value.locationName);
+     if (value.floorNumber == nil) {
+       nonNullValue_0.floorNumber.SetNull();
+     } else {
+       auto & nonNullValue_2 = nonNullValue_0.floorNumber.SetNonNull();
+         nonNullValue_2 = value.floorNumber.shortValue;
+  }
+     if (value.areaType == nil) {
+       nonNullValue_0.areaType.SetNull();
+     } else {
+       auto & nonNullValue_2 = nonNullValue_0.areaType.SetNonNull();
+         nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.areaType.unsignedCharValue);
+  }
+  }
+
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
+        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
+    std::move(*bridge).DispatchAction(self.device);
+}
+
+- (void)subscribeAttributeDeviceLocationWithParams:(MTRSubscribeParams * _Nonnull)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = BasicInformation::Attributes::DeviceLocation::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeDeviceLocationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = BasicInformation::Attributes::DeviceLocation::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
 - (void)readAttributeConfigurationVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = BasicInformation::Attributes::ConfigurationVersion::TypeInfo;
@@ -29206,6 +29287,87 @@ public:
 + (void)readAttributeProductAppearanceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = BridgedDeviceBasicInformation::Attributes::ProductAppearance::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeDeviceLocationWithCompletion:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = BridgedDeviceBasicInformation::Attributes::DeviceLocation::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable)value completion:(MTRStatusCompletion)completion
+{
+    [self writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable) value params:nil completion:completion];
+}
+- (void)writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    value = [value copy];
+
+    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+        chip::Optional<uint16_t> timedWriteTimeout;
+        if (params != nil) {
+          if (params.timedWriteTimeout != nil){
+            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
+          }
+        }
+
+        ListFreer listFreer;
+        using TypeInfo = BridgedDeviceBasicInformation::Attributes::DeviceLocation::TypeInfo;
+        TypeInfo::Type cppValue;
+          if (value == nil) {
+            cppValue.SetNull();
+          } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+                 nonNullValue_0.locationName = AsCharSpan(value.locationName);
+     if (value.floorNumber == nil) {
+       nonNullValue_0.floorNumber.SetNull();
+     } else {
+       auto & nonNullValue_2 = nonNullValue_0.floorNumber.SetNonNull();
+         nonNullValue_2 = value.floorNumber.shortValue;
+  }
+     if (value.areaType == nil) {
+       nonNullValue_0.areaType.SetNull();
+     } else {
+       auto & nonNullValue_2 = nonNullValue_0.areaType.SetNonNull();
+         nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.areaType.unsignedCharValue);
+  }
+  }
+
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
+        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
+    std::move(*bridge).DispatchAction(self.device);
+}
+
+- (void)subscribeAttributeDeviceLocationWithParams:(MTRSubscribeParams * _Nonnull)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = BridgedDeviceBasicInformation::Attributes::DeviceLocation::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeDeviceLocationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = BridgedDeviceBasicInformation::Attributes::DeviceLocation::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()

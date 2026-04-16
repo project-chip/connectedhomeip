@@ -180,7 +180,7 @@ class Flasher:
 
     def actions(self):
         """Perform actions on the device according to self.option."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def log(self, level, *args):
         """Optionally log a message to stderr."""

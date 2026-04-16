@@ -138,10 +138,10 @@ class Flasher(firmware_utils.Flasher):
         self.define_options(PSOC6_OPTIONS)
 
     def verify(self, image):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def reset(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def erase(self):
         tools_path = _find_tools_path()

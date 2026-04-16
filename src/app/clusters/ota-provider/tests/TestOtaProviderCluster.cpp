@@ -19,7 +19,7 @@
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 namespace {

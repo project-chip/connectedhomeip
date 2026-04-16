@@ -96,7 +96,7 @@ class EventHandler(BaseHandler):
 
             field = Field(
                 data_type=data_type,
-                code=ParseInt(attrs['id']),
+                code=ParseInt(attrs['fieldId'] if 'fieldId' in attrs else attrs['id']),
                 name=attrs['name'],
                 is_list=(attrs.get('array', 'false').lower() == 'true'),
             )

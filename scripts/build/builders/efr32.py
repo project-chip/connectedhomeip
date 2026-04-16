@@ -22,6 +22,8 @@ from enum import Enum, auto
 from .builder import BuilderOutput
 from .gn import GnBuilder
 
+log = logging.getLogger(__name__)
+
 
 class Efr32App(Enum):
     EVSE = auto()
@@ -283,7 +285,7 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
 
         if "GSDK_ROOT" in os.environ and not enable_wifi:
-            self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
+            self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/openthread_stack/util/third_party/openthread\"")
 
         if "WIFI_SDK_ROOT" in os.environ:
             wifi_sdk_path = shlex.quote(os.environ['WIFI_SDK_ROOT'])
@@ -296,7 +298,7 @@ class Efr32Builder(GnBuilder):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
         if self.app == Efr32App.UNIT_TEST:
             flash_bundle_path = os.path.join(self.output_dir, self.app.FlashBundleName())
-            logging.info(f'Generating flashbundle {flash_bundle_path}')
+            log.info(f'Generating flashbundle {flash_bundle_path}')
 
             patterns = [
                 os.path.join(self.output_dir, "tests", "*.flash.py"),

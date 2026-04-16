@@ -144,6 +144,8 @@ class TestParser(unittest.TestCase):
                 struct TestStruct {
                     /** Struct field comment */
                     int8u returnValue = 0;
+                    /** Optional struct field comment */
+                    optional int8u optionalValue = 1;
                 }
 
                 /** Multi line
@@ -190,6 +192,8 @@ class TestParser(unittest.TestCase):
             actual.clusters[1].structs[0].description, "Multi line\n                Struct comment")
         self.assertIdlEqual(
             actual.clusters[1].structs[0].fields[0].description, "Struct field comment")
+        self.assertIdlEqual(
+            actual.clusters[1].structs[0].fields[1].description, "Optional struct field comment")
         self.assertIdlEqual(
             actual.clusters[1].bitmaps[0].description, "Multi line\n                Bitmap comment")
         self.assertIdlEqual(actual.clusters[1].bitmaps[0].entries[0].description,

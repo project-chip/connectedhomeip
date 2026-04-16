@@ -20,6 +20,8 @@ from enum import Enum, auto
 from .builder import BuilderOutput
 from .gn import GnBuilder
 
+log = logging.getLogger(__name__)
+
 
 class NxpOsUsed(Enum):
     FREERTOS = auto()
@@ -133,6 +135,10 @@ class NxpApp(Enum):
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board, os_env, build_system):
+        if os_env == NxpOsUsed.ZEPHYR:
+            if self.ExampleName() == "unit-test":
+                return os.path.join(root, 'src', 'test_driver', 'nxp', 'zephyr')
+            return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
         if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
             if (self.ExampleName() == "unit-test"):
                 return os.path.join(root, 'src', 'test_driver', 'nxp')
@@ -215,7 +221,7 @@ class NxpBuilder(GnBuilder):
         self.iw610_transceiver = iw610_transceiver
         self.se05x_enable = se05x_enable
         if self.low_power and log_level != NxpLogLevel.NONE:
-            logging.warning("Switching log level to 'NONE' for low power build")
+            log.warning("Switching log level to 'NONE' for low power build")
             log_level = NxpLogLevel.NONE
         self.log_level = log_level
 

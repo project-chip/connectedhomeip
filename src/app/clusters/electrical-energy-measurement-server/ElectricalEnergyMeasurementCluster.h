@@ -23,6 +23,7 @@
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/Structs.h>
 #include <lib/core/Optional.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {
@@ -66,8 +67,12 @@ public:
         EndpointId endpointId;
         BitMask<ElectricalEnergyMeasurement::Feature> featureFlags;
         BitMask<ElectricalEnergyMeasurement::OptionalAttributes> optionalAttributes;
+        const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type & accuracyStruct;
     };
 
+    /// @brief Constructor for ElectricalEnergyMeasurementCluster.
+    /// @param config The configuration for the cluster.
+    /// @note The accuracyStruct must outlive the cluster to avoid dangling pointers.
     ElectricalEnergyMeasurementCluster(const Config & config) :
         DefaultServerCluster({ config.endpointId, ElectricalEnergyMeasurement::Id }), mFeatureFlags(config.featureFlags),
         mEnabledOptionalAttributes([&]() {
@@ -86,7 +91,19 @@ public:
                 config.featureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy));
             return attrs;
         }())
-    {}
+    {
+        mMeasurementData.measurementAccuracy.measurementType  = config.accuracyStruct.measurementType;
+        mMeasurementData.measurementAccuracy.measured         = config.accuracyStruct.measured;
+        mMeasurementData.measurementAccuracy.minMeasuredValue = config.accuracyStruct.minMeasuredValue;
+        mMeasurementData.measurementAccuracy.maxMeasuredValue = config.accuracyStruct.maxMeasuredValue;
+
+        // ReferenceExisting: caller's accuracyRanges data must outlive the cluster
+        using RangeType = ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type;
+        ReadOnlyBufferBuilder<RangeType> rangesBuilder;
+        VerifyOrDie(rangesBuilder.ReferenceExisting(config.accuracyStruct.accuracyRanges) == CHIP_NO_ERROR);
+        mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer();
+        mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
+    }
 
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
     const BitFlags<ElectricalEnergyMeasurement::Feature> & Features() const { return mFeatureFlags; }
@@ -102,7 +119,10 @@ public:
     CHIP_ERROR GetPeriodicEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const;
     CHIP_ERROR GetCumulativeEnergyReset(Optional<CumulativeEnergyResetStruct> & outValue) const;
 
-    // Setters - update values and notify data model
+    /// @brief Sets the measurement accuracy.
+    /// @param value The new measurement accuracy value.
+    /// @return CHIP_ERROR_NO_MEMORY if the deep copy of accuracyRanges fails to allocate.
+    /// @note Use the constructor with Config::accuracyStruct for zero-copy reference to long-lived (e.g. flash) data.
     CHIP_ERROR SetMeasurementAccuracy(const MeasurementAccuracyStruct & value);
     CHIP_ERROR SetCumulativeEnergyReset(const Optional<CumulativeEnergyResetStruct> & value);
 
@@ -127,6 +147,9 @@ private:
     const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
     ElectricalEnergyMeasurement::MeasurementData mMeasurementData;
+
+    // Owns the accuracyRanges backing store; either references long-lived data (ReferenceExisting) or an allocated copy.
+    ReadOnlyBuffer<ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type> mAccuracyRangesStorage;
 };
 
 } // namespace Clusters

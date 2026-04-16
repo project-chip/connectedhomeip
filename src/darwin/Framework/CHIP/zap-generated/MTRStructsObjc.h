@@ -2036,13 +2036,14 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nullable ambientContextType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRAmbientContextSensingClusterAmbientContextTypeStruct * _Nullable ambientContextDetected MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable objectCountReached MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable objectCount MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull startEventNumber MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull eventStartTime MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))

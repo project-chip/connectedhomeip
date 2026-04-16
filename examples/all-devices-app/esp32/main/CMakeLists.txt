@@ -47,6 +47,8 @@ set(SRC_DIRS_LIST
     "${ALL_DEVICES_COMMON_DIR}/devices/interface"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker"

@@ -324,7 +324,7 @@
         "SWITCH_CLUSTER": ["switch-server"],
         "TARGET_NAVIGATOR_CLUSTER": ["target-navigator-server"],
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
-        "TEMPERATURE_MEASUREMENT_CLUSTER": [],
+        "TEMPERATURE_MEASUREMENT_CLUSTER": ["temperature-measurement-server"],
         "THERMOSTAT_CLUSTER": ["thermostat-server"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"

@@ -95,8 +95,6 @@ void app_pds_fastboot_done_callback(void)
 
     bl_psram_init();
 
-    // app_pds_config_pin();
-
     app_pds_wakeup_source = bl_pds_get_wakeup_source();
     app_pds_wakeup_pin    = bl_pds_get_wakeup_gpio();
 }
@@ -107,6 +105,7 @@ int app_pds_before_sleep_callback(void)
     {
         bl_pds_set_psram_retention(1);
         lmac154_sleepStoreRegs(low_power_pds_lmac154_backup);
+        L1C_Cache_Flush();
 
         return 0;
     }
@@ -125,6 +124,7 @@ void app_pds_after_sleep_callback(void)
 
         zb_timer_restore_events(true);
 
+        lmac154_enableCoex();
         bl_irq_enable(M154_IRQn);
     }
     bl_sec_init();

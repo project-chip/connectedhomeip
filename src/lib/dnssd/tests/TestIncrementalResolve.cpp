@@ -30,7 +30,7 @@
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 using namespace chip;
 using namespace chip::Dnssd;

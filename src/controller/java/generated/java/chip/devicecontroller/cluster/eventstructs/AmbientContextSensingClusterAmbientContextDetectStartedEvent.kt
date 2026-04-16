@@ -18,24 +18,23 @@ package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
 import java.util.Optional
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
-  val ambientContextType:
+  val ambientContextDetected:
     Optional<
-      List<
-        chip.devicecontroller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct
-      >
+      chip.devicecontroller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct
     >,
+  val objectCountReached: Optional<Boolean>,
   val objectCount: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextDetectStartedEvent {\n")
-    append("\tambientContextType : $ambientContextType\n")
+    append("\tambientContextDetected : $ambientContextDetected\n")
+    append("\tobjectCountReached : $objectCountReached\n")
     append("\tobjectCount : $objectCount\n")
     append("}\n")
   }
@@ -43,13 +42,13 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (ambientContextType.isPresent) {
-        val optambientContextType = ambientContextType.get()
-        startArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
-        for (item in optambientContextType.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
+      if (ambientContextDetected.isPresent) {
+        val optambientContextDetected = ambientContextDetected.get()
+        optambientContextDetected.toTlv(ContextSpecificTag(TAG_AMBIENT_CONTEXT_DETECTED), this)
+      }
+      if (objectCountReached.isPresent) {
+        val optobjectCountReached = objectCountReached.get()
+        put(ContextSpecificTag(TAG_OBJECT_COUNT_REACHED), optobjectCountReached)
       }
       if (objectCount.isPresent) {
         val optobjectCount = objectCount.get()
@@ -60,31 +59,28 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
   }
 
   companion object {
-    private const val TAG_AMBIENT_CONTEXT_TYPE = 0
-    private const val TAG_OBJECT_COUNT = 1
+    private const val TAG_AMBIENT_CONTEXT_DETECTED = 0
+    private const val TAG_OBJECT_COUNT_REACHED = 1
+    private const val TAG_OBJECT_COUNT = 2
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader,
     ): AmbientContextSensingClusterAmbientContextDetectStartedEvent {
       tlvReader.enterStructure(tlvTag)
-      val ambientContextType =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))) {
+      val ambientContextDetected =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AMBIENT_CONTEXT_DETECTED))) {
           Optional.of(
-            buildList<
-              chip.devicecontroller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct
-            > {
-              tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
-              while (!tlvReader.isEndOfContainer()) {
-                this.add(
-                  chip.devicecontroller.cluster.structs
-                    .AmbientContextSensingClusterAmbientContextTypeStruct
-                    .fromTlv(AnonymousTag, tlvReader)
-                )
-              }
-              tlvReader.exitContainer()
-            }
+            chip.devicecontroller.cluster.structs
+              .AmbientContextSensingClusterAmbientContextTypeStruct
+              .fromTlv(ContextSpecificTag(TAG_AMBIENT_CONTEXT_DETECTED), tlvReader)
           )
+        } else {
+          Optional.empty()
+        }
+      val objectCountReached =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OBJECT_COUNT_REACHED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OBJECT_COUNT_REACHED)))
         } else {
           Optional.empty()
         }
@@ -98,7 +94,8 @@ class AmbientContextSensingClusterAmbientContextDetectStartedEvent(
       tlvReader.exitContainer()
 
       return AmbientContextSensingClusterAmbientContextDetectStartedEvent(
-        ambientContextType,
+        ambientContextDetected,
+        objectCountReached,
         objectCount,
       )
     }

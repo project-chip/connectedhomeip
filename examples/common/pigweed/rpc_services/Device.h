@@ -505,7 +505,7 @@ public:
         TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 ChipLogDetail(AppServer, "Being triggered to send ICD check-in message to subscriber");
-                chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+                chip::app::ICDNotifier::GetInstance().NotifySendCheckIn(Optional<chip::Access::SubjectDescriptor>());
             },
             reinterpret_cast<intptr_t>(nullptr));
         return pw::OkStatus();

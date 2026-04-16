@@ -11,5 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("actions-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+static_library("actions-server") {
+  sources = [
+    "ActionsCluster.cpp",
+    "ActionsCluster.h",
+    "ActionsDelegate.h",
+    "ActionsStructs.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
 }

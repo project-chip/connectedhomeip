@@ -19,7 +19,9 @@
 #include <access/SubjectDescriptor.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/support/BitFlags.h>
+
 namespace chip {
 namespace app {
 
@@ -113,8 +115,9 @@ public:
      * It informs the subscriber that a Check-In message needs to be sent for the provided subject.
      *
      * @param subject : The subject descriptor for which the Check-In message needs to be sent.
+     *                  If not provided, Check-In messages should be sent for all subjects that require it.
      */
-    virtual void OnSendCheckIn(const chip::Access::SubjectDescriptor & subject) = 0;
+    virtual void OnSendCheckIn(Optional<Access::SubjectDescriptor> specificSubject) = 0;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 };
 
@@ -141,7 +144,7 @@ public:
     void NotifySubscriptionReport();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    void NotifySendCheckIn(const chip::Access::SubjectDescriptor & subject);
+    void NotifySendCheckIn(Optional<Access::SubjectDescriptor> specificSubject);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
     inline void BroadcastActiveRequest(ICDListener::KeepActiveFlags request, bool notify)

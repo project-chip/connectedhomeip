@@ -19,6 +19,8 @@ import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+log = logging.getLogger(__name__)
+
 
 @dataclass
 class BuilderOptions:
@@ -61,12 +63,12 @@ class Builder(ABC):
     @abstractmethod
     def generate(self):
         """Generate the build files - generally the ninja/makefiles"""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     def _build(self):
         """Perform an actual build"""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def _bundle(self):
         """Perform an actual generating of flashbundle.
@@ -84,7 +86,7 @@ class Builder(ABC):
            May use build output data (e.g. manifests), so this should be
            invoked only after a build has succeeded.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def bundle_outputs(self):
         """Return the BuilderOutput objects in flashbundle.
@@ -114,20 +116,20 @@ class Builder(ABC):
     def CompressArtifacts(self, target_file: str):
         with tarfile.open(target_file, "w:gz") as tar:
             for output in self.outputs():
-                logging.info('Adding %s into %s(%s)',
-                             output.source, target_file, output.target)
+                log.info('Adding %s into %s(%s)',
+                         output.source, target_file, output.target)
                 tar.add(output.source, output.target)
 
     def CopyArtifacts(self, target_dir: str):
         for output in self.outputs():
-            logging.info(f'Copying {output.source} into {output.target}')
+            log.info(f'Copying {output.source} into {output.target}')
 
             target_full_name = os.path.join(target_dir, output.target)
             target_dir_full_name = os.path.dirname(target_full_name)
 
             if not os.path.exists(target_dir_full_name):
-                logging.info('Creating subdirectory %s first',
-                             target_dir_full_name)
+                log.info('Creating subdirectory %s first',
+                         target_dir_full_name)
                 os.makedirs(target_dir_full_name)
 
             shutil.copyfile(output.source, target_full_name)

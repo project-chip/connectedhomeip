@@ -109,10 +109,6 @@ bouffalolab_executable("lighting_app") {
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
 
-  if (enable_lwip_pbuf_ram) {
-    defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
-  }
-
   bl_plat_name = "bl602"
   sources = [
     "${examples_plat_dir}/common/route_hook/bl_route_hook.c",
@@ -232,10 +228,6 @@ bouffalolab_executable("lighting_app") {
   inputs = [ ldscript ]
 
   if (chip_print_memory_usage) {
-    if (enable_lwip_pbuf_ram) {
-      ldflags += [ "-Wl,--defsym=__RAM_PBUF_POOL=0" ]
-    }
-
     ldflags += [
       "-Wl,--print-memory-usage",
       "-fstack-usage",

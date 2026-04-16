@@ -57,7 +57,6 @@ namespace {
 /*******************************************************************************
  * Macros & Constants definitions
  *******************************************************************************/
-#define APP_MAX_LINKS 1
 #define MAX_ADV_DATA_LEN 31
 #define MAX_RSP_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
@@ -121,10 +120,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Check if BLE stack is initialized
     VerifyOrExit(!mFlags.Has(Flags::kAMEBABLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = MapBLEError(matter_ble_init(APP_MAX_LINKS));
     matter_ble_cback_register((P_MATTER_BLE_CBACK) (ble_callback_dispatcher));
-
-    SuccessOrExit(err);
 
     // Set related flags
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);

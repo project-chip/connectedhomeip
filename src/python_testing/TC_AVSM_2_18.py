@@ -137,7 +137,7 @@ class TC_AVSM_2_18(MatterBaseTest, AVSMTestBase):
         min_resolution = min_viewport_resolution
         min_bit_rate = trade_off_point.minBitRate
         max_bit_rate = trade_off_point.minBitRate
-        min_frame_rate = 30
+        min_frame_rate = min(15, video_sensor_params.maxFPS)
         max_frame_rate = video_sensor_params.maxFPS
         key_frame_interval = 4000
 

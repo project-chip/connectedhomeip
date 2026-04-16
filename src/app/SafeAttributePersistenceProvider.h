@@ -155,6 +155,15 @@ public:
      * @retval CHIP_ERROR_BUFFER_TOO_SMALL aValue.size() is too small to hold the value.
      */
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
+
+    /**
+     * Delete an attribute value from non-volatile memory
+     *
+     * @param [in]     aPath the attribute path for the data being persisted.
+     *
+     * @retval CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if no stored value exists for the attribute
+     */
+    virtual CHIP_ERROR SafeDeleteValue(const ConcreteAttributePath & aPath) = 0;
 };
 
 /**

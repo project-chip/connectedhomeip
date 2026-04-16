@@ -26,7 +26,7 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
 #if CONFIG_CHIP_LIB_SHELL
     int rc = Engine::Root().Init();

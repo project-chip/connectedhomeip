@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Concentration Measurement Clusters" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Concentration Measurement Clusters" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2882"/>
     <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty."/>
     <revision revision="4" summary="Removed P quality"/>
+    <revision revision="5" summary="Added F quality to MinMeasuredValue, MaxMeasuredValue and Uncertainty attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement" picsCode="CMOCONC"/>
@@ -201,14 +202,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
@@ -272,6 +273,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="Uncertainty" type="single" default="MS">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="MEA"/>
       </optionalConform>

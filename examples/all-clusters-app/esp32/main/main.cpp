@@ -33,6 +33,7 @@
 #include "nvs_flash.h"
 #include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/endpoint-config-api.h>
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
@@ -124,7 +125,7 @@ static void InitServer(intptr_t context)
     SetupPretendDevices();
 #endif
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 

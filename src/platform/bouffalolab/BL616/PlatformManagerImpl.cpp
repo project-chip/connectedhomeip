@@ -22,8 +22,8 @@
 
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -43,7 +43,9 @@
 #include <bflb_sec_trng.h>
 extern "C" {
 #include <partition.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <rfparam_adapter.h>
+#endif
 }
 
 namespace chip {
@@ -58,13 +60,14 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TaskHandle_t backup_eventLoopTask;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
     int iret_rfInit = -1;
 
     pt_table_set_flash_operation(bflb_flash_erase, bflb_flash_write, bflb_flash_read);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_THREAD
     VerifyOrDieWithMsg(0 == (iret_rfInit = rfparam_init(0, NULL, 0)), DeviceLayer, "rfparam_init failed with %d", iret_rfInit);
+#endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     tcpip_init(NULL, NULL);
@@ -94,11 +97,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    /** weiyin, backup mEventLoopTask which is reset in _InitChipStack */
-    backup_eventLoopTask = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask;
-    err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
 
 exit:
     return err;

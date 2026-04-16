@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
@@ -274,7 +275,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     Events::SoftwareFault::DecodableType decodedFault;
     auto event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR);
 
     EXPECT_EQ(decodedFault.id, fault.id);
     ASSERT_TRUE(decodedFault.name.HasValue());

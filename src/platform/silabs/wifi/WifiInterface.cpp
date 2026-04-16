@@ -27,6 +27,7 @@
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 
 // TODO: We shouldn't need to have access to a global variable in the interface here
 extern WfxRsi_t wfx_rsi;
@@ -134,12 +135,12 @@ void WifiInterface::NotifyWifiTaskInitialized(void)
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
 
-    // TODO : Remove workwound when sl_wfx_startup_ind_t is unified
+    // TODO : Remove workaround when sl_wfx_startup_ind_t is unified
     //        Issue is same structure name but different contents
 #if WF200_WIFI
-    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWifiMacAddressLength);
+    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWiFiMacAddressLength);
 #else
-    MutableByteSpan macSpan(evt.body.mac_addr, kWifiMacAddressLength);
+    MutableByteSpan macSpan(evt.body.mac_addr, kWiFiMacAddressLength);
 #endif // WF200_WIFI
 
     TEMPORARY_RETURN_IGNORED GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);

@@ -22,10 +22,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
 #include "BoltLockManager.h"
 
 #include "FreeRTOS.h"
+#include "app_msg.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
@@ -46,11 +46,9 @@ public:
 
     static void AppTaskMain(void * pvParameter);
 
-    // void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);//for shell
-    void PostEvent(const AppEvent * event);
-    void UpdateClusterState();
+    static bool PostMessage(T_IO_MSG * p_msg);
 
-    static void ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed);
+    void UpdateClusterState();
 
 private:
     friend AppTask & GetAppTask(void);
@@ -62,16 +60,12 @@ private:
 
     void CancelTimer(void);
 
-    void DispatchEvent(AppEvent * event);
+    static void ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed);
+    static void ButtonHandler(T_IO_MSG * p_msg);
 
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
-    static void LockActionEventHandler(AppEvent * aEvent);
-    static void JammedLockEventHandler(AppEvent * aEvent);
+    static void FunctionTimerEventHandler(T_IO_MSG * p_msg);
+
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
-
-    // static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    // static void UpdateLEDs(void);
 
     void StartTimer(uint32_t aTimeoutMs);
 

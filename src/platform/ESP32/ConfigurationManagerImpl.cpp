@@ -373,7 +373,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DoFactoryReset));
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)

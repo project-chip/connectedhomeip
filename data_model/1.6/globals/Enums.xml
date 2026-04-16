@@ -69,6 +69,17 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </item>
   </enum>
+  <enum name="CertificationTypeEnum">
+    <item value="0" name="DeviceAttestationPKI" summary="DeviceAttestationPKI">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="OperationalPKI" summary="OperationalPKI">
+      <mandatoryConform/>
+    </item>
+    <item value="2" name="VIDSignerPKI" summary="VIDSignerPKI">
+      <mandatoryConform/>
+    </item>
+  </enum>
   <enum name="MeasurementTypeEnum">
     <item value="0" name="Unspecified">
       <mandatoryConform/>

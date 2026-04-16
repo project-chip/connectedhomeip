@@ -22,9 +22,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
-
 #include "FreeRTOS.h"
+#include "app_msg.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
@@ -41,10 +40,6 @@ public:
 
     static void AppTaskMain(void * pvParameter);
 
-    void PostEvent(const AppEvent * event);
-
-    static void ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed);
-
 private:
     friend AppTask & GetAppTask(void);
 
@@ -53,15 +48,16 @@ private:
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
 
-    void DispatchEvent(AppEvent * event);
+    static void ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed);
+    static void ButtonHandler(T_IO_MSG * p_msg);
 
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
+    static void FunctionTimerEventHandler(T_IO_MSG * p_msg);
 
     static void OpenHandler(intptr_t);
     static void CloseHandler(intptr_t);
-    static void WindowActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
+
+    static bool PostMessage(T_IO_MSG * p_msg);
 
     enum Function_t
     {

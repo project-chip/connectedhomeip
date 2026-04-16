@@ -6,11 +6,13 @@ __EM_SIZE = DEFINED(ble_controller_init) ? (DEFINED(em_16k_init) ? 16K : 8K) : 0
 __CACHE_SIZE = 16K;
 __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
 __sha_ocram_size = DEFINED(__sha_ocram_size) ? __sha_ocram_size : 128;
+__platform_size = 9K;
 
 MEMORY
 {
   flash  (rxai!w) : ORIGIN = 0x23000000, LENGTH = (2M)
-  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __EM_SIZE - __stack_size - __sha_ocram_size)
+  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __EM_SIZE - __stack_size - __sha_ocram_size - __platform_size)
+  platform_ocram (wxa) : ORIGIN = 0x42030000 - __EM_SIZE - __stack_size - __sha_ocram_size - __platform_size, LENGTH = __platform_size
   sys_stack (wxa) : ORIGIN = 0x42030000 - __EM_SIZE - __stack_size - __sha_ocram_size, LENGTH = __stack_size
   sha_ocram (wxa) : ORIGIN = 0x42030000 - __EM_SIZE - __sha_ocram_size, LENGTH = __sha_ocram_size
   hbnram    (wxa) : ORIGIN = 0x40010000, LENGTH = (4K)
@@ -226,6 +228,14 @@ SECTIONS
   PROVIDE( _heap2_start = .);
   PROVIDE( _heap2_size = ADDR(.stack) - _heap2_start );
 
+  .bss_platform (NOLOAD) :
+  {
+    PROVIDE( __bss_plat_start = ADDR(.bss_platform) );
+    PROVIDE( __bss_plat_end = ADDR(.bss_platform) + SIZEOF(.bss_platform) );
+    . = ALIGN(4);
+    KEEP(*libCHIP.a:*PlatformManagerImpl.cpp.o(.bss.*))
+  } >platform_ocram
+
   .bss_psram (NOLOAD) :
   {
     PROVIDE( __bss_psram_start = ADDR(.bss_psram) );
@@ -234,8 +244,8 @@ SECTIONS
     PROVIDE ( __psram_bss_init_start = . );
     /** put the bss data in psram between __psram_bss_init_start and __psram_bss_init_end will bet reset to 0 after psram init*/
     . = ALIGN(16);
-    KEEP(*libCHIP.a:*(EXCLUDE_FILE(*ThreadStackManagerImpl.cpp.o *PlatformManagerImpl.cpp.o) .bss.*))
-    KEEP(*libCHIP.a:*(EXCLUDE_FILE(*ThreadStackManagerImpl.cpp.o *PlatformManagerImpl.cpp.o) .sbss.*))
+    KEEP(*libCHIP.a:*(EXCLUDE_FILE(*ThreadStackManagerImpl.cpp.o) .bss.*))
+    KEEP(*libCHIP.a:*(EXCLUDE_FILE(*ThreadStackManagerImpl.cpp.o) .sbss.*))
 
     . = ALIGN(16);
     KEEP(*libCHIPAppServer.a:*(.sbss.*))
