@@ -56,7 +56,7 @@ private:
     // Define non-volatile storage keys for DownloadedBytes and ImageDigest.
     static constexpr char kDownloadedBytes[]           = "DownloadedBytes";
     static constexpr char kImageDigest[]               = "ImageDigest";
-    static constexpr uint16_t kResumeWatchdogTimeoutMs = 2000;
+    static constexpr uint16_t kResumeWatchdogTimeoutMs = 6000;
     uint64_t downloadedBytesRestored                   = 0;
 };
 
