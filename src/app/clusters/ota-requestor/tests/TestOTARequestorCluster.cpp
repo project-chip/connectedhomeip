@@ -59,6 +59,7 @@ constexpr bool operator==(const Type & lhs, const Type & rhs)
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
+const ConcreteClusterPath kTestClusterPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id);
 
 class MockOtaCommands : public OTARequestorCommandInterface
 {
@@ -302,6 +303,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
 
     auto & changeListener = context.ChangeListener();
     changeListener.DirtyList().clear();
+    DataVersion dataVersion = cluster.GetDataVersion(kTestClusterPath);
 
     // Write the default OTA providers list.
     OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
@@ -326,6 +328,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOTAProviders::Id);
+    EXPECT_NE(cluster.GetDataVersion(kTestClusterPath), dataVersion);
 }
 
 TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite)
@@ -339,6 +342,7 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
 
     auto & changeListener = context.ChangeListener();
     changeListener.DirtyList().clear();
+    DataVersion dataVersion = cluster.GetDataVersion(kTestClusterPath);
 
     std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(UpdatePossible::Id, false);
     ASSERT_TRUE(result.has_value());
@@ -361,6 +365,7 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+    EXPECT_EQ(cluster.GetDataVersion(kTestClusterPath), dataVersion);
 }
 
 TEST_F(TestOTARequestorCluster, ChangingAttributesMarksAsChanged)
@@ -371,7 +376,8 @@ TEST_F(TestOTARequestorCluster, ChangingAttributesMarksAsChanged)
     OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    auto & changeListener = context.ChangeListener();
+    auto & changeListener   = context.ChangeListener();
+    DataVersion dataVersion = cluster.GetDataVersion(kTestClusterPath);
 
     changeListener.DirtyList().clear();
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying,
@@ -380,20 +386,25 @@ TEST_F(TestOTARequestorCluster, ChangingAttributesMarksAsChanged)
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdateState::Id);
+    EXPECT_NE(cluster.GetDataVersion(kTestClusterPath), dataVersion);
 
     changeListener.DirtyList().clear();
+    dataVersion = cluster.GetDataVersion(kTestClusterPath);
     EXPECT_EQ(attributes.SetUpdateStateProgress(85), CHIP_NO_ERROR);
     ASSERT_EQ(changeListener.DirtyList().size(), 1u);
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdateStateProgress::Id);
+    EXPECT_NE(cluster.GetDataVersion(kTestClusterPath), dataVersion);
 
     changeListener.DirtyList().clear();
+    dataVersion = cluster.GetDataVersion(kTestClusterPath);
     attributes.SetUpdatePossible(false);
     ASSERT_EQ(changeListener.DirtyList().size(), 1u);
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdatePossible::Id);
+    EXPECT_NE(cluster.GetDataVersion(kTestClusterPath), dataVersion);
 
     // DefaultOTAProviders is verified in the test WriteDefaultProvidersList.
 }
@@ -451,8 +462,7 @@ TEST_F(TestOTARequestorCluster, SendDownloadErrorEventSendsAnEvent)
     EXPECT_EQ(cluster.SendDownloadErrorEvent(event), CHIP_NO_ERROR);
     auto sentEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
-    EXPECT_EQ(sentEvent->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
+    EXPECT_EQ(sentEvent->eventOptions.mPath, ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     DownloadError::DecodableType decodedEvent;
     ASSERT_EQ(sentEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 0x12345678u);
@@ -465,8 +475,7 @@ TEST_F(TestOTARequestorCluster, SendDownloadErrorEventSendsAnEvent)
     EXPECT_EQ(cluster.SendDownloadErrorEvent(event), CHIP_NO_ERROR);
     sentEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
-    EXPECT_EQ(sentEvent->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
+    EXPECT_EQ(sentEvent->eventOptions.mPath, ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     ASSERT_EQ(sentEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 0x12345678u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 0x123456789ABCDEF0u);
