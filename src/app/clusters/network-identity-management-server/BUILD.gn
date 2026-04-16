@@ -14,6 +14,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 source_set("network-identity-management-server") {
   sources = [
     "AuthenticatorDriver.h",
@@ -27,9 +29,14 @@ source_set("network-identity-management-server") {
     "NetworkIdentityManagementCluster.h",
     "NetworkIdentityStorage.cpp",
     "NetworkIdentityStorage.h",
-    "RawKeyNetworkIdentityKeystore.cpp",
-    "RawKeyNetworkIdentityKeystore.h",
   ]
+
+  if (chip_crypto_keystore == "raw") {
+    sources += [
+      "RawKeyNetworkIdentityKeystore.cpp",
+      "RawKeyNetworkIdentityKeystore.h",
+    ]
+  }
 
   public_deps = [
     "${chip_root}/src/app:constants",

@@ -17,8 +17,6 @@
 
 #include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
 
-#if NETIM_RAW_KEYSTORE_SUPPORTED
-
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -103,5 +101,3 @@ void RawKeyNetworkIdentityKeystore::DestroyNetworkIdentityKeypair(P256KeypairHan
 }
 
 } // namespace chip::Crypto
-
-#endif

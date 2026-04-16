@@ -15,14 +15,11 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
-
-#if NETIM_RAW_KEYSTORE_SUPPORTED
-
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/network-identity-management-server/NetworkAdministratorSecret.h>
+#include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
 #include <app/clusters/network-identity-management-server/tests/NASS_test_vectors.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -194,4 +191,3 @@ TEST_F(TestRawKeyNetworkIdentityKeystore, DeriveNASSSpecVector)
     EXPECT_TRUE(keyId.data_equal(ByteSpan(kNASSTestVector1_KeyIdentifier)));
 }
 
-#endif // NETIM_RAW_KEYSTORE_SUPPORTED
