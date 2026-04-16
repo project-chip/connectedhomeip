@@ -27,15 +27,14 @@
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
+#include "esp_check.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-#include "driver/rmt.h"
 #include "led_strip.h"
 #define RMT_TX_DEFAULT_GPIO GPIO_NUM_8
-#define RMT_TX_DEFAULT_CHANNEL RMT_CHANNEL_0
-static led_strip_t * strip = NULL;
+static led_strip_handle_t strip = NULL;
 #else
 #include "driver/ledc.h"
 #include "hal/ledc_types.h"
@@ -54,15 +53,16 @@ void LEDWidget::Init(gpio_num_t gpioNum)
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
     if (gpioNum == RMT_TX_DEFAULT_GPIO)
     {
-        rmt_config_t config = RMT_DEFAULT_CONFIG_TX(RMT_TX_DEFAULT_GPIO, RMT_TX_DEFAULT_CHANNEL);
-        config.clk_div      = 2;
-        rmt_config(&config);
-        rmt_driver_install(config.channel, 0, 0);
-        led_strip_config_t strip_config = LED_STRIP_DEFAULT_CONFIG(1, (led_strip_dev_t) config.channel);
-        strip                           = led_strip_new_rmt_ws2812(&strip_config);
-        mDefaultOnBrightness            = UINT8_MAX;
-        mHue                            = 0;
-        mSaturation                     = 0;
+        led_strip_config_t strip_config = {};
+        strip_config.strip_gpio_num     = RMT_TX_DEFAULT_GPIO;
+        strip_config.max_leds           = 1;
+
+        led_strip_rmt_config_t rmt_config = {};
+        rmt_config.resolution_hz          = 10 * 1000 * 1000; // 10 MHz
+        ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &strip));
+        mDefaultOnBrightness = UINT8_MAX;
+        mHue                 = 0;
+        mSaturation          = 0;
     }
 #else
     if (gpioNum < GPIO_NUM_MAX)
@@ -103,8 +103,8 @@ void LEDWidget::SetBrightness(uint8_t brightness)
     {
         uint8_t red, green, blue;
         HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
-        strip->set_pixel(strip, 0, red, green, blue);
-        strip->refresh(strip, 100);
+        led_strip_set_pixel(strip, 0, red, green, blue);
+        led_strip_refresh(strip);
     }
 #else
     if (mGPIONum < GPIO_NUM_MAX)
@@ -192,8 +192,8 @@ void LEDWidget::DoSet(bool state)
         uint8_t red, green, blue;
         uint8_t brightness = state ? mDefaultOnBrightness : 0;
         HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
-        strip->set_pixel(strip, 0, red, green, blue);
-        strip->refresh(strip, 100);
+        led_strip_set_pixel(strip, 0, red, green, blue);
+        led_strip_refresh(strip);
     }
 #else
     if (mGPIONum < GPIO_NUM_MAX)
@@ -238,8 +238,8 @@ void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
     mSaturation        = static_cast<uint16_t>(Saturation) * 100 / 254; // mSaturation [0 , 100]
 
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
-    strip->set_pixel(strip, 0, red, green, blue);
-    strip->refresh(strip, 100);
+    led_strip_set_pixel(strip, 0, red, green, blue);
+    led_strip_refresh(strip);
 }
 
 void LEDWidget::HSB2rgb(uint16_t Hue, uint8_t Saturation, uint8_t brightness, uint8_t & red, uint8_t & green, uint8_t & blue)
