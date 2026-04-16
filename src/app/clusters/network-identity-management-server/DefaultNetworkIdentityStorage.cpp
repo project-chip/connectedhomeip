@@ -334,7 +334,7 @@ void DefaultNetworkIdentityStorage::LoadNITableIndexIfNeeded()
     SuccessOrExit(err = reader.Next(TLV::kTLVType_Array, TLVConstants::kNIIndex_Entries));
     SuccessOrExit(err = reader.EnterContainer(arrayType));
     mNICount = 0;
-    while (reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()) == CHIP_NO_ERROR)
+    while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
         VerifyOrExit(mNICount < kMaxNetworkIdentities, err = CHIP_ERROR_INTERNAL);
         auto & entry = mNITableIndex[mNICount++];
@@ -348,6 +348,7 @@ void DefaultNetworkIdentityStorage::LoadNITableIndexIfNeeded()
         SuccessOrExit(err = reader.Get(entry.clientCount));
         SuccessOrExit(err = reader.ExitContainer(entryType));
     }
+    SuccessOrExit(err.NoErrorIf(CHIP_ERROR_END_OF_TLV));
     SuccessOrExit(err = reader.ExitContainer(arrayType));
 
     // Check for optional pending{Count,Timestamp}. If present, a previous
@@ -506,8 +507,7 @@ CHIP_ERROR DefaultNetworkIdentityStorage::LoadNetworkIdentity(const NetworkIdent
                                                               NetworkIdentityEntry & outEntry, BitFlags<NetworkIdentityFlags> flags,
                                                               MutableByteSpan buffer)
 {
-    static_assert(std::is_trivially_copyable<NetworkIdentityEntry>::value, "memset requires trivially copyable type");
-    memset(&outEntry, 0, sizeof(outEntry));
+    outEntry = {};
 
     // Copy fields that are embedded in the table index entry
     outEntry.index   = meta.index;
@@ -898,8 +898,8 @@ CHIP_ERROR DefaultNetworkIdentityStorage::StoreClientDetail(uint16_t index, cons
 CHIP_ERROR DefaultNetworkIdentityStorage::LoadClient(uint16_t index, ClientEntry & outEntry, BitFlags<ClientFlags> flags,
                                                      MutableByteSpan buffer)
 {
-    static_assert(std::is_trivially_copyable<ClientEntry>::value, "memset requires trivially copyable type");
-    memset(&outEntry, 0, sizeof(outEntry));
+    outEntry = {};
+
     outEntry.index = index;
     VerifyOrReturnValue(flags.HasAny(), CHIP_NO_ERROR); // nothing further to do
 
