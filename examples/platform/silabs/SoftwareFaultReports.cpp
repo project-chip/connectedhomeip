@@ -23,6 +23,7 @@
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 
+#include <cinttypes>
 #include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>

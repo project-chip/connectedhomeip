@@ -196,8 +196,7 @@ silabs_executable("smoke_co_alarm_app") {
 
   if (is_clang) {
     ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
-  }
-  else {
+  } else {
     ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
   }
   

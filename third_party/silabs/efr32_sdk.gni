@@ -363,10 +363,15 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/rail_library/plugin/pa-conversions/efr32xg24/config",
       ]
 
-      libs += [
-        "${efr32_sdk_root}/bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a",
-        "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
-      ]
+      if (is_clang) {
+        libs += [
+          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_llvm_release.a",
+        ]
+      } else {
+        libs += [
+          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
+        ]
+      }
 
       if (silabs_mcu == "MGM240PB32VNA") {
         libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
@@ -390,8 +395,17 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/rail_library/plugin/pa-conversions/efr32xg26/config",
       ]
 
+      if (is_clang) {
+        libs += [
+          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_llvm_release.a",
+        ]
+      } else {
+        libs += [
+          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
+        ]
+      }
+      
       libs += [
-        "${efr32_sdk_root}/bluetooth_le_controller/build/gcc/xg26/release/liblinklayer.a",
         "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
       ]
 
@@ -703,9 +717,6 @@ template("efr32_sdk") {
       # -fno-threadsafe-statics and -femulated-tls are needed since clang will try to use TLS,
       # which is not supported by the EFR32 thus resulting on linking failing on undefined __aeabi_read_tp symbol
       # thus resulting on linking failing on undefined __aeabi_read_tp symbol
-
-      # -femulated-tls is needed since clang will try to use TLS,
-      # which is not supported by the EFR32 thus resulting on linking failing on undefined __aeabi_read_tp symbol
       cflags += [
         "-fno-threadsafe-statics",
         "-femulated-tls",
