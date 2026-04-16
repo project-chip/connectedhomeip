@@ -46,10 +46,10 @@ constexpr uint8_t kDefaultPowerStepNum = 10u;
 
 MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
                                                          const OptionalAttributeSet & optionalAttributeSet, const Context context) :
-    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(feature), mOptionalAttributeSet(optionalAttributeSet),
-    mDelegate(context.delegate), mOpStateInstance(context.opStateInstance),
-    mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance), mInteractionModelEngine(context.interactionModelEngine),
-    mCookTimeSec(kDefaultCookTimeSec)
+    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }),
+    mFeature(feature), mOptionalAttributeSet(optionalAttributeSet), mDelegate(context.delegate),
+    mOpStateInstance(context.opStateInstance), mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance),
+    mInteractionModelEngine(context.interactionModelEngine), mCookTimeSec(kDefaultCookTimeSec)
 {}
 
 CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
