@@ -16,25 +16,21 @@
  */
 
 #include "binding-handler.h"
+#include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/ids/Commands.h>
-#include <app/CommandSender.h>
-#include <app/clusters/bindings/BindingManager.h>
-#include <lib/core/CHIPError.h>
+#include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
 
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
 
 namespace {
 
-void ProcessOnOffUnicastBindingCommand(CommandId commandId, const Binding::TableEntry & binding, OperationalDeviceProxy * peer_device)
+void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device)
 {
 
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -49,26 +45,26 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const Binding::Table
     {
     case Clusters::OnOff::Commands::Toggle::Id:
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          toggleCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::On::Id:
         Clusters::OnOff::Commands::On::Type onCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
         Clusters::OnOff::Commands::Off::Type offCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          offCommand, onSuccess, onFailure);
         break;
     }
 }
 
 
-void ProcessOnOffGroupBindingCommand(CommandId commandId, const Binding::TableEntry & binding)
+void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
@@ -76,23 +72,23 @@ void ProcessOnOffGroupBindingCommand(CommandId commandId, const Binding::TableEn
     {
     case Clusters::OnOff::Commands::Toggle::Id:
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
         break;
 
     case Clusters::OnOff::Commands::On::Id:
         Clusters::OnOff::Commands::On::Type onCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
 
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
         Clusters::OnOff::Commands::Off::Type offCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
         break;
     }
 }
 
-void SwitchChangedHandler(const Binding::TableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
+void SwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
 	VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
 	BindingCommandData * data = static_cast<BindingCommandData *>(context);
@@ -101,7 +97,7 @@ void SwitchChangedHandler(const Binding::TableEntry & binding, OperationalDevice
 	{
 		/*Group commands*/
 	}
-	else if (binding.type == Binding::MATTER_UNICAST_BINDING && !data->isGroup)
+	else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
 	{
 		ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
 	}
@@ -119,10 +115,10 @@ void SwitchContextReleaseHandler(void * context)
 void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init(
+    chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(SwitchChangedHandler);
-    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(SwitchContextReleaseHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(SwitchChangedHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(SwitchContextReleaseHandler);
 }
 
 
@@ -138,19 +134,19 @@ void SwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
+    BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
 }
 
 void BindingWorkerFunction(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
 
-    Binding::TableEntry * entry = reinterpret_cast<Binding::TableEntry *>(context);
-    TEMPORARY_RETURN_IGNORED AddBindingEntry(*entry);
+    EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
+    AddBindingEntry(*entry);
 }
 
 CHIP_ERROR InitBindingHandlers()
 {
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
     return CHIP_NO_ERROR;
 }

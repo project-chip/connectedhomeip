@@ -80,7 +80,7 @@ CHIP_ERROR LightSwitchComboApp::AppTask::ProcessSetStateClusterHandler(void)
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
     data->clusterId           = chip::app::Clusters::OnOff::Id;
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 
     return CHIP_NO_ERROR;
 }

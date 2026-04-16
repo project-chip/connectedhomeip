@@ -15,5 +15,6 @@
 #
 mainmenu "Matter NXP Cooksurface Example Application"
 
-rsource "../../../../config/zephyr/chip-module/Kconfig.defaults"
+rsource "../../../../config/nxp/chip-module/Kconfig.features"
+rsource "../../../../config/nxp/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

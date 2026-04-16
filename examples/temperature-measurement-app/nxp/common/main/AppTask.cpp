@@ -85,7 +85,7 @@ chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()
 
 void TemperatureSensorApp::AppTask::TemperatureMeasurementHandler(void)
 {
-	TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(TemperatureSensorApp::AppTask::TemperatureMeasurementInternal, 0);
+	PlatformMgr().ScheduleWork(TemperatureSensorApp::AppTask::TemperatureMeasurementInternal, 0);
 }
 
 void TemperatureSensorApp::AppTask::TemperatureMeasurementInternal(intptr_t arg)
