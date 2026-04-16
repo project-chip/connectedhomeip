@@ -22,15 +22,10 @@
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ConcentrationMeasurement {
-
-// Forward declaration — to call NotifyAttributeChanged().  
-
-class ConcentrationMeasurementCluster;
 
 // Delegate — abstract interface your application implements to supply attribute values.
 class Delegate
@@ -64,28 +59,6 @@ public:
 
     // ── Feature::kLevelIndication ─────────────────────────────────────────────
     virtual LevelValueEnum GetLevelValue() { return LevelValueEnum::kUnknown; }
-
-    // ── Internal wiring — do not call from application code ──────────────────
-    // Called by ConcentrationMeasurementCluster::Startup() and destructor only.
-    void SetCluster(ConcentrationMeasurementCluster * cluster) { mCluster = cluster; }
-
-    /**
-     * Notify the framework that an attribute value has changed server-side.
-     * Call from your Handle*() methods or anywhere a stored value changes.
-     * This causes the Matter framework to send attribute reports to all
-     * subscribed controllers — it is NOT related to WriteAttribute.
-     *
-     * Safe to call before Startup() — silently no-ops if mCluster is null.
-     *
-     *   void OnNewReading(float ppm) {
-     *       mValue = ppm;
-     *       NotifyAttributeChanged(Attributes::MeasuredValue::Id);
-     *   }
-     */
-    //void NotifyAttributeChanged(AttributeId attributeId);
-
-private:
-    ConcentrationMeasurementCluster * mCluster = nullptr;
 };
 
 /**
@@ -128,15 +101,9 @@ private:
     DataModel::Nullable<float> GetMaxMeasuredValue() override { return mMax; }
     LevelValueEnum GetLevelValue() override { return mLevel; }
 
-    // Setters for app code — notify server on change
-    void SetMeasuredValue(DataModel::Nullable<float> v) {
-        mValue = v;
-        NotifyAttributeChanged(Attributes::MeasuredValue::Id);
-    }
-    void SetLevelValue(LevelValueEnum v) {
-        mLevel = v;
-        NotifyAttributeChanged(Attributes::LevelValue::Id);
-    }
+    // Setters for app code
+    void SetMeasuredValue(DataModel::Nullable<float> v) { mValue = v; }
+    void SetLevelValue(LevelValueEnum v) { mLevel = v; }
 
 private:
     // Only the fields this sensor needs — peak/average NOT compiled
@@ -173,9 +140,10 @@ public:
     uint32_t GetAverageMeasuredValueWindow() override                  { return mAverageMeasuredValueWindow; }
     LevelValueEnum GetLevelValue() override                            { return mLevelValue; }
 
-    // ── Handle*() 
-    // Each method stores the value and notifies subscribed Matter controllers via NotifyAttributeChanged().
-    // Only call Handle*() methods that correspond to features that are  enabled —
+    // ── Handle*()
+    // Each method stores the value. The cluster will report the change to subscribed
+    // controllers on the next read cycle via DefaultServerCluster::NotifyAttributeChanged().
+    // Only call Handle*() methods that correspond to features that are enabled —
     // calling others is harmless (cluster won't expose them) but wastes RAM.
 
 void HandleNewMeasuredValue(DataModel::Nullable<float> v)

@@ -81,8 +81,6 @@ public:
      *                    Example: BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement)
      *                    This value is also returned as the FeatureMap attribute.
      * @param delegate    Application-supplied delegate. Must outlive this cluster instance.
-     *                    Startup() will call delegate.SetCluster(this) so it can call
-     *                    NotifyChanged() later. Destructor calls delegate.SetCluster(nullptr).
      */
     ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId,
                                     BitFlags<Feature> features, Delegate & delegate);
