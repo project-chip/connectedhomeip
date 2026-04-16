@@ -4,6 +4,8 @@ let state = {
     selectedTest: null,
     granularity: "weekly",
     chart: null,
+    page: 1,
+    pageSize: 20,
 };
 
 function fmtNumber(n) {
@@ -74,6 +76,7 @@ function applyFilters() {
 
     state.filteredTests.sort((a, b) => compareTests(a, b, sortBy));
 
+    state.page = 1;
     renderTable();
 
     if (!state.selectedTest && state.filteredTests.length > 0) {
@@ -102,9 +105,21 @@ function renderTable() {
     const tbody = document.querySelector("#testsTable tbody");
     tbody.innerHTML = "";
 
-    for (const t of state.filteredTests) {
+    const total = state.filteredTests.length;
+    const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+
+    if (state.page > totalPages) {
+        state.page = totalPages;
+    }
+
+    const start = (state.page - 1) * state.pageSize;
+    const end = start + state.pageSize;
+    const pageItems = state.filteredTests.slice(start, end);
+
+    for (const t of pageItems) {
         const tr = document.createElement("tr");
         tr.dataset.fullName = t.fullName;
+
         tr.innerHTML = `
       <td>
         <div class="test-name">${escapeHtml(t.displayName)}</div>
@@ -118,11 +133,17 @@ function renderTable() {
       <td>${badge(t.lastStatus || "unknown")}</td>
       <td>${fmtDateTime(t.lastRun)}</td>
     `;
+
         tr.addEventListener("click", () => selectTest(t.fullName));
         tbody.appendChild(tr);
     }
 
-    getEl("tableCount").textContent = `${state.filteredTests.length} tests shown`;
+    getEl("tableCount").textContent = `${total} tests shown`;
+
+    const pageInfoEl = getEl("pageInfo");
+    if (pageInfoEl) {
+        pageInfoEl.textContent = `Page ${state.page} / ${totalPages}`;
+    }
 }
 
 function buildTrendData(test) {
@@ -189,7 +210,7 @@ function renderDetail() {
             <div class="detail-stat-label">Last 30d failure rate</div>
             <div class="detail-stat-value">${fmtPercent(t.last30d?.failureRate || 0)}</div>
         </div>
-        `;
+    `;
 
     recentBody.innerHTML = "";
     for (const run of t.recentRuns) {
@@ -204,7 +225,7 @@ function renderDetail() {
     }
 
     const trend = buildTrendData(t);
-    const ctx = document.getElementById("trendChart");
+    const ctx = getEl("trendChart");
 
     if (state.chart) {
         state.chart.destroy();
@@ -266,11 +287,32 @@ async function loadData() {
 }
 
 function bindEvents() {
-    getEl("searchInput").addEventListener("input", applyFilters);
-    getEl("statusFilter").addEventListener("change", applyFilters);
-    getEl("bucketFilter").addEventListener("change", applyFilters);
-    getEl("sortBy").addEventListener("change", applyFilters);
-    getEl("reloadButton").addEventListener("click", loadData);
+    getEl("searchInput")?.addEventListener("input", applyFilters);
+    getEl("statusFilter")?.addEventListener("change", applyFilters);
+    getEl("bucketFilter")?.addEventListener("change", applyFilters);
+    getEl("sortBy")?.addEventListener("change", applyFilters);
+    getEl("reloadButton")?.addEventListener("click", loadData);
+
+    getEl("pageSize")?.addEventListener("change", (e) => {
+        state.pageSize = Number(e.target.value);
+        state.page = 1;
+        renderTable();
+    });
+
+    getEl("prevPage")?.addEventListener("click", () => {
+        if (state.page > 1) {
+            state.page--;
+            renderTable();
+        }
+    });
+
+    getEl("nextPage")?.addEventListener("click", () => {
+        const totalPages = Math.max(1, Math.ceil(state.filteredTests.length / state.pageSize));
+        if (state.page < totalPages) {
+            state.page++;
+            renderTable();
+        }
+    });
 
     document.querySelectorAll(".toggle-group button").forEach((btn) => {
         btn.addEventListener("click", () => {

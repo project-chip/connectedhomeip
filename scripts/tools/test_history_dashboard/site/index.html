@@ -72,6 +72,20 @@
         </div>
     </section>
 
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:10px;">
+        <label>Rows per page:</label>
+        <select id="pageSize">
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+        </select>
+
+        <button id="prevPage">Prev</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage">Next</button>
+    </div>
+
     <section class="panel">
         <div class="panel-header">
             <h2>Tests</h2>

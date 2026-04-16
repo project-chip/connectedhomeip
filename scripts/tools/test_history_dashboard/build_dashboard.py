@@ -145,12 +145,14 @@ def summarize_test(full_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
 
     normalized_runs.sort(key=lambda r: r["start"], reverse=True)
 
-    total_runs = len(normalized_runs)
-    passed_runs = status_counts["passed"]
-    failed_runs = status_counts["failed"]
-    broken_runs = status_counts["broken"]
-    skipped_runs = status_counts["skipped"]
-    unknown_runs = status_counts["unknown"]
+    statistic = payload.get("statistic", {}) or {}
+
+    total_runs = safe_int(statistic.get("total"), len(normalized_runs))
+    passed_runs = safe_int(statistic.get("passed"), status_counts["passed"])
+    failed_runs = safe_int(statistic.get("failed"), status_counts["failed"])
+    broken_runs = safe_int(statistic.get("broken"), status_counts["broken"])
+    skipped_runs = safe_int(statistic.get("skipped"), status_counts["skipped"])
+    unknown_runs = safe_int(statistic.get("unknown"), status_counts["unknown"])
     non_passing_runs = failed_runs + broken_runs
 
     avg_duration = round(sum(durations) / len(durations)) if durations else 0
