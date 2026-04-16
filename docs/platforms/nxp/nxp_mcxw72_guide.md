@@ -25,7 +25,7 @@ The examples support:
 
 ### Supported build systems
 
-MCXW72 platform supports only one build system to generate the application :
+MCXW72 platform supports only one build system to generate the application:
 
 -   `CMake`
 
