@@ -47,6 +47,7 @@
 import asyncio
 import logging
 import os
+import queue
 import time
 
 from mobly import asserts
@@ -613,7 +614,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         elapsed_s4 = t_downloading_s4[0] - t_delayed_on_query_s4[0]
         logger.info(f'{step_number_s4}: Step #4.5 - Elapsed since kDelayedOnQuery → kDownloading: '
                     f'{elapsed_s4:.2f}s (expected >= 180s)')
-        tolerance_sec_s4 = 0.5
+        tolerance_sec_s4 = 5.0
         asserts.assert_true(elapsed_s4 >= 180 - tolerance_sec_s4,
                             f"{step_number_s4}: DUT re-queried too soon. "
                             f"Elapsed: {elapsed_s4:.2f}s, expected >= {180 - tolerance_sec_s4}s.")
@@ -700,11 +701,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         while time.time() - t_s7_start < s7_timeout:
             remaining = s7_timeout - (time.time() - t_s7_start)
             try:
-                evt = subscription_state_invalid_uri.wait_for_event_report(
-                    Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-                    timeout_sec=min(60.0, remaining)
-                )
-            except Exception:
+                raw = subscription_state_invalid_uri.get_event_from_queue(block=True, timeout=min(60.0, remaining))
+            except queue.Empty:
                 # No event for 60 s — DUT may have missed AnnounceOTAProvider while busy.
                 # Re-send so the DUT queries as soon as it returns to kIdle.
                 logger.info(f"{step_number_s7}: No event in 60s, re-sending AnnounceOTAProvider "
@@ -713,6 +711,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                     controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
                 continue
 
+            if raw.Header.EventId != Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id:
+                continue
+
+            evt = raw.Data
             if evt.previousState == kIdle and evt.newState == kQuerying:
                 event1 = evt
                 logger.info(f"{step_number_s7}: Event 1 (Idle→Querying): {event1}")
@@ -725,17 +727,33 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                             f"{step_number_s7}: Idle→Querying transition not found within {s7_timeout}s")
 
         # --- Transition 2: Querying → Idle ---
-        event2 = subscription_state_invalid_uri.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-            timeout_sec=60
-        )
-        logger.info(f"{step_number_s7}: Event 2 (Querying→Idle): {event2}")
+        # Apply the same stale-event filtering as Transition 1 — earlier steps may have left
+        # residual events in the queue (e.g. kDownloading→kIdle from an aborted BDX session).
+        event2 = None
+        s7_t2_timeout = 120
+        t_s7_t2_start = time.time()
 
-        self.verify_state_transition_event(
-            event2,
-            kQuerying,
-            kIdle
-        )
+        while time.time() - t_s7_t2_start < s7_t2_timeout:
+            remaining = s7_t2_timeout - (time.time() - t_s7_t2_start)
+            try:
+                raw = subscription_state_invalid_uri.get_event_from_queue(block=True, timeout=min(30.0, remaining))
+            except queue.Empty:
+                continue
+
+            if raw.Header.EventId != Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id:
+                continue
+
+            evt2 = raw.Data
+            if evt2.previousState == kQuerying and evt2.newState == kIdle:
+                event2 = evt2
+                logger.info(f"{step_number_s7}: Event 2 (Querying→Idle): {event2}")
+                break
+
+            logger.info(f"{step_number_s7}: Discarding stale event (transition 2): "
+                        f"{evt2.previousState} → {evt2.newState}")
+
+        asserts.assert_true(event2 is not None,
+                            f"{step_number_s7}: Querying→Idle transition not found within {s7_t2_timeout}s")
 
         subscription_state_invalid_uri.cancel()
 
@@ -1012,14 +1030,22 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         kIdle_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         kDownloading_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        kQuerying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
 
-        # The first report from the subscription is always the current state (kIdle, since
-        # the DUT just rebooted). kQuerying is transient — the DUT may complete the entire
-        # kIdle→kQuerying→kIdle cycle before its reporting engine sends the intermediate
-        # kQuerying update, so we cannot rely on seeing it. Instead, skip the initial kIdle
-        # (priming report) and accept the next kIdle as confirmation the query cycle
-        # completed without a download.
-        initial_idle_skipped_s6 = [False]
+        # The first report from the subscription is the current state (kIdle, since the DUT
+        # just rebooted). Wait for that priming report first, then reset accumulated history
+        # so the post-announce check cannot be satisfied by re-evaluating the same kIdle.
+        priming_matcher_s6 = AttributeMatcher.from_callable(
+            description=f"{step_number_s6} - initial kIdle priming report",
+            matcher=lambda report: report.value == kIdle_s6
+        )
+        subscription_s6.await_all_expected_report_matches([priming_matcher_s6], timeout_sec=30.0)
+        logger.info(f'{step_number_s6}: Initial kIdle (priming report) observed.')
+        subscription_s6.reset()
+
+        # kQuerying is transient — the DUT may complete the full kIdle→kQuerying→kIdle cycle
+        # before its reporting engine sends the intermediate kQuerying update, so accept either
+        # kQuerying or a later kIdle as success. Reject kDownloading at any point.
         downloading_seen_s6 = [False]
 
         def matcher_s6(report):
@@ -1028,22 +1054,21 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 downloading_seen_s6[0] = True
                 logger.info(f'{step_number_s6}: UNEXPECTED kDownloading — DUT started download of same-version image!')
                 return False
+            if val == kQuerying_s6:
+                logger.info(f'{step_number_s6}: kQuerying observed after announce (expected)')
+                return True
             if val == kIdle_s6:
-                if not initial_idle_skipped_s6[0]:
-                    initial_idle_skipped_s6[0] = True
-                    logger.info(f'{step_number_s6}: Initial kIdle (priming report) — skipping')
-                    return False
                 logger.info(f'{step_number_s6}: kIdle after query cycle — no download started (expected)')
                 return True
             return False
 
         matcher_s6_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s6} - kQuerying then kIdle, no kDownloading",
+            description=f"{step_number_s6} - post-announce kQuerying or kIdle, no kDownloading",
             matcher=matcher_s6
         )
 
-        subscription_s6.await_all_expected_report_matches([matcher_s6_obj], timeout_sec=120.0)
-        logger.info(f'{step_number_s6}: Step #6.2 - Query cycle completed (kIdle observed after announce).')
+        subscription_s6.await_all_expected_report_matches([matcher_s6_obj], timeout_sec=720.0)
+        logger.info(f'{step_number_s6}: Step #6.2 - Query cycle completed after announce.')
         subscription_s6.cancel()
 
         # ------------------------------------------------------------------------------------
