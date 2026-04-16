@@ -18,13 +18,14 @@
 
 #pragma once
 
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventSender.h>
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip::app::Clusters {
 
-class OTARequestorCluster : public DefaultServerCluster
+class OTARequestorCluster : public DefaultServerCluster, public DefaultOTARequestorEventSender
 {
 public:
     OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands, OTARequestorAttributes & attributes);
@@ -45,6 +46,10 @@ public:
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR SendVersionAppliedEvent(const DefaultOTARequestorEventSender::VersionAppliedEvent & event) override;
+
+    CHIP_ERROR SendDownloadErrorEvent(const DefaultOTARequestorEventSender::DownloadErrorEvent & event) override;
 
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);

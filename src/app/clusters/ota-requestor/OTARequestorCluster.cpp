@@ -47,7 +47,7 @@ CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     return mAttributes.SetInteractionModelContext(mPath.mEndpointId, context.interactionContext.dataModelChangeListener,
-                                         context.interactionContext.eventsGenerator);
+                                                  context.interactionContext.eventsGenerator);
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -166,6 +166,22 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
+}
+
+CHIP_ERROR OTARequestorCluster::SendVersionAppliedEvent(const DefaultOTARequestorEventSender::VersionAppliedEvent & event)
+{
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    VerifyOrReturnError(eventNumber.has_value(), CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTARequestorCluster::SendDownloadErrorEvent(const DefaultOTARequestorEventSender::DownloadErrorEvent & event)
+{
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    VerifyOrReturnError(eventNumber.has_value(), CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::Clusters

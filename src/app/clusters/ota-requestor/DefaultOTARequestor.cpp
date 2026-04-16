@@ -116,7 +116,8 @@ OTARequestorInterface * GetRequestorInstance()
 }
 
 CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver,
-                                     BDXDownloader & downloader, OTARequestorAttributes & attributes)
+                                     BDXDownloader & downloader, OTARequestorAttributes & attributes,
+                                     DefaultOTARequestorEventSender & eventSender)
 {
     mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
@@ -124,6 +125,7 @@ CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & stor
     mOtaRequestorDriver = &driver;
     mBdxDownloader      = &downloader;
     mAttributes         = &attributes;
+    mEventSender        = &eventSender;
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
 
@@ -590,19 +592,11 @@ void DefaultOTARequestor::NotifyUpdateApplied()
         return;
     }
 
-    DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-    VerifyOrDie(dataModelProvider != nullptr);
-    OtaSoftwareUpdateRequestor::Events::VersionApplied::Type event{ mCurrentVersion, productId };
-
-    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+    if (mEventSender)
     {
-        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
-        {
-            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
-            {
-                static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
-            }
-        }
+        DefaultOTARequestorEventSender::VersionAppliedEvent event{ mCurrentVersion, productId };
+        CHIP_ERROR error = mEventSender->SendVersionAppliedEvent(event);
+        SuccessOrLog(error, SoftwareUpdate, "Failed to record VersionApplied event: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     ConnectToProvider(kNotifyUpdateApplied);
@@ -698,20 +692,12 @@ void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReas
     Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
 
-    DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
-    VerifyOrDie(dataModelProvider != nullptr);
-    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
-                                                                   progressPercent, platformCode };
-
-    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+    if (mEventSender)
     {
-        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
-        {
-            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
-            {
-                static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
-            }
-        }
+        DefaultOTARequestorEventSender::DownloadErrorEvent event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
+                                                                  progressPercent, platformCode };
+        CHIP_ERROR send_error = mEventSender->SendDownloadErrorEvent(event);
+        SuccessOrLog(send_error, SoftwareUpdate, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT, send_error.Format());
     }
 
     // Whenever an error occurs, always reset to Idle state
