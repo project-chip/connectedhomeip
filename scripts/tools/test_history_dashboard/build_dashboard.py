@@ -26,7 +26,7 @@ def month_key(dt: datetime) -> str:
 def safe_int(value: Any, default: int = 0) -> int:
     try:
         return int(value)
-    except Exception:
+    except (ValueError, TypeError):
         return default
 
 
