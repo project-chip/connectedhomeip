@@ -639,8 +639,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
     switch (request.path.mAttributeId)
     {
     case GroupKeyManagement::Attributes::ClusterRevision::Id:
-        return encoder.Encode(mContext.groupDataProvider.IsGroupcastEnabled() ? kRevision
-                                                                              : kGroupKeyClusterRevisionBeforeGroupcast);
+        return encoder.Encode(kRevision);
     case Attributes::FeatureMap::Id: {
         BitFlags<GroupKeyManagement::Feature> features;
         if (mContext.groupDataProvider.IsGroupcastEnabled())
