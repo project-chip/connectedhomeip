@@ -74,7 +74,11 @@ void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t acti
             Platform::Delete(data);
             return;
         }
-        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+        // ScheduleWork is asynchronous and returns immediately.
+        // Failure means the work couldn't be queued, but there's nothing
+        // we can do about it here, so the return value can be safely ignored.
+        RETURN_SAFELY_IGNORED(
+            DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     }
 }
 

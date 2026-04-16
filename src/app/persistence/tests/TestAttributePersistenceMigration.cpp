@@ -21,8 +21,6 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/Scoped.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -31,19 +29,16 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 
-// Used by TestMigrationDeletesFromSafeOnWriteFailure to poison the normal-provider
-// key after the initial ReadValue check has already passed.
-TestPersistentStorageDelegate * sStorageDelegateForPoisoning = nullptr;
-
-CHIP_ERROR PoisonAfterReadMigrator(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
-                                   MutableByteSpan & buffer)
+// A test-only provider that always fails on WriteValue, used to verify
+// that the safe value is deleted even when the destination write fails.
+class WriteFailingAttributeProvider : public DefaultAttributePersistenceProvider
 {
-    CHIP_ERROR err = DefaultMigrators::ScalarValue<uint32_t>(attrPath, provider, buffer);
-    // Poison the normal provider key now, after ReadValue already returned CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
-    sStorageDelegateForPoisoning->AddPoisonKey(
-        DefaultStorageKeyAllocator::AttributeValue(attrPath.mEndpointId, attrPath.mClusterId, attrPath.mAttributeId).KeyName());
-    return err;
-}
+public:
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+};
 
 // Single attribute migrated successfully: value appears in AttributePersistence, deleted from SafeAttribute.
 TEST(TestAttributePersistenceMigration, TestMigrationSuccess)
@@ -63,7 +58,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSuccess)
 
     // Run migration
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -105,7 +100,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
     // Don't write anything to the safe provider
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -128,11 +123,9 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
 TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailure)
 {
     TestPersistentStorageDelegate storageDelegate;
-    ScopedChange ptrGuard(sStorageDelegateForPoisoning, &storageDelegate);
-
-    DefaultAttributePersistenceProvider ramProvider;
+    WriteFailingAttributeProvider failingProvider;
     DefaultSafeAttributePersistenceProvider safeRamProvider;
-    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(failingProvider.Init(&storageDelegate), CHIP_NO_ERROR);
     ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
 
     const ConcreteAttributePath path(1, 2, 3);
@@ -143,12 +136,12 @@ TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailu
     ASSERT_EQ(safeRamProvider.WriteScalarValue(path, kValueToStore), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &PoisonAfterReadMigrator },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
     EXPECT_NE(
-        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, failingProvider, cluster, Span(attributesToMigrate), buffer),
         CHIP_NO_ERROR);
 
     // Value should still be deleted from the safe provider
@@ -175,7 +168,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationTwice)
     ASSERT_EQ(safeRamProvider.WriteScalarValue(path, kValueToStore), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -226,8 +219,8 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesMixedPresence)
     ASSERT_EQ(safeRamProvider.WriteScalarValue(pathB, kValueB), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
-        { 4, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
+        { 4, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -281,8 +274,8 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesAllPresent)
     ASSERT_EQ(safeRamProvider.WriteScalarValue(pathB, kValueB), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
-        { 4, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, sizeof(uint32_t), true },
+        { 4, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -359,9 +352,9 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithSafeValueMigrator)
     const uint8_t kRawValue[] = { 0xDE, 0xAD, 0xBE, 0xEF };
     ASSERT_EQ(safeRamProvider.SafeWriteValue(path, ByteSpan(kRawValue)), CHIP_NO_ERROR);
 
-    // Migrate using SafeValue (raw byte migrator)
+    // Migrate raw bytes using AttrMigrationData { valueSize, isScalar }.
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::SafeValue },
+        { 3, sizeof(kRawValue), false },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
@@ -386,8 +379,8 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithSafeValueMigrator)
     }
 }
 
-// Null migrator: reports failure for the null entry but still migrates the valid entry.
-TEST(TestAttributePersistenceMigration, TestMigrationWithNullMigrator)
+// Invalid scalar size: reports failure for the invalid entry but still migrates the valid entry.
+TEST(TestAttributePersistenceMigration, TestMigrationWithInvalidScalarSize)
 {
     TestPersistentStorageDelegate storageDelegate;
     DefaultAttributePersistenceProvider ramProvider;
@@ -400,17 +393,19 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithNullMigrator)
     const ConcreteClusterPath cluster(1, 2);
     constexpr uint32_t kValueB = 55;
 
-    // Only attribute B has a value in the safe provider
+    // Store 3 raw bytes for attribute A (unsupported scalar size)
+    const uint8_t kRawA[] = { 0x01, 0x02, 0x03 };
+    ASSERT_EQ(safeRamProvider.SafeWriteValue(pathA, ByteSpan(kRawA)), CHIP_NO_ERROR);
     ASSERT_EQ(safeRamProvider.WriteScalarValue(pathB, kValueB), CHIP_NO_ERROR);
 
-    // Attribute A has a null migrator, attribute B has a valid one
+    // Attribute A has an invalid 3-byte scalar size, attribute B is valid
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, nullptr },
-        { 4, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, 3, true },
+        { 4, sizeof(uint32_t), true },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    // Should report failure due to null migrator
+    // Should report failure due to invalid scalar size on attribute A
     EXPECT_EQ(
         MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
         CHIP_ERROR_HAD_FAILURES);

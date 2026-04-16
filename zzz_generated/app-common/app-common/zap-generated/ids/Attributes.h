@@ -116,6 +116,7 @@
 #include <clusters/PowerSourceConfiguration/AttributeIds.h>
 #include <clusters/PowerTopology/AttributeIds.h>
 #include <clusters/PressureMeasurement/AttributeIds.h>
+#include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProxyConfiguration/AttributeIds.h>
 #include <clusters/ProxyDiscovery/AttributeIds.h>
 #include <clusters/ProxyValid/AttributeIds.h>

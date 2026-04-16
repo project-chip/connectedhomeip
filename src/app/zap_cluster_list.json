@@ -81,6 +81,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
@@ -236,7 +237,7 @@
         "FAN_CONTROL_CLUSTER": ["fan-control-server"],
         "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
         "FIXED_LABEL_CLUSTER": ["fixed-label-server"],
-        "FLOW_MEASUREMENT_CLUSTER": [],
+        "FLOW_MEASUREMENT_CLUSTER": ["flow-measurement-server"],
         "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -268,6 +269,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": ["push-av-stream-transport-server"],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
@@ -315,7 +317,9 @@
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
             "mode-base-server"
         ],
-        "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
+        "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [
+            "relative-humidity-measurement-server"
+        ],
         "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
         "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],

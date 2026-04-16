@@ -475,6 +475,8 @@ config("sanitize_memory") {
     "-fno-omit-frame-pointer",
   ]
   ldflags = cflags
+
+  defines = [ "CHIP_MEMORY_SANITIZER_ENABLED=1" ]
 }
 
 config("sanitize_undefined_behavior") {

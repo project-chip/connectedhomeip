@@ -83,7 +83,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
 
     @async_test_body
     async def teardown_test(self):
-        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
         super().teardown_test()
 
     def steps_TC_PAVSTI_1_2(self) -> list[TestStep]:
@@ -181,7 +181,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         # Commission DUT - already done
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
-        self.tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
+        self.tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=self.host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.dash.value)
 
         self.step(1)
