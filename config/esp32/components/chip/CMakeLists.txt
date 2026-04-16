@@ -331,29 +331,16 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  chip_gn_arg_bool("matter_enable_tracing_support"  "true")
-  chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
-endif()
-
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
     chip_gn_arg_bool("matter_enable_tracing_support"  "true")
     chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostics:esp32_diagnostic_tracing\"")
-endif()
-
-if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
-     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
 endif()
 
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-   target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
-endif()
-
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
     target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
 
@@ -426,11 +413,7 @@ if(CONFIG_ENABLE_PW_RPC)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
-endif()
-
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
 endif()
 
