@@ -69,6 +69,8 @@ class Builder(ABC):
         self.identifier = None
         self.output_dir = None
         self.options = BuilderOptions()
+        self.quiet = False
+        self.verbose = False
 
     @abstractmethod
     def generate(self):
@@ -121,7 +123,7 @@ class Builder(ABC):
             self._bundle()
 
     def _Execute(self, cmdarray, title=None, dedup=False):
-        self._runner.Run(cmdarray, title=title, dedup=dedup)
+        self._runner.Run(cmdarray, title=title, dedup=dedup, quiet=self.quiet)
 
     def CompressArtifacts(self, target_file: str):
         with tarfile.open(target_file, "w:gz") as tar:

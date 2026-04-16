@@ -23,6 +23,21 @@ source_set("zone-geometry") {
   ]
 }
 
-group("zone-management-server") {
-  public_deps = [ ":zone-geometry" ]
+source_set("zone-management-server") {
+  sources = [
+    "ZoneManagementCluster.cpp",
+    "ZoneManagementCluster.h",
+    "zone-geometry.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/persistence",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/ZoneManagement",
+  ]
 }

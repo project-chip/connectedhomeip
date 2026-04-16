@@ -174,6 +174,7 @@ def BuildHostTarget():
     target.AppendModifier(
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
+    target.AppendModifier("no-groupcast", enable_groupcast=False)
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
@@ -300,6 +301,7 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('smoke-co-alarm', app=Efr32App.SMOKE_CO_ALARM),
         TargetPart('switch', app=Efr32App.SWITCH),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
@@ -421,6 +423,9 @@ def BuildAndroidTarget():
         TargetPart('virtual-device-app',
                    app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
+
+    # Modifiers
+    target.AppendModifier('size-optimized', optimize_size=True)
 
     return target
 
