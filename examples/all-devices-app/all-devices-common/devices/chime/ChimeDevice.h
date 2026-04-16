@@ -20,8 +20,8 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <lib/support/TimerDelegate.h>
 #include <lib/support/Span.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {

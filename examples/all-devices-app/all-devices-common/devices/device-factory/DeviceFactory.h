@@ -118,12 +118,12 @@ private:
             };
             return std::make_unique<ChimeDevice>(mContext->timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
         };
-        mRegistry["dimmable-light"]   = [this]() {
+        mRegistry["dimmable-light"] = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<LoggingDimmableLightDevice>(LoggingDimmableLightDevice::Context{
-                  .groupDataProvider = mContext->groupDataProvider,
-                  .fabricTable       = mContext->fabricTable,
-                  .timerDelegate     = mContext->timerDelegate,
+                .groupDataProvider = mContext->groupDataProvider,
+                .fabricTable       = mContext->fabricTable,
+                .timerDelegate     = mContext->timerDelegate,
             });
         };
         mRegistry["on-off-light"] = [this]() {

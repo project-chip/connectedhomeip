@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <DeviceFactoryPlatformOverride.h>
 #include <DarwinChimeDevice.h>
+#include <DeviceFactoryPlatformOverride.h>
 #include <devices/device-factory/DeviceFactory.h>
 
 namespace chip {

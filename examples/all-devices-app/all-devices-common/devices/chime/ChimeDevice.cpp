@@ -16,8 +16,8 @@
  */
 #include <devices/Types.h>
 #include <devices/chime/ChimeDevice.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
 
@@ -25,8 +25,8 @@ namespace chip {
 namespace app {
 
 ChimeDevice::ChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)),
-    mTimerDelegate(timerDelegate), mSounds(sounds)
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mTimerDelegate(timerDelegate),
+    mSounds(sounds)
 {}
 
 CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
