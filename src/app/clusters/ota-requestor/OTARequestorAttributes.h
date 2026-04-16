@@ -26,7 +26,6 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/data-model-provider/EventsGenerator.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -43,6 +42,13 @@ public:
     using OTAChangeReasonEnum  = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
     using OTAUpdateStateEnum   = OTARequestorInterface::OTAUpdateStateEnum;
     using ProviderLocationType = OTARequestorInterface::ProviderLocationType;
+
+    class AttributeChangeListener
+    {
+    public:
+        virtual ~AttributeChangeListener()                     = default;
+        virtual void AttributeChanged(AttributeId attributeId) = 0;
+    };
 
     OTAUpdateStateEnum GetUpdateState() const;
     // If the events generator is set this will also send a StateTransition event.
@@ -62,7 +68,7 @@ public:
     // AddDefaultOtaProvider or RemoveDefaultOtaProvider.
     ProviderLocationList::Iterator GetDefaultOtaProviderListIterator();
 
-    CHIP_ERROR SetInteractionModelContext(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener,
+    CHIP_ERROR SetInteractionModelContext(EndpointId endpointId, AttributeChangeListener & attributeChangeListener,
                                           app::DataModel::EventsGenerator & eventsGenerator);
     // This loads the default OTA provider list and update state attributes from storage. This will not send events.
     CHIP_ERROR SetStorageAndLoadAttributes(OTARequestorStorage & storage);
@@ -73,9 +79,9 @@ private:
     app::DataModel::Nullable<uint8_t> mUpdateStateProgress;
     bool mUpdatePossible = true;
 
-    app::DataModel::ProviderChangeListener * mDataModelChangeListener = nullptr;
-    EndpointId mEndpointId                                            = kInvalidEndpointId;
-    app::DataModel::EventsGenerator * mEventsGenerator                = nullptr;
+    AttributeChangeListener * mAttributeChangeListener = nullptr;
+    EndpointId mEndpointId                             = kInvalidEndpointId;
+    app::DataModel::EventsGenerator * mEventsGenerator = nullptr;
 
     OTARequestorStorage * mStorage = nullptr;
 };

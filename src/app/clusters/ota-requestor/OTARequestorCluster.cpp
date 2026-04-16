@@ -46,8 +46,7 @@ OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorComm
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    return mAttributes.SetInteractionModelContext(mPath.mEndpointId, context.interactionContext.dataModelChangeListener,
-                                                  context.interactionContext.eventsGenerator);
+    return mAttributes.SetInteractionModelContext(mPath.mEndpointId, *this, context.interactionContext.eventsGenerator);
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

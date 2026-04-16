@@ -18,6 +18,8 @@
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <pw_unit_test/framework.h>
 
+#include <vector>
+
 #include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/common/CompatEnumNames.h>
 #include <app/data-model/Nullable.h>
@@ -81,6 +83,13 @@ struct MockOTARequestorStorage : public OTARequestorStorage
     bool loadCurrentUpdateStateCalled = false;
 };
 
+struct MockAttributeChangeListener : public OTARequestorAttributes::AttributeChangeListener
+{
+    void AttributeChanged(AttributeId attributeId) override { dirtyList.push_back(attributeId); }
+
+    std::vector<AttributeId> dirtyList;
+};
+
 struct TestOTARequestorAttributes : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -90,10 +99,10 @@ struct TestOTARequestorAttributes : public ::testing::Test
 TEST_F(TestOTARequestorAttributes, SetChangeListenerRejectsInvalidEndpointId)
 {
     chip::Testing::TestServerClusterContext context;
+    MockAttributeChangeListener changeListener;
     OTARequestorAttributes attributes;
 
-    EXPECT_NE(attributes.SetInteractionModelContext(kInvalidEndpointId, context.ChangeListener(), context.EventsGenerator()),
-              CHIP_NO_ERROR);
+    EXPECT_NE(attributes.SetInteractionModelContext(kInvalidEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 }
 
 TEST_F(TestOTARequestorAttributes, SetUpdateStateChangesValue)
@@ -132,33 +141,32 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateChangesValue)
 TEST_F(TestOTARequestorAttributes, SetUpdateStateMarksChangedWhenDifferent)
 {
     chip::Testing::TestServerClusterContext context;
-    auto & changeListener      = context.ChangeListener();
+    MockAttributeChangeListener changeListener;
     OTAChangeReasonEnum reason = OTAChangeReasonEnum::kSuccess;
 
     OTARequestorAttributes attributes;
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kUnknown, reason, NullNullable);
     ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, reason, NullNullable);
-    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdateState::Id);
+    ASSERT_EQ(changeListener.dirtyList.size(), 1u);
+    EXPECT_EQ(changeListener.dirtyList[0], UpdateState::Id);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, reason, NullNullable);
-    EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+    EXPECT_EQ(changeListener.dirtyList.size(), 0u);
 }
 
 TEST_F(TestOTARequestorAttributes, SetUpdateStateSendsEventWhenDifferent)
 {
     chip::Testing::TestServerClusterContext context;
+    MockAttributeChangeListener changeListener;
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
 
     OTARequestorAttributes attributes;
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kUnknown, OTAChangeReasonEnum::kUnknown, NullNullable);
-    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, context.ChangeListener(), eventsGenerator), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, eventsGenerator), CHIP_NO_ERROR);
     ASSERT_FALSE(eventsGenerator.GetNextEvent().has_value());
 
     // Verify setting a state with a target version sends a matching event.
@@ -220,37 +228,35 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateProgressChangesValue)
 TEST_F(TestOTARequestorAttributes, SetUpdateStateProgressMarksChangedWhenDifferent)
 {
     chip::Testing::TestServerClusterContext context;
-    auto & changeListener = context.ChangeListener();
+    MockAttributeChangeListener changeListener;
 
     OTARequestorAttributes attributes;
     EXPECT_EQ(attributes.SetUpdateStateProgress(NullNullable), CHIP_NO_ERROR);
     ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     EXPECT_EQ(attributes.SetUpdateStateProgress(42), CHIP_NO_ERROR);
-    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdateStateProgress::Id);
+    ASSERT_EQ(changeListener.dirtyList.size(), 1u);
+    EXPECT_EQ(changeListener.dirtyList[0], UpdateStateProgress::Id);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     EXPECT_EQ(attributes.SetUpdateStateProgress(42), CHIP_NO_ERROR);
-    EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+    EXPECT_EQ(changeListener.dirtyList.size(), 0u);
 }
 
 TEST_F(TestOTARequestorAttributes, InvalidUpdateStateProgressDoesNotChangeValueOrMarkChanged)
 {
     chip::Testing::TestServerClusterContext context;
-    auto & changeListener = context.ChangeListener();
+    MockAttributeChangeListener changeListener;
 
     OTARequestorAttributes attributes;
     EXPECT_EQ(attributes.SetUpdateStateProgress(NullNullable), CHIP_NO_ERROR);
     ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     EXPECT_NE(attributes.SetUpdateStateProgress(200), CHIP_NO_ERROR);
     EXPECT_EQ(attributes.GetUpdateStateProgress(), NullNullable);
-    EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+    EXPECT_EQ(changeListener.dirtyList.size(), 0u);
 }
 
 TEST_F(TestOTARequestorAttributes, SetUpdateStatePossibleChangesValue)
@@ -267,22 +273,20 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStatePossibleChangesValue)
 TEST_F(TestOTARequestorAttributes, SetUpdateStatePossibleMarksChangedWhenDifferent)
 {
     chip::Testing::TestServerClusterContext context;
-    auto & changeListener = context.ChangeListener();
+    MockAttributeChangeListener changeListener;
 
     OTARequestorAttributes attributes;
     attributes.SetUpdatePossible(false);
     ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     attributes.SetUpdatePossible(true);
-    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdatePossible::Id);
+    ASSERT_EQ(changeListener.dirtyList.size(), 1u);
+    EXPECT_EQ(changeListener.dirtyList[0], UpdatePossible::Id);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     attributes.SetUpdatePossible(true);
-    EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+    EXPECT_EQ(changeListener.dirtyList.size(), 0u);
 }
 
 TEST_F(TestOTARequestorAttributes, CanAddAndIterateProviders)
@@ -395,34 +399,30 @@ TEST_F(TestOTARequestorAttributes, ClearingProvidersRemovesFromList)
 TEST_F(TestOTARequestorAttributes, ChangingProvidersMarksChanged)
 {
     chip::Testing::TestServerClusterContext context;
-    auto & changeListener = context.ChangeListener();
+    MockAttributeChangeListener changeListener;
 
     OTARequestorAttributes attributes;
     ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     OTARequestorAttributes::ProviderLocationType location;
     location.providerNodeID = 0x1234;
     location.endpoint       = 10;
     location.fabricIndex    = 1;
     EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
-    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOTAProviders::Id);
+    ASSERT_EQ(changeListener.dirtyList.size(), 1u);
+    EXPECT_EQ(changeListener.dirtyList[0], DefaultOTAProviders::Id);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     EXPECT_EQ(attributes.RemoveDefaultOtaProvider(1), CHIP_NO_ERROR);
-    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOTAProviders::Id);
+    ASSERT_EQ(changeListener.dirtyList.size(), 1u);
+    EXPECT_EQ(changeListener.dirtyList[0], DefaultOTAProviders::Id);
 }
 
 TEST_F(TestOTARequestorAttributes, CannotAddProviderForFabricWithProvider)
 {
     chip::Testing::TestServerClusterContext context;
-    auto & changeListener = context.ChangeListener();
+    MockAttributeChangeListener changeListener;
 
     OTARequestorAttributes attributes;
 
@@ -434,12 +434,12 @@ TEST_F(TestOTARequestorAttributes, CannotAddProviderForFabricWithProvider)
 
     ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, context.EventsGenerator()), CHIP_NO_ERROR);
 
-    changeListener.DirtyList().clear();
+    changeListener.dirtyList.clear();
     location.providerNodeID = 0x5678;
     location.endpoint       = 20;
     location.fabricIndex    = 1;
     EXPECT_NE(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
-    ASSERT_EQ(changeListener.DirtyList().size(), 0u);
+    ASSERT_EQ(changeListener.dirtyList.size(), 0u);
 }
 
 TEST_F(TestOTARequestorAttributes, DefaultProvidersAreLoadedWhenSettingStorage)

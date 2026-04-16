@@ -25,7 +25,9 @@
 
 namespace chip::app::Clusters {
 
-class OTARequestorCluster : public DefaultServerCluster, public DefaultOTARequestorEventSender
+class OTARequestorCluster : public DefaultServerCluster,
+                            public DefaultOTARequestorEventSender,
+                            public OTARequestorAttributes::AttributeChangeListener
 {
 public:
     OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands, OTARequestorAttributes & attributes);
@@ -50,6 +52,8 @@ public:
     CHIP_ERROR SendVersionAppliedEvent(const DefaultOTARequestorEventSender::VersionAppliedEvent & event) override;
 
     CHIP_ERROR SendDownloadErrorEvent(const DefaultOTARequestorEventSender::DownloadErrorEvent & event) override;
+
+    void AttributeChanged(AttributeId attributeId) override { NotifyAttributeChanged(attributeId); }
 
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);

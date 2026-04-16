@@ -19,10 +19,9 @@
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 
 #include <app/clusters/ota-requestor/OTARequestorStorage.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/data-model/Nullable.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
-#include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -33,8 +32,6 @@ namespace chip {
 
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Events;
-
-constexpr ClusterId kClusterId = app::Clusters::OtaSoftwareUpdateRequestor::Id;
 
 OTARequestorAttributes::OTAUpdateStateEnum OTARequestorAttributes::GetUpdateState() const
 {
@@ -51,9 +48,9 @@ void OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState, OTAC
 
     OTAUpdateStateEnum previousState = mUpdateState;
     mUpdateState                     = updateState;
-    if (mDataModelChangeListener)
+    if (mAttributeChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, UpdateState::Id });
+        mAttributeChangeListener->AttributeChanged(UpdateState::Id);
     }
     if (mEventsGenerator)
     {
@@ -78,9 +75,9 @@ CHIP_ERROR OTARequestorAttributes::SetUpdateStateProgress(app::DataModel::Nullab
 
     VerifyOrReturnError(updateStateProgress.IsNull() || updateStateProgress.Value() <= 100, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (mUpdateStateProgress.Update(updateStateProgress) && mDataModelChangeListener)
+    if (mUpdateStateProgress.Update(updateStateProgress) && mAttributeChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, UpdateStateProgress::Id });
+        mAttributeChangeListener->AttributeChanged(UpdateStateProgress::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -98,21 +95,21 @@ void OTARequestorAttributes::SetUpdatePossible(bool updatePossible)
     VerifyOrReturn(updatePossible != mUpdatePossible);
 
     mUpdatePossible = updatePossible;
-    if (mDataModelChangeListener)
+    if (mAttributeChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, UpdatePossible::Id });
+        mAttributeChangeListener->AttributeChanged(UpdatePossible::Id);
     }
 }
 
 CHIP_ERROR OTARequestorAttributes::SetInteractionModelContext(EndpointId endpointId,
-                                                              app::DataModel::ProviderChangeListener & dataModelChangeListener,
+                                                              AttributeChangeListener & attributeChangeListener,
                                                               app::DataModel::EventsGenerator & eventsGenerator)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(IsValidEndpointId(endpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     mEndpointId              = endpointId;
-    mDataModelChangeListener = &dataModelChangeListener;
+    mAttributeChangeListener = &attributeChangeListener;
     mEventsGenerator         = &eventsGenerator;
     return CHIP_NO_ERROR;
 }
@@ -129,9 +126,9 @@ CHIP_ERROR OTARequestorAttributes::RemoveDefaultOtaProvider(FabricIndex fabricIn
     }
     ReturnErrorOnFailure(error);
 
-    if (mDataModelChangeListener)
+    if (mAttributeChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, DefaultOTAProviders::Id });
+        mAttributeChangeListener->AttributeChanged(DefaultOTAProviders::Id);
     }
     if (mStorage)
     {
@@ -159,9 +156,9 @@ CHIP_ERROR OTARequestorAttributes::AddDefaultOtaProvider(const ProviderLocationT
 
     ReturnErrorOnFailure(mProviders.Add(providerLocation));
 
-    if (mDataModelChangeListener)
+    if (mAttributeChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, DefaultOTAProviders::Id });
+        mAttributeChangeListener->AttributeChanged(DefaultOTAProviders::Id);
     }
     if (mStorage)
     {
