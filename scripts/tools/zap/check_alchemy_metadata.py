@@ -69,11 +69,13 @@ from typing import Dict, List, Optional, Set
 # ---------------------------------------------------------------------------
 _ALLOWLISTS_PATH = Path(__file__).resolve().parents[3] / "src/app/zap-templates/zcl/data-model/chip/alchemy_allowlists.json"
 
+
 def _load_allowlists() -> tuple:
     """Load MANUAL_ALLOWLIST and INCOMPLETE_METADATA_ALLOWLIST from JSON."""
     with open(_ALLOWLISTS_PATH, encoding="utf-8") as f:
         data = json.load(f)
     return set(data["MANUAL_ALLOWLIST"]), set(data["INCOMPLETE_METADATA_ALLOWLIST"])
+
 
 MANUAL_ALLOWLIST: Set[str]
 INCOMPLETE_METADATA_ALLOWLIST: Set[str]
