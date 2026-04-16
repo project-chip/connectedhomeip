@@ -49,7 +49,7 @@ Git: 0.7-summer-2025-ncr-295-geca1936d2
       <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Node makes available the counts for the number of received and transmitted packets on the ethernet interface.">
         <optionalConform/>
       </feature>
-      <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Node makes available the counts for the number of errors that have occurred during the reception and transmission of packets on the ethernet interface.">
+      <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Node makes available the count for the number of errors that have occurred during the reception and transmission of packets on the ethernet interface.">
         <optionalConform/>
       </feature>
     </features>
