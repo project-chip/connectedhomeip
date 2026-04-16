@@ -272,7 +272,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
             jfadmin_fabric_b_passcode = self.matter_test_config.setup_passcodes[0]
             if not jfadmin_fabric_b_passcode:
                 asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
-            jfadmin_fabric_b_discriminator = self.matter_test_config.setup_discriminators[0]
+            jfadmin_fabric_b_discriminator = self.matter_test_config.discriminators[0]
             if not jfadmin_fabric_b_discriminator:
                 asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
