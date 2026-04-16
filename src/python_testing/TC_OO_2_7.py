@@ -71,7 +71,8 @@ class TC_OO_2_7(MatterBaseTest):
             TestStep("2a", "TH sends Off command to DUT."),
             TestStep("2b", "After a few seconds, TH reads OnOff attribute from DUT."),
             TestStep("3", "TH sends a StoreScene command to DUT with the GroupID field set to 1 and the SceneID field set to 0x01."),
-            TestStep("4", "TH sends a AddScene command to DUT with the GroupID field set to 1, the SceneID field set to 0x02, the TransitionTime field set to 1000 (1s) and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0006, AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }]}]'"),
+            TestStep(
+                "4", "TH sends a AddScene command to DUT with the GroupID field set to 1, the SceneID field set to 0x02, the TransitionTime field set to 1000 (1s) and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0006, AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }]}]'"),
             TestStep("5a", "TH sends a RecallScene command to DUT with the GroupID field set to 1, the SceneID field set to 0x02 and the TransitionTime omitted."),
             TestStep("5b", "After a few seconds, TH reads the OnOff attribute from DUT."),
             TestStep("6a", "TH sends a RecallScene command to DUT with the GroupID field set to 1, the SceneID field set to 0x01 and the TransitionTime set to 1000ms (1s)."),
