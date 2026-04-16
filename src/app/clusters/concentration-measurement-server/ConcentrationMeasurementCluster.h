@@ -82,8 +82,7 @@ public:
      *                    This value is also returned as the FeatureMap attribute.
      * @param delegate    Application-supplied delegate. Must outlive this cluster instance.
      */
-    ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId,
-                                    BitFlags<Feature> features, Delegate & delegate);
+    ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId, BitFlags<Feature> features, Delegate & delegate);
 
     ~ConcentrationMeasurementCluster() override;
 
@@ -105,8 +104,7 @@ public:
      *   kAverageMeasurement → AverageMeasuredValue, AverageMeasuredValueWindow
      *   kLevelIndication    → LevelValue
      */
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
-                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     /**
      * Reads an attribute value and encodes it into 'encoder'.
@@ -116,7 +114,6 @@ public:
      */
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
-
 
     /** Returns true if the given feature flag was set at construction. */
     bool HasFeature(Feature f) const { return mFeatures.Has(f); }
@@ -129,29 +126,25 @@ private:
     static constexpr uint16_t kClusterRevision = 3;
 
     BitFlags<Feature> mFeatures;
-    Delegate &        mDelegate;
+    Delegate & mDelegate;
 
-
-    static bool CheckConstraintMinMax(DataModel::Nullable<float> value,
-                                      DataModel::Nullable<float> minValue,
+    static bool CheckConstraintMinMax(DataModel::Nullable<float> value, DataModel::Nullable<float> minValue,
                                       DataModel::Nullable<float> maxValue)
     {
         return (minValue.IsNull() || value.IsNull() || (value.Value() >= minValue.Value())) &&
-               (maxValue.IsNull() || value.IsNull() || (value.Value() <= maxValue.Value()));
+            (maxValue.IsNull() || value.IsNull() || (value.Value() <= maxValue.Value()));
     }
 
     static bool CheckConstraintsLessThanOrEqualTo(DataModel::Nullable<float> value,
                                                   DataModel::Nullable<float> valueToBeLessThanOrEqualTo)
     {
-        return valueToBeLessThanOrEqualTo.IsNull() || value.IsNull() ||
-               (value.Value() <= valueToBeLessThanOrEqualTo.Value());
+        return valueToBeLessThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() <= valueToBeLessThanOrEqualTo.Value());
     }
 
     static bool CheckConstraintsGreaterThanOrEqualTo(DataModel::Nullable<float> value,
                                                      DataModel::Nullable<float> valueToBeGreaterThanOrEqualTo)
     {
-        return valueToBeGreaterThanOrEqualTo.IsNull() || value.IsNull() ||
-               (value.Value() >= valueToBeGreaterThanOrEqualTo.Value());
+        return valueToBeGreaterThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() >= valueToBeGreaterThanOrEqualTo.Value());
     }
 };
 

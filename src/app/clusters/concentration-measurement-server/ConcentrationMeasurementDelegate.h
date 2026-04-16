@@ -43,19 +43,19 @@ public:
 
     // ── Feature::kNumericMeasurement ─────────────────────────────────────────
     // Override if cluster was constructed with Feature::kNumericMeasurement.
-    virtual DataModel::Nullable<float> GetMeasuredValue()    { return DataModel::Nullable<float>(); }
+    virtual DataModel::Nullable<float> GetMeasuredValue() { return DataModel::Nullable<float>(); }
     virtual DataModel::Nullable<float> GetMinMeasuredValue() { return DataModel::Nullable<float>(); }
     virtual DataModel::Nullable<float> GetMaxMeasuredValue() { return DataModel::Nullable<float>(); }
-    virtual float GetUncertainty()                           { return 0.0f; }
-    virtual MeasurementUnitEnum GetMeasurementUnit()         { return MeasurementUnitEnum::kPpm; }
+    virtual float GetUncertainty() { return 0.0f; }
+    virtual MeasurementUnitEnum GetMeasurementUnit() { return MeasurementUnitEnum::kPpm; }
 
     // ── Feature::kPeakMeasurement (requires kNumericMeasurement) ─────────────
-    virtual DataModel::Nullable<float> GetPeakMeasuredValue()  { return DataModel::Nullable<float>(); }
-    virtual uint32_t GetPeakMeasuredValueWindow()              { return 0; }
+    virtual DataModel::Nullable<float> GetPeakMeasuredValue() { return DataModel::Nullable<float>(); }
+    virtual uint32_t GetPeakMeasuredValueWindow() { return 0; }
 
     // ── Feature::kAverageMeasurement (requires kNumericMeasurement) ──────────
-    virtual DataModel::Nullable<float> GetAverageMeasuredValue()  { return DataModel::Nullable<float>(); }
-    virtual uint32_t GetAverageMeasuredValueWindow()              { return 0; }
+    virtual DataModel::Nullable<float> GetAverageMeasuredValue() { return DataModel::Nullable<float>(); }
+    virtual uint32_t GetAverageMeasuredValueWindow() { return 0; }
 
     // ── Feature::kLevelIndication ─────────────────────────────────────────────
     virtual LevelValueEnum GetLevelValue() { return LevelValueEnum::kUnknown; }
@@ -124,21 +124,20 @@ public:
      *                Both are fixed — they describe the physical sensor hardware,
      *                not mutable runtime state.
      */
-    DefaultDelegate(MeasurementMediumEnum medium, MeasurementUnitEnum unit)
-        : mMedium(medium), mUnit(unit) {}
+    DefaultDelegate(MeasurementMediumEnum medium, MeasurementUnitEnum unit) : mMedium(medium), mUnit(unit) {}
 
     // ── Delegate overrides ────────────────────────────────────────────────────
-    MeasurementMediumEnum GetMeasurementMedium() override              { return mMedium; }
-    MeasurementUnitEnum GetMeasurementUnit() override                  { return mUnit; }
-    DataModel::Nullable<float> GetMeasuredValue() override             { return mMeasuredValue; }
-    DataModel::Nullable<float> GetMinMeasuredValue() override          { return mMinMeasuredValue; }
-    DataModel::Nullable<float> GetMaxMeasuredValue() override          { return mMaxMeasuredValue; }
-    float GetUncertainty() override                                    { return mUncertainty; }
-    DataModel::Nullable<float> GetPeakMeasuredValue() override         { return mPeakMeasuredValue; }
-    uint32_t GetPeakMeasuredValueWindow() override                     { return mPeakMeasuredValueWindow; }
-    DataModel::Nullable<float> GetAverageMeasuredValue() override      { return mAverageMeasuredValue; }
-    uint32_t GetAverageMeasuredValueWindow() override                  { return mAverageMeasuredValueWindow; }
-    LevelValueEnum GetLevelValue() override                            { return mLevelValue; }
+    MeasurementMediumEnum GetMeasurementMedium() override { return mMedium; }
+    MeasurementUnitEnum GetMeasurementUnit() override { return mUnit; }
+    DataModel::Nullable<float> GetMeasuredValue() override { return mMeasuredValue; }
+    DataModel::Nullable<float> GetMinMeasuredValue() override { return mMinMeasuredValue; }
+    DataModel::Nullable<float> GetMaxMeasuredValue() override { return mMaxMeasuredValue; }
+    float GetUncertainty() override { return mUncertainty; }
+    DataModel::Nullable<float> GetPeakMeasuredValue() override { return mPeakMeasuredValue; }
+    uint32_t GetPeakMeasuredValueWindow() override { return mPeakMeasuredValueWindow; }
+    DataModel::Nullable<float> GetAverageMeasuredValue() override { return mAverageMeasuredValue; }
+    uint32_t GetAverageMeasuredValueWindow() override { return mAverageMeasuredValueWindow; }
+    LevelValueEnum GetLevelValue() override { return mLevelValue; }
 
     // ── Handle*()
     // Each method stores the value. The cluster will report the change to subscribed
@@ -146,32 +145,23 @@ public:
     // Only call Handle*() methods that correspond to features that are enabled —
     // calling others is harmless (cluster won't expose them) but wastes RAM.
 
-void HandleNewMeasuredValue(DataModel::Nullable<float> v)
-        { mMeasuredValue = v; }
+    void HandleNewMeasuredValue(DataModel::Nullable<float> v) { mMeasuredValue = v; }
 
-    void HandleNewMinMeasuredValue(DataModel::Nullable<float> v)
-        { mMinMeasuredValue = v;  }
+    void HandleNewMinMeasuredValue(DataModel::Nullable<float> v) { mMinMeasuredValue = v; }
 
-    void HandleNewMaxMeasuredValue(DataModel::Nullable<float> v)
-        { mMaxMeasuredValue = v;   }
+    void HandleNewMaxMeasuredValue(DataModel::Nullable<float> v) { mMaxMeasuredValue = v; }
 
-    void HandleNewUncertainty(float v)
-        { mUncertainty = v;   }
+    void HandleNewUncertainty(float v) { mUncertainty = v; }
 
-    void HandleNewPeakMeasuredValue(DataModel::Nullable<float> v)
-        { mPeakMeasuredValue = v;  }
+    void HandleNewPeakMeasuredValue(DataModel::Nullable<float> v) { mPeakMeasuredValue = v; }
 
-    void HandleNewPeakMeasuredValueWindow(uint32_t v)
-        { mPeakMeasuredValueWindow = v;  }
+    void HandleNewPeakMeasuredValueWindow(uint32_t v) { mPeakMeasuredValueWindow = v; }
 
-    void HandleNewAverageMeasuredValue(DataModel::Nullable<float> v)
-        { mAverageMeasuredValue = v;  }
+    void HandleNewAverageMeasuredValue(DataModel::Nullable<float> v) { mAverageMeasuredValue = v; }
 
-    void HandleNewAverageMeasuredValueWindow(uint32_t v)
-        { mAverageMeasuredValueWindow = v;  }
+    void HandleNewAverageMeasuredValueWindow(uint32_t v) { mAverageMeasuredValueWindow = v; }
 
-    void HandleNewLevelValue(LevelValueEnum v)
-        { mLevelValue = v;  }
+    void HandleNewLevelValue(LevelValueEnum v) { mLevelValue = v; }
 
 private:
     // All fields start null/zero/unknown — safe defaults before first reading.
@@ -179,13 +169,13 @@ private:
     DataModel::Nullable<float> mMinMeasuredValue;
     DataModel::Nullable<float> mMaxMeasuredValue;
     DataModel::Nullable<float> mPeakMeasuredValue;
-    uint32_t                   mPeakMeasuredValueWindow  = 0;
+    uint32_t mPeakMeasuredValueWindow = 0;
     DataModel::Nullable<float> mAverageMeasuredValue;
-    uint32_t                   mAverageMeasuredValueWindow = 0;
-    float                      mUncertainty               = 0.0f;
-    MeasurementMediumEnum      mMedium;
-    MeasurementUnitEnum        mUnit;
-    LevelValueEnum             mLevelValue = LevelValueEnum::kUnknown;
+    uint32_t mAverageMeasuredValueWindow = 0;
+    float mUncertainty                   = 0.0f;
+    MeasurementMediumEnum mMedium;
+    MeasurementUnitEnum mUnit;
+    LevelValueEnum mLevelValue = LevelValueEnum::kUnknown;
 };
 
 } // namespace ConcentrationMeasurement

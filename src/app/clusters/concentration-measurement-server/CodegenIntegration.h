@@ -55,14 +55,10 @@ namespace ConcentrationMeasurement {
 class Instance
 {
 public:
-    Instance(EndpointId endpointId,
-             ClusterId clusterId,
-             BitFlags<Feature> features,
-             MeasurementMediumEnum medium,
-             MeasurementUnitEnum unit)
-        : mDelegate(medium, unit),
-          mCluster(endpointId, clusterId, features, mDelegate),
-          mRegistration(mCluster)
+    Instance(EndpointId endpointId, ClusterId clusterId, BitFlags<Feature> features, MeasurementMediumEnum medium,
+             MeasurementUnitEnum unit) :
+        mDelegate(medium, unit),
+        mCluster(endpointId, clusterId, features, mDelegate), mRegistration(mCluster)
     {}
 
     // Returns the delegate to push new sensor readings.
@@ -78,9 +74,9 @@ private:
     //   1. delegate  — cluster stores a reference, must be alive first
     //   2. cluster   — registration stores a pointer, must be alive first
     //   3. registration — just holds the pointer; Startup() is called by the provider
-    DefaultDelegate                  mDelegate;
-    ConcentrationMeasurementCluster  mCluster;
-    ServerClusterRegistration        mRegistration;
+    DefaultDelegate mDelegate;
+    ConcentrationMeasurementCluster mCluster;
+    ServerClusterRegistration mRegistration;
 };
 
 } // namespace ConcentrationMeasurement

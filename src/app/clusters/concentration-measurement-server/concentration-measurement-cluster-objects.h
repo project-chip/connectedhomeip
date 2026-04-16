@@ -104,24 +104,56 @@ enum class Feature : uint32_t
 
 namespace Attributes {
 
-namespace MeasuredValue            { static constexpr AttributeId Id = 0x00000000; }
-namespace MinMeasuredValue         { static constexpr AttributeId Id = 0x00000001; }
-namespace MaxMeasuredValue         { static constexpr AttributeId Id = 0x00000002; }
-namespace PeakMeasuredValue        { static constexpr AttributeId Id = 0x00000003; }
-namespace PeakMeasuredValueWindow  { static constexpr AttributeId Id = 0x00000004; }
-namespace AverageMeasuredValue     { static constexpr AttributeId Id = 0x00000005; }
-namespace AverageMeasuredValueWindow { static constexpr AttributeId Id = 0x00000006; }
-namespace Uncertainty              { static constexpr AttributeId Id = 0x00000007; }
-namespace MeasurementUnit          { static constexpr AttributeId Id = 0x00000008; }
-namespace MeasurementMedium        { static constexpr AttributeId Id = 0x00000009; }
-namespace LevelValue               { static constexpr AttributeId Id = 0x0000000A; }
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+}
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+}
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+}
+namespace PeakMeasuredValue {
+static constexpr AttributeId Id = 0x00000003;
+}
+namespace PeakMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000004;
+}
+namespace AverageMeasuredValue {
+static constexpr AttributeId Id = 0x00000005;
+}
+namespace AverageMeasuredValueWindow {
+static constexpr AttributeId Id = 0x00000006;
+}
+namespace Uncertainty {
+static constexpr AttributeId Id = 0x00000007;
+}
+namespace MeasurementUnit {
+static constexpr AttributeId Id = 0x00000008;
+}
+namespace MeasurementMedium {
+static constexpr AttributeId Id = 0x00000009;
+}
+namespace LevelValue {
+static constexpr AttributeId Id = 0x0000000A;
+}
 
 // Global attributes — IDs are cluster-independent
-namespace GeneratedCommandList { static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id; }
-namespace AcceptedCommandList  { static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;  }
-namespace AttributeList        { static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;        }
-namespace FeatureMap           { static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;           }
-namespace ClusterRevision      { static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;      }
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+}
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+}
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+}
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+}
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+}
 
 } // namespace Attributes
 } // namespace ConcentrationMeasurement

@@ -36,15 +36,15 @@ public:
                            BitMask<AirQuality::Feature, uint32_t>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
                                                                   AirQuality::Feature::kVeryPoor,
                                                                   AirQuality::Feature::kExtremelyPoor)),
-        carbonDioxideConcentrationMeasurementInstance(
-            mEndpointId, CarbonDioxideConcentrationMeasurement::Id, kAllFeatures,
-            ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        carbonMonoxideConcentrationMeasurementInstance(
-            mEndpointId, CarbonMonoxideConcentrationMeasurement::Id, kAllFeatures,
-            ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        nitrogenDioxideConcentrationMeasurementInstance(
-            mEndpointId, NitrogenDioxideConcentrationMeasurement::Id, kAllFeatures,
-            ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        carbonDioxideConcentrationMeasurementInstance(mEndpointId, CarbonDioxideConcentrationMeasurement::Id, kAllFeatures,
+                                                      ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                      ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        carbonMonoxideConcentrationMeasurementInstance(mEndpointId, CarbonMonoxideConcentrationMeasurement::Id, kAllFeatures,
+                                                       ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                       ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        nitrogenDioxideConcentrationMeasurementInstance(mEndpointId, NitrogenDioxideConcentrationMeasurement::Id, kAllFeatures,
+                                                        ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                        ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
         pm1ConcentrationMeasurementInstance(mEndpointId, Pm1ConcentrationMeasurement::Id, kAllFeatures,
                                             ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                             ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
@@ -63,9 +63,9 @@ public:
         ozoneConcentrationMeasurementInstance(mEndpointId, OzoneConcentrationMeasurement::Id, kAllFeatures,
                                               ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        formaldehydeConcentrationMeasurementInstance(
-            mEndpointId, FormaldehydeConcentrationMeasurement::Id, kAllFeatures,
-            ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm){};
+        formaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id, kAllFeatures,
+                                                     ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                     ConcentrationMeasurement::MeasurementUnitEnum::kPpm){};
 
     void Init();
 

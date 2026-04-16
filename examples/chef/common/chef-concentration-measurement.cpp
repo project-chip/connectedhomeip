@@ -114,8 +114,8 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(ch
         break;
     case Clusters::OzoneConcentrationMeasurement::Id:
         ret = chefConcentrationMeasurementWriteCallbackHelper(gOzoneConcentrationMeasurementInstance,
-                                                              OzoneConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
-                                                              clusterId, attributeMetadata, buffer);
+                                                              OzoneConcentrationMeasurement::Attributes::MeasuredValue::Id,
+                                                              endpoint, clusterId, attributeMetadata, buffer);
         break;
     case Clusters::Pm25ConcentrationMeasurement::Id:
         ret = chefConcentrationMeasurementWriteCallbackHelper(gPm25ConcentrationMeasurementInstance,
@@ -123,9 +123,9 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(ch
                                                               clusterId, attributeMetadata, buffer);
         break;
     case Clusters::FormaldehydeConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallbackHelper(
-            gFormaldehydeConcentrationMeasurementInstance,
-            FormaldehydeConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId, attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gFormaldehydeConcentrationMeasurementInstance,
+                                                              FormaldehydeConcentrationMeasurement::Attributes::MeasuredValue::Id,
+                                                              endpoint, clusterId, attributeMetadata, buffer);
         break;
     case Clusters::Pm1ConcentrationMeasurement::Id:
         ret = chefConcentrationMeasurementWriteCallbackHelper(gPm1ConcentrationMeasurementInstance,
@@ -139,8 +139,8 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(ch
         break;
     case Clusters::RadonConcentrationMeasurement::Id:
         ret = chefConcentrationMeasurementWriteCallbackHelper(gRadonConcentrationMeasurementInstance,
-                                                              RadonConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
-                                                              clusterId, attributeMetadata, buffer);
+                                                              RadonConcentrationMeasurement::Attributes::MeasuredValue::Id,
+                                                              endpoint, clusterId, attributeMetadata, buffer);
         break;
     case Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         ret = chefConcentrationMeasurementWriteCallbackHelper(
@@ -331,8 +331,8 @@ void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint
 #ifdef MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    Instance * instance = new Instance(EndpointId(endpoint), TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, kAllFeatures,
-                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
+    Instance * instance = new Instance(EndpointId(endpoint), TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                                       kAllFeatures, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
     gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
     instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(5.0f));
     instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));

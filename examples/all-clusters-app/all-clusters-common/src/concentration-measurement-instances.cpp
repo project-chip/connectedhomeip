@@ -25,21 +25,20 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
 // All 10 aliased clusters share the same feature set in this example app.
-static constexpr BitFlags<Feature> kAllFeatures(Feature::kNumericMeasurement, Feature::kLevelIndication,
-                                                Feature::kMediumLevel, Feature::kCriticalLevel,
-                                                Feature::kPeakMeasurement, Feature::kAverageMeasurement);
+static constexpr BitFlags<Feature> kAllFeatures(Feature::kNumericMeasurement, Feature::kLevelIndication, Feature::kMediumLevel,
+                                                Feature::kCriticalLevel, Feature::kPeakMeasurement, Feature::kAverageMeasurement);
 
-static Instance gCarbonDioxideConcentrationMeasurementInstance(
-    EndpointId(1), CarbonDioxideConcentrationMeasurement::Id, kAllFeatures, MeasurementMediumEnum::kAir,
-    MeasurementUnitEnum::kPpm);
+static Instance gCarbonDioxideConcentrationMeasurementInstance(EndpointId(1), CarbonDioxideConcentrationMeasurement::Id,
+                                                               kAllFeatures, MeasurementMediumEnum::kAir,
+                                                               MeasurementUnitEnum::kPpm);
 
-static Instance gCarbonMonoxideConcentrationMeasurementInstance(
-    EndpointId(1), CarbonMonoxideConcentrationMeasurement::Id, kAllFeatures, MeasurementMediumEnum::kAir,
-    MeasurementUnitEnum::kPpm);
+static Instance gCarbonMonoxideConcentrationMeasurementInstance(EndpointId(1), CarbonMonoxideConcentrationMeasurement::Id,
+                                                                kAllFeatures, MeasurementMediumEnum::kAir,
+                                                                MeasurementUnitEnum::kPpm);
 
-static Instance gNitrogenDioxideConcentrationMeasurementInstance(
-    EndpointId(1), NitrogenDioxideConcentrationMeasurement::Id, kAllFeatures, MeasurementMediumEnum::kAir,
-    MeasurementUnitEnum::kPpm);
+static Instance gNitrogenDioxideConcentrationMeasurementInstance(EndpointId(1), NitrogenDioxideConcentrationMeasurement::Id,
+                                                                 kAllFeatures, MeasurementMediumEnum::kAir,
+                                                                 MeasurementUnitEnum::kPpm);
 
 static Instance gPm1ConcentrationMeasurementInstance(EndpointId(1), Pm1ConcentrationMeasurement::Id, kAllFeatures,
                                                      MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
@@ -60,9 +59,8 @@ static Instance gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance(
 static Instance gOzoneConcentrationMeasurementInstance(EndpointId(1), OzoneConcentrationMeasurement::Id, kAllFeatures,
                                                        MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
-static Instance gFormaldehydeConcentrationMeasurementInstance(
-    EndpointId(1), FormaldehydeConcentrationMeasurement::Id, kAllFeatures, MeasurementMediumEnum::kAir,
-    MeasurementUnitEnum::kPpm);
+static Instance gFormaldehydeConcentrationMeasurementInstance(EndpointId(1), FormaldehydeConcentrationMeasurement::Id, kAllFeatures,
+                                                              MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {

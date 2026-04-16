@@ -19,8 +19,7 @@
 #include "ConcentrationMeasurementCluster.h"
 #include "ConcentrationMeasurementDelegate.h"
 #include <app/server-cluster/AttributeListBuilder.h>
- #include <lib/core/CHIPError.h>
-
+#include <lib/core/CHIPError.h>
 
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
@@ -29,7 +28,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ConcentrationMeasurement {
-
 
 ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId,
                                                                  BitFlags<Feature> features, Delegate & delegate) :
@@ -42,7 +40,6 @@ ConcentrationMeasurementCluster::~ConcentrationMeasurementCluster()
     mDelegate.SetCluster(nullptr);
 }
 
-
 CHIP_ERROR ConcentrationMeasurementCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
@@ -54,8 +51,8 @@ CHIP_ERROR ConcentrationMeasurementCluster::Startup(ServerClusterContext & conte
     return mDelegate.Init();
 }
 
-DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(
-    const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                             AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -72,56 +69,46 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(
 
     // ── Feature::kNumericMeasurement
     case MeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMeasuredValue());
 
     case MinMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMinMeasuredValue());
 
     case MaxMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMaxMeasuredValue());
 
     case Uncertainty::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetUncertainty());
 
     case MeasurementUnit::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMeasurementUnit());
 
     // ── Feature::kPeakMeasurement
     case PeakMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetPeakMeasuredValue());
 
     case PeakMeasuredValueWindow::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetPeakMeasuredValueWindow());
 
     // ── Feature::kAverageMeasurement
     case AverageMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetAverageMeasuredValue());
 
     case AverageMeasuredValueWindow::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetAverageMeasuredValueWindow());
 
     // ── Feature::kLevelIndication
     case LevelValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kLevelIndication),
-                            Status::UnsupportedAttribute);
+        VerifyOrReturnError(mFeatures.Has(Feature::kLevelIndication), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetLevelValue());
 
     default:
@@ -148,23 +135,26 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
 
     if (mFeatures.Has(Feature::kNumericMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasuredValue::Id,    Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
         ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MinMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
         ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MaxMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(Uncertainty::Id,      Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementUnit::Id,  Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(Uncertainty::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementUnit::Id, Flags{}, Priv::kView, std::nullopt)));
     }
 
     if (mFeatures.Has(Feature::kPeakMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(PeakMeasuredValue::Id,       Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(PeakMeasuredValueWindow::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(PeakMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(
+            builder.Append(DataModel::AttributeEntry(PeakMeasuredValueWindow::Id, Flags{}, Priv::kView, std::nullopt)));
     }
 
     if (mFeatures.Has(Feature::kAverageMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(AverageMeasuredValue::Id,       Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(AverageMeasuredValueWindow::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(
+            builder.Append(DataModel::AttributeEntry(AverageMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(
+            builder.Append(DataModel::AttributeEntry(AverageMeasuredValueWindow::Id, Flags{}, Priv::kView, std::nullopt)));
     }
 
     if (mFeatures.Has(Feature::kLevelIndication))
