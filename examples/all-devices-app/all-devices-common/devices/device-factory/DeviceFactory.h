@@ -60,7 +60,7 @@ public:
 
     void Init(const Context & context) { mContext.emplace(context); }
 
-    void RegisterCreator(const std::string & deviceTypeArg, DeviceCreator creator)
+    void RegisterCreator(const std::string & deviceTypeArg, DeviceCreator && creator)
     {
         mRegistry[deviceTypeArg] = std::move(creator);
     }

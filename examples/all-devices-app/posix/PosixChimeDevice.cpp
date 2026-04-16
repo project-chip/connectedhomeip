@@ -23,12 +23,12 @@ namespace app {
 Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chimeID)
 {
     // Call base class to log the default message
-    ChimeDevice::PlayChimeSound(chimeID);
+    auto status = ChimeDevice::PlayChimeSound(chimeID);
 
     // TODO: play a real sound on POSIX (Linux/Darwin)
     ChipLogProgress(DeviceLayer, "PosixChimeDevice: TODO: Play real sound for ID %d", chimeID);
 
-    return Protocols::InteractionModel::Status::Success;
+    return status;
 }
 
 } // namespace app

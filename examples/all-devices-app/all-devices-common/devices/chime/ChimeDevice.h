@@ -35,6 +35,7 @@ public:
         CharSpan name;
     };
 
+    // Note: sounds array must outlive the ChimeDevice lifetime (i.e. often static or similar)
     ChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds);
     ~ChimeDevice() override = default;
 
