@@ -51,6 +51,7 @@ INCOMPLETE_METADATA_ALLOWLIST
 """
 
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -58,122 +59,25 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set
 
 # ---------------------------------------------------------------------------
-# MANUAL_ALLOWLIST – XML files that are maintained by hand, not via Alchemy.
-# Do NOT add new entries.  New data-model XML files must be generated with
-# Alchemy (https://github.com/project-chip/alchemy).
-# ---------------------------------------------------------------------------
-MANUAL_ALLOWLIST: Set[str] = {
-    "access-control-definitions.xml",
-    "ballast-configuration-cluster.xml",
-    "channel-cluster.xml",
-    "chip-ota.xml",
-    "chip-types.xml",
-    "clusters-extensions.xml",
-    "content-launch-cluster.xml",
-    "door-lock-cluster.xml",
-    "fault-injection-cluster.xml",
-    "global-attributes.xml",
-    "global-bitmaps.xml",
-    "matter-devices.xml",
-    "measurement-and-sensing.xml",
-    "media-playback-cluster.xml",
-    "messages-cluster.xml",
-    "mode-base-cluster.xml",
-    "proxy-configuration-cluster.xml",
-    "proxy-discovery-cluster.xml",
-    "proxy-valid-cluster.xml",
-    "pwm-cluster.xml",
-    "sample-mei-cluster.xml",
-    "semantic-tag-namespace-enums.xml",
-    "test-cluster.xml",
-    "timer-cluster.xml",
-    "wake-on-lan-cluster.xml",
-}
-
-# ---------------------------------------------------------------------------
-# INCOMPLETE_METADATA_ALLOWLIST – Alchemy-generated files whose metadata
-# header is incomplete (typically: no "Alchemy: v..." line, or empty/missing
-# SHA in the "Git:" field).  These were created with an older Alchemy release
-# that did not emit all fields.
+# Allowlists – loaded from alchemy_allowlists.json next to this script.
 #
-# TODO: regenerate each file with a current Alchemy version and remove it
-# from this list.  Do NOT add new entries.
+# MANUAL_ALLOWLIST: hand-maintained XML files that pre-date Alchemy.
+# INCOMPLETE_METADATA_ALLOWLIST: Alchemy-generated files with incomplete
+#     metadata headers (older Alchemy releases).
+#
+# Edit alchemy_allowlists.json to update entries; do NOT add new ones.
 # ---------------------------------------------------------------------------
-INCOMPLETE_METADATA_ALLOWLIST: Set[str] = {
-    # Missing "Alchemy: v..." line (generated before Alchemy added versioning)
-    "account-login-cluster.xml",
-    "actions-cluster.xml",
-    "air-quality-cluster.xml",
-    "audio-output-cluster.xml",
-    "binding-cluster.xml",
-    "closure-control-cluster.xml",
-    "closure-dimension-cluster.xml",
-    "commissioner-control-cluster.xml",
-    "commodity-price-cluster.xml",
-    "concentration-measurement-cluster.xml",
-    "descriptor-cluster.xml",
-    "device-energy-management-cluster.xml",
-    "device-energy-management-mode-cluster.xml",
-    "diagnostic-logs-cluster.xml",
-    "dishwasher-alarm-cluster.xml",
-    "electrical-energy-measurement-cluster.xml",
-    "electrical-grid-conditions-cluster.xml",
-    "electrical-power-measurement-cluster.xml",
-    "energy-evse-cluster.xml",
-    "energy-evse-mode-cluster.xml",
-    "energy-preference-cluster.xml",
-    "ethernet-network-diagnostics-cluster.xml",
-    "fan-control-cluster.xml",
-    "flow-measurement-cluster.xml",
-    "general-commissioning-cluster.xml",
-    "illuminance-measurement-cluster.xml",
-    "joint-fabric-administrator-cluster.xml",
-    "joint-fabric-datastore-cluster.xml",
-    "laundry-dryer-controls-cluster.xml",
-    "localization-configuration-cluster.xml",
-    "media-input-cluster.xml",
-    "microwave-oven-control-cluster.xml",
-    "mode-select-cluster.xml",
-    "power-source-configuration-cluster.xml",
-    "pressure-measurement-cluster.xml",
-    "pump-configuration-and-control-cluster.xml",
-    "refrigerator-alarm.xml",
-    "relative-humidity-measurement-cluster.xml",
-    "scene.xml",
-    "service-area-cluster.xml",
-    "software-diagnostics-cluster.xml",
-    "soil-measurement-cluster.xml",
-    "switch-cluster.xml",
-    "temperature-control-cluster.xml",
-    "temperature-measurement-cluster.xml",
-    "thermostat-user-interface-configuration-cluster.xml",
-    "thread-border-router-management-cluster.xml",
-    "thread-network-diagnostics-cluster.xml",
-    "thread-network-directory-cluster.xml",
-    "time-format-localization-cluster.xml",
-    "unit-localization-cluster.xml",
-    "water-heater-management-cluster.xml",
-    "water-heater-mode-cluster.xml",
-    "wifi-network-diagnostics-cluster.xml",
-    "wifi-network-management-cluster.xml",
-    # "Git:" field present but contains no commit SHA (tag-only git-describe)
-    "general-diagnostics-cluster.xml",
-    "group-key-mgmt-cluster.xml",
-    "groupcast-cluster.xml",
-    "smoke-co-alarm-cluster.xml",
-    # Dirty suffix in Alchemy version and/or Git field (pre-existing)
-    "access-control-cluster.xml",
-    "camera-av-stream-management-cluster.xml",
-    "global-structs.xml",
-    "push-av-stream-transport-cluster.xml",
-    "thermostat-cluster.xml",
-    "tls-certificate-management-cluster.xml",
-    "tls-client-management-cluster.xml",
-    "valve-configuration-and-control-cluster.xml",
-    "webrtc-provider-cluster.xml",
-    "webrtc-requestor-cluster.xml",
-    "zone-management-cluster.xml",
-}
+_ALLOWLISTS_PATH = Path(__file__).resolve().parents[3] / "src/app/zap-templates/zcl/data-model/chip/alchemy_allowlists.json"
+
+def _load_allowlists() -> tuple:
+    """Load MANUAL_ALLOWLIST and INCOMPLETE_METADATA_ALLOWLIST from JSON."""
+    with open(_ALLOWLISTS_PATH, encoding="utf-8") as f:
+        data = json.load(f)
+    return set(data["MANUAL_ALLOWLIST"]), set(data["INCOMPLETE_METADATA_ALLOWLIST"])
+
+MANUAL_ALLOWLIST: Set[str]
+INCOMPLETE_METADATA_ALLOWLIST: Set[str]
+MANUAL_ALLOWLIST, INCOMPLETE_METADATA_ALLOWLIST = _load_allowlists()
 
 # ---------------------------------------------------------------------------
 # Compiled patterns for the Alchemy metadata comment block
