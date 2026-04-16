@@ -51,7 +51,8 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo),
+    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext          = nullptr;
     mInputFormatContext     = nullptr;
@@ -386,7 +387,7 @@ void PushAVClipRecorder::Stop()
         else
         {
             ChipLogError(Camera, "PushAVClipRecorder::~PushAVClipRecorder - Cluster server reference is null for connection %u",
-                        mConnectionID);
+                         mConnectionID);
         }
         SetRecorderStatus(false);
         mCondition.notify_one();
