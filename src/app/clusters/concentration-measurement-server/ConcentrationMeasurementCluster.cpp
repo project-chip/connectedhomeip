@@ -19,8 +19,8 @@
 #include "ConcentrationMeasurementCluster.h"
 #include "ConcentrationMeasurementDelegate.h"
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <lib/core/CHIPError.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <lib/core/CHIPError.h>
 
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
@@ -32,13 +32,11 @@ namespace ConcentrationMeasurement {
 
 ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId,
                                                                  BitFlags<Feature> features, Delegate & delegate) :
-    DefaultServerCluster({endpointId, clusterId}),
+    DefaultServerCluster({ endpointId, clusterId }),
     mFeatures(features), mDelegate(delegate)
 {}
 
-ConcentrationMeasurementCluster::~ConcentrationMeasurementCluster()
-{
-}
+ConcentrationMeasurementCluster::~ConcentrationMeasurementCluster() {}
 
 CHIP_ERROR ConcentrationMeasurementCluster::Startup(ServerClusterContext & context)
 {
