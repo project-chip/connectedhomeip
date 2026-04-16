@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Sources needed when this cluster is enabled in the app's ZAP config.
+# CodegenIntegration.h is header-only — no .cpp needed.
 app_config_dependent_sources = [
-  "concentration-measurement-cluster-objects.h",
+  "CodegenIntegration.h",
   "concentration-measurement-server.h",
 ]

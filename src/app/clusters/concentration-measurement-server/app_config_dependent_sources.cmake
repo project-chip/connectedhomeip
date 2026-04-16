@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
+# Codegen integration — the backwards-compat wrapper included by generated app code.
+# CodegenIntegration.h is header-only so no .cpp is listed here.
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/concentration-measurement-cluster-objects.h"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/concentration-measurement-server.h"
 )

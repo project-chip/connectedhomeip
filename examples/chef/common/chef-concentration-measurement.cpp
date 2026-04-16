@@ -40,27 +40,26 @@ using namespace chip::app::Clusters;
 #include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
-static std::map<int, Instance<true, true, true, true, true, true> *> gCarbonMonoxideConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *> gCarbonDioxideConcentrationMeasurementInstance{};
+// All six feature flags — matches the old Instance<true,true,true,true,true,true>.
+static constexpr BitFlags<Feature> kAllFeatures{ Feature::kNumericMeasurement, Feature::kLevelIndication,
+                                                 Feature::kMediumLevel,        Feature::kCriticalLevel,
+                                                 Feature::kPeakMeasurement,    Feature::kAverageMeasurement };
 
-static std::map<int, Instance<true, true, true, true, true, true> *> gNitrogenDioxideConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *> gOzoneConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *> gPm25ConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *> gFormaldehydeConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *> gPm1ConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *> gPm10ConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *> gRadonConcentrationMeasurementInstance{};
-static std::map<int, Instance<true, true, true, true, true, true> *>
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gCarbonMonoxideConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gCarbonDioxideConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gNitrogenDioxideConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gOzoneConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gPm25ConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gFormaldehydeConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gPm1ConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gPm10ConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gRadonConcentrationMeasurementInstance{};
+static std::map<int, Instance *> gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance{};
 
-template <bool NumericMeasurementEnabled, bool LevelIndicationEnabled, bool MediumLevelEnabled, bool CriticalLevelEnabled,
-          bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
-Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(
-    std::map<int,
-             Instance<NumericMeasurementEnabled, LevelIndicationEnabled, MediumLevelEnabled, CriticalLevelEnabled,
-                      PeakMeasurementEnabled, LevelIndicationEnabled> *> & map,
-    AttributeId measuredValueId, chip::EndpointId endpoint, chip::ClusterId clusterId,
-    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+static Protocols::InteractionModel::Status
+chefConcentrationMeasurementWriteCallbackHelper(std::map<int, Instance *> & map, AttributeId measuredValueId,
+                                                chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
@@ -70,25 +69,16 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
-    Instance<NumericMeasurementEnabled, LevelIndicationEnabled, MediumLevelEnabled, CriticalLevelEnabled, PeakMeasurementEnabled,
-             LevelIndicationEnabled> * clusterInstance = map[endpoint];
-    AttributeId attributeId                            = attributeMetadata->attributeId;
+    Instance * clusterInstance = map[endpoint];
+    AttributeId attributeId    = attributeMetadata->attributeId;
 
     if (attributeId == measuredValueId)
     {
         float newValue;
-        std::memcpy(&newValue, buffer, sizeof(float)); // Copy buffer content to float
+        std::memcpy(&newValue, buffer, sizeof(float));
 
-        CHIP_ERROR err = clusterInstance->SetMeasuredValue(MakeNullable(newValue));
-        if (CHIP_NO_ERROR == err)
-        {
-            ChipLogDetail(DeviceLayer, "Updated EP:%d, Cluster: 0x%04x MeasuredValue", endpoint, clusterId);
-        }
-        else
-        {
-            ret = Protocols::InteractionModel::Status::UnsupportedWrite;
-            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        clusterInstance->GetDelegate().HandleNewMeasuredValue(MakeNullable(newValue));
+        ChipLogDetail(DeviceLayer, "Updated EP:%d, Cluster: 0x%04x MeasuredValue", endpoint, clusterId);
     }
     else
     {
@@ -108,52 +98,52 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(ch
     switch (clusterId)
     {
     case Clusters::CarbonMonoxideConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gCarbonMonoxideConcentrationMeasurementInstance, CarbonMonoxideConcentrationMeasurement::Attributes::MeasuredValue::Id,
-            endpoint, clusterId, attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gCarbonMonoxideConcentrationMeasurementInstance,
+                                                              CarbonMonoxideConcentrationMeasurement::Attributes::MeasuredValue::Id,
+                                                              endpoint, clusterId, attributeMetadata, buffer);
         break;
     case Clusters::CarbonDioxideConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gCarbonDioxideConcentrationMeasurementInstance, CarbonDioxideConcentrationMeasurement::Attributes::MeasuredValue::Id,
-            endpoint, clusterId, attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gCarbonDioxideConcentrationMeasurementInstance,
+                                                              CarbonDioxideConcentrationMeasurement::Attributes::MeasuredValue::Id,
+                                                              endpoint, clusterId, attributeMetadata, buffer);
         break;
     case Clusters::NitrogenDioxideConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
+        ret = chefConcentrationMeasurementWriteCallbackHelper(
             gNitrogenDioxideConcentrationMeasurementInstance,
             NitrogenDioxideConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId, attributeMetadata, buffer);
         break;
     case Clusters::OzoneConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gOzoneConcentrationMeasurementInstance, OzoneConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
-            clusterId, attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gOzoneConcentrationMeasurementInstance,
+                                                              OzoneConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
+                                                              clusterId, attributeMetadata, buffer);
         break;
     case Clusters::Pm25ConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gPm25ConcentrationMeasurementInstance, Pm25ConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId,
-            attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gPm25ConcentrationMeasurementInstance,
+                                                              Pm25ConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
+                                                              clusterId, attributeMetadata, buffer);
         break;
     case Clusters::FormaldehydeConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gFormaldehydeConcentrationMeasurementInstance, FormaldehydeConcentrationMeasurement::Attributes::MeasuredValue::Id,
-            endpoint, clusterId, attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(
+            gFormaldehydeConcentrationMeasurementInstance,
+            FormaldehydeConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId, attributeMetadata, buffer);
         break;
     case Clusters::Pm1ConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gPm1ConcentrationMeasurementInstance, Pm1ConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId,
-            attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gPm1ConcentrationMeasurementInstance,
+                                                              Pm1ConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
+                                                              clusterId, attributeMetadata, buffer);
         break;
     case Clusters::Pm10ConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gPm10ConcentrationMeasurementInstance, Pm10ConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId,
-            attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gPm10ConcentrationMeasurementInstance,
+                                                              Pm10ConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
+                                                              clusterId, attributeMetadata, buffer);
         break;
     case Clusters::RadonConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
-            gRadonConcentrationMeasurementInstance, RadonConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
-            clusterId, attributeMetadata, buffer);
+        ret = chefConcentrationMeasurementWriteCallbackHelper(gRadonConcentrationMeasurementInstance,
+                                                              RadonConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
+                                                              clusterId, attributeMetadata, buffer);
         break;
     case Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
-        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
+        ret = chefConcentrationMeasurementWriteCallbackHelper(
             gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance,
             TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId,
             attributeMetadata, buffer);
@@ -179,231 +169,179 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementReadCallback(chi
 #ifdef MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(
-        MakeNullable(10.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(
-        MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(
-        MakeNullable(12.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(
-        3600);
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(10.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(
-        3600);
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
-    TEMPORARY_RETURN_IGNORED gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(
-        LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), CarbonMonoxideConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+    gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(10.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(12.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(10.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(1.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), CarbonDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(
-        MakeNullable(426.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(
-        MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(
-        MakeNullable(523.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(421.0f));
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(
-        3600);
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
-    TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(
-        LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), CarbonDioxideConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+    gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(426.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(523.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(421.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(10.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), NitrogenDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(
-        MakeNullable(70.0f));
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(
-        MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(
-        MakeNullable(138.0f));
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(
-        3600);
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(97.5f));
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(
-        3600);
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
-    TEMPORARY_RETURN_IGNORED gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(
-        LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), NitrogenDioxideConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
+    gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(70.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(138.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(97.5f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(10.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), OzoneConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(60.0f));
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(
-        MakeNullable(99.0f));
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(72.0f));
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
-    TEMPORARY_RETURN_IGNORED gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), OzoneConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+    gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(60.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(99.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(72.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(10.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), Pm25ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(35.0f));
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(50.0f));
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(43.0f));
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
-    TEMPORARY_RETURN_IGNORED gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), Pm25ConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
+    gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(35.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(50.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(43.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(1.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kMgm3);
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(
-        MakeNullable(40.0f));
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(
-        MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(
-        MakeNullable(88.0f));
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(7200);
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(40.0f));
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(
-        7200);
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
-    TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(
-        LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), FormaldehydeConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kMgm3);
+    gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(40.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(88.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(7200);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(40.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(7200);
+    instance->GetDelegate().HandleNewUncertainty(1.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(200.0f));
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(430.0f));
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(270.0f));
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
-    TEMPORARY_RETURN_IGNORED gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), Pm1ConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+    gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(200.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(430.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(270.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(10.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(50.0f));
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(81.0f));
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(67.0f));
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(10.0f);
-    TEMPORARY_RETURN_IGNORED gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), Pm10ConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
+    gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(50.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(81.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(67.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(10.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
-        EndpointId(endpoint), RadonConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(100.0f));
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
-        MakeNullable(1000.0f));
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(
-        MakeNullable(150.0f));
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
-        MakeNullable(120.0f));
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
-    TEMPORARY_RETURN_IGNORED gRadonConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kMedium);
+    Instance * instance = new Instance(EndpointId(endpoint), RadonConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+    gRadonConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(100.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(1000.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(150.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(120.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(1.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)] =
-        new Instance<true, true, true, true, true, true>(EndpointId(endpoint),
-                                                         TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
-                                                         MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(
-        MakeNullable(5.0f));
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]
-        ->SetMinMeasuredValue(MakeNullable(1.0f));
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]
-        ->SetMaxMeasuredValue(MakeNullable(100.0f));
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]
-        ->SetPeakMeasuredValue(MakeNullable(8.0f));
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]
-        ->SetPeakMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]
-        ->SetAverageMeasuredValue(MakeNullable(2.0f));
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]
-        ->SetAverageMeasuredValueWindow(3600);
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(
-        1.0f);
-    TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(
-        LevelValueEnum::kLow);
+    Instance * instance = new Instance(EndpointId(endpoint), TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, kAllFeatures,
+                                       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpb);
+    gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)] = instance;
+    instance->GetDelegate().HandleNewMeasuredValue(MakeNullable(5.0f));
+    instance->GetDelegate().HandleNewMinMeasuredValue(MakeNullable(1.0f));
+    instance->GetDelegate().HandleNewMaxMeasuredValue(MakeNullable(100.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValue(MakeNullable(8.0f));
+    instance->GetDelegate().HandleNewPeakMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewAverageMeasuredValue(MakeNullable(2.0f));
+    instance->GetDelegate().HandleNewAverageMeasuredValueWindow(3600);
+    instance->GetDelegate().HandleNewUncertainty(1.0f);
+    instance->GetDelegate().HandleNewLevelValue(LevelValueEnum::kLow);
 }
 #endif
