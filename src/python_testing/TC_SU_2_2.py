@@ -1013,9 +1013,25 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=0,
-            max_interval_sec=60,
+            max_interval_sec=5,
             keepSubscriptions=False
         )
+
+        kIdle_s7 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        kDownloading_s7 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        kQuerying_s7 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+
+        # Wait for the priming kIdle (DUT's current state on subscription start), then reset
+        # accumulated history BEFORE sending the announce.  This guarantees that any kQuerying
+        # or kIdle that arrives after the announce is a genuine post-announce report and cannot
+        # be confused with the pre-announce priming report.
+        priming_matcher_s7 = AttributeMatcher.from_callable(
+            description=f"{step_number_s7} - initial kIdle priming report",
+            matcher=lambda report: report.value == kIdle_s7
+        )
+        subscription_s7.await_all_expected_report_matches([priming_matcher_s7], timeout_sec=30.0)
+        logger.info(f'{step_number_s7}: Initial kIdle (priming report) observed.')
+        subscription_s7.reset()
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.0 - Controller sends AnnounceOTAProvider command
@@ -1028,29 +1044,14 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_7]: Step #7.2 - Wait for kQuerying then kIdle; assert kDownloading never seen.
         # The DUT is on V2 and the provider offers V2 — same version — so the DUT should
         # query (kQuerying) but reject the image and return to kIdle without downloading.
+        # kQuerying is transient — the DUT may complete the full kIdle→kQuerying→kIdle cycle
+        # before its reporting engine sends the intermediate kQuerying update, so accept either
+        # kQuerying or a later kIdle as success.  Reject kDownloading at any point.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s7}: Step #7.1 - Waiting for kQuerying→kIdle sequence '
             '(DUT should reject the same-version image without downloading)')
 
-        kIdle_s7 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-        kDownloading_s7 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
-        kQuerying_s7 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-
-        # The first report from the subscription is the current state (kIdle, since the DUT
-        # just rebooted). Wait for that priming report first, then reset accumulated history
-        # so the post-announce check cannot be satisfied by re-evaluating the same kIdle.
-        priming_matcher_s7 = AttributeMatcher.from_callable(
-            description=f"{step_number_s7} - initial kIdle priming report",
-            matcher=lambda report: report.value == kIdle_s7
-        )
-        subscription_s7.await_all_expected_report_matches([priming_matcher_s7], timeout_sec=30.0)
-        logger.info(f'{step_number_s7}: Initial kIdle (priming report) observed.')
-        subscription_s7.reset()
-
-        # kQuerying is transient — the DUT may complete the full kIdle→kQuerying→kIdle cycle
-        # before its reporting engine sends the intermediate kQuerying update, so accept either
-        # kQuerying or a later kIdle as success. Reject kDownloading at any point.
         downloading_seen_s7 = [False]
 
         def matcher_s7(report):
@@ -1060,7 +1061,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 logger.info(f'{step_number_s7}: UNEXPECTED kDownloading — DUT started download of same-version image!')
                 return False
             if val == kQuerying_s7:
-                logger.info(f'{step_number_s7}: kQuerying observed after announce (expected)')
+                logger.info(f'{step_number_s7}: kQuerying observed (expected)')
                 return True
             if val == kIdle_s7:
                 logger.info(f'{step_number_s7}: kIdle after query cycle — no download started (expected)')
