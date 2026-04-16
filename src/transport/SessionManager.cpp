@@ -1183,10 +1183,10 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         else
         {
             // FAILURE CASE: No valid groupContext or decryption failed. This can happen
-            // when there is an empty group key map. This means GroupSessions cannot be 
-            // iterated over to populate groupContext, and the fabric index cannot be 
+            // when there is an empty group key map. This means GroupSessions cannot be
+            // iterated over to populate groupContext, and the fabric index cannot be
             // explicitly checked here.
-            
+
             testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
             testing.NotifyDelegate();
         }
