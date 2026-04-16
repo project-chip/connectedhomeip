@@ -74,8 +74,7 @@ CHIP_ERROR NetworkIdentityStorage::FindNetworkIdentityByIterating(NetworkIdentit
         }
     }
 
-    static_assert(std::is_trivially_copyable<NetworkIdentityEntry>::value, "memset requires trivially copyable type");
-    memset(&outEntry, 0, sizeof(outEntry));
+    outEntry = {};
     return CHIP_ERROR_NOT_FOUND;
 }
 
