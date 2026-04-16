@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CHIP CI Test History Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header class="page-header">
+        <div>
+            <h1>CI Test History Dashboard</h1>
+            <p class="muted">
+                Static dashboard built from <code>allure-report/ci_tests/last-history/history.json</code>
+            </p>
+        </div>
+        <div class="header-actions">
+            <button id="reloadButton">Reload</button>
+        </div>
+    </header>
+
+    <section class="cards" id="summaryCards">
+        <div class="card">
+            <div class="card-title">Tests</div>
+            <div class="card-value" id="totalTests">-</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Runs</div>
+            <div class="card-value" id="totalRuns">-</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Non-passing</div>
+            <div class="card-value" id="totalNonPassing">-</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Pass rate</div>
+            <div class="card-value" id="globalPassRate">-</div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Filters</h2>
+        </div>
+        <div class="filters">
+            <input id="searchInput" type="text" placeholder="Search test name..." />
+            <select id="statusFilter">
+                <option value="all">All last statuses</option>
+                <option value="passed">Last status: passed</option>
+                <option value="failed">Last status: failed</option>
+                <option value="broken">Last status: broken</option>
+                <option value="skipped">Last status: skipped</option>
+                <option value="unknown">Last status: unknown</option>
+            </select>
+            <select id="bucketFilter">
+                <option value="all">All tests</option>
+                <option value="nonpassing">Only tests with non-passing runs</option>
+                <option value="flaky">Only tests with both pass and non-pass</option>
+                <option value="flakyRecent">Only recently flaky</option>
+                <option value="clean">Only tests with zero non-passing runs</option>
+            </select>
+            <select id="sortBy">
+                <option value="nonPassingRuns">Sort: non-passing runs</option>
+                <option value="failureRate">Sort: failure rate</option>
+                <option value="totalRuns">Sort: total runs</option>
+                <option value="lastRun">Sort: last run</option>
+                <option value="displayName">Sort: name</option>
+            </select>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Tests</h2>
+            <div class="muted" id="tableCount"></div>
+        </div>
+        <div class="table-wrap">
+            <table id="testsTable">
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Runs</th>
+                        <th>Failed</th>
+                        <th>Broken</th>
+                        <th>Non-passing</th>
+                        <th>Pass rate</th>
+                        <th>Last status</th>
+                        <th>Last run</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="two-col">
+        <section class="panel">
+            <div class="panel-header">
+                <h2 id="detailTitle">Select a test</h2>
+                <div class="toggle-group">
+                    <button class="active" data-granularity="weekly">Weekly</button>
+                    <button data-granularity="monthly">Monthly</button>
+                </div>
+            </div>
+
+            <div class="detail-stats" id="detailStats"></div>
+
+            <div class="chart-wrap">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Recent runs</h2>
+            </div>
+            <div class="table-wrap recent-wrap">
+                <table id="recentRunsTable">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Report</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+
+    <script src="./app.js"></script>
+</body>
+
+</html>

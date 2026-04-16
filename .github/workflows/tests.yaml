@@ -1316,6 +1316,30 @@ jobs:
                 keep_reports: 200
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
+                
+          - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: "3.11"
+
+          - name: Build test history dashboard
+            run: |
+                set -euxo pipefail
+
+                INPUT_JSON="allure-history/allure-report/ci_tests/last-history/history.json"
+                DASHBOARD_DIR="allure-history/allure-report/ci_tests/dashboard"
+
+                test -f "${INPUT_JSON}"
+
+                mkdir -p "${DASHBOARD_DIR}/data"
+
+                cp scripts/tools/test_history_dashboard/site/index.html "${DASHBOARD_DIR}/index.html"
+                cp scripts/tools/test_history_dashboard/site/app.js "${DASHBOARD_DIR}/app.js"
+                cp scripts/tools/test_history_dashboard/site/styles.css "${DASHBOARD_DIR}/styles.css"
+
+                python3 scripts/tools/test_history_dashboard/build_dashboard.py \
+                  --input "${INPUT_JSON}" \
+                  --output "${DASHBOARD_DIR}/data/summary.json"
 
           - name: Upload Allure Report
             uses: actions/upload-artifact@v7
