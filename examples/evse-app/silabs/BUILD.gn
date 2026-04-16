@@ -217,8 +217,7 @@ silabs_executable("evse-app") {
   inputs = [ ldscript ]
 
   ldflags = [ 
-    "-T" + rebase_path(ldscript, root_build_dir), 
-    "-Wl,-Map," + rebase_path("${root_build_dir}/evse-clang.map", root_build_dir),
+    "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
   if (chip_print_memory_usage) {

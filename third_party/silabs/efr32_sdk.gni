@@ -704,9 +704,8 @@ template("efr32_sdk") {
       # which is not supported by the EFR32 thus resulting on linking failing on undefined __aeabi_read_tp symbol
       # thus resulting on linking failing on undefined __aeabi_read_tp symbol
 
-      # -fno-builtin-memcpy is needed since clang will try to use newlib's optimized memcpy, which uses LDR.W (word load) even
-      # for misaligned addresses, which will result in a hardfault in NVM3 read on since NVM3 flash region is marked as Device
-      # memory by sl_mpu_disable_execute, where unaligned word loads fault.
+      # -femulated-tls is needed since clang will try to use TLS,
+      # which is not supported by the EFR32 thus resulting on linking failing on undefined __aeabi_read_tp symbol
       cflags += [
         "-fno-threadsafe-statics",
         "-femulated-tls",

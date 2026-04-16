@@ -124,12 +124,11 @@ if (!is_clang) {
   ]
 } else { 
   ldflags = [
-    "-Wl",
+    "-Wl,--allow-multiple-definition", # to allow our overrides from memory manager
     "-fno-lto",
     "-lc_nano",  # for C stdlib functions (e.g.snprintf)
     "-lstdc++_nano", # for C++ stdlib functions (e.g. sprintf)
     "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
-    "-Wl,--allow-multiple-definition", # to allow our overrides from memory manager
   ]
   }
 }
