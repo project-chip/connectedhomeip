@@ -364,13 +364,9 @@ template("efr32_sdk") {
       ]
 
       if (is_clang) {
-        libs += [
-          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_llvm_release.a",
-        ]
+        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_llvm_release.a" ]
       } else {
-        libs += [
-          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
-        ]
+        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a" ]
       }
 
       if (silabs_mcu == "MGM240PB32VNA") {
@@ -396,18 +392,12 @@ template("efr32_sdk") {
       ]
 
       if (is_clang) {
-        libs += [
-          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_llvm_release.a",
-        ]
+        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_llvm_release.a" ]
       } else {
-        libs += [
-          "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
-        ]
+        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a" ]
       }
-      
-      libs += [
-        "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
-      ]
+
+      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a" ]
 
       defines += [ "EFR32MG26" ]
     }

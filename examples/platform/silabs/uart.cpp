@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 #include "uart.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include <stddef.h>
 #include <string.h>
 

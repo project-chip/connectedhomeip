@@ -122,13 +122,13 @@ config("efr32-common-config") {
       "-Wl,--no-warn-rwx-segment",
       "-fno-lto",
     ]
-  } else { 
+  } else {
     ldflags = [
-      "-Wl,--allow-multiple-definition", # to allow our overrides from memory 
-                                         # manager
+      "-Wl,--allow-multiple-definition",  # to allow our overrides from memory
+                                          # manager
       "-fno-lto",
       "-lc_nano",  # for C stdlib functions (e.g.snprintf)
-      "-lstdc++_nano", # for C++ stdlib functions (e.g. sprintf)
+      "-lstdc++_nano",  # for C++ stdlib functions (e.g. sprintf)
       "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
     ]
   }

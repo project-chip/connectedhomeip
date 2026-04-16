@@ -175,7 +175,7 @@ silabs_executable("light_switch_app") {
   } else {
     ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
   }
-  
+
   inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

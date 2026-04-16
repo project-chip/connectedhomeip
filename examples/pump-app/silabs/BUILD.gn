@@ -192,11 +192,10 @@ silabs_executable("pump_app") {
 
   if (is_clang) {
     ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
-  }
-  else {
+  } else {
     ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
   }
-  
+
   inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
