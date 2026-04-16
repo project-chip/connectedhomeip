@@ -26,9 +26,9 @@ source_set("linux") {
   sources = [
     "../include/AppRootNode.h",
     "../include/TermHandling.h",
-    "TermHandling.cpp",
-    "LinuxChimeDevice.cpp",
     "DeviceFactoryPlatformOverride.cpp",
+    "LinuxChimeDevice.cpp",
+    "TermHandling.cpp",
   ]
 
   deps = [
