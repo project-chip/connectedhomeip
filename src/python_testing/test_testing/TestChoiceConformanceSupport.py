@@ -143,6 +143,35 @@ def _create_cluster():
     template = environment.from_string(CLUSTER_TEMPLATE)
     return template.render(feature_string=_create_features(), attribute_string=_create_attributes(), command_string=_create_commands())
 
+ATTRIBUTE_DEPENDING_ON_FEATURE_TEMPLATE = (
+    '    <attribute id="{{ id }}" name="{{ name }}" type="uint16">\n'
+    '      <optionalConform choice="{{ choice }}" more="{{ more }}">\n'
+    '    {% if XXX %}'
+    '        <feature name="XXX" />\n'
+    '    {% endif %}'
+    '    </optionalConform>\n'
+    '    </attribute>\n'
+)
+
+FEATURE_FOR_O_AND_XXX = '''\
+    <feature bit="0" code="XXX" name="XXX" summary="summary">
+      <optionalConform />
+    </feature>
+'''
+
+def create_cluster_with_o_and_xxx_choice(more:bool):
+    xml_str = []
+    attr_environment = jinja2.Environment()
+    attr_template = attr_environment.from_string(ATTRIBUTE_DEPENDING_ON_FEATURE_TEMPLATE)
+    # Attr0 = 0.a
+    # Attr1 = [XXX].a
+    xml_str.append(attr_template.render(id=0, name='Attr0', choice='a', more=more, XXX=False))
+    xml_str.append(attr_template.render(id=1, name='Attr1', choice='a', more=more, XXX=True))
+
+    cluster_environment = jinja2.Environment()
+    cluster_template = cluster_environment.from_string(CLUSTER_TEMPLATE)
+    return cluster_template.render(feature_string=FEATURE_FOR_O_AND_XXX, attribute_string='\n'.join(xml_str), command_string='')
+
 
 class TestConformanceSupport(MatterBaseTest):
     def setup_class(self):
@@ -213,6 +242,52 @@ class TestConformanceSupport(MatterBaseTest):
             info = ConformanceAssessmentData(feature_map=0, attribute_list=[], all_command_list=list(combo), cluster_revision=1)
             problems = evaluate_command_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
+
+    def test_O_and_feature_choice(self):
+        cluster_xml_str = create_cluster_with_o_and_xxx_choice(False)
+
+        clusters: dict[int, XmlCluster] = {}
+        pure_base_clusters: dict[str, XmlCluster] = {}
+        ids_by_name: dict[str, int] = {}
+        problems: list[ProblemNotice] = []
+        cluster_xml = ElementTree.fromstring(cluster_xml_str)
+        add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+
+        def evaluate_test_scenarios(tests: list[tuple[list[int], set[str]]], feature_map: int):
+            for attribute_list, expected_failure in tests:
+                info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=attribute_list, all_command_list=[], cluster_revision=1)
+                problems = evaluate_attribute_choice_conformance(0, 1, clusters, info)
+                self._evaluate_problems(problems, expected_failure)
+
+        # Attr0 = O.a, Attr1 = [XXX].a
+        # If the feature is off, the only valid option is Attr0 included, Attr1 not
+        # We always expect the failure on choice a
+        failure = {'a'}
+        no_failure = set()
+        # not testing [0, 1] - the fact that 1 is disallowed here is checked in the main conformance test
+        tests = [([], failure), ([0], no_failure), ([1], failure)]
+        evaluate_test_scenarios(tests, 0)
+
+        # Attr0 = O.a, Attr1 = [XXX].a
+        # If the feature is on, the only valid options are only Attr0 included, or only Attr1 included
+        # We always expect the failure on choice a
+        tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
+        evaluate_test_scenarios(tests, 1)
+
+        # Attr0 = O.a, Attr1 = [XXX].a+
+        # If the feature is off, the only valid option is Attr0 included, Attr1 not
+        # We always expect the failure on choice a
+        failure = {'a'}
+        no_failure = set()
+        # not testing [0, 1] - the fact that 1 is disallowed here is checked in the main conformance test
+        tests = [([], failure), ([0], no_failure), ([1], failure)]
+        evaluate_test_scenarios(tests, 0)
+
+        # Attr0 = O.a+, Attr1 = [XXX].a+
+        # If the feature is on, all of these scenarios are valid except the empty list
+        tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
+        evaluate_test_scenarios(tests, 1)
+
 
 
 if __name__ == "__main__":
