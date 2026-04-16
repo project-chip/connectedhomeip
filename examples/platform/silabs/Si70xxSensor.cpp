@@ -122,7 +122,7 @@ bool initialized = false;
 
 sl_status_t Init()
 {
-    sl_status_t status         = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
 #ifdef SLI_SI91X_MCU_INTERFACE
     sl_i2c_config_t i2c_config = kI2cDriverConfig;
 
