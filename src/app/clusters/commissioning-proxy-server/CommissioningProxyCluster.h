@@ -136,6 +136,12 @@ private:
     DataModel::ActionReturnStatus HandleProxyMessageRequest(const DataModel::InvokeRequest & request,
                                                             TLV::TLVReader & input_arguments, CommandHandler * handler);
 
+    // Returns the set of transports supported by this proxy instance.
+    // Mirrors the Transport attribute value and is the single source of truth for
+    // transport validation in command handlers.  When a Feature::kBleInterface flag
+    // is added, kBle should be gated here in the same way as kWiFiPAF.
+    chip::BitMask<CapabilitiesBitmap> GetSupportedTransports() const;
+
     CommissioningProxy::Delegate & mDelegate;
     const BitFlags<CommissioningProxy::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;

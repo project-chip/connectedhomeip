@@ -325,8 +325,10 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithoutWIFe
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// WiFiBand field present without the WI feature SHALL return InvalidCommand.
-TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandWithoutWIFeature)
+// kBle without a BLE feature flag SHALL return InvalidTransportType.
+// kBle is a valid spec-defined transport; once Feature::kBleInterface is added
+// to the cluster, a positive test should be added alongside this one.
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BleWithoutBleFeature)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
@@ -335,52 +337,14 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandWithoutWIF
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(CapabilitiesBitmap::kBle);
-    cmd.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
-
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+    EXPECT_FALSE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Valid BLE transport — SHALL succeed and return a ProxyConnectResponse with a sessionId.
-TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ValidBLETransport)
-{
-    TestServerClusterContext context;
-    CommissioningProxyMockDelegate mockDelegate;
-    CommissioningProxyCluster cluster(
-        CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    ClusterTester tester(cluster);
-    auto result = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle));
-
-    EXPECT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->sessionId, 1u);
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-// Valid BLE transport with a non-zero timeout — SHALL succeed.
-TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ValidBLEWithTimeout)
-{
-    TestServerClusterContext context;
-    CommissioningProxyMockDelegate mockDelegate;
-    CommissioningProxyCluster cluster(
-        CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    ClusterTester tester(cluster);
-    auto result = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle, 60));
-
-    EXPECT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-// WiFiPAF transport with WI feature enabled — SHALL succeed.
+// WiFiPAF transport with WI feature enabled — SHALL succeed and return a sessionId.
+// (kBle would also succeed here once Feature::kBleInterface is defined; transport
+// acceptance is driven by GetSupportedTransports(), not per-transport hardcoding.)
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithWIFeature)
 {
     TestServerClusterContext context;
@@ -395,6 +359,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithWIFeatu
 
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->sessionId, 1u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -423,14 +388,15 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_StateTransitionOnS
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
     CommissioningProxyCluster cluster(
-        CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+        CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
 
     ClusterTester tester(cluster);
-    EXPECT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
+    EXPECT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
 
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
@@ -464,14 +430,15 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_AfterConnect)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
     CommissioningProxyCluster cluster(
-        CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+        CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
 
     // Establish a proxy session.
-    auto connectResult = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle));
+    auto connectResult = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF));
     ASSERT_TRUE(connectResult.IsSuccess());
     ASSERT_TRUE(connectResult.response.has_value());
 
@@ -488,13 +455,14 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
     CommissioningProxyCluster cluster(
-        CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+        CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
 
-    ASSERT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
+    ASSERT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
     Commands::ProxyDisconnectRequest::Type cmd;
@@ -521,13 +489,14 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateFailure
     } mockDelegate;
 
     TestServerClusterContext context;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
     CommissioningProxyCluster cluster(
-        CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+        CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
 
-    ASSERT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
+    ASSERT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
     Commands::ProxyDisconnectRequest::Type cmd;
@@ -544,46 +513,149 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateFailure
 // ProxyScanRequest Command Tests
 // =============================================================================
 
-// WiFiPAF transport without the WI feature SHALL return InvalidTransportType.
-TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiPAFWithoutWIFeature)
+// Zero transport bits SHALL return InvalidCommand.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ZeroTransport)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
-    BitMask<Feature> noFeatures;
 
-    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
     Commands::ProxyScanRequest::Type command;
-    command.transport = CapabilitiesBitmap::kWiFiPAF;
-    command.wiFiBands.SetValue(WiFiBandBitmap::k2g4);
+    command.transport = static_cast<CapabilitiesBitmap>(0);
 
     EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// BLE transport (no WI feature required) SHALL succeed and return scan results.
-TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_BLETransport)
+// Reserved bits in transport SHALL return InvalidCommand.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ReservedTransportBits)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
-    BitMask<Feature> noFeatures;
 
-    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    // kWiFiPAF(0x08) | reserved(0x01) = 0x09 contains a reserved bit.
+    Commands::ProxyScanRequest::Type command;
+    command.transport = static_cast<CapabilitiesBitmap>(0x09);
+
+    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// kBle without a BLE feature flag SHALL return InvalidTransportType.
+// kBle is a valid spec-defined transport; once Feature::kBleInterface is added
+// to the cluster, a positive test should be added alongside this one.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_BleWithoutBleFeature)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
     Commands::ProxyScanRequest::Type command;
     command.transport = CapabilitiesBitmap::kBle;
 
-    EXPECT_TRUE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// WiFiPAF transport with WI feature enabled — SHALL succeed.
+// kWiFiPAF transport without the WI feature SHALL return InvalidTransportType.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiPAFWithoutWIFeature)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::ProxyScanRequest::Type command;
+    command.transport = CapabilitiesBitmap::kWiFiPAF;
+
+    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// WiFiBands field present without the WI feature SHALL be rejected.
+// The kWiFiPAF transport check fires first (InvalidTransportType) since
+// kWiFiPAF itself requires WI; the wiFiBands guard is defence-in-depth.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiBandWithoutWIFeature)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::ProxyScanRequest::Type command;
+    command.transport = CapabilitiesBitmap::kWiFiPAF;
+    command.wiFiBands.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+
+    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Reserved bits in wiFiBands SHALL return InvalidCommand.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ReservedWiFiBandBits)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    mockDelegate.SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    // k2g4=0x01, k5g=0x04 are valid; bit 1 (0x02) is reserved.
+    Commands::ProxyScanRequest::Type command;
+    command.transport = CapabilitiesBitmap::kWiFiPAF;
+    command.wiFiBands.SetValue(chip::BitMask<WiFiBandBitmap>(static_cast<WiFiBandBitmap>(0x02)));
+
+    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// wiFiBands containing bits not in the proxy's supported bands SHALL return
+// InvalidTransportType.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiBandNotInSupportedBands)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    // Proxy only supports 2.4 GHz.
+    mockDelegate.SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    // Request 5 GHz — not in supported bands.
+    Commands::ProxyScanRequest::Type command;
+    command.transport = CapabilitiesBitmap::kWiFiPAF;
+    command.wiFiBands.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g));
+
+    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// kWiFiPAF with WI feature enabled and no wiFiBands — SHALL succeed.
 TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiPAFWithWIFeature)
 {
     TestServerClusterContext context;
@@ -596,7 +668,32 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiPAFWithWIFeature)
     ClusterTester tester(cluster);
     Commands::ProxyScanRequest::Type command;
     command.transport = CapabilitiesBitmap::kWiFiPAF;
-    command.wiFiBands.SetValue(WiFiBandBitmap::k2g4);
+    // No wiFiBands — skips the band validation entirely.
+
+    EXPECT_TRUE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// kWiFiPAF with WI feature and a wiFiBands value within supported bands — SHALL succeed.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ValidWiFiBandInSupportedBands)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    // Proxy supports both 2.4 GHz and 5 GHz.
+    chip::BitMask<WiFiBandBitmap> bothBands;
+    bothBands.Set(WiFiBandBitmap::k2g4);
+    bothBands.Set(WiFiBandBitmap::k5g);
+    mockDelegate.SetSupportedWiFiBands(bothBands);
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::ProxyScanRequest::Type command;
+    command.transport = CapabilitiesBitmap::kWiFiPAF;
+    command.wiFiBands.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
 
     EXPECT_TRUE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
 
@@ -733,8 +830,10 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ReservedTransportBits)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// kBle transport SHALL return InvalidTransportType (BLE bg-scan not supported).
-TEST_F(TestCommissioningProxyCluster, TestBgScanStart_BleNotSupported)
+// kBle without a BLE feature flag SHALL return InvalidTransportType.
+// kBle is a valid spec-defined transport; once Feature::kBleInterface is added
+// to the cluster, a positive test should be added alongside this one.
+TEST_F(TestCommissioningProxyCluster, TestBgScanStart_BleWithoutBleFeature)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
@@ -901,8 +1000,10 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ReservedTransportBits)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// kBle transport SHALL return InvalidTransportType.
-TEST_F(TestCommissioningProxyCluster, TestBgScanStop_BleNotSupported)
+// kBle without a BLE feature flag SHALL return InvalidTransportType.
+// kBle is a valid spec-defined transport; once Feature::kBleInterface is added
+// to the cluster, a positive test should be added alongside this one.
+TEST_F(TestCommissioningProxyCluster, TestBgScanStop_BleWithoutBleFeature)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;

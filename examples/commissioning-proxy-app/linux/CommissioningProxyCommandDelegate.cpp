@@ -85,6 +85,9 @@ struct ProxyMsgCtx
 // Map sessionId → pending ProxyMessageRequest context (at most one per session).
 static std::map<uint16_t, ProxyMsgCtx *> sPendingProxyMsgCtx;
 
+// True while a ProxyScanRequest is in progress; used to return Busy for concurrent requests.
+static bool sScanInProgress = false;
+
 // Context that keeps the IM command alive until scan completes.
 struct ProxyScanCtx
 {
@@ -379,6 +382,7 @@ static void OnPafScanDone(void * context,
 
     if (cmd == nullptr)
     {
+        sScanInProgress = false;
         delete ctx;
         return;
     }
@@ -428,6 +432,7 @@ static void OnPafScanDone(void * context,
     // AddResponse sends the ProxyScanResponse
     cmd->AddResponse(ctx->path, response);
 
+    sScanInProgress = false;
     delete ctx;
 }
 
@@ -807,6 +812,12 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 {
     ChipLogProgress(AppServer, "ProxyScanRequest: transport:0x%x wiFiBands:0x%x", (int) transport, (int) wiFiBands);
 
+    if (sScanInProgress)
+    {
+        ChipLogProgress(AppServer, "ProxyScanRequest: scan already in progress — returning Busy");
+        return chip::Protocols::InteractionModel::Status::Busy;
+    }
+
     // Start PAF (you already do this)
     CHIP_ERROR err = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
     if (err != CHIP_NO_ERROR)
@@ -816,6 +827,8 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     }
 
     uint8_t scanMaxTime = GetScanMaxTime();
+
+    sScanInProgress = true;
 
     // Hold the invoke open and move it into ConnectivityManagerImpl
     // This keeps the ProxyScanRequest open, so the scan can complete before the ProxyScanResponse is sent
@@ -827,6 +840,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnPafScanDone, ctx);
     if (err != CHIP_NO_ERROR)
     {
+        sScanInProgress = false;
         delete ctx;
         return chip::Protocols::InteractionModel::Status::Failure;
     }

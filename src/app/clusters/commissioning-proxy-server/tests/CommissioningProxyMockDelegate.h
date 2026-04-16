@@ -92,7 +92,8 @@ public:
 
     uint8_t GetScanMaxTime() override;
     void SetScanMaxTime(uint8_t seconds) override;
-    chip::BitMask<WiFiBandBitmap> GetSupportedWiFiBands() override { return chip::BitMask<WiFiBandBitmap>(); }
+    chip::BitMask<WiFiBandBitmap> GetSupportedWiFiBands() override { return mSupportedWiFiBands; }
+    void SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap> bands) { mSupportedWiFiBands = bands; }
 #if 0
     /**
      * @brief Handle PowerAdjustRequest command
@@ -169,6 +170,7 @@ public:
 private:
     CommissioningProxyCluster * mServer = nullptr;
     uint8_t     mScanMaxTime        = 120;
+    chip::BitMask<WiFiBandBitmap> mSupportedWiFiBands;
     // uint8_t     mMaxSessions        = 1;
     // uint8_t     mMaxCachedResult    = 1;
     // uint16_t    mCacheTimeout       = 120;
