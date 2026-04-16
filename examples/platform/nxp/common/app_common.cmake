@@ -66,6 +66,15 @@ if (CONFIG_CHIP_APP_CLUSTERS)
     )
 endif()
 
+if (CONFIG_CHIP_APP_IDENTIFY)
+    target_include_directories(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/clusters/include
+    )
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/clusters/source/Identify.cpp
+    )
+endif()
+
 if (CONFIG_CHIP_APP_ASSERT)
     target_sources(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_assert/source/AppAssert.cpp
