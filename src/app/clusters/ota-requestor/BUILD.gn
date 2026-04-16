@@ -45,11 +45,7 @@ source_set("interface") {
 }
 
 source_set("codegen-integration-internal") {
-  sources = [
-    "CodegenIntegrationInternal.h",
-  ]
+  sources = [ "CodegenIntegrationInternal.h" ]
 
-  public_deps = [
-    ":interface",
-  ]
+  public_deps = [ ":interface" ]
 }
