@@ -639,11 +639,11 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
     switch (request.path.mAttributeId)
     {
     case GroupKeyManagement::Attributes::ClusterRevision::Id:
-        return encoder.Encode(Credentials::GetGroupDataProvider()->IsGroupcastEnabled() ? kRevision
-                                                                                        : kGroupKeyClusterRevisionBeforeGroupcast);
+        return encoder.Encode(mContext.groupDataProvider.IsGroupcastEnabled() ? kRevision
+                                                                              : kGroupKeyClusterRevisionBeforeGroupcast);
     case Attributes::FeatureMap::Id: {
         BitFlags<GroupKeyManagement::Feature> features;
-        if (Credentials::GetGroupDataProvider()->IsGroupcastEnabled())
+        if (mContext.groupDataProvider.IsGroupcastEnabled())
         {
             features.Set(Clusters::GroupKeyManagement::Feature::kGroupcast);
         }
