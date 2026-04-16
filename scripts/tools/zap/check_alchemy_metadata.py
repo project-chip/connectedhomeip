@@ -52,6 +52,7 @@ INCOMPLETE_METADATA_ALLOWLIST
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Set
@@ -217,6 +218,76 @@ def _find_alchemy_comment(content: str) -> Optional[str]:
     return None
 
 
+def _get_base_content(git_ref: str, repo_path: str) -> Optional[str]:
+    """Retrieve file content at *git_ref* via ``git show``, or None."""
+    try:
+        result = subprocess.run(
+            ["git", "show", f"{git_ref}:{repo_path}"],
+            capture_output=True, text=True, check=True,
+        )
+        return result.stdout
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
+
+
+def _check_hand_edits(
+    xml_files: List[Path], root: Path, diff_base: str,
+) -> List[str]:
+    """Flag Alchemy-generated XML files whose content changed but whose
+    metadata comment is identical to *diff_base*, indicating a hand-edit."""
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", diff_base, "--"] +
+            [str(f) for f in xml_files],
+            capture_output=True, text=True, check=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        return [f"unable to run git diff: {exc}"]
+
+    changed_names = {Path(p).name for p in result.stdout.splitlines() if p.strip()}
+    if not changed_names:
+        return []
+
+    errors: List[str] = []
+    for xml_file in xml_files:
+        fname = xml_file.name
+        if fname not in changed_names:
+            continue
+        # Skip files that are expected to be hand-maintained.
+        if fname in MANUAL_ALLOWLIST:
+            continue
+
+        try:
+            new_content = xml_file.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        new_comment = _find_alchemy_comment(new_content)
+        if new_comment is None:
+            continue  # No Alchemy block — other checks handle this.
+
+        try:
+            rel = xml_file.relative_to(root)
+        except ValueError:
+            rel = xml_file
+        old_content = _get_base_content(diff_base, str(rel))
+        if old_content is None:
+            continue  # New file — no base to compare against.
+
+        old_comment = _find_alchemy_comment(old_content)
+        if old_comment is None:
+            continue  # Was manual before, now Alchemy — that is fine.
+
+        if new_comment.strip() == old_comment.strip():
+            errors.append(
+                f"{rel}: XML content changed but Alchemy metadata is "
+                "identical to the base branch — suspected hand-edit.\n"
+                "    Regenerate this file with Alchemy instead of editing "
+                "it manually."
+            )
+
+    return errors
+
+
 def validate_file(filepath: Path) -> List[str]:
     """
     Validate a single XML file.
@@ -333,6 +404,17 @@ def main() -> int:
             "that now carry the Alchemy marker."
         ),
     )
+    parser.add_argument(
+        "--diff-base",
+        metavar="GIT_REF",
+        default=None,
+        help=(
+            "Git ref (branch, tag, or SHA) to compare against. When set, "
+            "any Alchemy-generated XML file whose content changed but whose "
+            "metadata comment is identical to the base is flagged as a "
+            "suspected hand-edit."
+        ),
+    )
     args = parser.parse_args()
 
     root = Path(args.root)
@@ -386,6 +468,11 @@ def main() -> int:
                     "complete metadata — remove it from the allowlist"
                 )
 
+    # ── Hand-edit detection (optional) ─────────────────────────────────────
+    hand_edit_errors: List[str] = []
+    if args.diff_base:
+        hand_edit_errors = _check_hand_edits(xml_files, root, args.diff_base)
+
     # ── Primary validation ──────────────────────────────────────────────────
     failures: Dict[Path, List[str]] = {}
     n_manual = 0
@@ -406,6 +493,15 @@ def main() -> int:
             print(f"  {w}")
         print()
 
+    if hand_edit_errors:
+        print("ERROR: suspected hand-edits to Alchemy-generated XML files:\n")
+        for msg in hand_edit_errors:
+            print(f"  {msg}")
+        print(
+            "\nAlchemy-generated files must not be edited by hand.  Re-run "
+            "Alchemy to regenerate them.\n"
+        )
+
     if not failures:
         n_full = len(xml_files) - n_manual - n_incomplete
         print(
@@ -413,6 +509,8 @@ def main() -> int:
             f"validation ({n_full} fully validated, {n_manual} manual-allowlist, "
             f"{n_incomplete} incomplete-allowlist)."
         )
+        if hand_edit_errors:
+            return 1
         return 1 if stale_warnings else 0
 
     print("ERROR: the following XML file(s) failed Alchemy metadata validation:\n")
