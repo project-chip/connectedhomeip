@@ -18,7 +18,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
+#include <app/clusters/closure-dimension-server/GenericDimensionState.h>
 #include <app/data-model/Nullable.h>
 
 using namespace chip;
