@@ -457,9 +457,12 @@ class TC_S_2_6(MatterBaseTest):
         self.step("10b")
         self._wait_remaining_capacity(sub2, f2, f2_baseline_rc)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> adee28d235 (update script)
+=======
+>>>>>>> a9b3196e589c2938ac9afa2272da641414a0a004
 
         self.step("11a")
         res_a = await self.TH1.SendCommand(self.dut_node_id, 0, OC.Commands.RemoveFabric(fabricIndex=f2))
