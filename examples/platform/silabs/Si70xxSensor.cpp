@@ -113,7 +113,7 @@ sl_status_t Si70xxSensorEnableGpio()
     return status;
 }
 
-#else
+#else // For EFR/MG Devices
 
 bool initialized = false;
 
@@ -155,7 +155,7 @@ sl_status_t Init()
     status = sl_si91x_si70xx_init(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, SL_EID_SECOND_BYTE);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
-#else
+#else // For EFR/MG Devices
     status = sl_board_enable_sensor(SL_BOARD_SENSOR_RHT);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
@@ -206,7 +206,7 @@ exit:
     sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS3);
 #endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED)
 
-#else
+#else // For EFR/MG Devices
     VerifyOrReturnError(initialized, SL_STATUS_NOT_INITIALIZED);
 
     status = sl_si70xx_measure_rh_and_temp(sl_i2cspm_sensor, SI7021_ADDR, &tempHumidity, &tempTemperature);
