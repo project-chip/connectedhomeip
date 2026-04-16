@@ -1048,6 +1048,14 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 
 void ConnectivityManagerImpl::PostNetworkConnect()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Restore NAN channel availability now that WiFi is connected and the radio
+    // is no longer busy with scanning/association/DHCP.  Restoring it earlier
+    // (e.g. at scan-done) risks sending PAFTP frames while the radio is still
+    // occupied, causing them to be silently dropped.
+    mPafChannelAvailable = true;
+#endif
+
     // Iterate on the network interface to see if we already have beed assigned addresses.
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we deprecate the rendezvous session.
@@ -1626,10 +1634,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 
         delete networkScanned;
     });
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChannelAvailable = true;
-#endif
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()
