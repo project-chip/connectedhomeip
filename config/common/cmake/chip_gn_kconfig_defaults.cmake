@@ -30,7 +30,7 @@ matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" CONFIG_CHIP_INET_E
 matter_add_gn_arg_bool("chip_error_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
 matter_add_gn_arg_bool("chip_progress_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
 matter_add_gn_arg_bool("chip_detail_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
-matter_add_gn_arg_bool("chip_automation_logging" FALSE)
+matter_add_gn_arg_bool("chip_automation_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 5)
 matter_add_gn_arg_bool("chip_malloc_sys_heap" CONFIG_CHIP_MALLOC_SYS_HEAP)
 matter_add_gn_arg_bool("chip_enable_wifi" CONFIG_CHIP_WIFI)
 matter_add_gn_arg_bool("chip_enable_ethernet" CONFIG_CHIP_ETHERNET)
@@ -41,6 +41,7 @@ matter_add_gn_arg_bool("chip_enable_icd_dsls" CONFIG_CHIP_ICD_DSLS_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
 matter_add_gn_arg_bool("chip_enable_read_client" CONFIG_CHIP_ENABLE_READ_CLIENT)
+matter_add_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
 
 # Allows to set chip_stack_lock_tracking level
 # Required in case default value needs to be set to "none" for optimization
@@ -94,4 +95,8 @@ endif()
 if(CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
     matter_add_gn_arg_bool("chip_use_transitional_device_instance_info_provider" FALSE)
+endif()
+
+if (CONFIG_CHIP_BUILD_TESTS)
+    matter_add_gn_arg_bool("chip_with_nlfaultinjection" CONFIG_CHIP_BUILD_NL_FAULT_INJECTION)
 endif()

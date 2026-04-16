@@ -35,22 +35,14 @@ import alive_progress
 import click
 import colorama
 import coloredlogs
+import python_path
 import tabulate
 import yaml
-from chiptest.runner import SubprocessKind
 
-try:
-    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
-except ImportError:
-    # Fallback to manual import from source tree
-    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
-        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
-    if _MATTER_TESTING_PATH not in sys.path:
-        sys.path.insert(0, _MATTER_TESTING_PATH)
-    try:
-        from matter.testing.metadata import extract_runs_args
-    except ImportError:
-        extract_runs_args = None  # filtering by app (--app-filter) will not work.
+with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
+    from matter.testing.metadata import extract_runs_args
+    from matter.testing.tasks import SubprocessKind
+
 
 log = logging.getLogger(__name__)
 
@@ -167,6 +159,15 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             env_key="ALL_CLUSTERS_APP",
             cli_key="all-clusters",
             target=f"{target_prefix}-all-clusters-{suffix}",
+            binary="chip-all-clusters-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ALL_CLUSTERS_NO_GROUPCAST_APP",
+            cli_key="all-clusters-no-groupcast",
+            target=f"{target_prefix}-all-clusters-no-groupcast-{suffix}",
             binary="chip-all-clusters-app",
         )
     )
@@ -967,7 +968,7 @@ def python_tests(
             f.write(f"{target.env_key}: {run_path}\n")
 
         # PushAV is special
-        f.write("PUSH_AV_SERVER: src/tools/push_av_server/server.py\n")
+        f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
 
         # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:

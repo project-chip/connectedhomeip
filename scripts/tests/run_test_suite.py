@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import enum
+import functools
 import logging
 import os
 import random
@@ -27,11 +28,15 @@ from typing import Any, Protocol
 
 import chiptest
 import click
-import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.log_config import LOG_LEVELS, LogConfig
+from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
+from chiptest.status import PeriodicStatusThread
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
+from chiptest.work_queue import CancellableQueue
+from chiptest.worker import TaskQueueT, WorkerThread
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -52,17 +57,13 @@ class ManualHandling(enum.Enum):
     ONLY = enum.auto()
 
 
-# Supported log levels, mapping string values required for argument
-# parsing into logging constants
-__LOG_LEVELS__ = logging.getLevelNamesMapping()
-
-
 @dataclass
 class RunContext:
     root: str
     tests: list[chiptest.TestDefinition]
     runtime: TestRunTime
     find_path: list[str]
+    log_config: LogConfig
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
@@ -105,8 +106,12 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.option(
     '--log-level',
     default='info',
-    type=click.Choice(tuple(__LOG_LEVELS__.keys()), case_sensitive=False),
-    help='Determines the verbosity of script output.')
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger')
+@click.option(
+    '--log-level-tests',
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger during test execution. Use --log-level if not defined')
 @click.option(
     '--target',
     default=['all'],
@@ -124,10 +129,9 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What targets to skip (glob)'
 )
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--root',
     default=DEFAULT_CHIP_ROOT,
@@ -168,24 +172,21 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='Default directory path for finding compiled targets.')
 @click.option(
     '--runner',
-    type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
-    default='chip_tool_python',
+    type=click.Choice(TestRunTime, case_sensitive=False),  # type: ignore[arg-type]
+    default=TestRunTime.CHIP_TOOL_PYTHON,
     help='Run YAML tests using the specified runner.')
 @click.option(
-
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
-         no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
+def main(context: click.Context, log_level: str, log_level_tests: str | None, target: str, target_glob: str, target_skip_glob: str,
+         log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: TestRunTime,
          chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
-    coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
+    log_config = LogConfig(log_level, log_level_tests if log_level_tests is not None else log_level, log_timestamps)
+    log_config.set_fmt()
 
     if sys.platform == "linux":
         if not internal_inside_unshare:
@@ -194,19 +195,16 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         else:
             chiptest.linux.ensure_private_state()
 
-    runtime = TestRunTime.CHIP_TOOL_PYTHON
-    if runner == 'matter_repl_python':
-        runtime = TestRunTime.MATTER_REPL_PYTHON
-    elif runner == 'darwin_framework_tool_python':
-        runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
-
     # Figures out selected test that match the given name(s)
-    if runtime == TestRunTime.MATTER_REPL_PYTHON:
-        all_tests = list(chiptest.AllReplYamlTests())
-    elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
-    else:
-        all_tests = list(chiptest.AllChipToolYamlTests())
+    match runner:
+        case TestRunTime.MATTER_REPL_PYTHON:
+            all_tests = list(chiptest.AllReplYamlTests())
+        case TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
+            all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
+        case TestRunTime.CHIP_TOOL_PYTHON:
+            all_tests = list(chiptest.AllChipToolYamlTests())
+        case _:
+            raise ValueError(f"Unsupported test runtime: {runner}")
 
     tests: list[TestDefinition] = all_tests
 
@@ -223,7 +221,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
             TestTag.PURPOSEFUL_FAILURE,
         }
 
-        if runtime == TestRunTime.MATTER_REPL_PYTHON:
+        if runner == TestRunTime.MATTER_REPL_PYTHON:
             exclude_tags_set.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
@@ -270,8 +268,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         random.seed(test_order_seed)
         random.shuffle(tests_filtered)
 
-    context.obj = RunContext(root=root, tests=tests_filtered,
-                             runtime=runtime, find_path=find_path)
+    context.obj = RunContext(root=root, tests=tests_filtered, runtime=runner, find_path=find_path, log_config=log_config)
     if chip_tool:
         context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
@@ -299,6 +296,22 @@ class Terminable(Protocol):
     def terminate(self) -> None: ...
 
 
+class CommissioningMethod(enum.StrEnum):
+    ON_NETWORK = "on-network"
+    BLE_WIFI = "ble-wifi"
+    BLE_THREAD = "ble-thread"
+    THREAD_MESHCOP = "thread-meshcop"
+    WIFIPAF_WIFI = "wifipaf-wifi"
+
+    @property
+    def wifi_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_WIFI, CommissioningMethod.WIFIPAF_WIFI}
+
+    @property
+    def thread_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_THREAD, CommissioningMethod.THREAD_MESHCOP}
+
+
 @main.command(
     'run', help='Execute the tests')
 @click.option(
@@ -309,7 +322,68 @@ class Terminable(Protocol):
 @click.option(
     '--iterations',
     default=1,
+    type=click.IntRange(min=1),
     help='Number of iterations to run')
+@click.option(
+    '--app-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys')
+@click.option(
+    '--tool-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys')
+@click.option(
+    '--discover-paths',
+    is_flag=True,
+    default=False,
+    help='Discover missing paths for application and tool binaries')
+@click.option(
+    '--help-paths',
+    is_flag=True,
+    default=False,
+    help="Print keys for known application and controller paths")
+@click.option(
+    '--pics-file',
+    type=ExistingFilePath,
+    default="src/app/tests/suites/certification/ci-pics-values",
+    show_default=True,
+    help='PICS file to use for test runs.')
+@click.option(
+    '--keep-going',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Keep running the rest of the tests even if a test fails.')
+@click.option(
+    '--test-timeout-seconds',
+    default=None,
+    type=int,
+    help='If provided, fail if a test runs for longer than this time')
+@click.option(
+    '--expected-failures',
+    type=click.IntRange(min=0),
+    default=0,
+    show_default=True,
+    help=('Number of tests that are expected to fail in each iteration. Overall test will pass if the number of failures matches '
+          'this. Nonzero values require --keep-going'))
+@click.option(
+    '--commissioning-method',
+    type=click.Choice(CommissioningMethod, case_sensitive=False),  # type: ignore[arg-type]
+    default=CommissioningMethod.ON_NETWORK,
+    help=('Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi '
+          'commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth '
+          'and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is '
+          'Linux-only.'))
+@click.option(
+    '--summary-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='If provided, write a JSON test-run summary to this file at the end of the run.')
+@click.option(
+    '--periodic-status',
+    default=50,
+    show_default=True,
+    type=click.IntRange(min=0),
+    help=('Periodically show the status of test execution. '
+          '0: turn off, other values: periodicity of report in number of logged messages.'))
 # Deprecated flags:
 @click.option(
     '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
@@ -362,64 +436,16 @@ class Terminable(Protocol):
 @click.option(
     '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
-@click.option(
-    '--app-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys'
-)
-@click.option(
-    '--tool-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for a tool (run in tool network namespace), use `--help-paths` to list known keys'
-)
-@click.option(
-    '--discover-paths',
-    is_flag=True,
-    default=False,
-    help='Discover missing paths for application and tool binaries'
-)
-@click.option(
-    '--help-paths',
-    is_flag=True,
-    default=False,
-    help="Print keys for known application and tool paths"
-)
-@click.option(
-    '--pics-file',
-    type=ExistingFilePath,
-    default="src/app/tests/suites/certification/ci-pics-values",
-    show_default=True,
-    help='PICS file to use for test runs.')
-@click.option(
-    '--keep-going',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Keep running the rest of the tests even if a test fails.')
-@click.option(
-    '--test-timeout-seconds',
-    default=None,
-    type=int,
-    help='If provided, fail if a test runs for longer than this time')
-@click.option(
-    '--expected-failures',
-    type=click.IntRange(min=0),
-    default=0,
-    show_default=True,
-    help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
-@click.option(
-    '--commissioning-method',
-    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
-    default='on-network',
-    help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.pass_context
-def cmd_run(context: click.Context, dry_run: bool, iterations: int,
-            app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
+def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
+            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
+            commissioning_method: CommissioningMethod, summary_file: Path | None, periodic_status: int,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
-            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
-            water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
-            chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, commissioning_method: str | None) -> None:
+            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None,
+            energy_gateway_app: Path | None, water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None,
+            matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -491,55 +517,59 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning_method parameter
-    wifi_required = commissioning_method in ['ble-wifi']
-    thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
+    wifi_required = commissioning_method.wifi_required
+    thread_required = commissioning_method.thread_required
 
     if (wifi_required or thread_required) and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
+    run_summary = RunSummary(iterations, tests_per_iteration=len(context.obj.tests))
     ble_controller_app = None
     ble_controller_tool = None
     thread_ba_host = None
     thread_ba_port = None
     to_terminate: list[Terminable] = []
-
-    def cleanup() -> None:
-        for item in reversed(to_terminate):
-            try:
-                log.info("Cleaning up %s", item.__class__.__name__)
-                item.terminate()
-            except Exception as e:
-                log.warning("Encountered exception during cleanup: %r", e)
-        to_terminate.clear()
+    task_queue: TaskQueueT = CancellableQueue()
+    errors: list[BaseException] = []
 
     try:
+        # Initialize result thread first so that it's closed last.
+        to_terminate.append(result_thread := ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file))
+
         if sys.platform == 'linux':
+            app_name = 'wlx-app' if wifi_required else 'eth-app'
+            tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
+
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not wifi_required,
+                app_link_up=not wifi_required,
                 add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if wifi_required else 'eth-app'))
+                app_link_name=app_name, tool_link_name=tool_name))
 
-            if commissioning_method == 'ble-wifi':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif commissioning_method == 'ble-thread':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif commissioning_method == 'thread-meshcop':
-                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                thread_ba_host = tbr.get_border_agent_host()
-                thread_ba_port = tbr.get_border_agent_port()
+            match commissioning_method:
+                case CommissioningMethod.BLE_WIFI:
+                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+                case CommissioningMethod.BLE_THREAD:
+                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+                case CommissioningMethod.THREAD_MESHCOP:
+                    to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                    thread_ba_host = tbr.get_border_agent_host()
+                    thread_ba_port = tbr.get_border_agent_port()
+                case CommissioningMethod.WIFIPAF_WIFI:
+                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                    to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -550,55 +580,109 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
         runner = chiptest.runner.Runner(executor=executor)
 
-        log.info("Each test will be executed %d times", iterations)
-
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
 
-        for i in range(iterations):
-            log.info("Starting iteration %d", i+1)
-            observed_failures = 0
+        to_terminate.append(status_thread := PeriodicStatusThread(run_summary, context.obj.log_config.filter.msg_counter,
+                                                                  periodicity=periodic_status))
+        status_thread.start()
+
+        # Initialize the worker thread last, to ensure it's terminated first.
+        to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
+
+        # Schedule all tests.
+        log.info("Each test will be executed %d times", iterations)
+        for i in range(1, iterations + 1):
+            log.info("Scheduling iteration %d", i)
             for test in context.obj.tests:
-                test_start = time.monotonic()
-                try:
-                    if dry_run:
-                        log.info("Would run test: '%s'", test.name)
-                    else:
-                        log.info("%-20s - Starting test", test.name)
-                    test.Run(
-                        runner, apps_register, subproc_info_repo, pics_file,
-                        test_timeout_seconds, dry_run,
+                log.debug("Enqueuing test %s", test.name)
+                task_queue.put(functools.partial(
+                    TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
+                        test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
                         op_network='Thread' if thread_required else 'WiFi',
                         thread_ba_host=thread_ba_host,
                         thread_ba_port=thread_ba_port,
-                    )
-                    if not dry_run:
-                        test_end = time.monotonic()
-                        log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-                except Exception:
-                    if os.path.exists('thread.pcap'):
-                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
-                    test_end = time.monotonic()
-                    log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                    observed_failures += 1
-                    if not keep_going:
-                        sys.exit(2)
+                        wifipaf_wifi=commissioning_method == CommissioningMethod.WIFIPAF_WIFI)))
 
-            if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d",
-                          i, expected_failures, observed_failures)
-                sys.exit(2)
-    except KeyboardInterrupt:
-        log.info("Interrupting execution on user request")
-        raise
-    except Exception as e:
-        log.error("Caught exception during test execution: %s", e, exc_info=True)
-        raise
+            # If this is the last iteration schedule finalization event by closing the task queue.
+            if i == iterations:
+                task_queue.close()
+
+        log.info("All jobs scheduled")
+
+        # Start worker and result threads.
+        result_thread.start()
+        worker_thread.start()
+
+        # Wait for exception or completion.
+        while True:
+            # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
+            if (exception := result_thread.exception or worker_thread.exception) is not None:
+                raise exception
+
+            # If the worker thread has finished processing all tasks, finalize the result processing.
+            if not worker_thread.is_alive():
+                result_thread.result_queue.close()
+
+            # Wait for the result thread to finish after closing the result queue to capture any exceptions.
+            if not result_thread.is_alive():
+                break
+
+            time.sleep(0.5)
+    except BaseException as e:
+        errors.append(e)
     finally:
-        cleanup()
+        for item in reversed(to_terminate):
+            item_name = item.__class__.__name__
+            try:
+                log.info("Cleaning up %s", item_name)
+                item.terminate()
+            except Exception as e:
+                log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
+                errors.append(e)
+
+    # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
+    # encountered during execution and cleanup.
+    if len(errors) == 1:
+        match error := errors[0]:
+            case KeyboardInterrupt():
+                log.info("Interrupting execution on user request")
+                raise error
+            case ResultError():
+                # We just print the message, as the actual test failure with stack trace has already been logged.
+                log.error("%s", error)
+                raise SystemExit(2)
+            case _:
+                # Reraise the single exception with its original traceback preserved.
+                raise error.with_traceback(error.__traceback__)
+
+    if errors:
+        raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
+
+
+@main.command(
+    'summarize',
+    help='Pretty-print a JSON summary file produced by the "run" command.')
+@click.option(
+    '--summary-file',
+    required=True,
+    type=ExistingFilePath,
+    help='Path to the JSON summary file to display.')
+@click.option(
+    '--top-slowest',
+    default=20,
+    show_default=True,
+    type=click.IntRange(min=-1),
+    help='Number of slowest tests to include in the timing table. Disable with 0 and show all with -1.')
+@click.option(
+    '--show-all',
+    is_flag=True,
+    help='Show statistics of all tests for all iterations.')
+def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool) -> None:
+    RunSummary.from_json(summary_file).print_summary(top_slowest=top_slowest, show_all=show_all)
 
 
 # On Linux, allow an execution shell to be prepared

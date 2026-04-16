@@ -27,6 +27,7 @@
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 #include <string>
@@ -220,25 +221,22 @@ public:
             else if (name == "Illuminance")
             {
                 // update the current illuminance here for hardcoded endpoint 1
-                auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
-                if (illuminanceMeasurement != nullptr)
+                CHIP_ERROR err = app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(n));
+                if (err == CHIP_NO_ERROR)
                 {
-                    CHIP_ERROR err = illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(n));
-                    if (err == CHIP_NO_ERROR)
-                    {
-                        ESP_LOGI(TAG, "Illuminance changed to : %d", n);
-                    }
-                    else
-                    {
-                        ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
-                    }
+                    ESP_LOGI(TAG, "Illuminance changed to : %d", n);
+                }
+                else
+                {
+                    ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
                 }
             }
             else if (name == "Humidity")
             {
                 // update the current humidity here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
-                app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(
+                    1, app::DataModel::MakeNullable(static_cast<uint16_t>(n * 100))));
             }
             else if (name == "CoolSetpoint")
             {
@@ -729,18 +727,15 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Humidity Sensor");
     AddAttribute("Humidity", "30");
-    app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+    LogErrorOnFailure(
+        app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(1, app::DataModel::MakeNullable<uint16_t>(30 * 100)));
 
     AddDevice("Light Sensor");
     AddEndpoint("External");
     AddCluster("Illuminance Measurement");
     AddAttribute("Illuminance", "1000");
 
-    auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
-    if (illuminanceMeasurement != nullptr)
-    {
-        LogErrorOnFailure(illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(1000)));
-    }
+    LogErrorOnFailure(app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(1000)));
 
     AddDevice("Color Light");
     AddEndpoint("1");

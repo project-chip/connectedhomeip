@@ -21,6 +21,7 @@
 #include <AppRootNode.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -55,6 +56,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
+DefaultTimerDelegate gTimerDelegate;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
@@ -99,7 +101,7 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
-
+        TimerDelegate & timerDelegate;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -127,6 +129,7 @@ public:
                     .dacProvider                      = mContext.dacProvider,                      //
                     .eventManagement                  = mContext.eventManagement,                  //
                     .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
+                    .timerDelegate                    = mContext.timerDelegate,                    //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -182,11 +185,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
 
-    static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = timerDelegate,                          //
+        .timerDelegate     = gTimerDelegate,                         //
 
     });
 
@@ -194,7 +196,16 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
+    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+    gGroupDataProvider.SetGroupcastEnabled(true);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
+    SuccessOrDie(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
@@ -232,6 +243,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement                  = EventManagement::GetInstance(),                          //
             .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
+            .timerDelegate                    = gTimerDelegate,                                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

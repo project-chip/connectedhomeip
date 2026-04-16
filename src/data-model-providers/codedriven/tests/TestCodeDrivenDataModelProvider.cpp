@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/AttributeChangeListener.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/data-model-provider/MetadataTypes.h>
@@ -42,11 +43,11 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::Testing;
 
-class TestProviderChangeListener : public DataModel::ProviderChangeListener
+class TestProviderChangeListener : public DataModel::AttributeChangeListener
 {
 public:
-    void MarkDirty(const AttributePathParams & path) override { mDirtyList.push_back(path); }
-    std::vector<AttributePathParams> mDirtyList;
+    void OnAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type) override { mDirtyList.push_back(path); }
+    std::vector<ConcreteAttributePath> mDirtyList;
 };
 
 class TestActionContext : public DataModel::ActionContext
@@ -101,7 +102,7 @@ public:
         {
             return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::UnsupportedAttribute);
         }
-        mLastReadRequest = request;
+        mLastReadRequest.emplace(request);
         return encoder.Encode(mAttributeValue);
     }
 
@@ -116,7 +117,7 @@ public:
         {
             return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::UnsupportedAttribute);
         }
-        mLastWriteRequest = request;
+        mLastWriteRequest.emplace(request);
         return decoder.Decode(mAttributeValue);
     }
 
@@ -131,7 +132,7 @@ public:
         {
             return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::UnsupportedCommand);
         }
-        mLastInvokeRequest = request;
+        mLastInvokeRequest.emplace(request);
         return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success);
     }
 
@@ -192,20 +193,16 @@ public:
 
     void Shutdown(ClusterShutdownType shutdownType) override
     {
-        // Respect idempotent shutdown - only count first shutdown
-        if (!mIsShutdown)
-        {
-            shutdownCallCount++;
-        }
+        shutdownCallCount++;
         DefaultServerCluster::Shutdown(shutdownType);
     }
 
     int startupCallCount  = 0;
     int shutdownCallCount = 0;
 
-    DataModel::ReadAttributeRequest mLastReadRequest;
-    DataModel::WriteAttributeRequest mLastWriteRequest;
-    DataModel::InvokeRequest mLastInvokeRequest;
+    std::optional<DataModel::ReadAttributeRequest> mLastReadRequest;
+    std::optional<DataModel::WriteAttributeRequest> mLastWriteRequest;
+    std::optional<DataModel::InvokeRequest> mLastInvokeRequest;
     uint32_t mAttributeValue = 42;
     std::vector<ConcreteClusterPath> mPaths;
     DataVersion mDataVersion;
@@ -230,9 +227,8 @@ protected:
     chip::Testing::LogOnlyEvents mEventGenerator;
     TestActionContext mActionContext;
     DataModel::InteractionModelContext mContext{
-        .eventsGenerator         = mEventGenerator,
-        .dataModelChangeListener = mChangeListener,
-        .actionContext           = mActionContext,
+        .eventsGenerator = mEventGenerator,
+        .actionContext   = mActionContext,
     };
     chip::Testing::TestServerClusterContext mServerClusterTestContext;
     CodeDrivenDataModelProvider mProvider;
@@ -243,10 +239,12 @@ protected:
         mProvider(mServerClusterTestContext.StorageDelegate(), mServerClusterTestContext.AttributePersistenceProvider())
     {
         EXPECT_EQ(mProvider.Startup(mContext), CHIP_NO_ERROR);
+        mProvider.RegisterAttributeChangeListener(mChangeListener);
     }
 
     ~TestCodeDrivenDataModelProvider() override
     {
+        mProvider.UnregisterAttributeChangeListener(mChangeListener);
         EXPECT_SUCCESS(mProvider.Shutdown());
         mEndpointStorage.clear();
         mOwnedRegistrations.clear();
@@ -679,7 +677,8 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttribute)
     auto path             = ConcreteDataAttributePath(1, 10, 1);
     uint32_t valueToWrite = 123;
     EXPECT_EQ(WriteU32Attribute(mProvider, path, valueToWrite), CHIP_NO_ERROR);
-    EXPECT_EQ(testCluster.mLastWriteRequest.path, path);
+    ASSERT_TRUE(testCluster.mLastWriteRequest.has_value());
+    EXPECT_EQ(testCluster.mLastWriteRequest->path, path);
 
     uint32_t readValue;
     EXPECT_SUCCESS(ReadU32Attribute(mProvider, path, readValue));
@@ -701,14 +700,13 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
     TLV::TLVReader reader;
     reader.Init(buffer->Start(), buffer->DataLength());
-    DataModel::InvokeRequest request = { .path = ConcreteCommandPath(1, 10, 1) };
-    auto result                      = mProvider.InvokeCommand(request, reader, nullptr);
-    EXPECT_TRUE(result.has_value());
-    if (result.has_value())
-    {
-        EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_NO_ERROR);
-    }
-    EXPECT_EQ(testCluster.mLastInvokeRequest.path, request.path);
+
+    DataModel::InvokeRequest request(ConcreteCommandPath(1, 10, 1), chip::Testing::kAdminSubjectDescriptor);
+    auto result = mProvider.InvokeCommand(request, reader, nullptr);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_NO_ERROR);
+    ASSERT_TRUE(testCluster.mLastInvokeRequest.has_value());
+    EXPECT_EQ(testCluster.mLastInvokeRequest->path, request.path);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverAttributes)
@@ -817,7 +815,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
     }
 }
 
-TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
+TEST_F(TestCodeDrivenDataModelProvider, NotifyAttributeChanged)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
@@ -829,12 +827,11 @@ TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
         *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
-    AttributePathParams path(1, 10, 1);
-    mProvider.Temporary_ReportAttributeChanged(path);
+    mProvider.NotifyAttributeChanged({ 1, 10, 1 }, AttributeChangeType::kReportable);
     ASSERT_EQ(mChangeListener.mDirtyList.size(), 1u);
-    EXPECT_EQ(mChangeListener.mDirtyList[0].mEndpointId, path.mEndpointId);
-    EXPECT_EQ(mChangeListener.mDirtyList[0].mClusterId, path.mClusterId);
-    EXPECT_EQ(mChangeListener.mDirtyList[0].mAttributeId, path.mAttributeId);
+    EXPECT_EQ(mChangeListener.mDirtyList[0].mEndpointId, 1u);
+    EXPECT_EQ(mChangeListener.mDirtyList[0].mClusterId, 10u);
+    EXPECT_EQ(mChangeListener.mDirtyList[0].mAttributeId, 1u);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
@@ -898,8 +895,8 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
     TLV::TLVReader reader;
     reader.Init(buffer->Start(), buffer->DataLength());
 
-    DataModel::InvokeRequest requestUnsupportedEndpoint = { .path = ConcreteCommandPath(5, 10, 1) };
-    auto result                                         = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
+    DataModel::InvokeRequest requestUnsupportedEndpoint(ConcreteCommandPath(5, 10, 1), chip::Testing::kAdminSubjectDescriptor);
+    auto result = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
     ASSERT_TRUE(result.has_value());
     if (result)
     {
@@ -919,8 +916,8 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
     TLV::TLVReader reader;
     reader.Init(buffer->Start(), buffer->DataLength());
 
-    DataModel::InvokeRequest requestUnsupportedCluster = { .path = ConcreteCommandPath(1, 99, 1) };
-    auto result                                        = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
+    DataModel::InvokeRequest requestUnsupportedCluster(ConcreteCommandPath(1, 99, 1), chip::Testing::kAdminSubjectDescriptor);
+    auto result = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
     ASSERT_TRUE(result.has_value());
     if (result)
     {

@@ -160,6 +160,7 @@ blocklist
 blockquote
 bluetoothd
 bluez
+Bonjour
 BOOL
 booleans
 BooleanState
@@ -210,6 +211,7 @@ CCXML
 CDEEDC
 CDVersionNumber
 ced
+centric
 cfg
 CFLAGS
 cgit
@@ -290,6 +292,8 @@ commissionables
 commissionee
 CommissioningFlow
 commondatastorage
+Compat
+compat
 CONF
 CONFIG
 ConfigDescription
@@ -480,6 +484,7 @@ downcasting
 DownloadProtocolEnum
 Doxygen
 dpkg
+drawables
 dropdown
 dryrun
 DS
@@ -552,6 +557,7 @@ EvalCode
 EvalCodeWithName
 EvalFrameDefault
 EVB
+EVKBMIMXRT
 EventLogging
 evk
 EVSE
@@ -610,10 +616,12 @@ fsl
 fstab
 fsync
 ftd
+ftr
 fullclean
 fuzzer
 fuzzers
 fuzztest
+fvisibility
 FW
 Fxx
 gbl
@@ -746,6 +754,7 @@ ini
 init
 InitArgs
 inlined
+inlining
 InputLoop
 installDebug
 instantiation
@@ -792,6 +801,7 @@ jpg
 jre
 js
 json
+jsoncpp
 JTAG
 Jupyter
 jupyterlab
@@ -841,6 +851,7 @@ libglib
 libical
 libncurses
 libreadline
+libs
 libsdl
 libshell
 libssl
@@ -948,6 +959,7 @@ middleware
 MIMXRT
 minApplicableSoftwareVersion
 Minicom
+minifyEnabled
 MinInterval
 MinIntervalFloorSeconds
 minLength
@@ -1120,6 +1132,7 @@ params
 PartNumber
 PASE
 Passcode
+passcodes
 passRetained
 passwd
 Pausable
@@ -1282,6 +1295,7 @@ riscv
 rloc
 rmw
 rnd
+Robolectric
 rodata
 Rollershade
 rootfs
@@ -1371,6 +1385,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+simw
 SiWx
 sizedb
 sl
@@ -1408,6 +1423,7 @@ StartScan
 startsWith
 StatusCode
 stderr
+stdlib
 stdout
 sterm
 stlink
@@ -1671,6 +1687,7 @@ xcd
 Xcode
 xcodebuild
 xcodeproj
+Xcode's
 xcworkspace
 xd
 xds
@@ -1721,3 +1738,4 @@ Zigbee
 zigbeealliance
 zigbeethread
 zsdk
+ZXing

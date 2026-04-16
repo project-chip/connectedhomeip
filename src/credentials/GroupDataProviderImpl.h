@@ -115,6 +115,17 @@ public:
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
     uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
 
+    bool ConsumeAuxAclNotificationNeeded() override
+    {
+        if (IsGroupcastEnabled())
+        {
+            bool needed               = mAuxAclNotificationNeeded;
+            mAuxAclNotificationNeeded = false;
+            return needed;
+        }
+        return false;
+    }
+
 protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator
     {
@@ -270,6 +281,7 @@ protected:
     ObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
     ObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
     ObjectPool<GroupKeyContext, kIteratorsMax> mGroupKeyContexPool;
+    bool mAuxAclNotificationNeeded = false;
 };
 
 } // namespace Credentials

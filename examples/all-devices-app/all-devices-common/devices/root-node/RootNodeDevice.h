@@ -33,6 +33,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
+#include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
@@ -61,6 +62,7 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
+        TimerDelegate & timerDelegate;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -86,7 +88,9 @@ private:
         mAdministratorCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;
     LazyRegisteredServerCluster<Clusters::GroupKeyManagementCluster> mGroupKeyManagementCluster;
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     LazyRegisteredServerCluster<Clusters::GroupcastCluster> mGroupcastCluster;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;

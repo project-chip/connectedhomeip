@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace LaundryWasherControls {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 

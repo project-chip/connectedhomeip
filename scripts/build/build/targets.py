@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabThreadType
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
@@ -174,6 +174,7 @@ def BuildHostTarget():
     target.AppendModifier(
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
+    target.AppendModifier("no-groupcast", enable_groupcast=False)
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
@@ -207,6 +208,7 @@ def BuildHostTarget():
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
+    target.AppendModifier('endpoint-unique-id', chip_enable_endpoint_unique_id=True)
     target.AppendModifier('unified', unified=True).OnlyIfRe(
         "-(" + "|".join([
             # keep-sorted start
@@ -299,6 +301,7 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('smoke-co-alarm', app=Efr32App.SMOKE_CO_ALARM),
         TargetPart('switch', app=Efr32App.SWITCH),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
@@ -422,7 +425,7 @@ def BuildAndroidTarget():
     ])
 
     # Modifiers
-    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
+    target.AppendModifier('size-optimized', optimize_size=True)
 
     return target
 
@@ -709,10 +712,6 @@ def BuildBouffalolabTarget():
                    board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
         TargetPart('BL706-NIGHT-LIGHT',
                    board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
-        TargetPart('BL602-IoT-Matter-V1',
-                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
-                   module_type="BL706C-22"),
     ])
 
     target.AppendFixedTargets([
@@ -721,11 +720,11 @@ def BuildBouffalolabTarget():
     ])
 
     target.AppendFixedTargets([
-        TargetPart('ethernet', enable_ethernet=True),
-        TargetPart('wifi', enable_wifi=True),
-        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
-        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
-        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD),
+        TargetPart('ethernet', enable_ethernet=True).OnlyIfRe('-(bl616dk|bl706dk)'),
+        TargetPart('wifi', enable_wifi=True).OnlyIfRe('-(bl602dk|bl706dk|bl616dk)'),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
     ])
 
     target.AppendFixedTargets([

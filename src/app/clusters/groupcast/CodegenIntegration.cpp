@@ -17,10 +17,12 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/groupcast/GroupcastContext.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/Groupcast.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -32,6 +34,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 LazyRegisteredServerCluster<GroupcastCluster> gServer;
+DefaultTimerDelegate sTimerDelegate;
 
 // Groupcast implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
@@ -56,6 +59,8 @@ public:
             GroupcastContext{
                 .fabricTable       = Server::GetInstance().GetFabricTable(),
                 .groupDataProvider = *groupDataProvider,
+                .timerDelegate     = sTimerDelegate,
+                .accessControl     = Server::GetInstance().GetAccessControl(),
             },
             BitFlags<Groupcast::Feature>(featureMap));
         return gServer.Registration();
@@ -75,8 +80,14 @@ public:
 
 void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == chip::kRootEndpointId);
+    if constexpr (Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
+    {
+        static_assert((Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+                       Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
+                      "Can only have groupcast cluster on endpoint 0");
+    }
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -90,6 +101,11 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+#else
+    ChipLogDetail(NotSpecified,
+                  "CHIP_CONFIG_ENABLE_GROUPCAST shuold be enabled for groupcast cluster along with injection of the appropriate "
+                  "delegate. Groupcast cluster WILL NOT be registered.");
+#endif
 }
 
 void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)

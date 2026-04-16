@@ -18,26 +18,38 @@ source_set("clusters") {
   public_deps = [
     # keep-sorted: start
     "access-control-server",
+    "actions-server",
     "administrator-commissioning-server",
+    "air-quality-server",
     "basic-information",
     "boolean-state-configuration-server",
     "boolean-state-server",
+    "bridged-device-basic-information-server",
     "camera-av-settings-user-level-management-server",
     "chime-server",
+    "closure-control-server",
+    "closure-dimension-server",
+    "commissioner-control-server",
     "descriptor",
+    "flow-measurement-server",
     "general-commissioning-server",
     "general-diagnostics-server",
     "group-key-mgmt-server",
     "groupcast",
     "groups-server",
     "identify-server",
+    "illuminance-measurement-server",
     "level-control",
     "network-commissioning",
     "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials-server",
+    "push-av-stream-transport-server",
+    "relative-humidity-measurement-server",
     "scenes-server",
     "software-diagnostics-server",
+    "soil-measurement-server",
+    "temperature-control-server",
     "temperature-measurement-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
@@ -47,7 +59,7 @@ source_set("clusters") {
     # keep-sorted: end
   ]
 
-  if (chip_device_platform != "ameba") {
+  if (chip_device_platform == "ameba") {
     # Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
     # these get pulled via LWIP and end up overriding things like true/false/isalpha by macros.
     #
@@ -64,6 +76,12 @@ source_set("clusters") {
     # INFO          |     ^~~~~~~
     # INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
     # INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
-    public_deps += [ "push-av-stream-transport-server" ]
+    public_deps -= [ "push-av-stream-transport-server" ]
+  }
+
+  if (chip_device_platform == "darwin") {
+    # Darwin does not include the uriparser submodule, which is required by
+    # push-av-stream-transport-server.
+    public_deps -= [ "push-av-stream-transport-server" ]
   }
 }

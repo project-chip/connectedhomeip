@@ -94,20 +94,6 @@ source_set("power-cluster-test-srcs") {
   ]
 }
 
-source_set("actions-cluster-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/actions-server/ActionsCluster.cpp",
-    "${chip_root}/src/app/clusters/actions-server/actions-server.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("scenes-table-test-srcs") {
   # Tests currently validate/use capping logic from codegen, so we add codegen support
   # and mock data models.
@@ -171,28 +157,6 @@ source_set("ecosystem-information-test-srcs") {
   ]
 }
 
-source_set("closure-dimension-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-logic.cpp",
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h",
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h",
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-delegate.h",
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-matter-context.cpp",
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-matter-context.h",
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-server.cpp",
-    "${chip_root}/src/app/clusters/closure-dimension-server/closure-dimension-server.h",
-  ]
-  public_deps = [
-    "${chip_root}/src/app:interaction-model",
-    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform",
-    "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension:metadata",
-  ]
-}
-
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
@@ -216,26 +180,6 @@ source_set("app-test-stubs") {
   ]
 }
 
-source_set("closure-control-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/closure-control-server/ClosureControlClusterLogic.cpp",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-delegate.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-objects.h",
-  ]
-
-  deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/app:interaction-model",
-    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
-    "${chip_root}/src/app/common:enums",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/clusters/ClosureControl:metadata",
-  ]
-}
-
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -251,11 +195,6 @@ chip_test_suite("tests") {
     "TestBasicCommandPathRegistry.cpp",
     "TestBuilderParser.cpp",
     "TestCheckInHandler.cpp",
-    "TestClosureControlClusterLogic.cpp",
-    "TestClosureControlClusterObjects.cpp",
-    "TestClosureControlConformance.cpp",
-    "TestClosureDimensionCluster.cpp",
-    "TestClosureDimensionClusterObjects.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -270,6 +209,7 @@ chip_test_suite("tests") {
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
@@ -284,6 +224,7 @@ chip_test_suite("tests") {
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
+    "TestThreadBorderRouterManagementCluster.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
@@ -293,11 +234,10 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":app-test-stubs",
-    ":closure-control-test-srcs",
-    ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
+    ":thread-border-router-management-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
@@ -309,6 +249,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server:terms_and_conditions",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
@@ -322,13 +263,11 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
-      "TestActionsCluster.cpp",
       "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
     public_deps += [
-      ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
       "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
@@ -344,14 +283,6 @@ chip_test_suite("tests") {
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
-  }
-  if (!chip_fake_platform) {
-    test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
-    public_deps += [ ":thread-border-router-management-test-srcs" ]
-  }
-
-  if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
   }
 
   # DefaultICDClientStorage assumes that raw AES key is used by the application
@@ -371,10 +302,18 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
-  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
+  # On NRF platform we do not have a realtime clock available,
   # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
   # but it's not set up to deal with the timestamps being that low.
-  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
+  if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestEventLogging.cpp" ]
+  }
+
+  # Some test files use complex mock object initialization, which leads to high
+  # estimated stack usage. This is acceptable for test code but causes the build
+  # to fail when stack-usage warnings are treated as errors.
+  # Disable the error on Zephyr so these tests can compile.
+  if (chip_device_platform == "zephyr") {
+    cflags += [ "-Wno-error=stack-usage=" ]
   }
 }

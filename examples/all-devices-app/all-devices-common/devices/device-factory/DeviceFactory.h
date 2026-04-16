@@ -20,8 +20,10 @@
 #include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/impl/LoggingChimeDevice.h>
+#include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
@@ -104,12 +106,20 @@ private:
         };
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
         mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };
-        mRegistry["on-off-light"]     = [this]() {
+        mRegistry["dimmable-light"]   = [this]() {
+            VerifyOrDie(mContext.has_value());
+            return std::make_unique<LoggingDimmableLightDevice>(LoggingDimmableLightDevice::Context{
+                  .groupDataProvider = mContext->groupDataProvider,
+                  .fabricTable       = mContext->fabricTable,
+                  .timerDelegate     = mContext->timerDelegate,
+            });
+        };
+        mRegistry["on-off-light"] = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<LoggingOnOffLightDevice>(LoggingOnOffLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
+                .groupDataProvider = mContext->groupDataProvider,
+                .fabricTable       = mContext->fabricTable,
+                .timerDelegate     = mContext->timerDelegate,
             });
         };
         mRegistry["speaker"] = [this]() {
@@ -117,6 +127,7 @@ private:
             return std::make_unique<LoggingSpeakerDevice>(
                 LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
         };
+        mRegistry["soil-sensor"] = []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); };
     }
 };
 

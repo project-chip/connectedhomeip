@@ -194,7 +194,7 @@ class AppsRegister:
         self.server.register_function(self.create_file, 'createFile')  # type: ignore[arg-type]
         self.server.register_function(self.delete_file, 'deleteFile')  # type: ignore[arg-type]
 
-        self.server_thread = threading.Thread(target=self.server.serve_forever)
+        self.server_thread = threading.Thread(target=self.server.serve_forever, name="XmlRpcServer")
         self.server_thread.start()
 
     def _stop_xmlrpc_server(self) -> None:

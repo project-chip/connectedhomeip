@@ -22,6 +22,9 @@
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
+using namespace chip;
+using namespace ::chip::app::Clusters;
+
 namespace {
 k_timer sTemperatureMeasurementUpdateTimer;
 constexpr uint16_t kTemperatureMeasurementUpdateTimerPeriodMs = 5000; // 5s timer period
@@ -33,7 +36,7 @@ CHIP_ERROR AppTask::Init(void)
 {
     CHIP_ERROR err;
 
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -48,8 +51,8 @@ CHIP_ERROR AppTask::Init(void)
     k_timer_start(&sTemperatureMeasurementUpdateTimer, K_MSEC(kTemperatureMeasurementUpdateTimerPeriodMs), K_NO_WAIT);
 
     PlatformMgr().LockChipStack();
-    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValueRange(kExampleEndpointId, SensorMgr().GetMinMeasuredTempValue(),
-                                                                    SensorMgr().GetMaxMeasuredTempValue()));
+    LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValueRange(
+        kExampleEndpointId, SensorMgr().GetMinMeasuredTempValue(), SensorMgr().GetMaxMeasuredTempValue()));
     PlatformMgr().UnlockChipStack();
 
     return CHIP_NO_ERROR;
@@ -88,7 +91,7 @@ void AppTask::TemperatureMeasurementUpdateTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Current temperature is (%d*0.01)°C", temperature);
 
     PlatformMgr().LockChipStack();
-    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(kExampleEndpointId, temperature));
+    LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(kExampleEndpointId, temperature));
     PlatformMgr().UnlockChipStack();
 
     // Start next timer to handle temp sensor.

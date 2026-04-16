@@ -595,7 +595,7 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         msgIOV.iov_len  = lBuffer->AvailableDataLength();
 
         memset(&lPeerSockAddr, 0, sizeof(lPeerSockAddr));
-
+        memset(controlData, 0, sizeof(controlData));
         memset(&msgHeader, 0, sizeof(msgHeader));
 
         msgHeader.msg_name       = &lPeerSockAddr;

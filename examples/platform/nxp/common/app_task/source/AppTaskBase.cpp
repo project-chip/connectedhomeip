@@ -40,12 +40,12 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if defined(MATTER_DM_PLUGIN_USER_LABEL) || defined(MATTER_DM_PLUGIN_FIXED_LABEL)
-#ifndef CONFIG_DEVICE_INFO_PROVIDER_IMPL
-#define CONFIG_DEVICE_INFO_PROVIDER_IMPL 1
+#ifndef CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+#define CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER 1
 #endif
 #endif
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 #include <DeviceInfoProviderImpl.h>
 #endif
 
@@ -114,6 +114,14 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
+#if CONFIG_CHIP_SE05X
+#include "AppSe05x.h"
+#endif
+
+#if CONFIG_NXP_USE_POWER_DOWN
+#include "ICDUtil.h"
+#endif // CONFIG_NXP_USE_POWER_DOWN
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -121,7 +129,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
@@ -190,7 +198,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
@@ -226,6 +234,10 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
     VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
 #endif
+
+#if CONFIG_NXP_USE_POWER_DOWN
+    VerifyOrDie(chip::Server::GetInstance().GetICDManager().RegisterObserver(&chip::NXP::App::GetAppICDObserver()));
+#endif // CONFIG_NXP_USE_POWER_DOWN
 }
 
 CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
@@ -316,6 +328,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     }
 #endif
 
+#if CONFIG_CHIP_SE05X
+    err = chip::NXP::App::Se05x::Init();
+    SuccessOrExit(err);
+#endif
+
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
 #ifdef ENABLE_CHIP_SHELL
@@ -353,6 +370,14 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
+    }
+#endif
+
+#if CONFIG_CHIP_SE05X
+    err = chip::NXP::App::Se05x::PostInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
     }
 #endif
 
