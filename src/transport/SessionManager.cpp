@@ -1177,7 +1177,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
             // We have a valid groupContext from the loop
             if (testing.IsFabricUnderTest(groupContext.fabric_index))
             {
-               testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+                testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
             }
         }
         else

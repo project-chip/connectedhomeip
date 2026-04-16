@@ -209,7 +209,7 @@ public:
 
 private:
     Delegate * mDelegate = nullptr;
-    bool mEnabled = false;
+    bool mEnabled        = false;
     // IP addresses stored as IPv6 address bytes (16 bytes) in network byte order (RFC 4291)
     uint8_t mSourceIpAddress[kIPv6AddressLength];
     uint8_t mDestinationIpAddress[kIPv6AddressLength];
