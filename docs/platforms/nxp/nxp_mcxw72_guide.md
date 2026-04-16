@@ -25,10 +25,8 @@ The examples support:
 
 ### Supported build systems
 
-MCXW72 platform supports two different build systems to generate the application
-:
+MCXW72 platform supports only one build system to generate the application:
 
--   `GN` (_contact-sensor_ application only)
 -   `CMake`
 
 <a name="building"></a>
@@ -40,8 +38,6 @@ Make sure to follow shared build instructions from
 to set-up your environment.
 
 > In the following steps, the "lighting-app" is used as an example.
-
-### CMake Build System
 
 The examples support configuration and build using the CMake build system. You
 can find more information in
@@ -65,25 +61,6 @@ Note that the MCXW72 examples support various configurations that can be
 provided to the `CONF_FILE_NAME` variable, you can refer to the
 [table of available project configuration files and platform compatibility](./nxp_examples_freertos_platforms.md#build-config-files)
 to check all the supported configurations.
-
-### GN Build System
-
-#### Building with Matter over Thread configuration on MCXW72
-
--   Build Matter-over-Thread configuration with BLE commissioning.
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/mcxw72$ gn gen out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/mcxw72$ ninja -C out/debug
-```
-
-#### General information
-
-The resulting application can be found in out/debug/chip-mcxw72-contact-example.
-
-Additional GN options can be added when building the application. You can check
-[Common GN options to FreeRTOS platforms](./nxp_examples_freertos_platforms.md#general-information)
-for the full list.
 
 <a name="manufacturing-data"></a>
 
