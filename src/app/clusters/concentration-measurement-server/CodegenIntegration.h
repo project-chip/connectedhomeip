@@ -65,15 +65,11 @@ public:
     // Example: instance.GetDelegate().HandleNewMeasuredValue(DataModel::MakeNullable(42.0f));
     DefaultDelegate & GetDelegate() { return mDelegate; }
 
-    // Returns the registration entry — pass this to your data model provider
+    // Returns the registration entry — pass  to  data model provider
     // to register the cluster and trigger Startup().
     ServerClusterRegistration & Registration() { return mRegistration; }
 
 private:
-    // Construction order matters:
-    //   1. delegate  — cluster stores a reference, must be alive first
-    //   2. cluster   — registration stores a pointer, must be alive first
-    //   3. registration — just holds the pointer; Startup() is called by the provider
     DefaultDelegate mDelegate;
     ConcentrationMeasurementCluster mCluster;
     ServerClusterRegistration mRegistration;

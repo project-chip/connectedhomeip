@@ -88,10 +88,15 @@ public:
 
     /**
      * Called once by the framework when the cluster is registered (via ServerClusterRegistration).
-     * Calls DefaultServerCluster::Startup(), then delegate.SetCluster(this) + delegate.Init().
+     * Calls DefaultServerCluster::Startup() +  delegate.Init().
      */
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
+    /**
+     * Called once by the framework when the cluster is unregistered (via ServerClusterRegistration).
+     * Calls DefaultServerCluster::Shutdown()
+     */
+    void Shutdown(ClusterShutdownType shutdownType) override;
     /**
      * Fills 'builder' with the AttributeEntry IDs this instance exposes.
      * Called by the DataModel layer to enumerate supported attributes.

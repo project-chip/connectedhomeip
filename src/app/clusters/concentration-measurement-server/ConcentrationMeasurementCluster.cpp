@@ -20,6 +20,7 @@
 #include "ConcentrationMeasurementDelegate.h"
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <lib/core/CHIPError.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
@@ -31,24 +32,23 @@ namespace ConcentrationMeasurement {
 
 ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId,
                                                                  BitFlags<Feature> features, Delegate & delegate) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, clusterId)),
+    DefaultServerCluster({endpointId, clusterId}),
     mFeatures(features), mDelegate(delegate)
 {}
 
 ConcentrationMeasurementCluster::~ConcentrationMeasurementCluster()
 {
-    mDelegate.SetCluster(nullptr);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Wire the delegate back to this cluster instance so
-    // Delegate::NotifyChanged() → NotifyAttributeChanged() works.
-    mDelegate.SetCluster(this);
-
     return mDelegate.Init();
+}
+void ConcentrationMeasurementCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -115,8 +115,6 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(con
         return Status::UnsupportedAttribute;
     }
 }
-
-// ── Attributes
 
 CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath & path,
                                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
