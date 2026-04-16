@@ -268,6 +268,19 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
     ReturnErrorAndLogOnFailure(mAuthenticator.PrepareNetworkIdentityAddition(), Zcl,
                                "ImportAdminSecret: Authenticator driver not ready");
 
+    // Delete the Network Identities we have identified for retirement. There are no clear
+    // requirements for what to do if this fails; technically we could carry on anyway
+    // as long as we will have enough table capacity, but if we're encountering storage
+    // errors here something is probably wrong anyway and it's safer to bail out.
+    // Note: Retirements are not atomic with respect to the overall import operation;
+    // this is acceptable since the key invariant is that the new NASS and the new derived
+    // NIs get committed as one unit. To be retired, NIs have to be non-current, i.e. they
+    // came from a NASS that we don't have anymore.
+    for (uint16_t index : retirableIndices)
+    {
+        ReturnErrorOnFailure(RetireNetworkIdentity(index));
+    }
+
     // Import the NASS into the keystore. Place the handle directly in the NetworkAdministratorSecretInfo
     // struct that we will be persisting later, since HkdfKeyHandle is not movable.
     NetworkIdentityStorage::NetworkAdministratorSecretInfo nassInfo;
@@ -308,24 +321,6 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
             mKeystore.DestroyNetworkIdentityKeypair(ecdsaKeypairHandle);
             mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle);
             return Status::DynamicConstraintError;
-        }
-    }
-
-    // Delete the Network Identities we have identified for retirement. There are no clear
-    // requirements for what to do if this fails; technically we could carry on anyway
-    // as long as we will have enough table capacity, but if we're encountering storage
-    // errors here something is probably wrong anyway and it's safer to bail out.
-    // Note: Retirements are committed individually before the atomic NASS + identity store
-    // below, so a crash mid-loop could leave some retired without the new identity stored.
-    // This is acceptable because retired NIs are non-current and have zero clients.
-    for (uint16_t index : retirableIndices)
-    {
-        err = RetireNetworkIdentity(index);
-        if (err != CHIP_NO_ERROR)
-        {
-            mKeystore.DestroyNetworkIdentityKeypair(ecdsaKeypairHandle);
-            mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle);
-            return err;
         }
     }
 
