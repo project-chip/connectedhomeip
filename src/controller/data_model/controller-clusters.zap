@@ -2487,6 +2487,32 @@
           "apiMaturity": "provisional"
         },
         {
+          "name": "Wi-Fi Network Management",
+          "code": 1105,
+          "mfgCode": null,
+          "define": "WIFI_NETWORK_MANAGEMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "NetworkPassphraseRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "NetworkPassphraseResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
           "name": "Thread Border Router Management",
           "code": 1106,
           "mfgCode": null,
