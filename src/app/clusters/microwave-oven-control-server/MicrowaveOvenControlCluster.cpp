@@ -17,13 +17,9 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/MicrowaveOvenControl/Metadata.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -46,39 +42,13 @@ constexpr uint8_t kDefaultMinPowerNum  = 10u;
 constexpr uint8_t kDefaultMaxPowerNum  = 100u;
 constexpr uint8_t kDefaultPowerStepNum = 10u;
 
-bool PathsContainsOrLogError(const ConcreteClusterPath & path, ServerClusterInterface & serverCluster)
-{
-    if (!serverCluster.PathsContains({ path.mEndpointId, path.mClusterId }))
-    {
-        ChipLogError(DataManagement,
-                     "[Configuration Error] The cluster path has not been added to this "
-                     "MicrowaveOvenControlCluster instance: Endpoint=0x%x Cluster " ChipLogFormatMEI,
-                     path.mEndpointId, ChipLogValueMEI(path.mClusterId));
-        return false;
-    }
-    return true;
-}
-
-DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPath & path)
-{
-    const CommandId commandId = path.mCommandId;
-    DataModel::AcceptedCommandEntry entry(
-        path.mCommandId,
-        BitFlags<DataModel::CommandQualityFlags>{}
-            .Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId))
-            .Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId))
-            .Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId)),
-        RequiredPrivilege::ForInvokeCommand(path));
-    return entry;
-}
-
 } // namespace
 
 MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
                                                          const OptionalAttributeSet & optionalAttributeSet, const Context context) :
-    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }),
-    mFeature(feature), mOptionalAttributeSet(optionalAttributeSet), mDelegate(context.delegate),
-    mOpStateInstance(context.opStateInstance), mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance),
+    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(feature), mOptionalAttributeSet(optionalAttributeSet),
+    mDelegate(context.delegate), mOpStateInstance(context.opStateInstance),
+    mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance), mInteractionModelEngine(context.interactionModelEngine),
     mCookTimeSec(kDefaultCookTimeSec)
 {}
 
@@ -207,48 +177,10 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Invoke
 CHIP_ERROR MicrowaveOvenControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    // Make sure first that the cluster actually exists on this endpoint before asking the
-    // CommandHandlerInterface what commands it claims to support.
-    const EmberAfCluster * serverCluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
-
-    // If path exists in ember storage but not added by the user to the ServerClusterShim instance
-    if (!PathsContainsOrLogError({ path.mEndpointId, path.mClusterId }, *this))
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-
-    if (interface != nullptr)
-    {
-        CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
-        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
-        // Otherwise we finished.
-        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
-    }
-
-    VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
-
-    const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
-    while (*endOfList != kInvalidCommandId)
-    {
-        endOfList++;
-    }
-    const auto commandCount = static_cast<size_t>(endOfList - serverCluster->acceptedCommandList);
-
-    // TODO: if ember would store command entries, we could simplify this code to use static data
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-    ConcreteCommandPath commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-    for (const chip::CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
-    {
-        commandPath.mCommandId = *p;
-        ReturnErrorOnFailure(builder.Append(AcceptedCommandEntryFor(commandPath)));
-    }
-
-    return CHIP_NO_ERROR;
+    return builder.AppendElements({
+        MicrowaveOvenControl::Commands::SetCookingParameters::kMetadataEntry,
+        MicrowaveOvenControl::Commands::AddMoreTime::kMetadataEntry,
+    });
 }
 
 static bool IsCookTimeSecondsInRange(uint32_t cookTimeSec, uint32_t maxCookTimeSec)
@@ -285,7 +217,7 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
-        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
+        TEMPORARY_RETURN_IGNORED mInteractionModelEngine.GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(commandPath.mEndpointId, OperationalState::Id), acceptedCommandsList);
         auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 

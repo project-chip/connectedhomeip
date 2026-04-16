@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -30,8 +31,7 @@ namespace chip::app::Clusters::MicrowaveOvenControl {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
@@ -81,8 +81,12 @@ CHIP_ERROR Instance::Init()
         optionalAttributeSet.Set<MicrowaveOvenControl::Attributes::WattRating::Id>();
     }
 
-    mCluster.Create(mEndpointId, mFeature, optionalAttributeSet,
-                    MicrowaveOvenControlCluster::Context{ mOpStateInstance, mMicrowaveOvenModeInstance, *mDelegate });
+    InteractionModelEngine * interactionModelEngine = InteractionModelEngine::GetInstance();
+    VerifyOrReturnError(interactionModelEngine != nullptr, CHIP_ERROR_INTERNAL);
+
+    mCluster.Create(
+        mEndpointId, mFeature, optionalAttributeSet,
+        MicrowaveOvenControlCluster::Context{ mOpStateInstance, mMicrowaveOvenModeInstance, *mDelegate, *interactionModelEngine });
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 

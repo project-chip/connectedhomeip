@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/Delegate.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
@@ -38,6 +39,7 @@ public:
         Clusters::OperationalState::Instance & opStateInstance;
         Clusters::ModeBase::Instance & microwaveOvenModeInstance;
         MicrowaveOvenControl::Delegate & delegate;
+        InteractionModelEngine & interactionModelEngine;
     };
 
     MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
@@ -66,6 +68,7 @@ private:
     MicrowaveOvenControl::Delegate & mDelegate;
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+    InteractionModelEngine & mInteractionModelEngine;
 
     uint32_t mCookTimeSec{};
     uint8_t mSupportedWattLevels{};
