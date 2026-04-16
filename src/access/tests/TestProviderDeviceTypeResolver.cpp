@@ -85,7 +85,6 @@ public:
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
-    void Temporary_ReportAttributeChanged(const AttributePathParams &) override {}
     ActionReturnStatus ReadAttribute(const ReadAttributeRequest &, AttributeValueEncoder &) override
     {
         return Protocols::InteractionModel::Status::Success;

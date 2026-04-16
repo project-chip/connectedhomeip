@@ -217,10 +217,14 @@ struct TestGroupcastCluster : public ::testing::Test
     CustomDataModel customDataModel;
     std::unique_ptr<ServerClusterContext> clusterContext;
     FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
+    ScopedAttributeChangeListenerRegistration mScopedListenerRegistration; // RAII registration
+
     app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
                                              BitFlags<Feature>{ Feature::kSender } };
     app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
                                                BitFlags<Feature>{ Feature::kListener, Feature::kPerGroup } };
+
+    TestGroupcastCluster() : mScopedListenerRegistration(customDataModel, mTestContext) {}
 };
 
 TEST_F(TestGroupcastCluster, TestAttributes)

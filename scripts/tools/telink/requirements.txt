@@ -1,4 +1,4 @@
-cryptography==46.0.6
+cryptography==46.0.7
 cffi==1.15.0; python_version < "3.13"
 cffi==1.17.1; python_version >= "3.13"
 future==0.18.3

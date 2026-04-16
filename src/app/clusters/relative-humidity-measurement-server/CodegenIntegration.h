@@ -18,4 +18,14 @@
 
 #pragma once
 
-#include <app/clusters/closure-dimension-server/ClosureDimensionClusterMatterContext.h>
+#include <app/clusters/relative-humidity-measurement-server/RelativeHumidityMeasurementCluster.h>
+
+namespace chip::app::Clusters::RelativeHumidityMeasurement {
+
+/// Returns the cluster instance registered on the given endpoint, or nullptr if not found.
+RelativeHumidityMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+/// Convenience helper — pushes a new measured value to the cluster on the given endpoint.
+CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t> measuredValue);
+
+} // namespace chip::app::Clusters::RelativeHumidityMeasurement

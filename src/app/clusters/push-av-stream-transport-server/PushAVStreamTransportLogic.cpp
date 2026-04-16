@@ -826,7 +826,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
 
             // Create new video stream entry with name 'video' and the provided or selected VideoStreamID i.e; finalVideoStreamID
             Structs::VideoStreamStruct::Type newVideoStream;
-            newVideoStream.videoStreamName = CharSpan::fromCharString("video");
+            newVideoStream.videoStreamName = "video"_span;
             newVideoStream.videoStreamID   = finalVideoStreamID;
 
             // Add to storage and update the list
@@ -868,7 +868,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
 
             // Create new audio stream entry with name 'audio' and the provided or selected AudioStreamID i.e; finalAudioStreamID
             Structs::AudioStreamStruct::Type newAudioStream;
-            newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
+            newAudioStream.audioStreamName = "audio"_span;
             newAudioStream.audioStreamID   = finalAudioStreamID;
 
             // Add to storage and update the list
@@ -922,8 +922,10 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     // Validate the TLS Endpoint
     if (mTLSClientManagementDelegate != nullptr)
     {
+        // Note: TLS clusters are always on EP0, per spec
+        //
         CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
+            kRootEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
             [&](auto & TLSEndpoint) -> CHIP_ERROR {
                 // Use heap allocation for large certificate buffers to reduce stack usage
                 auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
