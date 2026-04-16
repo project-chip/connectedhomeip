@@ -111,13 +111,15 @@ class TC_S_2_5(MatterBaseTest):
         expected_rc: int,
         timeout_sec: float = 130.0,
     ) -> int:
-        deadline = time.time() + timeout_sec
+        deadline = time.monotonic() + timeout_sec
         last_rc: Optional[int] = None
-        while time.time() < deadline:
-            wait = deadline - time.time()
+        while time.monotonic() < deadline:
+            wait = deadline - time.monotonic()
             if wait <= 0:
                 break
             item = handler.wait_next_report(timeout_sec=wait)
+            if item is None:
+                continue
             info_list = item.value
             asserts.assert_true(isinstance(info_list, list), "FabricSceneInfo report should be a list")
             rc = _remaining_capacity_for_fabric(info_list, fabric_index)
@@ -129,6 +131,7 @@ class TC_S_2_5(MatterBaseTest):
         asserts.fail(
             f"Timeout waiting for RemainingCapacity=={expected_rc} (fabric {fabric_index}), last={last_rc}"
         )
+        return last_rc
 
     async def _read_remaining_capacity(self, ep: int, fabric_index: int) -> int:
         """Read FabricSceneInfo and return RemainingCapacity for the given fabric index."""

@@ -112,13 +112,15 @@ class TC_S_2_6(MatterBaseTest):
         expected_rc: int,
         timeout_sec: float = 320.0,
     ) -> int:
-        deadline = time.time() + timeout_sec
+        deadline = time.monotonic() + timeout_sec
         last_rc: Optional[int] = None
-        while time.time() < deadline:
-            wait = deadline - time.time()
+        while time.monotonic() < deadline:
+            wait = deadline - time.monotonic()
             if wait <= 0:
                 break
             item = handler.wait_next_report(timeout_sec=wait)
+            if item is None:
+                continue
             info_list = item.value
             asserts.assert_true(isinstance(info_list, list), "FabricSceneInfo report should be a list")
             rc = _remaining_capacity_for_fabric(info_list, fabric_index)
@@ -130,6 +132,7 @@ class TC_S_2_6(MatterBaseTest):
         asserts.fail(
             f"Timeout waiting for RemainingCapacity=={expected_rc} (fabric {fabric_index}), last={last_rc}"
         )
+        return last_rc
 
     async def _read_remaining_capacity(self, dev_ctrl: ChipDeviceCtrl, ep: int, fabric_index: int) -> int:
         info_list = await self.read_single_attribute_check_success(
@@ -317,8 +320,7 @@ class TC_S_2_6(MatterBaseTest):
         self.step("2b")
 
         def _start_sub(ctrl: ChipDeviceCtrl) -> AttributeSubscriptionHandler:
-            h = AttributeSubscriptionHandler(expected_cluster=S, expected_attribute=S.Attributes.FabricSceneInfo)
-            return h
+            return AttributeSubscriptionHandler(expected_cluster=S, expected_attribute=S.Attributes.FabricSceneInfo)
 
         sub1 = _start_sub(self.TH1)
         sub2 = _start_sub(self.TH2)
@@ -397,11 +399,11 @@ class TC_S_2_6(MatterBaseTest):
         th2_next_scene_id = await self._add_scenes_until_remaining_zero(
             self.TH2, sub2, f2, ep, TRANSITION_TH23_MS, 2, "TH2"
         )
-        expected_th3_rc_after_th2 = scene_table_size - 2 * max_rc
+        expected_th3_rc_after_th2 = scene_table_size - f1_baseline_rc - f2_baseline_rc
         asserts.assert_greater_equal(
             expected_th3_rc_after_th2,
             0,
-            "SceneTableSize and MaxRemainingCapacity imply invalid TH3 RemainingCapacity formula",
+            "SceneTableSize and baseline capacities imply invalid TH3 RemainingCapacity formula",
         )
         th3_rc_after_th2 = await self._read_remaining_capacity(self.TH3, ep, f3)
         asserts.assert_equal(
