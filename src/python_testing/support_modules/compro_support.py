@@ -267,6 +267,9 @@ class EDFixture:
 
     async def _stop_remote(self):
         if self._remote_pid is None:
+            # No tracked PID — kill any stale instance from a previous run by app path.
+            await self._ssh(f"pkill -f '^{self._app_path}' 2>/dev/null || true")
+            await asyncio.sleep(1)
             return
         logger.info("Stopping remote ED fixture (PID=%d) on %s", self._remote_pid, self._ssh_host)
         await self._ssh(f"kill {self._remote_pid} 2>/dev/null || true; sleep 1")

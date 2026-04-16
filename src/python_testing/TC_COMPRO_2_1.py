@@ -55,10 +55,11 @@ import logging
 
 from matter.clusters.Types import NullValue
 from mobly import asserts
-from support_modules.compro_support import COMPRO_ENDPOINT, COMPROBaseTest, commission_if_needed
+from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ logger = logging.getLogger(__name__)
 class TC_COMPRO_2_1(COMPROBaseTest):
 
     def desc_TC_COMPRO_2_1(self) -> str:
-        return "TC-COMPRO-2.1 [PROVISIONAL]: Attributes with DUT as Server"
+        return "[TC-COMPRO-2.1] Attributes with DUT as Server"
 
     def pics_TC_COMPRO_2_1(self) -> list[str]:
         return ["COMPRO.S"]
@@ -89,9 +90,15 @@ class TC_COMPRO_2_1(COMPROBaseTest):
             TestStep(8, "TH reads CacheTimeout attribute (if BGS supported)",
                      "DUT returns a uint16 value >= 1"),
             TestStep(9, "TH reads CachedResults attribute (if BGS supported)",
-                     "DUT returns null or an empty list"),
+                     "DUT returns null (no cached results when background scan is not running)"),
             TestStep(10, "TH reads WiFiBand attribute (if WI supported)",
                      "DUT returns a WiFiBandBitmap with only valid bits set"),
+            TestStep(11, "TH reads Transport attribute a second time",
+                     "DUT returns the same value as step 3 (Fixed quality verified)"),
+            TestStep(12, "TH reads MaxSessions attribute a second time",
+                     "DUT returns the same value as step 5 (Fixed quality verified)"),
+            TestStep(13, "TH reads WiFiBand attribute a second time (if WI supported)",
+                     "DUT returns the same value as step 10 (Fixed quality verified)"),
         ]
 
     @async_test_body
@@ -138,11 +145,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         asserts.assert_less_equal(max_sessions, 0xFF,
                                   "MaxSessions must fit in uint8")
 
-        # Step 6 — MaxCachedResults (BGS feature, uint8, >= 1)
-        self.step(6)
-        if not has_bgs:
-            self.skip_step(6)
-        else:
+        if has_bgs:
+            # Step 6 — MaxCachedResults (BGS feature, uint8, >= 1)
+            self.step(6)
             max_cached = await self.read_cp_attribute(cp.Attributes.MaxCachedResults)
             logger.info("MaxCachedResults = %d", max_cached)
             asserts.assert_greater_equal(max_cached, 1,
@@ -150,21 +155,15 @@ class TC_COMPRO_2_1(COMPROBaseTest):
             asserts.assert_less_equal(max_cached, 0xFF,
                                       "MaxCachedResults must fit in uint8")
 
-        # Step 7 — NumCachedResults (BGS feature, uint8, should be 0 at start)
-        self.step(7)
-        if not has_bgs:
-            self.skip_step(7)
-        else:
+            # Step 7 — NumCachedResults (BGS feature, uint8, should be 0 at start)
+            self.step(7)
             num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
             logger.info("NumCachedResults = %d", num_cached)
             asserts.assert_equal(num_cached, 0,
                                  "NumCachedResults should be 0 when no background scan is active")
 
-        # Step 8 — CacheTimeout (BGS feature, uint16, >= 1)
-        self.step(8)
-        if not has_bgs:
-            self.skip_step(8)
-        else:
+            # Step 8 — CacheTimeout (BGS feature, uint16, >= 1)
+            self.step(8)
             cache_timeout = await self.read_cache_timeout()
             logger.info("CacheTimeout = %d", cache_timeout)
             asserts.assert_greater_equal(cache_timeout, 1,
@@ -172,23 +171,19 @@ class TC_COMPRO_2_1(COMPROBaseTest):
             asserts.assert_less_equal(cache_timeout, 0xFFFF,
                                       "CacheTimeout must fit in uint16")
 
-        # Step 9 — CachedResults (BGS feature, nullable list)
-        self.step(9)
-        if not has_bgs:
-            self.skip_step(9)
-        else:
+            # Step 9 — CachedResults (BGS feature, nullable list)
+            self.step(9)
             cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
             logger.info("CachedResults = %s", cached_results)
-            # At startup, must be null or empty
-            is_null_or_empty = (cached_results is NullValue) or (cached_results == [])
-            asserts.assert_true(is_null_or_empty,
-                                "CachedResults must be null or empty at startup")
+            asserts.assert_equal(cached_results, NullValue,
+                                 "CachedResults must be null when no background scan is active")
+        else:
+            self.mark_step_range_skipped(6, 9)
 
         # Step 10 — WiFiBand (WI feature, WiFiBandBitmap)
-        self.step(10)
-        if not has_wi:
-            self.skip_step(10)
-        else:
+        wifi_band = None
+        if has_wi:
+            self.step(10)
             wifi_band = await self.read_wifi_band()
             logger.info("WiFiBand = 0x%04x", wifi_band)
             valid_band_mask = (cp.Bitmaps.WiFiBandBitmap.k2g4 |
@@ -197,6 +192,32 @@ class TC_COMPRO_2_1(COMPROBaseTest):
                                      "WiFiBand must have at least one band bit set")
             asserts.assert_equal(wifi_band & ~valid_band_mask, 0,
                                  f"WiFiBand 0x{wifi_band:04x} contains undefined band bits")
+        else:
+            self.skip_step(10)
+
+        # Step 11 — Transport fixed quality (re-read, verify same value)
+        self.step(11)
+        transport2 = await self.read_transport()
+        logger.info("Transport (re-read) = 0x%02x", transport2)
+        asserts.assert_equal(transport2, transport,
+                             "Transport attribute (Fixed quality) value changed between reads")
+
+        # Step 12 — MaxSessions fixed quality (re-read, verify same value)
+        self.step(12)
+        max_sessions2 = await self.read_cp_attribute(cp.Attributes.MaxSessions)
+        logger.info("MaxSessions (re-read) = %d", max_sessions2)
+        asserts.assert_equal(max_sessions2, max_sessions,
+                             "MaxSessions attribute (Fixed quality) value changed between reads")
+
+        # Step 13 — WiFiBand fixed quality (re-read, WI feature only)
+        if has_wi:
+            self.step(13)
+            wifi_band2 = await self.read_wifi_band()
+            logger.info("WiFiBand (re-read) = 0x%04x", wifi_band2)
+            asserts.assert_equal(wifi_band2, wifi_band,
+                                 "WiFiBand attribute (Fixed quality) value changed between reads")
+        else:
+            self.skip_step(13)
 
 
 if __name__ == "__main__":

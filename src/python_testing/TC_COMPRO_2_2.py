@@ -58,14 +58,17 @@ Example usage:
     make the ED commissionable/not commissionable at each relevant step.
 """
 
+import asyncio
 import logging
 import time
 
+from matter.interaction_model import InteractionModelError, Status
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +83,7 @@ SCAN_TIMEOUT_MARGIN = 1.10
 class TC_COMPRO_2_2(COMPROBaseTest):
 
     def desc_TC_COMPRO_2_2(self) -> str:
-        return "TC-COMPRO-2.2: Proxy Scan feature functionality"
+        return "[TC-COMPRO-2.2] Proxy Scan feature functionality"
 
     def pics_TC_COMPRO_2_2(self) -> list[str]:
         return ["COMPRO.S"]
@@ -103,6 +106,13 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                      "DUT sends ProxyScanResponse within scan_max_time * 1.1 s; "
                      "Status SUCCESS; NumberOfResults >= 1; "
                      "At least one result has matching Transport, Discriminator, VendorID, ProductID"),
+            TestStep(9, "TH sends ProxyScanRequest with an unsupported Transport bit",
+                     "DUT returns INVALID_TRANSPORT_TYPE"),
+            TestStep(10, "TH sends ProxyScanRequest with WiFiPAF transport and a WiFiBand not in valid_bands "
+                     "(if WI supported)",
+                     "DUT returns INVALID_TRANSPORT_TYPE"),
+            TestStep(11, "TH sends two concurrent ProxyScanRequests with valid parameters",
+                     "DUT responds to both; each response is SUCCESS or BUSY"),
         ]
 
     @async_test_body
@@ -126,12 +136,13 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         valid_transports = await self.read_transport()
         logger.info("valid_transports = 0x%02x", valid_transports)
 
-        # Step 4 — read WiFiBand (conditional)
-        self.step(4)
+        # Step 4 — read WiFiBand (conditional on WI feature)
+        # Read FeatureMap first so we know whether to run or skip step 4.
         feature_map = await self.read_feature_map()
         has_wi = self.has_feature_wi(feature_map)
         valid_bands: int = 0
         if has_wi:
+            self.step(4)
             valid_bands = await self.read_wifi_band()
             logger.info("valid_bands = 0x%04x", valid_bands)
         else:
@@ -187,6 +198,105 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         if has_wi:
             asserts.assert_is_not_none(result.wiFiBand,
                                        "ScanResultStruct.WiFiBand must be present when WI feature is supported")
+
+        # Step 9 — defined but unsupported transport → INVALID_TRANSPORT_TYPE
+        # The spec returns INVALID_TRANSPORT_TYPE for defined transport bits not supported
+        # by this proxy. Undefined bits return INVALID_COMMAND (reserved-bit check).
+        # Use the first defined transport bit absent from valid_transports; kBle is
+        # always absent since this server never implements BLE scan.
+        defined_transports = [
+            int(cp.Bitmaps.CapabilitiesBitmap.kBle),
+            int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF),
+        ]
+        unsupported_transport = next(
+            (b for b in defined_transports if not (valid_transports & b)), None)
+        if unsupported_transport is None:
+            self.skip_step(9)
+            logger.info("Step 9 skipped: all defined transport bits are in valid_transports")
+        else:
+            self.step(9)
+            logger.info("Using unsupported transport bit 0x%02x for negative test", unsupported_transport)
+            try:
+                await self.default_controller.SendCommand(
+                    nodeId=self.dut_node_id,
+                    endpoint=self.cp_endpoint,
+                    payload=cp.Commands.ProxyScanRequest(transport=unsupported_transport),
+                    interactionTimeoutMs=10000,
+                )
+                asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidTransportType,
+                                     f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
+                logger.info("Got expected INVALID_TRANSPORT_TYPE for unsupported transport")
+
+        # Step 10 — valid WiFiPAF transport + band not in valid_bands → INVALID_TRANSPORT_TYPE
+        if not has_wi:
+            self.skip_step(10)
+        else:
+            # Find a defined WiFiBand bit absent from valid_bands.
+            # Undefined bits return INVALID_COMMAND (reserved-bit check), not
+            # INVALID_TRANSPORT_TYPE. Try k5g first (common case: proxy only supports 2.4 GHz).
+            defined_bands = [
+                int(cp.Bitmaps.WiFiBandBitmap.k5g),
+                int(cp.Bitmaps.WiFiBandBitmap.k2g4),
+            ]
+            invalid_band = next((b for b in defined_bands if not (valid_bands & b)), None)
+            if invalid_band is None:
+                self.skip_step(10)
+                logger.info("Step 10 skipped: all defined WiFiBand bits are in valid_bands")
+            else:
+                self.step(10)
+                logger.info("Using invalid WiFiBand bit 0x%04x for negative test", invalid_band)
+                # Keep transport as valid (WiFiPAF bit must be set per test plan)
+                wifipaf_transport = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
+                try:
+                    await self.default_controller.SendCommand(
+                        nodeId=self.dut_node_id,
+                        endpoint=self.cp_endpoint,
+                        payload=cp.Commands.ProxyScanRequest(
+                            transport=wifipaf_transport,
+                            wiFiBands=invalid_band,
+                        ),
+                        interactionTimeoutMs=10000,
+                    )
+                    asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.InvalidTransportType,
+                                         f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
+                    logger.info("Got expected INVALID_TRANSPORT_TYPE for invalid WiFiBand")
+
+        # Step 11 — two concurrent ProxyScanRequests; DUT must respond to both
+        # Both responses arrive within a single scan window (BUSY is immediate; parallel
+        # scans complete together), so use 1× scan_max_time + margin as the deadline.
+        self.step(11)
+        # The +2000 ms covers IM response flight time (network round-trip + stack
+        # processing) after the scan completes on the DUT.  On a local network this
+        # is well under 100 ms; the 2 s padding is intentionally generous.
+        concurrent_timeout_ms = int(scan_max_time * SCAN_TIMEOUT_MARGIN * 1000) + 2000
+
+        async def _scan_tolerant():
+            try:
+                return await self.default_controller.SendCommand(
+                    nodeId=self.dut_node_id,
+                    endpoint=self.cp_endpoint,
+                    payload=cp.Commands.ProxyScanRequest(
+                        transport=valid_transports,
+                        wiFiBands=valid_bands if has_wi else None,
+                    ),
+                    interactionTimeoutMs=concurrent_timeout_ms,
+                )
+            except InteractionModelError as e:
+                return e  # Return so gather captures it; validate below
+
+        concurrent_results = await asyncio.gather(_scan_tolerant(), _scan_tolerant())
+        for i, r in enumerate(concurrent_results):
+            if isinstance(r, InteractionModelError):
+                asserts.assert_equal(r.status, Status.Busy,
+                                     f"Concurrent scan {i + 1} returned unexpected status {r.status}")
+                logger.info("Concurrent scan %d returned BUSY (acceptable)", i + 1)
+            else:
+                logger.info("Concurrent scan %d returned SUCCESS (NumberOfResults=%d)",
+                            i + 1, r.numberOfResults)
 
         # Cleanup
         await self.ensure_ed_not_commissionable(ed)
