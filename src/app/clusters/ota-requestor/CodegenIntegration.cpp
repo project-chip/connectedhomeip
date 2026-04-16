@@ -51,9 +51,9 @@ static_assert(kOtaRequestorFixedClusterCount == 0 || kOtaRequestorFixedClusterCo
 class OTARequestorCommandForwarder : public OTARequestorCommandInterface
 {
 public:
-    void HandleAnnounceOTAProvider(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
+    void
+    HandleAnnounceOTAProvider(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                              const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
     {
         if (mDestination)
         {
@@ -67,8 +67,34 @@ private:
     OTARequestorCommandInterface * mDestination = nullptr;
 };
 
+// This class decouples the cluster and the DefaultOTARequestor singleton's event sending to allow the OTARequestorCluster to be
+// created after DefaultOTARequestor::Init is called.
+class OTAEventForwarder : public DefaultOTARequestorEventSender
+{
+public:
+    ~OTAEventForwarder() override = default;
+
+    CHIP_ERROR SendVersionAppliedEvent(const VersionAppliedEvent & event) override
+    {
+        VerifyOrReturnError(mDestination, CHIP_ERROR_INCORRECT_STATE);
+        return mDestination->SendVersionAppliedEvent(event);
+    }
+
+    CHIP_ERROR SendDownloadErrorEvent(const DownloadErrorEvent & event) override
+    {
+        VerifyOrReturnError(mDestination, CHIP_ERROR_INCORRECT_STATE);
+        return mDestination->SendDownloadErrorEvent(event);
+    }
+
+    void SetDestination(DefaultOTARequestorEventSender * destination) { mDestination = destination; }
+
+private:
+    DefaultOTARequestorEventSender * mDestination = nullptr;
+};
+
 OTARequestorAttributes gAttributes;
 OTARequestorCommandForwarder gCommandForwarder;
+OTAEventForwarder gEventForwarder;
 LazyRegisteredServerCluster<OTARequestorCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -78,6 +104,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         gServer.Create(endpointId, gCommandForwarder, gAttributes);
+        gEventForwarder.SetDestination(&gServer.Cluster());
         return gServer.Registration();
     }
 
@@ -87,7 +114,11 @@ public:
         return &gServer.Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override
+    {
+        gEventForwarder.SetDestination(nullptr);
+        gServer.Destroy();
+    }
 };
 
 void RegisterCluster(EndpointId endpointId)
@@ -132,6 +163,11 @@ namespace chip {
 OTARequestorAttributes & GetOTARequestorAttributes()
 {
     return gAttributes;
+}
+
+DefaultOTARequestorEventSender & GetDefaultOTARequestorEventSender()
+{
+    return gEventForwarder;
 }
 
 } // namespace chip
