@@ -87,7 +87,6 @@ IGNORE: Set[str] = {
     'src/lib/support/jsontlv/',
     'src/setup_payload/',
     'src/tracing/esp32_diagnostics/',
-    'src/tracing/esp32_trace/',
     'src/tracing/json/',
     # keep-sorted: end
 }
