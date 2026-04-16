@@ -77,20 +77,30 @@ class TC_JFADMIN_1_2(MatterBaseTest):
             self.fabric_storage = self.storage_directory_ecosystem_a.name
             log.info("Temporary storage directory: %s", self.fabric_storage)
 
-        self.admin_passcode = random.randint(20202021, 20202099)
-        self.admin_discriminator = random.randint(0, 4095)
+        self.admin_passcode = None
+        self.admin_discriminator = None
 
-        # Start JF-Administrator App
-        self.jf_admin = AppServerSubprocess(
-            self.jfa_server_app,
-            storage_dir=self.fabric_storage,
-            port=random.randint(5001, 5999),
-            discriminator=self.admin_discriminator,
-            passcode=self.admin_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.jf_admin.start(
-            expected_output="Server initialization complete",
-            timeout=10)
+        if self.is_pics_sdk_ci_only:
+            self.admin_passcode = random.randint(20202021, 20202099)
+            self.admin_discriminator = random.randint(0, 4095)
+            # Start JF-Administrator App
+            self.jf_admin = AppServerSubprocess(
+                self.jfa_server_app,
+                storage_dir=self.fabric_storage,
+                port=random.randint(5001, 5999),
+                discriminator=self.admin_discriminator,
+                passcode=self.admin_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+            self.jf_admin.start(
+                expected_output="Server initialization complete",
+                timeout=10)
+        else:
+            self.admin_passcode = self.matter_test_config.setup_passcodes[0]
+            if not self.admin_passcode:
+                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+            self.admin_discriminator = self.matter_test_config.setup_discriminators[0]
+            if not self.admin_discriminator:
+                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
     def teardown_class(self):
         self.jf_admin.terminate()

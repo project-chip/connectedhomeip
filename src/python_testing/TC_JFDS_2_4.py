@@ -100,21 +100,27 @@ class TC_JFDS_2_4(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
         self.jfadmin_fabric_a_node_id = 1
 
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            jfa_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=10)
+         # If test is executed in CI environment, start JFA app for Fabric B
+        if self.is_pics_sdk_ci_only:
+            self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            # Start Fabric A JF-Administrator App
+            self.fabric_a_admin = AppServerSubprocess(
+                jfa_server_app,
+                storage_dir=self.storage_fabric_a,
+                port=random.randint(5001, 5999),
+                discriminator=random.randint(0, 4095),
+                passcode=self.jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=10)
+        else:
+            self.jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
+            if not self.jfadmin_fabric_a_passcode:
+                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
