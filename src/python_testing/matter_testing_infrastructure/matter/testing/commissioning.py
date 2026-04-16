@@ -325,7 +325,8 @@ class CommissioningFlow:
         if commissioning_method == "thread-meshcop":
             return CommissioningThreadMeshcop(dev_ctrl, node_id, info, commissioning_info)
 
-        raise ValueError(f"Invalid commissioning method {commissioning_method}")
+        # Default: This is needed for --manual-code flag
+        return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info)
 
 
 async def commission_device(

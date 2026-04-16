@@ -466,7 +466,16 @@ def run_tests_no_exit(
         #
         # Run commissioning first, if requested.
         #
-        if matter_test_config.commissioning_method is not None:
+
+        should_run_pre_commissioning = (
+            getattr(matter_test_config, "in_test_commissioning_method", None) is None
+            and (
+                matter_test_config.commissioning_method is not None
+                or bool(getattr(matter_test_config, "manual_code", []))
+                or bool(getattr(matter_test_config, "qr_code_content", []))
+            )
+        )
+        if should_run_pre_commissioning:
             runner = TestRunner(log_dir=test_config.log_path,
                                 testbed_name=test_config.testbed_name)
 
@@ -490,13 +499,7 @@ def run_tests_no_exit(
         #
         # Populate the global wildcard
         #
-        should_populate_global_wildcard = (
-            ok
-            and matter_test_config.dut_node_ids
-            and matter_test_config.commissioning_method is not None
-            and getattr(matter_test_config, "in_test_commissioning_method", None) is None
-        )
-        if should_populate_global_wildcard:
+        if ok and should_run_pre_commissioning:
             try:
                 global_wildcard = event_loop.run_until_complete(
                     asyncio.wait_for(
