@@ -390,17 +390,17 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
-            
+
             # Step 12: Write empty key map
             self.step(12)
             await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
-            
+
             # Verify that GroupKeyMap is empty
             groupKeyMap = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap)
             asserts.assert_equal(len(groupKeyMap), 0, "GroupKeyMap should be empty")
 
             # Verify that all entries in Membership have kInvalidKeysetId (0xFFFF)
-            # This is because clearing GroupKeyMap removes the link between GroupID and KeySetID, 
+            # This is because clearing GroupKeyMap removes the link between GroupID and KeySetID,
             # but the groups themselves still exist in the Groupcast cluster's view.
             kInvalidKeysetId = 0xFFFF
             membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
@@ -410,7 +410,7 @@ class TC_ACE_1_6(MatterBaseTest):
             # Step 13: Group command to Group 0x0103 after gorup keys are empty
             self.step(13)
             self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
-            
+
             # Step 14: Check for groupcast testing event, ensure it's result is kNoAvailableKey
             self.step(14)
             event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
