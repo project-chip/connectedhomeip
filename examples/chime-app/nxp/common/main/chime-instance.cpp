@@ -60,7 +60,7 @@ CHIP_ERROR ChimeCommandDelegate::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t &
 
 static ChimeServer gChimeClusterServerInstance = ChimeServer(EndpointId(1), ChimeCommandDelegate::getInstance());
 
-Status ChimeCommandDelegate::PlayChimeSound(uint8_t chimeID)
+Status ChimeCommandDelegate::PlayChimeSound()
 {
     // Get the Active Chime ID
     auto selectedChime = gChimeClusterServerInstance.GetSelectedChime();
