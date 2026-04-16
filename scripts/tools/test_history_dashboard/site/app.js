@@ -219,7 +219,7 @@ function renderDetail() {
       <td>${fmtDateTime(run.start)}</td>
       <td>${badge(run.status || "unknown")}</td>
       <td>${fmtDuration(run.duration)}</td>
-      <td>${run.reportUrl ? `<a href="${run.reportUrl}" target="_blank" rel="noopener noreferrer">open</a>` : "-"}</td>
+      <td>${run.reportUrl ? `<a href="${escapeHtml(run.reportUrl)}" target="_blank" rel="noopener noreferrer">open</a>` : "-"}</td>
     `;
         recentBody.appendChild(tr);
     }
