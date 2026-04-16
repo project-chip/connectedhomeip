@@ -32,11 +32,11 @@ namespace ClosureDimension {
  *    Defines methods for implementing application-specific logic for the Closure Dimension Cluster.
  */
 
-class DelegateBase
+class ClosureDimensionClusterDelegate
 {
 public:
-    DelegateBase(){};
-    virtual ~DelegateBase() = default;
+    ClosureDimensionClusterDelegate(){};
+    virtual ~ClosureDimensionClusterDelegate() = default;
 
     /**
      * @brief This function handles SetTarget command implementaion.
