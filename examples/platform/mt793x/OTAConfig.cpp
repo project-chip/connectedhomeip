@@ -81,7 +81,8 @@ void InitRequestor(void)
     SetRequestorInstance(&gRequestorCore);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes(),
+                        GetDefaultOTARequestorEventSender());
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 

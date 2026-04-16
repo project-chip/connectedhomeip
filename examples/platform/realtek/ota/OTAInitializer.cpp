@@ -41,7 +41,8 @@ void OTAInitializer::InitOTARequestor(void)
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes(),
+                        GetDefaultOTARequestorEventSender());
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);

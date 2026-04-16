@@ -31,9 +31,9 @@ void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    TEMPORARY_RETURN_IGNORED otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage,
-                                                                   otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader,
-                                                                   GetOTARequestorAttributes());
+    TEMPORARY_RETURN_IGNORED otaRequestorInit->gRequestorCore.Init(
+        chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage, otaRequestorInit->gRequestorUser,
+        otaRequestorInit->gDownloader, GetOTARequestorAttributes(), GetDefaultOTARequestorEventSender());
     otaRequestorInit->gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
     TEMPORARY_RETURN_IGNORED imageProcessor.Init(&otaRequestorInit->gDownloader);

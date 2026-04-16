@@ -78,7 +78,8 @@ void InitializeOTARequestor(void)
     SetRequestorInstance(&sRequestorCore);
 
     sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader, GetOTARequestorAttributes());
+    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader, GetOTARequestorAttributes(),
+                        GetDefaultOTARequestorEventSender());
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
