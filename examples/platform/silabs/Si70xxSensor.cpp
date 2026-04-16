@@ -19,12 +19,6 @@
 #include "Si70xxSensor.h"
 #include <lib/support/CodeUtils.h>
 
-namespace {
-
-constexpr uint16_t kSensorTemperatureOffset = 475;
-
-} // namespace
-
 #ifdef SLI_SI91X_MCU_INTERFACE
 // WiFi SDK (Si91x) includes
 #include "sl_i2c_instances.h"
@@ -44,9 +38,20 @@ constexpr uint16_t kSensorTemperatureOffset = 475;
 #define RX_THRESHOLD 0 // rx threshold value
 #define OUTPUT_VALUE 1 // GPIO output value
 
+#else
+// EFR/Simplicity SDK includes
+#include "sl_board_control.h"
+#include "sl_i2cspm_instances.h"
+#include "sl_si70xx.h"
+#endif // SLI_SI91X_MCU_INTERFACE
+
 namespace Si70xxSensor {
 
 namespace {
+
+constexpr uint16_t kSensorTemperatureOffset = 475;
+
+#ifdef SLI_SI91X_MCU_INTERFACE
 
 sl_i2c_config_t kI2cDriverConfig = [] {
     sl_i2c_config_t cfg{};
@@ -57,12 +62,9 @@ sl_i2c_config_t kI2cDriverConfig = [] {
     return cfg;
 }();
 
-} // namespace
-
-sl_status_t Init()
+sl_status_t Si70xxSensorEnableGpio()
 {
-    sl_status_t status         = SL_STATUS_OK;
-    sl_i2c_config_t i2c_config = kI2cDriverConfig;
+    sl_status_t status = SL_STATUS_OK;
 
 #if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
     if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) != 1)
@@ -108,6 +110,25 @@ sl_status_t Init()
         VerifyOrReturnError(status == SL_STATUS_OK, status);
     }
 #endif
+    return status;
+}
+
+#else
+
+bool initialized = false;
+
+#endif // SLI_SI91X_MCU_INTERFACE
+} // namespace
+
+sl_status_t Init()
+{
+    sl_status_t status         = SL_STATUS_OK;
+#ifdef SLI_SI91X_MCU_INTERFACE
+    sl_i2c_config_t i2c_config = kI2cDriverConfig;
+
+    // Drive the sensor enable GPIO high (UULP NPSS or ULP/M4 pin, per board config) so the Si70xx is powered before I2C.
+    status = Si70xxSensorEnableGpio();
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     /* Wait for sensor to become ready */
     osDelay(80);
@@ -133,6 +154,17 @@ sl_status_t Init()
     // Initializes sensor and reads electronic ID 2nd byte
     status = sl_si91x_si70xx_init(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, SL_EID_SECOND_BYTE);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
+
+#else
+    status = sl_board_enable_sensor(SL_BOARD_SENSOR_RHT);
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
+
+    status = sl_si70xx_init(sl_i2cspm_sensor, SI7021_ADDR);
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
+
+    initialized = true;
+#endif // SLI_SI91X_MCU_INTERFACE
+
     return status;
 }
 
@@ -141,7 +173,8 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     sl_status_t status      = SL_STATUS_OK;
     int32_t tempTemperature = 0;
     uint32_t tempHumidity   = 0;
-#if (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
+#ifdef SLI_SI91X_MCU_INTERFACE
+#if (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED)
     // Add PS requirement to keep the sensor awake
     sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS3);
 
@@ -151,7 +184,7 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     // Initialize sensor
     status = Init();
     VerifyOrExit(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to initialize the sensor : %ld", status));
-#endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
+#endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED)
 
     status = sl_si91x_si70xx_measure_rh_and_temp(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, &tempHumidity, &tempTemperature);
     VerifyOrExit(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to measure sensor data : %ld", status));
@@ -161,54 +194,20 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     temperature      = static_cast<int16_t>(tempTemperature * 100) - kSensorTemperatureOffset;
     relativeHumidity = static_cast<uint16_t>(tempHumidity * 100);
 
-#if (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
+#if (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED)
     // De-initialize I2C driver
     status = sl_i2c_driver_deinit(SI70XX_I2C_INSTANCE);
     VerifyOrExit(status == SL_I2C_SUCCESS, ChipLogError(AppServer, "Failed to de-initialize I2C driver : %ld", status));
-#endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
+#endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED)
 
 exit:
-#if (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
+#if (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED)
     // Remove PS requirement to allow device to sleep (always remove, even on error)
     sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS3);
-#endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
-    return status;
-}
-
-} // namespace Si70xxSensor
+#endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED)
 
 #else
-// EFR/Simplicity SDK includes
-#include "sl_board_control.h"
-#include "sl_i2cspm_instances.h"
-#include "sl_si70xx.h"
-
-namespace Si70xxSensor {
-
-namespace {
-bool initialized = false;
-} // namespace
-
-sl_status_t Init()
-{
-    sl_status_t status = SL_STATUS_OK;
-    status             = sl_board_enable_sensor(SL_BOARD_SENSOR_RHT);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
-
-    status = sl_si70xx_init(sl_i2cspm_sensor, SI7021_ADDR);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
-
-    initialized = true;
-    return status;
-}
-
-sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
-{
     VerifyOrReturnError(initialized, SL_STATUS_NOT_INITIALIZED);
-
-    sl_status_t status      = SL_STATUS_OK;
-    int32_t tempTemperature = 0;
-    uint32_t tempHumidity   = 0;
 
     status = sl_si70xx_measure_rh_and_temp(sl_i2cspm_sensor, SI7021_ADDR, &tempHumidity, &tempTemperature);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
@@ -217,8 +216,8 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     temperature      = static_cast<int16_t>(tempTemperature / 10) - kSensorTemperatureOffset;
     relativeHumidity = static_cast<uint16_t>(tempHumidity / 10);
 
+#endif // SLI_SI91X_MCU_INTERFACE
     return status;
 }
 
 } // namespace Si70xxSensor
-#endif // SLI_SI91X_MCU_INTERFACE
