@@ -622,7 +622,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.6 - Close Provider Process
         # Kill immediately after download start is confirmed so the download is aborted.
-        # The single full OTA update is reserved for Step 1.
+        # The single full OTA update is reserved for Step 6.
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.6 - Close Provider Process (aborting download)')
         self.current_provider_app_proc.terminate()
