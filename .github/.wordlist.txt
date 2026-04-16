@@ -552,7 +552,6 @@ EvalCode
 EvalCodeWithName
 EvalFrameDefault
 EVB
-EVKBMIMXRT
 EventLogging
 evk
 EVSE
@@ -611,7 +610,6 @@ fsl
 fstab
 fsync
 ftd
-ftr
 fullclean
 fuzzer
 fuzzers
@@ -1122,7 +1120,6 @@ params
 PartNumber
 PASE
 Passcode
-passcodes
 passRetained
 passwd
 Pausable
@@ -1374,7 +1371,6 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
-simw
 SiWx
 sizedb
 sl
