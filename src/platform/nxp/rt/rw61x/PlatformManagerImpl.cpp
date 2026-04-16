@@ -133,9 +133,9 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     status_t status;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
-    /* Initialize the mbedtls mutex and call mbedtls_threading_set_alt(...) 
-    as required by mbedTLS3x threading documentation*/
 #if CONFIG_CHIP_CRYPTO_PSA
+    static chip::DeviceLayer::S50KeyAllocator s50KeyAllocator;
+    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
     config_mbedtls_threading_alt();
 #endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
@@ -183,10 +183,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     /* Mask of combined controllers to initialize */
     uint8_t controllerMask = 0U;
 
-#if CONFIG_CHIP_CRYPTO_PSA
-    static chip::DeviceLayer::S50KeyAllocator s50KeyAllocator;
-#endif
-
     // Initialize the configuration system.
     err = Internal::NXPConfig::Init();
     SuccessOrExit(err);
@@ -223,10 +219,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = ServiceInit();
     SuccessOrExit(err);
 
-#endif
-
-#if CONFIG_CHIP_CRYPTO_PSA
-    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
 #endif
 
     /*
