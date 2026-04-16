@@ -20,6 +20,7 @@ executable("all-devices-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "PosixChimeDevice.cpp",
   ]
 
   deps = [

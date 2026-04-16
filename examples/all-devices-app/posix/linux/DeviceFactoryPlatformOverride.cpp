@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <DeviceFactoryPlatformOverride.h>
-#include <LinuxChimeDevice.h>
+#include <PosixChimeDevice.h>
 #include <devices/device-factory/DeviceFactory.h>
 
 namespace chip {
@@ -28,7 +28,7 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate)
             { 0, "Ding Dong"_span },
             { 1, "Ring Ring"_span },
         };
-        return std::make_unique<LinuxChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+        return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
     });
 }
 

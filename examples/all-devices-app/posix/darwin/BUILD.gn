@@ -26,7 +26,6 @@ source_set("darwin") {
   sources = [
     "../include/AppRootNode.h",
     "../include/TermHandling.h",
-    "DarwinChimeDevice.cpp",
     "DeviceFactoryPlatformOverride.cpp",
     "TermHandling.cpp",
   ]

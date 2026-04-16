@@ -27,7 +27,6 @@ source_set("linux") {
     "../include/AppRootNode.h",
     "../include/TermHandling.h",
     "DeviceFactoryPlatformOverride.cpp",
-    "LinuxChimeDevice.cpp",
     "TermHandling.cpp",
   ]
 

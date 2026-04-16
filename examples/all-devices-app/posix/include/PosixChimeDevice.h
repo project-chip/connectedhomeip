@@ -21,7 +21,7 @@
 namespace chip {
 namespace app {
 
-class DarwinChimeDevice : public ChimeDevice
+class PosixChimeDevice : public ChimeDevice
 {
 public:
     using ChimeDevice::ChimeDevice;

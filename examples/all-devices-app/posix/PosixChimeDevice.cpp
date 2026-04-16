@@ -14,19 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
-#include <devices/chime/ChimeDevice.h>
+#include <PosixChimeDevice.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
 
-class LinuxChimeDevice : public ChimeDevice
+Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chimeID)
 {
-public:
-    using ChimeDevice::ChimeDevice;
-    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
-};
+    // Call base class to log the default message
+    ChimeDevice::PlayChimeSound(chimeID);
+
+    // TODO: play a real sound on POSIX (Linux/Darwin)
+    ChipLogProgress(DeviceLayer, "PosixChimeDevice: TODO: Play real sound for ID %d", chimeID);
+
+    return Protocols::InteractionModel::Status::Success;
+}
 
 } // namespace app
 } // namespace chip
