@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
-import("//build_overrides/build.gni")
 import("${build_root}/config/compiler/compiler.gni")
 
 import("${chip_root}/src/app/icd/icd.gni")
@@ -700,13 +700,13 @@ template("efr32_sdk") {
     }
 
     if (is_clang) {
-      # -fno-threadsafe-statics and -femulated-tls are needed since clang will try to use TLS, 
+      # -fno-threadsafe-statics and -femulated-tls are needed since clang will try to use TLS,
       # which is not supported by the EFR32 thus resulting on linking failing on undefined __aeabi_read_tp symbol
       # thus resulting on linking failing on undefined __aeabi_read_tp symbol
 
       # -fno-builtin-memcpy is needed since clang will try to use newlib's optimized memcpy, which uses LDR.W (word load) even
-      # for misaligned addresses, which will result in a hardfault in NVM3 read on since NVM3 flash region is marked as Device  
-      # memory by sl_mpu_disable_execute, where unaligned word loads fault. 
+      # for misaligned addresses, which will result in a hardfault in NVM3 read on since NVM3 flash region is marked as Device
+      # memory by sl_mpu_disable_execute, where unaligned word loads fault.
       cflags += [
         "-fno-threadsafe-statics",
         "-femulated-tls",
