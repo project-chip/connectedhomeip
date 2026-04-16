@@ -101,12 +101,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::SignWithOpKeypair(FabricIndex fabric
     uint16_t keyBlobLen = keyBlob.Capacity();
     TEMPORARY_RETURN_IGNORED keyBlob.SetLength(keyBlobLen);
 
-#if CONFIG_NXP_USE_POWER_DOWN
-    // When using PowerDown force the key to be loaded all the time from the
-    // persistent storage in order to make sure it exists in the S200 keystore
-#else
     if (fabricIndex != mCachedFabricIndex)
-#endif // CONFIG_NXP_USE_POWER_DOWN
     {
         error =
             mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), keyBlob.Bytes(), keyBlobLen);
@@ -127,17 +122,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::SignWithOpKeypair(FabricIndex fabric
         VerifyOrReturnError(mCachedKeypair->ImportBlob(keyBlob) == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     }
 
-    error = mCachedKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
-
-#if CONFIG_NXP_USE_POWER_DOWN
-    // In order to trigger the ImportBlob() call to reinitialize the S200 key
-    // handle each time we need to clean up the cached keypair once we're done
-    // with this crypto operation.
-    delete mCachedKeypair;
-    mCachedKeypair = nullptr;
-#endif // CONFIG_NXP_USE_POWER_DOWN
-
-    return error;
+    return mCachedKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
 }
 
 } // namespace chip
