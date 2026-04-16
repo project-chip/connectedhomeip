@@ -108,3 +108,7 @@ elseif(CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
         ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/smoke-co-alarm-app-ot.zap
     )
 endif()
+
+target_compile_definitions(app PRIVATE
+        SMOKE_CO_ALARM=1
+)
