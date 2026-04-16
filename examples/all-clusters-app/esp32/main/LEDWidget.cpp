@@ -27,7 +27,6 @@
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
-#include "esp_check.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
@@ -59,7 +58,8 @@ void LEDWidget::Init(gpio_num_t gpioNum)
 
         led_strip_rmt_config_t rmt_config = {};
         rmt_config.resolution_hz          = 10 * 1000 * 1000; // 10 MHz
-        ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &strip));
+        VerifyOrReturn(led_strip_new_rmt_device(&strip_config, &rmt_config, &strip) == ESP_OK,
+                       ESP_LOGE("LEDWidget", "Failed to create LED strip"));
         mDefaultOnBrightness = UINT8_MAX;
         mHue                 = 0;
         mSaturation          = 0;

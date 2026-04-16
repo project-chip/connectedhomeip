@@ -20,8 +20,6 @@
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
-#include "esp_check.h"
-
 static const char TAG[] = "LEDWidget";
 
 void LEDWidget::Init(void)
@@ -37,7 +35,8 @@ void LEDWidget::Init(void)
     led_strip_rmt_config_t rmt_config = {};
     rmt_config.resolution_hz          = 10 * 1000 * 1000; // 10 MHz
 
-    ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &mStrip));
+    VerifyOrReturn(led_strip_new_rmt_device(&strip_config, &rmt_config, &mStrip) == ESP_OK,
+                   ESP_LOGE("LEDWidget", "Failed to create LED strip"));
     mHue        = 0;
     mSaturation = 0;
 #else
