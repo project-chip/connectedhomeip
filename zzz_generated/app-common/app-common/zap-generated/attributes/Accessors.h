@@ -2391,72 +2391,7 @@ namespace Attributes {} // namespace Attributes
 } // namespace ClosureControl
 
 namespace ClosureDimension {
-namespace Attributes {
-
-namespace Resolution {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent100ths * value); // percent100ths
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent100ths value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent100ths value, MarkAttributeDirty markDirty);
-} // namespace Resolution
-
-namespace StepValue {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent100ths * value); // percent100ths
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent100ths value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent100ths value, MarkAttributeDirty markDirty);
-} // namespace StepValue
-
-namespace Unit {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ClosureDimension::ClosureUnitEnum * value); // ClosureUnitEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::ClosureUnitEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::ClosureUnitEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace Unit
-
-namespace TranslationDirection {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::ClosureDimension::TranslationDirectionEnum * value); // TranslationDirectionEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::TranslationDirectionEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::TranslationDirectionEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace TranslationDirection
-
-namespace RotationAxis {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ClosureDimension::RotationAxisEnum * value); // RotationAxisEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::RotationAxisEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::RotationAxisEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace RotationAxis
-
-namespace Overflow {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ClosureDimension::OverflowEnum * value); // OverflowEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::OverflowEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::OverflowEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace Overflow
-
-namespace ModulationType {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ClosureDimension::ModulationTypeEnum * value); // ModulationTypeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::ModulationTypeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureDimension::ModulationTypeEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace ModulationType
-
-namespace LatchControlModes {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> * value); // LatchControlModesBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> value,
-                                        MarkAttributeDirty markDirty);
-} // namespace LatchControlModes
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace ClosureDimension
 
 namespace ServiceArea {

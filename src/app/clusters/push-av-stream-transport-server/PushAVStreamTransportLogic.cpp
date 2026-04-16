@@ -922,8 +922,10 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     // Validate the TLS Endpoint
     if (mTLSClientManagementDelegate != nullptr)
     {
+        // Note: TLS clusters are always on EP0, per spec
+        //
         CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
+            kRootEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
             [&](auto & TLSEndpoint) -> CHIP_ERROR {
                 // Use heap allocation for large certificate buffers to reduce stack usage
                 auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
