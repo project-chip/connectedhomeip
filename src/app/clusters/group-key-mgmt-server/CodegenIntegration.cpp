@@ -45,10 +45,18 @@ public:
         Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
         VerifyOrDie(groupDataProvider != nullptr); // we require app main to set this before cluster startup
 
-        gServer.Create(GroupKeyManagementCluster::Context{
-            .fabricTable       = Server::GetInstance().GetFabricTable(),
-            .groupDataProvider = *groupDataProvider,
-        });
+        BitFlags<GroupKeyManagement::Feature> features(featureMap);
+        if (groupDataProvider->IsGroupcastEnabled())
+        {
+            features.Set(GroupKeyManagement::Feature::kGroupcast);
+        }
+
+        gServer.Create(
+            GroupKeyManagementCluster::Context{
+                .fabricTable       = Server::GetInstance().GetFabricTable(),
+                .groupDataProvider = *groupDataProvider,
+            },
+            BitFlags<GroupKeyManagement::Feature>(features));
         return gServer.Registration();
     }
 

@@ -81,7 +81,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
 
     GroupKeyManagementCluster mCluster{ { fabricHelper.GetFabricTable(), mRealProvider } };
 
-    ClusterTester tester{ mCluster };
+    ClusterTester mTester{ mCluster };
 
     void SetUp() override
     {
@@ -94,12 +94,12 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
         CHIP_ERROR err = fabricHelper.SetUpTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mRealProvider);
-        tester.SetFabricIndex(kTestFabricIndex);
+        mTester.SetFabricIndex(kTestFabricIndex);
     }
 
     void TearDown() override
     {
-        tester.SetFabricIndex(kUndefinedFabricIndex);
+        mTester.SetFabricIndex(kUndefinedFabricIndex);
         mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         Credentials::SetGroupDataProvider(nullptr);
         CHIP_ERROR err = fabricHelper.TearDownTestFabric(kTestFabricIndex);
@@ -114,7 +114,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
         auto listToWrite =
             app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
+        CHIP_ERROR err = mTester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
                              .GetUnderlyingError();
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
@@ -201,7 +201,7 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeDuplicateKey)
         auto listToWrite =
             app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
+        CHIP_ERROR err = mTester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
                              .GetUnderlyingError();
 
         ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
@@ -321,7 +321,7 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteCommand)
         .epochStartTime2        = DataModel::NullNullable,
     };
 
-    auto result = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData);
+    auto result = mTester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData);
     EXPECT_TRUE(result.IsSuccess());
     Credentials::GroupDataProvider::KeySet storedKeySet;
     CHIP_ERROR err = mRealProvider.GetKeySet(kTestFabricIndex, kTestKeySetId, storedKeySet);
@@ -346,7 +346,7 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteSameId)
         .epochKey2              = DataModel::NullNullable,
         .epochStartTime2        = DataModel::NullNullable,
     };
-    auto result1 = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData1);
+    auto result1 = mTester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData1);
 
     EXPECT_TRUE(result1.IsSuccess());
     chip::Credentials::GroupDataProvider::KeySet storedKeySet;
@@ -367,7 +367,7 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteSameId)
         .epochStartTime2        = DataModel::NullNullable,
     };
 
-    auto result2 = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData2);
+    auto result2 = mTester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData2);
 
     EXPECT_TRUE(result2.IsSuccess());
 
@@ -422,4 +422,212 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeIteratorExhau
     EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
 }
 
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Write GroupcastAdoption with adopted=true for the test fabric
+    GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type adoption;
+    adoption.groupcastAdopted                                                            = true;
+    adoption.fabricIndex                                                                 = kTestFabricIndex;
+    std::vector<GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type> adoptionList = { adoption };
+    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type>(adoptionList.data(),
+                                                                                                              adoptionList.size());
+
+    CHIP_ERROR err =
+        tester.WriteAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, listToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // With GCAST feature ON and GroupcastAdoption=true, writing GroupKeyMap should be rejected
+    auto keys        = TestHelpers::CreateGroupKeyMapList(1, kTestFabricIndex);
+    auto keysToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+
+    err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, keysToWrite, ListWritingPattern::ReplaceAll)
+              .GetUnderlyingError();
+    EXPECT_EQ(err, CHIP_IM_GLOBAL_STATUS(InvalidInState));
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestReadGroupKeyMapAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Write GroupcastAdoption with adopted=true for the test fabric
+    GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type adoption;
+    adoption.groupcastAdopted                                                            = true;
+    adoption.fabricIndex                                                                 = kTestFabricIndex;
+    std::vector<GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type> adoptionList = { adoption };
+    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type>(adoptionList.data(),
+                                                                                                              adoptionList.size());
+
+    CHIP_ERROR err =
+        tester.WriteAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, listToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // With GCAST feature ON and GroupcastAdoption=true, reading GroupKeyMap should return an empty list
+    GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType groupKeyMapList;
+    err = tester.ReadAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, groupKeyMapList).GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t count = 0;
+    ASSERT_EQ(groupKeyMapList.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupTableAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Write GroupcastAdoption with adopted=true for the test fabric
+    GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type adoption;
+    adoption.groupcastAdopted                                                            = true;
+    adoption.fabricIndex                                                                 = kTestFabricIndex;
+    std::vector<GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type> adoptionList = { adoption };
+    auto adoptionToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type>(
+        adoptionList.data(), adoptionList.size());
+
+    CHIP_ERROR err =
+        tester
+            .WriteAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, adoptionToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // GroupTable is read-only; writing it should return UnsupportedWrite regardless of GCAST state
+    GroupKeyManagement::Structs::GroupInfoMapStruct::Type entry;
+    entry.groupId                                                                     = kTestGroupId;
+    entry.fabricIndex                                                                 = kTestFabricIndex;
+    std::vector<GroupKeyManagement::Structs::GroupInfoMapStruct::Type> groupTableList = { entry };
+    auto groupTableToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupInfoMapStruct::Type>(
+        groupTableList.data(), groupTableList.size());
+
+    err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupTable::Id, groupTableToWrite, ListWritingPattern::ReplaceAll)
+              .GetUnderlyingError();
+    EXPECT_EQ(err, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestReadGroupTableAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Prepopulate a group entry so there is data that would normally be returned
+    ASSERT_EQ(mRealProvider.AddEndpoint(kTestFabricIndex, kTestGroupId, kTestEndpoint1), CHIP_NO_ERROR);
+
+    // Write GroupcastAdoption with adopted=true for the test fabric
+    GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type adoption;
+    adoption.groupcastAdopted                                                            = true;
+    adoption.fabricIndex                                                                 = kTestFabricIndex;
+    std::vector<GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type> adoptionList = { adoption };
+    auto adoptionToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type>(
+        adoptionList.data(), adoptionList.size());
+
+    CHIP_ERROR err =
+        tester
+            .WriteAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, adoptionToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // With GCAST feature ON and GroupcastAdoption=true, reading GroupTable should return an empty list
+    GroupKeyManagement::Attributes::GroupTable::TypeInfo::DecodableType groupTableList;
+    err = tester.ReadAttribute(GroupKeyManagement::Attributes::GroupTable::Id, groupTableList).GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t count = 0;
+    ASSERT_EQ(groupTableList.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestReadGroupcastAdopted)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Default state: GroupcastAdoption should be false
+    GroupKeyManagement::Attributes::GroupcastAdoption::TypeInfo::DecodableType readList;
+    CHIP_ERROR err = tester.ReadAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, readList).GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t count = 0;
+    ASSERT_EQ(readList.ComputeSize(&count), CHIP_NO_ERROR);
+    ASSERT_EQ(count, 1u);
+
+    auto iter = readList.begin();
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().fabricIndex, kTestFabricIndex);
+    EXPECT_FALSE(iter.GetValue().groupcastAdopted);
+    ASSERT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+
+    // Write GroupcastAdoption with adopted=true
+    GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type adoption;
+    adoption.groupcastAdopted                                                            = true;
+    adoption.fabricIndex                                                                 = kTestFabricIndex;
+    std::vector<GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type> adoptionList = { adoption };
+    auto adoptionToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type>(
+        adoptionList.data(), adoptionList.size());
+
+    err =
+        tester
+            .WriteAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, adoptionToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // Read back: should now be adopted=true
+    GroupKeyManagement::Attributes::GroupcastAdoption::TypeInfo::DecodableType readList2;
+    err = tester.ReadAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, readList2).GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    count = 0;
+    ASSERT_EQ(readList2.ComputeSize(&count), CHIP_NO_ERROR);
+    ASSERT_EQ(count, 1u);
+
+    auto iter2 = readList2.begin();
+    ASSERT_TRUE(iter2.Next());
+    EXPECT_EQ(iter2.GetValue().fabricIndex, kTestFabricIndex);
+    EXPECT_TRUE(iter2.GetValue().groupcastAdopted);
+    ASSERT_EQ(iter2.GetStatus(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestReadMaxGroupsPerFabric)
+{
+    // Without GCAST: should return the provider's configured value
+    {
+        GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                               BitFlags<GroupKeyManagement::Feature>(0) };
+        ClusterTester tester{ mockCluster };
+        tester.SetFabricIndex(kTestFabricIndex);
+
+        uint16_t maxGroups = 0;
+        CHIP_ERROR err =
+            tester.ReadAttribute(GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroups).GetUnderlyingError();
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(maxGroups, mRealProvider.GetMaxGroupsPerFabric());
+    }
+    // With GCAST feature ON: should return 0
+    {
+        GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                               BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+        ClusterTester tester{ mockCluster };
+        tester.SetFabricIndex(kTestFabricIndex);
+
+        uint16_t maxGroupsGcast = 0;
+        CHIP_ERROR err =
+            tester.ReadAttribute(GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroupsGcast).GetUnderlyingError();
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(maxGroupsGcast, 0u);
+    }
+}
 } // namespace

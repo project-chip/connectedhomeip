@@ -363,7 +363,9 @@ public:
     virtual KeySetIterator * IterateKeySets(FabricIndex fabric_index) = 0;
 
     // Fabrics
-    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index)                      = 0;
+    virtual bool IsGroupcastAdopted(FabricIndex fabric_index) const                = 0;
+    virtual CHIP_ERROR SetGroupcastAdopted(FabricIndex fabric_index, bool adopted) = 0;
 
     // Decryption
     virtual GroupSessionIterator * IterateGroupSessions(uint16_t session_id)                        = 0;

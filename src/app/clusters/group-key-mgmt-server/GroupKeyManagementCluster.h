@@ -20,6 +20,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
+#include <clusters/GroupKeyManagement/Commands.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
 
 namespace chip {
@@ -37,7 +38,13 @@ public:
 
     // New constructor using Context
     GroupKeyManagementCluster(Context && context) :
-        DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mContext(std::move(context))
+        // GCAST feature enabled by default
+        GroupKeyManagementCluster(std::move(context),
+                                  BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast))
+    {}
+
+    GroupKeyManagementCluster(Context && context, BitFlags<GroupKeyManagement::Feature> features) :
+        DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mContext(std::move(context)), mFeatures(features)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
@@ -57,13 +64,36 @@ public:
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-    // TODO: Once there is MCSP support, this may need to change.
-    static constexpr bool IsMCSPSupported() { return false; }
-    // TODO: Hardcode this to true for now
-    static constexpr bool IsGCASTSupported() { return true; }
+    bool IsMCSPSupported() const;
+    bool IsGCASTSupported() const;
 
 private:
+    CHIP_ERROR ReadGroupKeyMap(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadGroupTable(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMaxGroupsPerFabric(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadGroupcastAdopted(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteGroupcastAdopted(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    const FabricInfo * GetFabricInfoOrNull(CommandHandler * handler, FabricTable & fabricTable);
+    Protocols::InteractionModel::Status
+    ValidateKeySetWriteArguments(const GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleKeySetWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                      const GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData, const FabricInfo * fabric);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleKeySetRead(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                     const GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData, const FabricInfo * fabric);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleKeySetRemove(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                       const GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData, const FabricInfo * fabric);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleKeySetReadAllIndices(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                               const GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData,
+                               const FabricInfo * fabric);
+
     Context mContext;
+    const BitFlags<GroupKeyManagement::Feature> mFeatures;
 };
 } // namespace Clusters
 } // namespace app

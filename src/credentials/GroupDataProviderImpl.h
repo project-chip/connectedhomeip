@@ -106,6 +106,8 @@ public:
 
     // Fabrics
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
+    bool IsGroupcastAdopted(FabricIndex fabric_index) const override;
+    CHIP_ERROR SetGroupcastAdopted(FabricIndex fabric_index, bool adopted) override;
 
     // Decryption
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) override;

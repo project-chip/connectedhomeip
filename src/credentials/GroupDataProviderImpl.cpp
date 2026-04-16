@@ -68,6 +68,7 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
     static constexpr TLV::Tag TagFirstKeyset() { return TLV::ContextTag(5); }
     static constexpr TLV::Tag TagKeysetCount() { return TLV::ContextTag(6); }
     static constexpr TLV::Tag TagNext() { return TLV::ContextTag(7); }
+    static constexpr TLV::Tag GroupcastEnabled() { return TLV::ContextTag(8); }
 
     chip::FabricIndex fabric_index = kUndefinedFabricIndex;
     chip::GroupId first_group      = kUndefinedGroupId;
@@ -76,6 +77,7 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
     uint16_t map_count             = 0;
     chip::KeysetId first_keyset    = kInvalidKeysetId;
     uint16_t keyset_count          = 0;
+    bool groupcast_enabled         = false;
     chip::FabricIndex next         = kUndefinedFabricIndex;
 
     FabricData() = default;
@@ -109,6 +111,8 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
         ReturnErrorOnFailure(writer.Put(TagFirstKeyset(), static_cast<uint16_t>(first_keyset)));
         ReturnErrorOnFailure(writer.Put(TagKeysetCount(), static_cast<uint16_t>(keyset_count)));
         ReturnErrorOnFailure(writer.Put(TagNext(), static_cast<uint16_t>(next)));
+        uint8_t groupcast_enabled_value = groupcast_enabled ? 1 : 0;
+        ReturnErrorOnFailure(writer.Put(GroupcastEnabled(), groupcast_enabled_value));
 
         return writer.EndContainer(container);
     }
@@ -141,7 +145,14 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
         // next
         ReturnErrorOnFailure(reader.Next(TagNext()));
         ReturnErrorOnFailure(reader.Get(next));
-
+        // groupcast_enabled
+        CHIP_ERROR err = reader.Next(GroupcastEnabled());
+        if (CHIP_NO_ERROR == err)
+        {
+            uint8_t value = 0;
+            ReturnErrorOnFailure(reader.Get(value));
+            groupcast_enabled = (value > 0);
+        }
         return reader.ExitContainer(container);
     }
 
@@ -1867,6 +1878,22 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
     err                       = fabric.Delete(mStorage);
     mAuxAclNotificationNeeded = false;
     return err;
+}
+
+bool GroupDataProviderImpl::IsGroupcastAdopted(chip::FabricIndex fabric_index) const
+{
+    FabricData fabric(fabric_index);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), false);
+    return fabric.groupcast_enabled;
+}
+
+CHIP_ERROR GroupDataProviderImpl::SetGroupcastAdopted(chip::FabricIndex fabric_index, bool adopted)
+{
+    FabricData fabric(fabric_index);
+    CHIP_ERROR err = fabric.Load(mStorage);
+    VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+    fabric.groupcast_enabled = adopted;
+    return fabric.Save(mStorage);
 }
 
 //

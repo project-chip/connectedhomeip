@@ -200,6 +200,8 @@ public:
     CHIP_ERROR GetIpkKeySet(FabricIndex, KeySet &) override { return CHIP_ERROR_NOT_FOUND; }
     KeySetIterator * IterateKeySets(FabricIndex) override { return nullptr; }
     CHIP_ERROR RemoveFabric(FabricIndex) override { return CHIP_NO_ERROR; }
+    bool IsGroupcastAdopted(FabricIndex fabric_index) const override { return false; }
+    CHIP_ERROR SetGroupcastAdopted(FabricIndex fabric_index, bool adopted) override { return CHIP_NO_ERROR; }
     GroupSessionIterator * IterateGroupSessions(uint16_t) override { return nullptr; }
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex, GroupId) override { return nullptr; }
     uint16_t getMaxMembershipCount() override { return 0; }
