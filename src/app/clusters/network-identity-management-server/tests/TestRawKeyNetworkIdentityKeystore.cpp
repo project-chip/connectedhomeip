@@ -15,11 +15,14 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
+
+#if NETIM_RAW_KEYSTORE_SUPPORTED
+
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/network-identity-management-server/NetworkAdministratorSecret.h>
-#include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
 #include <app/clusters/network-identity-management-server/tests/NASS_test_vectors.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -37,13 +40,9 @@ struct TestRawKeyNetworkIdentityKeystore : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-// DeriveECDSANetworkIdentity requires deterministic ECDSA and a non-PSA build
-// (CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE == 0, so P256KeypairHandle == P256SerializedKeypair).
+// DeriveECDSANetworkIdentity requires deterministic ECDSA
 static bool DeriveECDSANetworkIdentitySupported()
 {
-#if CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE > 0
-    return false;
-#else
     static bool supported = []() {
         P256Keypair keypair;
         P256ECDSASignature sig;
@@ -52,10 +51,9 @@ static bool DeriveECDSANetworkIdentitySupported()
         return keypair.ECDSA_sign_msg_det(&probe, 1, sig) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }();
     return supported;
-#endif
 }
 
-// Pre-defined raw secrets for tests. Three distinct secrets are sufficient for all current tests.
+// Pre-defined raw secrets for tests. Two distinct secrets are sufficient for all current tests.
 static const NetworkAdministratorRawSecret kRawSecret1((const uint8_t[]){
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
@@ -195,3 +193,5 @@ TEST_F(TestRawKeyNetworkIdentityKeystore, DeriveNASSSpecVector)
     EXPECT_SUCCESS(ExtractIdentifierFromChipNetworkIdentity(identity, keyId));
     EXPECT_TRUE(keyId.data_equal(ByteSpan(kNASSTestVector1_KeyIdentifier)));
 }
+
+#endif // NETIM_RAW_KEYSTORE_SUPPORTED

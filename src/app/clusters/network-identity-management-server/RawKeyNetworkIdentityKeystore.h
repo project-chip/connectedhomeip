@@ -20,6 +20,12 @@
 #include <app/clusters/network-identity-management-server/NetworkIdentityKeystore.h>
 #include <lib/core/CHIPConfig.h>
 
+// RawKeyNetworkIdentityKeystore requires HkdfKeyHandle to be able to hold the
+// raw NASS secret (32 bytes), and P256KeypairHandle to be P256SerializedKeypair.
+#define NETIM_RAW_KEYSTORE_SUPPORTED (CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE >= 32 && CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE == 0)
+
+#if NETIM_RAW_KEYSTORE_SUPPORTED
+
 namespace chip::Crypto {
 
 /**
@@ -29,11 +35,8 @@ namespace chip::Crypto {
  * - HkdfKeyHandle contains the raw 32-byte NASS secret
  * - P256KeypairHandle contains the serialized keypair (97 bytes)
  *
- * Identity derivation via `DeriveECDSANetworkIdentity` will only work on
- * platforms where CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE == 0 (i.e. where
- * P256KeypairHandle is really just P256SerializedKeypair), and requires
- * Deterministic ECDSA (`P256KeyPair::ECDSA_sign_msg_det()`) to be supported
- * by the crypto backend.
+ * Identity derivation via `DeriveECDSANetworkIdentity` requires Deterministic
+ * ECDSA (`P256KeyPair::ECDSA_sign_msg_det()`) to be supported by the crypto backend.
  *
  * WARNING: This implementation stores raw key material in handles that may be
  * persisted to storage. For production use, consider PSA-backed implementations
@@ -53,3 +56,5 @@ public:
 };
 
 } // namespace chip::Crypto
+
+#endif // NETIM_RAW_KEYSTORE_SUPPORTED

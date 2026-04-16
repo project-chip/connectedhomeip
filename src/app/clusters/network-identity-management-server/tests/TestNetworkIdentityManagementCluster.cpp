@@ -20,8 +20,8 @@
 
 #include <app/clusters/network-identity-management-server/DefaultNetworkIdentityStorage.h>
 #include <app/clusters/network-identity-management-server/NetworkAdministratorSecret.h>
+#include <app/clusters/network-identity-management-server/NetworkIdentityKeystore.h>
 #include <app/clusters/network-identity-management-server/NetworkIdentityManagementCluster.h>
-#include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
 #include <app/clusters/network-identity-management-server/tests/NASS_test_vectors.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -51,39 +51,109 @@ using namespace chip::Testing;
 
 namespace {
 
-// A mock NetworkIdentityKeystore that works on all platforms, even those that don't
-// support Deterministic ECDSA, or that use real (e.g. PSA) key handles. This class
-// inherits from RawKeyNetworkIdentityKeystore for convenience, since that implementation
-// already handles the necessary copying etc for working with raw HkdfKeyHandles. This
-// class simply overrides DeriveECDSANetworkIdentity to generate a valid random identity
-// for each distinct NASS, and keeping a cache so that for tests that require it
-// re-"deriving" from the same NASS produces the same identity. Limitations:
+// A mock NetworkIdentityKeystore that works on all platforms, including those with
+// small (e.g. PSA) key handles that can't hold raw key material. Uses two fixed
+// slots (the API requires at most 2 simultaneous NASS handles); the first byte of
+// each HkdfKeyHandle holds the slot index.
+//
+// DeriveECDSANetworkIdentity generates a valid random identity for each distinct
+// NASS, caching results so that re-"deriving" from the same NASS produces the
+// same identity.
+//
+// Limitations:
 // - Identities are random, not derived as required by the spec
-// - The returned  P256KeypairHandle is a fake (filled with a tag byte) since real
-//   handles for the platform might not in fact be raw key material.
-class TestNetworkIdentityKeystore : public RawKeyNetworkIdentityKeystore
+// - The returned P256KeypairHandle can't be used for any operations
+class TestNetworkIdentityKeystore : public NetworkIdentityKeystore
 {
+private:
+    struct HkdfSlot
+    {
+        bool inUse = false;
+        NetworkAdministratorRawSecret secret;
+    };
+    struct P256Slot
+    {
+        bool inUse = false;
+    };
+
+    HkdfSlot mHkdfSlots[2]; // minimum per NetworkIdentityKeystore API contract
+    P256Slot mP256Slots[4]; // minimum per NetworkIdentityKeystore API contract
+
+    HkdfSlot * FindSlot(const HkdfKeyHandle & handle)
+    {
+        auto index = static_cast<uint8_t>(handle.As<uint8_t>() ^ 0xaa);
+        return (index < std::size(mHkdfSlots)) ? &mHkdfSlots[index] : nullptr;
+    }
+
+    void MakeHandle(HkdfSlot const * slot, HkdfKeyHandle & outHandle)
+    {
+        outHandle.AsMutable<uint8_t>() = static_cast<uint8_t>((slot - mHkdfSlots) ^ 0xaa);
+    }
+
+    P256Slot * FindSlot(const P256KeypairHandle & handle)
+    {
+        VerifyOrReturnValue(handle.Length() == 1, nullptr);
+        auto index = static_cast<uint8_t>(*handle.ConstBytes() ^ 0xbb);
+        return (index < std::size(mP256Slots)) ? &mP256Slots[index] : nullptr;
+    }
+
+    void MakeHandle(P256Slot const * slot, P256KeypairHandle & outHandle)
+    {
+        *outHandle.Bytes() = static_cast<uint8_t>((slot - mP256Slots) ^ 0xbb);
+        SuccessOrDie(outHandle.SetLength(1));
+    }
+
+    struct CachedIdentity
+    {
+        NetworkAdministratorRawSecret rawSecret;
+        uint8_t identityBuffer[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+        size_t identityLen = 0;
+    };
+    std::vector<CachedIdentity> mIdentityCache;
+
 public:
     CHIP_ERROR ImportNetworkAdministratorSecret(const NetworkAdministratorRawSecret & secret, HkdfKeyHandle & outHandle) override
     {
-        ReturnErrorOnFailure(RawKeyNetworkIdentityKeystore::ImportNetworkAdministratorSecret(secret, outHandle));
-        mNassHandleCount++;
+        for (auto & slot : mHkdfSlots)
+        {
+            if (!slot.inUse)
+            {
+                slot.inUse  = true;
+                slot.secret = secret;
+                MakeHandle(&slot, outHandle);
+                return CHIP_NO_ERROR;
+            }
+        }
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    CHIP_ERROR ExportNetworkAdministratorSecret(const HkdfKeyHandle & handle, NetworkAdministratorRawSecret & outRawSecret) override
+    {
+        auto * hkdf = FindSlot(handle);
+        VerifyOrReturnError(hkdf != nullptr && hkdf->inUse, CHIP_ERROR_NOT_FOUND);
+        memcpy(outRawSecret.Bytes(), hkdf->secret.ConstBytes(), outRawSecret.Capacity());
         return CHIP_NO_ERROR;
     }
 
     void DestroyNetworkAdministratorSecret(HkdfKeyHandle & handle) override
     {
-        RawKeyNetworkIdentityKeystore::DestroyNetworkAdministratorSecret(handle);
-        mNassHandleCount--;
+        auto * hkdf = FindSlot(handle);
+        ASSERT_TRUE(hkdf != nullptr && hkdf->inUse);
+        hkdf->inUse = false;
     }
 
     CHIP_ERROR DeriveECDSANetworkIdentity(const HkdfKeyHandle & nassHandle, P256KeypairHandle & outKeypairHandle,
                                           MutableByteSpan & outIdentity) override
     {
+        auto * hkdf = FindSlot(nassHandle);
+        VerifyOrReturnError(hkdf != nullptr && hkdf->inUse, CHIP_ERROR_NOT_FOUND);
+
+        // Look up cached identities by raw secret bytes (not slot index) so that re-importing
+        // the same secret produces the same identity, matching real deterministic derivation.
         CachedIdentity * entry = nullptr;
-        for (auto & cached : mCache)
+        for (auto & cached : mIdentityCache)
         {
-            if (ByteSpan(cached.nassHandleBytes).data_equal(nassHandle.OpaqueBytes()))
+            if (memcmp(cached.rawSecret.ConstBytes(), hkdf->secret.ConstBytes(), NetworkAdministratorRawSecret::Length()) == 0)
             {
                 entry = &cached;
                 break;
@@ -93,8 +163,8 @@ public:
         if (entry == nullptr)
         {
             // Generate a new random keypair and derive a valid compact identity from it
-            entry = &mCache.emplace_back();
-            memcpy(entry->nassHandleBytes, nassHandle.OpaqueBytes().data(), HkdfKeyHandle::Size());
+            entry            = &mIdentityCache.emplace_back();
+            entry->rawSecret = hkdf->secret;
             P256Keypair keypair;
             MutableByteSpan certSpan(entry->identityBuffer);
             SuccessOrDie(keypair.Initialize(ECPKeyTarget::ECDSA));
@@ -103,35 +173,31 @@ public:
         }
 
         ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(entry->identityBuffer, entry->identityLen), outIdentity));
-        memset(outKeypairHandle.Bytes(), 0xAB, outKeypairHandle.Length()); // fake!
-        mKeypairHandleCount++;
-        return CHIP_NO_ERROR;
+
+        for (auto & slot : mP256Slots)
+        {
+            if (!slot.inUse)
+            {
+                slot.inUse = 1;
+                MakeHandle(&slot, outKeypairHandle);
+                return CHIP_NO_ERROR;
+            }
+        }
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     void DestroyNetworkIdentityKeypair(P256KeypairHandle & handle) override
     {
-        RawKeyNetworkIdentityKeystore::DestroyNetworkIdentityKeypair(handle);
-        mKeypairHandleCount--;
+        auto * p256 = FindSlot(handle);
+        ASSERT_TRUE(p256 != nullptr && p256->inUse);
+        p256->inUse = false;
     }
 
     void ValidateHandles(int expectedNass, int expectedKeypairs)
     {
-        EXPECT_EQ(mNassHandleCount, expectedNass);
-        EXPECT_EQ(mKeypairHandleCount, expectedKeypairs);
+        EXPECT_EQ(std::count_if(std::begin(mHkdfSlots), std::end(mHkdfSlots), [](auto & s) { return s.inUse; }), expectedNass);
+        EXPECT_EQ(std::count_if(std::begin(mP256Slots), std::end(mP256Slots), [](auto & s) { return s.inUse; }), expectedKeypairs);
     }
-
-    int mNassHandleCount    = 0;
-    int mKeypairHandleCount = 0;
-
-private:
-    struct CachedIdentity
-    {
-        uint8_t nassHandleBytes[HkdfKeyHandle::Size()];
-        uint8_t identityBuffer[Credentials::kMaxCHIPCompactNetworkIdentityLength];
-        size_t identityLen = 0;
-    };
-
-    std::vector<CachedIdentity> mCache;
 };
 
 // A test AuthenticatorDriver that records all calls in a combined event log.

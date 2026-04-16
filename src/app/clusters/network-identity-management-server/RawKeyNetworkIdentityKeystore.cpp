@@ -17,6 +17,8 @@
 
 #include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
 
+#if NETIM_RAW_KEYSTORE_SUPPORTED
+
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -59,10 +61,6 @@ CHIP_ERROR RawKeyNetworkIdentityKeystore::DeriveECDSANetworkIdentity(const HkdfK
                                                                      P256KeypairHandle & outKeypairHandle,
                                                                      MutableByteSpan & outIdentity)
 {
-#if CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
-    // The implementation requires P256KeypairHandle == P256SerializedKeypair
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
     // The HKDF_SHA256 API in CHIPCryptoPAL.h does not support streaming. Simply generate
     // enough HKDF output to allow for up to 8 key derivation attempts. The probability of
     // needing more than this number of attempts is approximately 1 in 2^256 (10^77).
@@ -97,7 +95,6 @@ CHIP_ERROR RawKeyNetworkIdentityKeystore::DeriveECDSANetworkIdentity(const HkdfK
 
     ChipLogError(Crypto, "ECDSA Network Identity derivation by rejection sampling failed after max attempts");
     return CHIP_ERROR_INTERNAL;
-#endif
 }
 
 void RawKeyNetworkIdentityKeystore::DestroyNetworkIdentityKeypair(P256KeypairHandle & handle)
@@ -106,3 +103,5 @@ void RawKeyNetworkIdentityKeystore::DestroyNetworkIdentityKeypair(P256KeypairHan
 }
 
 } // namespace chip::Crypto
+
+#endif

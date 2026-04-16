@@ -88,6 +88,8 @@ public:
         Credentials::CertificateKeyIdStorage identifier;
         ByteSpan compactIdentity;
         ByteSpan keypairHandle; ///< Opaque bytes at storage layer
+
+        CHIP_ERROR GetKeypairHandle(Crypto::P256KeypairHandle & outHandle);
     };
 
     /// Output data when retrieving a Network Identity.

@@ -17,7 +17,19 @@
 
 #include <app/clusters/network-identity-management-server/NetworkIdentityStorage.h>
 
+#include <lib/support/CodeUtils.h>
+
 namespace chip::app::Clusters {
+
+CHIP_ERROR NetworkIdentityStorage::NetworkIdentityInfo::GetKeypairHandle(Crypto::P256KeypairHandle & outHandle)
+{
+    VerifyOrReturnError(type == NetworkIdentityManagement::IdentityTypeEnum::kEcdsa, CHIP_ERROR_INCORRECT_STATE);
+    size_t length = keypairHandle.size();
+    VerifyOrReturnError(length > 0, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(outHandle.SetLength(length));
+    memcpy(outHandle.Bytes(), keypairHandle.data(), length);
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR
 NetworkIdentityStorage::StoreNetworkAdministratorSecretAndDerivedIdentities(const NetworkAdministratorSecretInfo & nassInfo,

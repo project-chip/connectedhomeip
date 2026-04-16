@@ -198,11 +198,9 @@ CHIP_ERROR NetworkIdentityManagementCluster::RetireNetworkIdentity(uint16_t inde
     ReturnErrorOnFailure(mStorage.FindNetworkIdentity(index, entry, NetworkIdentityStorage::NetworkIdentityFlags::kPopulateAll,
                                                       MutableByteSpan(buffer.Bytes(), buffer.Capacity())));
 
-    // Extract the ECDSA P256 keypair handle
+    // Get the ECDSA P256 keypair handle
     P256KeypairHandle ecdsaHandle;
-    size_t ecdsaHandleSize = entry.keypairHandle.size();
-    VerifyOrReturnError(ecdsaHandleSize <= ecdsaHandle.Capacity(), CHIP_ERROR_INTERNAL);
-    memcpy(ecdsaHandle.Bytes(), entry.keypairHandle.data(), ecdsaHandleSize);
+    ReturnErrorOnFailure(entry.GetKeypairHandle(ecdsaHandle));
 
     // Remove from storage and destroy the keypair
     ReturnErrorOnFailure(mStorage.RemoveNetworkIdentity(index));
