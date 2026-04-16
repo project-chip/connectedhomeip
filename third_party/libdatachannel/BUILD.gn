@@ -32,7 +32,7 @@ action("build_libdatachannel") {
 
   args = [
     "--build-dir",
-    rebase_path(_output_dir, root_build_dir),
+    rebase_path(_output_dir, root_out_dir),
   ]
 
   if (is_clang) {
@@ -66,15 +66,16 @@ config("datachannel_config") {
   ]
 
   cflags_cc = [ "-Wno-shadow" ]
-
-  # suppress known `libdatachannel` int conversion issues
-  cflags = [ "-Wno-implicit-int-conversion" ]
+  if (is_clang) {
+    # suppress known `libdatachannel` int conversion issues
+    cflags = [ "-Wno-implicit-int-conversion" ]
+  }
 
   lib_dirs = [
-    rebase_path("${_output_dir}", root_build_dir),
-    rebase_path("${_output_dir}/deps/usrsctp/usrsctplib", root_build_dir),
-    rebase_path("${_output_dir}/deps/libsrtp", root_build_dir),
-    rebase_path("${_output_dir}/deps/libjuice", root_build_dir),
+    "${_output_dir}",
+    "${_output_dir}/deps/usrsctp/usrsctplib",
+    "${_output_dir}/deps/libsrtp",
+    "${_output_dir}/deps/libjuice",
   ]
 }
 
