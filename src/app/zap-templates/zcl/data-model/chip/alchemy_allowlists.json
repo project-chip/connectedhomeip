@@ -14,7 +14,6 @@
         "matter-devices.xml",
         "measurement-and-sensing.xml",
         "media-playback-cluster.xml",
-        "messages-cluster.xml",
         "mode-base-cluster.xml",
         "proxy-configuration-cluster.xml",
         "proxy-discovery-cluster.xml",
