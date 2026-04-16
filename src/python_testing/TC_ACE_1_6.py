@@ -333,7 +333,8 @@ class TC_ACE_1_6(MatterBaseTest):
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[th1_nodeid],
-                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.GroupKeyManagement.id)]
+                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                    endpoint=0, cluster=Clusters.GroupKeyManagement.id)]
             )
 
             acl_entries.append(groupcast_admin)
