@@ -163,7 +163,7 @@ def create_cluster_with_o_and_xxx_choice(more:bool):
     xml_str = []
     attr_environment = jinja2.Environment()
     attr_template = attr_environment.from_string(ATTRIBUTE_DEPENDING_ON_FEATURE_TEMPLATE)
-    # Attr0 = 0.a
+    # Attr0 = O.a
     # Attr1 = [XXX].a
     xml_str.append(attr_template.render(id=0, name='Attr0', choice='a', more=more, XXX=False))
     xml_str.append(attr_template.render(id=1, name='Attr1', choice='a', more=more, XXX=True))
