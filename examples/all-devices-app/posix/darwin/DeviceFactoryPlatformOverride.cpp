@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <DeviceFactoryPlatformOverride.h>
+#include <PosixChimeDevice.h>
+#include <devices/device-factory/DeviceFactory.h>
 
-#pragma once
+namespace chip {
+namespace app {
 
-#include <app/clusters/closure-dimension-server/ClosureDimensionClusterMatterContext.h>
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate)
+{
+    DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate]() {
+        static const ChimeDevice::Sound kDefaultSounds[] = {
+            { 0, "Ding Dong"_span },
+            { 1, "Ring Ring"_span },
+        };
+        return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+    });
+}
+
+} // namespace app
+} // namespace chip

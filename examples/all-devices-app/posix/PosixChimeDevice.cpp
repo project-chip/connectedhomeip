@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#pragma once
-
-#include <app/clusters/closure-dimension-server/ClosureDimensionClusterDelegate.h>
+#include <PosixChimeDevice.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
-namespace Clusters {
-namespace ClosureDimension {
 
-using DelegateBase = ClosureDimensionClusterDelegate;
-} // namespace ClosureDimension
-} // namespace Clusters
+Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chimeID)
+{
+    // Call base class to log the default message
+    auto status = ChimeDevice::PlayChimeSound(chimeID);
+
+    // TODO: play a real sound on POSIX (Linux/Darwin)
+    ChipLogProgress(DeviceLayer, "PosixChimeDevice: TODO: Play real sound for ID %d", chimeID);
+
+    return status;
+}
+
 } // namespace app
 } // namespace chip

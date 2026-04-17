@@ -1,6 +1,6 @@
 /*
- *    Copyright 2024 Project CHIP Authors
- *    All rights reserved.
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,16 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-/* ---- App Config ---- */
-#define APP_DEVICE_TYPE_ENDPOINT 1
-#define APP_CLUSTER_ATTRIBUTE chip::app::Clusters::BooleanState::Attributes::StateValue
+#include <lib/support/TimerDelegate.h>
 
-/* ---- Button Manager Config ---- */
-#define BUTTON_MANAGER_FACTORY_RESET_TIMEOUT_MS 6000
+namespace chip {
+namespace app {
 
-/* ---- LED Manager Config ---- */
-#define LED_MANAGER_STATUS_LED_INDEX 0
-#define LED_MANAGER_LIGHT_LED_INDEX 1
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate);
+
+} // namespace app
+} // namespace chip
