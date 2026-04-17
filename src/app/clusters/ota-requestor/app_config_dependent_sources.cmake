@@ -20,6 +20,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/BDXDownloader.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegrationInternal.h"
     "${CLUSTER_DIR}/DefaultOTARequestor.cpp"
     "${CLUSTER_DIR}/DefaultOTARequestor.h"
     "${CLUSTER_DIR}/DefaultOTARequestorDriver.cpp"
@@ -53,11 +54,4 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/OTARequestorInterface.h"
     "${CLUSTER_DIR}/OTARequestorStorage.h"
     "${CLUSTER_DIR}/OTARequestorUserConsentDelegate.h"
-)
-
-# This is equivalent to BUILD.gn's codegen-integration-internal source set.
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegrationInternal.h"
 )
