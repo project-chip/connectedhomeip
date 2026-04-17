@@ -17,6 +17,7 @@
 #pragma once
 
 #include <devices/chime/ChimeDevice.h>
+#include <miniaudio.h>
 
 namespace chip {
 namespace app {
@@ -24,8 +25,14 @@ namespace app {
 class PosixChimeDevice : public ChimeDevice
 {
 public:
-    using ChimeDevice::ChimeDevice;
+    PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds);
+    ~PosixChimeDevice() override;
+
     Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
+
+private:
+    ma_engine mEngine;
+    bool mEngineInitialized = false;
 };
 
 } // namespace app

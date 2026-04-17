@@ -19,6 +19,7 @@ config("includes") {
   include_dirs = [
     ".",
     "../include",
+    "${chip_root}/third_party/miniaudio/repo",
   ]
 }
 
