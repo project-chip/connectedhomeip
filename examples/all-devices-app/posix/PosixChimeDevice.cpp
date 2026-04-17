@@ -26,121 +26,195 @@ namespace {
 
 const double kPi = 3.14159265358979323846;
 const uint16_t kAudioFormatPCM = 1;
+const uint32_t kSampleRate = 44100;
 
-// Helper to generate raw PCM data in memory
-void GeneratePcmMemory(std::vector<uint8_t> & buffer, double freq1, double freq2, double duration, bool pulse = false)
+// Custom data source read callback
+ma_result custom_data_source_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead)
 {
-    const int sampleRate    = 44100;
-    const int bitsPerSample = 16;
-    const int numChannels   = 1;
-    const int numSamples    = static_cast<int>(duration * sampleRate);
-    const int dataSize      = numSamples * numChannels * (bitsPerSample / 8);
+    auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
+    if (pCustomDS == NULL) return MA_INVALID_ARGS;
 
-    buffer.resize(dataSize);
-    uint8_t * p = buffer.data();
+    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRate);
 
-    // Helper to write Little-Endian 16-bit values
-    auto writeVal16 = [&](uint16_t val) {
-        *p++ = static_cast<uint8_t>(val & 0xFF);
-        *p++ = static_cast<uint8_t>((val >> 8) & 0xFF);
-    };
-
-    // Generate samples
-    for (int i = 0; i < numSamples; ++i)
+    ma_uint64 framesToRead = frameCount;
+    if (pCustomDS->cursor + framesToRead > totalSamples)
     {
-        // Current time in seconds
-        double t = static_cast<double>(i) / sampleRate;
-        double freq;
-        double t_note; // Time relative to the start of the current note
+        framesToRead = totalSamples - pCustomDS->cursor;
+    }
 
-        if (pulse)
+    if (framesToRead == 0)
+    {
+        if (pFramesRead) *pFramesRead = 0;
+        return MA_AT_END;
+    }
+
+    int16_t* pOut = reinterpret_cast<int16_t*>(pFramesOut);
+
+    for (ma_uint64 i = 0; i < framesToRead; ++i)
+    {
+        ma_uint64 currentSample = pCustomDS->cursor + i;
+        double t = static_cast<double>(currentSample) / kSampleRate;
+        double freq;
+        double t_note;
+
+        if (pCustomDS->pulse)
         {
-            freq   = freq1;
+            freq = pCustomDS->freq1;
             t_note = t;
         }
         else
         {
-            // Two-tone sound: first half plays freq1, second half plays freq2
-            if (t < duration / 2.0)
+            if (t < pCustomDS->duration / 2.0)
             {
-                freq   = freq1;
+                freq = pCustomDS->freq1;
                 t_note = t;
             }
             else
             {
-                freq   = freq2;
-                t_note = t - (duration / 2.0);
+                freq = pCustomDS->freq2;
+                t_note = t - (pCustomDS->duration / 2.0);
             }
         }
 
-        // Exponential decay for a natural "bell-like" volume drop
         double volume = exp(-t_note * 4.0);
 
-        // If pulsing, toggle sound on and off at 20Hz rate
-        if (pulse)
+        if (pCustomDS->pulse)
         {
             bool on = (static_cast<int>(t * 20) % 2) == 0;
-            if (!on)
-                volume = 0;
+            if (!on) volume = 0;
         }
 
-        // Additive synthesis: combine fundamental frequency with overtones
-        // to make it sound richer than a simple pure beep.
         double sample = 0;
-        // Fundamental frequency (60% weight)
         sample += 0.6 * sin(2.0 * kPi * freq * t_note);
-        // First overtone / 2nd harmonic (30% weight)
         sample += 0.3 * sin(2.0 * kPi * freq * 2.0 * t_note);
-        // Second overtone / 3rd harmonic (10% weight)
         sample += 0.1 * sin(2.0 * kPi * freq * 3.0 * t_note);
 
         sample *= volume;
 
-        // Scale to 16-bit signed integer PCM
-        int16_t pcmSample = static_cast<int16_t>(sample * 32767.0);
-        writeVal16(static_cast<uint16_t>(pcmSample));
+        pOut[i] = static_cast<int16_t>(sample * 32767.0);
     }
 
-    ChipLogProgress(DeviceLayer, "Generated PCM buffer size %zu", buffer.size());
+    pCustomDS->cursor += framesToRead;
+    if (pFramesRead) *pFramesRead = framesToRead;
+
+    return (framesToRead < frameCount) ? MA_AT_END : MA_SUCCESS;
 }
+
+// Custom data source seek callback
+ma_result custom_data_source_seek(ma_data_source* pDataSource, ma_uint64 frameIndex)
+{
+    auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
+    if (pCustomDS == NULL) return MA_INVALID_ARGS;
+
+    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRate);
+
+    if (frameIndex > totalSamples)
+    {
+        pCustomDS->cursor = totalSamples;
+    }
+    else
+    {
+        pCustomDS->cursor = frameIndex;
+    }
+
+    return MA_SUCCESS;
+}
+
+// Custom data source get data format callback
+ma_result custom_data_source_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels, ma_uint32* pSampleRate, ma_channel* pChannelMap, size_t channelMapCap)
+{
+    if (pFormat) *pFormat = ma_format_s16;
+    if (pChannels) *pChannels = 1;
+    if (pSampleRate) *pSampleRate = kSampleRate;
+    if (pChannelMap && channelMapCap > 0) *pChannelMap = MA_CHANNEL_MONO;
+
+    return MA_SUCCESS;
+}
+
+// Custom data source get cursor callback
+ma_result custom_data_source_get_cursor(ma_data_source* pDataSource, ma_uint64* pCursor)
+{
+    auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
+    if (pCustomDS == NULL) return MA_INVALID_ARGS;
+
+    if (pCursor) *pCursor = pCustomDS->cursor;
+    return MA_SUCCESS;
+}
+
+// Custom data source get length callback
+ma_result custom_data_source_get_length(ma_data_source* pDataSource, ma_uint64* pLength)
+{
+    auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
+    if (pCustomDS == NULL) return MA_INVALID_ARGS;
+
+    if (pLength) *pLength = static_cast<ma_uint64>(pCustomDS->duration * kSampleRate);
+    return MA_SUCCESS;
+}
+
+// Custom data source set looping callback
+ma_result custom_data_source_set_looping(ma_data_source* pDataSource, ma_bool32 isLooping)
+{
+    // Not supported for now
+    return MA_NOT_IMPLEMENTED;
+}
+
+// Define the vtable
+static ma_data_source_vtable g_custom_data_source_vtable = {
+    custom_data_source_read,
+    custom_data_source_seek,
+    custom_data_source_get_data_format,
+    custom_data_source_get_cursor,
+    custom_data_source_get_length,
+    custom_data_source_set_looping,
+    0 // flags
+};
 
 bool InitializeSoundResource(ma_engine * engine, const ChimeDevice::Sound & sound, PosixChimeDevice::SoundResource & resource)
 {
     resource.id = sound.id;
  
-    // Generate sound based on ID
+    // Configure the custom data source based on ID
+    resource.dataSource.cursor = 0;
+ 
     if (sound.id == 0)
     {
-        GeneratePcmMemory(resource.buffer, 880, 660, 1.0, false); // Ding Dong
+        resource.dataSource.freq1 = 880;
+        resource.dataSource.freq2 = 660;
+        resource.dataSource.duration = 1.0;
+        resource.dataSource.pulse = false;
     }
     else if (sound.id == 1)
     {
-        GeneratePcmMemory(resource.buffer, 1000, 1000, 1.0, true); // Ring Ring
+        resource.dataSource.freq1 = 1000;
+        resource.dataSource.freq2 = 1000;
+        resource.dataSource.duration = 1.0;
+        resource.dataSource.pulse = true;
     }
     else
     {
-        GeneratePcmMemory(resource.buffer, 440, 440, 0.5, false); // Default beep
+        resource.dataSource.freq1 = 440;
+        resource.dataSource.freq2 = 440;
+        resource.dataSource.duration = 0.5;
+        resource.dataSource.pulse = false;
     }
  
-    // Initialize audio buffer from raw PCM memory
-    // We use 44100 Hz, 16-bit signed PCM, mono.
-    // Frames count is buffer size / 2 (since each sample is 2 bytes).
-    ma_audio_buffer_config config = ma_audio_buffer_config_init(ma_format_s16, 1, resource.buffer.size() / 2, resource.buffer.data(), NULL);
-    config.sampleRate = 44100; // Explicitly set sample rate as it's not in the init helper arguments for audio_buffer
+    // Initialize the base data source with our vtable
+    ma_data_source_config config = ma_data_source_config_init();
+    config.vtable = &g_custom_data_source_vtable;
     
-    ma_result res = ma_audio_buffer_init(&config, &resource.audioBuffer);
+    ma_result res = ma_data_source_init(&config, &resource.dataSource.base);
     if (res != MA_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "Failed to initialize audio buffer for sound %d: %d", sound.id, res);
+        ChipLogError(DeviceLayer, "Failed to initialize base data source for sound %d: %d", sound.id, res);
         return false;
     }
  
     // Initialize sound from data source
-    res = ma_sound_init_from_data_source(engine, &resource.audioBuffer, 0, NULL, &resource.sound);
+    res = ma_sound_init_from_data_source(engine, &resource.dataSource.base, 0, NULL, &resource.sound);
     if (res != MA_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Failed to initialize sound %d from data source: %d", sound.id, res);
-        ma_audio_buffer_uninit(&resource.audioBuffer);
+        ma_data_source_uninit(&resource.dataSource.base);
         return false;
     }
  
@@ -189,7 +263,7 @@ PosixChimeDevice::~PosixChimeDevice()
             if (resource.initialized)
             {
                 ma_sound_uninit(&resource.sound);
-                ma_audio_buffer_uninit(&resource.audioBuffer);
+                ma_data_source_uninit(&resource.dataSource.base);
             }
         }
         ma_engine_uninit(&mEngine);

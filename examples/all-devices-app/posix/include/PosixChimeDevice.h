@@ -26,11 +26,20 @@ namespace app {
 class PosixChimeDevice : public ChimeDevice
 {
 public:
+    struct CustomDataSource
+    {
+        ma_data_source_base base;
+        double freq1;
+        double freq2;
+        double duration;
+        bool pulse;
+        ma_uint64 cursor;
+    };
+
     struct SoundResource
     {
         uint8_t id;
-        std::vector<uint8_t> buffer;
-        ma_audio_buffer audioBuffer;
+        CustomDataSource dataSource;
         ma_sound sound;
         bool initialized = false;
     };
