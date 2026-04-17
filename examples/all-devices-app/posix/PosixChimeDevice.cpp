@@ -45,7 +45,8 @@ constexpr uint32_t kSampleRateHz   = 44100;
 ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOut, ma_uint64 frameCount, ma_uint64 * pFramesRead)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL) return MA_INVALID_ARGS;
+    if (pCustomDS == NULL)
+        return MA_INVALID_ARGS;
 
     // Calculate total samples for the full duration of the sound
     const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
@@ -59,7 +60,8 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
 
     if (framesToRead == 0)
     {
-        if (pFramesRead) *pFramesRead = 0;
+        if (pFramesRead)
+            *pFramesRead = 0;
         return MA_AT_END;
     }
 
@@ -77,7 +79,7 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
         if (pCustomDS->pulse)
         {
             // Pulsing sound: keep same frequency
-            freq = pCustomDS->freq1;
+            freq   = pCustomDS->freq1;
             t_note = t;
         }
         else
@@ -85,12 +87,12 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
             // Two-tone sound (Ding-Dong): switch frequency halfway
             if (t < pCustomDS->duration / 2.0)
             {
-                freq = pCustomDS->freq1;
+                freq   = pCustomDS->freq1;
                 t_note = t;
             }
             else
             {
-                freq = pCustomDS->freq2;
+                freq   = pCustomDS->freq2;
                 t_note = t - (pCustomDS->duration / 2.0); // Reset relative time for second tone
             }
         }
@@ -102,7 +104,8 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
         {
             // Apply a square wave modulation for the pulse effect
             bool on = (static_cast<int>(t * 20) % 2) == 0;
-            if (!on) volume = 0;
+            if (!on)
+                volume = 0;
         }
 
         // Additive synthesis: combine fundamental frequency and harmonics
@@ -118,7 +121,8 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
     }
 
     pCustomDS->cursor += framesToRead;
-    if (pFramesRead) *pFramesRead = framesToRead;
+    if (pFramesRead)
+        *pFramesRead = framesToRead;
 
     return (framesToRead < frameCount) ? MA_AT_END : MA_SUCCESS;
 }
@@ -127,7 +131,8 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
 ma_result custom_data_source_seek(ma_data_source * pDataSource, ma_uint64 frameIndex)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL) return MA_INVALID_ARGS;
+    if (pCustomDS == NULL)
+        return MA_INVALID_ARGS;
 
     const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
 
@@ -145,12 +150,17 @@ ma_result custom_data_source_seek(ma_data_source * pDataSource, ma_uint64 frameI
 }
 
 // Custom data source get data format callback. Tells miniaudio what format we are generating.
-ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_format * pFormat, ma_uint32 * pChannels, ma_uint32 * pSampleRate, ma_channel * pChannelMap, size_t channelMapCap)
+ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_format * pFormat, ma_uint32 * pChannels,
+                                             ma_uint32 * pSampleRate, ma_channel * pChannelMap, size_t channelMapCap)
 {
-    if (pFormat) *pFormat = ma_format_s16; // 16-bit signed integer PCM
-    if (pChannels) *pChannels = 1;         // Mono
-    if (pSampleRate) *pSampleRate = kSampleRateHz;
-    if (pChannelMap && channelMapCap > 0) *pChannelMap = MA_CHANNEL_MONO;
+    if (pFormat)
+        *pFormat = ma_format_s16; // 16-bit signed integer PCM
+    if (pChannels)
+        *pChannels = 1; // Mono
+    if (pSampleRate)
+        *pSampleRate = kSampleRateHz;
+    if (pChannelMap && channelMapCap > 0)
+        *pChannelMap = MA_CHANNEL_MONO;
 
     return MA_SUCCESS;
 }
@@ -159,9 +169,11 @@ ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_fo
 ma_result custom_data_source_get_cursor(ma_data_source * pDataSource, ma_uint64 * pCursor)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL) return MA_INVALID_ARGS;
+    if (pCustomDS == NULL)
+        return MA_INVALID_ARGS;
 
-    if (pCursor) *pCursor = pCustomDS->cursor;
+    if (pCursor)
+        *pCursor = pCustomDS->cursor;
     return MA_SUCCESS;
 }
 
@@ -169,9 +181,11 @@ ma_result custom_data_source_get_cursor(ma_data_source * pDataSource, ma_uint64 
 ma_result custom_data_source_get_length(ma_data_source * pDataSource, ma_uint64 * pLength)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL) return MA_INVALID_ARGS;
+    if (pCustomDS == NULL)
+        return MA_INVALID_ARGS;
 
-    if (pLength) *pLength = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
+    if (pLength)
+        *pLength = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
     return MA_SUCCESS;
 }
 
@@ -199,47 +213,47 @@ static ma_data_source_vtable g_custom_data_source_vtable = {
 PosixChimeDevice::SoundResource::SoundResource(ma_engine * engine, const ChimeDevice::Sound & soundInfo)
 {
     id = soundInfo.id;
- 
+
     // Configure the custom data source parameters based on ID.
     // These hardcoded values define the characteristics of each chime.
     dataSource.cursor = 0;
- 
+
     if (soundInfo.id == 0)
     {
         // Chime 0: Two-tone "Ding-Dong" (880Hz then 660Hz)
-        dataSource.freq1 = 880;
-        dataSource.freq2 = 660;
+        dataSource.freq1    = 880;
+        dataSource.freq2    = 660;
         dataSource.duration = 1.0;
-        dataSource.pulse = false;
+        dataSource.pulse    = false;
     }
     else if (soundInfo.id == 1)
     {
         // Chime 1: Pulsing warning tone (1000Hz pulsing)
-        dataSource.freq1 = 1000;
-        dataSource.freq2 = 1000;
+        dataSource.freq1    = 1000;
+        dataSource.freq2    = 1000;
         dataSource.duration = 1.0;
-        dataSource.pulse = true;
+        dataSource.pulse    = true;
     }
     else
     {
         // Chime 2 (Default): Single short tone (440Hz)
-        dataSource.freq1 = 440;
-        dataSource.freq2 = 440;
+        dataSource.freq1    = 440;
+        dataSource.freq2    = 440;
         dataSource.duration = 0.5;
-        dataSource.pulse = false;
+        dataSource.pulse    = false;
     }
- 
+
     // Initialize the base data source with our vtable mapping to the callbacks above
     ma_data_source_config config = ma_data_source_config_init();
-    config.vtable = &g_custom_data_source_vtable;
-    
+    config.vtable                = &g_custom_data_source_vtable;
+
     ma_result res = ma_data_source_init(&config, &dataSource.base);
     if (res != MA_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Failed to initialize base data source for sound %d: %d", soundInfo.id, res);
         return;
     }
- 
+
     // Initialize the sound object from the data source. Miniaudio will pull data from it during playback.
     res = ma_sound_init_from_data_source(engine, &dataSource.base, 0, NULL, &sound);
     if (res != MA_SUCCESS)
@@ -248,7 +262,7 @@ PosixChimeDevice::SoundResource::SoundResource(ma_engine * engine, const ChimeDe
         ma_data_source_uninit(&dataSource.base);
         return;
     }
- 
+
     mInitialized = true;
 }
 
@@ -333,10 +347,10 @@ Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chi
     if (pSound)
     {
         ChipLogProgress(DeviceLayer, "PosixChimeDevice: Attempting to play sound %d from memory", chimeID);
-        
+
         // Rewind sound to the beginning before playing
         ma_sound_seek_to_pcm_frame(pSound, 0);
-        
+
         // Start playback. This will trigger callbacks to custom_data_source_read.
         ma_result result = ma_sound_start(pSound);
         if (result != MA_SUCCESS)

@@ -17,9 +17,9 @@
 #pragma once
 
 #include <devices/chime/ChimeDevice.h>
+#include <memory>
 #include <miniaudio.h>
 #include <vector>
-#include <memory>
 
 namespace chip {
 namespace app {
