@@ -821,7 +821,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestMultipleVideoStreamNamesNoCorruptio
     DataModel::List<const Structs::VideoStreamStruct::Type> videoList = transportOptionsStorage.videoStreams.Value();
     EXPECT_EQ(videoList.size(), (size_t) 5);
 
-    for (int i = 0; i < 5; i++)
+    for (size_t i = 0; i < 5; i++)
     {
         std::string expectedName = "VideoStream" + std::to_string(i);
         std::string storedName(videoList[i].videoStreamName.data(), videoList[i].videoStreamName.size());
@@ -849,7 +849,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestMultipleAudioStreamNamesNoCorruptio
     DataModel::List<const Structs::AudioStreamStruct::Type> audioList = transportOptionsStorage.audioStreams.Value();
     EXPECT_EQ(audioList.size(), (size_t) 5);
 
-    for (int i = 0; i < 5; i++)
+    for (size_t i = 0; i < 5; i++)
     {
         std::string expectedName = "AudioStream" + std::to_string(i);
         std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());
