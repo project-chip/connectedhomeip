@@ -26,10 +26,12 @@ source_set("darwin") {
   sources = [
     "../include/AppRootNode.h",
     "../include/TermHandling.h",
+    "DeviceFactoryPlatformOverride.cpp",
     "TermHandling.cpp",
   ]
 
   deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
