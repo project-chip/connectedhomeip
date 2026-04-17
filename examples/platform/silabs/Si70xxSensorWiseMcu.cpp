@@ -147,7 +147,7 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     relativeHumidity = static_cast<uint16_t>(tempHumidity * 100);
 
 #endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
-    
+
     return status;
 }
 
