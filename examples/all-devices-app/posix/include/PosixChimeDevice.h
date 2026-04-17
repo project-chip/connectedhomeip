@@ -35,12 +35,16 @@ private:
     ma_engine mEngine;
     bool mEngineInitialized = false;
 
-    std::vector<uint8_t> mChime0Buffer;
-    std::vector<uint8_t> mChime1Buffer;
-    ma_decoder mDecoder0;
-    ma_decoder mDecoder1;
-    ma_sound mSound0;
-    ma_sound mSound1;
+    struct SoundResource
+    {
+        uint8_t id;
+        std::vector<uint8_t> buffer;
+        ma_decoder decoder;
+        ma_sound sound;
+        bool initialized = false;
+    };
+
+    std::vector<SoundResource> mSoundResources;
     bool mSoundsInitialized = false;
 };
 
