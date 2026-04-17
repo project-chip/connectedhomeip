@@ -62,10 +62,8 @@ CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
         endOfList++;
     }
 
-    ConcreteCommandPath commandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
     for (const CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
     {
-        commandPath.mCommandId = *p;
         acceptedCommands.set(*p);
     }
 
@@ -77,8 +75,7 @@ CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
