@@ -24,6 +24,9 @@ namespace app {
 
 namespace {
 
+const double kPi = 3.14159265358979323846;
+const uint16_t kAudioFormatPCM = 1;
+
 // Helper to generate a simple WAV file in memory
 void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2, double duration, bool pulse = false)
 {
@@ -65,7 +68,7 @@ void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2
     writeStr("fmt ", 4);
     uint32_t subChunk1Size = 16;
     writeVal32(subChunk1Size);
-    uint16_t audioFormat = 1; // PCM
+    uint16_t audioFormat = kAudioFormatPCM; // PCM
     writeVal16(audioFormat);
     uint16_t numChans = numChannels;
     writeVal16(numChans);
@@ -124,11 +127,11 @@ void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2
         // to make it sound richer than a simple pure beep.
         double sample = 0;
         // Fundamental frequency (60% weight)
-        sample += 0.6 * sin(2.0 * 3.14159265358979323846 * freq * t_note);
+        sample += 0.6 * sin(2.0 * kPi * freq * t_note);
         // First overtone / 2nd harmonic (30% weight)
-        sample += 0.3 * sin(2.0 * 3.14159265358979323846 * freq * 2.0 * t_note);
+        sample += 0.3 * sin(2.0 * kPi * freq * 2.0 * t_note);
         // Second overtone / 3rd harmonic (10% weight)
-        sample += 0.1 * sin(2.0 * 3.14159265358979323846 * freq * 3.0 * t_note);
+        sample += 0.1 * sin(2.0 * kPi * freq * 3.0 * t_note);
 
         sample *= volume;
 
