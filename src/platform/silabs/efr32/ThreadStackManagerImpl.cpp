@@ -25,8 +25,9 @@
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <platform/NetworkCommissioning.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
