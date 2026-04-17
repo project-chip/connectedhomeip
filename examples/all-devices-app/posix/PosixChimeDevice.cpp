@@ -41,35 +41,43 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
         p += len;
     };
 
-    // Helper to write trivial types
-    auto writeVal = [&](const auto & val) {
-        memcpy(p, &val, sizeof(val));
-        p += sizeof(val);
+    // Helper to write Little-Endian 16-bit values
+    auto writeVal16 = [&](uint16_t val) {
+        *p++ = static_cast<uint8_t>(val & 0xFF);
+        *p++ = static_cast<uint8_t>((val >> 8) & 0xFF);
+    };
+
+    // Helper to write Little-Endian 32-bit values
+    auto writeVal32 = [&](uint32_t val) {
+        *p++ = static_cast<uint8_t>(val & 0xFF);
+        *p++ = static_cast<uint8_t>((val >> 8) & 0xFF);
+        *p++ = static_cast<uint8_t>((val >> 16) & 0xFF);
+        *p++ = static_cast<uint8_t>((val >> 24) & 0xFF);
     };
 
     // WAV Header
     writeStr("RIFF", sizeof("RIFF") - 1);
     uint32_t chunkSize = 36 + dataSize;
-    writeVal(chunkSize);
+    writeVal32(chunkSize);
     writeStr("WAVE", sizeof("WAVE") - 1);
     writeStr("fmt ", sizeof("fmt ") - 1);
     uint32_t subChunk1Size = 16;
-    writeVal(subChunk1Size);
+    writeVal32(subChunk1Size);
     uint16_t audioFormat = 1; // PCM
-    writeVal(audioFormat);
+    writeVal16(audioFormat);
     uint16_t channels = numChannels;
-    writeVal(channels);
+    writeVal16(channels);
     uint32_t sRate = sampleRate;
-    writeVal(sRate);
+    writeVal32(sRate);
     uint32_t byteRate = sampleRate * numChannels * (bitsPerSample / 8);
-    writeVal(byteRate);
+    writeVal32(byteRate);
     uint16_t blockAlign = numChannels * (bitsPerSample / 8);
-    writeVal(blockAlign);
+    writeVal16(blockAlign);
     uint16_t bps = bitsPerSample;
-    writeVal(bps);
+    writeVal16(bps);
     writeStr("data", sizeof("data") - 1);
     uint32_t subChunk2Size = dataSize;
-    writeVal(subChunk2Size);
+    writeVal32(subChunk2Size);
 
     // Generate samples
     for (int i = 0; i < numSamples; ++i)
@@ -114,7 +122,7 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
         sample *= volume;
 
         int16_t pcmSample = static_cast<int16_t>(sample * 32767.0);
-        writeVal(pcmSample);
+        writeVal16(static_cast<uint16_t>(pcmSample));
     }
 
     ChipLogProgress(DeviceLayer, "Generated WAV buffer size %zu", buffer.size());
