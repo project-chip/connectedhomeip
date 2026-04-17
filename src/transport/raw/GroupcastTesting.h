@@ -40,7 +40,7 @@ public:
     {
     public:
         virtual ~Delegate()               = default;
-        virtual void OnTestingCompleted() = 0;
+        virtual void FlushGroupcastTestingEvent() = 0;
     };
 
     /**
@@ -68,7 +68,7 @@ public:
     {
         if (mDelegate != nullptr)
         {
-            mDelegate->OnTestingCompleted();
+            mDelegate->FlushGroupcastTestingEvent();
         }
     }
 

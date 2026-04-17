@@ -216,7 +216,9 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    Groupcast::GetTesting().SetDelegate(this);
+    if(Credentials::GetGroupDataProvider()->IsGroupcastEnabled()) {
+        Groupcast::GetTesting().SetDelegate(this);
+    }
 
     TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
                                                                                 : &EventManagement::GetInstance());
@@ -231,7 +233,9 @@ void InteractionModelEngine::Shutdown()
 {
     VerifyOrReturn(State::kUninitialized != mState);
 
-    Groupcast::GetTesting().SetDelegate(nullptr);
+    if(Credentials::GetGroupDataProvider()->IsGroupcastEnabled()) {
+        Groupcast::GetTesting().SetDelegate(nullptr);
+    }
 
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
@@ -1057,7 +1061,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedMessageReceived(const PayloadHea
     return CHIP_NO_ERROR;
 }
 
-void InteractionModelEngine::OnTestingCompleted()
+void InteractionModelEngine::FlushGroupcastTestingEvent()
 {
     auto & testing = Groupcast::GetTesting();
     VerifyOrReturn(testing.IsEnabled());
@@ -1066,12 +1070,12 @@ void InteractionModelEngine::OnTestingCompleted()
 
     // Convert to event type
     testing.ToEventType(event);
-    testing.Clear();
-
+    
     // Generate event
     DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
     eventGenerator.GenerateEvent(event, kRootEndpointId);
     eventGenerator.ScheduleUrgentEventDeliverySync();
+    testing.Clear();
 }
 
 CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,

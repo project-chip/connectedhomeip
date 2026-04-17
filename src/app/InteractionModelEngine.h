@@ -440,7 +440,7 @@ public:
     SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override;
 
     // Groupcast::Testing::Delegate implementation
-    void OnTestingCompleted() override;
+    void FlushGroupcastTestingEvent() override;
 
 private:
     /* DataModel::ActionContext implementation */
