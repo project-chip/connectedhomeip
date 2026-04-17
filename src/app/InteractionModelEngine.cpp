@@ -1070,7 +1070,7 @@ void InteractionModelEngine::FlushGroupcastTestingEvent()
 
     // Convert to event type
     testing.ToEventType(event);
-    
+
     // Generate event
     DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
     eventGenerator.GenerateEvent(event, kRootEndpointId);
