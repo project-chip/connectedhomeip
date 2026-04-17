@@ -639,11 +639,13 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
     switch (request.path.mAttributeId)
     {
     case GroupKeyManagement::Attributes::ClusterRevision::Id:
-        return encoder.Encode(Credentials::GetGroupDataProvider()->IsGroupcastEnabled() ? kRevision
-                                                                                        : kGroupKeyClusterRevisionBeforeGroupcast);
+        return encoder.Encode(kRevision);
     case Attributes::FeatureMap::Id: {
         BitFlags<GroupKeyManagement::Feature> features;
-        features.Set(Clusters::GroupKeyManagement::Feature::kGroupcast);
+        if (mContext.groupDataProvider.IsGroupcastEnabled())
+        {
+            features.Set(Clusters::GroupKeyManagement::Feature::kGroupcast);
+        }
         if (IsMCSPSupported())
         {
             features.Set(Clusters::GroupKeyManagement::Feature::kCacheAndSync);
@@ -658,8 +660,6 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
         return ReadMaxGroupsPerFabric(mContext.groupDataProvider, encoder);
     case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
         return ReadMaxGroupKeysPerFabric(mContext.groupDataProvider, encoder);
-    case GroupKeyManagement::Attributes::GroupcastAdoption::Id:
-        return encoder.EncodeList([](const auto & e) { return CHIP_NO_ERROR; });
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -683,11 +683,7 @@ CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & pat
                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { IsGCASTSupported(), GroupcastAdoption::kMetadataEntry },
-    };
-
-    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), Span(optionalAttributes));
+    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), {});
 }
 
 CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,

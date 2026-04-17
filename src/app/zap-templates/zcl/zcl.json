@@ -237,8 +237,16 @@
         "Closure Dimension": [
             "CurrentState",
             "TargetState",
+            "Resolution",
+            "StepValue",
+            "Unit",
             "UnitRange",
             "LimitRange",
+            "TranslationDirection",
+            "RotationAxis",
+            "Overflow",
+            "ModulationType",
+            "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
         ],

@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app/clusters/closure-dimension-server/ClosureDimensionClusterDelegate.h>
+#include <devices/chime/ChimeDevice.h>
 
 namespace chip {
 namespace app {
-namespace Clusters {
-namespace ClosureDimension {
 
-using DelegateBase = ClosureDimensionClusterDelegate;
-} // namespace ClosureDimension
-} // namespace Clusters
+class PosixChimeDevice : public ChimeDevice
+{
+public:
+    using ChimeDevice::ChimeDevice;
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
+};
+
 } // namespace app
 } // namespace chip
