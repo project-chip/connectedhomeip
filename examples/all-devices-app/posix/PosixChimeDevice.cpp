@@ -29,14 +29,18 @@ constexpr uint16_t kAudioFormatPCM = 1;
 constexpr uint32_t kSampleRateHz   = 44100;
 
 // Custom data source read callback
+// Custom data source read callback. This is called by miniaudio to fetch more audio frames.
+// It generates the audio on-the-fly instead of reading from a buffer.
 ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOut, ma_uint64 frameCount, ma_uint64 * pFramesRead)
 {
-    auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
+    auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
     if (pCustomDS == NULL) return MA_INVALID_ARGS;
 
+    // Calculate total samples for the full duration of the sound
     const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
 
     ma_uint64 framesToRead = frameCount;
+    // Ensure we don't read past the end of the sound
     if (pCustomDS->cursor + framesToRead > totalSamples)
     {
         framesToRead = totalSamples - pCustomDS->cursor;
@@ -48,22 +52,26 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
         return MA_AT_END;
     }
 
-    int16_t* pOut = reinterpret_cast<int16_t*>(pFramesOut);
+    int16_t * pOut = reinterpret_cast<int16_t *>(pFramesOut);
 
+    // Generate samples on the fly
     for (ma_uint64 i = 0; i < framesToRead; ++i)
     {
         ma_uint64 currentSample = pCustomDS->cursor + i;
+        // Calculate current time in seconds
         double t = static_cast<double>(currentSample) / kSampleRateHz;
         double freq;
         double t_note;
 
         if (pCustomDS->pulse)
         {
+            // Pulsing sound: keep same frequency
             freq = pCustomDS->freq1;
             t_note = t;
         }
         else
         {
+            // Two-tone sound (Ding-Dong): switch frequency halfway
             if (t < pCustomDS->duration / 2.0)
             {
                 freq = pCustomDS->freq1;
@@ -72,25 +80,29 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
             else
             {
                 freq = pCustomDS->freq2;
-                t_note = t - (pCustomDS->duration / 2.0);
+                t_note = t - (pCustomDS->duration / 2.0); // Reset relative time for second tone
             }
         }
 
+        // Apply exponential decay for a natural chime fade-out effect
         double volume = exp(-t_note * 4.0);
 
         if (pCustomDS->pulse)
         {
+            // Apply a square wave modulation for the pulse effect
             bool on = (static_cast<int>(t * 20) % 2) == 0;
             if (!on) volume = 0;
         }
 
+        // Additive synthesis: combine fundamental frequency and harmonics
         double sample = 0;
-        sample += 0.6 * sin(2.0 * kPi * freq * t_note);
-        sample += 0.3 * sin(2.0 * kPi * freq * 2.0 * t_note);
-        sample += 0.1 * sin(2.0 * kPi * freq * 3.0 * t_note);
+        sample += 0.6 * sin(2.0 * kPi * freq * t_note);       // Fundamental
+        sample += 0.3 * sin(2.0 * kPi * freq * 2.0 * t_note); // 2nd harmonic
+        sample += 0.1 * sin(2.0 * kPi * freq * 3.0 * t_note); // 3rd harmonic
 
         sample *= volume;
 
+        // Scale to 16-bit signed PCM and store
         pOut[i] = static_cast<int16_t>(sample * 32767.0);
     }
 
