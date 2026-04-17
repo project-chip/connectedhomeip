@@ -204,9 +204,9 @@ CHIP_ERROR CommandDispatcher_Internal(ClusterId clusterId, CommandId commandId, 
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY);
-    data->commandId           = commandId;
-    data->clusterId           = clusterId;
-    data->isGroup             = isGroup;
+    data->commandId = commandId;
+    data->clusterId = clusterId;
+    data->isGroup   = isGroup;
 
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     if (err != CHIP_NO_ERROR)
