@@ -406,13 +406,13 @@ class TC_ACE_1_6(MatterBaseTest):
             kInvalidKeysetId = 0xFFFF
             membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
             for entry in membership:
-                asserts.assert_equal(entry.keySetID, kInvalidKeysetId, f"Group {entry.groupID} should have invalid keyset ID")
+                asserts.assert_equal(entry.keySetID, kInvalidKeysetId, f"Group {entry.groupID} should have invalid keyset ID (0xFFFF)")
 
-            # Step 13: Group command to Group 0x0103 after gorup keys are empty
+            # Step 13: Group command to Group 0x0103 after group keys are empty
             self.step(13)
             self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
 
-            # Step 14: Check for groupcast testing event, ensure it's result is kNoAvailableKey
+            # Step 14: Check for groupcast testing event, ensure its result is kNoAvailableKey
             self.step(14)
             event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
