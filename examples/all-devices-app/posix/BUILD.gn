@@ -41,8 +41,8 @@ executable("all-devices-app") {
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
-    "${chip_root}/zzz_generated/app-common/devices/",
     "${chip_root}/third_party/miniaudio:miniaudio",
+    "${chip_root}/zzz_generated/app-common/devices/",
   ]
 
   if (chip_device_platform == "darwin") {
