@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
 
 config("miniaudio_config") {
   include_dirs = [ "repo" ]
@@ -25,7 +28,16 @@ source_set("miniaudio") {
 
   cflags = [
     "-Wno-missing-format-attribute",
-    "-Wno-shorten-64-to-32",
     "-Wno-implicit-fallthrough",
   ]
+
+  if (is_clang) {
+    cflags += [
+      "-Wno-shorten-64-to-32",
+      "-Wno-format-nonliteral",
+      "-Wno-conversion",
+      "-Wno-sign-conversion",
+      "-Wno-shadow",
+    ]
+  }
 }
