@@ -18,6 +18,7 @@
 
 #include <devices/chime/ChimeDevice.h>
 #include <miniaudio.h>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -33,6 +34,14 @@ public:
 private:
     ma_engine mEngine;
     bool mEngineInitialized = false;
+
+    std::vector<uint8_t> mChime0Buffer;
+    std::vector<uint8_t> mChime1Buffer;
+    ma_decoder mDecoder0;
+    ma_decoder mDecoder1;
+    ma_sound mSound0;
+    ma_sound mSound1;
+    bool mSoundsInitialized = false;
 };
 
 } // namespace app

@@ -17,20 +17,15 @@
 #include <PosixChimeDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <cmath>
-#include <fstream>
+#include <sstream>
 
 namespace chip {
 namespace app {
 
-// Helper to generate a simple WAV file
-static void GenerateWavFile(const char* filename, double freq1, double freq2, double duration, bool pulse = false)
+// Helper to generate a simple WAV file in memory
+static void GenerateWavMemory(std::vector<uint8_t>& buffer, double freq1, double freq2, double duration, bool pulse = false)
 {
-    std::ofstream file(filename, std::ios::binary);
-    if (!file.is_open())
-    {
-        ChipLogError(DeviceLayer, "Failed to open file %s for writing", filename);
-        return;
-    }
+    std::stringstream file(std::ios::binary | std::ios::out);
 
     const int sampleRate = 44100;
     const int bitsPerSample = 16;
@@ -66,25 +61,56 @@ static void GenerateWavFile(const char* filename, double freq1, double freq2, do
     for (int i = 0; i < numSamples; ++i)
     {
         double t = static_cast<double>(i) / sampleRate;
-        double freq = (t < duration / 2.0) ? freq1 : freq2;
-        
-        double volume = 1.0 - (t / duration);
+        double freq;
+        double t_note;
         
         if (pulse)
         {
-            // Pulse every 50ms (10Hz)
+            // For pulse (Ring Ring), we don't split into two notes
+            freq = freq1;
+            t_note = t;
+        }
+        else
+        {
+            // For chime (Ding Dong), we split into two notes
+            if (t < duration / 2.0)
+            {
+                freq = freq1;
+                t_note = t;
+            }
+            else
+            {
+                freq = freq2;
+                t_note = t - (duration / 2.0);
+            }
+        }
+        
+        // Exponential decay per note
+        double volume = exp(-t_note * 4.0);
+        
+        if (pulse)
+        {
+            // Pulse every 50ms (50ms on, 50ms off)
             bool on = (static_cast<int>(t * 20) % 2) == 0;
             if (!on) volume = 0;
         }
         
-        double sample = volume * sin(2.0 * 3.14159265358979323846 * freq * t);
+        // Additive synthesis for richer sound (Fundamental + Harmonics)
+        double sample = 0;
+        sample += 0.6 * sin(2.0 * 3.14159265358979323846 * freq * t_note);
+        sample += 0.3 * sin(2.0 * 3.14159265358979323846 * freq * 2.0 * t_note);
+        sample += 0.1 * sin(2.0 * 3.14159265358979323846 * freq * 3.0 * t_note);
+        
+        sample *= volume;
+        
         int16_t pcmSample = static_cast<int16_t>(sample * 32767.0);
         
         file.write(reinterpret_cast<const char*>(&pcmSample), 2);
     }
 
-    file.close();
-    ChipLogProgress(DeviceLayer, "Generated WAV file %s", filename);
+    std::string str = file.str();
+    buffer.assign(str.begin(), str.end());
+    ChipLogProgress(DeviceLayer, "Generated WAV buffer size %zu", buffer.size());
 }
 
 PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
@@ -100,14 +126,46 @@ PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sou
         mEngineInitialized = true;
         ChipLogProgress(DeviceLayer, "Miniaudio engine initialized successfully");
         
-        // Generate dummy sound files
-        GenerateWavFile("chime_0.wav", 880, 660, 1.0, false); // Ding Dong
-        GenerateWavFile("chime_1.wav", 1000, 1000, 1.0, true); // Ring Ring
+        // Generate dummy sound buffers
+        GenerateWavMemory(mChime0Buffer, 880, 660, 1.0, false); // Ding Dong
+        GenerateWavMemory(mChime1Buffer, 1000, 1000, 1.0, true); // Ring Ring
+
+        // Initialize decoders from memory
+        ma_result res0 = ma_decoder_init_memory(mChime0Buffer.data(), mChime0Buffer.size(), NULL, &mDecoder0);
+        ma_result res1 = ma_decoder_init_memory(mChime1Buffer.data(), mChime1Buffer.size(), NULL, &mDecoder1);
+
+        if (res0 == MA_SUCCESS && res1 == MA_SUCCESS)
+        {
+            // Initialize sounds from data sources
+            res0 = ma_sound_init_from_data_source(&mEngine, &mDecoder0, 0, NULL, &mSound0);
+            res1 = ma_sound_init_from_data_source(&mEngine, &mDecoder1, 0, NULL, &mSound1);
+
+            if (res0 == MA_SUCCESS && res1 == MA_SUCCESS)
+            {
+                mSoundsInitialized = true;
+                ChipLogProgress(DeviceLayer, "In-memory sounds initialized successfully");
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Failed to initialize sounds from data source: %d, %d", res0, res1);
+            }
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to initialize decoders from memory: %d, %d", res0, res1);
+        }
     }
 }
 
 PosixChimeDevice::~PosixChimeDevice()
 {
+    if (mSoundsInitialized)
+    {
+        ma_sound_uninit(&mSound0);
+        ma_sound_uninit(&mSound1);
+        ma_decoder_uninit(&mDecoder0);
+        ma_decoder_uninit(&mDecoder1);
+    }
     if (mEngineInitialized)
     {
         ma_engine_uninit(&mEngine);
@@ -120,20 +178,29 @@ Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chi
     // Call base class to log the default message
     auto status = ChimeDevice::PlayChimeSound(chimeID);
 
-    if (!mEngineInitialized)
+    if (!mSoundsInitialized)
     {
-        ChipLogError(DeviceLayer, "PosixChimeDevice: Engine not initialized, cannot play sound");
+        ChipLogError(DeviceLayer, "PosixChimeDevice: Sounds not initialized, cannot play sound");
         return status;
     }
 
-    char filePath[32];
-    snprintf(filePath, sizeof(filePath), "chime_%d.wav", chimeID);
+    ma_sound* pSound = nullptr;
+    if (chimeID == 0) pSound = &mSound0;
+    else if (chimeID == 1) pSound = &mSound1;
 
-    ChipLogProgress(DeviceLayer, "PosixChimeDevice: Attempting to play sound %s", filePath);
-    ma_result result = ma_engine_play_sound(&mEngine, filePath, NULL);
-    if (result != MA_SUCCESS)
+    if (pSound)
     {
-        ChipLogError(DeviceLayer, "Failed to play sound %s: %d", filePath, result);
+        ChipLogProgress(DeviceLayer, "PosixChimeDevice: Attempting to play sound %d from memory", chimeID);
+        ma_sound_seek_to_pcm_frame(pSound, 0);
+        ma_result result = ma_sound_start(pSound);
+        if (result != MA_SUCCESS)
+        {
+            ChipLogError(DeviceLayer, "Failed to start sound %d: %d", chimeID, result);
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "PosixChimeDevice: Invalid chimeID %d", chimeID);
     }
 
     return status;
