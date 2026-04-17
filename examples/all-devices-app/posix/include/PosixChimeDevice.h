@@ -26,15 +26,6 @@ namespace app {
 class PosixChimeDevice : public ChimeDevice
 {
 public:
-    PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds);
-    ~PosixChimeDevice() override;
-
-    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
-
-private:
-    ma_engine mEngine;
-    bool mEngineInitialized = false;
-
     struct SoundResource
     {
         uint8_t id;
@@ -43,6 +34,15 @@ private:
         ma_sound sound;
         bool initialized = false;
     };
+
+    PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds);
+    ~PosixChimeDevice() override;
+
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
+
+private:
+    ma_engine mEngine;
+    bool mEngineInitialized = false;
 
     std::vector<SoundResource> mSoundResources;
     bool mSoundsInitialized = false;

@@ -22,8 +22,10 @@
 namespace chip {
 namespace app {
 
+namespace {
+
 // Helper to generate a simple WAV file in memory
-static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2, double duration, bool pulse = false)
+void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2, double duration, bool pulse = false)
 {
     const int sampleRate    = 44100;
     const int bitsPerSample = 16;
@@ -56,17 +58,17 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
     };
 
     // WAV Header
-    writeStr("RIFF", sizeof("RIFF") - 1);
-    uint32_t chunkSize = 36 + dataSize;
-    writeVal32(chunkSize);
-    writeStr("WAVE", sizeof("WAVE") - 1);
-    writeStr("fmt ", sizeof("fmt ") - 1);
+    writeStr("RIFF", 4);
+    uint32_t fileSize = totalSize - 8;
+    writeVal32(fileSize);
+    writeStr("WAVE", 4);
+    writeStr("fmt ", 4);
     uint32_t subChunk1Size = 16;
     writeVal32(subChunk1Size);
     uint16_t audioFormat = 1; // PCM
     writeVal16(audioFormat);
-    uint16_t channels = numChannels;
-    writeVal16(channels);
+    uint16_t numChans = numChannels;
+    writeVal16(numChans);
     uint32_t sRate = sampleRate;
     writeVal32(sRate);
     uint32_t byteRate = sampleRate * numChannels * (bitsPerSample / 8);
@@ -75,7 +77,7 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
     writeVal16(blockAlign);
     uint16_t bps = bitsPerSample;
     writeVal16(bps);
-    writeStr("data", sizeof("data") - 1);
+    writeStr("data", 4);
     uint32_t subChunk2Size = dataSize;
     writeVal32(subChunk2Size);
 
@@ -138,6 +140,47 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
     ChipLogProgress(DeviceLayer, "Generated WAV buffer size %zu", buffer.size());
 }
 
+bool InitializeSoundResource(ma_engine * engine, const ChimeDevice::Sound & sound, PosixChimeDevice::SoundResource & resource)
+{
+    resource.id = sound.id;
+
+    // Generate sound based on ID
+    if (sound.id == 0)
+    {
+        GenerateWavMemory(resource.buffer, 880, 660, 1.0, false); // Ding Dong
+    }
+    else if (sound.id == 1)
+    {
+        GenerateWavMemory(resource.buffer, 1000, 1000, 1.0, true); // Ring Ring
+    }
+    else
+    {
+        GenerateWavMemory(resource.buffer, 440, 440, 0.5, false); // Default beep
+    }
+
+    // Initialize decoder from memory
+    ma_result res = ma_decoder_init_memory(resource.buffer.data(), resource.buffer.size(), NULL, &resource.decoder);
+    if (res != MA_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize decoder for sound %d: %d", sound.id, res);
+        return false;
+    }
+
+    // Initialize sound from data source
+    res = ma_sound_init_from_data_source(engine, &resource.decoder, 0, NULL, &resource.sound);
+    if (res != MA_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize sound %d from data source: %d", sound.id, res);
+        ma_decoder_uninit(&resource.decoder);
+        return false;
+    }
+
+    resource.initialized = true;
+    return true;
+}
+
+} // namespace
+
 PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds) : ChimeDevice(timerDelegate, sounds)
 {
     ma_result result = ma_engine_init(NULL, &mEngine);
@@ -155,44 +198,10 @@ PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sou
     bool allSoundsInitialized = true;
     for (size_t i = 0; i < sounds.size(); ++i)
     {
-        const auto & sound = sounds[i];
-        auto & resource    = mSoundResources[i];
-        resource.id        = sound.id;
-
-        // Generate sound based on ID
-        if (sound.id == 0)
+        if (!InitializeSoundResource(&mEngine, sounds[i], mSoundResources[i]))
         {
-            GenerateWavMemory(resource.buffer, 880, 660, 1.0, false); // Ding Dong
-        }
-        else if (sound.id == 1)
-        {
-            GenerateWavMemory(resource.buffer, 1000, 1000, 1.0, true); // Ring Ring
-        }
-        else
-        {
-            GenerateWavMemory(resource.buffer, 440, 440, 0.5, false); // Default beep
-        }
-
-        // Initialize decoder from memory
-        ma_result res = ma_decoder_init_memory(resource.buffer.data(), resource.buffer.size(), NULL, &resource.decoder);
-        if (res != MA_SUCCESS)
-        {
-            ChipLogError(DeviceLayer, "Failed to initialize decoder for sound %d: %d", sound.id, res);
             allSoundsInitialized = false;
-            continue;
         }
-
-        // Initialize sound from data source
-        res = ma_sound_init_from_data_source(&mEngine, &resource.decoder, 0, NULL, &resource.sound);
-        if (res != MA_SUCCESS)
-        {
-            ChipLogError(DeviceLayer, "Failed to initialize sound %d from data source: %d", sound.id, res);
-            ma_decoder_uninit(&resource.decoder);
-            allSoundsInitialized = false;
-            continue;
-        }
-
-        resource.initialized = true;
     }
 
     mSoundsInitialized = allSoundsInitialized;
