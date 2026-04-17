@@ -18,7 +18,7 @@
 # This file only changes defaults and thus all symbols here must be promptless
 # and safeguarded so that they only are applied when building Matter.
 
-if SOC_FAMILY_NXP_RW
+if SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
 
 if CHIP
 
@@ -142,7 +142,7 @@ config LOG_DEFAULT_LEVEL
 config CHIP_LOG_SIZE_OPTIMIZATION
 	default y
 
-endif
+endif # LOG
 
 config PRINTK_SYNC
 	default y
@@ -185,6 +185,11 @@ config CHIP_TASK_STACK_SIZE
 	default 8192
 	help
 	  Set the stack size (in bytes) for the chip task (CHIP event loop).
+	  
+# AEAD ITS transform module encryption key provider
+choice SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER
+	default SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER_ENTRY_UID_HASH if SOC_SERIES_MCXW7XX
+endchoice
 
 config INIT_STACKS
 	default y
@@ -274,13 +279,46 @@ config OPENTHREAD_PING_SENDER
 config OPENTHREAD_SLAAC
 	default y
 
-# Increase number of message buffers in the buffer pool
+# Number of message buffers in the buffer pool
 config OPENTHREAD_NUM_MESSAGE_BUFFERS
+	default 30 if SOC_SERIES_MCXW7XX
 	default 256
 
 # Enable IPv6 fragmentation support
 config OPENTHREAD_IP6_FRAGM
 	default y
+
+# Enable CSL Receiver support
+config OPENTHREAD_CSL_RECEIVER
+	default y if SOC_SERIES_MCXW7XX
+
+# CSL receiver wake up margin in microseconds
+config OPENTHREAD_CSL_RECEIVE_TIME_AHEAD
+	default 2500 if SOC_SERIES_MCXW7XX
+
+# CSL transmitter request time ahead
+config OPENTHREAD_CSL_REQUEST_TIME_AHEAD
+	default 2500 if SOC_SERIES_MCXW7XX
+
+# Minimum receiving time before start of MHR
+config OPENTHREAD_MIN_RECEIVE_ON_AHEAD
+	default 320 if SOC_SERIES_MCXW7XX
+
+# Minimum receiving time after start of MHR
+config OPENTHREAD_MIN_RECEIVE_ON_AFTER
+	default 64 if SOC_SERIES_MCXW7XX
+
+# Software transmission security logic
+config OPENTHREAD_MAC_SOFTWARE_TX_SECURITY_ENABLE
+	default n if SOC_SERIES_MCXW7XX
+
+# Enable Domain Unicast Address feature
+config OPENTHREAD_DUA
+	default y if SOC_SERIES_MCXW7XX
+
+# Enable Multicast Listener Registration support
+config OPENTHREAD_MLR
+	default y if SOC_SERIES_MCXW7XX
 
 if OPENTHREAD_DEBUG
 
@@ -543,9 +581,11 @@ config LOG_PROCESS_THREAD_STACK_SIZE
 	default 1536
 
 config HEAP_MEM_POOL_SIZE
+	default 25600 if SOC_SERIES_MCXW7XX
 	default 122880
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
+	default 8192 if SOC_SERIES_MCXW7XX # 8 kB
 	default 28672 # 28 kB
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
@@ -577,12 +617,14 @@ config MBEDTLS_ENTROPY_C
 	default y
 
 config MBEDTLS_SSL_MAX_CONTENT_LEN
+	default 768 if SOC_SERIES_MCXW7XX
 	default 8192
 
 config MBEDTLS_ENABLE_HEAP
 	default y
 
 config MBEDTLS_HEAP_SIZE
+	default 8192 if SOC_SERIES_MCXW7XX
 	default 15360
 
 config MBEDTLS_CTR_DRBG_C
@@ -666,4 +708,4 @@ config CHIP_SE05X
 
 endif # CHIP
 
-endif # SOC_FAMILY_NXP_RW
+endif # SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
