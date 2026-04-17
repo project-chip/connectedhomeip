@@ -22,4 +22,10 @@ source_set("miniaudio") {
   sources = [ "miniaudio.cpp" ]
 
   public_configs = [ ":miniaudio_config" ]
+
+  cflags = [
+    "-Wno-missing-format-attribute",
+    "-Wno-shorten-64-to-32",
+    "-Wno-implicit-fallthrough",
+  ]
 }
