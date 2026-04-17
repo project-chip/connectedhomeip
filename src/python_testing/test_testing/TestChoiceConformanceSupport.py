@@ -145,7 +145,7 @@ def _create_cluster():
 
 ATTRIBUTE_DEPENDING_ON_FEATURE_TEMPLATE = (
     '    <attribute id="{{ id }}" name="{{ name }}" type="uint16">\n'
-    '      <optionalConform choice="{{ choice }}" more="{{ more }}">\n'
+    '      <optionalConform choice="{{ choice }}"{% if more %} more="true"{% endif %}>\n'
     '    {% if XXX %}'
     '        <feature name="XXX" />\n'
     '    {% endif %}'
