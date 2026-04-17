@@ -19,6 +19,7 @@
 #include <devices/chime/ChimeDevice.h>
 #include <miniaudio.h>
 #include <vector>
+#include <memory>
 
 namespace chip {
 namespace app {
@@ -36,12 +37,16 @@ public:
         ma_uint64 cursor;
     };
 
-    struct SoundResource
+    class SoundResource
     {
+    public:
+        SoundResource(ma_engine * engine, const ChimeDevice::Sound & soundInfo);
+        ~SoundResource();
+
         uint8_t id;
         CustomDataSource dataSource;
         ma_sound sound;
-        bool initialized = false;
+        bool mInitialized = false;
     };
 
     PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds);
@@ -53,7 +58,7 @@ private:
     ma_engine mEngine;
     bool mEngineInitialized = false;
 
-    std::vector<SoundResource> mSoundResources;
+    std::vector<std::unique_ptr<SoundResource>> mSoundResources;
     bool mSoundsInitialized = false;
 };
 

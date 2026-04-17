@@ -24,17 +24,17 @@ namespace app {
 
 namespace {
 
-const double kPi = 3.14159265358979323846;
-const uint16_t kAudioFormatPCM = 1;
-const uint32_t kSampleRate = 44100;
+constexpr double kPi               = 3.14159265358979323846;
+constexpr uint16_t kAudioFormatPCM = 1;
+constexpr uint32_t kSampleRateHz   = 44100;
 
 // Custom data source read callback
-ma_result custom_data_source_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead)
+ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOut, ma_uint64 frameCount, ma_uint64 * pFramesRead)
 {
     auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
     if (pCustomDS == NULL) return MA_INVALID_ARGS;
 
-    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRate);
+    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
 
     ma_uint64 framesToRead = frameCount;
     if (pCustomDS->cursor + framesToRead > totalSamples)
@@ -53,7 +53,7 @@ ma_result custom_data_source_read(ma_data_source* pDataSource, void* pFramesOut,
     for (ma_uint64 i = 0; i < framesToRead; ++i)
     {
         ma_uint64 currentSample = pCustomDS->cursor + i;
-        double t = static_cast<double>(currentSample) / kSampleRate;
+        double t = static_cast<double>(currentSample) / kSampleRateHz;
         double freq;
         double t_note;
 
@@ -101,12 +101,12 @@ ma_result custom_data_source_read(ma_data_source* pDataSource, void* pFramesOut,
 }
 
 // Custom data source seek callback
-ma_result custom_data_source_seek(ma_data_source* pDataSource, ma_uint64 frameIndex)
+ma_result custom_data_source_seek(ma_data_source * pDataSource, ma_uint64 frameIndex)
 {
     auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
     if (pCustomDS == NULL) return MA_INVALID_ARGS;
 
-    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRate);
+    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
 
     if (frameIndex > totalSamples)
     {
@@ -121,18 +121,18 @@ ma_result custom_data_source_seek(ma_data_source* pDataSource, ma_uint64 frameIn
 }
 
 // Custom data source get data format callback
-ma_result custom_data_source_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels, ma_uint32* pSampleRate, ma_channel* pChannelMap, size_t channelMapCap)
+ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_format * pFormat, ma_uint32 * pChannels, ma_uint32 * pSampleRate, ma_channel * pChannelMap, size_t channelMapCap)
 {
     if (pFormat) *pFormat = ma_format_s16;
     if (pChannels) *pChannels = 1;
-    if (pSampleRate) *pSampleRate = kSampleRate;
+    if (pSampleRate) *pSampleRate = kSampleRateHz;
     if (pChannelMap && channelMapCap > 0) *pChannelMap = MA_CHANNEL_MONO;
 
     return MA_SUCCESS;
 }
 
 // Custom data source get cursor callback
-ma_result custom_data_source_get_cursor(ma_data_source* pDataSource, ma_uint64* pCursor)
+ma_result custom_data_source_get_cursor(ma_data_source * pDataSource, ma_uint64 * pCursor)
 {
     auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
     if (pCustomDS == NULL) return MA_INVALID_ARGS;
@@ -142,17 +142,17 @@ ma_result custom_data_source_get_cursor(ma_data_source* pDataSource, ma_uint64* 
 }
 
 // Custom data source get length callback
-ma_result custom_data_source_get_length(ma_data_source* pDataSource, ma_uint64* pLength)
+ma_result custom_data_source_get_length(ma_data_source * pDataSource, ma_uint64 * pLength)
 {
     auto* pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource*>(pDataSource);
     if (pCustomDS == NULL) return MA_INVALID_ARGS;
 
-    if (pLength) *pLength = static_cast<ma_uint64>(pCustomDS->duration * kSampleRate);
+    if (pLength) *pLength = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
     return MA_SUCCESS;
 }
 
 // Custom data source set looping callback
-ma_result custom_data_source_set_looping(ma_data_source* pDataSource, ma_bool32 isLooping)
+ma_result custom_data_source_set_looping(ma_data_source * pDataSource, ma_bool32 isLooping)
 {
     // Not supported for now
     return MA_NOT_IMPLEMENTED;
@@ -169,60 +169,68 @@ static ma_data_source_vtable g_custom_data_source_vtable = {
     0 // flags
 };
 
-bool InitializeSoundResource(ma_engine * engine, const ChimeDevice::Sound & sound, PosixChimeDevice::SoundResource & resource)
+} // namespace
+
+PosixChimeDevice::SoundResource::SoundResource(ma_engine * engine, const ChimeDevice::Sound & soundInfo)
 {
-    resource.id = sound.id;
+    id = soundInfo.id;
  
     // Configure the custom data source based on ID
-    resource.dataSource.cursor = 0;
+    dataSource.cursor = 0;
  
-    if (sound.id == 0)
+    if (soundInfo.id == 0)
     {
-        resource.dataSource.freq1 = 880;
-        resource.dataSource.freq2 = 660;
-        resource.dataSource.duration = 1.0;
-        resource.dataSource.pulse = false;
+        dataSource.freq1 = 880;
+        dataSource.freq2 = 660;
+        dataSource.duration = 1.0;
+        dataSource.pulse = false;
     }
-    else if (sound.id == 1)
+    else if (soundInfo.id == 1)
     {
-        resource.dataSource.freq1 = 1000;
-        resource.dataSource.freq2 = 1000;
-        resource.dataSource.duration = 1.0;
-        resource.dataSource.pulse = true;
+        dataSource.freq1 = 1000;
+        dataSource.freq2 = 1000;
+        dataSource.duration = 1.0;
+        dataSource.pulse = true;
     }
     else
     {
-        resource.dataSource.freq1 = 440;
-        resource.dataSource.freq2 = 440;
-        resource.dataSource.duration = 0.5;
-        resource.dataSource.pulse = false;
+        dataSource.freq1 = 440;
+        dataSource.freq2 = 440;
+        dataSource.duration = 0.5;
+        dataSource.pulse = false;
     }
  
     // Initialize the base data source with our vtable
     ma_data_source_config config = ma_data_source_config_init();
     config.vtable = &g_custom_data_source_vtable;
     
-    ma_result res = ma_data_source_init(&config, &resource.dataSource.base);
+    ma_result res = ma_data_source_init(&config, &dataSource.base);
     if (res != MA_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "Failed to initialize base data source for sound %d: %d", sound.id, res);
-        return false;
+        ChipLogError(DeviceLayer, "Failed to initialize base data source for sound %d: %d", soundInfo.id, res);
+        return;
     }
  
     // Initialize sound from data source
-    res = ma_sound_init_from_data_source(engine, &resource.dataSource.base, 0, NULL, &resource.sound);
+    res = ma_sound_init_from_data_source(engine, &dataSource.base, 0, NULL, &sound);
     if (res != MA_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "Failed to initialize sound %d from data source: %d", sound.id, res);
-        ma_data_source_uninit(&resource.dataSource.base);
-        return false;
+        ChipLogError(DeviceLayer, "Failed to initialize sound %d from data source: %d", soundInfo.id, res);
+        ma_data_source_uninit(&dataSource.base);
+        return;
     }
  
-    resource.initialized = true;
-    return true;
+    mInitialized = true;
 }
 
-} // namespace
+PosixChimeDevice::SoundResource::~SoundResource()
+{
+    if (mInitialized)
+    {
+        ma_sound_uninit(&sound);
+        ma_data_source_uninit(&dataSource.base);
+    }
+}
 
 PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds) : ChimeDevice(timerDelegate, sounds)
 {
@@ -236,15 +244,15 @@ PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sou
     mEngineInitialized = true;
     ChipLogProgress(DeviceLayer, "Miniaudio engine initialized successfully");
 
-    mSoundResources.resize(sounds.size());
-
     bool allSoundsInitialized = true;
     for (size_t i = 0; i < sounds.size(); ++i)
     {
-        if (!InitializeSoundResource(&mEngine, sounds[i], mSoundResources[i]))
+        auto resource = std::make_unique<SoundResource>(&mEngine, sounds[i]);
+        if (!resource->mInitialized)
         {
             allSoundsInitialized = false;
         }
+        mSoundResources.push_back(std::move(resource));
     }
 
     mSoundsInitialized = allSoundsInitialized;
@@ -258,14 +266,7 @@ PosixChimeDevice::~PosixChimeDevice()
 {
     if (mEngineInitialized)
     {
-        for (auto & resource : mSoundResources)
-        {
-            if (resource.initialized)
-            {
-                ma_sound_uninit(&resource.sound);
-                ma_data_source_uninit(&resource.dataSource.base);
-            }
-        }
+        mSoundResources.clear();
         ma_engine_uninit(&mEngine);
         ChipLogProgress(DeviceLayer, "Miniaudio engine uninitialized");
     }
@@ -285,9 +286,9 @@ Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chi
     ma_sound * pSound = nullptr;
     for (auto & resource : mSoundResources)
     {
-        if (resource.id == chimeID && resource.initialized)
+        if (resource && resource->id == chimeID && resource->mInitialized)
         {
-            pSound = &resource.sound;
+            pSound = &resource->sound;
             break;
         }
     }
