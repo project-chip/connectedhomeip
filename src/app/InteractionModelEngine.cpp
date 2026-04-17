@@ -216,7 +216,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    if(Credentials::GetGroupDataProvider()->IsGroupcastEnabled()) {
+    if (Credentials::GetGroupDataProvider()->IsGroupcastEnabled())
+    {
         Groupcast::GetTesting().SetDelegate(this);
     }
 
@@ -233,7 +234,8 @@ void InteractionModelEngine::Shutdown()
 {
     VerifyOrReturn(State::kUninitialized != mState);
 
-    if(Credentials::GetGroupDataProvider()->IsGroupcastEnabled()) {
+    if (Credentials::GetGroupDataProvider()->IsGroupcastEnabled())
+    {
         Groupcast::GetTesting().SetDelegate(nullptr);
     }
 

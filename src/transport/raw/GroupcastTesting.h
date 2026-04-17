@@ -39,7 +39,7 @@ public:
     class Delegate
     {
     public:
-        virtual ~Delegate()               = default;
+        virtual ~Delegate()                       = default;
         virtual void FlushGroupcastTestingEvent() = 0;
     };
 
