@@ -639,12 +639,12 @@ TEST_F(TestPushAVStreamTransportStorage, TestVideoStreamDeepCopy)
 
     // Create video streams with names
     Structs::VideoStreamStruct::Type videoStream1;
-    std::string videoName1 = "FrontDoor";
+    std::string videoName1       = "FrontDoor";
     videoStream1.videoStreamID   = 1;
     videoStream1.videoStreamName = CharSpan(videoName1.data(), videoName1.size());
 
     Structs::VideoStreamStruct::Type videoStream2;
-    std::string videoName2 = "BackYard";
+    std::string videoName2       = "BackYard";
     videoStream2.videoStreamID   = 2;
     videoStream2.videoStreamName = CharSpan(videoName2.data(), videoName2.size());
 
@@ -679,12 +679,12 @@ TEST_F(TestPushAVStreamTransportStorage, TestAudioStreamDeepCopy)
 
     // Create audio streams with names
     Structs::AudioStreamStruct::Type audioStream1;
-    std::string audioName1 = "Mic1";
+    std::string audioName1       = "Mic1";
     audioStream1.audioStreamID   = 1;
     audioStream1.audioStreamName = CharSpan(audioName1.data(), audioName1.size());
 
     Structs::AudioStreamStruct::Type audioStream2;
-    std::string audioName2 = "Mic2";
+    std::string audioName2       = "Mic2";
     audioStream2.audioStreamID   = 2;
     audioStream2.audioStreamName = CharSpan(audioName2.data(), audioName2.size());
 
@@ -718,7 +718,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestClearVideoStreams)
 
     // Add a video stream
     Structs::VideoStreamStruct::Type videoStream;
-    std::string videoName = "TestStream";
+    std::string videoName       = "TestStream";
     videoStream.videoStreamID   = 1;
     videoStream.videoStreamName = CharSpan(videoName.data(), videoName.size());
     transportOptionsStorage.AddVideoStream(videoStream);
@@ -740,7 +740,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestClearAudioStreams)
 
     // Add an audio stream
     Structs::AudioStreamStruct::Type audioStream;
-    std::string audioName = "TestAudio";
+    std::string audioName       = "TestAudio";
     audioStream.audioStreamID   = 1;
     audioStream.audioStreamName = CharSpan(audioName.data(), audioName.size());
     transportOptionsStorage.AddAudioStream(audioStream);
@@ -769,7 +769,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestUpdateVideoStreamsList)
 
     // Add a video stream
     Structs::VideoStreamStruct::Type videoStream;
-    std::string videoName = "Stream1";
+    std::string videoName       = "Stream1";
     videoStream.videoStreamID   = 1;
     videoStream.videoStreamName = CharSpan(videoName.data(), videoName.size());
     transportOptionsStorage.AddVideoStream(videoStream);
@@ -792,7 +792,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestUpdateAudioStreamsList)
 
     // Add an audio stream
     Structs::AudioStreamStruct::Type audioStream;
-    std::string audioName = "Audio1";
+    std::string audioName       = "Audio1";
     audioStream.audioStreamID   = 1;
     audioStream.audioStreamName = CharSpan(audioName.data(), audioName.size());
     transportOptionsStorage.AddAudioStream(audioStream);
@@ -811,7 +811,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestMultipleVideoStreamNamesNoCorruptio
     for (int i = 0; i < 5; i++)
     {
         Structs::VideoStreamStruct::Type videoStream;
-        std::string name = "VideoStream" + std::to_string(i);
+        std::string name            = "VideoStream" + std::to_string(i);
         videoStream.videoStreamID   = static_cast<uint16_t>(i);
         videoStream.videoStreamName = CharSpan(name.data(), name.size());
         transportOptionsStorage.AddVideoStream(videoStream);
@@ -839,7 +839,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestMultipleAudioStreamNamesNoCorruptio
     for (int i = 0; i < 5; i++)
     {
         Structs::AudioStreamStruct::Type audioStream;
-        std::string name = "AudioStream" + std::to_string(i);
+        std::string name            = "AudioStream" + std::to_string(i);
         audioStream.audioStreamID   = static_cast<uint16_t>(i);
         audioStream.audioStreamName = CharSpan(name.data(), name.size());
         transportOptionsStorage.AddAudioStream(audioStream);
