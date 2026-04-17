@@ -24,7 +24,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include "OTAConfig.h"
+#endif // SILABS_OTA_ENABLED
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
