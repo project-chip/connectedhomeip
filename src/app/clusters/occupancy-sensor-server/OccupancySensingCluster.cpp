@@ -96,8 +96,11 @@ OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mHoldTimeDelegate(config.mHoldTimeDelegate),
     mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mShowDeprecatedAttributes(config.mShowDeprecatedAttributes)
 {
-    SetHoldTimeLimits(config.mHoldTimeLimits);
-    mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+    if (mHoldTimeDelegate)
+    {
+        SetHoldTimeLimits(config.mHoldTimeLimits);
+        mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+    }
 }
 
 CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
