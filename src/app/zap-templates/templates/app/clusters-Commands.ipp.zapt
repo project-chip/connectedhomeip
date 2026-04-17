@@ -46,7 +46,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 {{else}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 {{/if}}
-    detail::StructDecodeIterator __iterator(reader);
+    {{! Should the required fields bit be restricted to client-source commands? }}
+    constexpr uint32_t kRequiredFieldsBitmap = 0
+    {{#zcl_command_arguments}}
+      {{#unless isOptional}}
+      | (1 << to_underlying(Fields::k{{asUpperCamelCase label}}))
+      {{/unless}}
+    {{/zcl_command_arguments}}
+    ;
+    {{#zcl_command_arguments}}
+      {{#unless isOptional}}
+      static_assert(to_underlying(Fields::k{{asUpperCamelCase label}}) < sizeof(kRequiredFieldsBitmap) * 8);
+      {{/unless}}
+    {{/zcl_command_arguments}}
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true) {
         uint8_t __context_tag  = 0;
         CHIP_ERROR err = __iterator.Next(__context_tag);

@@ -44,7 +44,17 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kPeriodStart)) |
+        (1 << to_underlying(Fields::kPeriodEnd)) | (1 << to_underlying(Fields::kGridCarbonIntensity)) |
+        (1 << to_underlying(Fields::kGridCarbonLevel)) | (1 << to_underlying(Fields::kLocalCarbonIntensity)) |
+        (1 << to_underlying(Fields::kLocalCarbonLevel));
+    static_assert(to_underlying(Fields::kPeriodStart) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kPeriodEnd) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kGridCarbonIntensity) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kGridCarbonLevel) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLocalCarbonIntensity) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLocalCarbonLevel) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

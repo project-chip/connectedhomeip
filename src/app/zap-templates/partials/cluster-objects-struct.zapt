@@ -113,7 +113,30 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {{/if}}
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0
+    {{#zcl_struct_items}}
+      {{#unless isOptional}}
+      {{! Fabric-sensitive fields are allowed to be missing even when they are not optional }}
+      {{#unless isFabricSensitive}}
+      {{! FabricIndex looks non-optional, but for writes it must be absent, so don't enforce its presence.
+         In any case, it's too big to fit in our bitmap }}
+      {{#unless (is_num_equal fieldIdentifier 254)}}
+      | (1 << to_underlying(Fields::k{{asUpperCamelCase label}}))
+      {{/unless}}
+      {{/unless}}
+      {{/unless}}
+    {{/zcl_struct_items}}
+    ;
+    {{#zcl_struct_items}}
+      {{#unless isOptional}}
+      {{#unless isFabricSensitive}}
+      {{#unless (is_num_equal fieldIdentifier 254)}}
+      static_assert(to_underlying(Fields::k{{asUpperCamelCase label}}) < sizeof(kRequiredFieldsBitmap) * 8);
+      {{/unless}}
+      {{/unless}}
+      {{/unless}}
+    {{/zcl_struct_items}}
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true) {
         uint8_t __context_tag  = 0;
         CHIP_ERROR err = __iterator.Next(__context_tag);

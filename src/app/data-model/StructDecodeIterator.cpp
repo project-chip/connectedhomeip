@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <app/data-model/StructDecodeIterator.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -47,12 +48,21 @@ CHIP_ERROR StructDecodeIterator::Next(uint8_t & context_tag)
 
         // we know context tags are 8-bit
         context_tag = static_cast<uint8_t>(TLV::TagNumFromTag(tag));
+        if (context_tag < sizeof(mRequiredFieldBitmap) * 8)
+        {
+            mRequiredFieldBitmap &= ~(static_cast<uint32_t>(1) << context_tag);
+        }
         return CHIP_NO_ERROR;
     }
 
     // we get here IFF error is CHIP_ERROR_END_OF_TLV. We exit the container but
     // forward the the `end of tlv` as a final marker
     ReturnErrorOnFailure(mReader.ExitContainer(mOuter));
+    if (mRequiredFieldBitmap != 0)
+    {
+        // We have required fields that were not observed.
+        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+    }
     return CHIP_ERROR_END_OF_TLV;
 }
 
