@@ -127,7 +127,7 @@ void InitializeOTARequestor(void)
 
     sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     TEMPORARY_RETURN_IGNORED sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader,
-                                                 GetOTARequestorAttributes(), GetDefaultOTARequestorEventSender());
+                                                 GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);

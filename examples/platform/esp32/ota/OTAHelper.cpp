@@ -148,7 +148,7 @@ void OTAHelpers::InitOTARequestor()
         SetRequestorInstance(&gRequestorCore);
         gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
         TEMPORARY_RETURN_IGNORED gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
-                                                     GetOTARequestorAttributes(), GetDefaultOTARequestorEventSender());
+                                                     GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
         gImageProcessor.SetOTADownloader(&gDownloader);
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
         gImageProcessor.SetOtaRcpDelegate(&gOtaRcpDelegate);

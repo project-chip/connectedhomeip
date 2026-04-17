@@ -61,7 +61,7 @@ void OTAInitializer::InitOTARequestor(void)
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
     TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
-                                                 GetOTARequestorAttributes(), GetDefaultOTARequestorEventSender());
+                                                 GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);

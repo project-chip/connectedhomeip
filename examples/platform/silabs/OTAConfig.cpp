@@ -90,7 +90,7 @@ void OTAConfig::Init()
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
-                                                 chip::GetOTARequestorAttributes(), chip::GetDefaultOTARequestorEventSender());
+                                                 chip::GetOTARequestorAttributes(), chip::GetDefaultOTARequestorEventGenerator());
 
     // Periodic query timeout must be set prior to requestor being initialized
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);

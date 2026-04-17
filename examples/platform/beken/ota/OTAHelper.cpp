@@ -156,7 +156,7 @@ static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState
 
     // Set server instance used for session establishment
     gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes(),
-                        GetDefaultOTARequestorEventSender());
+                        GetDefaultOTARequestorEventGenerator());
 
     gImageProcessor.SetOTADownloader(&gDownloader);
 

@@ -63,7 +63,7 @@ void InitBasicOTARequestor()
     sBDXDownloader.SetImageProcessorDelegate(&imageProcessor);
     sOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     TEMPORARY_RETURN_IGNORED sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader,
-                                                GetOTARequestorAttributes(), GetDefaultOTARequestorEventSender());
+                                                GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &imageProcessor);
     imageProcessor.TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
