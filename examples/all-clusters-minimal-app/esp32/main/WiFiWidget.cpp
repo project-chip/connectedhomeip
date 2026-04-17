@@ -30,7 +30,7 @@
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
-extern const char TAG[];
+static const char TAG[] = "WiFiWidget";
 
 void WiFiWidget::Init()
 {
