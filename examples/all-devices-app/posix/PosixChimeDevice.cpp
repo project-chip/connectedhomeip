@@ -15,47 +15,47 @@
  *    limitations under the License.
  */
 #include <PosixChimeDevice.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <cmath>
+#include <lib/support/logging/CHIPLogging.h>
 #include <sstream>
 
 namespace chip {
 namespace app {
 
 // Helper to generate a simple WAV file in memory
-static void GenerateWavMemory(std::vector<uint8_t>& buffer, double freq1, double freq2, double duration, bool pulse = false)
+static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2, double duration, bool pulse = false)
 {
     std::stringstream file(std::ios::binary | std::ios::out);
 
-    const int sampleRate = 44100;
+    const int sampleRate    = 44100;
     const int bitsPerSample = 16;
-    const int numChannels = 1;
-    const int numSamples = static_cast<int>(duration * sampleRate);
-    const int dataSize = numSamples * numChannels * (bitsPerSample / 8);
+    const int numChannels   = 1;
+    const int numSamples    = static_cast<int>(duration * sampleRate);
+    const int dataSize      = numSamples * numChannels * (bitsPerSample / 8);
 
     // WAV Header
     file.write("RIFF", 4);
     uint32_t chunkSize = 36 + dataSize;
-    file.write(reinterpret_cast<const char*>(&chunkSize), 4);
+    file.write(reinterpret_cast<const char *>(&chunkSize), 4);
     file.write("WAVE", 4);
     file.write("fmt ", 4);
     uint32_t subChunk1Size = 16;
-    file.write(reinterpret_cast<const char*>(&subChunk1Size), 4);
+    file.write(reinterpret_cast<const char *>(&subChunk1Size), 4);
     uint16_t audioFormat = 1; // PCM
-    file.write(reinterpret_cast<const char*>(&audioFormat), 2);
+    file.write(reinterpret_cast<const char *>(&audioFormat), 2);
     uint16_t channels = numChannels;
-    file.write(reinterpret_cast<const char*>(&channels), 2);
+    file.write(reinterpret_cast<const char *>(&channels), 2);
     uint32_t sRate = sampleRate;
-    file.write(reinterpret_cast<const char*>(&sRate), 4);
+    file.write(reinterpret_cast<const char *>(&sRate), 4);
     uint32_t byteRate = sampleRate * numChannels * (bitsPerSample / 8);
-    file.write(reinterpret_cast<const char*>(&byteRate), 4);
+    file.write(reinterpret_cast<const char *>(&byteRate), 4);
     uint16_t blockAlign = numChannels * (bitsPerSample / 8);
-    file.write(reinterpret_cast<const char*>(&blockAlign), 2);
+    file.write(reinterpret_cast<const char *>(&blockAlign), 2);
     uint16_t bps = bitsPerSample;
-    file.write(reinterpret_cast<const char*>(&bps), 2);
+    file.write(reinterpret_cast<const char *>(&bps), 2);
     file.write("data", 4);
     uint32_t subChunk2Size = dataSize;
-    file.write(reinterpret_cast<const char*>(&subChunk2Size), 4);
+    file.write(reinterpret_cast<const char *>(&subChunk2Size), 4);
 
     // Generate samples
     for (int i = 0; i < numSamples; ++i)
@@ -63,11 +63,11 @@ static void GenerateWavMemory(std::vector<uint8_t>& buffer, double freq1, double
         double t = static_cast<double>(i) / sampleRate;
         double freq;
         double t_note;
-        
+
         if (pulse)
         {
             // For pulse (Ring Ring), we don't split into two notes
-            freq = freq1;
+            freq   = freq1;
             t_note = t;
         }
         else
@@ -75,37 +75,38 @@ static void GenerateWavMemory(std::vector<uint8_t>& buffer, double freq1, double
             // For chime (Ding Dong), we split into two notes
             if (t < duration / 2.0)
             {
-                freq = freq1;
+                freq   = freq1;
                 t_note = t;
             }
             else
             {
-                freq = freq2;
+                freq   = freq2;
                 t_note = t - (duration / 2.0);
             }
         }
-        
+
         // Exponential decay per note
         double volume = exp(-t_note * 4.0);
-        
+
         if (pulse)
         {
             // Pulse every 50ms (50ms on, 50ms off)
             bool on = (static_cast<int>(t * 20) % 2) == 0;
-            if (!on) volume = 0;
+            if (!on)
+                volume = 0;
         }
-        
+
         // Additive synthesis for richer sound (Fundamental + Harmonics)
         double sample = 0;
         sample += 0.6 * sin(2.0 * 3.14159265358979323846 * freq * t_note);
         sample += 0.3 * sin(2.0 * 3.14159265358979323846 * freq * 2.0 * t_note);
         sample += 0.1 * sin(2.0 * 3.14159265358979323846 * freq * 3.0 * t_note);
-        
+
         sample *= volume;
-        
+
         int16_t pcmSample = static_cast<int16_t>(sample * 32767.0);
-        
-        file.write(reinterpret_cast<const char*>(&pcmSample), 2);
+
+        file.write(reinterpret_cast<const char *>(&pcmSample), 2);
     }
 
     std::string str = file.str();
@@ -113,8 +114,7 @@ static void GenerateWavMemory(std::vector<uint8_t>& buffer, double freq1, double
     ChipLogProgress(DeviceLayer, "Generated WAV buffer size %zu", buffer.size());
 }
 
-PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
-    ChimeDevice(timerDelegate, sounds)
+PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds) : ChimeDevice(timerDelegate, sounds)
 {
     ma_result result = ma_engine_init(NULL, &mEngine);
     if (result != MA_SUCCESS)
@@ -125,9 +125,9 @@ PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sou
     {
         mEngineInitialized = true;
         ChipLogProgress(DeviceLayer, "Miniaudio engine initialized successfully");
-        
+
         // Generate dummy sound buffers
-        GenerateWavMemory(mChime0Buffer, 880, 660, 1.0, false); // Ding Dong
+        GenerateWavMemory(mChime0Buffer, 880, 660, 1.0, false);  // Ding Dong
         GenerateWavMemory(mChime1Buffer, 1000, 1000, 1.0, true); // Ring Ring
 
         // Initialize decoders from memory
@@ -184,9 +184,11 @@ Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chi
         return status;
     }
 
-    ma_sound* pSound = nullptr;
-    if (chimeID == 0) pSound = &mSound0;
-    else if (chimeID == 1) pSound = &mSound1;
+    ma_sound * pSound = nullptr;
+    if (chimeID == 0)
+        pSound = &mSound0;
+    else if (chimeID == 1)
+        pSound = &mSound1;
 
     if (pSound)
     {
