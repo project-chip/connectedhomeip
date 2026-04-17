@@ -144,7 +144,7 @@ void LightSwitchContextReleaseHandler(void * context)
 
 void InitBindingHandlerInternal(intptr_t arg)
 {
-    auto & server = chip::Server::GetInstance();
+    auto & server  = chip::Server::GetInstance();
     CHIP_ERROR err = Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     if (err != CHIP_NO_ERROR)
