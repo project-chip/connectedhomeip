@@ -406,7 +406,8 @@ class TC_ACE_1_6(MatterBaseTest):
             kInvalidKeysetId = 0xFFFF
             membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
             for entry in membership:
-                asserts.assert_equal(entry.keySetID, kInvalidKeysetId, f"Group {entry.groupID} should have invalid keyset ID (0xFFFF)")
+                asserts.assert_equal(entry.keySetID, kInvalidKeysetId,
+                                     f"Group {entry.groupID} should have invalid keyset ID (0xFFFF)")
 
             # Step 13: Group command to Group 0x0103 after group keys are empty
             self.step(13)
