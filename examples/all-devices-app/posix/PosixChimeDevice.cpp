@@ -27,62 +27,23 @@ namespace {
 const double kPi = 3.14159265358979323846;
 const uint16_t kAudioFormatPCM = 1;
 
-// Helper to generate a simple WAV file in memory
-void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2, double duration, bool pulse = false)
+// Helper to generate raw PCM data in memory
+void GeneratePcmMemory(std::vector<uint8_t> & buffer, double freq1, double freq2, double duration, bool pulse = false)
 {
     const int sampleRate    = 44100;
     const int bitsPerSample = 16;
     const int numChannels   = 1;
     const int numSamples    = static_cast<int>(duration * sampleRate);
     const int dataSize      = numSamples * numChannels * (bitsPerSample / 8);
-    const int totalSize     = 44 + dataSize;
 
-    buffer.resize(totalSize);
+    buffer.resize(dataSize);
     uint8_t * p = buffer.data();
-
-    // Helper to write strings
-    auto writeStr = [&](const char * str, size_t len) {
-        memcpy(p, str, len);
-        p += len;
-    };
 
     // Helper to write Little-Endian 16-bit values
     auto writeVal16 = [&](uint16_t val) {
         *p++ = static_cast<uint8_t>(val & 0xFF);
         *p++ = static_cast<uint8_t>((val >> 8) & 0xFF);
     };
-
-    // Helper to write Little-Endian 32-bit values
-    auto writeVal32 = [&](uint32_t val) {
-        *p++ = static_cast<uint8_t>(val & 0xFF);
-        *p++ = static_cast<uint8_t>((val >> 8) & 0xFF);
-        *p++ = static_cast<uint8_t>((val >> 16) & 0xFF);
-        *p++ = static_cast<uint8_t>((val >> 24) & 0xFF);
-    };
-
-    // WAV Header
-    writeStr("RIFF", 4);
-    uint32_t fileSize = totalSize - 8;
-    writeVal32(fileSize);
-    writeStr("WAVE", 4);
-    writeStr("fmt ", 4);
-    uint32_t subChunk1Size = 16;
-    writeVal32(subChunk1Size);
-    uint16_t audioFormat = kAudioFormatPCM; // PCM
-    writeVal16(audioFormat);
-    uint16_t numChans = numChannels;
-    writeVal16(numChans);
-    uint32_t sRate = sampleRate;
-    writeVal32(sRate);
-    uint32_t byteRate = sampleRate * numChannels * (bitsPerSample / 8);
-    writeVal32(byteRate);
-    uint16_t blockAlign = numChannels * (bitsPerSample / 8);
-    writeVal16(blockAlign);
-    uint16_t bps = bitsPerSample;
-    writeVal16(bps);
-    writeStr("data", 4);
-    uint32_t subChunk2Size = dataSize;
-    writeVal32(subChunk2Size);
 
     // Generate samples
     for (int i = 0; i < numSamples; ++i)
@@ -140,44 +101,49 @@ void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, double freq2
         writeVal16(static_cast<uint16_t>(pcmSample));
     }
 
-    ChipLogProgress(DeviceLayer, "Generated WAV buffer size %zu", buffer.size());
+    ChipLogProgress(DeviceLayer, "Generated PCM buffer size %zu", buffer.size());
 }
 
 bool InitializeSoundResource(ma_engine * engine, const ChimeDevice::Sound & sound, PosixChimeDevice::SoundResource & resource)
 {
     resource.id = sound.id;
-
+ 
     // Generate sound based on ID
     if (sound.id == 0)
     {
-        GenerateWavMemory(resource.buffer, 880, 660, 1.0, false); // Ding Dong
+        GeneratePcmMemory(resource.buffer, 880, 660, 1.0, false); // Ding Dong
     }
     else if (sound.id == 1)
     {
-        GenerateWavMemory(resource.buffer, 1000, 1000, 1.0, true); // Ring Ring
+        GeneratePcmMemory(resource.buffer, 1000, 1000, 1.0, true); // Ring Ring
     }
     else
     {
-        GenerateWavMemory(resource.buffer, 440, 440, 0.5, false); // Default beep
+        GeneratePcmMemory(resource.buffer, 440, 440, 0.5, false); // Default beep
     }
-
-    // Initialize decoder from memory
-    ma_result res = ma_decoder_init_memory(resource.buffer.data(), resource.buffer.size(), NULL, &resource.decoder);
+ 
+    // Initialize audio buffer from raw PCM memory
+    // We use 44100 Hz, 16-bit signed PCM, mono.
+    // Frames count is buffer size / 2 (since each sample is 2 bytes).
+    ma_audio_buffer_config config = ma_audio_buffer_config_init(ma_format_s16, 1, resource.buffer.size() / 2, resource.buffer.data(), NULL);
+    config.sampleRate = 44100; // Explicitly set sample rate as it's not in the init helper arguments for audio_buffer
+    
+    ma_result res = ma_audio_buffer_init(&config, &resource.audioBuffer);
     if (res != MA_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "Failed to initialize decoder for sound %d: %d", sound.id, res);
+        ChipLogError(DeviceLayer, "Failed to initialize audio buffer for sound %d: %d", sound.id, res);
         return false;
     }
-
+ 
     // Initialize sound from data source
-    res = ma_sound_init_from_data_source(engine, &resource.decoder, 0, NULL, &resource.sound);
+    res = ma_sound_init_from_data_source(engine, &resource.audioBuffer, 0, NULL, &resource.sound);
     if (res != MA_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Failed to initialize sound %d from data source: %d", sound.id, res);
-        ma_decoder_uninit(&resource.decoder);
+        ma_audio_buffer_uninit(&resource.audioBuffer);
         return false;
     }
-
+ 
     resource.initialized = true;
     return true;
 }
@@ -223,7 +189,7 @@ PosixChimeDevice::~PosixChimeDevice()
             if (resource.initialized)
             {
                 ma_sound_uninit(&resource.sound);
-                ma_decoder_uninit(&resource.decoder);
+                ma_audio_buffer_uninit(&resource.audioBuffer);
             }
         }
         ma_engine_uninit(&mEngine);

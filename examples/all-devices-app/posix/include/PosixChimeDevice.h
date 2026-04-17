@@ -30,7 +30,7 @@ public:
     {
         uint8_t id;
         std::vector<uint8_t> buffer;
-        ma_decoder decoder;
+        ma_audio_buffer audioBuffer;
         ma_sound sound;
         bool initialized = false;
     };
