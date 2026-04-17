@@ -21,11 +21,7 @@ config("miniaudio_config") {
   include_dirs = [ "repo" ]
 }
 
-source_set("miniaudio") {
-  sources = [ "miniaudio.cpp" ]
-
-  public_configs = [ ":miniaudio_config" ]
-
+config("miniaudio_warnings") {
   cflags = [
     "-Wno-missing-format-attribute",
     "-Wno-implicit-fallthrough",
@@ -40,4 +36,11 @@ source_set("miniaudio") {
       "-Wno-shadow",
     ]
   }
+}
+
+source_set("miniaudio") {
+  sources = [ "miniaudio.cpp" ]
+
+  public_configs = [ ":miniaudio_config" ]
+  configs += [ ":miniaudio_warnings" ]
 }
