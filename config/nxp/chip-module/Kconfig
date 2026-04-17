@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-if SOC_FAMILY_NXP_RW
+if SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
 
 rsource "../cmake/Kconfig.matter.nxp"
 
@@ -53,4 +53,4 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
 	endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
 
-endif # SOC_FAMILY_NXP_RW
+endif # SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
