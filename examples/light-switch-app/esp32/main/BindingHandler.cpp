@@ -198,37 +198,38 @@ CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv)
     return sShellSwitchOnOffSubCommands.ExecCommand(argc, argv);
 }
 
-CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
+namespace {
+
+CHIP_ERROR CommandDispatcher_Internal(ClusterId clusterId, CommandId commandId, bool isGroup = false)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
+    data->commandId           = commandId;
+    data->clusterId           = clusterId;
+    data->isGroup             = isGroup;
 
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(data), err));
-    return CHIP_NO_ERROR;
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(data);
+    }
+    return err;
+}
+
+} // anonymous namespace
+
+CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
+{
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id);
 }
 
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(data), err));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id);
 }
 
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(data), err));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id);
 }
 
 /********************************************************
@@ -257,9 +258,13 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
+
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(entry), err));
-    return CHIP_NO_ERROR;
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(entry);
+    }
+    return err;
 }
 
 CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
@@ -268,9 +273,13 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
+
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(entry), err));
-    return CHIP_NO_ERROR;
+    if (err != CHIP_NO_ERROR)
+    {
+        Platform::Delete(entry);
+    }
+    return err;
 }
 
 /********************************************************
@@ -315,38 +324,17 @@ CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(data), err));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id, true /* isGroup */);
 }
 
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(data), err));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id, true /* isGroup */);
 }
 
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, (Platform::Delete(data), err));
-    return CHIP_NO_ERROR;
+    return CommandDispatcher_Internal(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id, true /* isGroup */);
 }
 
 /**
