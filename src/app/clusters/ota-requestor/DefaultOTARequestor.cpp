@@ -696,8 +696,9 @@ void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReas
     {
         DefaultOTARequestorEventGenerator::DownloadErrorEvent event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
                                                                      progressPercent, platformCode };
-        CHIP_ERROR send_error = mEventGenerator->GenerateDownloadErrorEvent(event);
-        SuccessOrLog(send_error, SoftwareUpdate, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT, send_error.Format());
+        CHIP_ERROR generator_error = mEventGenerator->GenerateDownloadErrorEvent(event);
+        SuccessOrLog(generator_error, SoftwareUpdate, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT,
+                     generator_error.Format());
     }
 
     // Whenever an error occurs, always reset to Idle state

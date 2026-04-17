@@ -67,7 +67,7 @@ private:
     OTARequestorCommandInterface * mDestination = nullptr;
 };
 
-// This class decouples the cluster and the DefaultOTARequestor singleton's event sending to allow the OTARequestorCluster to be
+// This class decouples the cluster and the DefaultOTARequestor singleton's event generation to allow the OTARequestorCluster to be
 // created after DefaultOTARequestor::Init is called.
 class OTAEventForwarder : public DefaultOTARequestorEventGenerator
 {
