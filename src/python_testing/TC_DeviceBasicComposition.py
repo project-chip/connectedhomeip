@@ -376,6 +376,14 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                   "feature is not present on the root node (EP0)",
                                   spec_location="Root node device type - GroupcastSenderCond")
                 self.fail_current_test()
+            if has_groupcast_listener:
+                acl_feature_map = root[Clusters.AccessControl][Clusters.AccessControl.Attributes.FeatureMap]
+                has_acl_aux = bool(acl_feature_map & Clusters.AccessControl.Bitmaps.Feature.kAuxiliary)
+                if not has_acl_aux:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                      problem="Groupcast with Listener feature is on EP0 but Access Control cluster does not have Auxiliary feature",
+                                      spec_location="Root node device type - GroupcastListenerCond")
+                    self.fail_current_test()
 
     def test_TC_DT_1_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
