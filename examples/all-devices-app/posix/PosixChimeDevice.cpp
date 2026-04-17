@@ -82,9 +82,10 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
     // Generate samples
     for (int i = 0; i < numSamples; ++i)
     {
+        // Current time in seconds
         double t = static_cast<double>(i) / sampleRate;
         double freq;
-        double t_note;
+        double t_note; // Time relative to the start of the current note
 
         if (pulse)
         {
@@ -93,6 +94,7 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
         }
         else
         {
+            // Two-tone sound: first half plays freq1, second half plays freq2
             if (t < duration / 2.0)
             {
                 freq   = freq1;
@@ -105,8 +107,10 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
             }
         }
 
+        // Exponential decay for a natural "bell-like" volume drop
         double volume = exp(-t_note * 4.0);
 
+        // If pulsing, toggle sound on and off at 20Hz rate
         if (pulse)
         {
             bool on = (static_cast<int>(t * 20) % 2) == 0;
@@ -114,13 +118,19 @@ static void GenerateWavMemory(std::vector<uint8_t> & buffer, double freq1, doubl
                 volume = 0;
         }
 
+        // Additive synthesis: combine fundamental frequency with overtones
+        // to make it sound richer than a simple pure beep.
         double sample = 0;
+        // Fundamental frequency (60% weight)
         sample += 0.6 * sin(2.0 * 3.14159265358979323846 * freq * t_note);
+        // First overtone / 2nd harmonic (30% weight)
         sample += 0.3 * sin(2.0 * 3.14159265358979323846 * freq * 2.0 * t_note);
+        // Second overtone / 3rd harmonic (10% weight)
         sample += 0.1 * sin(2.0 * 3.14159265358979323846 * freq * 3.0 * t_note);
 
         sample *= volume;
 
+        // Scale to 16-bit signed integer PCM
         int16_t pcmSample = static_cast<int16_t>(sample * 32767.0);
         writeVal16(static_cast<uint16_t>(pcmSample));
     }
