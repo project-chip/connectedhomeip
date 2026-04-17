@@ -430,7 +430,7 @@ class TC_ACE_1_6(MatterBaseTest):
             self.step("11f")
             self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
 
-            # Step 11g: Verify GroupcastTesting event is emitted the same as in step 11 (AccessAllowed: true)
+            # Step 11g: Verify GroupcastTesting event is emitted the same as in step 11a (AccessAllowed: true)
             self.step("11g")
             event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
