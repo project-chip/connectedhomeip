@@ -193,26 +193,17 @@ class CommissioningMethod(ABC):
         return await self.dev_ctrl.Commission(self.node_id)
 
 
-class CommissioningNetworkOnNetwork(CommissioningMethod):
+class Commission(CommissioningMethod):
     async def _prepare(self):
-        pass
-
-
-class CommissioningBleWiFi(CommissioningMethod):
-    async def _prepare(self):
-        asserts.assert_is_not_none(
-            self.commissioning_info.wifi_ssid,
-            "WiFi SSID must be provided for ble-wifi commissioning"
-        )
-        asserts.assert_is_not_none(
-            self.commissioning_info.wifi_passphrase,
-            "WiFi Passphrase must be provided for ble-wifi commissioning"
-        )
-
-        self.dev_ctrl.SetWiFiCredentials(
-            self.commissioning_info.wifi_ssid,
-            self.commissioning_info.wifi_passphrase
-        )
+        if self.commissioning_info.wifi_ssid is not None and self.commissioning_info.wifi_passphrase is not None:
+            self.dev_ctrl.SetWiFiCredentials(
+                self.commissioning_info.wifi_ssid,
+                self.commissioning_info.wifi_passphrase
+            )
+        elif self.commissioning_info.thread_operational_dataset is not None:
+            self.dev_ctrl.SetThreadOperationalDataset(
+                self.commissioning_info.thread_operational_dataset
+            )
 
 
 class CommissioningBleThread(CommissioningMethod):
@@ -312,12 +303,6 @@ class CommissioningThreadMeshcop(CommissioningMethod):
 class CommissioningFlow:
     @staticmethod
     def create(commissioning_method: str | None, dev_ctrl, node_id, info, commissioning_info):
-        if commissioning_method == "on-network":
-            return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info)
-        if commissioning_method == "ble-wifi":
-            return CommissioningBleWiFi(dev_ctrl, node_id, info, commissioning_info)
-        if commissioning_method == "ble-thread":
-            return CommissioningBleThread(dev_ctrl, node_id, info, commissioning_info)
         if commissioning_method == "nfc-thread":
             return CommissioningNfcThread(dev_ctrl, node_id, info, commissioning_info)
         if commissioning_method == "nfc-wifi":
@@ -325,8 +310,7 @@ class CommissioningFlow:
         if commissioning_method == "thread-meshcop":
             return CommissioningThreadMeshcop(dev_ctrl, node_id, info, commissioning_info)
 
-        # Default: This is needed for --manual-code flag
-        return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info)
+        return Commission(dev_ctrl, node_id, info, commissioning_info)
 
 
 async def commission_device(
