@@ -46,10 +46,10 @@ constexpr uint8_t kDefaultPowerStepNum = 10u;
 
 MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
                                                          const OptionalAttributeSet & optionalAttributeSet, const Context context) :
-    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }),
-    mFeature(feature), mOptionalAttributeSet(optionalAttributeSet), mDelegate(context.delegate),
-    mOpStateInstance(context.opStateInstance), mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance),
-    mInteractionModelEngine(context.interactionModelEngine), mCookTimeSec(kDefaultCookTimeSec)
+    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(feature), mOptionalAttributeSet(optionalAttributeSet),
+    mDelegate(context.delegate), mOpStateInstance(context.opStateInstance),
+    mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance), mInteractionModelEngine(context.interactionModelEngine),
+    mAcceptedCommands(context.acceptedCommands), mCookTimeSec(kDefaultCookTimeSec)
 {}
 
 CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
@@ -177,10 +177,17 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Invoke
 CHIP_ERROR MicrowaveOvenControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    return builder.AppendElements({
-        MicrowaveOvenControl::Commands::SetCookingParameters::kMetadataEntry,
-        MicrowaveOvenControl::Commands::AddMoreTime::kMetadataEntry,
-    });
+    if (mAcceptedCommands.test(MicrowaveOvenControl::Commands::SetCookingParameters::Id))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ MicrowaveOvenControl::Commands::SetCookingParameters::kMetadataEntry }));
+    }
+
+    if (mAcceptedCommands.test(MicrowaveOvenControl::Commands::AddMoreTime::Id))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ MicrowaveOvenControl::Commands::AddMoreTime::kMetadataEntry }));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 static bool IsCookTimeSecondsInRange(uint32_t cookTimeSec, uint32_t maxCookTimeSec)
