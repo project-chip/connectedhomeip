@@ -37,7 +37,6 @@ namespace app {
 namespace {
 
 constexpr double kPi               = 3.14159265358979323846;
-constexpr uint16_t kAudioFormatPCM = 1;
 constexpr uint32_t kSampleRateHz   = 44100;
 
 // Custom data source read callback. This is called by miniaudio to fetch more audio frames.

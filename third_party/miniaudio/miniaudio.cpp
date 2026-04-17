@@ -22,4 +22,17 @@
 // This file should be compiled exactly once in the project to avoid
 // duplicate symbol errors during linking.
 #define MINIAUDIO_IMPLEMENTATION
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-format-attribute"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+#pragma clang diagnostic ignored "-Wshadow"
+#endif
+
 #include <miniaudio.h>
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
