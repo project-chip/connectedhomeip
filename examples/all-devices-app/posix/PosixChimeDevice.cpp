@@ -19,23 +19,17 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <sstream>
 
-/**
- * @file PosixChimeDevice.cpp
- * @brief Implementation of the Chime device for POSIX platforms.
- *
- * High-Level Overview:
- * This file implements the audio playback for the Chime cluster on POSIX systems using the
- * miniaudio library. To avoid shipping large audio files or consuming significant memory with
- * pre-rendered PCM buffers, this implementation uses an "incremental synthesis" approach.
- *
- * A custom miniaudio data source (`CustomDataSource`) is defined. When miniaudio needs more
- * audio data, it calls `custom_data_source_read`, which generates the audio samples on-the-fly.
- * The sounds are synthesized using additive synthesis (combining a fundamental frequency with
- * harmonics) and an exponential decay to simulate a natural bell or chime fade-out.
- *
- * The `SoundResource` class manages the lifecycle of these miniaudio structures using RAII,
- * ensuring proper cleanup when the device is destroyed.
- */
+// This file implements the audio playback for the Chime cluster on POSIX systems using the
+// miniaudio library. To avoid shipping large audio files or consuming significant memory with
+// pre-rendered PCM buffers, this implementation uses an "incremental synthesis" approach.
+//
+// A custom miniaudio data source (`CustomDataSource`) is defined. When miniaudio needs more
+// audio data, it calls `custom_data_source_read`, which generates the audio samples on-the-fly.
+// The sounds are synthesized using additive synthesis (combining a fundamental frequency with
+// harmonics) and an exponential decay to simulate a natural bell or chime fade-out.
+//
+// The `SoundResource` class manages the lifecycle of these miniaudio structures using RAII,
+// ensuring proper cleanup when the device is destroyed.
 
 namespace chip {
 namespace app {
