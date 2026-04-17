@@ -673,24 +673,24 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.0 - Controller sends AnnounceOTAProvider command
-        # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
-        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info(f'{step_number_s4}: Step #4.0 - sent cmd AnnounceOTAProvider.')
-
-        # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.2 - Track OTA StateTransition events: Idle→Querying→Idle.
         #
         # Stale-event handling: Step 3 killed the provider during an active BDX download.
         # The DUT may take a long time to recover (BDX timeout + retry backoff), emitting
         # stale StateTransition events (kDownloading→kIdle, kIdle→kQuerying from retries,
         # etc.) that arrive in this subscription's queue before the Step 4 events.
-        # Flush any buffered events accumulated before and during the announce, then loop
-        # discarding stale transitions and re-sending AnnounceOTAProvider every 60 s so
-        # the DUT queries as soon as it recovers.
+        # Flush buffered events accumulated before the announce so only post-announce
+        # events are considered, then loop discarding any remaining stale transitions and
+        # re-sending AnnounceOTAProvider every 60 s so the DUT queries as soon as it recovers.
         # ------------------------------------------------------------------------------------
         subscription_state_invalid_uri.flush_events()
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_4]: Step #4.0 - Controller sends AnnounceOTAProvider command
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number_s4}: Step #4.0 - sent cmd AnnounceOTAProvider.')
 
         kIdle = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         kQuerying = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
@@ -1013,7 +1013,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=0,
-            max_interval_sec=5,
+            max_interval_sec=30,
             keepSubscriptions=False
         )
 
@@ -1041,12 +1041,16 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s7}: Step #7.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step #7.2 - Wait for kQuerying then kIdle; assert kDownloading never seen.
-        # The DUT is on V2 and the provider offers V2 — same version — so the DUT should
-        # query (kQuerying) but reject the image and return to kIdle without downloading.
-        # kQuerying is transient — the DUT may complete the full kIdle→kQuerying→kIdle cycle
-        # before its reporting engine sends the intermediate kQuerying update, so accept either
-        # kQuerying or a later kIdle as success.  Reject kDownloading at any point.
+        # [STEP_7]: Step #7.1 - Wait for the DUT to query and reject the same-version image.
+        # The DUT is on V2 and the provider offers V2, so the DUT should query (kQuerying)
+        # but reject the image and return to kIdle without downloading.
+        #
+        # Two-phase wait to reliably cover the full kIdle→kQuerying→kIdle cycle:
+        #   Phase 1 (720 s): accept kQuerying or kIdle.  kQuerying is transient — the DUT
+        #     may complete the entire cycle between subscription polls, so a bare kIdle counts.
+        #   Phase 2 (60 s): always runs after Phase 1.  Resets history and waits for kIdle.
+        #     This prevents a false pass when Phase 1 fires on a periodic keepalive kIdle
+        #     (max_interval_sec=30) that arrives before the DUT starts querying.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s7}: Step #7.1 - Waiting for kQuerying→kIdle sequence '
@@ -1054,7 +1058,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         downloading_seen_s7 = [False]
 
-        def matcher_s7(report):
+        def phase1_matcher_s7(report):
             val = report.value
             if val == kDownloading_s7:
                 downloading_seen_s7[0] = True
@@ -1064,22 +1068,42 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 logger.info(f'{step_number_s7}: kQuerying observed (expected)')
                 return True
             if val == kIdle_s7:
-                logger.info(f'{step_number_s7}: kIdle after query cycle — no download started (expected)')
+                logger.info(f'{step_number_s7}: kIdle observed (query cycle completed or too fast to capture kQuerying)')
                 return True
             return False
 
-        matcher_s7_obj = AttributeMatcher.from_callable(
+        phase1_matcher_s7_obj = AttributeMatcher.from_callable(
             description=f"{step_number_s7} - post-announce kQuerying or kIdle, no kDownloading",
-            matcher=matcher_s7
+            matcher=phase1_matcher_s7
         )
 
-        subscription_s7.await_all_expected_report_matches([matcher_s7_obj], timeout_sec=720.0)
-        logger.info(f'{step_number_s7}: Step #7.2 - Query cycle completed after announce.')
+        subscription_s7.await_all_expected_report_matches([phase1_matcher_s7_obj], timeout_sec=720.0)
+
+        # Phase 2: reset and wait for kIdle.
+        logger.info(f'{step_number_s7}: Phase 2: awaiting kIdle to confirm query cycle completed without download.')
+        subscription_s7.reset()
+
+        def phase2_matcher_s7(report):
+            val = report.value
+            if val == kDownloading_s7:
+                downloading_seen_s7[0] = True
+                logger.info(
+                    f'{step_number_s7}: UNEXPECTED kDownloading in Phase 2 — DUT started download of same-version image!')
+                return False
+            if val == kIdle_s7:
+                logger.info(f'{step_number_s7}: kIdle confirmed — query cycle completed without download.')
+                return True
+            return False
+
+        phase2_matcher_s7_obj = AttributeMatcher.from_callable(
+            description=f"{step_number_s7} - post-kQuerying kIdle, no kDownloading",
+            matcher=phase2_matcher_s7
+        )
+
+        subscription_s7.await_all_expected_report_matches([phase2_matcher_s7_obj], timeout_sec=90.0)
+        logger.info(f'{step_number_s7}: Step #7.2 - Query cycle fully completed after announce.')
         subscription_s7.cancel()
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step #7.4 - Verify NO image transfer occurred (same version already installed)
-        # ------------------------------------------------------------------------------------
         asserts.assert_false(downloading_seen_s7[0],
                              f"{step_number_s7}: DUT started downloading the same-version image (kDownloading seen).")
         logger.info(f"{step_number_s7}: No image transfer occurred (expected — DUT already on V2).")
