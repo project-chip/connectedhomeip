@@ -203,6 +203,7 @@ namespace {
 CHIP_ERROR CommandDispatcher_Internal(ClusterId clusterId, CommandId commandId, bool isGroup = false)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY);
     data->commandId           = commandId;
     data->clusterId           = clusterId;
     data->isGroup             = isGroup;
@@ -258,6 +259,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     if (err != CHIP_NO_ERROR)
@@ -273,6 +275,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     if (err != CHIP_NO_ERROR)
