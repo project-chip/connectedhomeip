@@ -43,7 +43,6 @@ set(SRC_DIRS_LIST
     # all-devices-common device modules
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime"
-    "${ALL_DEVICES_COMMON_DIR}/devices/chime/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"

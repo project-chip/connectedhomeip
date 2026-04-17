@@ -37,8 +37,8 @@ class ExampleMicrowaveOvenModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(ModeTag::kNormal) } };
-    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
+    ModeTagStructType modeTagsNormal[1]  = { { .mfgCode = {}, .value = to_underlying(ModeTag::kNormal) } };
+    ModeTagStructType modeTagsDefrost[1] = { { .mfgCode = {}, .value = to_underlying(ModeTag::kDefrost) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
         detail::Structs::ModeOptionStruct::Type{
