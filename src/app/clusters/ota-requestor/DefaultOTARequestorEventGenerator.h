@@ -22,19 +22,20 @@
 
 namespace chip {
 
-// This interface is used by the DefaultOTARequestor to send events.
-class DefaultOTARequestorEventSender
+// This interface is used by the DefaultOTARequestor to generate events.
+class DefaultOTARequestorEventGenerator
 {
 public:
-    virtual ~DefaultOTARequestorEventSender() = default;
+    virtual ~DefaultOTARequestorEventGenerator() = default;
 
     using DownloadErrorEvent  = app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::Type;
     using VersionAppliedEvent = app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::Type;
 
-    virtual CHIP_ERROR SendVersionAppliedEvent(const VersionAppliedEvent & event) = 0;
+    // Generates a version applied event.
+    virtual CHIP_ERROR GenerateVersionAppliedEvent(const VersionAppliedEvent & event) = 0;
 
-    // Sends a download error event.
-    virtual CHIP_ERROR SendDownloadErrorEvent(const DownloadErrorEvent & event) = 0;
+    // Generates a download error event.
+    virtual CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent & event) = 0;
 };
 
 } // namespace chip

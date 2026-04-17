@@ -69,27 +69,27 @@ private:
 
 // This class decouples the cluster and the DefaultOTARequestor singleton's event sending to allow the OTARequestorCluster to be
 // created after DefaultOTARequestor::Init is called.
-class OTAEventForwarder : public DefaultOTARequestorEventSender
+class OTAEventForwarder : public DefaultOTARequestorEventGenerator
 {
 public:
     ~OTAEventForwarder() override = default;
 
-    CHIP_ERROR SendVersionAppliedEvent(const VersionAppliedEvent & event) override
+    CHIP_ERROR GenerateVersionAppliedEvent(const VersionAppliedEvent & event) override
     {
         VerifyOrReturnError(mDestination, CHIP_ERROR_INCORRECT_STATE);
-        return mDestination->SendVersionAppliedEvent(event);
+        return mDestination->GenerateVersionAppliedEvent(event);
     }
 
-    CHIP_ERROR SendDownloadErrorEvent(const DownloadErrorEvent & event) override
+    CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent & event) override
     {
         VerifyOrReturnError(mDestination, CHIP_ERROR_INCORRECT_STATE);
-        return mDestination->SendDownloadErrorEvent(event);
+        return mDestination->GenerateDownloadErrorEvent(event);
     }
 
-    void SetDestination(DefaultOTARequestorEventSender * destination) { mDestination = destination; }
+    void SetDestination(DefaultOTARequestorEventGenerator * destination) { mDestination = destination; }
 
 private:
-    DefaultOTARequestorEventSender * mDestination = nullptr;
+    DefaultOTARequestorEventGenerator * mDestination = nullptr;
 };
 
 OTARequestorAttributes gAttributes;
@@ -165,7 +165,7 @@ OTARequestorAttributes & GetOTARequestorAttributes()
     return gAttributes;
 }
 
-DefaultOTARequestorEventSender & GetDefaultOTARequestorEventSender()
+DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
 {
     return gEventForwarder;
 }

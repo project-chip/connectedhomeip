@@ -27,7 +27,7 @@
 #include <protocols/bdx/BdxMessages.h>
 
 #include "BDXDownloader.h"
-#include "DefaultOTARequestorEventSender.h"
+#include "DefaultOTARequestorEventGenerator.h"
 #include "OTARequestorAttributes.h"
 #include "OTARequestorDriver.h"
 #include "OTARequestorInterface.h"
@@ -122,7 +122,7 @@ public:
      * InitState.
      */
     CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader,
-                    OTARequestorAttributes & attributes, DefaultOTARequestorEventSender & eventSender);
+                    OTARequestorAttributes & attributes, DefaultOTARequestorEventGenerator & eventGenerator);
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
@@ -326,14 +326,14 @@ private:
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-    OTARequestorStorage * mStorage                = nullptr;
-    OTARequestorDriver * mOtaRequestorDriver      = nullptr;
-    CASESessionManager * mCASESessionManager      = nullptr;
-    OTARequestorAttributes * mAttributes          = nullptr;
-    DefaultOTARequestorEventSender * mEventSender = nullptr;
-    OnConnectedAction mOnConnectedAction          = kQueryImage;
-    BDXDownloader * mBdxDownloader                = nullptr; // TODO: this should be OTADownloader
-    BDXMessenger mBdxMessenger;                              // TODO: ideally this is held by the application
+    OTARequestorStorage * mStorage                      = nullptr;
+    OTARequestorDriver * mOtaRequestorDriver            = nullptr;
+    CASESessionManager * mCASESessionManager            = nullptr;
+    OTARequestorAttributes * mAttributes                = nullptr;
+    DefaultOTARequestorEventGenerator * mEventGenerator = nullptr;
+    OnConnectedAction mOnConnectedAction                = kQueryImage;
+    BDXDownloader * mBdxDownloader                      = nullptr; // TODO: this should be OTADownloader
+    BDXMessenger mBdxMessenger;                                    // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     Optional<ByteSpan> mMetadataForProvider;
     ByteSpan mUpdateToken;

@@ -158,7 +158,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateMarksChangedWhenDifferent)
     EXPECT_EQ(changeListener.dirtyList.size(), 0u);
 }
 
-TEST_F(TestOTARequestorAttributes, SetUpdateStateSendsEventWhenDifferent)
+TEST_F(TestOTARequestorAttributes, SetUpdateStateGeneratesEventWhenDifferent)
 {
     chip::Testing::TestServerClusterContext context;
     MockAttributeChangeListener changeListener;
@@ -169,7 +169,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateSendsEventWhenDifferent)
     ASSERT_EQ(attributes.SetInteractionModelContext(kTestEndpointId, changeListener, eventsGenerator), CHIP_NO_ERROR);
     ASSERT_FALSE(eventsGenerator.GetNextEvent().has_value());
 
-    // Verify setting a state with a target version sends a matching event.
+    // Verify setting a state with a target version generates a matching event.
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess,
                               Nullable<uint32_t>(1234u));
     auto event = eventsGenerator.GetNextEvent();
@@ -184,7 +184,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateSendsEventWhenDifferent)
     EXPECT_EQ(decodedEvent.reason, OTAChangeReasonEnum::kSuccess);
     EXPECT_EQ(decodedEvent.targetSoftwareVersion, Nullable<uint32_t>(1234u));
 
-    // Verify setting a state without a target version sends a matching event.
+    // Verify setting a state without a target version generates a matching event.
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kTimeOut, NullNullable);
     event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
@@ -197,7 +197,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateSendsEventWhenDifferent)
     EXPECT_EQ(decodedEvent.reason, OTAChangeReasonEnum::kTimeOut);
     EXPECT_TRUE(decodedEvent.targetSoftwareVersion.IsNull());
 
-    // Verify setting the same state doesn't send an event.
+    // Verify setting the same state doesn't generate an event.
     attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess, NullNullable);
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
 }

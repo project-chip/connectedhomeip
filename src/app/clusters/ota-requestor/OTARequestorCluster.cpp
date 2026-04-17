@@ -167,7 +167,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
     }
 }
 
-CHIP_ERROR OTARequestorCluster::SendVersionAppliedEvent(const DefaultOTARequestorEventSender::VersionAppliedEvent & event)
+CHIP_ERROR OTARequestorCluster::GenerateVersionAppliedEvent(const DefaultOTARequestorEventGenerator::VersionAppliedEvent & event)
 {
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
@@ -175,7 +175,7 @@ CHIP_ERROR OTARequestorCluster::SendVersionAppliedEvent(const DefaultOTARequesto
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestorCluster::SendDownloadErrorEvent(const DefaultOTARequestorEventSender::DownloadErrorEvent & event)
+CHIP_ERROR OTARequestorCluster::GenerateDownloadErrorEvent(const DefaultOTARequestorEventGenerator::DownloadErrorEvent & event)
 {
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);

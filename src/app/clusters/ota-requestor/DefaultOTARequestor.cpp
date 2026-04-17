@@ -117,7 +117,7 @@ OTARequestorInterface * GetRequestorInstance()
 
 CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver,
                                      BDXDownloader & downloader, OTARequestorAttributes & attributes,
-                                     DefaultOTARequestorEventSender & eventSender)
+                                     DefaultOTARequestorEventGenerator & eventGenerator)
 {
     mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
@@ -125,7 +125,7 @@ CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & stor
     mOtaRequestorDriver = &driver;
     mBdxDownloader      = &downloader;
     mAttributes         = &attributes;
-    mEventSender        = &eventSender;
+    mEventGenerator     = &eventGenerator;
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
 
@@ -592,11 +592,11 @@ void DefaultOTARequestor::NotifyUpdateApplied()
         return;
     }
 
-    if (mEventSender)
+    if (mEventGenerator)
     {
-        DefaultOTARequestorEventSender::VersionAppliedEvent event{ mCurrentVersion, productId };
-        CHIP_ERROR error = mEventSender->SendVersionAppliedEvent(event);
-        SuccessOrLog(error, SoftwareUpdate, "Failed to record VersionApplied event: %" CHIP_ERROR_FORMAT, error.Format());
+        DefaultOTARequestorEventGenerator::VersionAppliedEvent event{ mCurrentVersion, productId };
+        CHIP_ERROR error = mEventGenerator->GenerateVersionAppliedEvent(event);
+        SuccessOrLog(error, SoftwareUpdate, "Failed to generate VersionApplied event: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     ConnectToProvider(kNotifyUpdateApplied);
@@ -692,11 +692,11 @@ void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReas
     Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
 
-    if (mEventSender)
+    if (mEventGenerator)
     {
-        DefaultOTARequestorEventSender::DownloadErrorEvent event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
-                                                                  progressPercent, platformCode };
-        CHIP_ERROR send_error = mEventSender->SendDownloadErrorEvent(event);
+        DefaultOTARequestorEventGenerator::DownloadErrorEvent event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
+                                                                     progressPercent, platformCode };
+        CHIP_ERROR send_error = mEventGenerator->GenerateDownloadErrorEvent(event);
         SuccessOrLog(send_error, SoftwareUpdate, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT, send_error.Format());
     }
 

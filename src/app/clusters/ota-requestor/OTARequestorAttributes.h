@@ -34,8 +34,8 @@ namespace chip {
 
 // Class that tracks the non-array attributes in the OTA Requestor cluster. Marks
 // attributes dirty when they're changed. Updates the storage when the default OTA
-// providers list changes. Sends events when the update state changes. All methods
-// must be invoked with the Matter lock held.
+// providers list changes. Generates events when the update state changes. All
+// methods must be invoked with the Matter lock held.
 class OTARequestorAttributes
 {
 public:
@@ -51,7 +51,7 @@ public:
     };
 
     OTAUpdateStateEnum GetUpdateState() const;
-    // If the events generator is set this will also send a StateTransition event.
+    // If the events generator is set this will also generate a StateTransition event.
     void SetUpdateState(OTAUpdateStateEnum updateState, OTAChangeReasonEnum reason,
                         app::DataModel::Nullable<uint32_t> targetSoftwareVersion);
 
@@ -70,7 +70,7 @@ public:
 
     CHIP_ERROR SetInteractionModelContext(EndpointId endpointId, AttributeChangeListener & attributeChangeListener,
                                           app::DataModel::EventsGenerator & eventsGenerator);
-    // This loads the default OTA provider list and update state attributes from storage. This will not send events.
+    // This loads the default OTA provider list and update state attributes from storage. This will not generate events.
     CHIP_ERROR SetStorageAndLoadAttributes(OTARequestorStorage & storage);
 
 private:

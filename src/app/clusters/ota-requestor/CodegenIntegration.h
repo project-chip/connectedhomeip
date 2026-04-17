@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/ota-requestor/DefaultOTARequestorEventSender.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 
 namespace chip {
@@ -26,7 +26,7 @@ namespace chip {
 // Returns the OTA requestor attributes that are used by the cluster methods.
 OTARequestorAttributes & GetOTARequestorAttributes();
 
-// Returns an event sender that can be used by a DefaultOTARequestor.
-DefaultOTARequestorEventSender & GetDefaultOTARequestorEventSender();
+// Returns an event generator that can be used by a DefaultOTARequestor.
+DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator();
 
 } // namespace chip

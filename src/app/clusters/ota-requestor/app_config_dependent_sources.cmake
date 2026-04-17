@@ -37,6 +37,7 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/DefaultOTARequestorEventGenerator.h"
     "${CLUSTER_DIR}/OTARequestorAttributes.cpp"
     "${CLUSTER_DIR}/OTARequestorAttributes.h"
     "${CLUSTER_DIR}/OTARequestorCluster.cpp"

@@ -18,7 +18,7 @@
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/ota-requestor/DefaultOTARequestorEventSender.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
@@ -409,7 +409,7 @@ TEST_F(TestOTARequestorCluster, ChangingAttributesMarksAsChanged)
     // DefaultOTAProviders is verified in the test WriteDefaultProvidersList.
 }
 
-TEST_F(TestOTARequestorCluster, SendVersionAppliedEventSendsAnEvent)
+TEST_F(TestOTARequestorCluster, GenerateVersionAppliedEventGeneratesAnEvent)
 {
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
@@ -421,18 +421,18 @@ TEST_F(TestOTARequestorCluster, SendVersionAppliedEventSendsAnEvent)
     ASSERT_FALSE(eventsGenerator.GetNextEvent().has_value());
 
     VersionApplied::Type event{ 0x12345678u, 0xABCDu };
-    EXPECT_EQ(cluster.SendVersionAppliedEvent(event), CHIP_NO_ERROR);
-    auto sentEvent = eventsGenerator.GetNextEvent();
+    EXPECT_EQ(cluster.GenerateVersionAppliedEvent(event), CHIP_NO_ERROR);
+    auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
-    EXPECT_EQ(sentEvent->eventOptions.mPath,
+    EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, VersionApplied::Id));
     VersionApplied::DecodableType decodedEvent;
-    ASSERT_EQ(sentEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 0x12345678u);
     EXPECT_EQ(decodedEvent.productID, 0xABCDu);
 }
 
-TEST_F(TestOTARequestorCluster, SendVersionAppliedEventBeforeStartupFails)
+TEST_F(TestOTARequestorCluster, GenerateVersionAppliedEventBeforeStartupFails)
 {
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
@@ -442,11 +442,11 @@ TEST_F(TestOTARequestorCluster, SendVersionAppliedEventBeforeStartupFails)
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
 
     VersionApplied::Type event{ 0x12345678u, 0xABCDu };
-    EXPECT_NE(cluster.SendVersionAppliedEvent(event), CHIP_NO_ERROR);
+    EXPECT_NE(cluster.GenerateVersionAppliedEvent(event), CHIP_NO_ERROR);
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
 }
 
-TEST_F(TestOTARequestorCluster, SendDownloadErrorEventSendsAnEvent)
+TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
 {
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
@@ -457,26 +457,28 @@ TEST_F(TestOTARequestorCluster, SendDownloadErrorEventSendsAnEvent)
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
     ASSERT_FALSE(eventsGenerator.GetNextEvent().has_value());
 
-    // Send an event with null ProgressPercent and PlatformCode.
+    // Generate an event with null ProgressPercent and PlatformCode.
     DownloadError::Type event{ 0x12345678u, 0x123456789ABCDEF0u, DataModel::NullNullable, DataModel::NullNullable };
-    EXPECT_EQ(cluster.SendDownloadErrorEvent(event), CHIP_NO_ERROR);
-    auto sentEvent = eventsGenerator.GetNextEvent();
+    EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
+    auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
-    EXPECT_EQ(sentEvent->eventOptions.mPath, ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
+    EXPECT_EQ(generatedEvent->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     DownloadError::DecodableType decodedEvent;
-    ASSERT_EQ(sentEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 0x12345678u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 0x123456789ABCDEF0u);
     EXPECT_TRUE(decodedEvent.progressPercent.IsNull());
     EXPECT_TRUE(decodedEvent.platformCode.IsNull());
 
-    // Send an event with non-null ProgressPercent and PlatformCode.
+    // Generate an event with non-null ProgressPercent and PlatformCode.
     event = { 0x12345678u, 0x123456789ABCDEF0u, 83u, 0x0FEDCBA987654321 };
-    EXPECT_EQ(cluster.SendDownloadErrorEvent(event), CHIP_NO_ERROR);
-    sentEvent = eventsGenerator.GetNextEvent();
+    EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
+    generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
-    EXPECT_EQ(sentEvent->eventOptions.mPath, ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
-    ASSERT_EQ(sentEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(generatedEvent->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
+    ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 0x12345678u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 0x123456789ABCDEF0u);
     ASSERT_FALSE(decodedEvent.progressPercent.IsNull());
@@ -485,7 +487,7 @@ TEST_F(TestOTARequestorCluster, SendDownloadErrorEventSendsAnEvent)
     EXPECT_EQ(decodedEvent.platformCode.Value(), 0x0FEDCBA987654321);
 }
 
-TEST_F(TestOTARequestorCluster, SendDownloadErrorEventBeforeStartupFails)
+TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventBeforeStartupFails)
 {
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
@@ -495,7 +497,7 @@ TEST_F(TestOTARequestorCluster, SendDownloadErrorEventBeforeStartupFails)
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
 
     DownloadError::Type event{ 0x12345678u, 0x123456789ABCDEF0u, DataModel::NullNullable, DataModel::NullNullable };
-    EXPECT_NE(cluster.SendDownloadErrorEvent(event), CHIP_NO_ERROR);
+    EXPECT_NE(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
 }
 
