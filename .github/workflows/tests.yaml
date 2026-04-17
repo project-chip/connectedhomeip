@@ -1316,7 +1316,7 @@ jobs:
                 keep_reports: 200
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
-                
+
           - name: Set up Python
             uses: actions/setup-python@v5
             with:
@@ -1348,6 +1348,14 @@ jobs:
                 path: allure-report
                 retention-days: 30
                 if-no-files-found: warn
+          
+          - name: Upload dashboard artifact
+            uses: actions/upload-artifact@v7
+            with:
+                name: ci-test-history-dashboard
+                path: allure-history/allure-report/ci_tests/dashboard
+                retention-days: 30
+                if-no-files-found: error
 
           - name: Deploy to GitHub Pages
             if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
