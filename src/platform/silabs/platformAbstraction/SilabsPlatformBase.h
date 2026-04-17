@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include <lib/core/CHIPError.h>
+#include <sl_status.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -64,6 +65,12 @@ public:
     virtual CHIP_ERROR FlashInit() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashErasePage(uint32_t addr) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Enable board-specific Si70xx supply / enable GPIO (e.g. SiWx917 WPK). GSDK boards typically use sl_board_enable_sensor
+     * instead; this hook is a no-op there.
+     */
+    virtual sl_status_t EnableSi70xxSensorGpio() = 0;
 
     // Watchdog
     virtual void WatchdogInit(){};

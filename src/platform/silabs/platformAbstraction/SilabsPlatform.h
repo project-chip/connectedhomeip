@@ -69,6 +69,8 @@ public:
     CHIP_ERROR FlashErasePage(uint32_t addr) override;
     CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) override;
 
+    sl_status_t EnableSi70xxSensorGpio() override;
+
     // Reboot
     void SoftwareReset(void) override;
     inline uint32_t GetRebootCause() { return mRebootCause; }
