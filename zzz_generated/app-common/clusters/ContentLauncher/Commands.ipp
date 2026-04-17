@@ -76,7 +76,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace LaunchContent.
+} // namespace LaunchContent
 namespace LaunchURL {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -114,7 +114,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace LaunchURL.
+} // namespace LaunchURL
 namespace LauncherResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -147,7 +147,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace LauncherResponse.
+} // namespace LauncherResponse
 } // namespace Commands
 } // namespace ContentLauncher
 } // namespace Clusters

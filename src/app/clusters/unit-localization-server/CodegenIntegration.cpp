@@ -16,15 +16,14 @@
  *    limitations under the License.
  */
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
 #include <app/clusters/unit-localization-server/MigrateUnitLocalizationServerStorage.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
-#include <app/persistence/DefaultAttributePersistenceProvider.h>
-#include <app/server/Server.h>
 #include <app/static-cluster-config/UnitLocalization.h>
 #include <clusters/UnitLocalization/Ids.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,7 +38,7 @@ static_assert((UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.si
 
 namespace {
 
-LazyRegisteredServerCluster<UnitLocalizationServer> gServer;
+LazyRegisteredServerCluster<CodegenUnitLocalizationServer> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -64,6 +63,21 @@ public:
 
 } // namespace
 
+CHIP_ERROR CodegenUnitLocalizationServer::Startup(ServerClusterContext & context)
+{
+    // Migrate attributes for this cluster from SafeAttribute to AttributePersistence.
+    // This is done at Startup time when the persistence providers are guaranteed to be available.
+    SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
+    AttributePersistenceProvider & dstProvider     = context.attributeStorage;
+
+    if (srcProvider != nullptr)
+    {
+        LogErrorOnFailure(MigrateUnitLocalizationServerStorage(mPath.mEndpointId, *srcProvider, dstProvider));
+    }
+
+    return UnitLocalizationServer::Startup(context);
+}
+
 UnitLocalizationServer & UnitLocalizationServer::Instance()
 {
     VerifyOrDie(gServer.IsConstructed());
@@ -74,15 +88,6 @@ void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpointId == kRootEndpointId);
-
-    // Migrate attributes for this cluster from SafeAttribute to AttributePersistence
-    // This cluster uses the DefaultSafeAttributePersistenceProvider
-    DefaultSafeAttributePersistenceProvider safeProvider;
-    LogErrorOnFailure(safeProvider.Init(&Server::GetInstance().GetPersistentStorage()));
-    // And the DefaultAttributePersistenceProvider
-    DefaultAttributePersistenceProvider dstProvider;
-    LogErrorOnFailure(dstProvider.Init(&Server::GetInstance().GetPersistentStorage()));
-    LogErrorOnFailure(MigrateUnitLocalizationServerStorage(endpointId, safeProvider, dstProvider));
 
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(

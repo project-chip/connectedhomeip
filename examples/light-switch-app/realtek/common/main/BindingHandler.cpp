@@ -58,7 +58,10 @@ void BindingHandler::Init()
     // The initialization of binding manager will try establishing connection with unicast peers
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
+    // ScheduleWork is asynchronous, failure means work couldn't be queued.
+    // Since this is init time, if it fails the system won't work anyway,
+    // so the return value can be safely ignored.
+    RETURN_SAFELY_IGNORED(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitInternal));
 #if CONFIG_ENABLE_CHIP_SHELL
     RegisterSwitchCommands();
 #endif
@@ -387,9 +390,15 @@ void BindingHandler::LightSwitchContextReleaseHandler(void * context)
 void BindingHandler::InitInternal(intptr_t arg)
 {
     ChipLogProgress(NotSpecified, "Initialize binding Handler");
-    auto & server = chip::Server::GetInstance();
-    Binding::Manager::GetInstance().Init(
+    CHIP_ERROR bindErr = CHIP_NO_ERROR;
+    auto & server      = chip::Server::GetInstance();
+    bindErr            = Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    if (bindErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Binding::Manager::Init() failed: %" CHIP_ERROR_FORMAT, bindErr.Format());
+        return;
+    }
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
@@ -701,12 +710,21 @@ void BindingHandler::SwitchWorkerFunction(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     streamer_printf(streamer_get(), "Notify Bounded Cluster | endpoint: %d CLuster: %d\r\n", data->EndpointId, data->ClusterId);
 #endif
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
+    CHIP_ERROR notifyErr =
+        Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
+    if (notifyErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, notifyErr.Format());
+    }
 }
 
 void BindingHandler::SwitchWorkerFunction2(int localEndpointId)
 {
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(localEndpointId, Clusters::OnOff::Id, nullptr);
+    CHIP_ERROR notifyErr = Binding::Manager::GetInstance().NotifyBoundClusterChanged(localEndpointId, Clusters::OnOff::Id, nullptr);
+    if (notifyErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, notifyErr.Format());
+    }
 }
 
 void BindingHandler::SwitchWorkerFunction3(intptr_t context)

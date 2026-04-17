@@ -71,17 +71,35 @@ bool BoltLockManager::IsUnlocked()
 bool BoltLockManager::ReadConfigValues()
 {
     size_t outLen;
-    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(mUsers),
-                                  sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mUsers), outLen);
+    CHIP_ERROR rtkErr = CHIP_NO_ERROR;
 
-    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_LockUserData, reinterpret_cast<uint8_t *>(mUserData),
-                                  sizeof(UserData) * MATTER_ARRAY_SIZE(mUserData), outLen);
+    rtkErr = RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(mUsers),
+                                           sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mUsers), outLen);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ReadConfigValueBin LockUser failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+    }
 
-    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(mCredentials),
-                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mCredentials), outLen);
+    rtkErr = RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_LockUserData, reinterpret_cast<uint8_t *>(mUserData),
+                                           sizeof(UserData) * MATTER_ARRAY_SIZE(mUserData), outLen);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ReadConfigValueBin LockUserData failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+    }
 
-    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                  sizeof(mCredentialData), outLen);
+    rtkErr = RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(mCredentials),
+                                           sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mCredentials), outLen);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ReadConfigValueBin Credential failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+    }
+
+    rtkErr = RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+                                           sizeof(mCredentialData), outLen);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ReadConfigValueBin CredentialData failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+    }
 
     return true;
 }
@@ -102,6 +120,7 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
                               uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType,
                               CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
+    CHIP_ERROR rtkErr = CHIP_NO_ERROR;
     VerifyOrReturnError(userIndex > 0 && userIndex <= CONFIG_LOCK_NUM_USERS, false);
     VerifyOrReturnError(userName.size() <= DOOR_LOCK_MAX_USER_NAME_SIZE, false);
     VerifyOrReturnError(totalCredentials <= CONFIG_LOCK_NUM_CREDENTIALS_PER_USER, false);
@@ -124,11 +143,21 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
     user.lastModifiedBy     = modifier;
 
     // Save user information in NVM flash
-    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(mUsers),
-                                   sizeof(EmberAfPluginDoorLockUserInfo) * CONFIG_LOCK_NUM_USERS);
+    rtkErr = RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(mUsers),
+                                            sizeof(EmberAfPluginDoorLockUserInfo) * CONFIG_LOCK_NUM_USERS);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "WriteConfigValueBin LockUser failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
+    }
 
-    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_LockUserData, reinterpret_cast<const uint8_t *>(mUserData),
-                                   sizeof(UserData) * CONFIG_LOCK_NUM_USERS);
+    rtkErr = RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_LockUserData, reinterpret_cast<const uint8_t *>(mUserData),
+                                            sizeof(UserData) * CONFIG_LOCK_NUM_USERS);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "WriteConfigValueBin LockUserData failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
+    }
 
     ChipLogProgress(Zcl, "Successfully set the user [index=%d]", userIndex);
 
@@ -151,6 +180,8 @@ bool BoltLockManager::GetCredential(uint16_t credentialIndex, CredentialTypeEnum
 bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
                                     DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const ByteSpan & secret)
 {
+    CHIP_ERROR rtkErr = CHIP_NO_ERROR;
+
     VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
     VerifyOrReturnError(secret.size() <= kMaxCredentialLength, false);
 
@@ -167,11 +198,22 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     credential.modificationSource = DlAssetSource::kMatterIM;
     credential.lastModifiedBy     = modifier;
 
-    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(mCredentials),
-                                   sizeof(EmberAfPluginDoorLockCredentialInfo) * CONFIG_LOCK_NUM_CREDENTIALS);
+    rtkErr = RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(mCredentials),
+                                            sizeof(EmberAfPluginDoorLockCredentialInfo) * CONFIG_LOCK_NUM_CREDENTIALS);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "WriteConfigValueBin Credential failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
+    }
 
-    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(mCredentialData),
-                                   CONFIG_LOCK_NUM_CREDENTIALS * kMaxCredentialLength);
+    rtkErr =
+        RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(mCredentialData),
+                                       CONFIG_LOCK_NUM_CREDENTIALS * kMaxCredentialLength);
+    if (rtkErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "WriteConfigValueBin CredentialData failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
+    }
 
     ChipLogProgress(Zcl, "Setting lock credential %u: %s", static_cast<unsigned>(credentialIndex),
                     credential.status == DlCredentialStatus::kAvailable ? "available" : "occupied");

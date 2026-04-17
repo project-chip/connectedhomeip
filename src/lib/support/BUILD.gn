@@ -113,6 +113,7 @@ source_set("arg_parser") {
 
 source_set("numeric-primitives") {
   sources = [
+    "PopCount.h",
     "attribute-storage-null-handling.h",
     "odd-sized-integers.h",
   ]
@@ -251,6 +252,8 @@ static_library("support") {
     "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
+    "Base85.cpp",
+    "Base85.h",
     "BitFlags.h",
     "BitMask.h",
     "BufferReader.cpp",
@@ -426,6 +429,7 @@ pw_static_library("pw_tests_wrapper") {
     "$dir_pw_unit_test",
     "$dir_pw_unit_test:logging",
     "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/system",
   ]
   sources = [
     "UnitTest.cpp",

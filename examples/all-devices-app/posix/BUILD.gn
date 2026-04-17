@@ -18,6 +18,7 @@ import("${chip_root}/src/platform/device.gni")
 
 executable("all-devices-app") {
   sources = [
+    "PosixChimeDevice.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

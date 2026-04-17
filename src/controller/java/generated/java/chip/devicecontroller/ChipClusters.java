@@ -53177,6 +53177,458 @@ public class ChipClusters {
     }
   }
 
+  public static class ProximityRangingCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1075L;
+
+    private static final long RANGING_CAPABILITIES_ATTRIBUTE_ID = 0L;
+    private static final long WI_FI_DEV_IK_ATTRIBUTE_ID = 1L;
+    private static final long BLE_DEVICE_ID_ATTRIBUTE_ID = 2L;
+    private static final long BLT_DEV_IK_ATTRIBUTE_ID = 3L;
+    private static final long BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID = 4L;
+    private static final long BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID = 5L;
+    private static final long SESSION_ID_LIST_ATTRIBUTE_ID = 6L;
+    private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
+    private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
+    private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
+    private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
+    private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
+
+    public ProximityRangingCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+
+    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, Integer securityMode, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition) {
+      startRangingRequest(callback, technology, wiFiRangingDeviceRoleConfig, BLERangingDeviceRoleConfig, BLTChannelSoundingDeviceRoleConfig, frequencyBand, bandwidth, securityMode, trigger, reportingCondition, 0);
+    }
+
+    public void startRangingRequest(StartRangingResponseCallback callback, Integer technology, Optional<ChipStructs.ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct> wiFiRangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLERangingDeviceRoleConfigStruct> BLERangingDeviceRoleConfig, Optional<ChipStructs.ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct> BLTChannelSoundingDeviceRoleConfig, Optional<Integer> frequencyBand, Optional<Long> bandwidth, Integer securityMode, ChipStructs.ProximityRangingClusterRangingTriggerConditionStruct trigger, Optional<ChipStructs.ProximityRangingClusterReportingConditionStruct> reportingCondition, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long technologyFieldID = 0L;
+      BaseTLVType technologytlvValue = new UIntType(technology);
+      elements.add(new StructElement(technologyFieldID, technologytlvValue));
+
+      final long wiFiRangingDeviceRoleConfigFieldID = 1L;
+      BaseTLVType wiFiRangingDeviceRoleConfigtlvValue = wiFiRangingDeviceRoleConfig.<BaseTLVType>map((nonOptionalwiFiRangingDeviceRoleConfig) -> nonOptionalwiFiRangingDeviceRoleConfig.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(wiFiRangingDeviceRoleConfigFieldID, wiFiRangingDeviceRoleConfigtlvValue));
+
+      final long BLERangingDeviceRoleConfigFieldID = 2L;
+      BaseTLVType BLERangingDeviceRoleConfigtlvValue = BLERangingDeviceRoleConfig.<BaseTLVType>map((nonOptionalBLERangingDeviceRoleConfig) -> nonOptionalBLERangingDeviceRoleConfig.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(BLERangingDeviceRoleConfigFieldID, BLERangingDeviceRoleConfigtlvValue));
+
+      final long BLTChannelSoundingDeviceRoleConfigFieldID = 3L;
+      BaseTLVType BLTChannelSoundingDeviceRoleConfigtlvValue = BLTChannelSoundingDeviceRoleConfig.<BaseTLVType>map((nonOptionalBLTChannelSoundingDeviceRoleConfig) -> nonOptionalBLTChannelSoundingDeviceRoleConfig.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(BLTChannelSoundingDeviceRoleConfigFieldID, BLTChannelSoundingDeviceRoleConfigtlvValue));
+
+      final long frequencyBandFieldID = 4L;
+      BaseTLVType frequencyBandtlvValue = frequencyBand.<BaseTLVType>map((nonOptionalfrequencyBand) -> new UIntType(nonOptionalfrequencyBand)).orElse(new EmptyType());
+      elements.add(new StructElement(frequencyBandFieldID, frequencyBandtlvValue));
+
+      final long bandwidthFieldID = 5L;
+      BaseTLVType bandwidthtlvValue = bandwidth.<BaseTLVType>map((nonOptionalbandwidth) -> new UIntType(nonOptionalbandwidth)).orElse(new EmptyType());
+      elements.add(new StructElement(bandwidthFieldID, bandwidthtlvValue));
+
+      final long securityModeFieldID = 6L;
+      BaseTLVType securityModetlvValue = new UIntType(securityMode);
+      elements.add(new StructElement(securityModeFieldID, securityModetlvValue));
+
+      final long triggerFieldID = 7L;
+      BaseTLVType triggertlvValue = trigger.encodeTlv();
+      elements.add(new StructElement(triggerFieldID, triggertlvValue));
+
+      final long reportingConditionFieldID = 8L;
+      BaseTLVType reportingConditiontlvValue = reportingCondition.<BaseTLVType>map((nonOptionalreportingCondition) -> nonOptionalreportingCondition.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(reportingConditionFieldID, reportingConditiontlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long resultCodeFieldID = 0L;
+          Integer resultCode = null;
+          final long sessionIDFieldID = 1L;
+          @Nullable Integer sessionID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == resultCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                resultCode = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == sessionIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                sessionID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(resultCode, sessionID);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void stopRangingRequest(DefaultClusterCallback callback, Integer sessionID) {
+      stopRangingRequest(callback, sessionID, 0);
+    }
+
+    public void stopRangingRequest(DefaultClusterCallback callback, Integer sessionID, int timedInvokeTimeoutMs) {
+      final long commandId = 2L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long sessionIDFieldID = 0L;
+      BaseTLVType sessionIDtlvValue = new UIntType(sessionID);
+      elements.add(new StructElement(sessionIDFieldID, sessionIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface StartRangingResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer resultCode, @Nullable Integer sessionID);
+    }
+
+    public interface RangingCapabilitiesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ProximityRangingClusterRangingCapabilitiesStruct> value);
+    }
+
+    public interface SessionIDListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable List<Integer> value);
+    }
+
+    public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AcceptedCommandListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public interface AttributeListAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Long> value);
+    }
+
+    public void readRangingCapabilitiesAttribute(
+        RangingCapabilitiesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RANGING_CAPABILITIES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ProximityRangingClusterRangingCapabilitiesStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RANGING_CAPABILITIES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeRangingCapabilitiesAttribute(
+        RangingCapabilitiesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RANGING_CAPABILITIES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ProximityRangingClusterRangingCapabilitiesStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RANGING_CAPABILITIES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readWiFiDevIKAttribute(
+        OctetStringAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WI_FI_DEV_IK_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, WI_FI_DEV_IK_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeWiFiDevIKAttribute(
+        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WI_FI_DEV_IK_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, WI_FI_DEV_IK_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readBLEDeviceIDAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLE_DEVICE_ID_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLE_DEVICE_ID_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBLEDeviceIDAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLE_DEVICE_ID_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLE_DEVICE_ID_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readBLTDevIKAttribute(
+        OctetStringAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLT_DEV_IK_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLT_DEV_IK_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBLTDevIKAttribute(
+        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLT_DEV_IK_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLT_DEV_IK_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readBLTCSSecurityLevelAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBLTCSSecurityLevelAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readBLTCSModeCapabilityAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBLTCSModeCapabilityAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSessionIDListAttribute(
+        SessionIDListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ID_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SESSION_ID_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSessionIDListAttribute(
+        SessionIDListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ID_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SESSION_ID_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GENERATED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+        AttributeListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ATTRIBUTE_LIST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ATTRIBUTE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FEATURE_MAP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FEATURE_MAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CLUSTER_REVISION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CLUSTER_REVISION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+  }
+
   public static class WiFiNetworkManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1105L;
 

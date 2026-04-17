@@ -81,7 +81,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetSettings.
+} // namespace SetSettings
 } // namespace Commands
 } // namespace Humidistat
 } // namespace Clusters
