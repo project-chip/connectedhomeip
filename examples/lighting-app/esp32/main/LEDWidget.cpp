@@ -16,8 +16,8 @@
  */
 
 #include "LEDWidget.h"
-#include <lib/support/CodeUtils.h>
 #include "ColorFormat.h"
+#include <lib/support/CodeUtils.h>
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
