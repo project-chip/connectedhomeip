@@ -101,7 +101,16 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
     ReturnErrorOnFailure(SaveLink(resumptionId, node));
 
     index.mNodes[index.mSize++] = node;
-    ReturnErrorOnFailure(SaveIndex(index));
+    err = SaveIndex(index);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SecureChannel,
+                     "SaveIndex failed; unable to persist reference for node " ChipLogFormatX64
+                     ": %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(node.GetNodeId()), err.Format());
+        ReturnErrorOnFailure(DeleteLink(resumptionId));
+        return err;
+    }
 
     return CHIP_NO_ERROR;
 }
