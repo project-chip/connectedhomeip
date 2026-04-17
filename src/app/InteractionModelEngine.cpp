@@ -217,7 +217,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    if (groups!=nullptr && groups->IsGroupcastEnabled())
+    if (groups != nullptr && groups->IsGroupcastEnabled())
     {
         Groupcast::GetTesting().SetDelegate(this);
     }
@@ -236,7 +236,7 @@ void InteractionModelEngine::Shutdown()
     VerifyOrReturn(State::kUninitialized != mState);
 
     Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    if (groups!=nullptr && groups->IsGroupcastEnabled())
+    if (groups != nullptr && groups->IsGroupcastEnabled())
     {
         Groupcast::GetTesting().SetDelegate(nullptr);
     }
