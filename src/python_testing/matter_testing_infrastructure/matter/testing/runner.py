@@ -478,10 +478,12 @@ def run_tests_no_exit(
         )
 
         is_discovery_test = test_class.__name__.startswith("TC_DD_")
+        is_post_cert = test_class.__name__.startswith("TC_SC_7_1")
 
         should_run_pre_commissioning = (
             not in_test_commissioning
             and not is_discovery_test
+            and not is_post_cert
             and has_commissioning_inputs
         )
 
