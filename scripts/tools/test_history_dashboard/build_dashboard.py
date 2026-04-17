@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-
 import argparse
 import json
-import math
 import os
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
