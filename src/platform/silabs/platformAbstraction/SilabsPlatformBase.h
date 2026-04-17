@@ -66,11 +66,12 @@ public:
     virtual CHIP_ERROR FlashErasePage(uint32_t addr) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
     /**
-     * Enable board-specific Si70xx supply / enable GPIO (e.g. SiWx917 WPK). GSDK boards typically use sl_board_enable_sensor
-     * instead; this hook is a no-op there.
+     * Enable board-specific Si70xx supply / enable GPIO (e.g. SiWx917 WPK).
      */
     virtual sl_status_t EnableSi70xxSensorGpio() = 0;
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
     // Watchdog
     virtual void WatchdogInit(){};

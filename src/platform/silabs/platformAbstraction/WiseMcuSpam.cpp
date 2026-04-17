@@ -87,7 +87,9 @@ namespace DeviceLayer {
 namespace Silabs {
 namespace {
 
-constexpr uint8_t kSi70xxSensorEnableGpioOutputValue = 1;
+#define SI70XX_SENSOR_ENABLE_GPIO_HIGH 1
+#define SI70XX_SENSOR_ENABLE_GPIO_LOW 0
+#define SI70XX_SENSOR_ENABLE_GPIO_PIN_MODE_DEFAULT 0
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
@@ -299,12 +301,13 @@ CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, s
     return CHIP_NO_ERROR;
 }
 
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
 {
     sl_status_t status = SL_STATUS_OK;
 
 #if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
-    if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) != 1)
+    if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) == SI70XX_SENSOR_ENABLE_GPIO_LOW)
     {
         // Enable GPIO ULP_CLK
         status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) ULPCLK_GPIO);
@@ -325,7 +328,7 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
 
     status = sl_gpio_driver_get_pin(&sensor_enable_port_pin, &pin_value);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
-    if (pin_value != 1)
+    if (pin_value == SI70XX_SENSOR_ENABLE_GPIO_LOW)
     {
         // Enable GPIO CLK
 #ifdef SENSOR_ENABLE_GPIO_MAPPED_TO_ULP
@@ -336,7 +339,8 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
         VerifyOrReturnError(status == SL_STATUS_OK, status);
 
         // Set the pin mode for GPIO pins.
-        status = sl_gpio_driver_set_pin_mode(&sensor_enable_port_pin, (sl_gpio_mode_t) 0, kSi70xxSensorEnableGpioOutputValue);
+        status = sl_gpio_driver_set_pin_mode(&sensor_enable_port_pin, (sl_gpio_mode_t) SI70XX_SENSOR_ENABLE_GPIO_PIN_MODE_DEFAULT,
+                                             SI70XX_SENSOR_ENABLE_GPIO_HIGH);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
         // Select the direction of GPIO pin whether Input/ Output
         status = sl_si91x_gpio_driver_set_pin_direction(SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN,
@@ -350,6 +354,7 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
 
     return status;
 }
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
 } // namespace Silabs
 } // namespace DeviceLayer

@@ -291,11 +291,8 @@ template("siwx917_sdk") {
         "SI917Y_DEVKIT=1",
       ]
     }
-    if (sl_enable_si70xx_sensor) {
-      defines += [ "SL_MATTER_USE_SI70XX_SENSOR=1" ]
-    } else {
-      defines += [ "SL_MATTER_USE_SI70XX_SENSOR=0" ]
-    }
+
+    defines += "SL_MATTER_USE_SI70XX_SENSOR=${sl_enable_si70xx_sensor}"
 
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
