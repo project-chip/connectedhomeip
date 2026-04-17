@@ -326,7 +326,7 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
     sl_gpio_t sensor_enable_port_pin = { (sl_gpio_port_t) SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN };
     uint8_t pin_value;
 
-    status = sl_gpio_driver_get_pin(&sensor_enable_port_pin, &pin_value);
+    status                        = sl_gpio_driver_get_pin(&sensor_enable_port_pin, &pin_value);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
     if (pin_value == SI70XX_SENSOR_ENABLE_GPIO_LOW)
     {
