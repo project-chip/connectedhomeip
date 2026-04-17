@@ -5,7 +5,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
-
 GOOD_STATUSES = {"passed"}
 BAD_STATUSES = {"failed", "broken"}
 KNOWN_STATUSES = {"passed", "failed", "broken", "skipped", "unknown"}
