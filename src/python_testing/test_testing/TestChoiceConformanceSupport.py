@@ -244,49 +244,55 @@ class TestConformanceSupport(MatterBaseTest):
             self._evaluate_problems(problems, expected_failures)
 
     def test_O_and_feature_choice(self):
-        cluster_xml_str = create_cluster_with_o_and_xxx_choice(False)
+        def init_clusters(more:bool) -> dict[int, XmlCluster]:
+            clusters: dict[int, XmlCluster] = {}
+            pure_base_clusters: dict[str, XmlCluster] = {}
+            ids_by_name: dict[str, int] = {}
+            problems: list[ProblemNotice] = []
+            cluster_xml_str = create_cluster_with_o_and_xxx_choice(more)
+            cluster_xml = ElementTree.fromstring(cluster_xml_str)
+            add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+            return clusters
 
-        clusters: dict[int, XmlCluster] = {}
-        pure_base_clusters: dict[str, XmlCluster] = {}
-        ids_by_name: dict[str, int] = {}
-        problems: list[ProblemNotice] = []
-        cluster_xml = ElementTree.fromstring(cluster_xml_str)
-        add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+        clusters =  init_clusters(False)
 
-        def evaluate_test_scenarios(tests: list[tuple[list[int], set[str]]], feature_map: int):
+        def evaluate_test_scenarios(clusters: dict[int, XmlCluster], tests: list[tuple[list[int], set[str]]], feature_map: int):
             for attribute_list, expected_failure in tests:
                 info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=attribute_list, all_command_list=[], cluster_revision=1)
                 problems = evaluate_attribute_choice_conformance(0, 1, clusters, info)
                 self._evaluate_problems(problems, expected_failure)
 
-        # Attr0 = O.a, Attr1 = [XXX].a
-        # If the feature is off, the only valid option is Attr0 included, Attr1 not
         # We always expect the failure on choice a
         failure = {'a'}
         no_failure = set()
+
+        # Attr0 = O.a, Attr1 = [XXX].a
+        clusters =  init_clusters(False)
+
+        # If the feature is off, the only valid option is Attr0 included, Attr1 not
         # not testing [0, 1] - the fact that 1 is disallowed here is checked in the main conformance test
         tests = [([], failure), ([0], no_failure), ([1], failure)]
-        evaluate_test_scenarios(tests, 0)
+        evaluate_test_scenarios(clusters, tests, 0)
 
         # Attr0 = O.a, Attr1 = [XXX].a
         # If the feature is on, the only valid options are only Attr0 included, or only Attr1 included
         # We always expect the failure on choice a
         tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
-        evaluate_test_scenarios(tests, 1)
+        evaluate_test_scenarios(clusters, tests, 1)
 
         # Attr0 = O.a, Attr1 = [XXX].a+
+        clusters =  init_clusters(True)
+
         # If the feature is off, the only valid option is Attr0 included, Attr1 not
         # We always expect the failure on choice a
-        failure = {'a'}
-        no_failure = set()
         # not testing [0, 1] - the fact that 1 is disallowed here is checked in the main conformance test
         tests = [([], failure), ([0], no_failure), ([1], failure)]
-        evaluate_test_scenarios(tests, 0)
+        evaluate_test_scenarios(clusters, tests, 0)
 
         # Attr0 = O.a+, Attr1 = [XXX].a+
         # If the feature is on, all of these scenarios are valid except the empty list
-        tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
-        evaluate_test_scenarios(tests, 1)
+        tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], no_failure)]
+        evaluate_test_scenarios(clusters, tests, 1)
 
 
 
