@@ -19,7 +19,6 @@ config("includes") {
   include_dirs = [
     ".",
     "../include",
-    "${chip_root}/third_party/miniaudio/repo",
   ]
 }
 
@@ -41,6 +40,7 @@ source_set("linux") {
     "${chip_root}/src/data-model-providers/codedriven/endpoint",
     "${chip_root}/src/platform/Linux",
     "${chip_root}/zzz_generated/app-common/devices",
+    "${chip_root}/third_party/miniaudio:miniaudio",
   ]
 
   public_configs = [ ":includes" ]
