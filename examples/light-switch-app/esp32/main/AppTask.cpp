@@ -132,7 +132,10 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
         data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
         data->clusterId           = chip::app::Clusters::OnOff::Id;
 
-        DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+        if (DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
+        {
+            Platform::Delete(data);
+        }
     }
 }
 

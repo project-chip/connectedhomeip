@@ -44,5 +44,5 @@ class AppDeviceCallbacksDelegate : public DeviceCallbacksDelegate
 public:
     void OnIPv4ConnectivityEstablished(void) override {}
     void OnIPv4ConnectivityLost(void) override {}
-    void OnDnssdInitialized(void) override { InitBindingHandler(); }
+    void OnDnssdInitialized(void) override { LogErrorOnFailure(InitBindingHandler()); }
 };
