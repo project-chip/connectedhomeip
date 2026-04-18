@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 5;
+  revision 4;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -6798,11 +6798,11 @@ endpoint 0 {
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 1 {
@@ -7107,19 +7107,19 @@ endpoint 1 {
   }
 
   server cluster FlowMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OccupancySensing {

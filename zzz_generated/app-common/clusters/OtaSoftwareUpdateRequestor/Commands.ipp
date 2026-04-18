@@ -76,7 +76,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AnnounceOTAProvider.
+} // namespace AnnounceOTAProvider
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace Clusters

@@ -56,7 +56,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace KeySetWrite.
+} // namespace KeySetWrite
 namespace KeySetRead {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -84,7 +84,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace KeySetRead.
+} // namespace KeySetRead
 namespace KeySetReadResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -112,7 +112,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace KeySetReadResponse.
+} // namespace KeySetReadResponse
 namespace KeySetRemove {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -140,7 +140,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace KeySetRemove.
+} // namespace KeySetRemove
 namespace KeySetReadAllIndices {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -162,7 +162,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace KeySetReadAllIndices.
+} // namespace KeySetReadAllIndices
 namespace KeySetReadAllIndicesResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -190,7 +190,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace KeySetReadAllIndicesResponse.
+} // namespace KeySetReadAllIndicesResponse
 } // namespace Commands
 } // namespace GroupKeyManagement
 } // namespace Clusters

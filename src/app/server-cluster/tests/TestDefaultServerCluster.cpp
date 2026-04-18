@@ -34,6 +34,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <cstdlib>
+#include <utility>
 
 using namespace chip;
 using namespace chip::Testing;
@@ -63,12 +64,11 @@ public:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    void TestIncreaseDataVersion() { IncreaseDataVersion(); }
-    void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
-    ActionReturnStatus TestNotifyAttributeChangedIfSuccess(AttributeId attributeId, ActionReturnStatus status)
-    {
-        return NotifyAttributeChangedIfSuccess(attributeId, status);
-    }
+    // Mark some methods public for the purpose of testing
+    using DefaultServerCluster::IncreaseDataVersion;
+    using DefaultServerCluster::NotifyAttributeChanged;
+    using DefaultServerCluster::NotifyAttributeChangedIfSuccess;
+    using DefaultServerCluster::SetAttributeValue;
 };
 
 } // namespace
@@ -78,7 +78,7 @@ TEST(TestDefaultServerCluster, TestDataVersion)
     FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataVersion v1 = cluster.GetDataVersion({ 1, 2 });
-    cluster.TestIncreaseDataVersion();
+    cluster.IncreaseDataVersion();
     ASSERT_EQ(cluster.GetDataVersion({ 1, 2 }), v1 + 1);
 }
 
@@ -182,7 +182,7 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
     // When no ServerClusterContext is set, only the data version should change.
     DataVersion oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
 
-    cluster.TestNotifyAttributeChanged(123);
+    cluster.NotifyAttributeChanged(123);
     ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
 
     // Create a ServerClusterContext and verify that attribute change notifications are processed.
@@ -190,11 +190,11 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
-    cluster.TestNotifyAttributeChanged(234);
+    cluster.NotifyAttributeChanged(234);
     ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 234));
 }
 
 TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
@@ -206,12 +206,12 @@ TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
     // When no ServerClusterContext is set, only the data version should change.
     DataVersion oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
 
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(123, Status::Success), Status::Success);
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(123, Status::Success), Status::Success);
     DataVersion newVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     ASSERT_NE(newVersion, oldVersion);
 
     oldVersion = newVersion;
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(123, Status::Failure), Status::Failure);
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(123, Status::Failure), Status::Failure);
     newVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     ASSERT_EQ(newVersion, oldVersion);
 
@@ -220,16 +220,94 @@ TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(234, Status::Success), Status::Success);
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(234, Status::Success), Status::Success);
     ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 234));
 
     // now test a failure - nothing should be marked dirty
     oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     context.ChangeListener().DirtyList().clear();
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(345, Status::Failure), Status::Failure);
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(345, Status::Failure), Status::Failure);
     ASSERT_EQ(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+}
+
+TEST(TestDefaultServerCluster, SetAttributeValueNullable)
+{
+    constexpr EndpointId kEndpointId = 321;
+    constexpr ClusterId kClusterId   = 1122;
+    FakeDefaultServerCluster cluster({ kEndpointId, kClusterId });
+
+    TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint32_t> attr;
+
+    // Initial state: null
+    ASSERT_TRUE(attr.IsNull());
+
+    // Set to null when already null -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, DataModel::NullNullable, 1));
+    ASSERT_TRUE(attr.IsNull());
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // Set to value -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, 123u, 1));
+    ASSERT_FALSE(attr.IsNull());
+    ASSERT_EQ(attr.Value(), 123u);
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 1));
+    context.ChangeListener().DirtyList().clear();
+
+    // Set to same value -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, 123u, 1));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // Set to different value -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, 456u, 1));
+    ASSERT_EQ(attr.Value(), 456u);
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Set to null -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, DataModel::NullNullable, 1));
+    ASSERT_TRUE(attr.IsNull());
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Test setting with another Nullable object
+    DataModel::Nullable<uint32_t> otherAttr;
+
+    // Initial state: null
+    ASSERT_TRUE(otherAttr.IsNull());
+
+    // Set attr to a value first so it's not null
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, 789u, 1));
+    context.ChangeListener().DirtyList().clear();
+
+    // Set with null Nullable -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, otherAttr, 1));
+    ASSERT_TRUE(attr.IsNull());
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Set with same null Nullable -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, otherAttr, 1));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // Set otherAttr to a value
+    otherAttr.SetNonNull(999u);
+
+    // Set with non-null Nullable -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, otherAttr, 1));
+    ASSERT_FALSE(attr.IsNull());
+    ASSERT_EQ(attr.Value(), 999u);
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Set with same non-null Nullable -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, otherAttr, 1));
     ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
 }

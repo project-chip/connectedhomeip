@@ -23,6 +23,26 @@ declare_args() {
   # If the 'matter_enable_java_generated_api' feature is enabled, this feature must be enabled.
   matter_enable_tlv_decoder_api = true
 
+  # Controls compilation of the C++ ZAP-generated TLV decoder files
+  # (CHIPAttributeTLVValueDecoder.cpp, CHIPEventTLVValueDecoder.cpp).
+  # These files reference app::DataModel::Decode() for every cluster,
+  # creating a link-time dependency on all ~200+ cluster implementations.
+  # Apps that use the slim cluster-objects override and don't call the
+  # C++ TLV decode path (e.g. the casting app's simplified JNI API) can
+  # set this to false to break that dependency.  The Java-side
+  # ChipTLVValueDecoder.java is controlled separately by
+  # matter_enable_tlv_decoder_api above.
+  matter_enable_tlv_decoder_cpp = true
+
+  # When non-empty, compile this file instead of the zap-generated
+  # CHIPAttributeTLVValueDecoder.cpp.  Used by the casting app to
+  # supply a slim decoder covering only the 18 casting clusters.
+  chip_tlv_decoder_attribute_source_override = ""
+
+  # When non-empty, compile this file instead of the zap-generated
+  # CHIPEventTLVValueDecoder.cpp.  Same pattern as above.
+  chip_tlv_decoder_event_source_override = ""
+
   matter_enable_java_compilation = false
   if (java_home != "" && (current_os == "linux" || current_os == "mac")) {
     java_matter_controller_dependent_paths += [ "${java_home}/include/" ]

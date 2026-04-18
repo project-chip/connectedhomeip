@@ -44,6 +44,7 @@
         "DISHWASHER_MODE_CLUSTER": [],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [],
         "GROUPCAST_CLUSTER": [],
+        "HUMIDISTAT_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
@@ -80,6 +81,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
@@ -215,6 +217,7 @@
             "electrical-grid-conditions-server"
         ],
         "GROUPCAST_CLUSTER": ["groupcast"],
+        "HUMIDISTAT_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
@@ -234,7 +237,7 @@
         "FAN_CONTROL_CLUSTER": ["fan-control-server"],
         "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
         "FIXED_LABEL_CLUSTER": ["fixed-label-server"],
-        "FLOW_MEASUREMENT_CLUSTER": [],
+        "FLOW_MEASUREMENT_CLUSTER": ["flow-measurement-server"],
         "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -266,6 +269,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": ["push-av-stream-transport-server"],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
@@ -313,7 +317,9 @@
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
             "mode-base-server"
         ],
-        "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
+        "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [
+            "relative-humidity-measurement-server"
+        ],
         "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
         "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],

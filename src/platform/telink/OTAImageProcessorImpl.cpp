@@ -21,7 +21,6 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <system/SystemError.h>
@@ -147,6 +146,16 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 #endif
 }
 
+void OTAImageProcessorImpl::ResumeWatchdogHandler(System::Layer * systemLayer, void * context)
+{
+    auto * self = static_cast<chip::DeviceLayer::OTAImageProcessorImpl *>(context);
+    ChipLogError(SoftwareUpdate, "Resume not supported by OTA provider");
+
+    LogErrorOnFailure(KeyValueStoreMgr().Delete(kDownloadedBytes));
+    LogErrorOnFailure(KeyValueStoreMgr().Delete(kImageDigest));
+    self->mDownloader->EndDownload(CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -181,9 +190,11 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                     ChipLogError(SoftwareUpdate, "OTA skip err: %" CHIP_ERROR_FORMAT, err.Format());
                 }
                 downloadedBytesRestored = 0;
+                SystemLayer().StartTimer(System::Clock::Milliseconds32(kResumeWatchdogTimeoutMs), ResumeWatchdogHandler, this);
             }
             else
             {
+                DeviceLayer::SystemLayer().CancelTimer(ResumeWatchdogHandler, this);
                 CHIP_ERROR err = mDownloader->FetchNextData();
                 if (err != CHIP_NO_ERROR)
                 {

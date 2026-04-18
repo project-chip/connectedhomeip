@@ -65,7 +65,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace LoggedOut.
+} // namespace LoggedOut
 } // namespace Events
 } // namespace AccountLogin
 } // namespace Clusters

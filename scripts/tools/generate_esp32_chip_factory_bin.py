@@ -433,8 +433,8 @@ def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
     with open(key_file, 'rb') as f:
         key_data = f.read()
 
-    log.warning("Leaking of DAC private keys may lead to attestation chain revokation")
-    log.warning("Please make sure the DAC private is key protected using a password")
+    log.warning("Leaking of DAC private keys may lead to attestation chain revocation")
+    log.warning("Please make sure the DAC private key is protected using a password")
 
     # WARNING: Below line assumes that the DAC private key is not protected by a password,
     #          please be careful and use the password-protected key if reusing this code
