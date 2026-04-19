@@ -126,6 +126,20 @@ class EventSubscriptionHandler:
         LOGGER.info(f"Successfully waited for {expected_event}")
         return res.Data
 
+    def wait_for_event_report_with_duplication(self, expected_event: ClusterObjects.ClusterEvent, previous_event_filter_func, current_event_filter_func, timeout_sec: float = 10.0) -> Any:
+        """This function blocks waiting for the specific event to arrive within a timeout.
+           It filters out leftover events matching previous_event_filter_func until an event
+           matches current_event_filter_func. Fails if a non-matching event arrives."""
+        while True:
+            event_data = self.wait_for_event_report(expected_event, timeout_sec=timeout_sec)
+            if current_event_filter_func(event_data):
+                LOGGER.info("Successfully captured the expected new event.")
+                return event_data
+            if previous_event_filter_func(event_data):
+                LOGGER.warning(f"Discarding leftover/duplicate event from previous step: {event_data}")
+                continue
+            asserts.fail(f"Received unexpected event data neither matching the previous nor current expectation: {event_data}")
+
     def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
         """This function returns if an event does not arrive within the timeout specified in seconds.
            If any event does arrive, an assert failure occurs."""

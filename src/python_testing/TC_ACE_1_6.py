@@ -80,7 +80,6 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-
 class TC_ACE_1_6(MatterBaseTest):
 
     def desc_TC_ACE_1_6(self) -> str:
@@ -432,7 +431,23 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 11g: Verify GroupcastTesting event is emitted the same as in step 11a (AccessAllowed: true)
             self.step("11g")
-            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            def previous_event_filter(data) -> bool:
+                return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey
+
+            def current_event_filter(data) -> bool:
+                return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess
+
+            # Duplicate events could occur from step 11d, as this is an event emitted from a point where the message cannot
+            # be decrypted (because of no group keys being present). Without the message being decrypted, logic to filter out
+            # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases 
+            # (i.e. when testing over multiple networks). This safely filters through potential duplicate events from the 
+            # previous steps.
+            event_data = event_sub.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                previous_event_filter,
+                current_event_filter,
+                timeout_sec=30
+            )
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
