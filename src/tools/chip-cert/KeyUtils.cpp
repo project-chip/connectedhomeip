@@ -296,11 +296,15 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
         }
     }
 
-    if ((EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key.get()))) != gNIDChipCurveP256) &&
-        !ignorErrorIfUnsupportedCurve)
+    // ML-DSA keys are not EC-based; skip the curve check for them.
+    if (!IsMLDSAKey(key.get()))
     {
-        fprintf(stderr, "Specified key uses unsupported Elliptic Curve\n");
-        ExitNow(res = false);
+        if ((EC_GROUP_get_curve_name(EC_KEY_get0_group(EVP_PKEY_get1_EC_KEY(key.get()))) != gNIDChipCurveP256) &&
+            !ignorErrorIfUnsupportedCurve)
+        {
+            fprintf(stderr, "Specified key uses unsupported Elliptic Curve\n");
+            ExitNow(res = false);
+        }
     }
 
 exit:
@@ -349,6 +353,42 @@ exit:
     return res;
 }
 
+bool GenerateKeyPair_MLDSA(std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, const char * algorithm)
+{
+#if !CHIP_CERT_ML_DSA_AVAILABLE
+    (void) key;
+    fprintf(stderr, "ML-DSA key generation (%s) requires chip-cert to be built against OpenSSL 3.5 or later\n", algorithm);
+    return false;
+#else
+    bool res = true;
+
+    {
+        std::unique_ptr<EVP_PKEY_CTX, void (*)(EVP_PKEY_CTX *)> ctx(EVP_PKEY_CTX_new_from_name(nullptr, algorithm, nullptr),
+                                                                     &EVP_PKEY_CTX_free);
+        if (ctx.get() == nullptr)
+        {
+            ReportOpenSSLErrorAndExit("EVP_PKEY_CTX_new_from_name", res = false);
+        }
+
+        if (EVP_PKEY_keygen_init(ctx.get()) <= 0)
+        {
+            ReportOpenSSLErrorAndExit("EVP_PKEY_keygen_init", res = false);
+        }
+
+        EVP_PKEY * pkey = nullptr;
+        if (EVP_PKEY_keygen(ctx.get(), &pkey) <= 0)
+        {
+            ReportOpenSSLErrorAndExit("EVP_PKEY_keygen", res = false);
+        }
+
+        key.reset(pkey);
+    }
+
+exit:
+    return res;
+#endif // CHIP_CERT_ML_DSA_AVAILABLE
+}
+
 bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
 {
     bool res              = true;
@@ -363,37 +403,78 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         VerifyOrExit(OpenFile(fileName, file, true), res = false);
     }
 
-    if (EVP_PKEY_type(EVP_PKEY_id(key)) != EVP_PKEY_EC)
     {
-        fprintf(stderr, "Unsupported private key type\n");
-        ExitNow(res = false);
+        int keyType = EVP_PKEY_id(key);
+        if (keyType != EVP_PKEY_EC && !IsMLDSAKey(key))
+        {
+            fprintf(stderr, "Unsupported private key type\n");
+            ExitNow(res = false);
+        }
     }
 
     switch (keyFmt)
     {
     case kKeyFormat_X509_PEM:
-        if (PEM_write_ECPrivateKey(file, EVP_PKEY_get1_EC_KEY(key), nullptr, nullptr, 0, nullptr, nullptr) == 0)
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            ReportOpenSSLErrorAndExit("PEM_write_ECPrivateKey", res = false);
+            if (PEM_write_ECPrivateKey(file, EVP_PKEY_get1_EC_KEY(key), nullptr, nullptr, 0, nullptr, nullptr) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_ECPrivateKey", res = false);
+            }
+        }
+        else
+        {
+            if (PEM_write_PrivateKey(file, key, nullptr, nullptr, 0, nullptr, nullptr) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_PrivateKey", res = false);
+            }
         }
         break;
     case kKeyFormat_X509_Pubkey_PEM:
-        if (PEM_write_EC_PUBKEY(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            ReportOpenSSLErrorAndExit("PEM_write_EC_PUBKEY", res = false);
+            if (PEM_write_EC_PUBKEY(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_EC_PUBKEY", res = false);
+            }
+        }
+        else
+        {
+            if (PEM_write_PUBKEY(file, key) == 0)
+            {
+                ReportOpenSSLErrorAndExit("PEM_write_PUBKEY", res = false);
+            }
         }
         break;
     case kKeyFormat_X509_DER:
-        if (i2d_ECPrivateKey_fp(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
         {
-            ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
+            if (i2d_ECPrivateKey_fp(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+            {
+                ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
+            }
+        }
+        else
+        {
+            if (i2d_PrivateKey_fp(file, key) == 0)
+            {
+                ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
+            }
         }
         break;
     case kKeyFormat_X509_Hex: {
-        int derKeyLen = i2d_ECPrivateKey(EVP_PKEY_get1_EC_KEY(key), &derKey);
+        int derKeyLen;
+        if (EVP_PKEY_id(key) == EVP_PKEY_EC)
+        {
+            derKeyLen = i2d_ECPrivateKey(EVP_PKEY_get1_EC_KEY(key), &derKey);
+        }
+        else
+        {
+            derKeyLen = i2d_PrivateKey(key, &derKey);
+        }
         if (derKeyLen < 0)
         {
-            ReportOpenSSLErrorAndExit("i2d_X509", res = false);
+            ReportOpenSSLErrorAndExit("i2d_PrivateKey", res = false);
         }
         VerifyOrExit(CanCastTo<size_t>(derKeyLen), res = false);
         VerifyOrExit(WriteDataIntoFile(fileName, derKey, static_cast<size_t>(derKeyLen), kDataFormat_Hex), res = false);
