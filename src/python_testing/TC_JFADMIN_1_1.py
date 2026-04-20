@@ -136,9 +136,9 @@ class TC_JFADMIN_1_1(MatterBaseTest):
             dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
             if not dut_rpc_server_port:
                 asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            if not self.matter_test_config.setup_passcodes:
+                asserts.fail("JF-Administrator passcode must be specified via --passcode:<passcode>")
             jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
-            if not jfadmin_fabric_a_passcode:
-                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
