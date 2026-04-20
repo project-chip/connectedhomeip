@@ -513,8 +513,9 @@ def run_tests_no_exit(
         #
         should_populate_global_wildcard = (
             ok
-            and should_run_pre_commissioning
-            and matter_test_config.dut_node_ids
+            and bool(matter_test_config.dut_node_ids)
+            and not is_discovery_test
+            and not in_test_commissioning
         )
         if ok and should_populate_global_wildcard:
             try:
