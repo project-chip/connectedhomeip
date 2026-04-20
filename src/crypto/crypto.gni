@@ -17,7 +17,7 @@ assert(current_toolchain != "",
            " Do not import this file from default_args / args.gni.")
 
 declare_args() {
-  # Crypto implementation: mbedtls, openssl, boringssl, platform.
+  # Crypto implementation: mbedtls, psa, openssl, boringssl, platform.
   chip_crypto = ""
   chip_with_se05x = 0
 
