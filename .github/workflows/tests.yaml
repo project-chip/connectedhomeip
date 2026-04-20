@@ -1293,7 +1293,7 @@ jobs:
                 merge-multiple: true
 
           - name: Publish test results to GitHub Actions
-            uses: mikepenz/action-junit-report@v5
+            uses: mikepenz/action-junit-report@v6
             with:
                 report_paths: junit-results/**/*.xml
                 detailed_summary: true
