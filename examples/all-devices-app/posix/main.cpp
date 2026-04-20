@@ -19,6 +19,7 @@
 #include <AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
+#include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
@@ -189,8 +190,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
-
     });
+
+    RegisterDeviceFactoryOverrides(gTimerDelegate);
 
     static chip::CommonCaseDeviceServerInitParams initParams;
 

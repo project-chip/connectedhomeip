@@ -23,13 +23,11 @@
 
 namespace chip::app {
 
-using SafeAttributeMigrator = CHIP_ERROR (*)(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
-                                             MutableByteSpan & buffer);
-
 struct AttrMigrationData
 {
     AttributeId attributeId;
-    SafeAttributeMigrator migrator;
+    size_t valueSize;
+    bool isScalar;
 };
 /**
  * @brief
@@ -61,22 +59,5 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
                                                          AttributePersistenceProvider & dstProvider,
                                                          const ConcreteClusterPath & cluster,
                                                          Span<const AttrMigrationData> attributes, MutableByteSpan buffer);
-
-namespace DefaultMigrators {
-template <class T>
-CHIP_ERROR ScalarValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
-                       MutableByteSpan & buffer)
-{
-    VerifyOrReturnError(sizeof(T) <= buffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    T value;
-    ReturnErrorOnFailure(provider.ReadScalarValue(attrPath, value));
-    buffer.reduce_size(sizeof(T));
-    memcpy(buffer.data(), &value, sizeof(T));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SafeValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer);
-}; // namespace DefaultMigrators
 
 } // namespace chip::app
