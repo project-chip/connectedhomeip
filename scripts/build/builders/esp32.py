@@ -242,7 +242,7 @@ class Esp32Builder(Builder):
 
         # pre-requisite
         self._Execute(
-            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_ENABLE_ESP_INSIGHTS_TRACE=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
 
         cmake_flags = []
 

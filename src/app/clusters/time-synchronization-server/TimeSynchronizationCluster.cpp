@@ -71,7 +71,7 @@ void OnFallbackNTPCompletionWrapper(void * context, bool timeSyncSuccessful)
     timeSynchronization->OnFallbackNTPCompletionFn(timeSyncSuccessful);
 }
 
-CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
+CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs, FabricTable & fabricTable)
 {
     uint64_t UTCTimeInUnixEpochUs;
 
@@ -79,8 +79,7 @@ CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
     uint64_t secs = UTCTimeInChipEpochUs / kMicrosecondsPerSecond;
     // https://github.com/project-chip/connectedhomeip/issues/27501
     VerifyOrReturnError(secs <= UINT32_MAX, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().SetLastKnownGoodChipEpochTime(
-        System::Clock::Seconds32(static_cast<uint32_t>(secs))));
+    ReturnErrorOnFailure(fabricTable.SetLastKnownGoodChipEpochTime(System::Clock::Seconds32(static_cast<uint32_t>(secs))));
     ReturnErrorOnFailure(System::SystemClock().SetClock_RealTime(System::Clock::Microseconds64(UTCTimeInUnixEpochUs)));
 
     return CHIP_NO_ERROR;
@@ -164,11 +163,11 @@ void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenera
 
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
-                                                       const StartupConfiguration & config) :
+                                                       const StartupConfiguration & config, Context context) :
     DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
     mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
     mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
-    mDelegate(config.delegate),
+    mDelegate(config.delegate), mTimeSyncContext(context),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -351,12 +350,12 @@ CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
 
     // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
     // want time sync even if we can't register the delegate here.
-    CHIP_ERROR err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    CHIP_ERROR err = mTimeSyncContext.fabricTable.AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    err = PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+    err = mTimeSyncContext.platformManager.AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Unable to add event handler for time sync: %" CHIP_ERROR_FORMAT, err.Format());
@@ -366,8 +365,8 @@ CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
 
 void TimeSynchronizationCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mTimeSyncContext.platformManager.RemoveEventHandler(OnPlatformEventWrapper, 0);
+    mTimeSyncContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -400,12 +399,12 @@ void TimeSynchronizationCluster::OnDeviceConnectedFn(Messaging::ExchangeManager 
     readPaths[0] = AttributePathParams(kRootEndpointId, Id, UTCTime::Id);
     readPaths[1] = AttributePathParams(kRootEndpointId, Id, Granularity::Id);
 
-    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
     ReadPrepareParams readParams(sessionHandle);
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = 2;
 
-    auto readInfo = Platform::MakeUnique<TimeReadInfo>(engine, &exchangeMgr, *this, ReadClient::InteractionType::Read);
+    auto readInfo = Platform::MakeUnique<TimeReadInfo>(&mTimeSyncContext.interactionModelEngine, &exchangeMgr, *this,
+                                                       ReadClient::InteractionType::Read);
     if (readInfo == nullptr)
     {
         // This is unlikely to work if we don't have memory, but let's try
@@ -522,9 +521,9 @@ CHIP_ERROR TimeSynchronizationCluster::AttemptToGetTimeFromTrustedNode()
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     if (!mTrustedTimeSource.IsNull())
     {
-        CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
         ScopedNodeId nodeId(mTrustedTimeSource.Value().nodeID, mTrustedTimeSource.Value().fabricIndex);
-        caseSessionManager->FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+        mTimeSyncContext.caseSessionManager.FindOrEstablishSession(nodeId, &mOnDeviceConnectedCallback,
+                                                                   &mOnDeviceConnectionFailureCallback);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_FOUND;
@@ -851,7 +850,7 @@ inline DataModel::List<Structs::DSTOffsetStruct::Type> & TimeSynchronizationClus
 CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source)
 {
     auto setAttribute = [this](uint64_t utct, GranularityEnum gran, TimeSourceEnum tsrc) {
-        CHIP_ERROR err = UpdateUTCTime(utct);
+        CHIP_ERROR err = UpdateUTCTime(utct, mTimeSyncContext.fabricTable);
         if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
         {
             ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());

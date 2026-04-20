@@ -48,6 +48,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -159,6 +173,7 @@ class TC_SC_5_2(MatterBaseTest):
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "11")
         else:
+            dev_ctrl.SetGroupInfo(0x0103, "Group #3")
             # Step 3: GroupKeyMap binding
             self.step("3")
             mapping = [
