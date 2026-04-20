@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@
 #if CONFIG_ENABLE_OTA_REQUESTOR
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
@@ -130,7 +131,8 @@ static void InitOTARequestor(void)
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
 
     // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes(),
+                        GetDefaultOTARequestorEventGenerator());
 
     gImageProcessor.SetOTADownloader(&gDownloader);
 
