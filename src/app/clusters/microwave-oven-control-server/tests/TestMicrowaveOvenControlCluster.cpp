@@ -54,6 +54,7 @@ public:
 
     CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) override
     {
+        VerifyOrReturnError(index < MATTER_ARRAY_SIZE(mWattSettingList), CHIP_ERROR_NOT_FOUND);
         wattSetting = mWattSettingList[index];
         return CHIP_NO_ERROR;
     }
@@ -95,29 +96,90 @@ public:
 
     CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override
     {
+        if (index >= mOperationalStateList.size())
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        operationalState = mOperationalStateList[index];
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override
+    {
+        if (index >= mOperationalPhaseList.size())
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
+    }
 
     void HandlePauseStateCallback(GenericOperationalError & err) override {}
     void HandleResumeStateCallback(GenericOperationalError & err) override {}
     void HandleStartStateCallback(GenericOperationalError & err) override {}
     void HandleStopStateCallback(GenericOperationalError & err) override {}
+
+private:
+    Span<const GenericOperationalState> mOperationalStateList;
+    Span<const CharSpan> mOperationalPhaseList;
 };
 
 class ModeBaseDelegate : public ModeBase::Delegate
 {
 private:
+    using ModeTagStructType = Clusters::detail::Structs::ModeTagStruct::Type;
+
+    ModeTagStructType modeTagsNormal[1] = { { .mfgCode = {}, .value = 0 } };
+    ModeTagStructType modeTagsHeavy[2]  = { { .mfgCode = {}, .value = 1 }, { .mfgCode = {}, .value = 2 } };
+    ModeTagStructType modeTagsLight[3]  = { { .mfgCode = {}, .value = 3 },
+                                            { .mfgCode = {}, .value = 4 },
+                                            { .mfgCode = {}, .value = 5 } };
+
+    const Clusters::detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
+        Clusters::detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = 0, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        Clusters::detail::Structs::ModeOptionStruct::Type{
+            .label = "Heavy"_span, .mode = 1, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsHeavy) },
+        Clusters::detail::Structs::ModeOptionStruct::Type{
+            .label = "Light"_span, .mode = 2, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsLight) }
+    };
+
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
 
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override {}
 
-    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
-                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & tags) override
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override
     {
+        if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
+        {
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+    }
+
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override
+    {
+        if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
+        {
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+        value = kModeOptions[modeIndex].mode;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override
+    {
+        if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
+        {
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+
+        if (tags.size() < kModeOptions[modeIndex].modeTags.size())
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
+        tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
         return CHIP_NO_ERROR;
     }
 };
@@ -151,16 +213,16 @@ struct TestMicrowaveOvenControlCluster : public ::testing::Test
 void TestMandatoryAttributes(ClusterTester & tester)
 {
     uint16_t revision{};
-    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
     uint32_t featureMap{};
-    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-    uint8_t cookingTime{};
-    ASSERT_EQ(tester.ReadAttribute(CookTime::Id, cookingTime), CHIP_NO_ERROR);
+    uint32_t cookTime{};
+    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::CookTime::Id, cookTime), CHIP_NO_ERROR);
 
-    uint8_t maxCookingTime{};
-    ASSERT_EQ(tester.ReadAttribute(MaxCookTime::Id, maxCookingTime), CHIP_NO_ERROR);
+    uint32_t maxCookTime{};
+    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::MaxCookTime::Id, maxCookTime), CHIP_NO_ERROR);
 }
 
 } // namespace
@@ -318,10 +380,17 @@ TEST_F(TestMicrowaveOvenControlCluster, ReadAttributeTest)
 
         DataModel::DecodableList<uint16_t> supportedWatts;
         ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::SupportedWatts::Id, supportedWatts), CHIP_NO_ERROR);
-
-        uint8_t selectedWattIndex{};
-        ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::SelectedWattIndex::Id, selectedWattIndex), CHIP_NO_ERROR);
-
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        auto it = supportedWatts.begin();
+        ASSERT_TRUE(it.Next());
+        ASSERT_TRUE(it.GetValue() == 100u);
+        ASSERT_TRUE(it.Next());
+        ASSERT_TRUE(it.GetValue() == 300u);
+        ASSERT_TRUE(it.Next());
+        ASSERT_TRUE(it.GetValue() == 500u);
+        ASSERT_TRUE(it.Next());
+        ASSERT_TRUE(it.GetValue() == 800u);
+        ASSERT_TRUE(it.Next());
+        ASSERT_TRUE(it.GetValue() == 1000u);
+        ASSERT_FALSE(it.Next());
     }
 }

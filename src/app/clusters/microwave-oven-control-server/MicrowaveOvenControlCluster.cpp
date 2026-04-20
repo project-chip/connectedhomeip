@@ -46,11 +46,10 @@ constexpr uint8_t kDefaultPowerStepNum = 10u;
 
 MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
                                                          const OptionalAttributeSet & optionalAttributeSet, const Context context) :
-    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }),
-    mFeature(feature), mOptionalAttributeSet(optionalAttributeSet), mDelegate(context.delegate),
-    mOpStateInstance(context.opStateInstance), mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance),
-    mInteractionModelEngine(context.interactionModelEngine), mOptionalAcceptedCommands(context.optionalAcceptedCommands),
-    mCookTimeSec(kDefaultCookTimeSec)
+    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(feature), mOptionalAttributeSet(optionalAttributeSet),
+    mDelegate(context.delegate), mOpStateInstance(context.opStateInstance),
+    mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance), mInteractionModelEngine(context.interactionModelEngine),
+    mOptionalAcceptedCommands(context.optionalAcceptedCommands), mCookTimeSec(kDefaultCookTimeSec)
 {}
 
 CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
@@ -151,7 +150,7 @@ CHIP_ERROR MicrowaveOvenControlCluster::Attributes(const ConcreteClusterPath & p
         { mOptionalAttributeSet.IsSet(WattRating::Id), WattRating::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
+    return listBuilder.Append(Span(MicrowaveOvenControl::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
 std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
