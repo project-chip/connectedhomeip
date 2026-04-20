@@ -229,14 +229,14 @@ template class chip::app::Storage::FabricTableImpl<TlsEndpointId, TLSClientManag
 CHIP_ERROR TlsClientManagementCommandDelegate::Init(PersistentStorageDelegate & storage)
 {
     mStorage = &storage;
-    mProvisioned.SetEndpoint(EndpointId(1));
+    mProvisioned.SetEndpoint(EndpointId(kRootEndpointId));
     return mProvisioned.Init(storage);
 }
 
 CHIP_ERROR TlsClientManagementCommandDelegate::ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
                                                                LoadedEndpointCallback callback)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_ERROR_INTERNAL);
 
     BufferedEndpoint endpoint;
     return mProvisioned.IterateEntries(fabric, endpoint.mBuffer, [&](auto & iterator) {
@@ -251,7 +251,7 @@ CHIP_ERROR TlsClientManagementCommandDelegate::ForEachEndpoint(EndpointId matter
 
 CHIP_ERROR TlsClientManagementCommandDelegate::GetEndpointId(FabricIndex fabric, uint16_t & id)
 {
-    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
+    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(kRootEndpointId)));
     VerifyOrReturnError(globalData, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(globalData->Load(mStorage));
     ReturnErrorOnFailure(globalData->GetNextId(fabric, id));
@@ -263,7 +263,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     EndpointId matterEndpoint, FabricIndex fabric,
     const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), ClusterStatusCode(Status::ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), ClusterStatusCode(Status::ConstraintError));
     VerifyOrReturnError(mStorage != nullptr, ClusterStatusCode(Status::ConstraintError));
 
     // Find existing value to update & check for port/name collisions
@@ -330,7 +330,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 CHIP_ERROR TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                            uint16_t endpointID, LoadedEndpointCallback callback)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_ERROR_INTERNAL);
 
     TlsEndpointId localId(endpointID);
     BufferedEndpoint endpoint;
@@ -341,7 +341,7 @@ CHIP_ERROR TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(Endpo
 Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                          uint16_t endpointID)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), Status::ConstraintError);
     VerifyOrReturnError(mStorage != nullptr, Status::ConstraintError);
 
     BufferedEndpoint endpoint;
@@ -397,7 +397,7 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 
     ReturnAndLogOnFailure(mProvisioned.RemoveFabric(*provider, fabric), Zcl, "Failure clearing TLS endpoints for fabric");
 
-    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
+    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(kRootEndpointId)));
     VerifyOrReturn(globalData);
     ReturnOnFailure(globalData->Load(mStorage));
 

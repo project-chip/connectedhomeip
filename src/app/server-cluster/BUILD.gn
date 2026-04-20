@@ -33,6 +33,7 @@ source_set("server-cluster") {
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/common:metadata",
+    "${chip_root}/src/app/data-model:nullable",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/persistence",
