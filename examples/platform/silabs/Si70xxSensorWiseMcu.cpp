@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#if !defined(SLI_SI91X_MCU_INTERFACE) || !SLI_SI91X_MCU_INTERFACE
-#error "Si70xxSensorWiseMcu.cpp must only be built when SLI_SI91X_MCU_INTERFACE is 1 (SiWx917 / WiseMCU)."
-#endif
 
 #include "Si70xxSensor.h"
 #include <lib/support/CodeUtils.h>
@@ -76,7 +71,8 @@ void Si91xSensorInitMeasureDeinit(uint16_t & relativeHumidity, int16_t & tempera
 
 sl_status_t Init()
 {
-    sl_status_t status = chip::DeviceLayer::Silabs::GetPlatform().EnableSi70xxSensorGpio();
+    chip::DeviceLayer::Silabs::SilabsPlatformAbstractionBase & platform = chip::DeviceLayer::Silabs::GetPlatform();
+    sl_status_t status                                                  = platform.EnableSi70xxSensorGpio();
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     sl_i2c_config_t i2c_config;

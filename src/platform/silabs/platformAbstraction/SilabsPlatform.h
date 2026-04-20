@@ -69,10 +69,6 @@ public:
     CHIP_ERROR FlashErasePage(uint32_t addr) override;
     CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) override;
 
-#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
-    sl_status_t EnableSi70xxSensorGpio() override;
-#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
-
     // Reboot
     void SoftwareReset(void) override;
     inline uint32_t GetRebootCause() { return mRebootCause; }
@@ -98,6 +94,10 @@ public:
 
 private:
     friend SilabsPlatform & GetPlatform(void);
+
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+    sl_status_t EnableSi70xxSensorGpio() override;
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
     // To make underlying SDK thread safe
     void SilabsPlatformLock(void);

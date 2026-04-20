@@ -17,10 +17,6 @@
  *    limitations under the License.
  */
 
-#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
-#error "Si70xxSensorGsdk.cpp must only be built for EFR32 / GSDK targets with SLI_SI91X_MCU_INTERFACE unset or 0."
-#endif
-
 #include "Si70xxSensor.h"
 #include <lib/support/CodeUtils.h>
 
