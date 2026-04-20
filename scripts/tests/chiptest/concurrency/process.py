@@ -262,7 +262,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
                     case ProcessPhase.CLOSED:
                         raise RuntimeError("Process closed immediately after initialization")
                     case _:
-                        raise RuntimeError("Process is in an unexpected state")
+                        raise RuntimeError(f"Process is in an unexpected state: {self.state.phase!r}")
         except BaseException as start_exc:
             if not isinstance(start_exc, KeyboardInterrupt):
                 log.error("Stopping process %s on failure during initialization", self.name)
