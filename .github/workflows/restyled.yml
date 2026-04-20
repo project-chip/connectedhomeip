@@ -21,14 +21,14 @@ jobs:
         with:
           fail-on-differences: true
 
-      - if: ${{ !cancelled && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
+      - if: ${{ !cancelled() && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
         run: |
           cat >/tmp/pr-${{ github.event.pull_request.number }}-restyled.patch <<'EOM'
           ${{ steps.restyler.outputs.git-patch }}
           EOM
 
       - id: upload
-        if: ${{ !cancelled && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
+        if: ${{ !cancelled() && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
         uses: actions/upload-artifact@v4
         with:
           name: pr-${{ github.event.pull_request.number }}-restyled
@@ -37,7 +37,7 @@ jobs:
           overwrite: true
           retention-days: 1
 
-      - if: ${{ !cancelled && steps.restyler.outputs.success == 'true' && steps.upload.outputs.artifact-url }}
+      - if: ${{ !cancelled() && steps.restyler.outputs.success == 'true' && steps.upload.outputs.artifact-url }}
         run: |
           cat >>"$GITHUB_STEP_SUMMARY" <<'EOM'
           ## Restyled
