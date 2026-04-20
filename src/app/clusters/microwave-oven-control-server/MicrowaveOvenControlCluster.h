@@ -40,7 +40,7 @@ public:
         Clusters::ModeBase::Instance & microwaveOvenModeInstance;
         MicrowaveOvenControl::Delegate & delegate;
         InteractionModelEngine & interactionModelEngine;
-        std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> acceptedCommands;
+        std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
     };
 
     MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
@@ -70,7 +70,7 @@ private:
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
     InteractionModelEngine & mInteractionModelEngine;
-    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> mAcceptedCommands;
+    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> mOptionalAcceptedCommands;
 
     uint32_t mCookTimeSec{};
     uint8_t mSupportedWattLevels{};
