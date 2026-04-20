@@ -935,9 +935,10 @@ TEST_F(TestNIMCluster, RemoveClientInvalidCommand)
 TEST_F(TestNIMCluster, RemoveClientBothFieldsPresent)
 {
     // Both fields present — should return InvalidCommand
+    const uint8_t id[20] = { 1, 2, 3 };
     Commands::RemoveClient::Type removeRequest;
     removeRequest.clientIndex.SetValue(1);
-    removeRequest.clientIdentifier.SetValue(ByteSpan((const uint8_t[20]){}, 20));
+    removeRequest.clientIdentifier.SetValue(ByteSpan(id));
     auto result = tester.Invoke(removeRequest);
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 }
