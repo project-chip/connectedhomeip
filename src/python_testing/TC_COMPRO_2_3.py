@@ -37,7 +37,8 @@
 """TC-COMPRO-2.3 — Commissioning Proxy cluster: Background Scan feature functionality.
 
 Tests ProxyBackGroundScanStartRequest / ProxyBackGroundScanStopRequest with subscription
-monitoring of CachedResults and NumCachedResults attributes.
+monitoring of CachedResults and NumCachedResults attributes.  Also covers the Timeout
+parameter and negative transport/band validation.
 
 Test plan reference: TC-COMPRO-2.3
 PICS requirement: COMPRO.S.F01 (BackgroundScan feature)
@@ -61,24 +62,33 @@ Example usage:
 
 import asyncio
 import logging
+import queue
+import time
 
 from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
-
-# How long to poll for a subscription update after making the ED commissionable/not
-SUBSCRIPTION_POLL_TIMEOUT_SEC = 40
 
 
 class TC_COMPRO_2_3(COMPROBaseTest):
 
+    @property
+    def default_timeout(self) -> int:
+        # Step 7 sleeps 40 s; step 12 waits up to cache_timeout (≤120 s) + 10 s;
+        # steps 9/14 poll up to 40 s each; step 22 sleeps 20 s.
+        # Worst-case sequential total ≈ 270 s; 360 s gives comfortable headroom.
+        return 360
+
     def desc_TC_COMPRO_2_3(self) -> str:
-        return "TC-COMPRO-2.3: Proxy Background Scan feature functionality"
+        return "[TC-COMPRO-2.3] Proxy Background Scan feature functionality"
 
     def pics_TC_COMPRO_2_3(self) -> list[str]:
         return ["COMPRO.S", "COMPRO.S.F01"]
@@ -87,25 +97,48 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         return [
             TestStep(1, "Commission DUT to TH", is_commissioning=True),
             TestStep(2, "Ensure ED is NOT commissionable"),
-            TestStep(3, "TH reads Transport and WiFiBand attributes",
-                     "Store as valid_transports and valid_bands"),
-            TestStep(4, "TH subscribes to CachedResults and NumCachedResults (min=0, max=30 s)",
+            TestStep(3, "TH reads Transport attribute",
+                     "Store as valid_transports"),
+            TestStep(4, "TH reads WiFiBand attribute (if WI supported)",
+                     "Store as valid_bands"),
+            TestStep(5, "TH subscribes to CachedResults and NumCachedResults (min=0, max=30 s)",
                      "Subscription established successfully"),
-            TestStep(5, "TH sends ProxyBackGroundScanStartRequest(Transport, Timeout=0, WiFiBands)",
+            TestStep(6, "TH sends ProxyBackGroundScanStartRequest(Transport=valid_transports, "
+                     "Timeout=0, WiFiBands=valid_bands if WI supported)",
                      "DUT responds with SUCCESS"),
-            TestStep(6, "TH monitors subscription for 40 s while ED is NOT commissionable",
-                     "NumCachedResults remains 0; CachedResults remains null/empty"),
-            TestStep(7, "Ensure ED IS commissionable"),
-            TestStep(8, "TH monitors subscription until NumCachedResults >= 1 (up to 40 s)",
+            TestStep(7, "TH monitors for 40 s while ED is NOT commissionable",
+                     "NumCachedResults == 0; CachedResults is null"),
+            TestStep(8, "Ensure ED IS commissionable"),
+            TestStep(9, "TH monitors until NumCachedResults >= 1 (up to 40 s)",
                      "NumCachedResults >= 1; CachedResults has at least one entry with "
-                     "non-zero Transport, valid Discriminator, VendorID, ProductID fields"),
-            TestStep(9, "TH reads CacheTimeout attribute", "Store as cache_timeout"),
-            TestStep(10, "Ensure ED is NOT commissionable"),
-            TestStep(11, "TH monitors subscription until CachedResults clears (up to cache_timeout + 10 s)",
-                     "NumCachedResults drops to 0; CachedResults becomes null or empty"),
-            TestStep(12, "TH sends ProxyBackGroundScanStopRequest(Transport, WiFiBands)",
+                     "non-zero Transport, valid Discriminator, VendorID, ProductID"),
+            TestStep(10, "TH reads CacheTimeout attribute",
+                     "Store as cache_timeout"),
+            TestStep(11, "Ensure ED is NOT commissionable"),
+            TestStep(12, "TH monitors until cache clears (up to cache_timeout + 10 s)",
+                     "NumCachedResults drops to 0; CachedResults becomes null"),
+            TestStep(13, "Ensure ED IS commissionable again"),
+            TestStep(14, "TH monitors until NumCachedResults >= 1 again (up to 40 s)",
+                     "NumCachedResults >= 1 (ED re-appears in background scan cache)"),
+            TestStep(15, "TH sends ProxyBackGroundScanStopRequest(Transport=valid_transports, "
+                     "WiFiBands=valid_bands if WI supported)",
                      "DUT responds with SUCCESS"),
-            TestStep(13, "TH terminates subscription"),
+            TestStep(16, "TH reads NumCachedResults and CachedResults immediately after stop",
+                     "NumCachedResults == 0; CachedResults is null (proxy clears cache on stop)"),
+            TestStep(17, "TH sends ProxyBackGroundScanStopRequest with a transport not in the "
+                     "original start request (if a valid alternative transport is available)",
+                     "DUT returns SUCCESS (stopping a transport with no active scan is not an error)"),
+            TestStep(18, "TH terminates subscriptions"),
+            TestStep(19, "TH sends ProxyBackGroundScanStartRequest with an unsupported Transport bit",
+                     "DUT returns INVALID_TRANSPORT_TYPE"),
+            TestStep(20, "TH sends ProxyBackGroundScanStartRequest with WiFiPAF transport and a "
+                     "WiFiBand not in valid_bands (if WI supported)",
+                     "DUT returns INVALID_TRANSPORT_TYPE"),
+            TestStep(21, "TH sends ProxyBackGroundScanStartRequest with Timeout=10",
+                     "DUT responds with SUCCESS"),
+            TestStep(22, "TH verifies NumCachedResults == 0 after 20 s",
+                     "NumCachedResults == 0; CachedResults is null "
+                     "(background scan auto-stopped after Timeout)"),
         ]
 
     @async_test_body
@@ -115,13 +148,14 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         # Step 1 — commissioning done by framework
         self.step(1)
 
-        # Guard: skip entire test if BackgroundScan feature not present
+        # Guard: skip entire test if BackgroundScan feature not present.
+        # (PICS COMPRO.S.F01 also guards this, but we check explicitly so the
+        # test is self-contained when run without a PICS file.)
         feature_map = await self.read_feature_map()
         if not self.has_feature_bgs(feature_map):
             logger.info("BackgroundScan feature not supported — skipping TC-COMPRO-2.3")
-            self.skip_all_remaining_steps(2)
+            self.skip_remaining_steps(2)
             return
-
         has_wi = self.has_feature_wi(feature_map)
         ed = self._ed_fixture_from_params()
 
@@ -129,76 +163,126 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         self.step(2)
         await self.ensure_ed_not_commissionable(ed)
 
-        # Step 3 — read transport/band attributes
+        # Step 3 — read Transport attribute
         self.step(3)
         valid_transports = await self.read_transport()
         logger.info("valid_transports = 0x%02x", valid_transports)
+
+        # Step 4 — read WiFiBand (conditional on WI feature).
+        # Read feature_map before this step so we know whether to run or skip.
         valid_bands: int = 0
         if has_wi:
+            self.step(4)
             valid_bands = await self.read_wifi_band()
             logger.info("valid_bands = 0x%04x", valid_bands)
+        else:
+            self.skip_step(4)
 
-        # Step 4 — subscribe to CachedResults and NumCachedResults
-        self.step(4)
-        subscription = await self.default_controller.ReadAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[
-                (self.cp_endpoint, cp.Attributes.NumCachedResults),
-                (self.cp_endpoint, cp.Attributes.CachedResults),
-            ],
-            reportInterval=(0, 30),
+        # Step 5 — subscribe to CachedResults and NumCachedResults.
+        # AttributeSubscriptionHandler is the standard SDK class for subscription-based
+        # monitoring (matter.testing.event_attribute_reporting).  start() calls
+        # ReadAttribute with reportInterval and wires SetAttributeUpdateCallback
+        # internally; reports are pushed by the DUT and queued in handler.attribute_queue.
+        self.step(5)
+        handler = AttributeSubscriptionHandler(expected_cluster=cp)
+        await handler.start(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=self.cp_endpoint,
+            min_interval_sec=0,
+            max_interval_sec=30,
             keepSubscriptions=False,
         )
-        logger.info("Subscription to NumCachedResults and CachedResults established")
+        logger.info("Subscription established")
 
-        # Step 5 — send ProxyBackGroundScanStartRequest
-        self.step(5)
-        start_cmd = cp.Commands.ProxyBackGroundScanStartRequest(
-            transport=valid_transports,
-            timeout=0,   # 0 = infinite
-            wiFiBands=valid_bands if has_wi else None,
-        )
+        # ------------------------------------------------------------------
+        # Local helpers — closed over handler / cp.
+        # handler.attribute_queue holds AttributeValue(endpoint_id, attribute, value)
+        # items pushed by the DUT.  queue.Queue is thread-safe; blocking get() is the
+        # standard SDK pattern (see event_attribute_reporting.py, TC_RR_1_1.py).
+        # ------------------------------------------------------------------
+
+        def _monitor_sub_empty(duration_sec: int):
+            """Drain reports for duration_sec s; fail if NumCachedResults ever != 0."""
+            deadline = time.time() + duration_sec
+            while True:
+                remaining = deadline - time.time()
+                if remaining <= 0:
+                    break
+                try:
+                    item = handler.attribute_queue.get(block=True, timeout=remaining)
+                    if item.attribute == cp.Attributes.NumCachedResults:
+                        logger.info("Sub report (step 7): NumCachedResults=%d", item.value)
+                        asserts.assert_equal(
+                            item.value, 0,
+                            f"NumCachedResults={item.value} while ED is not commissionable")
+                except queue.Empty:
+                    break  # No report within the window — correct
+
+        def _wait_for_num_cached(condition_fn, timeout_sec: int, label: str):
+            """Block until a NumCachedResults report satisfies condition_fn."""
+            deadline = time.time() + timeout_sec
+            while True:
+                remaining = deadline - time.time()
+                if remaining <= 0:
+                    asserts.fail(f"{label}: NumCachedResults condition not met "
+                                 f"within {timeout_sec} s")
+                try:
+                    item = handler.attribute_queue.get(block=True, timeout=remaining)
+                    if item.attribute == cp.Attributes.NumCachedResults:
+                        logger.info("Sub report (%s): NumCachedResults=%d", label, item.value)
+                        if condition_fn(item.value):
+                            return item.value
+                except queue.Empty:
+                    asserts.fail(f"{label}: NumCachedResults condition not met "
+                                 f"within {timeout_sec} s")
+
+        # Step 6 — send ProxyBackGroundScanStartRequest (Timeout=0: infinite)
+        self.step(6)
         await self.default_controller.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=self.cp_endpoint,
-            payload=start_cmd,
+            payload=cp.Commands.ProxyBackGroundScanStartRequest(
+                transport=valid_transports,
+                timeout=0,
+                wiFiBands=valid_bands if has_wi else None,
+            ),
         )
-        logger.info("ProxyBackGroundScanStartRequest sent successfully")
+        logger.info("ProxyBackGroundScanStartRequest sent (Timeout=0, infinite)")
 
-        # Step 6 — confirm cache stays empty while ED not commissionable
-        self.step(6)
-        await asyncio.sleep(SUBSCRIPTION_POLL_TIMEOUT_SEC)
-        # Read current attribute values directly to verify they haven't changed
+        # Step 7 — verify cache stays empty for 40 s via subscription monitoring.
+        # Any subscription report with NumCachedResults != 0 fails the step immediately.
+        # A direct read at the end confirms the final state.
+        self.step(7)
+        logger.info("Monitoring subscription for 40 s (ED not commissionable)...")
+        _monitor_sub_empty(40)
         num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
         cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
-        logger.info("After %d s (no ED): NumCachedResults=%d CachedResults=%s",
-                    SUBSCRIPTION_POLL_TIMEOUT_SEC, num_cached, cached_results)
+        logger.info("After 40 s (no ED): NumCachedResults=%d", num_cached)
         asserts.assert_equal(num_cached, 0,
                              "NumCachedResults must be 0 when no ED is commissionable")
-        is_null_or_empty = (cached_results is NullValue) or (cached_results == [])
-        asserts.assert_true(is_null_or_empty,
-                            "CachedResults must be null/empty when no ED is commissionable")
+        asserts.assert_true(
+            (cached_results is NullValue) or (cached_results == []),
+            "CachedResults must be null when no ED is commissionable")
 
-        # Step 7 — make ED commissionable
-        self.step(7)
+        # Step 8 — make ED commissionable
+        self.step(8)
         await self.ensure_ed_commissionable(ed)
 
-        # Step 8 — wait for cache to fill
-        self.step(8)
-        logger.info("Waiting up to %d s for CachedResults to populate...", SUBSCRIPTION_POLL_TIMEOUT_SEC)
-        await self._wait_for_num_cached_results_nonzero(timeout_sec=SUBSCRIPTION_POLL_TIMEOUT_SEC)
-
+        # Step 9 — wait for background scan cache to populate via subscription.
+        # The subscription report signals the exact moment the DUT updates the cache.
+        self.step(9)
+        logger.info("Waiting up to 40 s for NumCachedResults >= 1 via subscription...")
+        _wait_for_num_cached(lambda v: v >= 1, 40, "step 9")
+        # Direct read for detailed entry validation (NumCachedResults + CachedResults).
         num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
         cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
-        logger.info("NumCachedResults=%d", num_cached)
         asserts.assert_greater_equal(num_cached, 1,
                                      "NumCachedResults must be >= 1 after ED becomes commissionable")
         asserts.assert_not_equal(cached_results, NullValue,
                                  "CachedResults must not be null after ED becomes commissionable")
         asserts.assert_greater_equal(len(cached_results), 1,
                                      "CachedResults must have at least one entry")
-
-        # Validate first result entry
         result = cached_results[0]
         asserts.assert_not_equal(result.transport, 0,
                                  "CachedResult entry Transport must be non-zero")
@@ -208,79 +292,172 @@ class TC_COMPRO_2_3(COMPROBaseTest):
             asserts.assert_is_not_none(result.wiFiBand,
                                        "CachedResult entry WiFiBand must be present when WI feature active")
 
-        # Step 9 — read CacheTimeout
-        self.step(9)
+        # Step 10 — read CacheTimeout
+        self.step(10)
         cache_timeout = await self.read_cache_timeout()
         logger.info("CacheTimeout = %d s", cache_timeout)
 
-        # Step 10 — make ED not commissionable (triggers TTL expiry)
-        self.step(10)
+        # Step 11 — make ED not commissionable to trigger TTL expiry
+        self.step(11)
         await self.ensure_ed_not_commissionable(ed)
 
-        # Step 11 — wait for cache to expire
-        self.step(11)
+        # Step 12 — wait for cache to expire via subscription.
+        # We receive the moment the DUT drops NumCachedResults to 0.
+        self.step(12)
         expiry_deadline = cache_timeout + 10
-        logger.info("Waiting up to %d s for CachedResults to clear...", expiry_deadline)
-        await self._wait_for_cache_to_clear(timeout_sec=expiry_deadline)
-
+        logger.info("Waiting up to %d s for cache to expire via subscription...", expiry_deadline)
+        _wait_for_num_cached(lambda v: v == 0, expiry_deadline, "step 12")
         num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
         cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
-        logger.info("NumCachedResults=%d after cache expiry", num_cached)
-        asserts.assert_equal(num_cached, 0,
-                             "NumCachedResults must return to 0 after cache timeout")
-        is_null_or_empty = (cached_results is NullValue) or (cached_results == [])
-        asserts.assert_true(is_null_or_empty,
-                            "CachedResults must be null/empty after cache timeout")
+        asserts.assert_equal(num_cached, 0, "NumCachedResults must be 0 after cache timeout")
+        asserts.assert_true(
+            (cached_results is NullValue) or (cached_results == []),
+            "CachedResults must be null after cache timeout")
 
-        # Step 12 — stop background scan
-        self.step(12)
-        stop_cmd = cp.Commands.ProxyBackGroundScanStopRequest(
-            transport=valid_transports,
-            wiFiBands=valid_bands if has_wi else None,
-        )
+        # Step 13 — make ED commissionable again to verify continuous background scan
+        self.step(13)
+        await self.ensure_ed_commissionable(ed)
+
+        # Step 14 — wait for cache to re-populate via subscription
+        self.step(14)
+        logger.info("Waiting up to 40 s for NumCachedResults >= 1 (ED re-appears)...")
+        _wait_for_num_cached(lambda v: v >= 1, 40, "step 14")
+        num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
+        asserts.assert_greater_equal(num_cached, 1,
+                                     "NumCachedResults must be >= 1 after ED re-appears")
+
+        # Step 15 — stop the background scan
+        self.step(15)
         await self.default_controller.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=self.cp_endpoint,
-            payload=stop_cmd,
+            payload=cp.Commands.ProxyBackGroundScanStopRequest(
+                transport=valid_transports,
+                wiFiBands=valid_bands if has_wi else None,
+            ),
         )
-        logger.info("ProxyBackGroundScanStopRequest sent successfully")
+        logger.info("ProxyBackGroundScanStopRequest sent")
 
-        # Step 13 — terminate subscription
-        self.step(13)
-        subscription.Shutdown()
-        logger.info("Subscription shut down")
+        # Step 16 — verify cache clears immediately after stop
+        self.step(16)
+        num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
+        cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
+        asserts.assert_equal(num_cached, 0,
+                             "NumCachedResults must be 0 immediately after stop")
+        asserts.assert_true(
+            (cached_results is NullValue) or (cached_results == []),
+            "CachedResults must be null immediately after stop")
 
-    # ------------------------------------------------------------------
-    # Internal polling helpers
-    # ------------------------------------------------------------------
+        # Step 17 — stop with a transport not in the original start request.
+        # Requires a valid (supported) transport that was absent from the step-6 start.
+        # Since the start used all of valid_transports, this step is only exercisable
+        # when multiple transport types are supported simultaneously (e.g., both kWiFiPAF
+        # and kBle appear in valid_transports).  Skip until that is the case.
+        self.skip_step(17)
 
-    async def _wait_for_num_cached_results_nonzero(self, timeout_sec: int):
-        """Poll NumCachedResults until it is >= 1 or timeout expires."""
-        cp = self.cp
-        poll_interval = 2
-        elapsed = 0
-        while elapsed < timeout_sec:
-            val = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
-            if val >= 1:
-                logger.info("NumCachedResults = %d after %d s", val, elapsed)
-                return
-            await asyncio.sleep(poll_interval)
-            elapsed += poll_interval
-        asserts.fail(f"NumCachedResults did not become >= 1 within {timeout_sec} s")
+        # Step 18 — terminate subscription
+        self.step(18)
+        handler.cancel()
+        logger.info("Subscription cancelled")
 
-    async def _wait_for_cache_to_clear(self, timeout_sec: int):
-        """Poll NumCachedResults until it is 0 or timeout expires."""
-        cp = self.cp
-        poll_interval = 2
-        elapsed = 0
-        while elapsed < timeout_sec:
-            val = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
-            if val == 0:
-                logger.info("NumCachedResults cleared after %d s", elapsed)
-                return
-            await asyncio.sleep(poll_interval)
-            elapsed += poll_interval
-        asserts.fail(f"NumCachedResults did not clear within {timeout_sec} s")
+        # Step 19 — negative: unsupported transport → INVALID_TRANSPORT_TYPE.
+        # Find the first defined transport bit absent from valid_transports.
+        # The supported set is derived from feature flags (same as the Transport attribute);
+        # kBle will pass here once Feature::kBleInterface is enabled.
+        defined_transports = [
+            int(cp.Bitmaps.CapabilitiesBitmap.kBle),
+            int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF),
+        ]
+        unsupported_transport = next(
+            (b for b in defined_transports if not (valid_transports & b)), None)
+        if unsupported_transport is None:
+            self.skip_step(19)
+            logger.info("Step 19 skipped: all defined transport bits are in valid_transports")
+        else:
+            self.step(19)
+            logger.info("Using unsupported transport bit 0x%02x for negative test", unsupported_transport)
+            try:
+                await self.default_controller.SendCommand(
+                    nodeId=self.dut_node_id,
+                    endpoint=self.cp_endpoint,
+                    payload=cp.Commands.ProxyBackGroundScanStartRequest(
+                        transport=unsupported_transport,
+                        timeout=0,
+                    ),
+                    interactionTimeoutMs=10000,
+                )
+                asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidTransportType,
+                                     f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
+                logger.info("Got expected INVALID_TRANSPORT_TYPE for unsupported transport")
+
+        # Step 20 — negative: WI feature + band not in valid_bands → INVALID_TRANSPORT_TYPE.
+        # Try k5g first (common case: proxy only supports 2.4 GHz).
+        if not has_wi:
+            self.skip_step(20)
+        else:
+            defined_bands = [
+                int(cp.Bitmaps.WiFiBandBitmap.k5g),
+                int(cp.Bitmaps.WiFiBandBitmap.k2g4),
+            ]
+            invalid_band = next((b for b in defined_bands if not (valid_bands & b)), None)
+            if invalid_band is None:
+                self.skip_step(20)
+                logger.info("Step 20 skipped: all defined WiFiBand bits are in valid_bands")
+            else:
+                self.step(20)
+                logger.info("Using invalid WiFiBand bit 0x%04x for negative test", invalid_band)
+                try:
+                    await self.default_controller.SendCommand(
+                        nodeId=self.dut_node_id,
+                        endpoint=self.cp_endpoint,
+                        payload=cp.Commands.ProxyBackGroundScanStartRequest(
+                            transport=valid_transports,
+                            timeout=0,
+                            wiFiBands=invalid_band,
+                        ),
+                        interactionTimeoutMs=10000,
+                    )
+                    asserts.fail("Expected INVALID_TRANSPORT_TYPE but command succeeded")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.InvalidTransportType,
+                                         f"Expected INVALID_TRANSPORT_TYPE, got {e.status}")
+                    logger.info("Got expected INVALID_TRANSPORT_TYPE for invalid WiFiBand")
+
+        # Step 21 — start background scan with Timeout=10 (auto-stops after 10 s).
+        # The ED is still commissionable from step 13; results may populate then
+        # auto-clear when the Timeout fires, testing both the cache-fill and
+        # cache-clear-on-stop paths in a single window.
+        self.step(21)
+        await self.default_controller.SendCommand(
+            nodeId=self.dut_node_id,
+            endpoint=self.cp_endpoint,
+            payload=cp.Commands.ProxyBackGroundScanStartRequest(
+                transport=valid_transports,
+                timeout=10,
+                wiFiBands=valid_bands if has_wi else None,
+            ),
+        )
+        logger.info("ProxyBackGroundScanStartRequest sent (Timeout=10 s)")
+
+        # Step 22 — after 20 s (2× Timeout) the scan must have auto-stopped and the
+        # cache must be clear.
+        self.step(22)
+        logger.info("Waiting 20 s for Timeout to fire and cache to clear...")
+        await asyncio.sleep(20)
+        num_cached = await self.read_cp_attribute(cp.Attributes.NumCachedResults)
+        cached_results = await self.read_cp_attribute(cp.Attributes.CachedResults)
+        asserts.assert_equal(num_cached, 0,
+                             "NumCachedResults must be 0 after Timeout expired "
+                             "(background scan auto-stopped)")
+        asserts.assert_true(
+            (cached_results is NullValue) or (cached_results == []),
+            "CachedResults must be null after Timeout expired")
+
+        # Cleanup
+        await self.ensure_ed_not_commissionable(ed)
+
 
 
 if __name__ == "__main__":
