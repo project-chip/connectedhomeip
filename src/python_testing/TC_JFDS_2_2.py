@@ -90,7 +90,7 @@ class TC_JFDS_2_2(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        
+
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
         self.jfadmin_fabric_a_node_id = 1
         self.fabric_a_admin = None
