@@ -39,6 +39,7 @@ source_set("darwin") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/data-model-providers/codedriven/endpoint",
     "${chip_root}/src/platform/Darwin",
+    "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 

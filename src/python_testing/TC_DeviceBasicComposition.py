@@ -340,9 +340,12 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
                 self.fail_current_test()
 
-        self.print_step(6, "Verify that the specification version is 1.6 or above for the next steps")
+        # NOTE: This was provisional in 1.6.0, but due to issues with reaching the finish line,
+        #       this step was punted to a later release to reduce friction for SVE participants.
+        self.print_step(6, "Verify that the specification version is above 1.6.0 for the next steps")
         specification_version = root[Clusters.BasicInformation].get(Clusters.BasicInformation.Attributes.SpecificationVersion, 0)
-        if specification_version >= 0x01060000:
+        # Gate Groupcast requirements on Matter > 1.6.0
+        if specification_version > 0x01060000:
             groupcast_feature_map = 0
             if Clusters.Groupcast in root:
                 groupcast_feature_map = root[Clusters.Groupcast][Clusters.Groupcast.Attributes.FeatureMap]
