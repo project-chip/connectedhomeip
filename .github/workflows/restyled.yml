@@ -21,16 +21,31 @@ jobs:
         with:
           fail-on-differences: true
 
-      - if: |
-          !cancelled() &&
-          steps.restyler.outputs.success == 'true' &&
-          github.event.pull_request.head.repo.full_name == github.repository
-        uses: peter-evans/create-pull-request@v8
+      - if: ${{ !cancelled && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
+        run: |
+          cat >/tmp/pr-${{ github.event.pull_request.number }}-restyled.patch <<'EOM'
+          ${{ steps.restyler.outputs.git-patch }}
+          EOM
+
+      - id: upload
+        if: ${{ !cancelled && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
+        uses: actions/upload-artifact@v4
         with:
-          base: ${{ steps.restyler.outputs.restyled-base }}
-          branch: ${{ steps.restyler.outputs.restyled-head }}
-          title: ${{ steps.restyler.outputs.restyled-title }}
-          body: ${{ steps.restyler.outputs.restyled-body }}
-          labels: "restyled"
-          reviewers: ${{ github.event.pull_request.user.login }}
-          delete-branch: true
+          name: pr-${{ github.event.pull_request.number }}-restyled
+          path: /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch
+          if-no-files-found: ignore
+          overwrite: true
+          retention-days: 1
+
+      - if: ${{ !cancelled && steps.restyler.outputs.success == 'true' && steps.upload.outputs.artifact-url }}
+        run: |
+          cat >>"$GITHUB_STEP_SUMMARY" <<'EOM'
+          ## Restyled
+
+          To apply these fixes locally,
+
+          1. Download [this patch](${{ steps.upload.outputs.artifact-url }})
+          2. Unzip it: `unzip pr-${{ github.event.pull_request.number }}-restyled.zip`
+          3. Apply it: `git am < pr-${{ github.event.pull_request.number }}-restyled.patch`
+
+          EOM
