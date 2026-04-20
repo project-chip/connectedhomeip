@@ -286,11 +286,11 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
         uint8_t oldPowerSettingNum = mDelegate.GetPowerSettingNum();
 
         status = mDelegate.HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting,
-                                                               MakeOptional(reqPowerSettingNum), NullOptional);
+                                                              MakeOptional(reqPowerSettingNum), NullOptional);
 
         if (oldPowerSettingNum != mDelegate.GetPowerSettingNum())
         {
-            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PowerSetting::Id);
+            NotifyAttributeChanged(MicrowaveOvenControl::Attributes::PowerSetting::Id);
         }
     }
     else
