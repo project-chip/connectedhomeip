@@ -1,0 +1,40 @@
+---
+name: python-test-reviewer
+description: Expert guidance for reviewing Python tests in the Matter (connectedhomeip) repository. Use this skill when reviewing changes to tests, specifically targeting common pitfalls in async execution, mocking cluster interactions, and assertion quality.
+---
+
+# Python Test Reviewer Skill
+
+This skill provides a checklist and set of principles for reviewing Python tests within the Matter repository.
+
+## Core Review Principles
+
+- **Prefer Real Interactions Over Mocks**: For integration tests, prioritize using the real Matter stack (via fixtures) unless the interaction is too complex or slow.
+- **Explicit Assertions**: Never accept tests that "pass by not crashing." Every test must have at least one clear, meaningful assertion.
+- **Async Hygiene**: Matter is heavily asynchronous. Ensure async patterns are used correctly.
+
+## Specific Checkpoints
+
+### 1. Asyncio Usage
+- **Check**: Are all awaitable calls (like `devCtrl.ReadAttribute`) actually awaited?
+
+### 2. Mocking Cluster Interactions
+- **Guideline**: When mocking cluster responses, ensure the mock structure matches the `chip.clusters` attributes or commands exactly.
+- **Pitfall**: Avoid mocking the entire `ChipDeviceCtrl` if you only need to mock a single attribute read.
+
+### 3. Code style
+- **Re-use**: avoid re-writing code that is present in matter/testing or the chip core libaries. If you are creating a class or function that is substantially similar to exisitng classes or functions, consider whether extension would be preferable to duplication
+- **Attribute reads**: prefer using read_single_attribute_check_success in matter/testing to the base Read and ReadAttribute functions in ChipDeviceCtrl.py unless there is a good reason. This function contains additional checks that are useful for testing.
+- **Exceptions**: Avoid `except Exception` - use a specific exception
+- **try / except can hide bugs**: Avoid fixing CI issues with a try: except:. This pattern can hide real bugs that should be fixed and is a code smell. Try except blocks should only be use where the exception is expected and that should normally include an assertion that the exception happens or a comment explaining in detail why the exception is thrown and how this is spec compliant.
+- **use dataclass**: Do not use dicts with string keys. Use dataclasses with named members instead. This helps programers avoid uncaught typos.
+
+
+### 5. Matter-Specific Patterns
+- **Commissioning**: If the test involves commissioning, ensure it uses the standard commissioning fixtures to avoid duplicated setup logic.
+- **IDs**: IDs and values should be taken from the codegen files (ex. Objects.py). Values that are not in the codegen should be flagged for follow up
+
+## Feedback Style
+- Be concise.
+- Reference specific lines.
+- If a pattern is repeated across many tests, suggest a helper function or fixture.
