@@ -109,7 +109,6 @@ class TC_JFADMIN_1_1(MatterBaseTest):
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
         dut_rpc_server_port = None
         dut_rpc_server_ip = None
-        dut_rpc_server_port = None
         jfadmin_fabric_a_discriminator = None
 
         if self.is_pics_sdk_ci_only:
