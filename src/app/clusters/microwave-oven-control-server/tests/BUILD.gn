@@ -21,16 +21,16 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestMicrowaveOvenControlCluster"
 
-  test_sources = [ "TestMicrowaveOvenControlCluster.cpp",
-  ]
+  test_sources = [ "TestMicrowaveOvenControlCluster.cpp" ]
 
-  sources = [ "../../operational-state-server/operational-state-cluster-objects.h",
-              "../../operational-state-server/operational-state-server.cpp",
-              "../../operational-state-server/operational-state-server.h",
-              "../../mode-base-server/mode-base-cluster-objects.cpp",
-              "../../mode-base-server/mode-base-cluster-objects.h",
-              "../../mode-base-server/mode-base-server.cpp",
-              "../../mode-base-server/mode-base-server.h",
+  sources = [
+    "../../mode-base-server/mode-base-cluster-objects.cpp",
+    "../../mode-base-server/mode-base-cluster-objects.h",
+    "../../mode-base-server/mode-base-server.cpp",
+    "../../mode-base-server/mode-base-server.h",
+    "../../operational-state-server/operational-state-cluster-objects.h",
+    "../../operational-state-server/operational-state-server.cpp",
+    "../../operational-state-server/operational-state-server.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -38,8 +38,8 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/app/clusters/microwave-oven-control-server",
     "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/lib/support",
     "${chip_root}/src/controller/data_model:data_model",
     "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
+    "${chip_root}/src/lib/support",
   ]
 }
