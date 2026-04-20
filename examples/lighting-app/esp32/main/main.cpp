@@ -26,14 +26,14 @@
 #else
 #include "esp_spi_flash.h"
 #endif
+#include "AppTask.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "AppTask.h"
+#include "nvs_flash.h"
 #include "shell_extension/launch.h"
 #include "shell_extension/openthread_cli_register.h"
 #include <app/server/Dnssd.h>
-#include "nvs_flash.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
