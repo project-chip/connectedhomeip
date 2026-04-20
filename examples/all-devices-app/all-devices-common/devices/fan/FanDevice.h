@@ -54,7 +54,7 @@ public:
     Clusters::FanControlCluster & FanControlCluster();
     Clusters::OnOffCluster & OnOffCluster();
     Clusters::GroupsCluster & GroupsCluster();
-    
+
 private:
     class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
     {
@@ -74,7 +74,7 @@ private:
     Clusters::FanControl::Delegate & mFanDelegate;
     Clusters::OnOffDelegate & mOnOffDelegate;
     TimerDelegate & mTimerDelegate;
-    
+
     const Context mContext;
 
     DefaultScenesManagementTableProvider mScenesTableProvider;
