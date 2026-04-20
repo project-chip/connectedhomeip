@@ -28,6 +28,7 @@
 #include <BindingHandler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/CommonDeviceCallbacks.h>
+#include <lib/support/CodeUtils.h>
 
 class AppDeviceCallbacks : public CommonDeviceCallbacks
 {

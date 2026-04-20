@@ -403,8 +403,15 @@ void SwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    LogErrorOnFailure(Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
-                                                                                static_cast<void *>(data)));
+    CHIP_ERROR err = Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
+                                                                                static_cast<void *>(data));
+    // In case of success, the binding manager calls LightSwitchContextReleaseHandler which does Platform::Delete(data)
+    // so it's freed by the callback. We only need to free the data if the operation failed.
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "SwitchWorkerFunction - Failed to notify bound cluster changed: %" CHIP_ERROR_FORMAT, err.Format());
+        Platform::Delete(data);
+    }
 }
 
 void BindingWorkerFunction(intptr_t context)
