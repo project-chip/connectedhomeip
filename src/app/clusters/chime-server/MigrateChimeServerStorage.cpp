@@ -16,27 +16,31 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/unit-localization-server/MigrateUnitLocalizationServerStorage.h>
-#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+#include <app/clusters/chime-server/MigrateChimeServerStorage.h>
+#include <clusters/Chime/Attributes.h>
+#include <clusters/Chime/ClusterId.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace UnitLocalization {
+namespace Chime {
 
-CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
-                                                AttributePersistenceProvider & dstProvider)
+CHIP_ERROR MigrateChimeServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
+                                     AttributePersistenceProvider & dstProvider)
 {
-    static constexpr AttrMigrationData attributesToUpdate[] = { { Attributes::TemperatureUnit::Id, sizeof(uint8_t),
-                                                                  true /* isScalar */ } };
+    static constexpr AttrMigrationData attributesToUpdate[] = {
+        { Attributes::SelectedChime::Id, sizeof(uint8_t), true /* isScalar */ },
+        { Attributes::Enabled::Id, sizeof(bool), true /* isScalar */ },
+    };
     // We need to provide a buffer with enough space for the attributes that will be migrated.
+    // Both uint8_t and bool fit in 1 byte.
     uint8_t attributeBuffer[sizeof(uint8_t)] = {};
     MutableByteSpan buffer(attributeBuffer);
-    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, UnitLocalization::Id },
+    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, Chime::Id },
                                                          Span(attributesToUpdate), buffer);
 }
 
-} // namespace UnitLocalization
+} // namespace Chime
 } // namespace Clusters
 } // namespace app
 } // namespace chip
