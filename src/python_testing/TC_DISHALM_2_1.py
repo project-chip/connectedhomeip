@@ -29,7 +29,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --int-arg allow_provisional:1
+#       --int-arg allow_provisional_test_event_only_disallowed_for_certification:1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -186,7 +186,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
         self.endpoint = self.get_endpoint()
 
         # Get test parameter for allowing provisional alarms (default: False for certification)
-        allow_provisional = self.user_params.get("allow_provisional", False)
+        allow_provisional = self.user_params.get("allow_provisional_test_event_only_disallowed_for_certification", False)
         logger.info(f"Test running with allow_provisional={allow_provisional}")
 
         self.step(1)
