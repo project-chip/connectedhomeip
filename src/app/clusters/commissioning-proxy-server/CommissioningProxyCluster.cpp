@@ -335,6 +335,14 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
         // WiFiBands must not contain reserved bits.
         VerifyOrReturnError((commandData.wiFiBands.Value().Raw() & ~kValidWiFiBandBits) == 0, Status::InvalidCommand);
 
+        // WiFiBands must be a subset of the bands supported by this proxy.
+        auto supportedBands = mDelegate.GetSupportedWiFiBands();
+        if ((commandData.wiFiBands.Value().Raw() & ~supportedBands.Raw()) != 0)
+        {
+            ChipLogError(Zcl, "CommissioningProxy: Requested WiFiBand not in supported bands");
+            return Status::InvalidTransportType;
+        }
+
         wiFiBands = static_cast<WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
     }
 

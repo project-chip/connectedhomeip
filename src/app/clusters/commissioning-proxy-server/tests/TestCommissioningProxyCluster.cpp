@@ -922,6 +922,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ValidWiFiPAF_2g4Band)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
+    mockDelegate.SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
     BitMask<Feature> features(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
     CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -939,16 +940,36 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ValidWiFiPAF_BothBands)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
+    chip::BitMask<WiFiBandBitmap> bothBands;
+    bothBands.Set(WiFiBandBitmap::k2g4);
+    bothBands.Set(WiFiBandBitmap::k5g);
+    mockDelegate.SetSupportedWiFiBands(bothBands);
     BitMask<Feature> features(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
     CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    chip::BitMask<WiFiBandBitmap> bothBands;
-    bothBands.Set(WiFiBandBitmap::k2g4);
-    bothBands.Set(WiFiBandBitmap::k5g);
     auto cmd = MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF, 30, chip::MakeOptional(bothBands));
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// kWiFiPAF with a WiFiBand bit not in GetSupportedWiFiBands() SHALL return INVALID_TRANSPORT_TYPE.
+// Proxy only supports 2.4 GHz; requesting 5 GHz must be rejected.
+TEST_F(TestCommissioningProxyCluster, TestBgScanStart_UnsupportedWiFiBand)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    mockDelegate.SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+    BitMask<Feature> features(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    auto cmd = MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF, 30,
+        chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g)));
+    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
