@@ -306,8 +306,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionNotFound)
     auto result = tester.Invoke(request);
 
     // Verify the command returned NotFound status
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status->IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 // Test invoking InstantAction command when delegate returns failure
@@ -338,8 +337,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionDelegateFailure)
     auto result = tester.Invoke(request);
 
     // Verify the command returned the failure status from delegate
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status->IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
 
     // Verify the delegate was still called
     EXPECT_TRUE(mDelegate.mHandleInstantActionCalled);
@@ -369,8 +367,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionUnsupportedCommand)
     auto result = tester.Invoke(request);
 
     // Verify the command returned InvalidCommand status
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status->IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 
     // Verify the delegate was NOT called (command was rejected before delegate)
     EXPECT_FALSE(mDelegate.mHandleInstantActionCalled);
