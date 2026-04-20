@@ -10738,7 +10738,7 @@ PICS:
     #
 
     - label:
-          "Does the device implement the Joint Fabric Datastore cluster as a 
+          "Does the device implement the Joint Fabric Datastore cluster as a
           server?"
       id: JFDS.S
 
@@ -10827,7 +10827,7 @@ PICS:
 
     - label: "Does the device implement receiving of AddGroupIDToEndpointForNode command?"
       id: JFDS.S.C0e.Rsp
-    
+
     - label:
           "Does the device implement receiving of RemoveGroupIDFromEndpointForNode command?"
       id: JFDS.S.C0f.Rsp
