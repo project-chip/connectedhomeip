@@ -43,33 +43,8 @@ namespace {
 
 constexpr uint16_t kSensorTemperatureOffset = 475;
 
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
-/** I2C instance setup, Si70xx init, one RH/temp sample (centi-units), I2C deinit. Caller owns power-state (PS) requirements. */
-void Si91xSensorInitMeasureDeinit(uint16_t & relativeHumidity, int16_t & temperature)
-{
-    sl_i2c_init_instances();
-
-    sl_status_t status = Init();
-    VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to initialize the sensor : %ld", status));
-
-    int32_t tempTemperature = 0;
-    uint32_t tempHumidity   = 0;
-    status = sl_si91x_si70xx_measure_rh_and_temp(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, &tempHumidity, &tempTemperature);
-    VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to measure sensor data : %ld", status));
-
-    // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes
-    // precision.
-    temperature      = static_cast<int16_t>(tempTemperature * 100) - kSensorTemperatureOffset;
-    relativeHumidity = static_cast<uint16_t>(tempHumidity * 100);
-
-    status = sl_i2c_driver_deinit(SI70XX_I2C_INSTANCE);
-    VerifyOrReturn(status == SL_I2C_SUCCESS, ChipLogError(AppServer, "Failed to de-initialize I2C driver : %ld", status));
-}
-#endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
-
-} // namespace
-
-sl_status_t Init()
+/** Full I2C + Si70xx setup (used at boot and from on-demand reads when power manager is present). */
+sl_status_t InitI2cAndSensor()
 {
     chip::DeviceLayer::Silabs::SilabsPlatformAbstractionBase & platform = chip::DeviceLayer::Silabs::GetPlatform();
     sl_status_t status                                                  = platform.EnableSi70xxSensorGpio();
@@ -107,6 +82,41 @@ sl_status_t Init()
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     return status;
+}
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+/** I2C instance setup, Si70xx init, one RH/temp sample (centi-units), I2C deinit. Caller owns power-state (PS) requirements. */
+void Si91xSensorInitMeasureDeinit(uint16_t & relativeHumidity, int16_t & temperature)
+{
+    sl_i2c_init_instances();
+
+    sl_status_t status = InitI2cAndSensor();
+    VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to initialize the sensor : %ld", status));
+
+    int32_t tempTemperature = 0;
+    uint32_t tempHumidity   = 0;
+    status = sl_si91x_si70xx_measure_rh_and_temp(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, &tempHumidity, &tempTemperature);
+    VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to measure sensor data : %ld", status));
+
+    // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes
+    // precision.
+    temperature      = static_cast<int16_t>(tempTemperature * 100) - kSensorTemperatureOffset;
+    relativeHumidity = static_cast<uint16_t>(tempHumidity * 100);
+
+    status = sl_i2c_driver_deinit(SI70XX_I2C_INSTANCE);
+    VerifyOrReturn(status == SL_I2C_SUCCESS, ChipLogError(AppServer, "Failed to de-initialize I2C driver : %ld", status));
+}
+#endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+
+} // namespace
+
+sl_status_t Init()
+{
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+    // Defer I2C / sensor bring-up to GetSensorData() so we do not hold the sensor active at boot while sleeping (ICD).
+    return SL_STATUS_OK;
+#endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+    return InitI2cAndSensor();
 }
 
 sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
