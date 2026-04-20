@@ -17,6 +17,7 @@
 
 #include "DeviceCallbacks.h"
 
+#include "AppTask.h"
 #include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
@@ -26,7 +27,6 @@
 #else
 #include "esp_spi_flash.h"
 #endif
-#include "AppTask.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
