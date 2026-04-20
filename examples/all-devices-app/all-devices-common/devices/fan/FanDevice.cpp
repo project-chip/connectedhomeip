@@ -68,6 +68,7 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 
     // Fan
     FanControlCluster::Config fanConfig(endpoint, &mFanDelegate);
+    fanConfig.WithSpeedMax(10).WithStep();
     mFanControlCluster.Create(fanConfig);
     ReturnErrorOnFailure(provider.AddCluster(mFanControlCluster.Registration()));
 
