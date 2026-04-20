@@ -72,7 +72,7 @@ public:
     virtual void OnWindSettingChanged(BitMask<WindBitmap> newValue) {}
     virtual void OnAirflowDirectionChanged(AirflowDirectionEnum newValue) {}
 
-    Delegate(EndpointId aEndpoint) : mEndpoint(aEndpoint) {}
+    Delegate(EndpointId aEndpoint = kInvalidEndpointId) : mEndpoint(aEndpoint) {}
 
     virtual ~Delegate() = default;
 

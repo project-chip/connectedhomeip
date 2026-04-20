@@ -21,6 +21,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/impl/LoggingChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/fan/impl/LoggingFanDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
@@ -128,6 +129,14 @@ private:
                 LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
         };
         mRegistry["soil-sensor"] = []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); };
+        mRegistry["fan"] = [this]() {
+            VerifyOrDie(mContext.has_value());
+            return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                .groupDataProvider = mContext->groupDataProvider,
+                .fabricTable       = mContext->fabricTable,
+                .timerDelegate     = mContext->timerDelegate,
+            });
+        };
     }
 };
 
