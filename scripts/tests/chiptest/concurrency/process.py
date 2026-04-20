@@ -219,6 +219,12 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
         self._proc = mp_context.Process(target=self.run, name=self._config.name)
         self._stopped = False
 
+    def __getstate__(self) -> dict[str, object]:
+        state = self.__dict__.copy()
+        # Drop _proc field to exclude it from pickling on process spawn.
+        state.pop("_proc", None)
+        return state
+
     @property
     def name(self) -> str:
         return self._config.name
