@@ -48,6 +48,8 @@ set(SRC_DIRS_LIST
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor"

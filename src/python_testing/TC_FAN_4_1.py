@@ -21,13 +21,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${AIR_PURIFIER_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace_file json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --int-arg pixit_fan_start_time:1
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
