@@ -103,7 +103,7 @@ class TC_JFDS_2_4(MatterBaseTest):
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
         self.jfadmin_fabric_a_node_id = 1
         self.fabric_a_admin = None
-         # If test is executed in CI environment, start JFA app for Fabric B
+        # If test is executed in CI environment, start JFA app for Fabric B
         if self.is_pics_sdk_ci_only:
             self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
             self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
@@ -129,10 +129,12 @@ class TC_JFDS_2_4(MatterBaseTest):
                 asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
             self.jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
             if not self.jfadmin_fabric_a_passcode:
-                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
             self.jfadmin_fabric_a_discriminator = self.matter_test_config.discriminators[0]
             if not self.jfadmin_fabric_a_discriminator:
-                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
