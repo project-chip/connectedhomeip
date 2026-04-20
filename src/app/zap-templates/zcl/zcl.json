@@ -237,8 +237,16 @@
         "Closure Dimension": [
             "CurrentState",
             "TargetState",
+            "Resolution",
+            "StepValue",
+            "Unit",
             "UnitRange",
             "LimitRange",
+            "TranslationDirection",
+            "RotationAxis",
+            "Overflow",
+            "ModulationType",
+            "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
         ],
@@ -442,6 +450,7 @@
             "nullable_global_struct"
         ],
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Flow Measurement": ["ClusterRevision", "FeatureMap", "MeasuredValue"],
         "Temperature Measurement": [
             "ClusterRevision",
             "FeatureMap",

@@ -1286,14 +1286,14 @@ jobs:
             uses: actions/checkout@v6
 
           - name: Download all JUnit XML results
-            uses: actions/download-artifact@v7
+            uses: actions/download-artifact@v8
             with:
                 pattern: junit-results-*
                 path: junit-results
                 merge-multiple: true
 
           - name: Publish test results to GitHub Actions
-            uses: mikepenz/action-junit-report@v5
+            uses: mikepenz/action-junit-report@v6
             with:
                 report_paths: junit-results/**/*.xml
                 detailed_summary: true

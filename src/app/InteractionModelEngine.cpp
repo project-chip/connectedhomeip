@@ -284,7 +284,6 @@ void InteractionModelEngine::Shutdown()
             writeHandler.Close();
         }
     }
-
     mReportingEngine.Shutdown();
     mAttributePathPool.ReleaseAll();
     mEventPathPool.ReleaseAll();
@@ -1958,6 +1957,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     DataModel::Provider * oldModel = mDataModelProvider;
     if (oldModel != nullptr)
     {
+        oldModel->UnregisterAttributeChangeListener(mReportingEngine);
         CHIP_ERROR err = oldModel->Shutdown();
         if (err != CHIP_NO_ERROR)
         {
@@ -1969,14 +1969,16 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     if (mDataModelProvider != nullptr)
     {
         CHIP_ERROR err = mDataModelProvider->Startup({
-            .eventsGenerator         = EventManagement::GetInstance(),
-            .dataModelChangeListener = mReportingEngine,
-            .actionContext           = *this,
+            .eventsGenerator = EventManagement::GetInstance(),
+            .actionContext   = *this,
         });
+
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
         }
+        // Register to the new model
+        mDataModelProvider->RegisterAttributeChangeListener(mReportingEngine);
     }
 
     return oldModel;

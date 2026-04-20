@@ -24,7 +24,6 @@ CommandHandlerInterfaceOnlyClusters:
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
     - Camera AV Settings User Level Management
-    - Closure Dimension
     - Commodity Price
     - Commodity Tariff
     - Device Energy Management Mode
@@ -119,6 +118,7 @@ CodeDrivenClusters:
     - Camera AV Stream Management
     - Chime
     - Closure Control
+    - Closure Dimension
     - Commissioner Control
     - Descriptor
     - Device Energy Management
@@ -128,6 +128,7 @@ CodeDrivenClusters:
     - Ethernet Network Diagnostics
     - Fan Control
     - Fixed Label
+    - Flow Measurement
     - General Commissioning
     - General Diagnostics
     - Group Key Management
