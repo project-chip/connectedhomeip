@@ -52,7 +52,7 @@ static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Cry
 #ifdef CONFIG_CHIP_NXP_PLATFORM_MCXW72
 static constexpr size_t kDacKeyBlobSize =
     PSA_S200_NON_EL2GO_BLOB_EXPORT_SIZE(PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 256);
-#elif defined(CONFIG_CHIP_NXP_PLATFORM_RW61X)
+#elif defined(CONFIG_CHIP_NXP_PLATFORM_RW61X) || defined(CONFIG_SOC_SERIES_RW6XX)
 static constexpr size_t kDacKeyBlobSize = 48;
 #else
 #define kDacKeyBlobSize Crypto::kP256_PrivateKey_Length

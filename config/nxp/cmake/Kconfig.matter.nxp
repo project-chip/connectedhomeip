@@ -188,6 +188,12 @@ config CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 		The application can provide its own singleton, for example by creating
 		a class that inherits from FactoryDataProviderImpl and overrides only the methods that need customization.
 
+config NXP_FACTORY_DAC_BLOB_GENERATION
+	bool "Enable factory DAC private key blob generation"
+	help
+		Enable factory DAC private key blob generation for secure storage.
+		To be used only during factory process.
+
 endif
 
 if CHIP_FACTORY_DATA_BUILD
