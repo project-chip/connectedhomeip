@@ -178,7 +178,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
             self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
             self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
             dut_rpc_server_ip = "127.0.0.1"
-            dut_rpc_server_port = 33033
+            dut_rpc_server_port = "33033"
             self.fabric_a_admin = JFAdministratorSubprocess(
                 self.jfa_server_app,
                 prefix="JFA-A",
