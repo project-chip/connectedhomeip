@@ -18,17 +18,17 @@ jobs:
 
       - id: restyler
         uses: restyled-io/actions/run@v4
-        with:
-          fail-on-differences: true
 
-      - if: ${{ !cancelled() && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
+      - name: Save restyle patch
+        if: ${{ steps.restyler.outputs.git-patch }}
+        env:
+          PATCH_CONTENT: ${{ steps.restyler.outputs.git-patch }}
         run: |
-          cat >/tmp/pr-${{ github.event.pull_request.number }}-restyled.patch <<'EOM'
-          ${{ steps.restyler.outputs.git-patch }}
-          EOM
+          printf '%s\n' "$PATCH_CONTENT" > /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch
+          echo "Patch saved ($(wc -l < /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch) lines)"
 
       - id: upload
-        if: ${{ !cancelled() && steps.restyler.outputs.success == 'true' && steps.restyler.outputs.git-patch }}
+        if: ${{ steps.restyler.outputs.git-patch }}
         uses: actions/upload-artifact@v4
         with:
           name: pr-${{ github.event.pull_request.number }}-restyled
@@ -37,15 +37,10 @@ jobs:
           overwrite: true
           retention-days: 1
 
-      - if: ${{ !cancelled() && steps.restyler.outputs.success == 'true' && steps.upload.outputs.artifact-url }}
+      - name: Fail if restyle differences found
+        if: ${{ steps.restyler.outputs.differences == 'true' }}
         run: |
-          cat >>"$GITHUB_STEP_SUMMARY" <<'EOM'
-          ## Restyled
-
-          To apply these fixes locally,
-
-          1. Download [this patch](${{ steps.upload.outputs.artifact-url }})
-          2. Unzip it: `unzip pr-${{ github.event.pull_request.number }}-restyled.zip`
-          3. Apply it: `git am < pr-${{ github.event.pull_request.number }}-restyled.patch`
-
-          EOM
+          echo "::error::Restyle differences found. Download patch: ${{ steps.upload.outputs.artifact-url }}"
+          echo ""
+          echo "To apply: unzip pr-${{ github.event.pull_request.number }}-restyled.zip && git am < pr-${{ github.event.pull_request.number }}-restyled.patch"
+          exit 1
