@@ -24,3 +24,5 @@ chip_enable_read_client = false
 chip_enable_ota_requestor = true
 app_data_model =
     "${chip_root}/examples/lighting-app/silabs/data_model:silabs-lighting"
+
+chip_config_enable_groupcast = true
