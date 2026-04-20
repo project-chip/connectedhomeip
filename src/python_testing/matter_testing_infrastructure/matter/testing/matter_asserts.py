@@ -454,11 +454,11 @@ async def assert_factory_fresh(
 
     Example:
         # Verify device is factory reset before running test
-        await assert_factory_fresh(controller, node_id=1234, "DUT")
+        await assert_factory_fresh(controller, node_id=1234, description="DUT")
 
         # Verify factory-fresh device (establishes PASE if needed)
         pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
+        await assert_factory_fresh(controller, node_id=1234, description="DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 
@@ -507,11 +507,11 @@ async def assert_fabric_count(
 
     Example:
         # Verify device has exactly 1 fabric before adding second
-        await assert_fabric_count(controller, node_id=1234, expected_count=1, "DUT")
+        await assert_fabric_count(controller, node_id=1234, expected_count=1, description="DUT")
 
         # Verify factory-fresh device has 0 fabrics (establishes PASE if needed)
         pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT", pase_params=pase_params)
+        await assert_fabric_count(controller, node_id=1234, expected_count=0, description="DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 

@@ -446,10 +446,6 @@ async def _is_device_operational_via_dnssd(
         LOGGER.info(f"Device {node_id} not found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
         return False
 
-    except ImportError:
-        raise
-    except asyncio.CancelledError:
-        raise
     except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
         LOGGER.warning(f"DNS-SD check failed, will fall back to connection attempt: {e}")
         return False
