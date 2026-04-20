@@ -956,7 +956,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 reconnected = True
                 logger.info(f'{step_number_s6}: Step #6.6 - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
                 break
-            except Exception:
+            except TimeoutError:
                 logger.info(
                     f'{step_number_s6}: Step #6.6 - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
 
