@@ -271,10 +271,12 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
                 asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
             jfadmin_fabric_b_passcode = self.matter_test_config.setup_passcodes[0]
             if not jfadmin_fabric_b_passcode:
-                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
             jfadmin_fabric_b_discriminator = self.matter_test_config.discriminators[0]
             if not jfadmin_fabric_b_discriminator:
-                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric B JF-Administrator App
         self.fabric_b_ctrl = JFControllerSubprocess(

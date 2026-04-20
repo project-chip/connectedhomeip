@@ -167,7 +167,8 @@ class TC_JFADMIN_2_1(MatterBaseTest):
                 asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
             jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
             if not jfadmin_fabric_a_passcode:
-                asserts.fail("JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
@@ -454,13 +455,14 @@ class TC_JFADMIN_2_1(MatterBaseTest):
             nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True, fabricFiltered=False)
 
-        rcac_data = matter.tlv.TLVReader(fabric_a_trusted_roots[0][Clusters.OperationalCredentials].trustedRootCertificates[1]).get()
+        rcac_data = matter.tlv.TLVReader(fabric_a_trusted_roots[0]
+                                         [Clusters.OperationalCredentials].trustedRootCertificates[1]).get()
         icac_data = matter.tlv.TLVReader(fabric_b_nocs[0][Clusters.OperationalCredentials].NOCs[2].icac).get()
 
         log.info("Verify the chain of trust between Ecosystem A and Ecosystem B. Issuer of ICAC for Ecosystem B should be the RCAC from Ecosystem A")
         asserts.assert_equal(
-            dict(rcac_data.get('Any', [])).get(6), # Tag 6 = Subject
-            dict(icac_data.get('Any', [])).get(3), # Tag 3 = Issuer
+            dict(rcac_data.get('Any', [])).get(6),  # Tag 6 = Subject
+            dict(icac_data.get('Any', [])).get(3),  # Tag 3 = Issuer
             "Issuer of ICAC for Ecosystem B is not the Subject of RCAC from Ecosystem A"
         )
 
