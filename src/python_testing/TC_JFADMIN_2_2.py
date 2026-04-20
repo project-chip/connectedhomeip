@@ -236,7 +236,7 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
             catTags=[int(self.ecoACATs, 16), int('fffe0001', 16)])
 
         self.step("2")
-        
+
         self.jfctrl_fabric_b_vid = random.randint(0x0001, 0xFFF0)
         jfadmin_fabric_b_passcode = None
         jfadmin_fabric_b_discriminator = None

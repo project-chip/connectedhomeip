@@ -172,7 +172,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
             self.storage_directory_ecosystem_a = tempfile.mkdtemp(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a
             log.info("Temporary storage directory: %s", self.storage_fabric_a)
-        
+
         # If test is executed in CI environment, start JFA app for Fabric B
         if self.is_pics_sdk_ci_only:
             self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
