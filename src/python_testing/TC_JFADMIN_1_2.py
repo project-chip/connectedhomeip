@@ -102,7 +102,8 @@ class TC_JFADMIN_1_2(MatterBaseTest):
             self.admin_discriminator = self.matter_test_config.discriminators[0]
 
     def teardown_class(self):
-        self.jf_admin.terminate()
+        if self.jf_admin is not None:
+            self.jf_admin.terminate()
         if self.storage_directory_ecosystem_a is not None:
             self.storage_directory_ecosystem_a.cleanup()
         super().teardown_class()
