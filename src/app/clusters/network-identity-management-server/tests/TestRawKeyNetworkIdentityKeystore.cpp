@@ -190,4 +190,3 @@ TEST_F(TestRawKeyNetworkIdentityKeystore, DeriveNASSSpecVector)
     EXPECT_SUCCESS(ExtractIdentifierFromChipNetworkIdentity(identity, keyId));
     EXPECT_TRUE(keyId.data_equal(ByteSpan(kNASSTestVector1_KeyIdentifier)));
 }
-
