@@ -88,6 +88,7 @@ class LogMessageCounter:
     def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
         self.cancel()
 
+
 class ProcessThreadTaskFilter(logging.Filter):
     """Logging filter to add process/thread and task information to log records."""
 
