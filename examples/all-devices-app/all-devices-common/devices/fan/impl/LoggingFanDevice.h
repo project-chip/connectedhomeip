@@ -29,7 +29,8 @@ public:
 
     // FanControlDelegate
 
-    Protocols::InteractionModel::Status HandleStep(Clusters::FanControl::StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
+    Protocols::InteractionModel::Status HandleStep(Clusters::FanControl::StepDirectionEnum aDirection, bool aWrap,
+                                                   bool aLowestOff) override;
 
     void OnFanStateChanged(bool isOn) override;
     void OnFanDriveStateChanged(const Clusters::FanControl::FanDriveState & newState) override;

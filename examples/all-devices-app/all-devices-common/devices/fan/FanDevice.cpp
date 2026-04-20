@@ -24,15 +24,13 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-
 FanDevice::FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate & onOffDelegate,
                      const Context & context) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFan, 1)),
     mFanDelegate(fanDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(context.timerDelegate), mContext(context)
 {}
 
-CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId)
+CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 

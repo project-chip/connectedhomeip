@@ -16,14 +16,14 @@
 
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
+#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
-#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -33,7 +33,6 @@ namespace app {
 class FanDevice : public SingleEndpointDevice
 {
 public:
-
     struct Context
     {
         Credentials::GroupDataProvider & groupDataProvider;
@@ -41,8 +40,7 @@ public:
         TimerDelegate & timerDelegate;
     };
 
-    FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate & onOffDelegate,
-              const Context & context);
+    FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate & onOffDelegate, const Context & context);
 
     ~FanDevice() override = default;
 
@@ -84,7 +82,6 @@ private:
     LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
     LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
-
 };
 
 } // namespace app
