@@ -66,8 +66,6 @@ class AndroidApp(Enum):
     CHIP_TEST = auto()
     TV_SERVER = auto()
     TV_CASTING_APP = auto()
-    JAVA_MATTER_CONTROLLER = auto()
-    KOTLIN_MATTER_CONTROLLER = auto()
     VIRTUAL_DEVICE_APP = auto()
 
     def AppName(self):
