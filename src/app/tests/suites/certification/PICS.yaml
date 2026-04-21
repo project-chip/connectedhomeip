@@ -10732,3 +10732,110 @@ PICS:
 
     - label: "Does the device implement the End command?"
       id: WEBRTCR.S.C03.Rsp
+
+    #
+    # Joint Fabric Datastore
+    #
+
+    - label:
+          "Does the device implement the Joint Fabric Datastore cluster as a
+          server?"
+      id: JFDS.S
+
+    - label:
+          "Does the device implement the Joint Fabric Datastore cluster as a
+          client?"
+      id: JFDS.C
+
+    - label: "Does the device implement the AnchorRootCA attribute?"
+      id: JFDS.S.A0000
+
+    - label: "Does the device implement the AnchorNodeID attribute?"
+      id: JFDS.S.A0001
+
+    - label: "Does the device implement the AnchorVendorID attribute?"
+      id: JFDS.S.A0002
+
+    - label: "Does the device implement the FriendlyName attribute?"
+      id: JFDS.S.A0003
+
+    - label: "Does the device implement the GroupKeySetList attribute?"
+      id: JFDS.S.A0004
+
+    - label: "Does the device implement the GroupList attribute?"
+      id: JFDS.S.A0005
+
+    - label: "Does the device implement the NodeList attribute?"
+      id: JFDS.S.A0006
+
+    - label: "Does the device implement the AdminList attribute?"
+      id: JFDS.S.A0007
+
+    - label: "Does the device implement receiving of AddKeySet command?"
+      id: JFDS.S.C00.Rsp
+
+    - label: "Does the device implement receiving of UpdateKeySet command?"
+      id: JFDS.S.C01.Rsp
+
+    - label: "Does the device implement receiving of RemoveKeySet command?"
+      id: JFDS.S.C02.Rsp
+
+    - label: "Does the device implement receiving of AddGroup command?"
+      id: JFDS.S.C03.Rsp
+
+    - label: "Does the device implement receiving of UpdateGroup command?"
+      id: JFDS.S.C04.Rsp
+
+    - label: "Does the device implement receiving of RemoveGroup command?"
+      id: JFDS.S.C05.Rsp
+
+    - label: "Does the device implement receiving of AddAdmin command?"
+      id: JFDS.S.C06.Rsp
+
+    - label: "Does the device implement receiving of UpdateAdmin command?"
+      id: JFDS.S.C07.Rsp
+
+    - label: "Does the device implement receiving of RemoveAdmin command?"
+      id: JFDS.S.C08.Rsp
+
+    - label: "Does the device implement receiving of AddPendingNode command?"
+      id: JFDS.S.C09.Rsp
+
+    - label: "Does the device implement receiving of RefreshNode command?"
+      id: JFDS.S.C0a.Rsp
+
+    - label: "Does the device implement receiving of UpdateNode command?"
+      id: JFDS.S.C0b.Rsp
+
+    - label: "Does the device implement receiving of RemoveNode command?"
+      id: JFDS.S.C0c.Rsp
+
+    - label:
+          "Does the device implement receiving of UpdateEndpointForNode command?"
+      id: JFDS.S.C0d.Rsp
+
+    - label:
+          "Does the device implement receiving of AddGroupIDToEndpointForNode
+          command?"
+      id: JFDS.S.C0e.Rsp
+
+    - label:
+          "Does the device implement receiving of
+          RemoveGroupIDFromEndpointForNode command?"
+      id: JFDS.S.C0f.Rsp
+
+    - label:
+          "Does the device implement receiving of AddBindingToEndpointForNode
+          command?"
+      id: JFDS.S.C10.Rsp
+
+    - label:
+          "Does the device implement receiving of
+          RemoveBindingFromEndpointForNode command?"
+      id: JFDS.S.C11.Rsp
+
+    - label: "Does the device implement receiving of AddACLToNode command?"
+      id: JFDS.S.C12.Rsp
+
+    - label: "Does the device implement receiving of RemoveACLFromNode command?"
+      id: JFDS.S.C13.Rsp

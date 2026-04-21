@@ -3200,3 +3200,42 @@ JFADMIN.C=1
 
 # Attributes
 JFADMIN.S.A0000=1 #AdministratorFabricIndex
+
+# Joint Fabric Datastore Cluster
+# Server
+JFDS.S=1
+
+# Client
+JFDS.C=1
+
+# Attributes
+JFDS.S.A0000=1 # AnchorRootCA
+JFDS.S.A0001=1 # AnchorNodeID
+JFDS.S.A0002=1 # AnchorVendorID
+JFDS.S.A0003=1 # FriendlyName
+JFDS.S.A0004=1 # GroupKeySetList
+JFDS.S.A0005=1 # GroupList
+JFDS.S.A0006=1 # NodeList
+JFDS.S.A0007=1 # AdminList
+
+# Commands Received
+JFDS.S.C00.Rsp=1 # AddKeySet
+JFDS.S.C01.Rsp=1 # UpdateKeySet
+JFDS.S.C02.Rsp=1 # RemoveKeySet
+JFDS.S.C03.Rsp=1 # AddGroup
+JFDS.S.C04.Rsp=1 # UpdateGroup
+JFDS.S.C05.Rsp=1 # RemoveGroup
+JFDS.S.C06.Rsp=1 # AddAdmin
+JFDS.S.C07.Rsp=1 # UpdateAdmin
+JFDS.S.C08.Rsp=1 # RemoveAdmin
+JFDS.S.C09.Rsp=1 # AddPendingNode
+JFDS.S.C0a.Rsp=1 # RefreshNode
+JFDS.S.C0b.Rsp=1 # UpdateNode
+JFDS.S.C0c.Rsp=1 # RemoveNode
+JFDS.S.C0d.Rsp=1 # UpdateEndpointForNode
+JFDS.S.C0e.Rsp=1 # AddGroupIDToEndpointForNode
+JFDS.S.C0f.Rsp=1 # RemoveGroupIDFromEndpointForNode
+JFDS.S.C10.Rsp=1 # AddBindingToEndpointForNode
+JFDS.S.C11.Rsp=1 # RemoveBindingFromEndpointForNode
+JFDS.S.C12.Rsp=1 # AddACLToNode
+JFDS.S.C13.Rsp=1 # RemoveACLFromNode
