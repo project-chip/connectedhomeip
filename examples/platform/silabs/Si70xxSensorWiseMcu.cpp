@@ -59,7 +59,7 @@ sl_status_t InitI2cAndSensor()
     i2c_config.i2c_callback   = NULL;
 
     // Si70xx power-up and I2C bus settle after supply enable. Takes ~80 ms.
-    osDelay(kSi70xxPowerUpDelay); 
+    osDelay(kSi70xxPowerUpDelay);
 
     // Initialize I2C bus
     status = sl_i2c_driver_init(SI70XX_I2C_INSTANCE, &i2c_config);
