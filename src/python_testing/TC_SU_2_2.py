@@ -1068,6 +1068,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             '(DUT should reject the same-version image without downloading)')
 
         downloading_seen_s7 = [False]
+        querying_seen_s7 = [False]
 
         def phase1_matcher_s7(report):
             val = report.value
@@ -1076,6 +1077,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 logger.info(f'{step_number_s7}: UNEXPECTED kDownloading — DUT started download of same-version image!')
                 return False
             if val == kQuerying_s7:
+                querying_seen_s7[0] = True
                 logger.info(f'{step_number_s7}: kQuerying observed (expected)')
                 return True
             if val == kIdle_s7:
@@ -1115,6 +1117,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s7}: Step #7.2 - Query cycle fully completed after announce.')
         subscription_s7.cancel()
 
+        asserts.assert_true(querying_seen_s7[0],
+                            f"{step_number_s7}: kQuerying never observed — DUT did not query the provider after announce.")
         asserts.assert_false(downloading_seen_s7[0],
                              f"{step_number_s7}: DUT started downloading the same-version image (kDownloading seen).")
         logger.info(f"{step_number_s7}: No image transfer occurred (expected — DUT already on V2).")
