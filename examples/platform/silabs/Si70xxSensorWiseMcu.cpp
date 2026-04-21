@@ -65,8 +65,7 @@ sl_status_t InitI2cAndSensor()
     status = sl_i2c_driver_init(SI70XX_I2C_INSTANCE, &i2c_config);
     VerifyOrReturnError(status == SL_I2C_SUCCESS, status);
 
-    status =
-        sl_i2c_driver_configure_fifo_threshold(SI70XX_I2C_INSTANCE, sFifoTxThreshold, sFifoRxThreshold);
+    status = sl_i2c_driver_configure_fifo_threshold(SI70XX_I2C_INSTANCE, sFifoTxThreshold, sFifoRxThreshold);
     VerifyOrReturnError(status == SL_I2C_SUCCESS, status);
 
     // reset the sensor
@@ -103,10 +102,10 @@ void Si91xSensorInitMeasureDeinit(uint16_t & relativeHumidity, int16_t & tempera
 
     // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes
     // precision.
-    tempTemperature  = (tempTemperature * 100) - static_cast<int32_t>(kSensorTemperatureOffset);
-    tempHumidity     = tempHumidity * 100;
+    tempTemperature = (tempTemperature * 100) - static_cast<int32_t>(kSensorTemperatureOffset);
+    tempHumidity    = tempHumidity * 100;
 
-    temperature = static_cast<int16_t>(std::clamp(tempTemperature, INT32_MIN, INT32_MAX));
+    temperature      = static_cast<int16_t>(std::clamp(tempTemperature, INT32_MIN, INT32_MAX));
     relativeHumidity = static_cast<uint16_t>(std::clamp<uint32_t>(tempHumidity, 0, UINT16_MAX));
 
     status = sl_i2c_driver_deinit(SI70XX_I2C_INSTANCE);
@@ -150,10 +149,10 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
 
     // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes
     // precision.
-    tempTemperature  = (tempTemperature * 100) - static_cast<int32_t>(kSensorTemperatureOffset);
-    tempHumidity     = tempHumidity * 100;
+    tempTemperature = (tempTemperature * 100) - static_cast<int32_t>(kSensorTemperatureOffset);
+    tempHumidity    = tempHumidity * 100;
 
-    temperature = static_cast<int16_t>(std::clamp(tempTemperature, INT32_MIN, INT32_MAX));
+    temperature      = static_cast<int16_t>(std::clamp(tempTemperature, INT32_MIN, INT32_MAX));
     relativeHumidity = static_cast<uint16_t>(std::clamp<uint32_t>(tempHumidity, 0, UINT16_MAX));
 
 #endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
