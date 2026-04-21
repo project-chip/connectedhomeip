@@ -17,6 +17,8 @@
 
 #include "WpaSupplicantClient.h"
 
+#include <mutex>
+
 #include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
@@ -52,6 +54,13 @@ void WpaSupplicantClient::Reset() noexcept
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     mWpaSupplicant.Reset();
+}
+
+bool WpaSupplicantClient::IsStarted() const noexcept
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    return !!mWpaSupplicant.iface;
 }
 
 } // namespace Internal

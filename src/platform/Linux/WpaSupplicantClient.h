@@ -160,6 +160,13 @@ protected:
      */
     void Reset() noexcept;
 
+    /**
+     *  @brief
+     *    Return whether the wpa_supplicant client has been started.
+     *
+     */
+    bool IsStarted() const noexcept;
+
     struct GDBusWpaSupplicant
     {
         GAutoPtr<WpaSupplicant1> proxy;
