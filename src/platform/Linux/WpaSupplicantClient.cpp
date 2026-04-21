@@ -23,6 +23,14 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+void WpaSupplicantClient::GDBusWpaSupplicant::Reset()
+{
+    iface.reset();
+    proxy.reset();
+    interfacePath.reset();
+    networkPath.reset();
+}
+
 CHIP_ERROR WpaSupplicantClient::Init(ConnectivityManagerImpl & inConnectivityManagerImpl)
 {
     VerifyOrReturnError(mConnectivityManagerImpl == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
@@ -41,10 +49,9 @@ void WpaSupplicantClient::Shutdown() noexcept
 
 void WpaSupplicantClient::Reset() noexcept
 {
-    iface.reset();
-    proxy.reset();
-    interfacePath.reset();
-    networkPath.reset();
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    mWpaSupplicant.Reset();
 }
 
 } // namespace Internal

@@ -166,6 +166,11 @@ protected:
         GAutoPtr<WpaSupplicant1Interface> iface;
         GAutoPtr<char> interfacePath;
         GAutoPtr<char> networkPath;
+
+        // Must be called synchronously on the GLib thread while the
+        // GLib main loop is still running.
+
+        void Reset();
     };
 
     GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
