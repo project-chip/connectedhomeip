@@ -508,8 +508,8 @@ def run_tests_no_exit(
                                      test_config.testbed_name)
                     ok = False
 
-        # If there is no commissioning but there is a commissioned device, read using CASE
-        if ok and not should_run_pre_commissioning and matter_test_config.dut_node_ids:
+        # There is an existing commissioned device. Read CASE
+        if ok and not has_commissioning_inputs and not in_test_commissioning and matter_test_config.dut_node_ids:
             try:
                 global_wildcard = event_loop.run_until_complete(
                     asyncio.wait_for(
@@ -532,7 +532,6 @@ def run_tests_no_exit(
                 LOGGER.exception('Exception when populating global wildcard for %s.',
                                  test_config.testbed_name)
                 ok = False
-
         #
         # Populate the global wildcard
         #
