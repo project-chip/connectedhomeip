@@ -295,43 +295,29 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
     nassInfo.createdTimestamp = newSecretData.created;
     ReturnErrorAndLogOnFailure(mKeystore.ImportNetworkAdministratorSecret(newSecretData.rawSecret, nassInfo.secretHandle), Zcl,
                                "ImportAdminSecret: Failed to import NASS into keystore");
+    auto destroyNassHandleOnExit = ScopeExit([&]() { mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle); });
 
     // Derive the ECDSA Network Identity
     P256KeypairHandle ecdsaKeypairHandle;
     uint8_t identityBuf[Credentials::kMaxCHIPCompactNetworkIdentityLength];
     MutableByteSpan identity(identityBuf);
-    err = mKeystore.DeriveECDSANetworkIdentity(nassInfo.secretHandle, ecdsaKeypairHandle, identity);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogFailure(err, Zcl, "ImportAdminSecret: Failed to derive Network Identity");
-        mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle);
-        return err;
-    }
+    ReturnErrorAndLogOnFailure(mKeystore.DeriveECDSANetworkIdentity(nassInfo.secretHandle, ecdsaKeypairHandle, identity), Zcl,
+                               "ImportAdminSecret: Failed to derive Network Identity");
+    auto destroyEcdsaKeypairOnExit = ScopeExit([&]() { mKeystore.DestroyNetworkIdentityKeypair(ecdsaKeypairHandle); });
 
     // Derive the 20-byte Network Identifier from the identity
     Credentials::CertificateKeyIdStorage identifier;
-    err = Credentials::ExtractIdentifierFromChipNetworkIdentity(identity, identifier);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogFailure(err, Zcl, "ImportAdminSecret: Failed to extract Network Identifier");
-        mKeystore.DestroyNetworkIdentityKeypair(ecdsaKeypairHandle);
-        mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle);
-        return err;
-    }
+    ReturnErrorAndLogOnFailure(Credentials::ExtractIdentifierFromChipNetworkIdentity(identity, identifier), Zcl,
+                               "ImportAdminSecret: Failed to extract Network Identifier");
 
     // Reject if an NI with the same identifier already exists. (The only practical
     // way for this to occur is re-importing an old secret with an updated timestamp.)
     {
         NetworkIdentityStorage::NetworkIdentityEntry existingEntry;
         err = mStorage.FindNetworkIdentity(identifier, existingEntry, {}, MutableByteSpan());
-        if (err != CHIP_ERROR_NOT_FOUND)
-        {
-            SuccessOrLog(err, Zcl, "ImportAdminSecret: Failed to check for duplicate Network Identity");
-            mKeystore.DestroyNetworkIdentityKeypair(ecdsaKeypairHandle);
-            mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle);
-            ReturnErrorOnFailure(err);
-            return Status::DynamicConstraintError; // conflicting record found
-        }
+        VerifyOrReturnValue(err != CHIP_NO_ERROR, Status::DynamicConstraintError); // conflicting record found
+        ReturnErrorAndLogOnFailure(err.NoErrorIf(CHIP_ERROR_NOT_FOUND), Zcl,
+                                   "ImportAdminSecret: Failed to check for duplicate Network Identity");
     }
 
     // Build the NetworkIdentityInfo for storage (keypair handle stored as opaque bytes).
@@ -345,14 +331,12 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
     // Atomically store NASS + derived identity
     NetworkIdentityStorage::NetworkIdentityEntry * identities[] = { &ecdsaIdentityEntry };
     err = mStorage.StoreNetworkAdministratorSecretAndDerivedIdentities(nassInfo, Span(identities));
-    if (err != CHIP_NO_ERROR)
-    {
-        mKeystore.DestroyNetworkIdentityKeypair(ecdsaKeypairHandle);
-        mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle);
-        VerifyOrReturnValue(err != CHIP_ERROR_NO_MEMORY, Status::ResourceExhausted);
-        ChipLogFailure(err, Zcl, "ImportAdminSecret: Failed to store NASS and derived identity");
-        return err;
-    }
+    VerifyOrReturnValue(err != CHIP_ERROR_NO_MEMORY, Status::ResourceExhausted);
+    ReturnErrorAndLogOnFailure(err, Zcl, "ImportAdminSecret: Failed to store NASS and derived identity");
+
+    // Import successful, disarm ScopeExits
+    destroyNassHandleOnExit.release();
+    destroyEcdsaKeypairOnExit.release();
     activeNetworkIdentitiesChanged = true; // NotifyAttributeChanged via ScopeExit
 
     // Destroy old NASS handle if there was one
