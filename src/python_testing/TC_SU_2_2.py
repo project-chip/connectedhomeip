@@ -694,6 +694,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         kIdle = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         kQuerying = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        kDownloading_s4 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        kApplying_s4 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
+        s4_forbidden_states = {kDownloading_s4, kApplying_s4}
 
         # --- Transition 1: Idle → Querying ---
         event1 = None
@@ -722,6 +725,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 logger.info(f"{step_number_s4}: Event 1 (Idle→Querying): {event1}")
                 break
 
+            if evt.newState in s4_forbidden_states:
+                asserts.fail(f"{step_number_s4}: DUT entered {evt.newState} — "
+                             "image transfer started despite invalid BDX ImageURI!")
             logger.info(f"{step_number_s4}: Discarding stale event: "
                         f"{evt.previousState} → {evt.newState}")
 
@@ -751,6 +757,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 logger.info(f"{step_number_s4}: Event 2 (Querying→Idle): {event2}")
                 break
 
+            if evt2.newState in s4_forbidden_states:
+                asserts.fail(f"{step_number_s4}: DUT entered {evt2.newState} — "
+                             "image transfer started despite invalid BDX ImageURI!")
             logger.info(f"{step_number_s4}: Discarding stale event (transition 2): "
                         f"{evt2.previousState} → {evt2.newState}")
 
