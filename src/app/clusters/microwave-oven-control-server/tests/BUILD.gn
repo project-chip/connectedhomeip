@@ -30,8 +30,9 @@ chip_test_suite("tests") {
     "../../mode-base-server/mode-base-server.h",
     "../../on-off-server/on-off-server.h",
     "../../operational-state-server/operational-state-cluster-objects.h",
-    "../../operational-state-server/operational-state-server.cpp",
-    "../../operational-state-server/operational-state-server.h",
+    "../../operational-state-server/OperationalStateCluster.cpp",
+    "../../operational-state-server/OperationalStateCluster.h",
+    "../../operational-state-server/OperationalStateDelegate.h",
   ]
 
   cflags = [ "-Wconversion" ]
