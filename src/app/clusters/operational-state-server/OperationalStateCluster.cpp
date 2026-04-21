@@ -19,7 +19,7 @@
  * @file
  * @brief Implementation for the Operational State Server Cluster
  ***************************************************************************/
-#include "operational-state-server.h"
+#include "OperationalStateCluster.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
