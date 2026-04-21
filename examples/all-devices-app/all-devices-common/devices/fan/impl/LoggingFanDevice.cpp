@@ -105,11 +105,13 @@ void LoggingFanDevice::OnAirflowDirectionChanged(FanControl::AirflowDirectionEnu
 void LoggingFanDevice::OnOffStartup(bool on)
 {
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffStartup() -> %s", on ? "ON" : "OFF");
+    FanControlCluster().SetOnOffState(on);
 }
 
 void LoggingFanDevice::OnOnOffChanged(bool on)
 {
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffChanged() -> %s", on ? "ON" : "OFF");
+    FanControlCluster().SetOnOffState(on);
 }
 
 } // namespace app
