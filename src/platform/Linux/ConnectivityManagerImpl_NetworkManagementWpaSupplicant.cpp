@@ -1640,9 +1640,7 @@ CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()
 
 CHIP_ERROR ConnectivityManagerImpl::_StopWiFiManagement()
 {
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    mWpaSupplicant.Reset();
+    WpaSupplicantClient::Reset();
 
     return CHIP_NO_ERROR;
 }
