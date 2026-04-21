@@ -19,7 +19,6 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
 #include <app/clusters/microwave-oven-control-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -77,8 +76,7 @@ CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
@@ -135,9 +133,11 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->SetInstance(this);
 
-    mCluster.Create(mEndpointId, mFeature, optionalAttributeSet,
-                    MicrowaveOvenControlCluster::Context{ mOpStateInstance, mMicrowaveOvenModeInstance, *mDelegate,
-                                                          *interactionModelEngine, optionalAcceptedCommands });
+    MicrowaveOvenControlCluster::Config config{
+        mFeature,   optionalAttributeSet,   optionalAcceptedCommands, mOpStateInstance, mMicrowaveOvenModeInstance,
+        *mDelegate, *interactionModelEngine
+    };
+    mCluster.Create(mEndpointId, config);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 
@@ -171,7 +171,7 @@ uint32_t Instance::GetCookTimeSec() const
 void Instance::SetCookTimeSec(uint32_t cookTimeSec)
 {
     VerifyOrDie(mCluster.IsConstructed());
-    mCluster.Cluster().SetCookTimeSec(cookTimeSec);
+    RETURN_SAFELY_IGNORED mCluster.Cluster().SetCookTimeSec(cookTimeSec);
 }
 
 } // namespace chip::app::Clusters::MicrowaveOvenControl

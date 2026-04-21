@@ -31,14 +31,20 @@ chip_test_suite("tests") {
     "../../operational-state-server/operational-state-cluster-objects.h",
     "../../operational-state-server/operational-state-server.cpp",
     "../../operational-state-server/operational-state-server.h",
+    "../../on-off-server/on-off-server.h"
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app/clusters/microwave-oven-control-server",
+    #"${chip_root}/src/app/clusters/mode-base-server",
+    #"${chip_root}/src/app/clusters/operational-state-server",
+    "${chip_root}/src/app/clusters/on-off-server",
+    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
+    #"${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
     "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/controller/data_model:data_model",
     "${chip_root}/src/lib/support",
   ]
 }

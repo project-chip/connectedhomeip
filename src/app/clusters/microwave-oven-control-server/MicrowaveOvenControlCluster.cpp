@@ -42,15 +42,23 @@ constexpr uint8_t kDefaultMinPowerNum  = 10u;
 constexpr uint8_t kDefaultMaxPowerNum  = 100u;
 constexpr uint8_t kDefaultPowerStepNum = 10u;
 
+bool IsCookTimeSecondsInRange(uint32_t cookTimeSec, uint32_t maxCookTimeSec)
+{
+    return kMinCookTimeSec <= cookTimeSec && cookTimeSec <= maxCookTimeSec;
+}
+
+bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNum, uint8_t maxCookPowerNum)
+{
+    return minCookPowerNum <= powerSettingNum && powerSettingNum <= maxCookPowerNum;
+}
+
 } // namespace
 
-MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
-                                                         const OptionalAttributeSet & optionalAttributeSet, const Context context) :
-    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }),
-    mFeature(feature), mOptionalAttributeSet(optionalAttributeSet), mDelegate(context.delegate),
-    mOpStateInstance(context.opStateInstance), mMicrowaveOvenModeInstance(context.microwaveOvenModeInstance),
-    mInteractionModelEngine(context.interactionModelEngine), mOptionalAcceptedCommands(context.optionalAcceptedCommands),
-    mCookTimeSec(kDefaultCookTimeSec)
+MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, const Config & config) :
+    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(config.feature),
+    mOptionalAttributeSet(config.optionalAttributeSet), mOptionalAcceptedCommands(config.optionalAcceptedCommands),
+    mOpStateInstance(config.opStateInstance), mMicrowaveOvenModeInstance(config.microwaveOvenModeInstance),
+    mDelegate(config.delegate), mInteractionModelEngine(config.interactionModelEngine), mCookTimeSec(kDefaultCookTimeSec)
 {}
 
 CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
@@ -85,9 +93,13 @@ uint32_t MicrowaveOvenControlCluster::GetCookTimeSec() const
     return mCookTimeSec;
 }
 
-void MicrowaveOvenControlCluster::SetCookTimeSec(uint32_t cookTimeSec)
+CHIP_ERROR MicrowaveOvenControlCluster::SetCookTimeSec(uint32_t cookTimeSec)
 {
+    VerifyOrReturnError(IsCookTimeSecondsInRange(cookTimeSec, mDelegate.GetMaxCookTimeSec()),
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
     SetAttributeValue(mCookTimeSec, cookTimeSec, CookTime::Id);
+    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus MicrowaveOvenControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -188,16 +200,6 @@ CHIP_ERROR MicrowaveOvenControlCluster::AcceptedCommands(const ConcreteClusterPa
     return CHIP_NO_ERROR;
 }
 
-static bool IsCookTimeSecondsInRange(uint32_t cookTimeSec, uint32_t maxCookTimeSec)
-{
-    return kMinCookTimeSec <= cookTimeSec && cookTimeSec <= maxCookTimeSec;
-}
-
-static bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNum, uint8_t maxCookPowerNum)
-{
-    return minCookPowerNum <= powerSettingNum && powerSettingNum <= maxCookPowerNum;
-}
-
 std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::HandleSetCookingParameters(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData)
@@ -219,7 +221,6 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
 
     if (startAfterSetting.HasValue())
     {
-
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
         TEMPORARY_RETURN_IGNORED mInteractionModelEngine.GetDataModelProvider()->AcceptedCommands(
@@ -333,6 +334,10 @@ MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, cons
 
     opState = mOpStateInstance.GetCurrentOperationalState();
     VerifyOrExit(opState != to_underlying(OperationalStateEnum::kError), status = Status::InvalidInState);
+
+    VerifyOrExit(commandData.timeToAdd <= mDelegate.GetMaxCookTimeSec() &&
+                     GetCookTimeSec() <= mDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
+                 status = Status::ConstraintError);
 
     // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
     VerifyOrExit(commandData.timeToAdd + GetCookTimeSec() <= mDelegate.GetMaxCookTimeSec(), status = Status::ConstraintError;

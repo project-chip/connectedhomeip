@@ -34,17 +34,18 @@ public:
     //       as other attributes are controlled by feature flags
     using OptionalAttributeSet = app::OptionalAttributeSet<MicrowaveOvenControl::Attributes::WattRating::Id>;
 
-    struct Context
+    struct Config
     {
+        BitMask<MicrowaveOvenControl::Feature> feature;
+        OptionalAttributeSet optionalAttributeSet;
+        std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
         Clusters::OperationalState::Instance & opStateInstance;
         Clusters::ModeBase::Instance & microwaveOvenModeInstance;
         MicrowaveOvenControl::Delegate & delegate;
         InteractionModelEngine & interactionModelEngine;
-        std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
     };
 
-    MicrowaveOvenControlCluster(EndpointId endpointId, BitMask<MicrowaveOvenControl::Feature> feature,
-                                const OptionalAttributeSet & optionalAttributeSet, const Context context);
+    MicrowaveOvenControlCluster(EndpointId endpointId, const Config & context);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -61,16 +62,16 @@ public:
 
     uint8_t GetCountOfSupportedWattLevels() const;
     uint32_t GetCookTimeSec() const;
-    void SetCookTimeSec(uint32_t cookTimeSec);
+    CHIP_ERROR SetCookTimeSec(uint32_t cookTimeSec);
 
 private:
     const BitMask<MicrowaveOvenControl::Feature> mFeature;
     const OptionalAttributeSet & mOptionalAttributeSet;
-    MicrowaveOvenControl::Delegate & mDelegate;
+    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> mOptionalAcceptedCommands;
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+    MicrowaveOvenControl::Delegate & mDelegate;
     InteractionModelEngine & mInteractionModelEngine;
-    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> mOptionalAcceptedCommands;
 
     uint32_t mCookTimeSec{};
     uint8_t mSupportedWattLevels{};
