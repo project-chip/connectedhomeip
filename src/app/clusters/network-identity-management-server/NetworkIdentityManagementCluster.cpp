@@ -272,12 +272,21 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
     // as long as we will have enough table capacity, but if we're encountering storage
     // errors here something is probably wrong anyway and it's safer to bail out.
     // Note: Retirements are not atomic with respect to the overall import operation;
-    // this is acceptable since the key invariant is that the new NASS and the new derived
-    // NIs get committed as one unit. To be retired, NIs have to be non-current, i.e. they
-    // came from a NASS that we don't have anymore.
+    // this is acceptable since the key invariant is only that the new NASS and the new
+    // derived NIs get committed as one unit. (To be retired, NIs have to be non-current,
+    // i.e. they came from a NASS that we don't have anymore.) If any NIs are retired we
+    // need to notify the ActiveNetworkIdentities even if the actual import fails.
+    bool activeNetworkIdentitiesChanged      = false;
+    auto notifyActiveNetworkIdentitiesOnExit = ScopeExit([&]() {
+        if (activeNetworkIdentitiesChanged)
+        {
+            NotifyAttributeChanged(ActiveNetworkIdentities::Id);
+        }
+    });
     for (uint16_t index : retirableIndices)
     {
         ReturnErrorOnFailure(RetireNetworkIdentity(index));
+        activeNetworkIdentitiesChanged = true;
     }
 
     // Import the NASS into the keystore. Place the handle directly in the NetworkAdministratorSecretInfo
@@ -344,6 +353,7 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
         ChipLogFailure(err, Zcl, "ImportAdminSecret: Failed to store NASS and derived identity");
         return err;
     }
+    activeNetworkIdentitiesChanged = true; // NotifyAttributeChanged via ScopeExit
 
     // Destroy old NASS handle if there was one
     if (hasExistingSecret)
@@ -352,7 +362,6 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
     }
 
     mAuthenticator.OnNetworkIdentityAdded(ecdsaIdentityEntry);
-    NotifyAttributeChanged(ActiveNetworkIdentities::Id);
 
     ChipLogProgress(Zcl, "NASS successfully imported by fabric %u node 0x" ChipLogFormatX64, //
                     request.subjectDescriptor.fabricIndex, ChipLogValueX64(request.subjectDescriptor.subject));
