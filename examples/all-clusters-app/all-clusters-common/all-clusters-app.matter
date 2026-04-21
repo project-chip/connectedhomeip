@@ -7965,7 +7965,7 @@ endpoint 1 {
     ram      attribute interconnectCOAlarm default = 0;
     ram      attribute contaminationState default = 0;
     ram      attribute smokeSensitivityLevel default = 1;
-    ram      attribute expiryDate default = 1167696000;
+    ram      attribute expiryDate default = 0;
     ram      attribute unmounted default = 0;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 0x0002;
