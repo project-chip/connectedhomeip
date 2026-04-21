@@ -21,9 +21,9 @@
 #include <openthread/platform/logging.h>
 #endif
 
+#include <cinttypes>
 #include <stdio.h>
 #include <string.h>
-#include <cinttypes>
 
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
