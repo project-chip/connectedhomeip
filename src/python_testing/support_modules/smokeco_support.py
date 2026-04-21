@@ -31,6 +31,8 @@ class SmokeCoBaseTest(MatterBaseTest):
 
     smokeco_cluster = Clusters.SmokeCoAlarm
     smokeco_enums = Clusters.SmokeCoAlarm.Enums
+    # Default Expiry Date : utc_time_in_matter_epoch(datetime(2126, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)) / 1000000
+    default_ci_expiry_date = 3976214400
 
     async def read_smokeco_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(cluster=self.smokeco_cluster, endpoint=self.get_endpoint(), attribute=attribute)
@@ -66,22 +68,21 @@ class SmokeCoBaseTest(MatterBaseTest):
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
         assert_valid_bool(value=attr, description=f"Attribute {attribute} is not a bool instance {attr}")
 
-    async def read_attribute_check_epoch(self, attribute):
+    async def read_attribute_check_epoch(self, attribute, check_expired: bool = False):
         """Reads an attribute from the SmokeCluster and validate is a int value represeting the seconds of matter epoch."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
         log.info(f"Reading attribte with value {attr} and checking the matter epoch ")
         # Number of seconds representing the matter epoch
         assert_valid_uint32(attr, "Attribute is not in uint range")
+        if check_expired:
+            self.is_valid_expired_date(attr)
+        return attr
 
-    async def is_valid_expired_date(self) -> bool:
-        """Check if the device alarm  has expired using the ExpiryDate.
-
-        Returns:
-            bool: Status of Expiration
-        """
-        expiry_date = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpiryDate)
+    def is_valid_expired_date(self, matter_epoch: int):
+        """Asserts if the value proviced is in the future (Not expired)."""
         # Convert the epoch time from the device into UTC to compare it to current date
-        device_utc_datetime = utc_datetime_from_matter_epoch_us(expiry_date * 1000000)
+        device_utc_datetime = utc_datetime_from_matter_epoch_us(matter_epoch * 1000000)
         current_date = datetime.now(tz=timezone.utc)
-        log.info(f"Current device Expire Date  {device_utc_datetime}")
-        return device_utc_datetime > current_date
+        log.info(f"Current matter epoch  {device_utc_datetime}")
+        asserts.assert_true(device_utc_datetime > current_date,
+                            f"Current matter_epoch is lower than current date. {device_utc_datetime} is an expired date.")

@@ -29,6 +29,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
@@ -37,6 +38,7 @@
 
 import logging
 
+from mobly import asserts
 from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
@@ -146,7 +148,11 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
         self.step(14)
         if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.ExpiryDate):
-            await self.read_attribute_check_epoch(self.smokeco_cluster.Attributes.ExpiryDate)
+            expiry_date = await self.read_attribute_check_epoch(self.smokeco_cluster.Attributes.ExpiryDate, check_expired=True)
+            # Verify when is not running on CI the ExpiryDate date is no the default as default_ci_expiry_date
+            if not self.is_pics_sdk_ci_only:
+                asserts.assert_not_equal(expiry_date, self.default_ci_expiry_date,
+                                         f"The current ExpiryDate is the same as the default ExpiryDate ({self.default_ci_expiry_date}).")
 
         self.step(15)
         if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.Unmounted):
