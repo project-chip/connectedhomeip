@@ -27,7 +27,7 @@ This skill provides a checklist and set of principles for reviewing Python tests
 - **Attribute reads**: Prefer using read_single_attribute_check_success in matter/testing to the base Read and ReadAttribute functions in ChipDeviceCtrl.py unless there is a good reason. This function contains additional checks that are useful for testing.
 - **Exceptions**: Avoid `except Exception` - use a specific exception
 - **try / except can hide bugs**: Avoid fixing CI issues with a try: except:. This pattern can hide real bugs that should be fixed and is a code smell. Try except blocks should only be used where the exception is expected and that should normally include an assertion that the exception happens or a comment explaining in detail why the exception is thrown and how this is spec compliant.
-- **use dataclass**: Do not use dicts with string keys. Use dataclasses with named members instead. This helps programers avoid uncaught typos.
+- **Use dataclass**: Do not use dicts with string keys. Use dataclasses with named members instead. This helps programmers avoid uncaught typos.
 
 
 ### 4. Matter-Specific Patterns
