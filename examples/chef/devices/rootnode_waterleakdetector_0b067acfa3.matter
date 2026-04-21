@@ -2004,7 +2004,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_water_leak_detector = 67, version 1;
+  device type ma_water_leak_detector = 67, version 2;
 
 
   server cluster Identify {
