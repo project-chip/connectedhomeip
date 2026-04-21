@@ -1199,10 +1199,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             return err;
         }
 
-        if (mFlags.Has(Flags::kFastAdvertisingEnabled)) 
+        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
             ble_addr_t addr;
-        
             /* generate static random address */
             err = MapBLEError(ble_hs_id_gen_rnd(0, &addr));
             if (err != CHIP_NO_ERROR)
