@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 5;
+  revision 4;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -5101,7 +5101,7 @@ provisional cluster CommodityPrice = 149 {
 }
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
-provisional cluster Messages = 151 {
+cluster Messages = 151 {
   revision 3;
 
   enum FutureMessagePreferenceEnum : enum8 {
@@ -5145,7 +5145,7 @@ provisional cluster Messages = 151 {
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
     nullable int64u duration = 4;
-    char_string<256> messageText = 5;
+    long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
 
@@ -5160,7 +5160,7 @@ provisional cluster Messages = 151 {
   info event MessageComplete = 2 {
     octet_string messageID = 0;
     optional nullable int32u responseID = 1;
-    optional nullable char_string reply = 2;
+    optional nullable long_char_string reply = 2;
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
@@ -5178,7 +5178,7 @@ provisional cluster Messages = 151 {
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
     nullable int64u duration = 4;
-    char_string<256> messageText = 5;
+    long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
 
@@ -5186,9 +5186,9 @@ provisional cluster Messages = 151 {
     octet_string messageIDs[] = 0;
   }
 
-  /** Command for requesting messages be presented */
+  /** Upon receipt, this SHALL cause the message in the passed fields to be appended to the Messages attribute. */
   fabric command PresentMessagesRequest(PresentMessagesRequestRequest): DefaultSuccess = 0;
-  /** Command for cancelling message present requests */
+  /** This command will cancel the message IDs specified. */
   fabric command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
 }
 
@@ -7677,6 +7677,73 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster specifies an interface to control the humidity of an environment. */
+provisional cluster Humidistat = 517 {
+  revision 1;
+
+  enum ModeEnum : enum8 {
+    kOff = 0;
+    kHumidifier = 1;
+    kDehumidifier = 2;
+    kAuto = 3;
+    kFanOnly = 4;
+  }
+
+  enum SystemStateEnum : enum8 {
+    kOff = 0;
+    kHumidifying = 1;
+    kDehumidifying = 2;
+    kFan = 3;
+    kIdle = 4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kHumidifier = 0x1;
+    kDehumidifier = 0x2;
+    kContinuous = 0x4;
+    kSensor = 0x8;
+    kAuto = 0x10;
+    kFanOnly = 0x20;
+    kOptimal = 0x40;
+    kWarmMist = 0x80;
+    kColdMist = 0x100;
+  }
+
+  bitmap MistTypeBitmap : bitmap8 {
+    kMistCold = 0x1;
+    kMistWarm = 0x2;
+  }
+
+  readonly attribute ModeEnum mode = 0;
+  readonly attribute SystemStateEnum systemState = 1;
+  readonly attribute optional percent userSetpoint = 2;
+  readonly attribute optional percent minSetpoint = 3;
+  readonly attribute optional percent maxSetpoint = 4;
+  readonly attribute optional percent step = 5;
+  readonly attribute optional percent targetSetpoint = 6;
+  readonly attribute optional MistTypeBitmap mistType = 7;
+  readonly attribute optional boolean continuous = 8;
+  readonly attribute optional boolean sleep = 9;
+  readonly attribute optional boolean optimal = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetSettingsRequest {
+    optional percent userSetpoint = 0;
+    optional ModeEnum mode = 1;
+    optional MistTypeBitmap mistType = 2;
+    optional boolean continuous = 3;
+    optional boolean sleep = 4;
+    optional boolean optimal = 5;
+  }
+
+  /** This command will set the specified settings to new values. */
+  command SetSettings(SetSettingsRequest): DefaultSuccess = 0;
+}
+
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
   revision 9;
@@ -8838,6 +8905,213 @@ provisional cluster AmbientContextSensing = 1073 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster enables the configuration of proximity ranging sessions and reporting of proximity ranging data. */
+provisional cluster ProximityRanging = 1075 {
+  revision 1;
+
+  enum BLTCSModeEnum : enum8 {
+    kPBROnly = 0;
+    kRTTOnly = 1;
+    kBoth = 2;
+  }
+
+  enum BLTCSSecurityLevelEnum : enum8 {
+    kBLTCSSecurityLevelUnknown = 0;
+    kBLTCSSecurityLevelOne = 1;
+    kBLTCSSecurityLevelTwo = 2;
+    kBLTCSSecurityLevelThree = 3;
+  }
+
+  enum NADMEnum : enum16 {
+    kAttackExtremelyUnlikely = 0;
+    kAttackVeryUnlikely = 1;
+    kAttackUnlikely = 2;
+    kAttackIsPossible = 3;
+    kAttackIsLikely = 4;
+    kAttackVeryLikely = 5;
+    kAttackExtremelyLikely = 6;
+    kUnknown = 255;
+  }
+
+  enum RDRReferenceEnum : enum8 {
+    kDeviceCoordinates = 0;
+    kEarthCoordinates = 1;
+  }
+
+  enum RangingRoleEnum : enum8 {
+    kWiFiSubscriberRole = 0;
+    kWiFiPublisherRole = 1;
+    kBLEScanningRole = 2;
+    kBLEBeaconRole = 3;
+    kBLTInitiatorRole = 4;
+    kBLTReflectorRole = 5;
+  }
+
+  enum RangingSecurityEnum : enum8 {
+    kSecureRanging = 0;
+    kOpenRanging = 1;
+  }
+
+  enum RangingSessionStatusEnum : enum8 {
+    kSessionEndTimeReached = 0;
+    kPeerNotFound = 1;
+    kHardwareError = 2;
+  }
+
+  enum RangingTechEnum : enum8 {
+    kBluetoothChannelSounding = 0;
+    kWiFiRoundTripTimeRanging = 1;
+    kWiFiNextGenerationRanging = 2;
+    kBLEBeaconRSSIRanging = 3;
+  }
+
+  enum ResultCodeEnum : enum8 {
+    kAccepted = 0;
+    kRejectedInfeasibleRanging = 1;
+    kRejectedInfeasibleRangingTriggers = 2;
+    kBusySessionCapacityReached = 3;
+    kBusyTryAgainLater = 4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kWiFiUSDProximityDetection = 0x1 [spec_name = "Wi-Fi USD Proximity Detection"];
+    kBluetoothChannelSounding = 0x2;
+    kBLEBeaconRSSI = 0x4 [spec_name = "BLE Beacon RSSI"];
+    kUWBRanging = 0x8 [spec_name = "UWB Ranging"];
+  }
+
+  bitmap RadioBandBitmap : bitmap16 {
+    k2G4 = 0x1 [spec_name = "2G4"];
+    k3G65 = 0x2 [spec_name = "3G65"];
+    k5G = 0x4 [spec_name = "5G"];
+    k6G = 0x8 [spec_name = "6G"];
+    k60G = 0x10 [spec_name = "60G"];
+    kS1G = 0x20 [spec_name = "S1G"];
+    k45G = 0x40 [spec_name = "45G"];
+  }
+
+  bitmap RangingBandwidthBitmap : bitmap32 {
+    k1MHz = 0x1;
+    k2MHz = 0x2;
+    k4MHz = 0x4;
+    k8MHz = 0x8;
+    k16MHz = 0x10;
+    k20MHz = 0x20;
+    k40MHz = 0x40;
+    k80MHz = 0x80;
+    k160MHz = 0x100;
+    k320MHz = 0x200;
+  }
+
+  struct RDRStruct {
+    int16u azimuth = 0;
+    int16s elevation = 1;
+    int8u azimuthAccuracy = 2;
+    int8u elevationAccuracy = 3;
+    RDRReferenceEnum reference = 4;
+  }
+
+  struct RangingMeasurementDataStruct {
+    optional octet_string<16> wiFiDevIK = 0;
+    optional int64u BLEDeviceID = 1;
+    optional octet_string BLTDevIK = 2;
+    optional epoch_s timeOfMeasurement = 3;
+    optional elapsed_s timeOfMeasurementOffset = 4;
+    nullable int16u distance = 5;
+    optional int16u errorMargin = 6;
+    optional RDRStruct rdr = 7;
+    optional NADMEnum detectedAttackLevel = 8;
+    optional nullable int8s rssi = 9;
+    optional nullable int8s txPower = 10;
+  }
+
+  struct BLERangingDeviceRoleConfigStruct {
+    RangingRoleEnum role = 0;
+    int64u peerBLEDeviceID = 1;
+  }
+
+  struct BLTChannelSoundingDeviceRoleConfigStruct {
+    RangingRoleEnum role = 0;
+    octet_string<16> peerBLTDevIK = 1;
+    optional BLTCSModeEnum BLTCSMode = 2;
+    optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 3;
+    optional octet_string<16> ltk = 4;
+  }
+
+  struct RangingCapabilitiesStruct {
+    RangingTechEnum technology = 0;
+    RadioBandBitmap frequencyBand = 1;
+    boolean periodicRangingSupport = 2;
+  }
+
+  struct RangingTriggerConditionStruct {
+    elapsed_s startTime = 0;
+    elapsed_s endTime = 1;
+    optional elapsed_s rangingInstanceInterval = 2;
+  }
+
+  struct ReportingConditionStruct {
+    optional int16u minDistanceCondition = 0;
+    optional int16u maxDistanceCondition = 1;
+    optional int16u errorMarginCondition = 2;
+  }
+
+  struct WiFiRangingDeviceRoleConfigStruct {
+    RangingRoleEnum role = 0;
+    octet_string<16> peerWiFiDevIK = 1;
+    optional octet_string<32> pmk = 2;
+  }
+
+  info event RangingResult = 0 {
+    int8u sessionID = 0;
+    RangingMeasurementDataStruct rangingResultData = 1;
+  }
+
+  info event RangingSessionStatus = 1 {
+    int8u sessionID = 0;
+    RangingSessionStatusEnum status = 1;
+  }
+
+  readonly attribute RangingCapabilitiesStruct rangingCapabilities[] = 0;
+  readonly attribute optional octet_string<16> wiFiDevIK = 1;
+  readonly attribute optional int64u BLEDeviceID = 2;
+  readonly attribute optional octet_string<16> BLTDevIK = 3;
+  readonly attribute optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 4;
+  readonly attribute optional BLTCSModeEnum BLTCSModeCapability = 5;
+  readonly attribute nullable int8u sessionIDList[] = 6;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct StartRangingRequestRequest {
+    RangingTechEnum technology = 0;
+    optional WiFiRangingDeviceRoleConfigStruct wiFiRangingDeviceRoleConfig = 1;
+    optional BLERangingDeviceRoleConfigStruct BLERangingDeviceRoleConfig = 2;
+    optional BLTChannelSoundingDeviceRoleConfigStruct BLTChannelSoundingDeviceRoleConfig = 3;
+    optional RadioBandBitmap frequencyBand = 4;
+    optional RangingBandwidthBitmap bandwidth = 5;
+    RangingSecurityEnum securityMode = 6;
+    RangingTriggerConditionStruct trigger = 7;
+    optional ReportingConditionStruct reportingCondition = 8;
+  }
+
+  response struct StartRangingResponse = 1 {
+    ResultCodeEnum resultCode = 0;
+    nullable int8u sessionID = 1;
+  }
+
+  request struct StopRangingRequestRequest {
+    int8u sessionID = 0;
+  }
+
+  /** This command allows the Client to request the start of a ranging session. */
+  command StartRangingRequest(StartRangingRequestRequest): StartRangingResponse = 0;
+  /** Upon receipt of a StopRangingRequest command that contains a SessionID that matches an active ranging session, the Server SHALL terminate the corresponding ranging session. */
+  command StopRangingRequest(StopRangingRequestRequest): DefaultSuccess = 2;
 }
 
 /** Functionality to retrieve operational information about a managed Wi-Fi network. */

@@ -39,7 +39,8 @@ void ServerClusterExtension::NotifyAttributeChanged(AttributeId id)
 {
     VerifyOrReturn(mContext != nullptr);
     mVersionDelta++;
-    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mClusterPath.mEndpointId, mClusterPath.mClusterId, id });
+    mContext->provider.NotifyAttributeChanged({ mClusterPath.mEndpointId, mClusterPath.mClusterId, id },
+                                              DataModel::AttributeChangeType::kReportable);
 }
 
 Span<const ConcreteClusterPath> ServerClusterExtension::GetPaths() const

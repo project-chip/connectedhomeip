@@ -42,7 +42,7 @@ CHIP_ERROR RTKDACVendorProvider::GetCertificationDeclaration(MutableByteSpan & o
     err                                   = CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
 #elif CONFIG_FACTORY_DATA
     VerifyOrReturnError(outBuffer.size() >= pFactoryData->dac.cd.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(pFactoryData->dac.cd.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.cd.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     memcpy(outBuffer.data(), pFactoryData->dac.cd.value, pFactoryData->dac.cd.len);
 
@@ -100,7 +100,7 @@ CHIP_ERROR RTKDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan & outB
 
 #if CONFIG_FACTORY_DATA
     VerifyOrReturnError(outBuffer.size() >= pFactoryData->dac.dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(pFactoryData->dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.dac_cert.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     memcpy(outBuffer.data(), pFactoryData->dac.dac_cert.value, pFactoryData->dac.dac_cert.len);
 
@@ -147,7 +147,7 @@ CHIP_ERROR RTKDACVendorProvider::GetProductAttestationIntermediateCert(MutableBy
 
 #if CONFIG_FACTORY_DATA
     VerifyOrReturnError(outBuffer.size() >= pFactoryData->dac.pai_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(pFactoryData->dac.pai_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.pai_cert.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     memcpy(outBuffer.data(), pFactoryData->dac.pai_cert.value, pFactoryData->dac.pai_cert.len);
 
@@ -190,8 +190,8 @@ CHIP_ERROR RTKDACVendorProvider::GetProductAttestationIntermediateCert(MutableBy
 #if FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC
 CHIP_ERROR RTKDACVendorProvider::ImportDACKey()
 {
-    VerifyOrReturnError(pFactoryData->dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    VerifyOrReturnError(pFactoryData->dac.dac_key.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.dac_cert.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.dac_key.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     ByteSpan dacCertSpan{ pFactoryData->dac.dac_cert.value, pFactoryData->dac.dac_cert.len };
     chip::Crypto::P256PublicKey dacPublicKey;
     ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
@@ -252,8 +252,8 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
 
     return CopySpanToMutableSpan(ByteSpan{ sig_tmp_buf, static_cast<size_t>(param.sig_len) }, outSignBuffer);
 #else
-    VerifyOrReturnError(pFactoryData->dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    VerifyOrReturnError(pFactoryData->dac.dac_key.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.dac_cert.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.dac_key.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     // Extract public key from DAC cert.
     ByteSpan dacCertSpan{ pFactoryData->dac.dac_cert.value, pFactoryData->dac.dac_cert.len };
     chip::Crypto::P256PublicKey dacPublicKey;
