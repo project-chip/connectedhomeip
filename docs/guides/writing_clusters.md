@@ -130,9 +130,8 @@ is the primary reference for this implementation pattern.
     different endpoints.
 -   **Separate Member Variables:** Extract configuration values from the
     `Config` object into separate member variables within the cluster class,
-    rather than storing the `Config` object itself. This allows making
-    immutable configuration values `const` (enhancing safety) and reduces
-    coupling.
+    rather than storing the `Config` object itself. This allows making immutable
+    configuration values `const` (enhancing safety) and reduces coupling.
 
 **Example Implementation (from LevelControlCluster):**
 
@@ -180,7 +179,6 @@ public:
     LevelControlCluster(EndpointId endpoint, const Config & config);
 };
 ```
-
 
 ### Design Principles
 

@@ -136,8 +136,13 @@ Key points:
     base constructor.
 -   Declare `OptionalAttributeSet` as a `using` alias so callers can refer to it
     via `FooCluster::OptionalAttributeSet`.
--   **Use a `Config` type:** For constructor arguments that may be optional or have defaults. Prefer a `class` with private members and builder-style `.WithXxx()` setters in non-trivial cases, and use a `struct` only for simple passive configuration bundles.
--   **Store Separate Variables:** Extract fields from the `Config` object into separate member variables in the cluster class. This allows marking immutable fields as `const` and prevents accidental runtime modification.
+-   **Use a `Config` type:** For constructor arguments that may be optional or
+    have defaults. Prefer a `class` with private members and builder-style
+    `.WithXxx()` setters in non-trivial cases, and use a `struct` only for
+    simple passive configuration bundles.
+-   **Store Separate Variables:** Extract fields from the `Config` object into
+    separate member variables in the cluster class. This allows marking
+    immutable fields as `const` and prevents accidental runtime modification.
 -   Validate constructor arguments with `VerifyOrDie` (programming errors that
     indicate a logic bug at call site, not a recoverable runtime error).
 -   Expose application-facing setters/getters; keep attribute storage in
