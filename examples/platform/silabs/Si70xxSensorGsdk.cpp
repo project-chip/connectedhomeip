@@ -34,6 +34,13 @@ bool initialized = false;
 
 } // namespace
 
+CHIP_ERROR SetI2cFifoThresholds(uint32_t txThreshold, uint32_t rxThreshold)
+{
+    (void) txThreshold;
+    (void) rxThreshold;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 sl_status_t Init()
 {
     sl_status_t status;

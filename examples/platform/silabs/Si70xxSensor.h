@@ -19,10 +19,21 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+
 #include "sl_status.h"
 #include <stdint.h>
 
 namespace Si70xxSensor {
+
+/**
+ * @brief Set I2C TX/RX FIFO thresholds used the next time the SiWx917 I2C driver is initialized for Si70xx.
+ *        Defaults are 0 until changed.
+ *
+ * @return CHIP_NO_ERROR on success (SiWx917 / WiseMCU path).
+ *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE on platforms without configurable I2C FIFO thresholds (e.g. GSDK / Series 2).
+ */
+CHIP_ERROR SetI2cFifoThresholds(uint32_t txThreshold, uint32_t rxThreshold);
 
 /**
  * @brief Initialises the Si70xx Sensor.

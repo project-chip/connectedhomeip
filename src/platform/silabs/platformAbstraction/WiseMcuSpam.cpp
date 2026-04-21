@@ -302,6 +302,7 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
 {
     sl_status_t status = SL_STATUS_OK;
 
+    // Sensor enable is on an NPSS / UULP pin (board defines SENSOR_ENABLE_GPIO_MAPPED_TO_UULP).
 #if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
     if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) == LOW)
     {
@@ -318,7 +319,7 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
         status = sl_si91x_gpio_driver_set_uulp_npss_pin_value(SENSOR_ENABLE_GPIO_PIN, GPIO_PIN_SET);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
     }
-#else
+#else // Sensor enable is a normal GPIO (ULP domain or M4 HP GPIO; see SENSOR_ENABLE_GPIO_MAPPED_TO_ULP for clock).
     sl_gpio_t sensor_enable_port_pin = { (sl_gpio_port_t) SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN };
     uint8_t pin_value;
 
@@ -326,12 +327,12 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
     VerifyOrReturnError(status == SL_STATUS_OK, status);
     if (pin_value == LOW)
     {
-        // Enable GPIO CLK
+        // GPIO peripheral clock: ULP vs M4 HP domain for this board pinout.
 #ifdef SENSOR_ENABLE_GPIO_MAPPED_TO_ULP
         status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) ULPCLK_GPIO);
 #else
         status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) M4CLK_GPIO);
-#endif
+#endif // SENSOR_ENABLE_GPIO_MAPPED_TO_ULP
         VerifyOrReturnError(status == SL_STATUS_OK, status);
 
         // Set the pin mode for GPIO pins.
@@ -345,7 +346,7 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
         status = sl_gpio_driver_set_pin(&sensor_enable_port_pin); // Set ULP GPIO pin
         VerifyOrReturnError(status == SL_STATUS_OK, status);
     }
-#endif
+#endif // SENSOR_ENABLE_GPIO_MAPPED_TO_UULP
 
     return status;
 }

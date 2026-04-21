@@ -20,28 +20,30 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#include <algorithm>
+#include <cstdint>
+#include <limits>
+
 // WiFi SDK (Si91x / Si917)
 #include "sl_i2c_instances.h"
 #include "sl_si91x_i2c.h"
 #include "sl_si91x_si70xx.h"
 #include <cmsis_os2.h>
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+#if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
 #include "sl_si91x_power_manager.h"
-#endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
-
-/*******************************************************************************
-***************************  Defines / Macros  ********************************
-******************************************************************************/
-#define TX_THRESHOLD 0 // tx threshold value
-#define RX_THRESHOLD 0 // rx threshold value
+#endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
 
 namespace Si70xxSensor {
 
 sl_status_t Init();
 
-namespace {
-
 constexpr uint16_t kSensorTemperatureOffset = 475;
+
+constexpr uint32_t kSi70xxPowerUpDelay = 80;
+constexpr uint32_t kSi70xxResetDelay   = 15;
+
+uint32_t sFifoTxThreshold = 0;
+uint32_t sFifoRxThreshold = 0;
 
 /** Full I2C + Si70xx setup (used at boot and from on-demand reads when power manager is present). */
 sl_status_t InitI2cAndSensor()
@@ -56,14 +58,15 @@ sl_status_t InitI2cAndSensor()
     i2c_config.operating_mode = SL_I2C_STANDARD_MODE;
     i2c_config.i2c_callback   = NULL;
 
-    /* Wait for sensor to become ready */
-    osDelay(80);
+    // Si70xx power-up and I2C bus settle after supply enable. Takes ~80 ms.
+    osDelay(kSi70xxPowerUpDelay); 
 
     // Initialize I2C bus
     status = sl_i2c_driver_init(SI70XX_I2C_INSTANCE, &i2c_config);
     VerifyOrReturnError(status == SL_I2C_SUCCESS, status);
 
-    status = sl_i2c_driver_configure_fifo_threshold(SI70XX_I2C_INSTANCE, TX_THRESHOLD, RX_THRESHOLD);
+    status =
+        sl_i2c_driver_configure_fifo_threshold(SI70XX_I2C_INSTANCE, sFifoTxThreshold, sFifoRxThreshold);
     VerifyOrReturnError(status == SL_I2C_SUCCESS, status);
 
     // reset the sensor
@@ -71,7 +74,7 @@ sl_status_t InitI2cAndSensor()
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     // Wait for sensor to recover after reset (Si70xx needs ~15ms to recover)
-    osDelay(15);
+    osDelay(kSi70xxResetDelay);
 
     // Initializes sensor and reads electronic ID 1st byte
     status = sl_si91x_si70xx_init(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, SL_EID_FIRST_BYTE);
@@ -84,7 +87,7 @@ sl_status_t InitI2cAndSensor()
     return status;
 }
 
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+#if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
 /** I2C instance setup, Si70xx init, one RH/temp sample (centi-units), I2C deinit. Caller owns power-state (PS) requirements. */
 void Si91xSensorInitMeasureDeinit(uint16_t & relativeHumidity, int16_t & temperature)
 {
@@ -100,22 +103,30 @@ void Si91xSensorInitMeasureDeinit(uint16_t & relativeHumidity, int16_t & tempera
 
     // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes
     // precision.
-    temperature      = static_cast<int16_t>(tempTemperature * 100) - kSensorTemperatureOffset;
-    relativeHumidity = static_cast<uint16_t>(tempHumidity * 100);
+    tempTemperature  = (tempTemperature * 100) - static_cast<int32_t>(kSensorTemperatureOffset);
+    tempHumidity     = tempHumidity * 100;
+
+    temperature = static_cast<int16_t>(std::clamp(tempTemperature, INT32_MIN, INT32_MAX));
+    relativeHumidity = static_cast<uint16_t>(std::clamp<uint32_t>(tempHumidity, 0, UINT16_MAX));
 
     status = sl_i2c_driver_deinit(SI70XX_I2C_INSTANCE);
     VerifyOrReturn(status == SL_I2C_SUCCESS, ChipLogError(AppServer, "Failed to de-initialize I2C driver : %ld", status));
 }
-#endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+#endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
 
-} // namespace
+CHIP_ERROR SetI2cFifoThresholds(uint32_t txThreshold, uint32_t rxThreshold)
+{
+    sFifoTxThreshold = txThreshold;
+    sFifoRxThreshold = rxThreshold;
+    return CHIP_NO_ERROR;
+}
 
 sl_status_t Init()
 {
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+#if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
     // Defer I2C / sensor bring-up to GetSensorData() so we do not hold the sensor active at boot while sleeping (ICD).
     return SL_STATUS_OK;
-#endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+#endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
     return InitI2cAndSensor();
 }
 
@@ -125,7 +136,7 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     int32_t tempTemperature = 0;
     uint32_t tempHumidity   = 0;
 
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+#if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
     // Add PS requirement to keep the sensor awake
     sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS3);
 
@@ -136,12 +147,16 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
 #else
     status = sl_si91x_si70xx_measure_rh_and_temp(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, &tempHumidity, &tempTemperature);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
+
     // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes
     // precision.
-    temperature      = static_cast<int16_t>(tempTemperature * 100) - kSensorTemperatureOffset;
-    relativeHumidity = static_cast<uint16_t>(tempHumidity * 100);
+    tempTemperature  = (tempTemperature * 100) - static_cast<int32_t>(kSensorTemperatureOffset);
+    tempHumidity     = tempHumidity * 100;
 
-#endif // defined(SL_CATALOG_POWER_MANAGER_PRESENT) && SL_CATALOG_POWER_MANAGER_PRESENT
+    temperature = static_cast<int16_t>(std::clamp(tempTemperature, INT32_MIN, INT32_MAX));
+    relativeHumidity = static_cast<uint16_t>(std::clamp<uint32_t>(tempHumidity, 0, UINT16_MAX));
+
+#endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
 
     return status;
 }
