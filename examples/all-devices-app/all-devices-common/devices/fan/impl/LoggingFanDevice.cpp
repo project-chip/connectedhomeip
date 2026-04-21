@@ -34,6 +34,48 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
 {
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> direction=%u wrap=%d lowestOff=%d",
                     static_cast<unsigned>(to_underlying(aDirection)), aWrap, aLowestOff);
+
+    auto & cluster = FanControlCluster();
+    
+    auto currentSpeedNullable = cluster.GetSpeedSetting();
+    uint8_t currentSpeed = currentSpeedNullable.IsNull() ? 0 : currentSpeedNullable.Value();
+    uint8_t maxSpeed = cluster.GetSpeedMax();
+    uint8_t newSpeed = currentSpeed;
+
+    if (aDirection == FanControl::StepDirectionEnum::kIncrease)
+    {
+        if (currentSpeed < maxSpeed) {
+            newSpeed++;
+        } else if (aWrap) {
+            newSpeed = aLowestOff ? 0 : 1;
+        }
+    }
+    else if (aDirection == FanControl::StepDirectionEnum::kDecrease)
+    {
+        uint8_t lowestSpeed = aLowestOff ? 0 : 1;
+        if (currentSpeed > lowestSpeed) {
+            newSpeed--;
+        } else if (aWrap) {
+            newSpeed = maxSpeed;
+        }
+    }
+
+    if (newSpeed != currentSpeed)
+    {
+        cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed));
+        
+        if (currentSpeed == 0 && newSpeed > 0)
+        {
+            cluster.SetOnOffState(true);
+        }
+        else if (newSpeed == 0)
+        {
+            cluster.SetOnOffState(false);
+        }
+    }
+
+    ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from %u to %u", currentSpeed, newSpeed);
+    
     return Protocols::InteractionModel::Status::Success;
 }
 
