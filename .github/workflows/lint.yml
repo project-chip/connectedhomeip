@@ -337,6 +337,7 @@ jobs:
               run: |
                   git grep -I -n 'emberAfReadAttribute' -- './*'                                                    \
                       ':(exclude).github/workflows/lint.yml'                                                        \
+                      ':(exclude)AGENTS.md'                                                                  \
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                                      \
                       ':(exclude)src/app/util/attribute-table.cpp'                                                  \
                       ':(exclude)src/app/util/attribute-table.h'                                                    \
@@ -359,6 +360,7 @@ jobs:
               run: |
                   git grep -I -n 'emberAfWriteAttribute' -- './*'                                            \
                       ':(exclude).github/workflows/lint.yml'                                                 \
+                      ':(exclude)AGENTS.md'                                                                  \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
                       ':(exclude)examples/common/server-cluster-shim/ServerClusterShim.cpp'                  \
                       ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'        \

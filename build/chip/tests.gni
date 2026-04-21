@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+assert(current_toolchain != "",
+       "Build settings cannot be evaluated without a toolchain." +
+           " Do not import this file from default_args / args.gni.")
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
@@ -29,7 +33,7 @@ declare_args() {
 
   # Enable building all platform specific tests.
   # This argument should set the default value for platform specific tests build arguments.
-  # See src/platform/silabs/tests/args.gni as an example.
+  # See src/platform/silabs/tests/tests.gni as an example.
   chip_build_all_platform_tests = false
 
   # Enabling useful support functions when building using GoogleTest framework (used in unit tests and pw_fuzzer FuzzTests)

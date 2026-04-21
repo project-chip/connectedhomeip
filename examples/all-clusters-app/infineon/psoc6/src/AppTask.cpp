@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
  *    All rights reserved.
@@ -49,6 +49,7 @@
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -439,7 +440,8 @@ void AppTask::InitOTARequestor()
     SetRequestorInstance(&gRequestorCore);
     ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes(),
+                        GetDefaultOTARequestorEventGenerator());
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
 

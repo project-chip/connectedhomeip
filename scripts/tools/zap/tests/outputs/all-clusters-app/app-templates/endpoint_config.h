@@ -695,13 +695,18 @@
         /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                         \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                     \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(READABLE) },                                                      /* DefaultOTAProviders */       \
-        { ZAP_SIMPLE_DEFAULT(1), 0x00000001, 1, ZAP_TYPE(BOOLEAN), ZAP_ATTRIBUTE_MASK(READABLE) }, /* UpdatePossible */            \
-        { ZAP_SIMPLE_DEFAULT(0), 0x00000002, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },   /* UpdateState */               \
-        { ZAP_SIMPLE_DEFAULT(0), 0x00000003, 1, ZAP_TYPE(INT8U),                                                                   \
-          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) },                            /* UpdateStateProgress */      \
-        { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
+              ZAP_ATTRIBUTE_MASK(READABLE) }, /* DefaultOTAProviders */                                                            \
+        { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(BOOLEAN),                                                                   \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* UpdatePossible */                              \
+        { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(ENUM8),                                                                     \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* UpdateState */                                 \
+        { ZAP_EMPTY_DEFAULT(), 0x00000003, 1, ZAP_TYPE(INT8U),                                                                     \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* UpdateStateProgress */                                                            \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Localization Configuration (server) */                                                            \
         { ZAP_LONG_DEFAULTS_INDEX(0), 0x00000000, 36, ZAP_TYPE(CHAR_STRING),                                                       \
@@ -3594,7 +3599,7 @@
       .clusterId = 0x0000002A, \
       .attributes = ZAP_ATTRIBUTE_INDEX(44), \
       .attributeCount = 6, \
-      .clusterSize = 9, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 12 ), \
