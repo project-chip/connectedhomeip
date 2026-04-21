@@ -7534,6 +7534,7 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute groupcastAdoption;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -7964,7 +7965,8 @@ endpoint 1 {
     ram      attribute interconnectCOAlarm default = 0;
     ram      attribute contaminationState default = 0;
     ram      attribute smokeSensitivityLevel default = 1;
-    ram      attribute expiryDate default = 3976214400;
+    ram      attribute expiryDate default = 1167696000;
+    ram      attribute unmounted default = 0;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 0x0002;
 
