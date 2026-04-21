@@ -117,11 +117,9 @@ config("efr32-common-config") {
     defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
   }
 
-  ldflags = ["-fno-lto"]
+  ldflags = [ "-fno-lto" ]
   if (!is_clang) {
-    ldflags += [
-      "-Wl,--no-warn-rwx-segment",
-    ]
+    ldflags += [ "-Wl,--no-warn-rwx-segment" ]
   } else {
     ldflags += [
       "-Wl,--allow-multiple-definition",  # to allow our overrides from memory
