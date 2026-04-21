@@ -122,7 +122,7 @@ public:
     DataModel::Nullable<int16_t> GetMeasuredValue() const { return mMeasuredValue; }
 
 protected:
-    BitFlags<Foo::Feature> mFeatureMap;
+    const BitFlags<Foo::Feature> mFeatureMap;
     OptionalAttributeSet mOptionalAttributeSet;
     DataModel::Nullable<int16_t> mMeasuredValue{};
     // ... other member variables
@@ -139,6 +139,7 @@ Key points:
     via `FooCluster::OptionalAttributeSet`.
 -   Use a `Config` struct (not a long constructor parameter list) when there are
     optional or defaulted configuration fields.
+-   **Store Separate Variables:** Extract fields from the `Config` object into separate member variables in the cluster class. This allows marking immutable fields as `const` and prevents accidental runtime modification.
 -   Validate constructor arguments with `VerifyOrDie` (programming errors that
     indicate a logic bug at call site, not a recoverable runtime error).
 -   Expose application-facing setters/getters; keep attribute storage in
