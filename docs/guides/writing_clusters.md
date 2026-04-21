@@ -101,9 +101,9 @@ unnecessary overhead.
 
 To ensure that a cluster is initialized correctly and that feature flags remain
 in sync with their mandatory attributes or parameters, all new code-driven
-clusters should use a **builder-style Config** pattern. This pattern
-prevents common errors where a feature is enabled but its mandatory parameters
-are missing.
+clusters should use a **builder-style Config** pattern. This pattern prevents
+common errors where a feature is enabled but its mandatory parameters are
+missing.
 
 **Reference Example:** The
 [Level Control Cluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/level-control/LevelControlCluster.h)
