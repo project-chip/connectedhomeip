@@ -416,10 +416,6 @@ def BuildAndroidTarget():
         TargetPart('chip-test', app=AndroidApp.CHIP_TEST),
         TargetPart('tv-server', app=AndroidApp.TV_SERVER),
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
-        TargetPart('java-matter-controller',
-                   app=AndroidApp.JAVA_MATTER_CONTROLLER),
-        TargetPart('kotlin-matter-controller',
-                   app=AndroidApp.KOTLIN_MATTER_CONTROLLER),
         TargetPart('virtual-device-app',
                    app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
