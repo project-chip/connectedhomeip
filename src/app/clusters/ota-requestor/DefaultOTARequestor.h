@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,8 @@
 #include <protocols/bdx/BdxMessages.h>
 
 #include "BDXDownloader.h"
+#include "DefaultOTARequestorEventGenerator.h"
+#include "OTARequestorAttributes.h"
 #include "OTARequestorDriver.h"
 #include "OTARequestorInterface.h"
 #include "OTARequestorStorage.h"
@@ -73,7 +75,10 @@ public:
     CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) override;
 
     // Get the current state of the OTA update
-    OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
+    OTAUpdateStateEnum GetCurrentUpdateState() override
+    {
+        return mAttributes ? mAttributes->GetUpdateState() : OTAUpdateStateEnum::kUnknown;
+    }
 
     // Get the target version of the OTA update
     uint32_t GetTargetVersion() override { return mTargetVersion; }
@@ -100,7 +105,10 @@ public:
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
     // Retrieve an iterator to the cached default OTA provider list
-    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
+    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override
+    {
+        return mAttributes ? mAttributes->GetDefaultOtaProviderListIterator() : ProviderLocationList::Iterator(nullptr, 0);
+    }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -113,7 +121,8 @@ public:
      * Called to perform some initialization. Note that some states that must be initalized in the CHIP context will be deferred to
      * InitState.
      */
-    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader);
+    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader,
+                    OTARequestorAttributes & attributes, DefaultOTARequestorEventGenerator & eventGenerator);
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
@@ -204,11 +213,6 @@ private:
         chip::Messaging::ExchangeContext * mExchangeCtx;
         chip::BDXDownloader * mDownloader;
     };
-
-    /**
-     * Callback to initialize states and server attributes in the CHIP context
-     */
-    static void InitState(intptr_t context);
 
     /**
      * Map a CHIP_ERROR to an IdleStateReason enum type
@@ -322,12 +326,14 @@ private:
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-    OTARequestorStorage * mStorage           = nullptr;
-    OTARequestorDriver * mOtaRequestorDriver = nullptr;
-    CASESessionManager * mCASESessionManager = nullptr;
-    OnConnectedAction mOnConnectedAction     = kQueryImage;
-    BDXDownloader * mBdxDownloader           = nullptr; // TODO: this should be OTADownloader
-    BDXMessenger mBdxMessenger;                         // TODO: ideally this is held by the application
+    OTARequestorStorage * mStorage                      = nullptr;
+    OTARequestorDriver * mOtaRequestorDriver            = nullptr;
+    CASESessionManager * mCASESessionManager            = nullptr;
+    OTARequestorAttributes * mAttributes                = nullptr;
+    DefaultOTARequestorEventGenerator * mEventGenerator = nullptr;
+    OnConnectedAction mOnConnectedAction                = kQueryImage;
+    BDXDownloader * mBdxDownloader                      = nullptr; // TODO: this should be OTADownloader
+    BDXMessenger mBdxMessenger;                                    // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     Optional<ByteSpan> mMetadataForProvider;
     ByteSpan mUpdateToken;
@@ -335,9 +341,7 @@ private:
     uint32_t mTargetVersion  = 0;
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
-    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
-    Server * mServer                       = nullptr;
-    ProviderLocationList mDefaultOtaProviderList;
+    Server * mServer = nullptr;
     // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.

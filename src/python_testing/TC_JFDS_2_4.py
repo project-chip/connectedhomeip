@@ -28,6 +28,7 @@
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -55,6 +56,16 @@ log = logging.getLogger(__name__)
 
 
 class TC_JFDS_2_4(MatterBaseTest):
+
+    @staticmethod
+    def _decode_cert_bytes(cert_str: str) -> bytes:
+        compact = "".join(cert_str.split())
+        if compact.startswith("0x"):
+            compact = compact[2:]
+        try:
+            return bytes.fromhex(compact)
+        except ValueError:
+            return base64.b64decode(compact)
 
     @async_test_body
     async def setup_class(self):
@@ -90,36 +101,58 @@ class TC_JFDS_2_4(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
-
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            jfa_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=10)
+        self.jfadmin_fabric_a_node_id = 1
+        self.fabric_a_admin = None
+        # If test is executed in CI environment, start JFA app for Fabric B
+        if self.is_pics_sdk_ci_only:
+            self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            self.dut_rpc_server_ip = "127.0.0.1"
+            self.dut_rpc_server_port = "33033"
+            # Start Fabric A JF-Administrator App
+            self.fabric_a_admin = AppServerSubprocess(
+                jfa_server_app,
+                storage_dir=self.storage_fabric_a,
+                port=random.randint(5001, 5999),
+                discriminator=self.jfadmin_fabric_a_discriminator,
+                passcode=self.jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", self.dut_rpc_server_port])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=10)
+        else:
+            self.dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not self.dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            self.dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not self.dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            self.jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
+            if not self.jfadmin_fabric_a_passcode:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+            self.jfadmin_fabric_a_discriminator = self.matter_test_config.discriminators[0]
+            if not self.jfadmin_fabric_a_discriminator:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             jfc_server_app,
             "JFC_A",  # Name of the controller instance, used for logging purposes in the JF-Controller app:w
-            rpc_server_port=33033,
+            rpc_server_port=self.dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", self.dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=10)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            message=f"pairing onnetwork {self.jfadmin_fabric_a_node_id} {self.jfadmin_fabric_a_passcode} --anchor true",
+            expected_output=f"[JF] Anchor Administrator (nodeId={self.jfadmin_fabric_a_node_id}) commissioned with success",
             timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
@@ -145,6 +178,12 @@ class TC_JFDS_2_4(MatterBaseTest):
         }
         # Extract CATs to be provided to the Python Controller later
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
+
+        self.icac_bytes = self._decode_cert_bytes(jfcStorage.get("Default", "ExampleCAIntermediateCert0"))
+        if jfcStorage.has_option("Default", "ExampleCARootCert0"):
+            self.icac_bytes_alt = self._decode_cert_bytes(jfcStorage.get("Default", "ExampleCARootCert0"))
+        else:
+            self.icac_bytes_alt = self.icac_bytes
 
     def teardown_class(self):
         # Shutdown in the correct order: Controller -> CertificateAuthorityManager -> PersistentStorage
@@ -189,6 +228,9 @@ class TC_JFDS_2_4(MatterBaseTest):
                      "Verify that no entry with NodeId=0x0000_0000_0000_000a exists in the list"),
         ]
 
+    def pics_TC_JFDS_2_4(self) -> list[str]:
+        return ["JFDS.S"]
+
     @async_test_body
     async def test_TC_JFDS_2_4(self):
         # Creating a Controller for Ecosystem A
@@ -203,12 +245,26 @@ class TC_JFDS_2_4(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
+        # Discover endpoint with JointFabricDatastore cluster via Descriptor
+        descriptor_response = await self.devCtrlEcoA.ReadAttribute(
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(Clusters.Descriptor)],
+            returnClusterObject=True)
+
+        jfds_endpoint = None
+        for endpoint_id, endpoint_data in descriptor_response.items():
+            if Clusters.JointFabricDatastore.id in endpoint_data[Clusters.Descriptor].serverList:
+                jfds_endpoint = endpoint_id
+                log.info(f"Found JointFabricDatastore cluster on endpoint {jfds_endpoint}")
+                break
+
+        asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
+
         self.step("1")
         # Read AdminList attribute from DUT
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AdminList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.AdminList)],
             returnClusterObject=True)
-        adminList = response[1][Clusters.JointFabricDatastore].adminList
+        adminList = response[jfds_endpoint][Clusters.JointFabricDatastore].adminList
 
         # Verify at least one entry is returned
         num_entries = len(adminList)
@@ -231,17 +287,21 @@ class TC_JFDS_2_4(MatterBaseTest):
             nodeID=0x0000000000000000A,
             friendlyName="tc-jf-2.4",
             vendorID=0x000C,
-            icac=bytes([0x00, 0x01, 0x00, 0x02]))
+            icac=self.icac_bytes)
 
         # Send AddAdmin command to DUT
-        await self.send_single_cmd(cmd=step2_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+        try:
+            await self.send_single_cmd(cmd=step2_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id,
+                                       endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when adding Admin: {e}")
 
         self.step("3")
         # Read AdminList attribute again to verify the new entry was added
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AdminList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.AdminList)],
             returnClusterObject=True)
-        adminList = response[1][Clusters.JointFabricDatastore].adminList
+        adminList = response[jfds_endpoint][Clusters.JointFabricDatastore].adminList
 
         # Verify that one entry has been added
         asserts.assert_greater(len(adminList), num_entries,
@@ -261,6 +321,8 @@ class TC_JFDS_2_4(MatterBaseTest):
         asserts.assert_equal(found_entry.friendlyName, step2_cmd.friendlyName, "FriendlyName does not match")
         asserts.assert_equal(found_entry.vendorID, step2_cmd.vendorID, "VendorID does not match")
         asserts.assert_equal(found_entry.icac, step2_cmd.icac, "ICAC does not match")
+        if step2_cmd.icac != step2_cmd.icac[::-1]:
+            asserts.assert_not_equal(found_entry.icac, step2_cmd.icac[::-1], "ICAC appears byte-reversed")
 
         log.info("Successfully verified Admin entry added in step 2")
 
@@ -269,16 +331,20 @@ class TC_JFDS_2_4(MatterBaseTest):
         step4_cmd = Clusters.JointFabricDatastore.Commands.UpdateAdmin(
             nodeID=0x0000000000000000A,
             friendlyName="tc-jf-2.4-update",
-            icac=bytes([0x00, 0x01, 0x00, 0x03]))
+            icac=self.icac_bytes_alt)
 
-        await self.send_single_cmd(cmd=step4_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+        try:
+            await self.send_single_cmd(cmd=step4_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id,
+                                       endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when updating Admin: {e}")
 
         self.step("5")
         # Read AdminList attribute to verify the update
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AdminList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.AdminList)],
             returnClusterObject=True)
-        adminList = response[1][Clusters.JointFabricDatastore].adminList
+        adminList = response[jfds_endpoint][Clusters.JointFabricDatastore].adminList
 
         # Find and verify the updated entry with NodeID=0x0000_0000_0000_000a
         found_entry = None
@@ -293,6 +359,8 @@ class TC_JFDS_2_4(MatterBaseTest):
         asserts.assert_equal(found_entry.nodeID, step4_cmd.nodeID, "NodeID does not match")
         asserts.assert_equal(found_entry.friendlyName, step4_cmd.friendlyName, "FriendlyName does not match")
         asserts.assert_equal(found_entry.icac, step4_cmd.icac, "ICAC does not match")
+        if step4_cmd.icac != step4_cmd.icac[::-1]:
+            asserts.assert_not_equal(found_entry.icac, step4_cmd.icac[::-1], "ICAC appears byte-reversed")
 
         log.info("Successfully verified Admin entry updated in step 4")
 
@@ -302,10 +370,10 @@ class TC_JFDS_2_4(MatterBaseTest):
             nodeID=0x0000000000000000A,
             friendlyName="tc-jf-2.4",
             vendorID=0x000C,
-            icac=bytes([0x00, 0x01, 0x00, 0x02]))
+            icac=self.icac_bytes)
 
         try:
-            await self.send_single_cmd(cmd=step6_cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            await self.send_single_cmd(cmd=step6_cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
@@ -314,14 +382,18 @@ class TC_JFDS_2_4(MatterBaseTest):
         self.step("7")
         # Send RemoveAdmin command
         cmd = Clusters.JointFabricDatastore.Commands.RemoveAdmin(0x0000000000000000A)
-        await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id,
+                                       endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when removing Admin: {e}")
 
         self.step("8")
         # Read AdminList attribute to verify the entry was removed
         response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AdminList)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.AdminList)],
             returnClusterObject=True)
-        adminList = response[1][Clusters.JointFabricDatastore].adminList
+        adminList = response[jfds_endpoint][Clusters.JointFabricDatastore].adminList
 
         # Verify that no entry with NodeID=0x0000_0000_0000_000a exists
         found_entry = False

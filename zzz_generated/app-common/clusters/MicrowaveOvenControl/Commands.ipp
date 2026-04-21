@@ -76,7 +76,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetCookingParameters.
+} // namespace SetCookingParameters
 namespace AddMoreTime {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -104,7 +104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AddMoreTime.
+} // namespace AddMoreTime
 } // namespace Commands
 } // namespace MicrowaveOvenControl
 } // namespace Clusters

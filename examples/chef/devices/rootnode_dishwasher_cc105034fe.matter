@@ -738,6 +738,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2013,7 +2014,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -2033,7 +2034,7 @@ endpoint 1 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint default = 0;
+    ram      attribute temperatureSetpoint default = 5000;
     ram      attribute minTemperature default = 4900;
     ram      attribute maxTemperature default = 8200;
     ram      attribute step default = 100;
@@ -2053,7 +2054,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }

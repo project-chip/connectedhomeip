@@ -299,7 +299,8 @@ void SendAndVerifyArbitraryBlock(TransferSession & sender, TransferSession & rec
     ASSERT_FALSE(fakeDataBuf.IsNull());
 
     uint8_t * fakeBlockData = fakeDataBuf->Start();
-    fakeBlockData[0]        = dataCount++;
+    memset(fakeBlockData, 0, maxBlockSize);
+    fakeBlockData[0] = dataCount++;
 
     TransferSession::BlockData blockData;
     blockData.Data   = fakeBlockData;

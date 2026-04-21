@@ -21,6 +21,7 @@
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -195,7 +196,6 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
         EXPECT_EQ(SetMeasurementAccuracy(kTestEndpointId, accuracy), CHIP_NO_ERROR);
 
         // Verify the value was set
-        Structs::MeasurementAccuracyStruct::Type readAccuracy;
         cluster->GetMeasurementAccuracy(readAccuracy);
         // Verify that the MeasurementAccuracyStruct is not erased by the empty accuracyRanges
         EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kApparentEnergy);
@@ -250,6 +250,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
         ASSERT_TRUE(event.has_value());
 
         using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
+
         EXPECT_EQ(event->eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
 

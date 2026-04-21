@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -61,7 +62,8 @@ void InitBasicOTARequestor()
     imageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&imageProcessor);
     sOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    TEMPORARY_RETURN_IGNORED sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
+    TEMPORARY_RETURN_IGNORED sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader,
+                                                GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &imageProcessor);
     imageProcessor.TriggerFlashAction(ExternalFlashManager::Action::SLEEP);

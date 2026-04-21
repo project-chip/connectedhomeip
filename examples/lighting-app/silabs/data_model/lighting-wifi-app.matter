@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 5;
+  revision 4;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -937,6 +937,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2892,14 +2893,14 @@ endpoint 0 {
 
   server cluster OtaSoftwareUpdateRequestor {
     callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
+    callback attribute updatePossible;
+    callback attribute updateState;
+    callback attribute updateStateProgress;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AnnounceOTAProvider;
   }
@@ -3130,7 +3131,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -3156,7 +3157,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;
@@ -3241,7 +3242,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 0x0009;
 
     handle command MoveToHue;
     handle command MoveHue;

@@ -19,6 +19,7 @@
 #include <AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
+#include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
@@ -189,18 +190,24 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
-
     });
+
+    RegisterDeviceFactoryOverrides(gTimerDelegate);
 
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
                                                                                         &Server::GetInstance().GetFabricTable());
     initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+    gGroupDataProvider.SetGroupcastEnabled(true);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
+    SuccessOrDie(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
