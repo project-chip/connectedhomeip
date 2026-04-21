@@ -19,20 +19,17 @@
 #pragma once
 
 #include "OperationalStateDelegate.h"
-#include "operational-state-cluster-objects.h"
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
-#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-const uint8_t DerivedClusterNumberSpaceStart = 0x40;
-const uint8_t VendorNumberSpaceStart         = 0x80;
+static constexpr uint8_t DerivedClusterNumberSpaceStart = 0x40;
+static constexpr uint8_t VendorNumberSpaceStart         = 0x80;
 
 class Uncopyable
 {
@@ -181,7 +178,7 @@ protected:
      * @param aState The state to check.
      * @return true if aState is pause-compatible, false otherwise.
      */
-    virtual bool IsDerivedClusterStatePauseCompatible(uint8_t aState) { return false; };
+    virtual bool IsDerivedClusterStatePauseCompatible(uint8_t aState) { return false; }
 
     /**
      * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is resume-compatible.
@@ -189,7 +186,7 @@ protected:
      * @param aState The state to check.
      * @return true if aState is pause-compatible, false otherwise.
      */
-    virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; };
+    virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; }
 
     /**
      * Handles the invocation of derived cluster commands.
@@ -197,7 +194,7 @@ protected:
      * to handle the derived cluster's specific commands.
      * @param handlerContext The command handler context containing information about the received command.
      */
-    virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) { return; };
+    virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) {}
 
     /**
      * Causes reporting/udpating of CountdownTime attribute from driver if sufficient changes have

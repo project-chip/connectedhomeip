@@ -147,7 +147,7 @@ public:
     virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
-    };
+    }
 
     /**
      * The start command is not supported by the RvcOperationalState cluster hence this method should never be called.
@@ -156,7 +156,7 @@ public:
     void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
-    };
+    }
 
     /**
      * The stop command is not supported by the RvcOperationalState cluster hence this method should never be called.
@@ -165,7 +165,7 @@ public:
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
-    };
+    }
 };
 
 } // namespace RvcOperationalState
