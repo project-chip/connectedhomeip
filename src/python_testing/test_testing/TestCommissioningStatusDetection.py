@@ -20,7 +20,7 @@ Unit tests for commissioning status detection functions in commissioning.py.
 
 Tests cover:
 - DNS-SD discovery (_is_device_operational_via_dnssd)
-- Parallel session establishment (_establish_pase_or_case_session)
+- Parallel session establishment (establish_pase_or_case_session)
 - is_commissioned() integration scenarios
 - get_commissioned_fabric_count() integration scenarios
 
@@ -388,7 +388,7 @@ async def test_parallel_session_pase_wins():
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         if session_kind != commissioning.EstablishedSessionKind.PASE:
             return f"Expected PASE session, got {session_kind}"
     except Exception as e:
@@ -426,7 +426,7 @@ async def test_parallel_session_case_wins():
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         if session_kind != commissioning.EstablishedSessionKind.CASE:
             return f"Expected CASE session, got {session_kind}"
     except Exception as e:
@@ -467,7 +467,7 @@ async def test_parallel_session_first_fails_second_succeeds():
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         if session_kind != commissioning.EstablishedSessionKind.PASE:
             return f"Expected PASE after CASE failed first, got {session_kind}"
     except Exception as e:
@@ -505,7 +505,7 @@ async def test_parallel_session_both_fail():
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         return "Should have raised RuntimeError when both fail"
     except RuntimeError as e:
         error_msg = str(e)
@@ -540,7 +540,7 @@ async def test_parallel_session_no_pase_params():
     mock_controller.GetConnectedDevice = case_success
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, None)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, None)
         if session_kind != commissioning.EstablishedSessionKind.CASE:
             return f"CASE-only path should yield CASE, got {session_kind}"
         if not case_called:
@@ -597,7 +597,7 @@ async def test_is_commissioned_on_current_fabric_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
 
         mock_dnssd.return_value = False
         mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE
@@ -634,7 +634,7 @@ async def test_is_commissioned_on_current_fabric_scenario3_pase_only_other_fabri
     mock_controller.ReadAttribute = AsyncMock(side_effect=fail_if_read)
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
 
         mock_dnssd.return_value = False
         mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE
@@ -667,7 +667,7 @@ async def test_is_commissioned_on_current_fabric_scenario_case_wins_after_dnssd_
     mock_controller.ReadAttribute = AsyncMock(side_effect=fail_if_read)
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
 
         mock_dnssd.return_value = False
         mock_parallel.return_value = commissioning.EstablishedSessionKind.CASE
@@ -753,7 +753,7 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
 
         mock_dnssd.return_value = False
         mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE

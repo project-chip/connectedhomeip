@@ -34,6 +34,7 @@ import matter.tlv
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
+from matter.testing.commissioning import PaseParams, establish_pase_or_case_session
 from matter.testing.conformance import ConformanceException
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
@@ -187,25 +188,8 @@ class BasicCompositionTests(MatterBaseTest):
 
         node_id = self.dut_node_id
 
-        task_list = []
-        if allow_pase and self.first_setup_code:
-            pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
-            task_list.append(asyncio.create_task(pase_future))
-
-        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
-        task_list.append(asyncio.create_task(case_future))
-
-        for task in task_list:
-            asyncio.ensure_future(task)
-
-        done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
-
-        for task in pending:
-            try:
-                task.cancel()
-                await task
-            except asyncio.CancelledError:
-                pass
+        pase_params = PaseParams(setup_code=self.first_setup_code) if allow_pase and self.first_setup_code else None
+        await establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
 
         wildcard_read = (await dev_ctrl.Read(node_id, [()]))  # type: ignore[list-item]
 

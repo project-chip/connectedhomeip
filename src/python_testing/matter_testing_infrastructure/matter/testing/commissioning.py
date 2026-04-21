@@ -451,7 +451,7 @@ async def _is_device_operational_via_dnssd(
         return False
 
 
-async def _establish_pase_or_case_session(
+async def establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
     pase_params: Optional[PaseParams] = None
@@ -606,7 +606,7 @@ async def is_commissioned(
 
         # Try both PASE and CASE in parallel - use whichever succeeds first
         LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
-        session_kind = await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
+        session_kind = await establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
         return session_kind == EstablishedSessionKind.CASE
 
     except Exception as e:
@@ -658,7 +658,7 @@ async def get_commissioned_fabric_count(
             # 2. Commissioned but DNS-SD failed - CASE will work
             # Try both in parallel for fastest response
             LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
-            await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
+            await establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
             result = await dev_ctrl.ReadAttribute(
                 nodeId=node_id,
                 attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
