@@ -95,7 +95,7 @@ class TC_CHIME_2_6(MatterBaseTest, CHIMETestBase):
         clusterRevision = await self.read_chime_attribute_expect_success(endpoint=endpoint, attribute=attributes.ClusterRevision)
         if clusterRevision < 2:
             log.info("TC-CHIME-2.6: skipping as cluster revision is less than 2")
-            self.mark_all_remaining_steps_skipped(1) # Skip rest of steps
+            self.mark_all_remaining_steps_skipped(1)  # Skip rest of steps
             return
 
         self.step(1)  # Already done, immediately go to step 2
