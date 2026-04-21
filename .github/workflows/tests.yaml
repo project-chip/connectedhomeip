@@ -1207,8 +1207,10 @@ jobs:
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
+              env:
+                  KEEP_GOING: ${{ github.event_name != 'pull_request' && '--keep-going' || '' }}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name "REPL Tests Linux - ${{github.ref_name}}"'
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
@@ -1313,7 +1315,7 @@ jobs:
                 gh_pages: gh-pages
                 allure_history: allure-history
                 subfolder: allure-report/ci_tests
-                keep_reports: 200
+                keep_reports: 2000
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
 
