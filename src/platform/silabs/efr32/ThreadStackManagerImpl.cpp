@@ -24,13 +24,11 @@
  *
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <openthread/platform/entropy.h>
 

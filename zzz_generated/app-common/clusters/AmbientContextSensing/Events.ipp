@@ -70,7 +70,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AmbientContextDetectStarted.
+} // namespace AmbientContextDetectStarted
 namespace AmbientContextDetectEnded {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -101,7 +101,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AmbientContextDetectEnded.
+} // namespace AmbientContextDetectEnded
 } // namespace Events
 } // namespace AmbientContextSensing
 } // namespace Clusters

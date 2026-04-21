@@ -40,12 +40,12 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if defined(MATTER_DM_PLUGIN_USER_LABEL) || defined(MATTER_DM_PLUGIN_FIXED_LABEL)
-#ifndef CONFIG_DEVICE_INFO_PROVIDER_IMPL
-#define CONFIG_DEVICE_INFO_PROVIDER_IMPL 1
+#ifndef CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+#define CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER 1
 #endif
 #endif
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 #include <DeviceInfoProviderImpl.h>
 #endif
 
@@ -122,6 +122,10 @@
 #include "ICDUtil.h"
 #endif // CONFIG_NXP_USE_POWER_DOWN
 
+#if CONFIG_CHIP_APP_IDENTIFY
+#include "Identify.h"
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -129,7 +133,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
@@ -154,6 +158,16 @@ extern const char sBaseServiceInstanceName[];
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
+#endif
+
+#if CONFIG_CHIP_APP_IDENTIFY
+NXP::App::IdentifyDelegate sIdentifyDelegate;
+static chip::app::DefaultTimerDelegate sTimerDelegateIdentify;
+
+app::RegisteredServerCluster<app::Clusters::IdentifyCluster>
+    gIdentifyCluster(app::Clusters::IdentifyCluster::Config(CONFIG_CHIP_APP_IDENTIFY_ENDPOINT, sTimerDelegateIdentify)
+                         .WithIdentifyType(chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                         .WithDelegate(&sIdentifyDelegate));
 #endif
 
 #if CONFIG_NET_L2_OPENTHREAD
@@ -198,7 +212,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
@@ -346,6 +360,15 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     {
         /* If an update is under test make it permanent */
         OTARequestorInitiator::Instance().HandleSelfTest();
+    }
+#endif
+
+#if CONFIG_CHIP_APP_IDENTIFY
+    err = chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during Register(gIdentifyCluster.Registration()");
+        goto exit;
     }
 #endif
 

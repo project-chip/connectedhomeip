@@ -344,3 +344,6 @@
 	url = https://github.com/bouffalolab/bouffalo_sdk.git
 	branch = main
 	platforms = bouffalolab
+[submodule "third_party/miniaudio/repo"]
+	path = third_party/miniaudio/repo
+	url = https://github.com/mackron/miniaudio
