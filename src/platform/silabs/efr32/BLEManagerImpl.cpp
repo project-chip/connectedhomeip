@@ -104,7 +104,7 @@ namespace {
 
 osTimerId_t sbleAdvTimeoutTimer; // SW timer
 
-const uint8_t ShortUUID_CHIPoBLEService[]             = { 0xF6, 0xFF };
+const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 bd_addr randomizedAddr = { 0 };
 
