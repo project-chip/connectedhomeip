@@ -33,7 +33,7 @@ void WpaSupplicantClient::GDBusWpaSupplicant::Reset()
     networkPath.reset();
 }
 
-CHIP_ERROR WpaSupplicantClient::Init(ConnectivityManagerImpl & inConnectivityManagerImpl)
+CHIP_ERROR WpaSupplicantClient::Init(ConnectivityManagerImpl & inConnectivityManagerImpl) noexcept
 {
     VerifyOrReturnError(mConnectivityManagerImpl == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
 
