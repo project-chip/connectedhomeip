@@ -90,11 +90,20 @@ public:
         Foo::Attributes::SomeOptional::Id,
         Foo::Attributes::AnotherOptional::Id>;
 
-    // Use a Config/StartupConfiguration struct for constructor arguments that
-    // may be optional or have defaults.  Builder-style .WithXxx() setters are
-    // common for optional fields.
-    struct Config
+    // Use a Config/StartupConfiguration class (or struct for simple cases) for
+    // constructor arguments that may be optional or have defaults. Use a class
+    // with private members and builder-style .WithXxx() setters to prevent
+    // misconfiguration in non-trivial cases.
+    class Config
     {
+    public:
+        Config() = default;
+        Config & WithMinValue(DataModel::Nullable<int16_t> min) { minValue = min; return *this; }
+        Config & WithMaxValue(DataModel::Nullable<int16_t> max) { maxValue = max; return *this; }
+        Config & WithOptionalAttributes(OptionalAttributeSet attrs) { optionalAttributes = attrs; return *this; }
+
+    private:
+        friend class FooCluster;
         DataModel::Nullable<int16_t> minValue{};
         DataModel::Nullable<int16_t> maxValue{};
         OptionalAttributeSet optionalAttributes{};
