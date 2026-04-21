@@ -656,7 +656,7 @@ template("efr32_sdk") {
 
     cflags = []
     foreach(include_dir, _include_dirs) {
-      cflags += [ "-isystem" + rebase_path(include_dir, root_compiler) ]
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
 
     cflags += [ "-Wno-shadow" ]
@@ -667,7 +667,7 @@ template("efr32_sdk") {
 
     if (is_clang) {
       # -fno-threadsafe-statics and -femulated-tls are needed since clang will try to use TLS,
-      # which is not supported by the EFR32 thus resulting on linking failing on 
+      # which is not supported by the EFR32 thus resulting on linking failing on
       # undefined __aeabi_read_tp symbol
       cflags += [
         "-fno-threadsafe-statics",
