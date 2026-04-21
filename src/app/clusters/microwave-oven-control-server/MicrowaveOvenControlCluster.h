@@ -66,7 +66,7 @@ public:
 
 private:
     const BitMask<MicrowaveOvenControl::Feature> mFeature;
-    const OptionalAttributeSet & mOptionalAttributeSet;
+    const OptionalAttributeSet mOptionalAttributeSet;
     std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> mOptionalAcceptedCommands;
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
