@@ -111,8 +111,11 @@ is the primary reference for this implementation pattern.
 
 **Pattern Principles:**
 
--   **Nested Config Struct/Class:** Define a `Config` struct or class within the main cluster
-    class to hold all startup state. Use a `class` with private members for non-trivial configurations to prevent direct manipulation of members and enforce the use of builder methods. A `struct` with public members is acceptable for very simple configurations without complex rules.
+-   **Nested Config Struct/Class:** Define a `Config` struct or class within the
+    main cluster class to hold all startup state. Use a `class` with private
+    members for non-trivial configurations to prevent direct manipulation of
+    members and enforce the use of builder methods. A `struct` with public
+    members is acceptable for very simple configurations without complex rules.
 -   **Fluent Builder API:** Provide `With<Feature>(...)` methods that return a
     reference to the `Config` object to allow for chained configuration calls.
 -   **Atomic Configuration:** Methods must handle both the `FeatureMap` bit
@@ -121,7 +124,10 @@ is the primary reference for this implementation pattern.
 -   **Encapsulated Logic:** This approach encapsulates the cluster's complex
     conformance logic directly into the configuration API, making it much harder
     for application developers to create an invalid configuration.
--   **External Endpoint ID:** The `EndpointId` should be passed to the cluster constructor directly, not stored in the `Config` object. This allows the same `Config` instance to be reused across multiple cluster instances on different endpoints.
+-   **External Endpoint ID:** The `EndpointId` should be passed to the cluster
+    constructor directly, not stored in the `Config` object. This allows the
+    same `Config` instance to be reused across multiple cluster instances on
+    different endpoints.
 
 **Example Implementation (from LevelControlCluster):**
 
