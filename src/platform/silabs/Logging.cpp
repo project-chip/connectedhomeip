@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <cinttypes>
 
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"

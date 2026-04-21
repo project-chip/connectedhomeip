@@ -39,6 +39,7 @@
 #include <mbedtls/error.h>
 #include <mbedtls/x509_csr.h>
 
+#include <cinttypes>
 #include <string.h>
 #include <type_traits>
 
