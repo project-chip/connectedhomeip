@@ -643,8 +643,7 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiManagementSync()
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    return !!mWpaSupplicant.iface;
+    return WpaSupplicantClient::IsStarted();
 }
 
 void ConnectivityManagerImpl::StartNonConcurrentWiFiManagement()
