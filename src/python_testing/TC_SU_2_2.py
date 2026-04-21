@@ -948,15 +948,17 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         reboot_timeout_sec = 120
         poll_interval_sec = 5
+        reconnect_timeout_ms = 5000
         reconnected = False
         for attempt in range(reboot_timeout_sec // poll_interval_sec):
             await asyncio.sleep(poll_interval_sec)
             try:
-                await controller.GetConnectedDevice(requestor_node_id, allowPASE=False)
+                await controller.GetConnectedDevice(
+                    requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
                 reconnected = True
                 logger.info(f'{step_number_s6}: Step #6.6 - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
                 break
-            except TimeoutError:
+            except (TimeoutError, ChipDeviceCtrl.ChipStackError):
                 logger.info(
                     f'{step_number_s6}: Step #6.6 - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
 
