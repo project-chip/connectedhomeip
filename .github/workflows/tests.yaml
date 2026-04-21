@@ -1331,6 +1331,10 @@ jobs:
 
                 test -f "${INPUT_JSON}"
 
+                if [ -e "${DASHBOARD_DIR}" ] && [ ! -d "${DASHBOARD_DIR}" ]; then
+                  rm -f "${DASHBOARD_DIR}"
+                fi
+
                 mkdir -p "${DASHBOARD_DIR}/data"
 
                 cp scripts/tools/test_history_dashboard/site/index.html "${DASHBOARD_DIR}/index.html"
