@@ -29,6 +29,7 @@
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 # === END CI TEST ARGUMENTS ===
 
@@ -236,37 +237,63 @@ class TC_JFADMIN_2_2(CADMINBaseTest):
             catTags=[int(self.ecoACATs, 16), int('fffe0001', 16)])
 
         self.step("2")
-        self.jfadmin_fabric_b_passcode = random.randint(20202021, 20202099)
-        self.jfadmin_fabric_b_discriminator = random.randint(0, 4095)
-        self.jfctrl_fabric_b_vid = random.randint(0x0001, 0xFFF0)
 
-        # Start Fabric B JF-Administrator App
-        self.fabric_b_admin = JFAdministratorSubprocess(
-            self.jfa_server_app,
-            prefix="JFA-B",
-            storage_dir=self.storage_fabric_b,
-            port=random.randint(5001, 5999),
-            discriminator=self.jfadmin_fabric_b_discriminator,
-            passcode=self.jfadmin_fabric_b_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33055"])
-        self.fabric_b_admin.start(
-            expected_output="Updating services using commissioning mode 1",
-            timeout=30)
+        self.jfctrl_fabric_b_vid = random.randint(0x0001, 0xFFF0)
+        jfadmin_fabric_b_passcode = None
+        jfadmin_fabric_b_discriminator = None
+        dut_rpc_server_ip = None
+        dut_rpc_server_port = None
+
+        # If test is executed in CI environment, start JFA app for Fabric B
+        if self.is_pics_sdk_ci_only:
+            dut_rpc_server_ip = "127.0.0.1"
+            jfadmin_fabric_b_passcode = random.randint(20202021, 20202099)
+            jfadmin_fabric_b_discriminator = random.randint(0, 4095)
+            dut_rpc_server_port = "33055"
+            # Start Fabric B JF-Administrator App
+            self.fabric_b_admin = JFAdministratorSubprocess(
+                self.jfa_server_app,
+                prefix="JFA-B",
+                storage_dir=self.storage_fabric_b,
+                port=random.randint(5001, 5999),
+                discriminator=jfadmin_fabric_b_discriminator,
+                passcode=jfadmin_fabric_b_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port])
+            self.fabric_b_admin.start(
+                expected_output="Updating services using commissioning mode 1",
+                timeout=30)
+        else:
+            # We have a DUT that is already running, connect to it via RPC
+            dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            jfadmin_fabric_b_passcode = self.matter_test_config.setup_passcodes[0]
+            if not jfadmin_fabric_b_passcode:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+            jfadmin_fabric_b_discriminator = self.matter_test_config.discriminators[0]
+            if not jfadmin_fabric_b_discriminator:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric B JF-Administrator App
         self.fabric_b_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             prefix="JFC-B",
-            rpc_server_port=33055,
+            rpc_server_port=dut_rpc_server_port,
             storage_dir=self.storage_fabric_b,
-            vendor_id=self.jfctrl_fabric_b_vid)
+            vendor_id=self.jfctrl_fabric_b_vid,
+            extra_args=["--rpc-server-ip", dut_rpc_server_ip])
         self.fabric_b_ctrl.start(
             expected_output="CHIP task running",
             timeout=30)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork-long 11 {self.jfadmin_fabric_b_passcode} {self.jfadmin_fabric_b_discriminator} --anchor true",
+            message=f"pairing onnetwork-long 11 {jfadmin_fabric_b_passcode} {jfadmin_fabric_b_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
             timeout=60)
 
