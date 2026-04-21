@@ -76,8 +76,7 @@ CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
@@ -117,10 +116,9 @@ CHIP_ERROR Instance::Init()
             Zcl,
             "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber"));
 
-    MicrowaveOvenControlCluster::OptionalAttributeSet optionalAttributeSet;
     if (emberAfContainsAttribute(mEndpointId, mClusterId, MicrowaveOvenControl::Attributes::WattRating::Id))
     {
-        optionalAttributeSet.Set<MicrowaveOvenControl::Attributes::WattRating::Id>();
+        mOptionalAttributeSet.Set<MicrowaveOvenControl::Attributes::WattRating::Id>();
     }
 
     InteractionModelEngine * interactionModelEngine = InteractionModelEngine::GetInstance();
@@ -135,7 +133,7 @@ CHIP_ERROR Instance::Init()
     mDelegate->SetInstance(this);
 
     MicrowaveOvenControlCluster::Config config{
-        mFeature,   optionalAttributeSet,   optionalAcceptedCommands, mOpStateInstance, mMicrowaveOvenModeInstance,
+        mFeature,   mOptionalAttributeSet,  optionalAcceptedCommands, mOpStateInstance, mMicrowaveOvenModeInstance,
         *mDelegate, *interactionModelEngine
     };
     mCluster.Create(mEndpointId, config);

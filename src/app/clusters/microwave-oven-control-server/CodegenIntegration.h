@@ -95,9 +95,10 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
-    BitMask<MicrowaveOvenControl::Feature> mFeature;
+    BitMask<MicrowaveOvenControl::Feature> mFeature{};
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+    MicrowaveOvenControlCluster::OptionalAttributeSet mOptionalAttributeSet{};
 
     // The Code Driven ChimeCluster instance (lazy-initialized)
     chip::app::LazyRegisteredServerCluster<MicrowaveOvenControlCluster> mCluster;

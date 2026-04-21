@@ -201,9 +201,10 @@ struct TestMicrowaveOvenControlCluster : public ::testing::Test
     std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands{
         MicrowaveOvenControl::Commands::AddMoreTime::Id
     };
+    MicrowaveOvenControlCluster::OptionalAttributeSet optionalAttributeSet{};
     MicrowaveOvenControlCluster::Config defaultConfig{
         .feature                   = BitFlags<MicrowaveOvenControl::Feature>{},
-        .optionalAttributeSet      = MicrowaveOvenControlCluster::OptionalAttributeSet{},
+        .optionalAttributeSet      = optionalAttributeSet,
         .optionalAcceptedCommands  = optionalAcceptedCommands,
         .opStateInstance           = operationalStateInstance,
         .microwaveOvenModeInstance = microwaveOvenModeInstance,
