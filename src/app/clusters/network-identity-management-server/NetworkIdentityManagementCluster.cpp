@@ -245,8 +245,7 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
                 IsBufferContentEqualConstantTime(newSecretData.rawSecret.ConstBytes(), existingRawSecret.ConstBytes(),
                                                  NetworkAdministratorRawSecret::Length()))
             {
-                handler->AddStatus(request.path, Status::Success);
-                return std::nullopt;
+                return Status::Success;
             }
         }
 
@@ -322,7 +321,7 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
             mKeystore.DestroyNetworkIdentityKeypair(ecdsaKeypairHandle);
             mKeystore.DestroyNetworkAdministratorSecret(nassInfo.secretHandle);
             ReturnErrorOnFailure(err);
-            return DataModel::ActionReturnStatus(Status::DynamicConstraintError); // conflicting record found
+            return Status::DynamicConstraintError; // conflicting record found
         }
     }
 
@@ -357,9 +356,7 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
 
     ChipLogProgress(Zcl, "NASS successfully imported by fabric %u node 0x" ChipLogFormatX64, //
                     request.subjectDescriptor.fabricIndex, ChipLogValueX64(request.subjectDescriptor.subject));
-
-    handler->AddStatus(request.path, Status::Success);
-    return std::nullopt;
+    return Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -602,9 +599,7 @@ NetworkIdentityManagementCluster::HandleRemoveClient(const DataModel::InvokeRequ
     ChipLogProgress(Zcl, "Client %" PRIu16 " (" ChipLogFormatKeyId ") removed by fabric %u node 0x" ChipLogFormatX64, //
                     entry.index, ChipLogValueKeyId(entry.identifier), request.subjectDescriptor.fabricIndex,
                     ChipLogValueX64(request.subjectDescriptor.subject));
-
-    handler->AddStatus(request.path, Status::Success);
-    return std::nullopt;
+    return Status::Success;
 }
 
 void NetworkIdentityManagementCluster::OnClientAuthenticated(uint16_t clientIndex, uint16_t networkIdentityIndex)
