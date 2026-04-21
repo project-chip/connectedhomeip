@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import asyncio
 import base64
 import copy
 import json
