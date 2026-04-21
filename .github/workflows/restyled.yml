@@ -29,7 +29,7 @@ jobs:
 
       - id: upload
         if: ${{ steps.restyler.outputs.git-patch }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pr-${{ github.event.pull_request.number }}-restyled
           path: /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch
