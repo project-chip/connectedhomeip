@@ -1228,11 +1228,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
         sl_status = sl_se_ecdh_compute_shared_secret(&cmd_ctx, &priv_desc, &pub_desc, &shared_desc);
         if (sl_status != SL_STATUS_OK)
         {
-#if !defined(__clang__)
-            ChipLogError(Crypto, "ECDH SL failure %lx", sl_status);
-#else
-            ChipLogError(Crypto, "ECDH SL failure %x", sl_status);
-#endif
+            ChipLogError(Crypto, "ECDH SL failure %" PRIx32, sl_status);
             if (sl_status == SL_STATUS_COMMAND_IS_INVALID)
             {
                 // This error will be returned if the key type isn't supported.

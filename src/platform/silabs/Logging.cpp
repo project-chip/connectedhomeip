@@ -131,9 +131,8 @@ size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
     totalSeconds /= 60;
     uint8_t minutes = totalSeconds % 60;
     uint32_t hours  = totalSeconds / 60;
-    int chWritten   = 0;
 
-    chWritten = snprintf(buffer, maxSize, "[%04" PRIu32 ":%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    int chWritten = snprintf(buffer, maxSize, "[%04" PRIu32 ":%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
     return (chWritten > 0) ? static_cast<size_t>(chWritten) : 0;
 }
 

@@ -117,16 +117,15 @@ config("efr32-common-config") {
     defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
   }
 
+  ldflags = ["-fno-lto"]
   if (!is_clang) {
-    ldflags = [
+    ldflags += [
       "-Wl,--no-warn-rwx-segment",
-      "-fno-lto",
     ]
   } else {
-    ldflags = [
+    ldflags += [
       "-Wl,--allow-multiple-definition",  # to allow our overrides from memory
                                           # manager
-      "-fno-lto",
       "-lc_nano",  # for C stdlib functions (e.g.snprintf)
       "-lstdc++_nano",  # for C++ stdlib functions (e.g. sprintf)
       "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)

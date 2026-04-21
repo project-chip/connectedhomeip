@@ -158,6 +158,12 @@ template("efr32_sdk") {
     libs = []
     defines = []
 
+    # Select toolchain build directory based on compiler
+    build_dir = "gcc"
+    if (is_clang) {
+      build_dir = "llvm"
+    }
+
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
@@ -283,60 +289,31 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
       ]
 
-      if (is_clang) {
-        libs += [ "${efr32_sdk_root}/openthread/build/llvm/cortex-m33/cmake/sl-openthread-library/Release/libsl_openthread.a" ]
-      } else {
-        libs += [ "${efr32_sdk_root}/openthread/build/gcc/cortex-m33/cmake/sl-openthread-library/Release/libsl_openthread.a" ]
-      }
+      libs += [ "${efr32_sdk_root}/openthread/build/${build_dir}/cortex-m33/cmake/sl-openthread-library/Release/libsl_openthread.a" ]
 
       if (!sl_matter_enable_siwx_ble) {
-        if (is_clang) {
-          libs += [
-            "${efr32_sdk_root}/bluetooth_common/lib/build/llvm/cortex-m33/bgcommon/release/libbgcommon.a",
-            "${efr32_sdk_root}/bluetooth_le_controller/build/llvm/xg24/release/liblinklayer.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/llvm/cortex-m33/protocol/core/release/libbgapi_core.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/llvm/cortex-m33/protocol/command/release/libbgapi_command.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/llvm/cortex-m33/protocol/device/release/libbgapi_device.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/llvm/cortex-m33/protocol/event/release/libbgapi_event.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/llvm/cortex-m33/protocol/release/libbgapi_protocol.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/llvm/cortex-m33/bgapi_trace/release/libbgapi_trace_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/accept_list/release/libble_host_accept_list_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/bgstack/release/libble_host.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/bgstack/release/libbondingdb_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/ble_bgapi/release/libble_bgapi.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/ble_bgapi/release/libble_bgapi_stub_gatt_client.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_server.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/ble_system/release/libble_system.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/connection_subrating/release/libble_host_connection_subrating_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/core/release/libble_host_core.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/hal/release/libble_host_hal_series2.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/hci/release/libble_host_hci.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/llvm/cortex-m33/system/release/libble_host_system.a",
-          ]
-        } else {
-          libs += [
-            "${efr32_sdk_root}/bluetooth_common/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
-            "${efr32_sdk_root}/bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/gcc/cortex-m33/protocol/core/release/libbgapi_core.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/gcc/cortex-m33/protocol/command/release/libbgapi_command.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/gcc/cortex-m33/protocol/device/release/libbgapi_device.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/gcc/cortex-m33/protocol/event/release/libbgapi_event.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/gcc/cortex-m33/protocol/release/libbgapi_protocol.a",
-            "${efr32_sdk_root}/bgapi_protocol/build/gcc/cortex-m33/bgapi_trace/release/libbgapi_trace_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/accept_list/release/libble_host_accept_list_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/bgstack/release/libble_host.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/bgstack/release/libbondingdb_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_stub_gatt_client.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_server.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/ble_system/release/libble_system.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/connection_subrating/release/libble_host_connection_subrating_stub.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/core/release/libble_host_core.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/hal/release/libble_host_hal_series2.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/hci/release/libble_host_hci.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/gcc/cortex-m33/system/release/libble_host_system.a",
-          ]
-        }
+        libs += [
+          "${efr32_sdk_root}/bluetooth_common/lib/build/${build_dir}/cortex-m33/bgcommon/release/libbgcommon.a",
+          "${efr32_sdk_root}/bluetooth_le_controller/build/${build_dir}/xg24/release/liblinklayer.a",
+          "${efr32_sdk_root}/bgapi_protocol/build/${build_dir}/cortex-m33/protocol/core/release/libbgapi_core.a",
+          "${efr32_sdk_root}/bgapi_protocol/build/${build_dir}/cortex-m33/protocol/command/release/libbgapi_command.a",
+          "${efr32_sdk_root}/bgapi_protocol/build/${build_dir}/cortex-m33/protocol/device/release/libbgapi_device.a",
+          "${efr32_sdk_root}/bgapi_protocol/build/${build_dir}/cortex-m33/protocol/event/release/libbgapi_event.a",
+          "${efr32_sdk_root}/bgapi_protocol/build/${build_dir}/cortex-m33/protocol/release/libbgapi_protocol.a",
+          "${efr32_sdk_root}/bgapi_protocol/build/${build_dir}/cortex-m33/bgapi_trace/release/libbgapi_trace_stub.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/accept_list/release/libble_host_accept_list_stub.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/bgstack/release/libble_host.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/bgstack/release/libbondingdb_stub.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/ble_bgapi/release/libble_bgapi.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/ble_bgapi/release/libble_bgapi_stub_gatt_client.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_server.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/ble_system/release/libble_system.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/connection_subrating/release/libble_host_connection_subrating_stub.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/core/release/libble_host_core.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/hal/release/libble_host_hal_series2.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/hci/release/libble_host_hci.a",
+          "${efr32_sdk_root}/bluetooth_le_host/build/${build_dir}/cortex-m33/system/release/libble_host_system.a",
+        ]
       }
     }
 
@@ -349,11 +326,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/emdrv/spidrv/config",
       ]
 
-      if (is_clang) {
-        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg24_llvm_release.a" ]
-      } else {
-        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
-      }
+      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg24_${build_dir}_release.a" ]
 
       defines += [ "EFR32MG24" ]
     } else if (silabs_family == "mgm24") {
@@ -363,11 +336,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/rail_library/plugin/pa-conversions/efr32xg24/config",
       ]
 
-      if (is_clang) {
-        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_llvm_release.a" ]
-      } else {
-        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a" ]
-      }
+      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_${build_dir}_release.a" ]
 
       if (silabs_mcu == "MGM240PB32VNA") {
         libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
@@ -391,11 +360,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/rail_library/plugin/pa-conversions/efr32xg26/config",
       ]
 
-      if (is_clang) {
-        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_llvm_release.a" ]
-      } else {
-        libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a" ]
-      }
+      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_${build_dir}_release.a" ]
 
       libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a" ]
 
