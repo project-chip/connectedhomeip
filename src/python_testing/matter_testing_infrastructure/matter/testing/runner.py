@@ -508,6 +508,31 @@ def run_tests_no_exit(
                                      test_config.testbed_name)
                     ok = False
 
+        # If there is no commissioning but there is a commissioned device, read using CASE
+        if ok and not should_run_pre_commissioning and matter_test_config.dut_node_ids:
+            try:
+                global_wildcard = event_loop.run_until_complete(
+                    asyncio.wait_for(
+                        default_controller.Read(
+                            matter_test_config.dut_node_ids[0],
+                            [
+                                (Clusters.Descriptor),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                            ]
+                        ),
+                        timeout=60
+                    )
+                )
+                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(global_wildcard)
+            except TimeoutError:
+                ok = False
+            except Exception:
+                LOGGER.exception('Exception when populating global wildcard for %s.',
+                                 test_config.testbed_name)
+                ok = False
+
         #
         # Populate the global wildcard
         #
