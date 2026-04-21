@@ -180,10 +180,8 @@ public:
     LevelControlCluster(EndpointId endpoint, const Config & config);
 };
 ```
-<<<<<<< HEAD
 
-=======
->>>>>>> 9dadbdba57 (Docs: Add separate variables principle to writing_clusters.md)
+
 ### Design Principles
 
 When designing and implementing a cluster, adhere to the following principles to
