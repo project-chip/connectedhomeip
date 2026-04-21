@@ -97,7 +97,6 @@ public:
     class Config
     {
     public:
-        Config() = default;
         Config & WithMinValue(DataModel::Nullable<int16_t> min) { minValue = min; return *this; }
         Config & WithMaxValue(DataModel::Nullable<int16_t> max) { maxValue = max; return *this; }
         Config & WithOptionalAttributes(OptionalAttributeSet attrs) { optionalAttributes = attrs; return *this; }
