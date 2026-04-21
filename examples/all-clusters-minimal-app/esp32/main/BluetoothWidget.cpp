@@ -31,7 +31,7 @@
 #include "ScreenManager.h"
 #endif
 
-static const char TAG[] = "BluetoothWidget";
+static constexpr char TAG[] = "BluetoothWidget";
 
 void BluetoothWidget::Init()
 {

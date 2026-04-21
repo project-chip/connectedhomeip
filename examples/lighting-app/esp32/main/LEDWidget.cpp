@@ -21,7 +21,7 @@
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
-static const char TAG[] = "LEDWidget";
+static constexpr char TAG[] = "LEDWidget";
 
 void LEDWidget::Init(void)
 {

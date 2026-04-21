@@ -44,7 +44,7 @@
 
 #include <string>
 
-static const char TAG[] = "QRCodeScreen";
+static constexpr char TAG[] = "QRCodeScreen";
 
 namespace {
 
