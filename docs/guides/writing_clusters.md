@@ -135,44 +135,40 @@ is the primary reference for this implementation pattern.
 class LevelControlCluster : public DefaultServerCluster ...
 {
 public:
-    class Config
-    {
-    public:
-        Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) :
-            mDelegate(delegate), mTimerDelegate(timerDelegate), mFeatureMap(0) {}
+  class Config {
+  public:
+    Config(TimerDelegate &timerDelegate, LevelControlDelegate &delegate)
+        : mDelegate(delegate), mTimerDelegate(timerDelegate), mFeatureMap(0) {}
 
-        // Automatically sets the Lighting feature and sets required attribute values
-        Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
-        {
-            mFeatureMap.Set(LevelControl::Feature::kLighting);
-            WithMinLevel(1);   // Spec mandates MinLevel=1 for Lighting feature
-            WithMaxLevel(254); // Spec mandates MaxLevel=254 for Lighting feature
-            mStartUpCurrentLevel = startUpCurrentLevel;
-            return *this;
-        }
+    // Automatically sets the Lighting feature and sets required attribute values
+    Config &WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel) {
+      mFeatureMap.Set(LevelControl::Feature::kLighting);
+      WithMinLevel(1);   // Spec mandates MinLevel=1 for Lighting feature
+      WithMaxLevel(254); // Spec mandates MaxLevel=254 for Lighting feature
+      mStartUpCurrentLevel = startUpCurrentLevel;
+      return *this;
+    }
 
-        Config & WithMinLevel(uint8_t minLevel)
-        {
-            // ... implementation
-            return *this;
-        }
+    Config &WithMinLevel(uint8_t minLevel) {
+      // ... implementation
+      return *this;
+    }
 
-        Config & WithMaxLevel(uint8_t maxLevel)
-        {
-            // ... implementation
-            return *this;
-        }
+    Config &WithMaxLevel(uint8_t maxLevel) {
+      // ... implementation
+      return *this;
+    }
 
-    private:
-        friend class LevelControlCluster;
-        LevelControlDelegate & mDelegate;
-        TimerDelegate & mTimerDelegate;
-        BitMask<LevelControl::Feature> mFeatureMap;
-        DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
-        // ... other members
-    };
+  private:
+    friend class LevelControlCluster;
+    LevelControlDelegate &mDelegate;
+    TimerDelegate &mTimerDelegate;
+    BitMask<LevelControl::Feature> mFeatureMap;
+    DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
+    // ... other members
+  };
 
-    LevelControlCluster(EndpointId endpoint, const Config & config);
+  LevelControlCluster(EndpointId endpoint, const Config &config);
 };
 ```
 
