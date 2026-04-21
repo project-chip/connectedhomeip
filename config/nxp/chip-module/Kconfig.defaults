@@ -46,6 +46,9 @@ config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
 config CHIP_TASK_PRIORITY
 	default 5
 
+config CHIP_TASK_STACK_SIZE
+	default 10240
+
 config MAX_EVENT_QUEUE_SIZE
 	default 64
 
