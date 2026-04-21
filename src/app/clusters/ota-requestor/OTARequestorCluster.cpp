@@ -159,6 +159,11 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
                          static_cast<unsigned>(kMaxMetadataLen));
             return Protocols::InteractionModel::Status::ConstraintError;
         }
+        if (data.announcementReason == OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUnknownEnumValue)
+        {
+            ChipLogError(Zcl, "Received unknown announcement reason");
+            return Protocols::InteractionModel::Status::ConstraintError;
+        }
         mOtaCommands.HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }

@@ -75,13 +75,13 @@ public:
         }
     }
 
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
+    std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> GetLastAnnounceCommandPayload() const
     {
         return mLastAnnounceCommandPayload;
     }
 
 private:
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
+    std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> mLastAnnounceCommandPayload;
 };
 
 struct TestOTARequestorCluster : public ::testing::Test
@@ -191,12 +191,38 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     EXPECT_TRUE(result.IsSuccess());
 
     // Check that the payload was decoded correctly.
+    ASSERT_TRUE(otaCommands.GetLastAnnounceCommandPayload().has_value());
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType forwarded_payload =
-        otaCommands.GetLastAnnounceCommandPayload();
+        *otaCommands.GetLastAnnounceCommandPayload();
     EXPECT_EQ(forwarded_payload.providerNodeID, static_cast<NodeId>(1234));
     EXPECT_EQ(forwarded_payload.vendorID, static_cast<VendorId>(4321));
     EXPECT_EQ(forwarded_payload.announcementReason, OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
     EXPECT_EQ(forwarded_payload.endpoint, 5);
+}
+
+TEST_F(TestOTARequestorCluster, UnknownAnnouncementReasonIsRejected)
+{
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Construct the payload with an unknown announcement reason. Sending the literal kUnknownEnumValue is rejected by the encoder,
+    // so use an undefined value instead.
+    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
+    payload.providerNodeID     = 1234;
+    payload.vendorID           = static_cast<VendorId>(4321);
+    payload.announcementReason = static_cast<OtaSoftwareUpdateRequestor::AnnouncementReasonEnum>(99);
+    payload.endpoint           = 5;
+
+    // Invoke the command.
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_EQ(result.status,
+              std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError)));
+
+    // Check that the command wasn't passed on.
+    EXPECT_FALSE(otaCommands.GetLastAnnounceCommandPayload().has_value());
 }
 
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
