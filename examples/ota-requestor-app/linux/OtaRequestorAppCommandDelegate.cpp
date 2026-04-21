@@ -25,7 +25,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-OtaRequestorAppCommandHandler * OtaRequestorAppCommandHandler::FromJSON(const char * json, OtaRequestorAppCommandDelegate * delegate)
+OtaRequestorAppCommandHandler * OtaRequestorAppCommandHandler::FromJSON(const char * json,
+                                                                        OtaRequestorAppCommandDelegate * delegate)
 {
     Json::Reader reader;
     Json::Value value;
@@ -49,7 +50,8 @@ OtaRequestorAppCommandHandler * OtaRequestorAppCommandHandler::FromJSON(const ch
         return nullptr;
     }
 
-    return Platform::New<OtaRequestorAppCommandHandler>(OtaRequestorAppCommandHandler::PrivateCtorTag{}, std::move(value), delegate);
+    return Platform::New<OtaRequestorAppCommandHandler>(OtaRequestorAppCommandHandler::PrivateCtorTag{}, std::move(value),
+                                                        delegate);
 }
 
 static std::string ToString(const Json::Value & v)
@@ -88,7 +90,7 @@ void OtaRequestorAppCommandHandler::HandleCommand(intptr_t context)
 
     std::string name;
     std::string cluster;
-    uint16_t endpoint                        = 0;
+    uint16_t endpoint                         = 0;
     OtaRequestorAppCommandDelegate * delegate = nullptr;
 
     if (self->mCommandPayload.empty())

@@ -21,12 +21,12 @@
 #include "NamedPipeCommands.h"
 
 #include <json/json.h>
-//#include <ota-Requestor-common/OTARequestorExample.h>
+// #include <ota-Requestor-common/OTARequestorExample.h>
 #include <platform/DiagnosticDataProvider.h>
 
 #include <string>
 
-//OTARequestorExample & GetOtaRequestorExample();
+// OTARequestorExample & GetOtaRequestorExample();
 
 class OtaRequestorAppCommandDelegate : public NamedPipeCommandDelegate
 {
