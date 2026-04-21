@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ static_library("CYW30739") {
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/crypto",

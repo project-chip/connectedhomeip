@@ -94,6 +94,7 @@ AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
+atomicity
 att
 attId
 attr
@@ -431,6 +432,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+Devkit
 DevKitC
 DevKitM
 devtype
@@ -1593,6 +1595,7 @@ UnitLocalization
 unittest
 unpair
 unprovisioned
+unreferenced
 unregistration
 Unsecure
 Unselect

@@ -96,16 +96,16 @@ constexpr DeviceTypeId kAirPurifierDeviceTypeId  = 0x0000002D;
 constexpr uint8_t kAirPurifierDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kWaterFreezeDetectorDeviceTypeId  = 0x00000041;
-constexpr uint8_t kWaterFreezeDetectorDeviceTypeRevision = 1;
+constexpr uint8_t kWaterFreezeDetectorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kWaterValveDeviceTypeId  = 0x00000042;
 constexpr uint8_t kWaterValveDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kWaterLeakDetectorDeviceTypeId  = 0x00000043;
-constexpr uint8_t kWaterLeakDetectorDeviceTypeRevision = 1;
+constexpr uint8_t kWaterLeakDetectorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kRainSensorDeviceTypeId  = 0x00000044;
-constexpr uint8_t kRainSensorDeviceTypeRevision = 1;
+constexpr uint8_t kRainSensorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kSoilSensorDeviceTypeId  = 0x00000045;
 constexpr uint8_t kSoilSensorDeviceTypeRevision = 1;
