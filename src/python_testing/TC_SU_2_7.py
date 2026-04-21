@@ -345,8 +345,8 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         else:
             # Ask the use if the Requestor Can Consent the software update
             user_response = self.wait_for_user_input(prompt_msg="Does the requestor device support CanConsent? Enter 'y' or 'n'",
-                                                         prompt_msg_placeholder="y",
-                                                         default_value="y")
+                                                     prompt_msg_placeholder="y",
+                                                     default_value="y")
             requestor_can_consent = user_response.lower() == "y" or user_response.lower() == 'yes'
         logger.info(f"Requestor CanConsent status: {requestor_can_consent}")
         if requestor_can_consent:
@@ -368,11 +368,11 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             event_report = state_transition_event_handler.wait_for_event_report(
                 self.ota_req.Events.StateTransition, timeout_sec=600)
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
-                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
+                                               expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
             # Wait State Event to change to kDelayedOnUserConsent
             event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
-                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
+                                               expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
             state_transition_event_handler.cancel()
             self.terminate_provider()
             self.restart_requestor()
