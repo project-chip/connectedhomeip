@@ -292,7 +292,7 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 
 #if CONFIG_FACTORY_DATA
     VerifyOrReturnError(bufSize >= sFactoryData.dii.vendor_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(sFactoryData.dii.vendor_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(sFactoryData.dii.vendor_name.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memcpy(buf, sFactoryData.dii.vendor_name.value, sFactoryData.dii.vendor_name.len);
     buf[sFactoryData.dii.vendor_name.len] = 0;
     err                                   = CHIP_NO_ERROR;
@@ -325,7 +325,7 @@ CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 
 #if CONFIG_FACTORY_DATA
     VerifyOrReturnError(bufSize >= sFactoryData.dii.product_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(sFactoryData.dii.product_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(sFactoryData.dii.product_name.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memcpy(buf, sFactoryData.dii.product_name.value, sFactoryData.dii.product_name.len);
     buf[sFactoryData.dii.product_name.len] = 0;
     err                                    = CHIP_NO_ERROR;
@@ -374,7 +374,7 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 
 #if CONFIG_FACTORY_DATA
     VerifyOrReturnError(bufSize >= sFactoryData.dii.serial_num.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(sFactoryData.dii.serial_num.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(sFactoryData.dii.serial_num.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memcpy(buf, sFactoryData.dii.serial_num.value, sFactoryData.dii.serial_num.len);
     buf[sFactoryData.dii.serial_num.len] = 0;
     err                                  = CHIP_NO_ERROR;
@@ -470,7 +470,7 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
 
 #if CONFIG_FACTORY_DATA
     VerifyOrReturnError(bufSize >= sFactoryData.dii.hw_ver_string.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(sFactoryData.dii.hw_ver_string.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(sFactoryData.dii.hw_ver_string.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memcpy(buf, sFactoryData.dii.hw_ver_string.value, sFactoryData.dii.hw_ver_string.len);
     buf[sFactoryData.dii.hw_ver_string.len] = 0;
     err                                     = CHIP_NO_ERROR;
@@ -489,7 +489,7 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 
 #if CONFIG_FACTORY_DATA
     VerifyOrReturnError(uniqueIdSpan.size() >= sFactoryData.dii.rd_id_uid.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(sFactoryData.dii.rd_id_uid.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(sFactoryData.dii.rd_id_uid.len > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memcpy(uniqueIdSpan.data(), sFactoryData.dii.rd_id_uid.value, sFactoryData.dii.rd_id_uid.len);
     err = CHIP_NO_ERROR;
 #else

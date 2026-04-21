@@ -37,6 +37,7 @@ class Efr32App(Enum):
     UNIT_TEST = auto()
     AIR_QUALITY_SENSOR = auto()
     CLOSURE = auto()
+    SMOKE_CO_ALARM = auto()
 
     def ExampleName(self):
         if self == Efr32App.EVSE:
@@ -59,6 +60,8 @@ class Efr32App(Enum):
             return 'air-quality-sensor-app'
         if self == Efr32App.CLOSURE:
             return 'closure-app'
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'smoke-co-alarm-app'
         raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
@@ -84,6 +87,8 @@ class Efr32App(Enum):
             return 'matter-silabs-air-quality-sensor-example'
         if self == Efr32App.CLOSURE:
             return 'matter-silabs-closure-example'
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'matter-silabs-smoke-co-alarm-example'
         raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
@@ -109,6 +114,8 @@ class Efr32App(Enum):
             return 'air_quality_sensor_app.flashbundle.txt'
         if self == Efr32App.CLOSURE:
             return 'closure_app.flashbundle.txt'
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'smoke_co_alarm_app.flashbundle.txt'
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):

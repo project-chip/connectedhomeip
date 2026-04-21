@@ -48,12 +48,15 @@ namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
+#if !CHIP_CRYPTO_PSA
+// PSA crypto manages entropy internally, so only add entropy source for non-PSA builds
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     esp_fill_random(output, len);
     *olen = len;
     return 0;
 }
+#endif // !CHIP_CRYPTO_PSA
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
@@ -71,7 +74,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     VerifyOrReturnError(err == ESP_OK, Internal::ESP32Utils::MapError(err));
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+#if !CHIP_CRYPTO_PSA
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, nullptr, 16));
+#endif // !CHIP_CRYPTO_PSA
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

@@ -435,8 +435,7 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
     Seconds32 currentMatterEpochTimestamp = Seconds32(currentMatterEpochTimestampInSeconds);
 
     // For the reference thermostat app, we will always choose a suggestion with the earliest effective time.
-    mIndexOfCurrentSuggestion = GetThermostatSuggestionIndexWithEarliestEffectiveTime(currentMatterEpochTimestamp);
-    SetCurrentThermostatSuggestion(mIndexOfCurrentSuggestion);
+    SetCurrentThermostatSuggestion(GetThermostatSuggestionIndexWithEarliestEffectiveTime(currentMatterEpochTimestamp));
 
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> nullableCurrentThermostatSuggestion;
     GetCurrentThermostatSuggestion(nullableCurrentThermostatSuggestion);

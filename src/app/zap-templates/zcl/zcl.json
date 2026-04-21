@@ -237,8 +237,16 @@
         "Closure Dimension": [
             "CurrentState",
             "TargetState",
+            "Resolution",
+            "StepValue",
+            "Unit",
             "UnitRange",
             "LimitRange",
+            "TranslationDirection",
+            "RotationAxis",
+            "Overflow",
+            "ModulationType",
+            "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
         ],
@@ -422,6 +430,13 @@
             "FeatureMap",
             "ClusterRevision"
         ],
+        "OTA Software Update Requestor": [
+            "UpdatePossible",
+            "UpdateState",
+            "UpdateStateProgress",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Scenes Management": ["ClusterRevision"],
         "Software Diagnostics": [
             "ClusterRevision",
@@ -441,6 +456,7 @@
             "nullable_global_struct"
         ],
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Flow Measurement": ["ClusterRevision", "FeatureMap", "MeasuredValue"],
         "Temperature Measurement": [
             "ClusterRevision",
             "FeatureMap",

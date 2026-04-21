@@ -21,6 +21,7 @@
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -250,12 +251,10 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
 
         using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
 
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access): we asserted above for has_value
         EXPECT_EQ(event->eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
 
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access): we asserted above for has_value
         ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
@@ -293,12 +292,10 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
         ASSERT_TRUE(event.has_value());
 
         using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access): we asserted above for has_value
         EXPECT_EQ(event->eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
 
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access): we asserted above for has_value
         ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
