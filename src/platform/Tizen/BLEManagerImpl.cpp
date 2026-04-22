@@ -940,8 +940,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    ReturnErrorOnFailure(
-        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BLEManagerImpl * self) { return self->_InitImpl(); }, this));
+    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this));
 
     mFlags.Set(Flags::kTizenBLELayerInitialized);
     return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
