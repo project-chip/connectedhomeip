@@ -16,9 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/CommandHandlerInterface.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -36,22 +33,9 @@ namespace {
 CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
                                     std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> & optionalAcceptedCommands)
 {
-    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
-    // it claims to support.
+    // Make sure that the cluster actually exists on this endpoint.
     const EmberAfCluster * serverCluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
     VerifyOrReturnValue(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
-
-    CommandHandlerInterface * interface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-    if (interface != nullptr)
-    {
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
-        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
-        // Otherwise we finished.
-        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
-    }
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
     const CommandId * endOfList = serverCluster->acceptedCommandList;
@@ -76,8 +60,7 @@ CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
@@ -133,10 +116,8 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->SetInstance(this);
 
-    MicrowaveOvenControlCluster::Config config{
-        mFeature,   mOptionalAttributeSet,  optionalAcceptedCommands, mOpStateInstance, mMicrowaveOvenModeInstance,
-        *mDelegate, *interactionModelEngine
-    };
+    MicrowaveOvenControlCluster::Config config{ mFeature,         mOptionalAttributeSet,      optionalAcceptedCommands,
+                                                mOpStateInstance, mMicrowaveOvenModeInstance, *mDelegate };
     mCluster.Create(mEndpointId, config);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }

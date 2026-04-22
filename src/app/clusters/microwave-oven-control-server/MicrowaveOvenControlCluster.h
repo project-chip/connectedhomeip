@@ -42,7 +42,6 @@ public:
         Clusters::OperationalState::Instance & opStateInstance;
         Clusters::ModeBase::Instance & microwaveOvenModeInstance;
         MicrowaveOvenControl::Delegate & delegate;
-        InteractionModelEngine & interactionModelEngine;
     };
 
     MicrowaveOvenControlCluster(EndpointId endpointId, const Config & context);
@@ -71,7 +70,6 @@ private:
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
     MicrowaveOvenControl::Delegate & mDelegate;
-    InteractionModelEngine & mInteractionModelEngine;
 
     uint32_t mCookTimeSec{};
     uint8_t mSupportedWattLevels{};

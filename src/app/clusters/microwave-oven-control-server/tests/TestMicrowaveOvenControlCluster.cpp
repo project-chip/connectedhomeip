@@ -32,9 +32,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
-using namespace chip::app::Clusters::OperationalState;
-using namespace chip::app::Clusters::ModeBase;
 using namespace chip::Testing;
+
+constexpr uint32_t kDefaultCookTimeSec = 30u;
 
 class MicrowaveOvenControlDelegate : public MicrowaveOvenControl::Delegate
 {
@@ -94,7 +94,7 @@ public:
 
     app::DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountDownTime; }
 
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState) override
     {
         if (index >= mOperationalStateList.size())
         {
@@ -113,13 +113,13 @@ public:
         return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
     }
 
-    void HandlePauseStateCallback(GenericOperationalError & err) override {}
-    void HandleResumeStateCallback(GenericOperationalError & err) override {}
-    void HandleStartStateCallback(GenericOperationalError & err) override {}
-    void HandleStopStateCallback(GenericOperationalError & err) override {}
+    void HandlePauseStateCallback(OperationalState::GenericOperationalError & err) override {}
+    void HandleResumeStateCallback(OperationalState::GenericOperationalError & err) override {}
+    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override {}
+    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override {}
 
 private:
-    Span<const GenericOperationalState> mOperationalStateList;
+    Span<const OperationalState::GenericOperationalState> mOperationalStateList;
     Span<const CharSpan> mOperationalPhaseList;
 };
 
@@ -198,34 +198,35 @@ struct TestMicrowaveOvenControlCluster : public ::testing::Test
     ModeBaseDelegate modeBaseDelegate;
     ModeBase::Instance microwaveOvenModeInstance{ &modeBaseDelegate, kRootEndpointId, MicrowaveOvenControl::Id, 0 };
     MicrowaveOvenControlDelegate microwaveOvenControlDelegate;
-    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands{
-        MicrowaveOvenControl::Commands::AddMoreTime::Id
-    };
+    std::bitset<Commands::kAcceptedCommandsCount> optionalAcceptedCommands{ Commands::AddMoreTime::Id };
     MicrowaveOvenControlCluster::OptionalAttributeSet optionalAttributeSet{};
     MicrowaveOvenControlCluster::Config defaultConfig{
-        .feature                   = BitFlags<MicrowaveOvenControl::Feature>{},
+        .feature                   = BitFlags<Feature>{},
         .optionalAttributeSet      = optionalAttributeSet,
         .optionalAcceptedCommands  = optionalAcceptedCommands,
         .opStateInstance           = operationalStateInstance,
         .microwaveOvenModeInstance = microwaveOvenModeInstance,
         .delegate                  = microwaveOvenControlDelegate,
-        .interactionModelEngine    = testContext.GetInteractionModelEngine(),
     };
 };
 
-void TestMandatoryAttributes(ClusterTester & tester)
+void TestMandatoryAttributes(ClusterTester & tester, Feature feature, MicrowaveOvenControlDelegate & delegate)
 {
     uint16_t revision{};
-    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_EQ(revision, MicrowaveOvenControl::kRevision);
 
     uint32_t featureMap{};
-    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    ASSERT_EQ(featureMap, to_underlying(feature));
 
     uint32_t cookTime{};
-    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::CookTime::Id, cookTime), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(CookTime::Id, cookTime), CHIP_NO_ERROR);
+    ASSERT_EQ(cookTime, kDefaultCookTimeSec);
 
     uint32_t maxCookTime{};
-    ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::MaxCookTime::Id, maxCookTime), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(MaxCookTime::Id, maxCookTime), CHIP_NO_ERROR);
+    ASSERT_EQ(maxCookTime, delegate.GetMaxCookTimeSec());
 }
 
 } // namespace
@@ -238,63 +239,63 @@ TEST_F(TestMicrowaveOvenControlCluster, AttributeTest)
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
-                                                MicrowaveOvenControl::Attributes::CookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::MaxCookTime::kMetadataEntry,
+                                                CookTime::kMetadataEntry,
+                                                MaxCookTime::kMetadataEntry,
                                             }));
     }
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.optionalAttributeSet.Set<MicrowaveOvenControl::Attributes::WattRating::Id>();
+        config.optionalAttributeSet.Set<WattRating::Id>();
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
-                                                MicrowaveOvenControl::Attributes::CookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::MaxCookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::WattRating::kMetadataEntry,
+                                                CookTime::kMetadataEntry,
+                                                MaxCookTime::kMetadataEntry,
+                                                WattRating::kMetadataEntry,
                                             }));
     }
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.feature                             = MicrowaveOvenControl::Feature::kPowerAsNumber;
+        config.feature                             = Feature::kPowerAsNumber;
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
-                                                MicrowaveOvenControl::Attributes::CookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::MaxCookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::PowerSetting::kMetadataEntry,
+                                                CookTime::kMetadataEntry,
+                                                MaxCookTime::kMetadataEntry,
+                                                PowerSetting::kMetadataEntry,
                                             }));
     }
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.feature                             = MicrowaveOvenControl::Feature::kPowerNumberLimits;
+        config.feature                             = Feature::kPowerNumberLimits;
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
-                                                MicrowaveOvenControl::Attributes::CookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::MaxCookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::MinPower::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::MaxPower::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::PowerStep::kMetadataEntry,
+                                                CookTime::kMetadataEntry,
+                                                MaxCookTime::kMetadataEntry,
+                                                MinPower::kMetadataEntry,
+                                                MaxPower::kMetadataEntry,
+                                                PowerStep::kMetadataEntry,
                                             }));
     }
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.feature                             = MicrowaveOvenControl::Feature::kPowerInWatts;
+        config.feature                             = Feature::kPowerInWatts;
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
-                                                MicrowaveOvenControl::Attributes::CookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::MaxCookTime::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::SupportedWatts::kMetadataEntry,
-                                                MicrowaveOvenControl::Attributes::SelectedWattIndex::kMetadataEntry,
+                                                CookTime::kMetadataEntry,
+                                                MaxCookTime::kMetadataEntry,
+                                                SupportedWatts::kMetadataEntry,
+                                                SelectedWattIndex::kMetadataEntry,
                                             }));
     }
 }
@@ -308,23 +309,23 @@ TEST_F(TestMicrowaveOvenControlCluster, ReadAttributeTest)
 
         ClusterTester tester(cluster);
 
-        TestMandatoryAttributes(tester);
+        TestMandatoryAttributes(tester, config.feature, microwaveOvenControlDelegate);
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.optionalAttributeSet.Set<MicrowaveOvenControl::Attributes::WattRating::Id>();
+        config.optionalAttributeSet.Set<WattRating::Id>();
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
 
-        TestMandatoryAttributes(tester);
+        TestMandatoryAttributes(tester, config.feature, microwaveOvenControlDelegate);
 
         uint16_t wattRating{};
-        ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::WattRating::Id, wattRating), CHIP_NO_ERROR);
+        ASSERT_EQ(tester.ReadAttribute(WattRating::Id, wattRating), CHIP_NO_ERROR);
         ASSERT_EQ(wattRating, microwaveOvenControlDelegate.GetWattRating());
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -332,16 +333,16 @@ TEST_F(TestMicrowaveOvenControlCluster, ReadAttributeTest)
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.feature                             = MicrowaveOvenControl::Feature::kPowerAsNumber;
+        config.feature                             = Feature::kPowerAsNumber;
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
 
-        TestMandatoryAttributes(tester);
+        TestMandatoryAttributes(tester, config.feature, microwaveOvenControlDelegate);
 
         uint8_t powerSetting{};
-        ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::PowerSetting::Id, powerSetting), CHIP_NO_ERROR);
+        ASSERT_EQ(tester.ReadAttribute(PowerSetting::Id, powerSetting), CHIP_NO_ERROR);
         ASSERT_EQ(powerSetting, microwaveOvenControlDelegate.GetPowerSettingNum());
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -349,24 +350,24 @@ TEST_F(TestMicrowaveOvenControlCluster, ReadAttributeTest)
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.feature                             = MicrowaveOvenControl::Feature::kPowerNumberLimits;
+        config.feature                             = Feature::kPowerNumberLimits;
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
 
-        TestMandatoryAttributes(tester);
+        TestMandatoryAttributes(tester, config.feature, microwaveOvenControlDelegate);
 
         uint8_t minPower{};
-        ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::MinPower::Id, minPower), CHIP_NO_ERROR);
+        ASSERT_EQ(tester.ReadAttribute(MinPower::Id, minPower), CHIP_NO_ERROR);
         ASSERT_EQ(minPower, microwaveOvenControlDelegate.GetMinPowerNum());
 
         uint8_t maxPower{};
-        ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::MaxPower::Id, maxPower), CHIP_NO_ERROR);
+        ASSERT_EQ(tester.ReadAttribute(MaxPower::Id, maxPower), CHIP_NO_ERROR);
         ASSERT_EQ(maxPower, microwaveOvenControlDelegate.GetMaxPowerNum());
 
         uint8_t powerStep{};
-        ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::PowerStep::Id, powerStep), CHIP_NO_ERROR);
+        ASSERT_EQ(tester.ReadAttribute(PowerStep::Id, powerStep), CHIP_NO_ERROR);
         ASSERT_EQ(powerStep, microwaveOvenControlDelegate.GetPowerStepNum());
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -374,16 +375,16 @@ TEST_F(TestMicrowaveOvenControlCluster, ReadAttributeTest)
 
     {
         MicrowaveOvenControlCluster::Config config = defaultConfig;
-        config.feature                             = MicrowaveOvenControl::Feature::kPowerInWatts;
+        config.feature                             = Feature::kPowerInWatts;
         MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
 
-        TestMandatoryAttributes(tester);
+        TestMandatoryAttributes(tester, config.feature, microwaveOvenControlDelegate);
 
         DataModel::DecodableList<uint16_t> supportedWatts;
-        ASSERT_EQ(tester.ReadAttribute(MicrowaveOvenControl::Attributes::SupportedWatts::Id, supportedWatts), CHIP_NO_ERROR);
+        ASSERT_EQ(tester.ReadAttribute(SupportedWatts::Id, supportedWatts), CHIP_NO_ERROR);
         auto it = supportedWatts.begin();
         ASSERT_TRUE(it.Next());
         ASSERT_TRUE(it.GetValue() == 100u);

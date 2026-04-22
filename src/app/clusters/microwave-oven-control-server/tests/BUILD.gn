@@ -23,6 +23,12 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestMicrowaveOvenControlCluster.cpp" ]
 
+  sources = []
+
+  # We need to build these files from the other clusters.
+  # We can not import app_config_dependent_sources.gni from the other clusters here and
+  # iterate the list of source files because all of them initialize the same variable
+  # app_config_dependent_sources with different values producing a value collision error.
   sources = [
     "../../mode-base-server/mode-base-cluster-objects.cpp",
     "../../mode-base-server/mode-base-cluster-objects.h",

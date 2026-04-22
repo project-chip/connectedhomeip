@@ -27,7 +27,6 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
 using Status = Protocols::InteractionModel::Status;
@@ -58,7 +57,7 @@ MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, 
     DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(config.feature),
     mOptionalAttributeSet(config.optionalAttributeSet), mOptionalAcceptedCommands(config.optionalAcceptedCommands),
     mOpStateInstance(config.opStateInstance), mMicrowaveOvenModeInstance(config.microwaveOvenModeInstance),
-    mDelegate(config.delegate), mInteractionModelEngine(config.interactionModelEngine), mCookTimeSec(kDefaultCookTimeSec)
+    mDelegate(config.delegate), mCookTimeSec(kDefaultCookTimeSec)
 {}
 
 CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
@@ -67,7 +66,7 @@ CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
 
     // If the PowerInWatts feature is supported, get the count of supported watt levels so we can later
     // ensure incoming watt level values are valid.
-    if (mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts))
+    if (mFeature.Has(Feature::kPowerInWatts))
     {
         mSupportedWattLevels = GetCountOfSupportedWattLevels();
         VerifyOrReturnError(mSupportedWattLevels > 0, CHIP_ERROR_INVALID_ARGUMENT,
@@ -88,7 +87,7 @@ uint8_t MicrowaveOvenControlCluster::GetCountOfSupportedWattLevels() const
     return wattIndex;
 }
 
-uint32_t MicrowaveOvenControlCluster::GetCookTimeSec() const
+inline uint32_t MicrowaveOvenControlCluster::GetCookTimeSec() const
 {
     return mCookTimeSec;
 }
@@ -154,16 +153,16 @@ CHIP_ERROR MicrowaveOvenControlCluster::Attributes(const ConcreteClusterPath & p
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber), PowerSetting::kMetadataEntry },
-        { mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits), MinPower::kMetadataEntry },
-        { mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits), MaxPower::kMetadataEntry },
-        { mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits), PowerStep::kMetadataEntry },
-        { mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts), SupportedWatts::kMetadataEntry },
-        { mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts), SelectedWattIndex::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerAsNumber), PowerSetting::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerNumberLimits), MinPower::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerNumberLimits), MaxPower::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerNumberLimits), PowerStep::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerInWatts), SupportedWatts::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerInWatts), SelectedWattIndex::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(WattRating::Id), WattRating::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(MicrowaveOvenControl::Attributes::kMandatoryMetadata), Span(optionalAttributes));
+    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
 std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -172,13 +171,13 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Invoke
 {
     switch (request.path.mCommandId)
     {
-    case MicrowaveOvenControl::Commands::SetCookingParameters::Id: {
-        MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType data;
+    case Commands::SetCookingParameters::Id: {
+        Commands::SetCookingParameters::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         return HandleSetCookingParameters(handler, request.path, data);
     }
-    case MicrowaveOvenControl::Commands::AddMoreTime::Id: {
-        MicrowaveOvenControl::Commands::AddMoreTime::DecodableType data;
+    case Commands::AddMoreTime::Id: {
+        Commands::AddMoreTime::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         return HandleAddMoreTime(handler, request.path, data);
     }
@@ -190,19 +189,19 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Invoke
 CHIP_ERROR MicrowaveOvenControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.AppendElements({ MicrowaveOvenControl::Commands::SetCookingParameters::kMetadataEntry }));
+    ReturnErrorOnFailure(builder.AppendElements({ Commands::SetCookingParameters::kMetadataEntry }));
 
-    if (mOptionalAcceptedCommands.test(MicrowaveOvenControl::Commands::AddMoreTime::Id))
+    if (mOptionalAcceptedCommands.test(Commands::AddMoreTime::Id))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ MicrowaveOvenControl::Commands::AddMoreTime::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::AddMoreTime::kMetadataEntry }));
     }
 
     return CHIP_NO_ERROR;
 }
 
-std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::HandleSetCookingParameters(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const Commands::SetCookingParameters::DecodableType & commandData)
 {
     Status status = Status::Success;
     uint8_t opState;
@@ -217,13 +216,13 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
     auto & startAfterSetting = commandData.startAfterSetting;
 
     opState = mOpStateInstance.GetCurrentOperationalState();
-    VerifyOrExit(opState == to_underlying(OperationalStateEnum::kStopped), status = Status::InvalidInState);
+    VerifyOrExit(opState == to_underlying(OperationalState::OperationalStateEnum::kStopped), status = Status::InvalidInState);
 
     if (startAfterSetting.HasValue())
     {
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
-        TEMPORARY_RETURN_IGNORED mInteractionModelEngine.GetDataModelProvider()->AcceptedCommands(
+        TEMPORARY_RETURN_IGNORED mContext->provider.AcceptedCommands(
             ConcreteClusterPath(commandPath.mEndpointId, OperationalState::Id), acceptedCommandsList);
         auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 
@@ -253,7 +252,7 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
     VerifyOrExit(IsCookTimeSecondsInRange(reqCookTimeSec, mDelegate.GetMaxCookTimeSec()), status = Status::ConstraintError;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
-    if (mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber))
+    if (mFeature.Has(Feature::kPowerAsNumber))
     {
         // if using power as number, check if the param is invalid and set PowerSetting number.
         uint8_t reqPowerSettingNum;
@@ -267,7 +266,7 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
             cookMode.HasValue() || cookTimeSec.HasValue() || powerSetting.HasValue(), status = Status::InvalidCommand;
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
-        if (mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits))
+        if (mFeature.Has(Feature::kPowerNumberLimits))
         {
             maxPowerNum  = mDelegate.GetMaxPowerNum();
             minPowerNum  = mDelegate.GetMinPowerNum();
@@ -292,7 +291,7 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
 
         if (oldPowerSettingNum != mDelegate.GetPowerSettingNum())
         {
-            NotifyAttributeChanged(MicrowaveOvenControl::Attributes::PowerSetting::Id);
+            NotifyAttributeChanged(PowerSetting::Id);
         }
     }
     else
@@ -320,20 +319,19 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Handle
     }
 
 exit:
-    commandObj->AddStatus(commandPath, status);
-    return std::nullopt;
+    return status;
 }
 
 std::optional<DataModel::ActionReturnStatus>
 MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                               const MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData)
+                                               const Commands::AddMoreTime::DecodableType & commandData)
 {
     Status status = Status::Success;
     uint8_t opState;
     uint32_t finalCookTimeSec;
 
     opState = mOpStateInstance.GetCurrentOperationalState();
-    VerifyOrExit(opState != to_underlying(OperationalStateEnum::kError), status = Status::InvalidInState);
+    VerifyOrExit(opState != to_underlying(OperationalState::OperationalStateEnum::kError), status = Status::InvalidInState);
 
     VerifyOrExit(commandData.timeToAdd <= mDelegate.GetMaxCookTimeSec() &&
                      GetCookTimeSec() <= mDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
@@ -347,8 +345,7 @@ MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, cons
     status           = mDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
 
 exit:
-    commandObj->AddStatus(commandPath, status);
-    return std::nullopt;
+    return status;
 }
 
 } // namespace chip::app::Clusters
