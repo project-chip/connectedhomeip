@@ -23,6 +23,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
