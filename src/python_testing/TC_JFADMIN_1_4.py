@@ -63,9 +63,9 @@ log = logging.getLogger(__name__)
 class TC_JFADMIN_1_4(MatterBaseTest):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
     _MIN_COMMISSIONING_TIMEOUT = 60
-    _DEFAULT_OJCW_TIMEOUT = 60
+    _DEFAULT_OJCW_TIMEOUT = 180
     # TODO: Seems like the OJCW Discriminator should be randomized, but the test plan explicitly requires this number.
-    _DEFAULT_OJCW_DISCRIMINATOR = 3840
+    _DEFAULT_OJCW_DISCRIMINATOR = 3839
     _DEFAULT_OJCW_ITERATIONS = 2000
     _VALID_97_BYTE_VERIFIER = bytes.fromhex(
         "b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
@@ -91,7 +91,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
     async def assert_ojcw(
         self,
         *,
-        commissioning_timeout=_DEFAULT_OJCW_TIMEOUT,
+        commissioning_timeout=None,
         pake_passcode_verifier=_VALID_97_BYTE_VERIFIER,
         discriminator=_DEFAULT_OJCW_DISCRIMINATOR,
         iterations=_DEFAULT_OJCW_ITERATIONS,
@@ -100,6 +100,9 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         expected_cluster_status=None,
         expected_error_message=None,
     ):
+        if commissioning_timeout is None:
+            commissioning_timeout = self._DEFAULT_OJCW_TIMEOUT
+        log.info(f"Setting commissioning timeout to {commissioning_timeout}ms")
         cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
             commissioningTimeout=commissioning_timeout,
             PAKEPasscodeVerifier=pake_passcode_verifier,
@@ -177,6 +180,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
             self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            self._DEFAULT_OJCW_TIMEOUT = 60
             dut_rpc_server_ip = "127.0.0.1"
             dut_rpc_server_port = "33033"
             self.fabric_a_admin = JFAdministratorSubprocess(
@@ -191,6 +195,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
                 expected_output="Updating services using commissioning mode 1",
                 timeout=30)
         else:
+            self._DEFAULT_OJCW_TIMEOUT = 180
             dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
             if not dut_rpc_server_ip:
                 asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
@@ -233,7 +238,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
     def steps_TC_JFADMIN_1_4(self) -> list[TestStep]:
         return [
             TestStep("1", "Commission DUT to TH."),
-            TestStep("2", "TH sends OJCW command to DUT with valid parameters: CommissioningTimeout=180, PAKEPasscodeVerifier=valid_97_byte_verifier, Discriminator=3840, Iterations=2000, Salt=valid_16_byte_salt.",
+            TestStep("2", "TH sends OJCW command to DUT with valid parameters: CommissioningTimeout=180, PAKEPasscodeVerifier=valid_97_byte_verifier, Discriminator=3839, Iterations=2000, Salt=valid_16_byte_salt.",
                      "DUT responds with SUCCESS status and opens its commissioning window."),
             TestStep("3", "Verify commissioning window is open by checking DUT advertisement.",
                      "DUT advertises commissioning service with correct discriminator."),
@@ -257,7 +262,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
                      "DUT responds with INVALID_COMMAND status code."),
             TestStep("13", "TH sends OJCW command to DUT with Salt of length 33 bytes (above maximum).",
                      "DUT responds with INVALID_COMMAND status code."),
-            TestStep("14", "TH sends OJCW command to DUT with valid parameters: CommissioningTimeout=60, Iterations=1000 (minimum valid), Salt=valid_32_byte_salt (maximum valid).",
+            TestStep("14", "TH sends OJCW command to DUT with valid parameters: CommissioningTimeout=180, Iterations=1000 (minimum valid), Salt=valid_32_byte_salt (maximum valid).",
                      "DUT responds with SUCCESS status and opens commissioning window."),
             TestStep("15", "Verify commissioning window behavior with minimum/maximum valid parameters.",
                      "DUT advertises commissioning service correctly."),
@@ -338,14 +343,14 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         self.step("3")
         responses = await self.discover_commissionable_nodes()
         asserts.assert_greater_equal(
-            len(responses), 1, "DUT should advertise commissioning service with discriminator 3840"
+            len(responses), 1, "DUT should advertise commissioning service with discriminator 3839"
         )
 
         self.step("4")
         await self.sleep(self._TIMEOUT_STEP_2 + 1)
         responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
-            len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3840"
+            len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3839"
         )
 
         self.step("5")
@@ -422,7 +427,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         self.step("15")
         responses = await self.discover_commissionable_nodes()
         asserts.assert_greater_equal(
-            len(responses), 1, "DUT should advertise commissioning service with discriminator 3840"
+            len(responses), 1, "DUT should advertise commissioning service with discriminator 3839"
         )
 
         self.step("16")
@@ -438,7 +443,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         await self.sleep(self._DEFAULT_OJCW_TIMEOUT + 1)
         responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
-            len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3840"
+            len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3839"
         )
 
         self.step("18")
@@ -448,14 +453,14 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         self.step("19")
         responses = await self.discover_commissionable_nodes()
         asserts.assert_greater_equal(
-            len(responses), 1, "DUT should advertise commissioning service with discriminator 3840"
+            len(responses), 1, "DUT should advertise commissioning service with discriminator 3839"
         )
 
         self.step("20")
         await self.sleep(self._DEFAULT_OJCW_TIMEOUT + 1)
         responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
-            len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3840"
+            len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3839"
         )
 
 
