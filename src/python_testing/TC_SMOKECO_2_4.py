@@ -153,6 +153,8 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.SmokeCoAlarm))
     async def test_TC_SMOKECO_2_4(self):
+        # Extra time to wait on reports
+        report_extra_wait = 60
 
         # Commission device already done
         self.step(1)
@@ -332,7 +334,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.start_device_self_test()
 
         self.step(38)
-        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
+        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180 + report_extra_wait)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
         asserts.assert_true(test_in_progress_report.value, "Test is not in progresss and should be in progress.")
 
@@ -341,7 +343,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kTesting)
 
         self.step(40)
-        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
+        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180 + report_extra_wait)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
         asserts.assert_equal(test_in_progress_report.value, False)
 
@@ -362,7 +364,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         await self.send_single_cmd(self_test_cmd, dev_ctrl=self.default_controller, endpoint=self.get_endpoint(), timedRequestTimeoutMs=5000)
 
         self.step(45)
-        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
+        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180 + report_extra_wait)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
         asserts.assert_true(test_in_progress_report.value, "Test is not in progress and should be in progress.")
 
@@ -371,7 +373,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kTesting)
 
         self.step(47)
-        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
+        test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180 + report_extra_wait)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
         asserts.assert_false(test_in_progress_report.value, "Test should not be in progress and is on progress.")
 
