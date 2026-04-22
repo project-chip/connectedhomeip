@@ -21,7 +21,6 @@
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
-#include "QRCodeScreen.h"
 #include "ShellCommands.h"
 #include "WiFiWidget.h"
 #include "esp_flash.h"
