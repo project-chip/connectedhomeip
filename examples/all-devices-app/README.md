@@ -223,7 +223,9 @@ If you encounter network discovery issues (especially when pairing with
 controllers that require mDNS), you may need to configure the firewall on the
 device running the `all-devices-app` to allow incoming connections.
 
-Instead of disabling the firewall entirely, it is recommended to allow only the specific ports required for Matter and mDNS. If using `ufw`, you can allow them with:
+Instead of disabling the firewall entirely, it is recommended to allow only the
+specific ports required for Matter and mDNS. If using `ufw`, you can allow them
+with:
 
 ```bash
 sudo ufw allow 5353/udp
