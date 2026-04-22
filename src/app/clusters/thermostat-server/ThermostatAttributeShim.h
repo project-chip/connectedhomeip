@@ -83,15 +83,11 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace ThermostatRunningMode {
 
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum * value); // ThermostatRunningModeEnum
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum value);
 
 } // namespace ThermostatRunningMode
 
 namespace ThermostatRunningState {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value); // RelayStateBitmap
 Protocols::InteractionModel::Status Set(EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> value);
 } // namespace ThermostatRunningState
