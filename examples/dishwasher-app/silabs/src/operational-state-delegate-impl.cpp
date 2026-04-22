@@ -178,7 +178,7 @@ OperationalState::OperationalStateDelegate * OperationalState::GetDelegate()
     return gOperationalStateDelegate.get();
 }
 
-void emberAfOperationalStateClusterInitCallback(EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(EndpointId endpointId)
 {
     CHIP_ERROR err;
 

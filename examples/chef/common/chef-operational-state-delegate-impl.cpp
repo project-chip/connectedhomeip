@@ -305,7 +305,7 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
     return ret;
 }
 
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, OperationalState::Id,
                                                             MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
