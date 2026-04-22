@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    Copyright 2023-2025 NXP
  *    All rights reserved.
  *
@@ -31,8 +31,9 @@ void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    TEMPORARY_RETURN_IGNORED otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage,
-                                                                   otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader);
+    TEMPORARY_RETURN_IGNORED otaRequestorInit->gRequestorCore.Init(
+        chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage, otaRequestorInit->gRequestorUser,
+        otaRequestorInit->gDownloader, GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     otaRequestorInit->gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
     TEMPORARY_RETURN_IGNORED imageProcessor.Init(&otaRequestorInit->gDownloader);

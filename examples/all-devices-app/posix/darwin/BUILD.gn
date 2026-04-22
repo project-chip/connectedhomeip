@@ -26,10 +26,12 @@ source_set("darwin") {
   sources = [
     "../include/AppRootNode.h",
     "../include/TermHandling.h",
+    "DeviceFactoryPlatformOverride.cpp",
     "TermHandling.cpp",
   ]
 
   deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
@@ -37,6 +39,7 @@ source_set("darwin") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/data-model-providers/codedriven/endpoint",
     "${chip_root}/src/platform/Darwin",
+    "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 

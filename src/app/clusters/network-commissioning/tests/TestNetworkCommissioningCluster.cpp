@@ -121,7 +121,7 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
         ASSERT_TRUE(tester.WriteAttribute(InterfaceEnabled::Id, true).IsSuccess());
         ASSERT_EQ(tester.GetDirtyList().size(), 1u);
         ASSERT_EQ(tester.GetDirtyList()[0],
-                  app::AttributePathParams(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id));
+                  app::ConcreteAttributePath(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id));
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

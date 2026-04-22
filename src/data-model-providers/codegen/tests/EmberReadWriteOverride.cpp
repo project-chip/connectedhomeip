@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 #include "EmberReadWriteOverride.h"
+#include "app/data-model-provider/AttributeChangeListener.h"
+#include "app/data-model-provider/Provider.h"
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteClusterPath.h>
@@ -38,6 +40,8 @@ Status gEmberStatusCode = Status::InvalidAction;
 
 namespace chip {
 namespace Testing {
+
+app::DataModel::Provider * TestNotifiedProvider::gProvider = nullptr;
 
 void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
 {
@@ -94,6 +98,11 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
         size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), readLength);
         memcpy(gEmberIoBuffer, buffer, len);
         gEmberIoBufferFill = len;
+        if (auto provider = chip::Testing::TestNotifiedProvider::Provider(); provider != nullptr)
+        {
+            provider->NotifyAttributeChanged({ attRecord->endpoint, attRecord->clusterId, attRecord->attributeId },
+                                             chip::app::DataModel::AttributeChangeType::kReportable);
+        }
     }
     else
     {
@@ -130,9 +139,9 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
         (*(version))++;
     }
 
-    if (input.changeListener != nullptr)
+    if (auto provider = chip::Testing::TestNotifiedProvider::Provider(); provider != nullptr)
     {
-        input.changeListener->MarkDirty(chip::app::AttributePathParams(path.mEndpointId, path.mClusterId, path.mAttributeId));
+        provider->NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
     }
 
     return Status::Success;
