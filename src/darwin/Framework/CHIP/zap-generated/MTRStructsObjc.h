@@ -2917,14 +2917,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull endpointID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull friendlyName MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nonnull statusEntry MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
 @interface MTRJointFabricDatastoreClusterDatastoreBindingTargetStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable node MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable group MTR_PROVISIONALLY_AVAILABLE;
@@ -2970,6 +2962,13 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSString * _Nonnull friendlyName MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull vendorID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nonnull icac MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull endpointID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull friendlyName MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

@@ -1265,14 +1265,16 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
         }
         mGroupInformationEntries[index].groupCATVersion = commandData.groupCATVersion;
     }
-    if (commandData.groupPermission != Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kUnknownEnumValue)
+    if (commandData.groupPermission.IsNull() == false &&
+        commandData.groupPermission.Value() !=
+            Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kUnknownEnumValue)
     {
-        if (mGroupInformationEntries[index].groupPermission != commandData.groupPermission)
+        if (mGroupInformationEntries[index].groupPermission != commandData.groupPermission.Value())
         {
             anyGroupCATFieldUpdated = true;
         }
         // If the groupPermission is not set to kUnknownEnumValue, update it
-        mGroupInformationEntries[index].groupPermission = commandData.groupPermission;
+        mGroupInformationEntries[index].groupPermission = commandData.groupPermission.Value();
     }
 
     if (anyGroupCATFieldUpdated)
