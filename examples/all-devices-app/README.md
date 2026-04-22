@@ -1,41 +1,61 @@
 # Matter All-Devices Application
 
-The `all-devices-app` is a sample application for the Matter SDK that demonstrates the **Code-Driven paradigm**, which removes the dependency on generated code (ZAP tool) and global instances. This is the recommended approach for developing Matter applications moving forward, as it allows testing various device types and clusters without requiring recompilation for each configuration.
+The `all-devices-app` is a sample application for the Matter SDK that
+demonstrates the **Code-Driven paradigm**, which removes the dependency on
+generated code (ZAP tool) and global instances. This is the recommended approach
+for developing Matter applications moving forward, as it allows testing various
+device types and clusters without requiring recompilation for each
+configuration.
 
 ## What’s The “All Devices App”?
 
 The Code-Driven paradigm offers several advantages:
-- **Unit Testable**: Allows clusters to be unit tested easily.
-- **Dynamic Data Model**: Allows applications to change their data model dynamically at runtime without requiring recompilation.
-- **Complex Products**: Makes it easier to develop complex products such as bridges.
-- **Software Evolution**: Makes it easier to iterate and evolve product software.
+
+-   **Unit Testable**: Allows clusters to be unit tested easily.
+-   **Dynamic Data Model**: Allows applications to change their data model
+    dynamically at runtime without requiring recompilation.
+-   **Complex Products**: Makes it easier to develop complex products such as
+    bridges.
+-   **Software Evolution**: Makes it easier to iterate and evolve product
+    software.
 
 The application simulates various device types and is highly extensible.
 
 ## Architecture and File Structure
 
-The `all-devices-app` is organized to be **platform-agnostic** at its core, with platform-specific specializations kept separate:
+The `all-devices-app` is organized to be **platform-agnostic** at its core, with
+platform-specific specializations kept separate:
 
-- **`all-devices-common/`**: Contains the platform-agnostic core of the application. This includes:
-  - Core cluster logic and device interfaces.
-  - Base device implementations.
-  - The **`DeviceFactory`** (in `all-devices-common/devices/device-factory/DeviceFactory.h`), which enables runtime registration and creation of supported device types.
-- **`esp32/`, `linux/`, `posix/`**: Contain platform-specific implementations, entry points, and build configurations.
-  - For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers platform-specific overrides for devices at build-time.
+-   **`all-devices-common/`**: Contains the platform-agnostic core of the
+    application. This includes:
+    -   Core cluster logic and device interfaces.
+    -   Base device implementations.
+    -   The **`DeviceFactory`** (in
+        `all-devices-common/devices/device-factory/DeviceFactory.h`), which
+        enables runtime registration and creation of supported device types.
+-   **`esp32/`, `linux/`, `posix/`**: Contain platform-specific implementations,
+    entry points, and build configurations.
+    -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
+        platform-specific overrides for devices at build-time.
 
-This separation ensures that the core logic remains clean and reusable across different operating systems and hardware platforms, while still allowing for deep platform integration when needed.
+This separation ensures that the core logic remains clean and reusable across
+different operating systems and hardware platforms, while still allowing for
+deep platform integration when needed.
 
 ## Supported Devices
 
-The application supports the following device types (selectable via the `--device` flag). Note that this list represents what is supported currently, but the application is constantly evolving and new device types are added often:
-- `contact-sensor`
-- `water-leak-detector`
-- `occupancy-sensor`
-- `chime`
-- `dimmable-light`
-- `on-off-light`
-- `speaker`
-- `soil-sensor`
+The application supports the following device types (selectable via the
+`--device` flag). Note that this list represents what is supported currently,
+but the application is constantly evolving and new device types are added often:
+
+-   `contact-sensor`
+-   `water-leak-detector`
+-   `occupancy-sensor`
+-   `chime`
+-   `dimmable-light`
+-   `on-off-light`
+-   `speaker`
+-   `soil-sensor`
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -74,7 +94,9 @@ Build the application using the following command:
 
 ## Running the Application
 
-To run the application, specify the device type using the `--device` flag. The application supports running multiple devices simultaneously by specifying the flag multiple times.
+To run the application, specify the device type using the `--device` flag. The
+application supports running multiple devices simultaneously by specifying the
+flag multiple times.
 
 ```bash
 # Clean up KVS storage if needed
@@ -96,7 +118,8 @@ You can use `chip-tool` as a controller to interact with the `all-devices-app`.
 
 ### Commissioning (Pairing)
 
-Pair the device using on-network pairing. The default setup code is usually `20202021`.
+Pair the device using on-network pairing. The default setup code is usually
+`20202021`.
 
 ```bash
 # Assuming node ID 1
@@ -105,35 +128,44 @@ Pair the device using on-network pairing. The default setup code is usually `202
 
 ### Example Interaction: Chime Device
 
-If you ran the application with `--device chime`, you can send commands to the Chime cluster.
+If you ran the application with `--device chime`, you can send commands to the
+Chime cluster.
 
 #### Play a Sound
+
 Trigger the chime sound playback (Node ID `1`, Endpoint `1`).
 
 Playing Chime 0 (Ding Dong):
+
 ```bash
 ./out/linux-x64-chip-tool-boringssl/chip-tool chime play-chime-sound 1 1 --ChimeID 0
 ```
 
 Playing Chime 1 (Ring Ring):
+
 ```bash
 ./out/linux-x64-chip-tool-boringssl/chip-tool chime play-chime-sound 1 1 --ChimeID 1
 ```
 
 #### Read Attribute
+
 ```bash
 ./out/linux-x64-chip-tool-boringssl/chip-tool chime read selected-chime 1 1
 ```
 
 #### Write Attribute
+
 Change the selected chime to `1`:
+
 ```bash
 ./out/linux-x64-chip-tool-boringssl/chip-tool chime write selected-chime 1 1 1
 ```
 
 ### Bash Script Example
 
-You can use the following bash script to automate the build, run, and test process for the Chime device. Copy and save it as `test_chime.sh` and run it from the repository root.
+You can use the following bash script to automate the build, run, and test
+process for the Chime device. Copy and save it as `test_chime.sh` and run it
+from the repository root.
 
 ```bash
 #!/bin/bash
@@ -182,16 +214,26 @@ echo "Done! Check app.log for application logs."
 
 ## Troubleshooting
 
-When testing with an external controller (such as the Google Home App), you might need to ensure the following:
+When testing with an external controller (such as the Google Home App), you
+might need to ensure the following:
 
 ### Network Discovery and Firewall
-If you encounter network discovery issues (especially when pairing with controllers that require mDNS), you may need to disable the firewall on the device running the `all-devices-app` to allow incoming TCP/UDP connections.
+
+If you encounter network discovery issues (especially when pairing with
+controllers that require mDNS), you may need to disable the firewall on the
+device running the `all-devices-app` to allow incoming TCP/UDP connections.
 
 If using `ufw`, you can disable it with:
+
 ```bash
 sudo ufw disable
 ```
-*Note: This command may need to be executed after every reboot in some environments.*
+
+_Note: This command may need to be executed after every reboot in some
+environments._
 
 ### Same Wi-Fi Network
-Ensure your device running the `all-devices-app` (laptop or workstation) is on the same local network (Wi-Fi) as the controller. This is critical for local discovery and communication.
+
+Ensure your device running the `all-devices-app` (laptop or workstation) is on
+the same local network (Wi-Fi) as the controller. This is critical for local
+discovery and communication.
