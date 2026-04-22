@@ -29,7 +29,7 @@
 #define ChipLogFormatKeyId "%08" PRIX32 "%08" PRIX32 "%08" PRIX32 "%08" PRIX32 "%08" PRIX32
 
 /**
- * @brief Logging value macro for for CertificateKeyId.
+ * @brief Logging value macro for CertificateKeyId.
  * Takes a CertificateKeyId (FixedByteSpan<20>) or a value implicitly convertible to it,
  * e.g. a uint8_t[20] or std::array<uint8_t, 20>.
  * NOTE: The argument to ChipLogValueKeyId may be evaluated multiple times.

@@ -86,8 +86,8 @@
 //      [1] index           uint16      NI Index number
 //      [2] type            uint8       type (e.g. kEcdsa)
 //      [3] clientCount     uint16      number of clients referencing this NI
-//    [4] pendingCount      uint16      optional; number of pending entries
-//    [5] pendingTimestamp  uint32      only if pendingCount is present; timestamp of pending NASS
+//    [3] pendingCount      uint16      optional; number of pending entries
+//    [4] pendingTimestamp  uint32      only if pendingCount is present; timestamp of pending NASS
 //
 // * g/nim/n/<index>                    detail record
 //    [1] identifier        bytes       20-byte key identifier
@@ -251,7 +251,7 @@ uint16_t DefaultNetworkIdentityStorage::AllocateNIIndex()
 {
     // Successful allocation / loop termination is guaranteed because the caller has already
     // checked that we have less than kMaxNetworkIdentities identities, and kMaxNetworkIdentities
-    // is guaranteed to be <= ClientIndexRange::Cardinality().
+    // is guaranteed to be <= NetworkIdentityIndexRange::kCardinality.
     using Range = NetworkIdentityIndexRange;
     for (auto index = Range::Clamp(mNINextIndex);; index = Range::Increment(index))
     {

@@ -146,6 +146,8 @@ public:
      *   0b010      fail once, succeed once, then fail forever
      *   -1         always succeed (effectively not poisoned for this operation type)
      *
+     * Note: Write patterns will not advance while `SetRejectWrites(true)` is in effect.
+     *
      * @param key          Key to poison.
      * @param readPattern  Bit pattern for read (Get) operations.
      * @param writePattern Bit pattern for write (Set/Delete) operations.
@@ -260,7 +262,7 @@ protected:
     virtual CHIP_ERROR SyncSetKeyValueInternal(const char * key, const void * value, uint16_t size)
     {
         // Make sure writes are allowed and poison keys are not accessed
-        if (IsWritePoisoned(key) || mRejectWrites)
+        if (mRejectWrites || /* has side effect */ IsWritePoisoned(key))
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
