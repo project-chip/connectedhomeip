@@ -20,6 +20,7 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
