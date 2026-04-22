@@ -90,7 +90,6 @@ public:
     Protocols::InteractionModel::Status ChangeSetpointAttribute(const AttributeId attributeId, int16_t temperature);
     Protocols::InteractionModel::Status SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
 
-
     BitFlags<Thermostat::Feature> mFeatures;
 
     Setpoints mSetpoints;
