@@ -130,7 +130,6 @@ silabs_executable("closure_app") {
   sources = [
     "${example_closure_dir}/closure-common/src/ClosureControlEndpoint.cpp",
     "${example_closure_dir}/closure-common/src/ClosureDimensionEndpoint.cpp",
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/ClosureManager.cpp",
     "src/DataModelCallbacks.cpp",
