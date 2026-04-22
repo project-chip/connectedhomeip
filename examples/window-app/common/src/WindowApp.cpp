@@ -19,6 +19,7 @@
 #include <WindowApp.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 
 #include <lib/support/CodeUtils.h>
@@ -454,15 +455,20 @@ void WindowApp::Cover::Finish()
 
 void WindowApp::Cover::LiftStepToward(OperationalState direction)
 {
-    Protocols::InteractionModel::Status status;
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+    auto wc = FindClusterOnEndpoint(mEndpoint);
+    if (wc == nullptr)
+    {
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        return;
+    }
+    current = wc->GetCurrentPositionLiftPercentage100ths();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+    if (!current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
     }
@@ -476,12 +482,14 @@ void WindowApp::Cover::LiftStepToward(OperationalState direction)
 
 void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
+    auto wc = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current, target;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
-    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+    target  = wc->GetTargetPositionLiftPercent100ths();
+    current = wc->GetCurrentPositionLiftPercentage100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -518,15 +526,16 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
 
 void WindowApp::Cover::TiltStepToward(OperationalState direction)
 {
-    Protocols::InteractionModel::Status status;
+    auto wc = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+    current = wc->GetCurrentPositionTiltPercentage100ths();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+    if (!current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
     }
@@ -540,12 +549,14 @@ void WindowApp::Cover::TiltStepToward(OperationalState direction)
 
 void WindowApp::Cover::TiltUpdate(bool newTarget)
 {
+    auto wc = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current, target;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
-    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+    target  = wc->GetTargetPositionTiltPercent100ths();
+    current = wc->GetCurrentPositionTiltPercentage100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -594,7 +605,8 @@ void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
 
 void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isTilt)
 {
-    Protocols::InteractionModel::Status status;
+    auto wc = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current;
     chip::Percent100ths target;
 
@@ -602,22 +614,20 @@ void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isT
 
     if (isTilt)
     {
-        status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+        current = wc->GetCurrentPositionTiltPercentage100ths();
+        if (!current.IsNull())
         {
-
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
-            (void) Attributes::TargetPositionTiltPercent100ths::Set(mEndpoint, target);
+            wc->SetTargetPositionTiltPercent100ths(DataModel::MakeNullable(target));
         }
     }
     else
     {
-        status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+        current = wc->GetCurrentPositionLiftPercentage100ths();
+        if (!current.IsNull())
         {
-
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
-            (void) Attributes::TargetPositionLiftPercent100ths::Set(mEndpoint, target);
+            wc->SetTargetPositionLiftPercent100ths(DataModel::MakeNullable(target));
         }
     }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
