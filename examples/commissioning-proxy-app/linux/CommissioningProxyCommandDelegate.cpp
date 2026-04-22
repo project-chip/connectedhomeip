@@ -199,8 +199,37 @@ public:
 
     CHIP_ERROR WiFiPAFCloseSession(chip::WiFiPAF::WiFiPAFSession & SessionInfo) override
     {
+        // If the PAF session closes while a ProxyMessageRequest is in flight (e.g.
+        // the ED disconnects from NAN when ConnectNetwork causes it to switch to
+        // infrastructure WiFi), the ack-received timer fires after PAFTP_ACK_TIMEOUT
+        // and the PAFTP layer calls here to close the session.  Without this
+        // handler the pending IM exchange would silently wait for the full 30-second
+        // commissioner-side timeout.  Resolve it immediately with Failure so the
+        // commissioner gets a timely error response.
+        for (auto & [sid, info] : sProxySessions)
+        {
+            if (info.pafSession.peer_id == SessionInfo.peer_id)
+            {
+                auto pendingIt = sPendingProxyMsgCtx.find(sid);
+                if (pendingIt != sPendingProxyMsgCtx.end())
+                {
+                    ProxyMsgCtx * ctx = pendingIt->second;
+                    sPendingProxyMsgCtx.erase(pendingIt);
+                    chip::app::CommandHandler * cmd = ctx->handle.Get();
+                    ChipLogError(AppServer,
+                                 "WiFiPAFCloseSession: PAF session closed with pending ProxyMessageRequest "
+                                 "for proxy session %u — returning Failure to commissioner", sid);
+                    if (cmd != nullptr)
+                        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
+                    delete ctx;
+                }
+                break;
+            }
+        }
         if (mOriginalTransport != nullptr)
+        {
             return mOriginalTransport->WiFiPAFCloseSession(SessionInfo);
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -913,6 +942,28 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
+    // Per spec ResponseTimeout Field: "A value of zero indicates no response is
+    // expected and the proxy should send ProxyMessageResponse immediately
+    // indicating success."  Forward the message but respond right away without
+    // registering a pending context.  Any unsolicited commissionee reply that
+    // arrives later will be dropped by OnProxyWiFiPAFMessageReceived.
+    if (responseTimeout == 0)
+    {
+        // Forward best-effort; log failure but always respond with success.
+        CHIP_ERROR sendErr = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().SendMessage(
+            it->second.pafSession, std::move(buf));
+        if (sendErr != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(AppServer, "ProxyMessageRequest(ResponseTimeout=0): SendMessage failed: %" CHIP_ERROR_FORMAT,
+                          sendErr.Format());
+        }
+        chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Type immediateResp;
+        immediateResp.sessionId = sessionId;
+        immediateResp.message.SetNull();
+        commandObj->AddResponse(request.path, immediateResp);
+        return chip::Protocols::InteractionModel::Status::Success;
+    }
+
     // Keep the invoke handler alive until the commissionee replies.
     // sPendingProxyMsgCtx takes ownership; cleaned up in the WiFiPAF receive callback.
     auto * ctx = new ProxyMsgCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, sessionId };
@@ -921,8 +972,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     // Extend the exchange response timeout to accommodate the WiFiPAF round-trip.
     if (auto * exchange = commandObj->GetExchangeContext())
     {
-        exchange->SetResponseTimeout(
-            chip::System::Clock::Seconds16(responseTimeout > 0 ? responseTimeout : 5));
+        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(responseTimeout));
     }
 
     // Forward the raw Matter packet over WiFiPAF to the commissionee.
@@ -1008,6 +1058,53 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         else
             ChipLogError(AppServer, "ProxyDisconnectRequest: resume background scan failed: %" CHIP_ERROR_FORMAT, resumeErr.Format());
     }
+
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::CancelPendingConnect()
+{
+    if (sPendingConnectCtx == nullptr)
+    {
+        ChipLogProgress(AppServer, "CancelPendingConnect: no pending connect");
+        return chip::Protocols::InteractionModel::Status::InvalidInState;
+    }
+
+    auto * ctx = sPendingConnectCtx;
+    sPendingConnectCtx = nullptr;
+
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnProxyConnectTimeout, ctx);
+
+    CHIP_ERROR cancelIncompleteErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+    if (cancelIncompleteErr != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "CancelPendingConnect: WiFiPAFCancelIncompleteSubscribe: %" CHIP_ERROR_FORMAT,
+                      cancelIncompleteErr.Format());
+    }
+    if (ctx->subscribeId != 0)
+    {
+        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx->subscribeId);
+        if (cancelErr != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(AppServer, "CancelPendingConnect: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT,
+                          ctx->subscribeId, cancelErr.Format());
+        }
+    }
+
+    chip::WiFiPAF::WiFiPAFSession keyInfo{};
+    keyInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
+    keyInfo.discriminator = ctx->discriminator;
+    CHIP_ERROR rmErr = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(
+        chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyInfo);
+    if (rmErr != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "CancelPendingConnect: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+    }
+
+    chip::app::CommandHandler * cmd = ctx->handle.Get();
+    if (cmd != nullptr)
+        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
+    delete ctx;
 
     return chip::Protocols::InteractionModel::Status::Success;
 }

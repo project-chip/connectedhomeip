@@ -53,6 +53,9 @@ constexpr uint16_t kValidWiFiBandBits =
     static_cast<uint16_t>(WiFiBandBitmap::k2g4) |
     static_cast<uint16_t>(WiFiBandBitmap::k5g);
 
+// Reserved SessionId sentinel for ProxyDisconnectRequest: cancel any ongoing ProxyConnectRequest.
+inline constexpr uint16_t kCancelPendingConnectSessionId = 0xFFFF;
+
 CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 {
     if (mDelegate.GetEndpointId() != mPath.mEndpointId)
@@ -211,6 +214,18 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
     if (commandData.wiFiBand.HasValue())
     {
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), Status::InvalidCommand);
+
+        // WiFiBand must not contain reserved bits.
+        VerifyOrReturnError((commandData.wiFiBand.Value().Raw() & ~kValidWiFiBandBits) == 0, Status::InvalidCommand);
+
+        // WiFiBand must be a subset of the bands supported by this proxy.
+        auto supportedBands = mDelegate.GetSupportedWiFiBands();
+        if ((commandData.wiFiBand.Value().Raw() & ~supportedBands.Raw()) != 0)
+        {
+            ChipLogError(Zcl, "CommissioningProxy: Requested WiFiBand not in supported bands");
+            return Status::InvalidTransportType;
+        }
+
         wiFiBand = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
             commandData.wiFiBand.Value().Raw());
     }
@@ -234,6 +249,14 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
 {
     Commands::ProxyDisconnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    ChipLogProgress(Zcl, "HandleProxyDisconnectRequest: sessionId=0x%04x", commandData.sessionId);
+
+    // SessionId=0xFFFF means cancel any ongoing ProxyConnectRequest, not disconnect a session.
+    if (commandData.sessionId == kCancelPendingConnectSessionId)
+    {
+        return mDelegate.CancelPendingConnect();
+    }
 
     auto delegateStatus = mDelegate.ProxyDisconnectRequest(commandData.sessionId);
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());

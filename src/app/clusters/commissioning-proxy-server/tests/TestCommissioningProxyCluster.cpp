@@ -364,12 +364,14 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithWIFeatu
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// WiFiBand field present with WI feature enabled — SHALL succeed.
+// WiFiBand field present with WI feature enabled and band in supported set — SHALL succeed.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandWithWIFeature)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    mockDelegate.SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+
     CommissioningProxyCluster cluster(
         CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -379,6 +381,49 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandWithWIFeat
     cmd.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
 
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Reserved bits in wiFiBand SHALL return InvalidCommand.
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ReservedWiFiBandBits)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    mockDelegate.SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF);
+    // bit 1 (0x02) is reserved.
+    cmd.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(static_cast<WiFiBandBitmap>(0x02)));
+
+    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// wiFiBand not in the proxy's supported bands SHALL return InvalidTransportType.
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandNotInSupportedBands)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    // Proxy only supports 2.4 GHz.
+    mockDelegate.SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF);
+    // Request 5 GHz — not in supported bands.
+    cmd.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g));
+
+    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -505,6 +550,59 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateFailure
 
     // State SHALL remain Connected since the delegate rejected the disconnect.
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// SessionId=0xFFFF with a pending connect SHALL return Success and cancel the connect.
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_Success)
+{
+    struct PendingConnectDelegate : public CommissioningProxyMockDelegate
+    {
+        Protocols::InteractionModel::Status CancelPendingConnect() override
+        {
+            cancelCalled = true;
+            return Protocols::InteractionModel::Status::Success;
+        }
+        bool cancelCalled = false;
+    } mockDelegate;
+
+    TestServerClusterContext context;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    CommissioningProxyCluster cluster(
+        CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    Commands::ProxyDisconnectRequest::Type cmd;
+    cmd.sessionId = 0xFFFF;
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+    EXPECT_TRUE(mockDelegate.cancelCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// SessionId=0xFFFF when already connected SHALL return InvalidInState.
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_AlreadyConnected)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    CommissioningProxyCluster cluster(
+        CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    // CancelPendingConnect inherits InvalidInState from Delegate base (no pending connect).
+    Commands::ProxyDisconnectRequest::Type cmd;
+    cmd.sessionId = 0xFFFF;
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    auto code = result.GetStatusCode();
+    ASSERT_TRUE(code.has_value());
+    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

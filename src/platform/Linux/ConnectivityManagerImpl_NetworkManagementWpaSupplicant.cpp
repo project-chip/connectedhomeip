@@ -398,8 +398,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         if (mAssociationStarted)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
                 ConnectivityMgrImpl().PostNetworkConnect();
+                OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             });
         }
         NotifyWiFiConnectivityChange(kConnectivity_Established);
@@ -1054,6 +1054,12 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // (e.g. at scan-done) risks sending PAFTP frames while the radio is still
     // occupied, causing them to be silently dropped.
     mPafChannelAvailable = true;
+    // Flush any PAFTP ACKs that were deferred while the channel was unavailable.
+    // This submits the ACK to wpa_supplicant via nantransmit_sync before
+    // OnConnectResult runs, ensuring the ACK is delivered ahead of the
+    // ConnectNetworkResponse (kOperationInFlight blocks the response until the
+    // ACK's done callback fires).
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
 #endif
 
     // Iterate on the network interface to see if we already have beed assigned addresses.

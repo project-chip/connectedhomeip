@@ -126,6 +126,20 @@ public:
     ProxyDisconnectRequest(uint16_t sessionId) { return Protocols::InteractionModel::Status::UnsupportedCommand; }
 
     /**
+     * @brief Cancel any in-progress ProxyConnectRequest.
+     *
+     * Called when ProxyDisconnectRequest with SessionId=0xFFFF is received.
+     * The delegate SHALL terminate any ongoing WiFiPAF subscribe/handshake,
+     * clean up associated state, and respond to the pending ProxyConnectRequest
+     * with an error status.
+     *
+     * @return Success if a pending connect was cancelled.
+     *         InvalidInState if no connect is pending (connection already completed).
+     */
+    virtual Protocols::InteractionModel::Status
+    CancelPendingConnect() { return Protocols::InteractionModel::Status::InvalidInState; }
+
+    /**
      * @brief Start a continuous background scan for commissionable devices.
      *
      * Discovery results are cached in the CachedResults attribute; each result

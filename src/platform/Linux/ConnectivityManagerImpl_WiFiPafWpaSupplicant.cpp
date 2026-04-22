@@ -487,6 +487,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%u], freq: %u", subscribe_id, freq);
+    mPendingConnectSubscribeId = subscribe_id;
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
 

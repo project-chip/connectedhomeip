@@ -75,6 +75,7 @@ protected:
                     const DataModel::InvokeRequest & request) override;
 
     Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId) override;
+    Protocols::InteractionModel::Status CancelPendingConnect() override;
 
     Protocols::InteractionModel::Status ProxyBackgroundScanStartRequest(
         chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
