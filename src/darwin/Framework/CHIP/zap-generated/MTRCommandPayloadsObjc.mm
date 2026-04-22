@@ -41009,7 +41009,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupCATVersion = nil;
 
-        _groupPermission = @(0);
+        _groupPermission = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -41082,7 +41082,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        encodableStruct.groupPermission = static_cast<std::remove_reference_t<decltype(encodableStruct.groupPermission)>>(self.groupPermission.unsignedCharValue);
+        if (self.groupPermission == nil) {
+            encodableStruct.groupPermission.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.groupPermission.SetNonNull();
+            nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(self.groupPermission.unsignedCharValue);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -41304,7 +41309,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _nodeID = nil;
+        _nodeID = @(0);
 
         _friendlyName = nil;
 
@@ -41343,27 +41348,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::JointFabricDatastore::Commands::UpdateAdmin::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.nodeID == nil) {
-            encodableStruct.nodeID.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.nodeID.SetNonNull();
-            nonNullValue_0 = self.nodeID.unsignedLongLongValue;
+        encodableStruct.nodeID = self.nodeID.unsignedLongLongValue;
+    }
+    {
+        if (self.friendlyName != nil) {
+            auto & definedValue_0 = encodableStruct.friendlyName.Emplace();
+            definedValue_0 = AsCharSpan(self.friendlyName);
         }
     }
     {
-        if (self.friendlyName == nil) {
-            encodableStruct.friendlyName.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.friendlyName.SetNonNull();
-            nonNullValue_0 = AsCharSpan(self.friendlyName);
-        }
-    }
-    {
-        if (self.icac == nil) {
-            encodableStruct.icac.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.icac.SetNonNull();
-            nonNullValue_0 = AsByteSpan(self.icac);
+        if (self.icac != nil) {
+            auto & definedValue_0 = encodableStruct.icac.Emplace();
+            definedValue_0 = AsByteSpan(self.icac);
         }
     }
 
@@ -42604,7 +42600,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _icaccsr = [NSData data];
+        _statusCode = @(0);
+
+        _icaccsr = nil;
     }
     return self;
 }
@@ -42613,6 +42611,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRJointFabricAdministratorClusterICACCSRResponseParams alloc] init];
 
+    other.statusCode = self.statusCode;
     other.icaccsr = self.icaccsr;
 
     return other;
@@ -42620,7 +42619,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: icaccsr:%@; >", NSStringFromClass([self class]), [_icaccsr base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; icaccsr:%@; >", NSStringFromClass([self class]), _statusCode, [_icaccsr base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -42681,7 +42680,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType &)decodableStruct
 {
     {
-        self.icaccsr = AsData(decodableStruct.icaccsr);
+        self.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.statusCode)];
+    }
+    {
+        if (decodableStruct.icaccsr.HasValue()) {
+            self.icaccsr = AsData(decodableStruct.icaccsr.Value());
+        } else {
+            self.icaccsr = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }

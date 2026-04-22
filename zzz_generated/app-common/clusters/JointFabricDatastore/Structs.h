@@ -90,9 +90,9 @@ using DecodableType = Type;
 namespace DatastoreNodeInformationEntryStruct {
 enum class Fields : uint8_t
 {
-    kNodeID                   = 1,
-    kFriendlyName             = 2,
-    kCommissioningStatusEntry = 3,
+    kNodeID                   = 0,
+    kFriendlyName             = 1,
+    kCommissioningStatusEntry = 2,
 };
 
 struct Type
@@ -139,40 +139,13 @@ public:
 using DecodableType = Type;
 
 } // namespace DatastoreEndpointGroupIDEntryStruct
-namespace DatastoreEndpointEntryStruct {
-enum class Fields : uint8_t
-{
-    kEndpointID   = 0,
-    kNodeID       = 1,
-    kFriendlyName = 2,
-    kStatusEntry  = 3,
-};
-
-struct Type
-{
-public:
-    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
-    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
-    chip::CharSpan friendlyName;
-    Structs::DatastoreStatusEntryStruct::Type statusEntry;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace DatastoreEndpointEntryStruct
 namespace DatastoreBindingTargetStruct {
 enum class Fields : uint8_t
 {
-    kNode     = 1,
-    kGroup    = 2,
-    kEndpoint = 3,
-    kCluster  = 4,
+    kNode     = 0,
+    kGroup    = 1,
+    kEndpoint = 2,
+    kCluster  = 3,
 };
 
 struct Type
@@ -250,10 +223,10 @@ using DecodableType = Type;
 namespace DatastoreAccessControlEntryStruct {
 enum class Fields : uint8_t
 {
-    kPrivilege = 1,
-    kAuthMode  = 2,
-    kSubjects  = 3,
-    kTargets   = 4,
+    kPrivilege = 0,
+    kAuthMode  = 1,
+    kSubjects  = 2,
+    kTargets   = 3,
 };
 
 struct Type
@@ -322,10 +295,10 @@ public:
 namespace DatastoreAdministratorInformationEntryStruct {
 enum class Fields : uint8_t
 {
-    kNodeID       = 1,
-    kFriendlyName = 2,
-    kVendorID     = 3,
-    kIcac         = 4,
+    kNodeID       = 0,
+    kFriendlyName = 1,
+    kVendorID     = 2,
+    kIcac         = 3,
 };
 
 struct Type
@@ -346,6 +319,31 @@ public:
 using DecodableType = Type;
 
 } // namespace DatastoreAdministratorInformationEntryStruct
+namespace DatastoreEndpointEntryStruct {
+enum class Fields : uint8_t
+{
+    kEndpointID   = 0,
+    kNodeID       = 1,
+    kFriendlyName = 2,
+};
+
+struct Type
+{
+public:
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreEndpointEntryStruct
 namespace DatastoreGroupInformationEntryStruct {
 enum class Fields : uint8_t
 {
