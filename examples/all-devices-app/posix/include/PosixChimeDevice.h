@@ -42,6 +42,8 @@ public:
     };
 
     // RAII wrapper for sound resources. Manages the lifecycle of miniaudio structures.
+    // A "SoundResource" represents a single chime sound, binding a Matter Chime ID to a specific
+    // audio synthesis configuration (CustomDataSource) and the associated miniaudio sound object.
     class SoundResource
     {
     public:
