@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,4 +16,18 @@
  */
 
 #pragma once
-#include <app/clusters/window-covering-server/WindowCoveringDelegate.h>
+
+#include <app/clusters/window-covering-server/window-covering-server.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WindowCovering {
+WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate);
+
+} // namespace WindowCovering
+} // namespace Clusters
+} // namespace app
+} // namespace chip

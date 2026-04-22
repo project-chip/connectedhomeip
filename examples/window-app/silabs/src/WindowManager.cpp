@@ -27,6 +27,7 @@
 
 #include <WindowManager.h>
 
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
@@ -251,13 +252,8 @@ void WindowManager::Cover::Init(chip::EndpointId endpoint)
     mLiftTimer = new Timer(COVER_LIFT_TILT_TIMEOUT, OnLiftTimeout, this);
     mTiltTimer = new Timer(COVER_LIFT_TILT_TIMEOUT, OnTiltTimeout, this);
 
-    // Preset Lift attributes
-    Attributes::InstalledOpenLimitLift::Set(endpoint, LIFT_OPEN_LIMIT);
-    Attributes::InstalledClosedLimitLift::Set(endpoint, LIFT_CLOSED_LIMIT);
-
-    // Preset Tilt attributes
-    Attributes::InstalledOpenLimitTilt::Set(endpoint, TILT_OPEN_LIMIT);
-    Attributes::InstalledClosedLimitTilt::Set(endpoint, TILT_CLOSED_LIMIT);
+    // InstalledOpenLimitLift, InstalledClosedLimitLift, InstalledOpenLimitTilt and InstalledClosedLimitTilt were deleted as they
+    // are not supported by the current spec
 
     // Note: All Current Positions are preset via Zap config and kept across reboot via NVM: no need to init them
 
@@ -310,12 +306,12 @@ void WindowManager::Cover::LiftUpdateWorker(intptr_t arg)
     std::unique_ptr<CoverWorkData> data(reinterpret_cast<CoverWorkData *>(arg));
     Cover * cover = data->cover;
 
+    auto wc = FindClusterOnEndpoint(cover->mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current, target;
 
-    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(cover->mEndpoint, target) ==
-                   Protocols::InteractionModel::Status::Success);
-    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(cover->mEndpoint, current) ==
-                   Protocols::InteractionModel::Status::Success);
+    target  = wc->GetTargetPositionLiftPercent100ths();
+    current = wc->GetCurrentPositionLiftPercentage100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -365,11 +361,11 @@ void WindowManager::Cover::TiltUpdateWorker(intptr_t arg)
     std::unique_ptr<CoverWorkData> data(reinterpret_cast<CoverWorkData *>(arg));
     Cover * cover = data->cover;
 
+    auto wc = FindClusterOnEndpoint(cover->mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current, target;
-    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(cover->mEndpoint, target) ==
-                   Protocols::InteractionModel::Status::Success);
-    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(cover->mEndpoint, current) ==
-                   Protocols::InteractionModel::Status::Success);
+    target  = wc->GetTargetPositionTiltPercent100ths();
+    current = wc->GetCurrentPositionTiltPercentage100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -415,7 +411,8 @@ void WindowManager::Cover::TiltUpdateWorker(intptr_t arg)
 
 void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, ControlAction action)
 {
-    Protocols::InteractionModel::Status status;
+    auto wc = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current;
     chip::Percent100ths target;
 
@@ -423,20 +420,20 @@ void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, Cont
 
     if (action == ControlAction::Tilt)
     {
-        status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+        current = wc->GetCurrentPositionTiltPercentage100ths();
+        if (!current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
-            (void) Attributes::TargetPositionTiltPercent100ths::Set(mEndpoint, target);
+            wc->SetTargetPositionTiltPercent100ths(chip::app::DataModel::MakeNullable(target));
         }
     }
     else
     {
-        status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+        current = wc->GetCurrentPositionLiftPercentage100ths();
+        if (!current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
-            (void) Attributes::TargetPositionLiftPercent100ths::Set(mEndpoint, target);
+            wc->SetTargetPositionLiftPercent100ths(chip::app::DataModel::MakeNullable(target));
         }
     }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -622,6 +619,7 @@ void WindowManager::PostAttributeChange(chip::EndpointId endpoint, chip::Attribu
 void WindowManager::UpdateLED()
 {
     Cover & cover = GetCover();
+    auto wc       = FindClusterOnEndpoint(cover.mEndpoint);
     if (mResetWarning)
     {
         mActionLED.Set(false);
@@ -634,7 +632,7 @@ void WindowManager::UpdateLED()
         LimitStatus liftLimit = LimitStatus::Intermediate;
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        Attributes::CurrentPositionLiftPercent100ths::Get(cover.mEndpoint, current);
+        current = wc->GetCurrentPositionLiftPercentage100ths();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!current.IsNull())
