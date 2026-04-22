@@ -1552,7 +1552,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
                 cmafSessionNumber = Optional<uint64_t>();
             }
         }
-
     }
 
     handler.AddStatus(commandPath, status);
