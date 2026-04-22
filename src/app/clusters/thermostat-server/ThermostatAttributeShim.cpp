@@ -29,6 +29,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
+namespace Attributes {
 
 namespace ControlSequenceOfOperation {
 
@@ -328,6 +329,8 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
     return Status::Success;
 }
 } // namespace FeatureMap
+
+} // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
