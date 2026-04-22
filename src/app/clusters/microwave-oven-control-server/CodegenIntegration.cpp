@@ -28,10 +28,13 @@ using namespace chip::app::DataModel;
 
 namespace chip::app::Clusters::MicrowaveOvenControl {
 
+using namespace Attributes;
+using namespace Commands;
+
 namespace {
 
 CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
-                                    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> & optionalAcceptedCommands)
+                                    std::bitset<Commands::kAcceptedCommandsCount> & optionalAcceptedCommands)
 {
     // Make sure that the cluster actually exists on this endpoint.
     const EmberAfCluster * serverCluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
@@ -46,9 +49,9 @@ CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
 
     for (const CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
     {
-        if (*p == MicrowaveOvenControl::Commands::AddMoreTime::Id)
+        if (*p == Commands::AddMoreTime::Id)
         {
-            optionalAcceptedCommands.set(MicrowaveOvenControl::Commands::AddMoreTime::Id);
+            optionalAcceptedCommands.set(Commands::AddMoreTime::Id);
         }
     }
 
@@ -57,18 +60,19 @@ CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
 
 } // namespace
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-                   BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
-                   Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<Feature> aFeature,
+                   OperationalState::Instance & aOpStateInstance, ModeBase::Instance & aMicrowaveOvenModeInstance) :
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
 Instance::~Instance()
 {
-    // Call Deinit() to clean up and unregister the cluster if it is constructed
-    // Return value is safely ignored because we are in the destructor
+    // Call Deinit() to clean up and unregister the cluster if it is constructed.
+    // Return value is safely ignored because we are in the destructor and this is just
+    // a cleanup and we do not want to Log the error because Deinit() is part of the API
+    // and could be called directly by the app.
+    // If the cluster is not constructed, Deinit() will return CHIP_ERROR_INCORRECT_STATE.
     RETURN_SAFELY_IGNORED Deinit();
 }
 
@@ -81,30 +85,25 @@ CHIP_ERROR Instance::Init()
 
     // Exactly one of the PowerAsNumber and PowerInWatts features must be supported, per spec.
     VerifyOrReturnError(
-        mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts),
-        CHIP_ERROR_INVALID_ARGUMENT,
+        mFeature.Has(Feature::kPowerAsNumber) || mFeature.Has(Feature::kPowerInWatts), CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(Zcl, "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts or PowerAsNumber"));
 
     // Check that the feature bits do not include both PowerAsNumber and PowerInWatts
     VerifyOrReturnError(
-        !(mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) &&
-          mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)),
-        CHIP_ERROR_INVALID_ARGUMENT,
+        !(mFeature.Has(Feature::kPowerAsNumber) && mFeature.Has(Feature::kPowerInWatts)), CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(Zcl, "Microwave Oven Control: feature bits error, PowerAsNumber and PowerInWatts are mutually exclusive"));
 
     // Per spec, the PowerNumberLimits feature is only allowed if the PowerAsNumber feature is supported.
     VerifyOrReturnError(
-        !mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) ||
-            mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber),
-        CHIP_ERROR_INVALID_ARGUMENT,
+        !mFeature.Has(Feature::kPowerNumberLimits) || mFeature.Has(Feature::kPowerAsNumber), CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(Zcl, "Microwave Oven Control: feature bits error, PowerNumberLimits feature requires PowerAsNumber"));
 
-    if (emberAfContainsAttribute(mEndpointId, mClusterId, MicrowaveOvenControl::Attributes::WattRating::Id))
+    if (emberAfContainsAttribute(mEndpointId, mClusterId, WattRating::Id))
     {
-        mOptionalAttributeSet.Set<MicrowaveOvenControl::Attributes::WattRating::Id>();
+        mOptionalAttributeSet.Set<WattRating::Id>();
     }
 
-    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
+    std::bitset<Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
     VerifyOrReturnError(OptionalAcceptedCommands(ConcreteClusterPath(mEndpointId, mClusterId), optionalAcceptedCommands) ==
                             CHIP_NO_ERROR,
                         CHIP_ERROR_INTERNAL);
@@ -129,7 +128,7 @@ CHIP_ERROR Instance::Deinit()
     return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
 }
 
-bool Instance::HasFeature(MicrowaveOvenControl::Feature feature) const
+bool Instance::HasFeature(Feature feature) const
 {
     return mFeature.Has(feature);
 }
