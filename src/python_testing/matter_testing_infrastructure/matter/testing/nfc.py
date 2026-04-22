@@ -276,7 +276,7 @@ def _select_ndef_file(connection):
     """
     Select the NDEF data file on the NFC tag.
 
-    The NDEF file (E104) contains the actual NDEF message data that can be read
+    The NDEF file  contains the actual NDEF message data that can be read
     from or written to the NFC tag. This file stores the structured NDEF records
     that contain the application data (such as URLs, text, or other payloads).
 
@@ -291,11 +291,16 @@ def _select_ndef_file(connection):
         This function must be called after _select_ndef_application() and
         _select_cc_file() before reading or writing NDEF data.
     """
-    # ISO/IEC 7816-4 APDU command to select the NDEF file (file ID: 0xE104)
+    # ISO/IEC 7816-4 APDU command to select the NDEF file
     # (P1, P2)=(0x00, 0x0C) corresponds to select by file ID
-    SELECT_NDEF_FILE = [CLA_ISO, INS_SELECT, 0x00, 0x0C, 0x02,  # CLA INS P1 P2 Lc
-                        0xE1, 0x04]                             # File ID
-    data, sw1, sw2 = connection.transmit(SELECT_NDEF_FILE)
+    for file_id in [0xE101, 0xE104]:
+        SELECT_NDEF_FILE = [CLA_ISO, INS_SELECT, 0x00, 0x0C, 0x02,  # CLA INS P1 P2 Lc
+                            (file_id >> 8) & 0xFF, file_id & 0xFF]  # File ID
+        data, sw1, sw2 = connection.transmit(SELECT_NDEF_FILE)
+        if sw1 == NFC_SUCCESS_SW1 and sw2 == NFC_SUCCESS_SW2:
+            break
+        if sw1 == 0x6A and sw2 == 0x82:
+            continue
     _check_transmission_status(sw1, sw2, "select NDEF file")
 
 
