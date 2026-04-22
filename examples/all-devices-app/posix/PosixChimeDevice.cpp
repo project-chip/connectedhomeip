@@ -18,6 +18,7 @@
 #include <cmath>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <limits>
 #include <sstream>
 
 // This file implements the audio playback for the Chime cluster on POSIX systems using the
@@ -118,7 +119,7 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
         sample *= volume;
 
         // Scale to 16-bit signed PCM and store
-        pOut[i] = static_cast<int16_t>(sample * 32767.0);
+        pOut[i] = static_cast<int16_t>(sample * static_cast<double>(std::numeric_limits<int16_t>::max()));
     }
 
     pCustomDS->cursor += framesToRead;
