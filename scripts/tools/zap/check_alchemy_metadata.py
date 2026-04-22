@@ -103,7 +103,7 @@ _SHA_RE = re.compile(r'(?:^|-)g([0-9a-f]{7,})', re.IGNORECASE)
 _SOURCE_RE = re.compile(r'^Source:\s+(\S.*?)\s*$', re.MULTILINE)
 
 # Alchemy command-line parameters
-_PARAMS_RE = re.compile(r'^Parameters:\s+(\S.*)', re.MULTILINE)
+_PARAMS_RE = re.compile(r'^Parameters:\s+(\S.*?)\s*$', re.MULTILINE)
 
 # Reject "-dirty" or "+dirty" suffixes indicating uncommitted changes.
 _DIRTY_RE = re.compile(r'[-+]dirty\b', re.IGNORECASE)
@@ -165,7 +165,7 @@ def _check_hand_edits(
 
         try:
             new_content = xml_file.read_text(encoding="utf-8")
-        except OSError:
+        except (OSError, UnicodeDecodeError):
             continue
         new_comment = _find_alchemy_comment(new_content)
         if new_comment is None:
@@ -205,7 +205,7 @@ def validate_file(filepath: Path) -> List[str]:
 
     try:
         content = filepath.read_text(encoding="utf-8")
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         return [f"cannot read file: {exc}"]
 
     comment = _find_alchemy_comment(content)
@@ -335,6 +335,8 @@ def main() -> int:
         else:
             print(f"warning: path not found: {p}", file=sys.stderr)
 
+    xml_files = list(dict.fromkeys(xml_files))
+
     if not xml_files:
         print("ERROR: no XML files found to check.", file=sys.stderr)
         return 2
@@ -358,7 +360,7 @@ def main() -> int:
                 continue
             try:
                 content = xml_file.read_text(encoding="utf-8")
-            except OSError:
+            except (OSError, UnicodeDecodeError):
                 continue
             comment = _find_alchemy_comment(content)
             if comment is None:
