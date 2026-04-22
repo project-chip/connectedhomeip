@@ -28,6 +28,7 @@
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -85,30 +86,53 @@ class TC_JFDS_2_1(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
-        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
-        self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
-        self.jfadmin_fabric_a_node_id = 1
 
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            jfa_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=self.jfadmin_fabric_a_discriminator,
-            passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=10)
+        self.jfadmin_fabric_a_node_id = 1
+        self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
+        self.dut_rpc_server_ip = None
+        self.dut_rpc_server_port = None
+        self.fabric_a_admin = None
+        # If test is executed in CI environment, start JFA app for Fabric B
+        if self.is_pics_sdk_ci_only:
+            self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            self.dut_rpc_server_ip = "127.0.0.1"
+            self.dut_rpc_server_port = "33033"
+            # Start Fabric A JF-Administrator App
+            self.fabric_a_admin = AppServerSubprocess(
+                jfa_server_app,
+                storage_dir=self.storage_fabric_a,
+                port=random.randint(5001, 5999),
+                discriminator=self.jfadmin_fabric_a_discriminator,
+                passcode=self.jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", self.dut_rpc_server_port])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=10)
+        else:
+            self.dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not self.dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            self.dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not self.dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            self.jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
+            if not self.jfadmin_fabric_a_passcode:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+            self.jfadmin_fabric_a_discriminator = self.matter_test_config.discriminators[0]
+            if not self.jfadmin_fabric_a_discriminator:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             jfc_server_app,
             "JFC_A",  # Name of the controller instance, used for logging purposes in the JF-Controller app:w
-            rpc_server_port=33033,
+            rpc_server_port=self.dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", self.dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=10)

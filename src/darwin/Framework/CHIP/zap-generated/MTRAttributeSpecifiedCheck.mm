@@ -5526,6 +5526,40 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInNetworkIdentityManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aAttributeId) {
+    case Attributes::ActiveNetworkIdentities::Id: {
+        return YES;
+    }
+    case Attributes::Clients::Id: {
+        return YES;
+    }
+    case Attributes::ClientTableSize::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known NetworkIdentityManagement attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -7514,6 +7548,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ProximityRanging::Id: {
         return AttributeIsSpecifiedInProximityRangingCluster(aAttributeId);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return AttributeIsSpecifiedInNetworkIdentityManagementCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);

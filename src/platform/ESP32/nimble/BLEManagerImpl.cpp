@@ -1199,22 +1199,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             return err;
         }
 
-        ble_addr_t addr;
-
-        /* generate new non-resolvable private address */
-        err = MapBLEError(ble_hs_id_gen_rnd(1, &addr));
-        if (err != CHIP_NO_ERROR)
+        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
-            ChipLogError(DeviceLayer, "ble_hs_id_gen_rnd failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
+            ble_addr_t addr;
+            /* generate static random address */
+            err = MapBLEError(ble_hs_id_gen_rnd(0, &addr));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_hs_id_gen_rnd failed: %" CHIP_ERROR_FORMAT, err.Format());
+                return err;
+            }
 
-        /* Set generated address */
-        err = MapBLEError(ble_gap_ext_adv_set_addr(kMatterAdvInstance, &addr));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "ble_gap_ext_adv_set_addr failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
+            /* Set generated address */
+            err = MapBLEError(ble_gap_ext_adv_set_addr(kMatterAdvInstance, &addr));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_gap_ext_adv_set_addr failed: %" CHIP_ERROR_FORMAT, err.Format());
+                return err;
+            }
         }
 
         struct os_mbuf * data = os_msys_get_pkthdr(mMatterAdvDataLen, 0);

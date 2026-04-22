@@ -137,7 +137,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
         # OCCEVENT (F09) requires cluster Rev >= v7
         try:
-            has_occevent_feature = (feature_map & cluster.Bitmaps.Feature.kOccupancyEventReporting) != 0
+            has_occevent_feature = (feature_map & cluster.Bitmaps.Feature.kOccupancyEvent) != 0
         except AttributeError:
             has_occevent_feature = False
 
