@@ -23,7 +23,6 @@
 
 #include "ChipDeviceScanner.h"
 
-#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <strings.h>
@@ -72,9 +71,12 @@ static bool __IsChipThingDevice(const bt_adapter_le_device_scan_result_info_s & 
                 strcasecmp(dataList[i].service_uuid, chip::Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR) == 0)
             {
                 __PrintLEScanData(dataList[i]);
-                memcpy(&info, dataList[i].service_data, std::min(static_cast<size_t>(dataList[i].service_data_len), sizeof(info)));
-                isChipDevice = true;
-                break;
+                if (dataList[i].service_data_len == sizeof(info))
+                {
+                    memcpy(&info, dataList[i].service_data, sizeof(info));
+                    isChipDevice = true;
+                    break;
+                }
             }
         }
     }
