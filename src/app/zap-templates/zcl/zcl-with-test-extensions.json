@@ -987,7 +987,11 @@
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
-        "Window Covering": ["ClusterRevision"],
+        "Window Covering": [
+            "ClusterRevision",
+            "OperationalStatus",
+            "SafetyStatus"
+        ],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",

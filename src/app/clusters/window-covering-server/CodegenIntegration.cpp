@@ -1,0 +1,455 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
+#include <app/clusters/window-covering-server/WindowCoveringCluster.h>
+#include <app/clusters/window-covering-server/WindowCoveringClusterDelegate.h>
+#include <app/static-cluster-config/WindowCovering.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WindowCovering;
+using namespace chip::app::Clusters::WindowCovering::Attributes;
+using chip::Protocols::InteractionModel::Status;
+
+namespace {
+
+constexpr size_t kWindowCoveringFixedClusterCount = WindowCovering::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kWindowCoveringMaxClusterCount   = kWindowCoveringFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<WindowCoveringCluster> gServers[kWindowCoveringMaxClusterCount];
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        WindowCovering::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        BitFlags<WindowCovering::Feature> features;
+        features.SetRaw(featureMap);
+
+        // Load RAM-backed attributes with ZAP-defined defaults from generated accessors so the
+        // cluster comes up with the application-configured values instead of zero-initialized ones.
+        WindowCovering::Type type{};
+        if (Attributes::Type::Get(endpointId, &type) != Status::Success)
+        {
+            type = WindowCovering::Type::kRollerShade;
+        }
+
+        chip::BitMask<WindowCovering::ConfigStatus> configStatus;
+        if (Attributes::ConfigStatus::Get(endpointId, &configStatus) != Status::Success)
+        {
+            configStatus.ClearAll();
+        }
+
+        WindowCovering::EndProductType endProductType{};
+        if (Attributes::EndProductType::Get(endpointId, &endProductType) != Status::Success)
+        {
+            endProductType = WindowCovering::EndProductType::kRollerShade;
+        }
+
+        chip::BitMask<WindowCovering::Mode> mode;
+        if (Attributes::Mode::Get(endpointId, &mode) != Status::Success)
+        {
+            mode.ClearAll();
+        }
+
+        // OperationalStatus has no RAM backing (handled by the code-driven cluster at runtime),
+        // so it is initialized to the spec default of "stall" (all zeros).
+        chip::BitMask<WindowCovering::OperationalStatus> operationalStatus;
+
+        Config config{ .type              = type,
+                       .configStatus      = configStatus,
+                       .operationalStatus = operationalStatus,
+                       .endProductType    = endProductType,
+                       .mode              = mode };
+        gServers[clusterInstanceIndex].Create(endpointId, features, optionalAttributeSet, config);
+
+        // Load ZAP-defined defaults for nullable position attributes so they don't start as null.
+        // Without this, ComputeOperationalState returns Stall (null current) and movement never starts.
+        auto & cluster = gServers[clusterInstanceIndex].Cluster();
+
+        DataModel::Nullable<Percent100ths> percent100ths;
+        if (Attributes::CurrentPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+        {
+            cluster.SetCurrentPositionLiftPercentage100ths(percent100ths);
+        }
+        if (Attributes::CurrentPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+        {
+            cluster.SetCurrentPositionTiltPercentage100ths(percent100ths);
+        }
+        if (Attributes::TargetPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+        {
+            cluster.SetTargetPositionLiftPercent100ths(percent100ths);
+        }
+        if (Attributes::TargetPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+        {
+            cluster.SetTargetPositionTiltPercent100ths(percent100ths);
+        }
+
+        DataModel::Nullable<Percent> percent;
+        if (Attributes::CurrentPositionLiftPercentage::Get(endpointId, percent) == Status::Success)
+        {
+            cluster.SetCurrentPositionLiftPercentage(percent);
+        }
+        if (Attributes::CurrentPositionTiltPercentage::Get(endpointId, percent) == Status::Success)
+        {
+            cluster.SetCurrentPositionTiltPercentage(percent);
+        }
+
+        return gServers[clusterInstanceIndex].Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
+    }
+
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+};
+
+} // namespace
+
+void MatterWindowCoveringClusterInitCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = WindowCovering::Id,
+            .fixedClusterInstanceCount = kWindowCoveringFixedClusterCount,
+            .maxClusterInstanceCount   = kWindowCoveringMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
+}
+
+void MatterWindowCoveringClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = WindowCovering::Id,
+            .fixedClusterInstanceCount = kWindowCoveringFixedClusterCount,
+            .maxClusterInstanceCount   = kWindowCoveringMaxClusterCount,
+        },
+        integrationDelegate, shutdownType);
+}
+
+namespace chip::app::Clusters::WindowCovering {
+
+WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * WindowCovering = CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = WindowCovering::Id,
+            .fixedClusterInstanceCount = kWindowCoveringFixedClusterCount,
+            .maxClusterInstanceCount   = kWindowCoveringMaxClusterCount,
+        },
+        integrationDelegate);
+
+    return static_cast<WindowCoveringCluster *>(WindowCovering);
+}
+
+void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate)
+{
+    WindowCoveringCluster * cluster = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(cluster != nullptr, ChipLogError(Zcl, "Failed to set WindowCovering delegate for endpoint:%u", endpointId));
+    cluster->SetDelegate(delegate);
+}
+
+void TypeSet(chip::EndpointId endpoint, Type type)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    cluster->SetType(type);
+}
+
+Type TypeGet(chip::EndpointId endpoint)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Type::kUnknown);
+    return cluster->GetType();
+}
+
+void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus> & configStatus)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    cluster->SetConfigStatus(configStatus);
+}
+
+chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, chip::BitMask<ConfigStatus>(0));
+    return cluster->GetConfigStatus();
+}
+
+void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+
+    configStatus.Set(ConfigStatus::kLiftPositionAware, cluster->HasFeaturePaLift());
+    configStatus.Set(ConfigStatus::kTiltPositionAware, cluster->HasFeaturePaTilt());
+
+    if (!cluster->HasFeaturePaLift())
+        configStatus.Clear(ConfigStatus::kLiftEncoderControlled);
+
+    if (!cluster->HasFeaturePaTilt())
+        configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
+
+    ConfigStatusSet(endpoint, configStatus);
+}
+
+chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, chip::BitMask<OperationalStatus>(0));
+    return cluster->GetOperationalStatus();
+}
+
+void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalStatus> newStatus)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    chip::BitMask<OperationalStatus> prevStatus = cluster->GetOperationalStatus();
+
+    // Filter changes
+    if (newStatus != prevStatus)
+    {
+        OperationalStatusPrint(newStatus);
+        cluster->SetOperationalStatus(newStatus);
+    }
+}
+
+void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field, OperationalState state)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    chip::BitMask<OperationalStatus> status = cluster->GetOperationalStatus();
+
+    /* Filter only Lift or Tilt action since we cannot allow global reflecting a state alone */
+    if ((OperationalStatus::kLift == field) || (OperationalStatus::kTilt == field))
+    {
+        status.SetField(field, static_cast<uint8_t>(state));
+        status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
+
+        /* Global Always follow Lift by priority or therefore fallback to Tilt */
+        chip::BitMask<OperationalStatus> opGlobal =
+            status.HasAny(OperationalStatus::kLift) ? OperationalStatus::kLift : OperationalStatus::kTilt;
+        status.SetField(OperationalStatus::kGlobal, status.GetField(opGlobal));
+
+        OperationalStatusSet(endpoint, status);
+    }
+}
+
+OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, OperationalState::Stall);
+    chip::BitMask<OperationalStatus> status = cluster->GetOperationalStatus();
+
+    return static_cast<OperationalState>(status.GetField(field));
+}
+
+void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    cluster->SetEndProductType(type);
+}
+
+EndProductType EndProductTypeGet(chip::EndpointId endpoint)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, EndProductType::kUnknown);
+    return cluster->GetEndProductType();
+}
+
+void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    chip::BitMask<ConfigStatus> newStatus;
+
+    chip::BitMask<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
+    chip::BitMask<Mode> oldMode           = ModeGet(endpoint);
+
+    newStatus = oldStatus;
+
+    // Attribute: ConfigStatus reflects the following current mode flags
+    newStatus.Set(ConfigStatus::kOperational, !newMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    newStatus.Set(ConfigStatus::kLiftMovementReversed, newMode.Has(Mode::kMotorDirectionReversed));
+
+    // Verify only one mode supported at once and maintenance lock goes over calibration
+    if (newMode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
+    {
+        newMode.Clear(Mode::kCalibrationMode);
+    }
+
+    if (oldMode != newMode)
+        cluster->SetMode(newMode);
+
+    if (oldStatus != newStatus)
+        ConfigStatusSet(endpoint, newStatus);
+}
+
+chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, chip::BitMask<Mode>(0));
+    return cluster->GetMode();
+}
+
+void SafetyStatusSet(chip::EndpointId endpoint, chip::BitMask<SafetyStatus> & newSafetyStatus)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    cluster->SetSafetyStatus(newSafetyStatus);
+}
+
+chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, chip::BitMask<SafetyStatus>(0));
+    return cluster->GetSafetyStatus();
+}
+
+// LiftPositionSet() and
+void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    NPercent percent;
+
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        ChipLogProgress(Zcl, "Lift[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        ChipLogProgress(Zcl, "Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    cluster->SetCurrentPositionLiftPercentage(percent);
+    cluster->SetCurrentPositionLiftPercentage100ths(percent100ths);
+}
+
+void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+    NPercent percent;
+
+    if (percent100ths.IsNull())
+    {
+        percent.SetNull();
+        ChipLogProgress(Zcl, "Tilt[%u] Position Set to Null", endpoint);
+    }
+    else
+    {
+        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
+        ChipLogProgress(Zcl, "Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
+    }
+    cluster->SetCurrentPositionTiltPercentage(percent);
+    cluster->SetCurrentPositionTiltPercentage100ths(percent100ths);
+}
+
+void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
+
+    BitMask<Mode> mode;
+    BitMask<ConfigStatus> configStatus;
+    NPercent100ths current, target;
+
+    ChipLogProgress(Zcl, "WC POST ATTRIBUTE=%u", (unsigned int) attributeId);
+
+    OperationalState opLift = OperationalStateGet(endpoint, OperationalStatus::kLift);
+    OperationalState opTilt = OperationalStateGet(endpoint, OperationalStatus::kTilt);
+
+    switch (attributeId)
+    {
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+        target  = cluster->GetTargetPositionLiftPercent100ths();
+        current = cluster->GetCurrentPositionLiftPercentage100ths();
+        if ((OperationalState::Stall != opLift) && (current == target))
+        {
+            ChipLogProgress(Zcl, "Lift stop");
+            OperationalStateSet(endpoint, OperationalStatus::kLift, OperationalState::Stall);
+        }
+        break;
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        target  = cluster->GetTargetPositionTiltPercent100ths();
+        current = cluster->GetCurrentPositionTiltPercentage100ths();
+        if ((OperationalState::Stall != opTilt) && (current == target))
+        {
+            ChipLogProgress(Zcl, "Tilt stop");
+            OperationalStateSet(endpoint, OperationalStatus::kTilt, OperationalState::Stall);
+        }
+        break;
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        target  = cluster->GetTargetPositionLiftPercent100ths();
+        current = cluster->GetCurrentPositionLiftPercentage100ths();
+        opLift  = ComputeOperationalState(target, current);
+        OperationalStateSet(endpoint, OperationalStatus::kLift, opLift);
+        break;
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        target  = cluster->GetTargetPositionTiltPercent100ths();
+        current = cluster->GetCurrentPositionTiltPercentage100ths();
+        opTilt  = ComputeOperationalState(target, current);
+        OperationalStateSet(endpoint, OperationalStatus::kTilt, opTilt);
+        break;
+    case Attributes::Mode::Id:
+        mode = ModeGet(endpoint);
+        ModePrint(mode);
+        ModeSet(endpoint, mode);
+        break;
+    case Attributes::ConfigStatus::Id:
+        configStatus = ConfigStatusGet(endpoint);
+        ConfigStatusPrint(configStatus);
+        break;
+    default:
+        break;
+    }
+}
+
+} // namespace chip::app::Clusters::WindowCovering
+
+/**
+ * @brief Cluster Plugin Init Callback
+ */
+void MatterWindowCoveringPluginServerInitCallback() {}
+void MatterWindowCoveringPluginServerShutdownCallback() {}
