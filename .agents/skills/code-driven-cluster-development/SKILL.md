@@ -638,6 +638,28 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
 9. **`LogErrorOnFailure` omitted on fire-and-forget calls** — use
    `LogErrorOnFailure(cluster->SetValue(...))` rather than silently ignoring
    errors from setters.
+10. **Unnecessary manual `AddStatus`** — Prefer returning the status directly
+    from `InvokeCommand` for simple status returns (no data payload), letting
+    the framework handle `AddStatus` automatically.
+11. **Cross-directory source inclusion in build files** — Avoid listing source
+    files from other clusters or directories directly in a target (e.g., in
+    tests). Use proper library dependencies instead to avoid duplicate
+    compilation and maintenance issues.
+12. **Dependency on heavy singletons** — Some singletons, such as
+    `Server::GetInstance()` and `InteractionModelEngine::GetInstance()`, are
+    very large and difficult to mock or use in tests. Review whether smaller,
+    more focused objects can be used or if additional decoupling is possible.
+    Example considerations:
+    - Instead of injecting a `Server` object, inject the specific objects needed
+      by the cluster (e.g., `FabricTable` and `EndpointTable`).
+    - Instead of using
+      `InteractionModelEngine::GetInstance()->GetDataModelProvider()`, use the
+      `DataModel::Provider` that is injected into the cluster context.
+    - For complex code that truly requires `Server` or `InteractionModelEngine`,
+      consider providing a delegate member and implementing the complex logic in
+      `CodegenIntegration.h/cpp` when the goal is to avoid direct coupling to
+      `Server` / `InteractionModelEngine` in the cluster itself when only a
+      small subset of their functionality is needed.
 
 ---
 

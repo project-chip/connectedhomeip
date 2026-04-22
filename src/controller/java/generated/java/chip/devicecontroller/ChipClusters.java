@@ -66031,11 +66031,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void updateGroup(DefaultClusterCallback callback, Integer groupID, @Nullable String friendlyName, @Nullable Integer groupKeySetID, @Nullable Integer groupCAT, @Nullable Integer groupCATVersion, Integer groupPermission) {
+    public void updateGroup(DefaultClusterCallback callback, Integer groupID, @Nullable String friendlyName, @Nullable Integer groupKeySetID, @Nullable Integer groupCAT, @Nullable Integer groupCATVersion, @Nullable Integer groupPermission) {
       updateGroup(callback, groupID, friendlyName, groupKeySetID, groupCAT, groupCATVersion, groupPermission, 0);
     }
 
-    public void updateGroup(DefaultClusterCallback callback, Integer groupID, @Nullable String friendlyName, @Nullable Integer groupKeySetID, @Nullable Integer groupCAT, @Nullable Integer groupCATVersion, Integer groupPermission, int timedInvokeTimeoutMs) {
+    public void updateGroup(DefaultClusterCallback callback, Integer groupID, @Nullable String friendlyName, @Nullable Integer groupKeySetID, @Nullable Integer groupCAT, @Nullable Integer groupCATVersion, @Nullable Integer groupPermission, int timedInvokeTimeoutMs) {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -66060,7 +66060,7 @@ public class ChipClusters {
       elements.add(new StructElement(groupCATVersionFieldID, groupCATVersiontlvValue));
 
       final long groupPermissionFieldID = 5L;
-      BaseTLVType groupPermissiontlvValue = new UIntType(groupPermission);
+      BaseTLVType groupPermissiontlvValue = groupPermission != null ? new UIntType(groupPermission) : new NullType();
       elements.add(new StructElement(groupPermissionFieldID, groupPermissiontlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -66123,24 +66123,24 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void updateAdmin(DefaultClusterCallback callback, @Nullable Long nodeID, @Nullable String friendlyName, @Nullable byte[] icac) {
+    public void updateAdmin(DefaultClusterCallback callback, Long nodeID, Optional<String> friendlyName, Optional<byte[]> icac) {
       updateAdmin(callback, nodeID, friendlyName, icac, 0);
     }
 
-    public void updateAdmin(DefaultClusterCallback callback, @Nullable Long nodeID, @Nullable String friendlyName, @Nullable byte[] icac, int timedInvokeTimeoutMs) {
+    public void updateAdmin(DefaultClusterCallback callback, Long nodeID, Optional<String> friendlyName, Optional<byte[]> icac, int timedInvokeTimeoutMs) {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long nodeIDFieldID = 0L;
-      BaseTLVType nodeIDtlvValue = nodeID != null ? new UIntType(nodeID) : new NullType();
+      BaseTLVType nodeIDtlvValue = new UIntType(nodeID);
       elements.add(new StructElement(nodeIDFieldID, nodeIDtlvValue));
 
       final long friendlyNameFieldID = 1L;
-      BaseTLVType friendlyNametlvValue = friendlyName != null ? new StringType(friendlyName) : new NullType();
+      BaseTLVType friendlyNametlvValue = friendlyName.<BaseTLVType>map((nonOptionalfriendlyName) -> new StringType(nonOptionalfriendlyName)).orElse(new EmptyType());
       elements.add(new StructElement(friendlyNameFieldID, friendlyNametlvValue));
 
       final long icacFieldID = 2L;
-      BaseTLVType icactlvValue = icac != null ? new ByteArrayType(icac) : new NullType();
+      BaseTLVType icactlvValue = icac.<BaseTLVType>map((nonOptionalicac) -> new ByteArrayType(nonOptionalicac)).orElse(new EmptyType());
       elements.add(new StructElement(icacFieldID, icactlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -67026,17 +67026,24 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long icaccsrFieldID = 0L;
-          byte[] icaccsr = null;
+          final long statusCodeFieldID = 0L;
+          Integer statusCode = null;
+          final long icaccsrFieldID = 1L;
+          Optional<byte[]> icaccsr = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == icaccsrFieldID) {
+            if (element.contextTagNum() == statusCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                statusCode = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == icaccsrFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
                 ByteArrayType castingValue = element.value(ByteArrayType.class);
-                icaccsr = castingValue.value(byte[].class);
+                icaccsr = Optional.of(castingValue.value(byte[].class));
               }
             }
           }
-          callback.onSuccess(icaccsr);
+          callback.onSuccess(statusCode, icaccsr);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -67169,7 +67176,7 @@ public class ChipClusters {
     }
 
     public interface ICACCSRResponseCallback extends BaseClusterCallback {
-      void onSuccess(byte[] icaccsr);
+      void onSuccess(Integer statusCode, Optional<byte[]> icaccsr);
     }
 
     public interface ICACResponseCallback extends BaseClusterCallback {

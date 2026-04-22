@@ -12411,42 +12411,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _endpointID = @(0);
-
-        _nodeID = @(0);
-
-        _friendlyName = @"";
-
-        _statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct alloc] init];
-
-    other.endpointID = self.endpointID;
-    other.nodeID = self.nodeID;
-    other.friendlyName = self.friendlyName;
-    other.statusEntry = self.statusEntry;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; nodeID:%@; friendlyName:%@; statusEntry:%@; >", NSStringFromClass([self class]), _endpointID, _nodeID, _friendlyName, _statusEntry];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRJointFabricDatastoreClusterDatastoreBindingTargetStruct
 - (instancetype)init
 {
@@ -12658,6 +12622,39 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; friendlyName:%@; vendorID:%@; icac:%@; >", NSStringFromClass([self class]), _nodeID, _friendlyName, _vendorID, [_icac base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpointID = @(0);
+
+        _nodeID = @(0);
+
+        _friendlyName = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct alloc] init];
+
+    other.endpointID = self.endpointID;
+    other.nodeID = self.nodeID;
+    other.friendlyName = self.friendlyName;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; nodeID:%@; friendlyName:%@; >", NSStringFromClass([self class]), _endpointID, _nodeID, _friendlyName];
     return descriptionString;
 }
 
