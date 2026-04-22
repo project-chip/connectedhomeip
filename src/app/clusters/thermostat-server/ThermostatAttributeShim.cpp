@@ -138,7 +138,8 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace ThermostatRunningMode
 
 namespace ThermostatRunningState {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
     if (cluster == nullptr)
@@ -173,7 +174,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
     *value = cluster->mSetpoints.absoluteHeatLimits.minimum;
     return Status::Success;
 }
-
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
