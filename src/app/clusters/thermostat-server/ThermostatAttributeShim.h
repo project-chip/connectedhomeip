@@ -36,6 +36,11 @@ namespace Clusters {
 namespace Thermostat {
 namespace Attributes {
 
+namespace ControlSequenceOfOperation {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value);
+} // namespace ControlSequenceOfOperation
+
 namespace LocalTemperature {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
