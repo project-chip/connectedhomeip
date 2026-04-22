@@ -18,6 +18,8 @@
 
 #include "AppTask.h"
 
+#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
