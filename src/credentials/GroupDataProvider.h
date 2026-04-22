@@ -171,11 +171,9 @@ public:
     {
         static constexpr size_t kEpochKeysMax = 3;
 
-        KeySet() { ClearKeys(); }
+        KeySet() = default;
         KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
-        {
-            ClearKeys();
-        }
+        {}
 
         // The actual keys for the group key set
         EpochKey epoch_keys[kEpochKeysMax];
