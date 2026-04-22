@@ -84,6 +84,9 @@ public:
     Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode);
     ThermostatRunningModeEnum GetRunningMode() const { return mRunningMode; }
 
+    Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
+    BitMask<RelayStateBitmap> GetRunningState() const { return mRunningState; }
+
     Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature);
     DataModel::Nullable<int16_t> GetLocalTemperature() const { return mLocalTemperature; }
 
@@ -106,6 +109,7 @@ private:
 
     SystemModeEnum mSystemMode;
     ThermostatRunningModeEnum mRunningMode;
+    BitMask<RelayStateBitmap> mRunningState;
     DataModel::Nullable<int16_t> mLocalTemperature;
 
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,

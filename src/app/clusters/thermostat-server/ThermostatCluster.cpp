@@ -247,6 +247,7 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
     }
     return Status::Success;
 }
+
 void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     mAtomicWriteSession.ResetAtomicWrite();
