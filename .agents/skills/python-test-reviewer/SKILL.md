@@ -29,16 +29,23 @@ This skill provides a checklist and set of principles for reviewing Python tests
 - **Attribute reads**: Prefer using read_single_attribute_check_success in matter/testing to the base Read and ReadAttribute functions in ChipDeviceCtrl.py unless there is a good reason. This function contains additional checks that are useful for testing.
 - **Exceptions**: Avoid `except Exception` - use a specific exception
 - **try / except can hide bugs**: Avoid fixing CI issues with a try: except:. This pattern can hide real bugs that should be fixed and is a code smell. Try except blocks should only be used where the exception is expected and that should normally include an assertion that the exception happens or a comment explaining in detail why the exception is thrown and how this is spec compliant.
+- **Sleeps can hide bugs**: a sleep in a test is a code smell. Ensure sleeps in tests are actually required. If the test is using sleep to wait for the device to do something, consider whether a subscription can be used instead.
+- **Tolerances should be well considered**: If there is a fudge factor built in, ensure the logic is both explained and reasonable.
 - **Use dataclass**: Do not use dicts with string keys. Use dataclasses with named members instead. This helps programmers avoid uncaught typos.
 - **Avoid Decorative Separators**: Remove long lines of hashes (e.g., ###########) or other decorative separators. Use standard spacing or docstrings instead.
 - **Cleanup of Stale Code**: Remove outdated TODO comments, unbound variables, and leftover debugging code.
 - **Type Hints**: Use type hints for function signatures to improve readability and maintainability, especially for functions that are part of the test framework or are likely to be reused.
+- **TODOs**: TODOs should be linked to a tracking issue and used sparingly.
 
 
 
 ### 4. Matter-Specific Patterns
 - **Commissioning**: If the test involves commissioning, ensure it uses the standard commissioning fixtures to avoid duplicated setup logic.
 - **IDs**: IDs and values should be taken from the codegen files (ex. Objects.py). Values that are not in the codegen should be flagged for follow up
+
+### 5. Testing failures
+- **Test for unexpected successes**: If a test is meant to verify that an error condition is properly handled, ensure that it fails if the error condition does not occur.
+
 
 ## Feedback Style
 - Be concise.
