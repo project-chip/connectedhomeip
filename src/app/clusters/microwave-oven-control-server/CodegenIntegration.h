@@ -89,7 +89,7 @@ public:
      * @param feature The feature to check.
      * @return True if the feature is supported, false otherwise.
      */
-    bool HasFeature(MicrowaveOvenControl::Feature feature) const;
+    bool HasFeature(MicrowaveOvenControl::Feature feature) const { return mFeature.Has(feature); }
 
 private:
     Delegate * mDelegate;

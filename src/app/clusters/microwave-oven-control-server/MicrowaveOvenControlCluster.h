@@ -60,7 +60,7 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     uint8_t GetCountOfSupportedWattLevels() const;
-    uint32_t GetCookTimeSec() const;
+    uint32_t GetCookTimeSec() const { return mCookTimeSec; }
     CHIP_ERROR SetCookTimeSec(uint32_t cookTimeSec);
 
 private:

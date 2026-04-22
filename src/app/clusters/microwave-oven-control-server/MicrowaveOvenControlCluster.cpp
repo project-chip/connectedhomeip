@@ -87,11 +87,6 @@ uint8_t MicrowaveOvenControlCluster::GetCountOfSupportedWattLevels() const
     return wattIndex;
 }
 
-inline uint32_t MicrowaveOvenControlCluster::GetCookTimeSec() const
-{
-    return mCookTimeSec;
-}
-
 CHIP_ERROR MicrowaveOvenControlCluster::SetCookTimeSec(uint32_t cookTimeSec)
 {
     VerifyOrReturnError(IsCookTimeSecondsInRange(cookTimeSec, mDelegate.GetMaxCookTimeSec()),
