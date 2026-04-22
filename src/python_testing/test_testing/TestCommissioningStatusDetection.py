@@ -19,7 +19,7 @@
 Unit tests for commissioning status detection functions in commissioning.py.
 
 Tests cover:
-- DNS-SD discovery (_is_device_operational_via_dnssd)
+- DNS-SD discovery (_is_device_operational_via_dnssd, _is_device_commissionable_via_dnssd)
 - Parallel session establishment (_establish_pase_or_case_session)
 - is_commissioned() integration scenarios
 - get_commissioned_fabric_count() integration scenarios
@@ -32,13 +32,13 @@ import asyncio
 import contextlib
 import sys
 from dataclasses import dataclass
-from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from python_path import PythonPath
+
 # Add the python_testing directory to path so mdns_discovery module can be found
-PYTHON_TESTING_DIR = Path(__file__).parent.parent
-if str(PYTHON_TESTING_DIR) not in sys.path:
-    sys.path.insert(0, str(PYTHON_TESTING_DIR))
+with PythonPath('..', relative_to=__file__):
+    import mdns_discovery.mdns_discovery  # noqa: F401
 
 # Test constants
 TEST_NODE_ID = 1234
@@ -583,68 +583,65 @@ async def test_is_commissioned_on_current_fabric_scenario2_operational_shortcirc
 
 async def test_is_commissioned_on_current_fabric_scenario1_factory_fresh():
     """
-    Test: SCENARIO 1 - Not operational on this fabric; only PASE succeeds (e.g. factory fresh).
+    Test: SCENARIO 1 - Not operational on this fabric, but commissionable via mDNS.
 
     Behavior:
-    - DNS-SD returns False (no operational advertisement on this fabric)
-    - Parallel PASE/CASE attempted; PASE wins
-    - is_commissioned returns False (not on this fabric via CASE)
+    - DNS-SD operational returns False
+    - DNS-SD commissionable returns True (pairing window open)
+    - is_commissioned returns False (fast-fail, no session opened)
 
-    Value: Factory-fresh / PASE-only path does not count as commissioned on this fabric.
+    Value: Factory-fresh device with open commissioning window is detected passively.
     """
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd_op, \
+            patch.object(commissioning, '_is_device_commissionable_via_dnssd', new_callable=AsyncMock) as mock_dnssd_comm:
 
-        mock_dnssd.return_value = False
-        mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE
+        mock_dnssd_op.return_value = False
+        mock_dnssd_comm.return_value = True
 
-        pase_params = commissioning.PaseParams(
-            setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
-        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, pase_params=pase_params)
+        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
 
         if result:
-            return "Expected False when only PASE session (not on this fabric)"
-        if not mock_parallel.called:
-            return "Parallel session should have been attempted"
+            return "Expected False when device is commissionable (fast-fail)"
+        if not mock_dnssd_comm.called:
+            return "Commissionable mDNS check should have been called"
     return None
 
 
-async def test_is_commissioned_on_current_fabric_scenario3_pase_only_other_fabric_possible():
+async def test_is_commissioned_on_current_fabric_scenario3_case_fails():
     """
-    Test: SCENARIO 3 - PASE wins; device might hold other fabrics but not this one.
+    Test: SCENARIO 3 - Neither mDNS check conclusive, CASE fallback fails.
 
     Behavior:
-    - DNS-SD returns False (not seen on our fabric via DNS-SD)
-    - Parallel session wins with PASE (e.g. commissioning window open)
-    - is_commissioned returns False for THIS fabric (TrustedRootCertificates not consulted)
+    - DNS-SD operational returns False
+    - DNS-SD commissionable returns False
+    - Direct CASE connection fails
+    - is_commissioned returns False
 
-    Value: Non-empty roots on the device do not imply operational on the controller's fabric.
+    Value: Verifies correct behavior when the device is completely unreachable.
     """
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
 
-    async def fail_if_read(*_args, **_kwargs):
-        raise AssertionError("is_commissioned must not read TrustedRootCertificates when PASE wins")
+    async def fail_case(*_args, **_kwargs):
+        raise RuntimeError("CASE failed")
 
-    mock_controller.ReadAttribute = AsyncMock(side_effect=fail_if_read)
+    mock_controller.GetConnectedDevice = AsyncMock(side_effect=fail_case)
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd_op, \
+            patch.object(commissioning, '_is_device_commissionable_via_dnssd', new_callable=AsyncMock) as mock_dnssd_comm:
 
-        mock_dnssd.return_value = False
-        mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE
+        mock_dnssd_op.return_value = False
+        mock_dnssd_comm.return_value = False
 
-        pase_params = commissioning.PaseParams(
-            setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
-        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, pase_params=pase_params)
+        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
 
         if result:
-            return "Expected False when PASE wins (not operational on this fabric)"
+            return "Expected False when CASE connection fails"
     return None
 
 
@@ -653,8 +650,9 @@ async def test_is_commissioned_on_current_fabric_scenario_case_wins_after_dnssd_
     Test: CASE wins after DNS-SD miss — operational on this fabric without attribute read.
 
     Behavior:
-    - DNS-SD returns False
-    - Parallel connect returns CASE
+    - DNS-SD operational returns False
+    - DNS-SD commissionable returns False
+    - Direct CASE succeeds
     - is_commissioned returns True without reading TrustedRootCertificates
     """
     from matter.testing import commissioning
@@ -665,43 +663,39 @@ async def test_is_commissioned_on_current_fabric_scenario_case_wins_after_dnssd_
         raise AssertionError("is_commissioned must not read attributes when CASE wins")
 
     mock_controller.ReadAttribute = AsyncMock(side_effect=fail_if_read)
+    mock_controller.GetConnectedDevice = AsyncMock(return_value=MagicMock())
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd_op, \
+            patch.object(commissioning, '_is_device_commissionable_via_dnssd', new_callable=AsyncMock) as mock_dnssd_comm:
 
-        mock_dnssd.return_value = False
-        mock_parallel.return_value = commissioning.EstablishedSessionKind.CASE
+        mock_dnssd_op.return_value = False
+        mock_dnssd_comm.return_value = False
 
-        pase_params = commissioning.PaseParams(
-            setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
-        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, pase_params=pase_params)
+        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
 
         if not result:
-            return "Expected True when CASE wins after DNS-SD miss"
+            return "Expected True when CASE succeeds after DNS-SD miss"
     return None
 
 
-async def test_is_commissioned_on_current_fabric_not_operational_no_pase_params():
+async def test_is_commissioned_exception_propagation():
     """
-    Test: Device not operational via DNS-SD and no PASE params provided.
+    Test: Unexpected exception propagates from is_commissioned.
 
-    Behavior: Raises ValueError - can't safely check without risking timeout.
-
-    Value: Prevents callers from accidentally causing long CASE timeouts
-    when device might not be commissioned.
+    Value: Ensures callers see unexpected errors explicitly.
     """
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
-        mock_dnssd.return_value = False
+        mock_dnssd.side_effect = Exception("General network failure")
 
         try:
-            await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, pase_params=None)
-            return "Expected ValueError when not operational and no PASE params"
-        except ValueError as e:
-            if "not operational on this fabric" not in str(e):
+            await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
+            return "Expected Exception to propagate"
+        except Exception as e:
+            if "General network failure" not in str(e):
                 return f"Unexpected error message: {e}"
     return None
 
@@ -712,38 +706,34 @@ async def test_is_commissioned_on_current_fabric_not_operational_no_pase_params(
 
 async def test_get_fabric_count_scenario2_operational():
     """
-    Test: SCENARIO 2 - Device operational on this fabric, get count via CASE.
+    Test: Device operational, get count directly via ReadAttribute.
 
-    Value: Verifies correct count retrieval when device is on our fabric.
+    Value: Verifies correct count retrieval assuming caller-managed session.
     """
     import matter.clusters as Clusters
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
-
-        mock_dnssd.return_value = True
-
-        # Fabric count is len(TrustedRootCertificates); use two placeholder roots.
-        mock_controller.ReadAttribute = AsyncMock(return_value={
-            TEST_ENDPOINT: {
-                Clusters.OperationalCredentials: {
-                    Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: [b'root_a', b'root_b']
-                }
+    # Fabric count is len(TrustedRootCertificates); use two placeholder roots.
+    mock_controller.ReadAttribute = AsyncMock(return_value={
+        TEST_ENDPOINT: {
+            Clusters.OperationalCredentials: {
+                Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: [b'root_a', b'root_b']
             }
-        })
+        }
+    })
 
-        result = await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
+    result = await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
 
-        if result != 2:
-            return f"Expected fabric count 2, got {result}"
+    if result != 2:
+        return f"Expected fabric count 2, got {result}"
     return None
 
 
 async def test_get_fabric_count_scenario1_factory_fresh():
     """
-    Test: SCENARIO 1 - Factory fresh device, should return 0.
+    Test: Factory fresh device, should return 0.
 
     Value: Verifies 0 count for uncommissioned devices.
     """
@@ -752,50 +742,40 @@ async def test_get_fabric_count_scenario1_factory_fresh():
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
-
-        mock_dnssd.return_value = False
-        mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE
-
-        mock_controller.ReadAttribute = AsyncMock(return_value={
-            TEST_ENDPOINT: {
-                Clusters.OperationalCredentials: {
-                    Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: []
-                }
+    mock_controller.ReadAttribute = AsyncMock(return_value={
+        TEST_ENDPOINT: {
+            Clusters.OperationalCredentials: {
+                Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: []
             }
-        })
+        }
+    })
 
-        pase_params = commissioning.PaseParams(
-            setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
-        result = await commissioning.get_commissioned_fabric_count(
-            mock_controller, TEST_NODE_ID, pase_params=pase_params
-        )
+    result = await commissioning.get_commissioned_fabric_count(
+        mock_controller, TEST_NODE_ID
+    )
 
-        if result != 0:
-            return f"Expected fabric count 0 for factory fresh, got {result}"
+    if result != 0:
+        return f"Expected fabric count 0 for factory fresh, got {result}"
     return None
 
 
-async def test_get_fabric_count_not_operational_no_pase_params():
+async def test_get_fabric_count_exception():
     """
-    Test: Device not operational via DNS-SD and no PASE params provided.
+    Test: Exception correctly propagates from get_commissioned_fabric_count.
 
-    Value: Ensures ValueError is raised to prevent timeout.
+    Value: Ensures callers see ReadAttribute failures.
     """
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
+    mock_controller.ReadAttribute = AsyncMock(side_effect=Exception("ReadAttribute failure"))
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
-        mock_dnssd.return_value = False
-
-        try:
-            await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID, pase_params=None)
-            return "Expected ValueError when not operational and no PASE params"
-        except ValueError as e:
-            if "not operational on this fabric" not in str(e):
-                return f"Unexpected error message: {e}"
+    try:
+        await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
+        return "Expected Exception to propagate"
+    except Exception as e:
+        if "ReadAttribute failure" not in str(e):
+            return f"Unexpected error message: {e}"
     return None
 
 
@@ -825,19 +805,19 @@ def main():
         # Category C: is_commissioned() Tests
         ("C1. is_commissioned: SCENARIO 2 - operational shortcircuit",
          test_is_commissioned_on_current_fabric_scenario2_operational_shortcircuit),
-        ("C2. is_commissioned: SCENARIO 1 - factory fresh",
+        ("C2. is_commissioned: SCENARIO 1 - factory fresh (commissionable fast-fail)",
          test_is_commissioned_on_current_fabric_scenario1_factory_fresh),
-        ("C3. is_commissioned: PASE only (not this fabric)",
-         test_is_commissioned_on_current_fabric_scenario3_pase_only_other_fabric_possible),
+        ("C3. is_commissioned: CASE fails after DNS-SD miss",
+         test_is_commissioned_on_current_fabric_scenario3_case_fails),
         ("C4. is_commissioned: CASE wins after DNS-SD miss",
          test_is_commissioned_on_current_fabric_scenario_case_wins_after_dnssd_miss),
-        ("C5. is_commissioned: not operational, no PASE params",
-         test_is_commissioned_on_current_fabric_not_operational_no_pase_params),
+        ("C5. is_commissioned: exception propagation",
+         test_is_commissioned_exception_propagation),
 
         # Category D: get_commissioned_fabric_count() Tests
-        ("D1. get_fabric_count: SCENARIO 2 - operational", test_get_fabric_count_scenario2_operational),
-        ("D2. get_fabric_count: SCENARIO 1 - factory fresh", test_get_fabric_count_scenario1_factory_fresh),
-        ("D3. get_fabric_count: not operational, no PASE params", test_get_fabric_count_not_operational_no_pase_params),
+        ("D1. get_fabric_count: operational (2 fabrics)", test_get_fabric_count_scenario2_operational),
+        ("D2. get_fabric_count: factory fresh (0 fabrics)", test_get_fabric_count_scenario1_factory_fresh),
+        ("D3. get_fabric_count: exception propagation", test_get_fabric_count_exception),
     ]
 
     print("\n" + "=" * 70)

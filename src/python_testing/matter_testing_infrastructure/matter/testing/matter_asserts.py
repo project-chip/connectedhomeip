@@ -6,8 +6,6 @@ from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
 
-from matter.testing.commissioning_types import PaseParams
-
 T = TypeVar('T')
 
 
@@ -377,8 +375,7 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
 async def assert_is_commissioned_to_any_fabric(
     dev_ctrl,
     node_id: int,
-    description: str = "Device",
-    pase_params: Optional[PaseParams] = None
+    description: str = "Device"
 ) -> None:
     """
     Asserts that the device has at least one commissioned fabric.
@@ -386,20 +383,16 @@ async def assert_is_commissioned_to_any_fabric(
     Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
     and verifies that the list is not empty. An empty list indicates factory fresh state.
 
-    This assertion works over PASE (before a CASE session is established) or CASE.
+    This assertion assumes the caller has already established a CASE or PASE connection.
 
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
-        pase_params: Optional parameters for establishing PASE if needed.
-                    See get_commissioned_fabric_count() for format details.
 
     Raises:
         AssertionError: If device has no commissioned fabrics (is factory fresh)
         ChipStackError: If unable to read the TrustedRootCertificates attribute
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
-        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
         # Verify device is commissioned before running multi-fabric test
@@ -407,14 +400,10 @@ async def assert_is_commissioned_to_any_fabric(
 
         # Check that device has been successfully commissioned in previous step
         await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="Newly commissioned device")
-
-        # Verify device is commissioned (establishes PASE if needed)
-        pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 
-    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id)
     asserts.assert_true(
         fabric_count > 0,
         f"{description} must have at least one commissioned fabric. "
@@ -425,8 +414,7 @@ async def assert_is_commissioned_to_any_fabric(
 async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,
-    description: str = "Device",
-    pase_params: Optional[PaseParams] = None
+    description: str = "Device"
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -434,7 +422,7 @@ async def assert_factory_fresh(
     Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
     and verifies that the list is empty. A non-empty list indicates the device has fabrics.
 
-    This assertion works over PASE (before a CASE session is established) or CASE.
+    This assertion assumes the caller has already established a CASE or PASE connection.
 
     Useful for tests that require factory-default state, such as discriminator uniqueness
     tests or device attestation tests.
@@ -443,26 +431,18 @@ async def assert_factory_fresh(
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
-        pase_params: Optional parameters for establishing PASE if needed.
-                    See get_commissioned_fabric_count() for format details.
 
     Raises:
         AssertionError: If device has any commissioned fabrics
         ChipStackError: If unable to read the TrustedRootCertificates attribute
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
-        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
         # Verify device is factory reset before running test
-        await assert_factory_fresh(controller, node_id=1234, "DUT")
-
-        # Verify factory-fresh device (establishes PASE if needed)
-        pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
+        await assert_factory_fresh(controller, node_id=1234, description="DUT")
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 
-    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id)
     asserts.assert_equal(
         fabric_count,
         0,
@@ -476,8 +456,7 @@ async def assert_fabric_count(
     dev_ctrl,
     node_id: int,
     expected_count: int,
-    description: str = "Device",
-    pase_params: Optional[PaseParams] = None
+    description: str = "Device"
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.
@@ -486,7 +465,7 @@ async def assert_fabric_count(
     and compares the count to the expected value. Each trusted root certificate
     corresponds to one commissioned fabric.
 
-    This assertion works over PASE (before a CASE session is established) or CASE.
+    This assertion assumes the caller has already established a CASE or PASE connection.
 
     Useful for multi-fabric tests where you need to verify the exact number of fabrics
     at different stages of the test.
@@ -496,26 +475,18 @@ async def assert_fabric_count(
         node_id: Node ID of the device to check
         expected_count: Expected number of commissioned fabrics
         description: User-defined description for error messages (default: "Device")
-        pase_params: Optional parameters for establishing PASE if needed.
-                    Same as for get_commissioned_fabric_count().
 
     Raises:
         AssertionError: If actual fabric count doesn't match expected count
         ChipStackError: If unable to read the TrustedRootCertificates attribute
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
-        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
         # Verify device has exactly 1 fabric before adding second
-        await assert_fabric_count(controller, node_id=1234, expected_count=1, "DUT")
-
-        # Verify factory-fresh device has 0 fabrics (establishes PASE if needed)
-        pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT", pase_params=pase_params)
+        await assert_fabric_count(controller, node_id=1234, expected_count=1, description="DUT")
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 
-    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id)
     asserts.assert_equal(
         actual_count,
         expected_count,

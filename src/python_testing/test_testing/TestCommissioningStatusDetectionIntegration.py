@@ -46,23 +46,21 @@ with a real Matter application server.
 import asyncio
 import logging
 import os
-import sys
 import tempfile
-from pathlib import Path
 
 from mobly import asserts
+from python_path import PythonPath
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.commissioning import PaseParams, _is_device_operational_via_dnssd, is_commissioned
+from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 # Add python_testing directory to path so mdns_discovery module is available
-PYTHON_TESTING_DIR = Path(__file__).parent.parent
-if str(PYTHON_TESTING_DIR) not in sys.path:
-    sys.path.insert(0, str(PYTHON_TESTING_DIR))
+with PythonPath('..', relative_to=__file__):
+    import mdns_discovery.mdns_discovery  # noqa: F401
 
 LOGGER = logging.getLogger(__name__)
 
@@ -158,16 +156,10 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
         LOGGER.info("=== Test: Factory Fresh Device - is_commissioned() ===")
         self.start_th_server()
 
-        pase_params = PaseParams(
-            discriminator=self.th_server_discriminator,
-            passcode=self.th_server_passcode,
-        )
-
         LOGGER.info("Checking is_commissioned() on factory-fresh device")
         commissioned = await is_commissioned(
             self.default_controller,
-            self.th_server_local_nodeid,
-            pase_params=pase_params
+            self.th_server_local_nodeid
         )
         asserts.assert_false(
             commissioned,
@@ -215,6 +207,10 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             "Commissioned device SHOULD be found operational via DNS-SD"
         )
         LOGGER.info("PASS: Commissioned device found operational via DNS-SD")
+
+        LOGGER.info("Checking is_commissioned() on commissioned device")
+        commissioned = await is_commissioned(self.default_controller, self.th_server_local_nodeid)
+        asserts.assert_true(commissioned, "Commissioned device should report is_commissioned=True")
 
 
 if __name__ == "__main__":
