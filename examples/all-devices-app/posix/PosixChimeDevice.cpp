@@ -48,7 +48,7 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
         return MA_INVALID_ARGS;
 
     // Calculate total samples for the full duration of the sound
-    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
+    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
 
     ma_uint64 framesToRead = frameCount;
     // Ensure we don't read past the end of the sound
@@ -78,21 +78,21 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
         if (pCustomDS->pulse)
         {
             // Pulsing sound: keep same frequency
-            freq   = pCustomDS->freq1;
+            freq   = pCustomDS->freq1_hz;
             t_note = t;
         }
         else
         {
             // Two-tone sound (Ding-Dong): switch frequency halfway
-            if (t < pCustomDS->duration / 2.0)
+            if (t < pCustomDS->duration_sec / 2.0)
             {
-                freq   = pCustomDS->freq1;
+                freq   = pCustomDS->freq1_hz;
                 t_note = t;
             }
             else
             {
-                freq   = pCustomDS->freq2;
-                t_note = t - (pCustomDS->duration / 2.0); // Reset relative time for second tone
+                freq   = pCustomDS->freq2_hz;
+                t_note = t - (pCustomDS->duration_sec / 2.0); // Reset relative time for second tone
             }
         }
 
@@ -133,7 +133,7 @@ ma_result custom_data_source_seek(ma_data_source * pDataSource, ma_uint64 frameI
     if (pCustomDS == NULL)
         return MA_INVALID_ARGS;
 
-    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
+    const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
 
     // Cap the cursor at the end of the sound
     if (frameIndex > totalSamples)
@@ -184,7 +184,7 @@ ma_result custom_data_source_get_length(ma_data_source * pDataSource, ma_uint64 
         return MA_INVALID_ARGS;
 
     if (pLength)
-        *pLength = static_cast<ma_uint64>(pCustomDS->duration * kSampleRateHz);
+        *pLength = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
     return MA_SUCCESS;
 }
 
@@ -220,26 +220,26 @@ PosixChimeDevice::SoundResource::SoundResource(ma_engine * engine, const ChimeDe
     if (soundInfo.id == 0)
     {
         // Chime 0: Two-tone "Ding-Dong" (880Hz then 660Hz)
-        dataSource.freq1    = 880;
-        dataSource.freq2    = 660;
-        dataSource.duration = 1.0;
-        dataSource.pulse    = false;
+        dataSource.freq1_hz    = 880;
+        dataSource.freq2_hz    = 660;
+        dataSource.duration_sec = 1.0;
+        dataSource.pulse       = false;
     }
     else if (soundInfo.id == 1)
     {
         // Chime 1: Pulsing warning tone (1000Hz pulsing)
-        dataSource.freq1    = 1000;
-        dataSource.freq2    = 1000;
-        dataSource.duration = 1.0;
-        dataSource.pulse    = true;
+        dataSource.freq1_hz    = 1000;
+        dataSource.freq2_hz    = 1000;
+        dataSource.duration_sec = 1.0;
+        dataSource.pulse       = true;
     }
     else
     {
         // Chime 2 (Default): Single short tone (440Hz)
-        dataSource.freq1    = 440;
-        dataSource.freq2    = 440;
-        dataSource.duration = 0.5;
-        dataSource.pulse    = false;
+        dataSource.freq1_hz    = 440;
+        dataSource.freq2_hz    = 440;
+        dataSource.duration_sec = 0.5;
+        dataSource.pulse       = false;
     }
 
     // Initialize the base data source with our vtable mapping to the callbacks above
