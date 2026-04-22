@@ -16,6 +16,7 @@
  */
 #include <PosixChimeDevice.h>
 #include <cmath>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <sstream>
 
@@ -44,8 +45,7 @@ constexpr uint32_t kSampleRateHz = 44100;
 ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOut, ma_uint64 frameCount, ma_uint64 * pFramesRead)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL)
-        return MA_INVALID_ARGS;
+    VerifyOrReturnError(pCustomDS != nullptr, MA_INVALID_ARGS);
 
     // Calculate total samples for the full duration of the sound
     const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
@@ -132,8 +132,7 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
 ma_result custom_data_source_seek(ma_data_source * pDataSource, ma_uint64 frameIndex)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL)
-        return MA_INVALID_ARGS;
+    VerifyOrReturnError(pCustomDS != nullptr, MA_INVALID_ARGS);
 
     const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
 
@@ -170,8 +169,7 @@ ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_fo
 ma_result custom_data_source_get_cursor(ma_data_source * pDataSource, ma_uint64 * pCursor)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL)
-        return MA_INVALID_ARGS;
+    VerifyOrReturnError(pCustomDS != nullptr, MA_INVALID_ARGS);
 
     if (pCursor)
         *pCursor = pCustomDS->cursor;
@@ -182,8 +180,7 @@ ma_result custom_data_source_get_cursor(ma_data_source * pDataSource, ma_uint64 
 ma_result custom_data_source_get_length(ma_data_source * pDataSource, ma_uint64 * pLength)
 {
     auto * pCustomDS = reinterpret_cast<PosixChimeDevice::CustomDataSource *>(pDataSource);
-    if (pCustomDS == NULL)
-        return MA_INVALID_ARGS;
+    VerifyOrReturnError(pCustomDS != nullptr, MA_INVALID_ARGS);
 
     if (pLength)
         *pLength = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
