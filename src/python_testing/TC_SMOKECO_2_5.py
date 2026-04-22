@@ -189,8 +189,8 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
         self.step(1)
 
         # InterconnectedSmokeAlarmHandler is optional
-        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
-            self.step(2)
+        self.step(2)
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
             interconnected_smoke_alarm_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm)
             await interconnected_smoke_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -228,12 +228,13 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             )
             interconnected_smoke_alarm_handler.cancel()
         else:
-            self.mark_step_range_skipped(2, 12)
+            self.mark_step_range_skipped(3, 12)
         # End of the checks for InterconnectedSmokeAlarmHandler
 
         # InterconnectedCOAlarmHandler is Optional
-        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
-            self.step(13)
+        self.step(13)
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
+
             interconnected_co_alarm_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm)
             await interconnected_co_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -266,13 +267,12 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             )
             interconnected_co_alarm_handler.cancel()
         else:
-            self.mark_step_range_skipped(13, 22)
+            self.mark_step_range_skipped(14, 22)
         # End of InterconnectedCOAlarmHandler
 
         # Contamination State depends on SMOKE
+        self.step(23)
         if await self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
-
-            self.step(23)
             contamination_state_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.ContaminationState)
             await contamination_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -311,11 +311,11 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             contamination_state_handler.cancel()
             #  End of ContaminationState
         else:
-            self.mark_step_range_skipped(23, 31)
+            self.mark_step_range_skipped(24, 31)
 
         # SmokeSensitivity depends on SMOKE
+        self.step(32)
         if await self.feature_guard(endpoint=self.get_endpoint(), cluster=self.smokeco_cluster, feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
-            self.step(32)
             smokesensitivity_handler = AttributeSubscriptionHandler(
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
             await smokesensitivity_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
@@ -352,7 +352,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             )
             smokesensitivity_handler.cancel()
         else:
-            self.mark_step_range_skipped(32, 40)
+            self.mark_step_range_skipped(33, 40)
         # End of SmokeSensitivity
 
         # Device muted on SmokeAlarm and COAlarm
