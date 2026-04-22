@@ -99,6 +99,12 @@ _SPEC_VER_RE = re.compile(r'^Git:\s+(\S.*?)\s*$', re.MULTILINE)
 # git-describe output, avoiding false matches mid-word.
 _SHA_RE = re.compile(r'(?:^|-)g([0-9a-f]{7,})', re.IGNORECASE)
 
+# Detects the "<N>-g" distance+SHA portion of git-describe output.
+# When present, the value is not a clean tag and a SHA must follow.
+# When absent, the value is a clean tag (HEAD exactly at a tag) and
+# no SHA suffix is appended by git describe.
+_HAS_DISTANCE_RE = re.compile(r'-\d+-g', re.IGNORECASE)
+
 # Source .adoc path(s), may be space-separated list
 _SOURCE_RE = re.compile(r'^Source:\s+(\S.*?)\s*$', re.MULTILINE)
 
@@ -254,7 +260,7 @@ def validate_file(filepath: Path) -> List[str]:
         )
     else:
         git_value = spec_match.group(1)
-        if not _SHA_RE.search(git_value):
+        if not _SHA_RE.search(git_value) and _HAS_DISTANCE_RE.search(git_value):
             errors.append(
                 f"'Git:' value '{git_value}' does not contain a commit SHA\n"
                 "    Expected git-describe format: X.Y-<tag>-<N>-g<SHA>\n"
