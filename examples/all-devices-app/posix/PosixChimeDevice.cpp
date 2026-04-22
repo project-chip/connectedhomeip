@@ -160,9 +160,18 @@ ma_result custom_data_source_seek(ma_data_source * pDataSource, ma_uint64 frameI
 ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_format * pFormat, ma_uint32 * pChannels,
                                              ma_uint32 * pSampleRate, ma_channel * pChannelMap, size_t channelMapCap)
 {
-    *pFormat     = ma_format_s16; // 16-bit signed integer PCM
-    *pChannels   = 1;             // Mono
-    *pSampleRate = kSampleRateHz;
+    if (pFormat)
+    {
+        *pFormat = ma_format_s16; // 16-bit signed integer PCM
+    }
+    if (pChannels)
+    {
+        *pChannels = 1; // Mono
+    }
+    if (pSampleRate)
+    {
+        *pSampleRate = kSampleRateHz;
+    }
 
     if (pChannelMap && channelMapCap > 0)
     {
