@@ -47,7 +47,8 @@ public:
     class SoundResource
     {
     public:
-        SoundResource(ma_engine * engine, const ChimeDevice::Sound & soundInfo);
+        static std::unique_ptr<SoundResource> Create(ma_engine * engine, const ChimeDevice::Sound & soundInfo);
+        SoundResource() = default; // Needed for factory
         ~SoundResource();
 
         uint8_t id;                  // Chime ID matching the Matter spec
