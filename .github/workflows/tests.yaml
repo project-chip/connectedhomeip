@@ -1327,14 +1327,11 @@ jobs:
                 set -euxo pipefail
 
                 INPUT_JSON="allure-history/allure-report/ci_tests/last-history/history.json"
-                DASHBOARD_DIR="allure-history/allure-report/ci_tests/dashboard"
+                DASHBOARD_DIR="ci-dashboard"
 
                 test -f "${INPUT_JSON}"
 
-                if [ -e "${DASHBOARD_DIR}" ] && [ ! -d "${DASHBOARD_DIR}" ]; then
-                  rm -f "${DASHBOARD_DIR}"
-                fi
-
+                rm -rf "${DASHBOARD_DIR}"
                 mkdir -p "${DASHBOARD_DIR}/data"
 
                 cp scripts/tools/test_history_dashboard/site/index.html "${DASHBOARD_DIR}/index.html"
@@ -1357,7 +1354,7 @@ jobs:
             uses: actions/upload-artifact@v7
             with:
                 name: ci-test-history-dashboard
-                path: allure-history/allure-report/ci_tests/dashboard
+                path: ci-dashboard
                 retention-days: 30
                 if-no-files-found: error
 
