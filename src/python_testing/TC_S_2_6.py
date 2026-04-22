@@ -214,10 +214,18 @@ class TC_S_2_6(MatterBaseTest):
         transition_ms: int,
         first_scene_id: int,
         log_label: str,
+        initial_remaining_capacity: Optional[int] = None,
     ) -> int:
-        """AddScene until this fabric's RemainingCapacity reaches 0; return next unused scene ID in this sequence."""
+        """AddScene until this fabric's RemainingCapacity reaches 0; return next unused scene ID in this sequence.
+
+        If initial_remaining_capacity is set, skip the seed read (avoids an extra FabricSceneInfo read while
+        multiple subscriptions are active).
+        """
         next_scene_id = first_scene_id
-        rc_before = await self._read_remaining_capacity(ctrl, ep, fabric_index)
+        if initial_remaining_capacity is not None:
+            rc_before = initial_remaining_capacity
+        else:
+            rc_before = await self._read_remaining_capacity(ctrl, ep, fabric_index)
         while True:
             if rc_before == 0:
                 break
@@ -388,7 +396,7 @@ class TC_S_2_6(MatterBaseTest):
 
         self.step("4a")
         th1_next_scene_id = await self._add_scenes_until_remaining_zero(
-            self.TH1, sub1, f1, ep, TRANSITION_TH1_MS, 2, "TH1"
+            self.TH1, sub1, f1, ep, TRANSITION_TH1_MS, 2, "TH1", initial_remaining_capacity=f1_baseline_rc - 1
         )
 
         self.step("4b")
@@ -398,7 +406,7 @@ class TC_S_2_6(MatterBaseTest):
 
         self.step("5a")
         th2_next_scene_id = await self._add_scenes_until_remaining_zero(
-            self.TH2, sub2, f2, ep, TRANSITION_TH23_MS, 2, "TH2"
+            self.TH2, sub2, f2, ep, TRANSITION_TH23_MS, 2, "TH2", initial_remaining_capacity=f2_baseline_rc
         )
         expected_th3_rc_after_th2 = scene_table_size - f1_baseline_rc - f2_baseline_rc
         asserts.assert_greater_equal(
@@ -425,7 +433,9 @@ class TC_S_2_6(MatterBaseTest):
         )
 
         self.step("6a")
-        await self._add_scenes_until_remaining_zero(self.TH3, sub3, f3, ep, TRANSITION_TH23_MS, 2, "TH3")
+        await self._add_scenes_until_remaining_zero(
+            self.TH3, sub3, f3, ep, TRANSITION_TH23_MS, 2, "TH3", initial_remaining_capacity=th3_rc_after_th2
+        )
 
         self.step("6b")
         await self._expect_add_scene_resource_exhausted(self.TH3, ep, GROUP_ID, 1, TRANSITION_TH1_MS, "scene")
