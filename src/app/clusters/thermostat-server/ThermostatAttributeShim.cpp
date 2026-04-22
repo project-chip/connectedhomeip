@@ -246,6 +246,18 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 
 } // namespace UnoccupiedHeatingSetpoint
 
+namespace FeatureMap {
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value) {
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    cluster->mFeatures = BitFlags<Thermostat::Feature>(value);
+    return Status::Success;
+}
+} // namespace FeatureMap
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

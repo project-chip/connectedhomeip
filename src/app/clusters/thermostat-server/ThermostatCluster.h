@@ -89,8 +89,9 @@ public:
 
     Setpoints mSetpoints;
 
+    BitFlags<Thermostat::Feature> mFeatures;
+    
 private:
-    const BitFlags<Thermostat::Feature> mFeatures;
 
     Thermostat::Delegate * mDelegate;
 
