@@ -44,7 +44,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -105,7 +105,7 @@ jobs:
               run: rm -rf out/esp32-m5stack-all-clusters-minimal examples/all-clusters-minimal-app/esp32/managed_components
 
             - name: Check for changed paths
-              uses: dorny/paths-filter@v4
+              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
               id: changed_paths
               with:
                 filters: |
@@ -199,7 +199,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
