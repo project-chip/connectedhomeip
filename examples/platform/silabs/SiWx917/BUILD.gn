@@ -122,10 +122,10 @@ source_set("siwx917-common") {
   #TO-DO Cleanup to be done for all the wifi files into common folder
   sources = [
     "${silabs_common_plat_dir}/BaseApplication.cpp",
-    "${silabs_common_plat_dir}/main.cpp",
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
+    "${silabs_common_plat_dir}/main.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
