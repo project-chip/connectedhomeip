@@ -51,29 +51,30 @@ INCOMPLETE_METADATA_ALLOWLIST
 """
 
 import argparse
-import json
 import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
+import yaml
+
 # ---------------------------------------------------------------------------
-# Allowlists – loaded from alchemy_allowlists.json next to this script.
+# Allowlists – loaded from alchemy_allowlists.yaml next to this script.
 #
 # MANUAL_ALLOWLIST: hand-maintained XML files that pre-date Alchemy.
 # INCOMPLETE_METADATA_ALLOWLIST: Alchemy-generated files with incomplete
 #     metadata headers (older Alchemy releases).
 #
-# Edit alchemy_allowlists.json to update entries; do NOT add new ones.
+# Edit alchemy_allowlists.yaml to update entries; do NOT add new ones.
 # ---------------------------------------------------------------------------
-_ALLOWLISTS_PATH = Path(__file__).resolve().parents[3] / "src/app/zap-templates/zcl/data-model/chip/alchemy_allowlists.json"
+_ALLOWLISTS_PATH = Path(__file__).resolve().parents[3] / "src/app/zap-templates/zcl/data-model/chip/alchemy_allowlists.yaml"
 
 
 def _load_allowlists() -> tuple:
-    """Load MANUAL_ALLOWLIST and INCOMPLETE_METADATA_ALLOWLIST from JSON."""
+    """Load MANUAL_ALLOWLIST and INCOMPLETE_METADATA_ALLOWLIST from YAML."""
     with open(_ALLOWLISTS_PATH, encoding="utf-8") as f:
-        data = json.load(f)
+        data = yaml.safe_load(f)
     return set(data["MANUAL_ALLOWLIST"]), set(data["INCOMPLETE_METADATA_ALLOWLIST"])
 
 
