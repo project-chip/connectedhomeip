@@ -61,7 +61,9 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
     if (framesToRead == 0)
     {
         if (pFramesRead)
+        {
             *pFramesRead = 0;
+        }
         return MA_AT_END;
     }
 
@@ -107,7 +109,9 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
             // Apply a square wave modulation for the pulse effect
             bool on = (static_cast<int>(t * 20) % 2) == 0;
             if (!on)
+            {
                 volume = 0;
+            }
         }
 
         // Additive synthesis: combine fundamental frequency and harmonics
@@ -124,7 +128,9 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
 
     pCustomDS->cursor += framesToRead;
     if (pFramesRead)
+    {
         *pFramesRead = framesToRead;
+    }
 
     return (framesToRead < frameCount) ? MA_AT_END : MA_SUCCESS;
 }
@@ -159,7 +165,9 @@ ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_fo
     *pSampleRate = kSampleRateHz;
 
     if (pChannelMap && channelMapCap > 0)
+    {
         *pChannelMap = MA_CHANNEL_MONO;
+    }
 
     return MA_SUCCESS;
 }
@@ -171,7 +179,9 @@ ma_result custom_data_source_get_cursor(ma_data_source * pDataSource, ma_uint64 
     VerifyOrReturnError(pCustomDS != nullptr, MA_INVALID_ARGS);
 
     if (pCursor)
+    {
         *pCursor = pCustomDS->cursor;
+    }
     return MA_SUCCESS;
 }
 
@@ -182,7 +192,9 @@ ma_result custom_data_source_get_length(ma_data_source * pDataSource, ma_uint64 
     VerifyOrReturnError(pCustomDS != nullptr, MA_INVALID_ARGS);
 
     if (pLength)
+    {
         *pLength = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
+    }
     return MA_SUCCESS;
 }
 
