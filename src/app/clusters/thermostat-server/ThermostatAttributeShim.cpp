@@ -79,7 +79,7 @@ Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-   return cluster->SetLocalTemperature(value);
+    return cluster->SetLocalTemperature(value);
 }
 
 } // namespace LocalTemperature
@@ -106,7 +106,7 @@ Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum 
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-   return cluster->SetSystemMode(value);
+    return cluster->SetSystemMode(value);
 }
 } // namespace SystemMode
 
@@ -132,7 +132,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-   return cluster->SetRunningMode(value);
+    return cluster->SetRunningMode(value);
 }
 
 } // namespace ThermostatRunningMode
@@ -242,7 +242,8 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 } // namespace UnoccupiedHeatingSetpoint
 
 namespace FeatureMap {
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value) {
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
+{
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
     if (cluster == nullptr)
     {

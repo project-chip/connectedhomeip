@@ -37,7 +37,8 @@ namespace Thermostat {
 namespace Attributes {
 
 namespace ControlSequenceOfOperation {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value);
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value);
 } // namespace ControlSequenceOfOperation
 
@@ -77,7 +78,6 @@ Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeE
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum value);
 
 } // namespace ThermostatRunningMode
-
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
