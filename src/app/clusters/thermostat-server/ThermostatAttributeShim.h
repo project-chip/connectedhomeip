@@ -73,6 +73,11 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 } // namespace ThermostatRunningMode
 
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+}
+
 } // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters

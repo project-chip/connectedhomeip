@@ -18,6 +18,7 @@
 
 #include "thermostat-manager.h"
 #include <protocols/interaction_model/StatusCode.h>
+#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
 
 using chip::Protocols::InteractionModel::Status;
 
