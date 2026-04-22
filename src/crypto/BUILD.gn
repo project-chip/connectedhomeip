@@ -20,36 +20,6 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("crypto.gni")
 
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "webos" ||
-      current_os == "cmsis-rtos") {
-    chip_crypto = "mbedtls"
-  } else if (current_os == "mac" || current_os == "ios") {
-    chip_crypto = "boringssl"
-  } else {
-    chip_crypto = "openssl"
-  }
-}
-
-assert(
-    chip_crypto == "mbedtls" || chip_crypto == "psa" ||
-        chip_crypto == "openssl" || chip_crypto == "boringssl" ||
-        chip_crypto == "platform",
-    "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
-
-if (chip_crypto_keystore == "") {
-  if (chip_crypto == "psa") {
-    chip_crypto_keystore = "psa"
-  } else {
-    chip_crypto_keystore = "raw"
-  }
-}
-
-assert(chip_crypto_keystore == "psa" || chip_crypto_keystore == "raw" ||
-           chip_crypto_keystore == "app",
-       "Please select a valid crypto keystore: psa, raw, app")
-
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
   header_dir = "crypto"

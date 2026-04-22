@@ -20,6 +20,19 @@
  *      PSA Crypto API based implementation of CHIP crypto primitives
  */
 
+// In mbedTLS v4.0, ECP and bignum function declarations moved to private headers.
+// These are only needed for the mbedTLS-based SPAKE2+ fallback. Platforms with a
+// PSA SPAKE2+ driver don't need these private headers.
+// TODO(#71479): Remove once a PSA SPAKE2+ driver is available for all platforms.
+#if !defined(CHIP_CRYPTO_SPAKE2P_PSA) || !CHIP_CRYPTO_SPAKE2P_PSA
+#include <mbedtls/version.h>
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+#include <mbedtls/private/bignum.h>
+#include <mbedtls/private/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#endif // !CHIP_CRYPTO_SPAKE2P_PSA
+
 #include "CHIPCryptoPALPSA.h"
 #include "CHIPCryptoPALmbedTLS.h"
 
@@ -34,8 +47,11 @@
 
 #include <psa/crypto.h>
 
+#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 #include <mbedtls/bignum.h>
 #include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
+
 #include <mbedtls/error.h>
 #include <mbedtls/x509_csr.h>
 
@@ -665,11 +681,6 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
     return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
-static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
-{
-    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
-}
-
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
@@ -960,6 +971,11 @@ typedef struct Spake2p_Context
 static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
 {
     return SafePointerCast<Spake2p_Context *>(context);
+}
+
+static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
+{
+    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)

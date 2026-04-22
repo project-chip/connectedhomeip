@@ -232,4 +232,60 @@ TEST_F(TestTCPConnection, TestUnauthenticatedSessionReleaseOnConnectionClose)
     EXPECT_SUCCESS(mTCP.TCPConnect(peerAddr, nullptr, connHandle));
 }
 
+TEST_F(TestTCPConnection, TestDefunctSecureSessionReleaseOnConnectionClose)
+{
+    uint16_t port;
+    EXPECT_SUCCESS(InitTCP(port));
+    EXPECT_SUCCESS(InitSessionManager());
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    // Connect to self (loopback)
+    Transport::PeerAddress peerAddr = Transport::PeerAddress::TCP(addr, port);
+
+    // 1. Establish initial connection
+    ActiveTCPConnectionHandle connHandle;
+    EXPECT_SUCCESS(mTCP.TCPConnect(peerAddr, nullptr, connHandle));
+
+    mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5),
+                             [&]() { return !connHandle.IsNull() && connHandle->IsConnected(); });
+    ASSERT_FALSE(connHandle.IsNull());
+    ASSERT_TRUE(connHandle->IsConnected());
+
+    // 2. Inject a Secure CASE Session associated with this connection
+    SessionHolder sessionHolder;
+    EXPECT_SUCCESS(mSessionManager.InjectCaseSessionWithTestKey(sessionHolder, 1, 2, 1234, 5678, 1, peerAddr,
+                                                                CryptoContext::SessionRole::kInitiator));
+
+    // Manually link the TCP connection handle to the session
+    sessionHolder->AsSecureSession()->SetTCPConnection(connHandle);
+
+    // 3. Mark the session as DEFUNCT
+    sessionHolder->AsSecureSession()->MarkAsDefunct();
+    ASSERT_FALSE(sessionHolder->AsSecureSession()->IsActiveSession());
+
+    // 4. Simulate TCP connection closure
+    // Close TCP connection & release local handle
+    connHandle->ForceDisconnect();
+    connHandle.Release();
+
+    // Drive IO to process TCP closure and session eviction logic
+    mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(1), [&]() { return false; });
+
+    // Verify the closed connection's slot was released.
+    // With loopback and kMaxTcpActiveConnectionCount = 2,
+    // a new connection needs both slots.
+    // If the defunct secure session still retains the closed
+    // connection handle, this reconnect will fail due to pool
+    // exhaustion.
+    ActiveTCPConnectionHandle secondConnHandle;
+    EXPECT_SUCCESS(mTCP.TCPConnect(peerAddr, nullptr, secondConnHandle));
+
+    mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5),
+                             [&]() { return !secondConnHandle.IsNull() && secondConnHandle->IsConnected(); });
+    ASSERT_FALSE(secondConnHandle.IsNull());
+    ASSERT_TRUE(secondConnHandle->IsConnected());
+}
+
 } // namespace

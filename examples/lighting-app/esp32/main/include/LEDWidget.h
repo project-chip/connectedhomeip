@@ -21,7 +21,6 @@
 #include "esp_log.h"
 
 #if CONFIG_LED_TYPE_RMT
-#include "driver/rmt.h"
 #include "led_strip.h"
 #else
 #include "driver/ledc.h"
@@ -55,7 +54,7 @@ private:
 #if CONFIG_LED_TYPE_RMT
     uint8_t mHue;
     uint8_t mSaturation;
-    led_strip_t * mStrip;
+    led_strip_handle_t mStrip;
 #else
     gpio_num_t mGPIONum;
 #endif

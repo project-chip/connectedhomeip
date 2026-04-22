@@ -18,19 +18,29 @@ jobs:
 
       - id: restyler
         uses: restyled-io/actions/run@v4
-        with:
-          fail-on-differences: true
 
-      - if: |
-          !cancelled() &&
-          steps.restyler.outputs.success == 'true' &&
-          github.event.pull_request.head.repo.full_name == github.repository
-        uses: peter-evans/create-pull-request@v8
+      - name: Save restyle patch
+        if: ${{ steps.restyler.outputs.git-patch }}
+        env:
+          PATCH_CONTENT: ${{ steps.restyler.outputs.git-patch }}
+        run: |
+          printf '%s\n' "$PATCH_CONTENT" > /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch
+          echo "Patch saved ($(wc -l < /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch) lines)"
+
+      - id: upload
+        if: ${{ steps.restyler.outputs.git-patch }}
+        uses: actions/upload-artifact@v7
         with:
-          base: ${{ steps.restyler.outputs.restyled-base }}
-          branch: ${{ steps.restyler.outputs.restyled-head }}
-          title: ${{ steps.restyler.outputs.restyled-title }}
-          body: ${{ steps.restyler.outputs.restyled-body }}
-          labels: "restyled"
-          reviewers: ${{ github.event.pull_request.user.login }}
-          delete-branch: true
+          name: pr-${{ github.event.pull_request.number }}-restyled
+          path: /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch
+          if-no-files-found: ignore
+          overwrite: true
+          retention-days: 1
+
+      - name: Fail if restyle differences found
+        if: ${{ steps.restyler.outputs.differences == 'true' }}
+        run: |
+          echo "::error::Restyle differences found. Download patch: ${{ steps.upload.outputs.artifact-url }}"
+          echo ""
+          echo "To apply: unzip pr-${{ github.event.pull_request.number }}-restyled.zip && git am < pr-${{ github.event.pull_request.number }}-restyled.patch"
+          exit 1

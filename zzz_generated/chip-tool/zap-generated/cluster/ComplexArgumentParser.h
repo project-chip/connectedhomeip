@@ -622,6 +622,64 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ProximityRanging::Structs::RDRStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RDRStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request,
                         Json::Value & value);
@@ -1033,12 +1091,6 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & request,
                         Json::Value & value);
 
@@ -1075,6 +1127,12 @@ Setup(const char * label,
 
 static void
 Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type & request,

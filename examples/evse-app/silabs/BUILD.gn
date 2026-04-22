@@ -73,7 +73,7 @@ if (slc_generate) {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -83,6 +83,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     defines = []
@@ -96,7 +97,7 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -106,6 +107,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     defines = []
@@ -131,7 +133,6 @@ silabs_executable("evse-app") {
 
   sources = [
     # Actual application code
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
 
     # EVSE Common, will be moved to evse-common when we have code driven clusters for evse

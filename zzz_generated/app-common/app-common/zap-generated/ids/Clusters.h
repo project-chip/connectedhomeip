@@ -78,6 +78,7 @@
 #include <clusters/Groupcast/ClusterId.h>
 #include <clusters/Groups/ClusterId.h>
 #include <clusters/HepaFilterMonitoring/ClusterId.h>
+#include <clusters/Humidistat/ClusterId.h>
 #include <clusters/IcdManagement/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
 #include <clusters/IlluminanceMeasurement/ClusterId.h>
@@ -98,6 +99,7 @@
 #include <clusters/MicrowaveOvenMode/ClusterId.h>
 #include <clusters/ModeSelect/ClusterId.h>
 #include <clusters/NetworkCommissioning/ClusterId.h>
+#include <clusters/NetworkIdentityManagement/ClusterId.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/ClusterId.h>
 #include <clusters/OccupancySensing/ClusterId.h>
 #include <clusters/OnOff/ClusterId.h>
@@ -115,6 +117,7 @@
 #include <clusters/PowerSourceConfiguration/ClusterId.h>
 #include <clusters/PowerTopology/ClusterId.h>
 #include <clusters/PressureMeasurement/ClusterId.h>
+#include <clusters/ProximityRanging/ClusterId.h>
 #include <clusters/ProxyConfiguration/ClusterId.h>
 #include <clusters/ProxyDiscovery/ClusterId.h>
 #include <clusters/ProxyValid/ClusterId.h>

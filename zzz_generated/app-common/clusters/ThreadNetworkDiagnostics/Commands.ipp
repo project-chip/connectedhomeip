@@ -50,7 +50,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ResetCounts.
+} // namespace ResetCounts
 } // namespace Commands
 } // namespace ThreadNetworkDiagnostics
 } // namespace Clusters

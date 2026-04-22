@@ -279,6 +279,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
         result = @"ThermostatUserInterfaceConfiguration";
         break;
+    case MTRClusterIDTypeHumidistatID:
+        result = @"Humidistat";
+        break;
     case MTRClusterIDTypeColorControlID:
         result = @"ColorControl";
         break;
@@ -338,6 +341,12 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeAmbientContextSensingID:
         result = @"AmbientContextSensing";
+        break;
+    case MTRClusterIDTypeProximityRangingID:
+        result = @"ProximityRanging";
+        break;
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+        result = @"NetworkIdentityManagement";
         break;
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
@@ -5957,6 +5966,82 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (attributeID) {
+
+            // Cluster Humidistat attributes
+        case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
+            result = @"Mode";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeSystemStateID:
+            result = @"SystemState";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeUserSetpointID:
+            result = @"UserSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMinSetpointID:
+            result = @"MinSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMaxSetpointID:
+            result = @"MaxSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeStepID:
+            result = @"Step";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeTargetSetpointID:
+            result = @"TargetSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMistTypeID:
+            result = @"MistType";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeContinuousID:
+            result = @"Continuous";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeSleepID:
+            result = @"Sleep";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeOptimalID:
+            result = @"Optimal";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known Humidistat attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (attributeID) {
@@ -7516,6 +7601,110 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known AmbientContextSensing attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (attributeID) {
+
+            // Cluster ProximityRanging attributes
+        case MTRAttributeIDTypeClusterProximityRangingAttributeRangingCapabilitiesID:
+            result = @"RangingCapabilities";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeWiFiDevIKID:
+            result = @"WiFiDevIK";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLEDeviceIDID:
+            result = @"BLEDeviceID";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTDevIKID:
+            result = @"BLTDevIK";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTCSSecurityLevelID:
+            result = @"BLTCSSecurityLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTCSModeCapabilityID:
+            result = @"BLTCSModeCapability";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeSessionIDListID:
+            result = @"SessionIDList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ProximityRanging attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (attributeID) {
+
+            // Cluster NetworkIdentityManagement attributes
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeActiveNetworkIdentitiesID:
+            result = @"ActiveNetworkIdentities";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientsID:
+            result = @"Clients";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientTableSizeID:
+            result = @"ClientTableSize";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known NetworkIdentityManagement attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -11353,6 +11542,20 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterHumidistatCommandSetSettingsID:
+            result = @"SetSettings";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (commandID) {
@@ -11622,6 +11825,54 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
     case MTRClusterIDTypeAmbientContextSensingID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStartRangingRequestID:
+            result = @"StartRangingRequest";
+            break;
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStopRangingRequestID:
+            result = @"StopRangingRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientID:
+            result = @"AddClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandRemoveClientID:
+            result = @"RemoveClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityID:
+            result = @"QueryIdentity";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandImportAdminSecretID:
+            result = @"ImportAdminSecret";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretID:
+            result = @"ExportAdminSecret";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -13769,6 +14020,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (commandID) {
@@ -13962,6 +14223,42 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
     case MTRClusterIDTypeAmbientContextSensingID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStartRangingResponseID:
+            result = @"StartRangingResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientResponseID:
+            result = @"AddClientResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityResponseID:
+            result = @"QueryIdentityResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretResponseID:
+            result = @"ExportAdminSecretResponse";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -15909,6 +16206,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (eventID) {
@@ -16116,6 +16423,35 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectEndedID:
             result = @"AmbientContextDetectEnded";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (eventID) {
+
+            // Cluster ProximityRanging events
+        case MTREventIDTypeClusterProximityRangingEventRangingResultID:
+            result = @"RangingResult";
+            break;
+
+        case MTREventIDTypeClusterProximityRangingEventRangingSessionStatusID:
+            result = @"RangingSessionStatus";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

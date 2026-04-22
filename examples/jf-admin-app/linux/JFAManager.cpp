@@ -178,7 +178,7 @@ void JFAManager::HandleCommissioningCompleteEvent()
                 // Uses internal method that bypasses CAT restrictions since JFA setup needs both Admin and Anchor CATs
                 Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addGroupCommandData;
                 addGroupCommandData.groupID       = 0;
-                addGroupCommandData.friendlyName  = CharSpan::fromCharString("Default JFA Group");
+                addGroupCommandData.friendlyName  = "Default JFA Group"_span;
                 addGroupCommandData.groupKeySetID = 0;
                 addGroupCommandData.groupCAT      = kAdminCATIdentifier; // Use Admin CAT for default group
                 addGroupCommandData.groupCATVersion.SetNonNull(1);
@@ -191,7 +191,7 @@ void JFAManager::HandleCommissioningCompleteEvent()
 
                 Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type newAdmin;
                 newAdmin.nodeID       = nodeId;
-                newAdmin.friendlyName = CharSpan::fromCharString("Default JFA Admin");
+                newAdmin.friendlyName = "Default JFA Admin"_span;
                 newAdmin.vendorID     = vendorId;
                 newAdmin.icac         = ByteSpan(mICACBuffer, mICACBufferLen);
 
@@ -374,7 +374,9 @@ void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICA
 
     ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse");
 
-    if ((CHIP_NO_ERROR == VerifyCertificateSigningRequest(icaccsr.icaccsr.data(), icaccsr.icaccsr.size(), pubKey)) &&
+    if (icaccsr.icaccsr.HasValue() &&
+        (CHIP_NO_ERROR ==
+         VerifyCertificateSigningRequest(icaccsr.icaccsr.Value().data(), icaccsr.icaccsr.Value().size(), pubKey)) &&
         jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
     {
         ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");

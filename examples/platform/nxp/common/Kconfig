@@ -32,7 +32,21 @@ config CHIP_APP_COMMON
 config CHIP_APP_CLUSTERS
     bool "App Clusters"
     help
-        Enable application common clusters implementation for the Identify and the ZCLCallbacks.
+        Enable application common clusters implementation for the ZCLCallbacks.
+
+config CHIP_APP_IDENTIFY
+    bool "App Identify"
+    default y
+    help
+        Enable application common clusters implementation for the Identify cluster.
+        Registers the Identify Clusters only for CHIP_APP_IDENTIFY_ENDPOINT.
+        If needed, specific application code must register the cluster for the other endpoints.
+
+config CHIP_APP_IDENTIFY_ENDPOINT
+	int "Endpoint ID for Identify cluster"
+	default 1
+	help
+        Set the endpoint ID for the Identify cluster implementation.
 
 config CHIP_APP_ASSERT
     bool "Application Assert"

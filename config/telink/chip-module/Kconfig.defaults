@@ -139,6 +139,25 @@ if BT
 config BT_PERIPHERAL
     default y
 
+config BT_PERIPHERAL_PREF_MIN_INT
+    default 36
+
+config BT_PERIPHERAL_PREF_MAX_INT
+    default 36
+
+# Increase BT timeout to 5 s to improve connection reliability and avoid fast drop outs.
+config BT_PERIPHERAL_PREF_TIMEOUT
+    default 500
+
+config BT_GAP_AUTO_UPDATE_CONN_PARAMS
+    default y
+
+# Decrease connection parameters update time, as some Matter controllers request
+# enabling IP networking faster than BT connection parameters are updated, what may result
+# in commissioning instabilities.
+config BT_CONN_PARAM_UPDATE_TIMEOUT
+    default 1000
+
 config BT_GATT_DYNAMIC_DB
     default y
 
@@ -171,7 +190,7 @@ config BT_GATT_CACHING
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
-    default 1024 if BT_W91
+    default 1200 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
     default 664 if BT_B9X || BT_TLX

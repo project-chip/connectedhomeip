@@ -80,6 +80,7 @@
 #include <clusters/Groupcast/EnumsCheck.h>
 #include <clusters/Groups/EnumsCheck.h>
 #include <clusters/HepaFilterMonitoring/EnumsCheck.h>
+#include <clusters/Humidistat/EnumsCheck.h>
 #include <clusters/IcdManagement/EnumsCheck.h>
 #include <clusters/Identify/EnumsCheck.h>
 #include <clusters/IlluminanceMeasurement/EnumsCheck.h>
@@ -100,6 +101,7 @@
 #include <clusters/MicrowaveOvenMode/EnumsCheck.h>
 #include <clusters/ModeSelect/EnumsCheck.h>
 #include <clusters/NetworkCommissioning/EnumsCheck.h>
+#include <clusters/NetworkIdentityManagement/EnumsCheck.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EnumsCheck.h>
 #include <clusters/OccupancySensing/EnumsCheck.h>
 #include <clusters/OnOff/EnumsCheck.h>
@@ -117,6 +119,7 @@
 #include <clusters/PowerSourceConfiguration/EnumsCheck.h>
 #include <clusters/PowerTopology/EnumsCheck.h>
 #include <clusters/PressureMeasurement/EnumsCheck.h>
+#include <clusters/ProximityRanging/EnumsCheck.h>
 #include <clusters/ProxyConfiguration/EnumsCheck.h>
 #include <clusters/ProxyDiscovery/EnumsCheck.h>
 #include <clusters/ProxyValid/EnumsCheck.h>

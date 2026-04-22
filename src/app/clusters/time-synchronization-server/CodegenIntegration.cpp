@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
@@ -82,12 +83,25 @@ public:
             VerifyOrDie(SupportsDNSResolve::Get(endpointId, &ntpServerAvailable) == Status::Success);
         }
 
-        gServer.Create(endpointId, featureMap, optionalAttributeSet,
-                       TimeSynchronizationCluster::StartupConfiguration{ .supportsDNSResolve = supportsDNSResolve,
-                                                                         .ntpServerAvailable = ntpServerAvailable,
-                                                                         .timeZoneDatabase   = timeZoneDatabase,
-                                                                         .timeSource         = timeSource,
-                                                                         .delegate = TimeSynchronization::GetDefaultDelegate() });
+        TimeSynchronizationCluster::StartupConfiguration startupConfiguration = { .supportsDNSResolve = supportsDNSResolve,
+                                                                                  .ntpServerAvailable = ntpServerAvailable,
+                                                                                  .timeZoneDatabase   = timeZoneDatabase,
+                                                                                  .timeSource         = timeSource,
+                                                                                  .delegate =
+                                                                                      TimeSynchronization::GetDefaultDelegate() };
+
+        auto * caseSessionManager = Server::GetInstance().GetCASESessionManager();
+        auto * engine             = InteractionModelEngine::GetInstance();
+        VerifyOrDie(caseSessionManager != nullptr && engine != nullptr);
+
+        // TODO: Adding the interaction model engine to the context might not be ideal since this is a massive object,
+        // although we are just passing a reference to the object, we should consider a better solution in the future.
+        TimeSynchronizationCluster::Context context = { .fabricTable            = Server::GetInstance().GetFabricTable(),
+                                                        .caseSessionManager     = *caseSessionManager,
+                                                        .platformManager        = DeviceLayer::PlatformMgr(),
+                                                        .interactionModelEngine = *engine };
+
+        gServer.Create(endpointId, featureMap, optionalAttributeSet, startupConfiguration, context);
         return gServer.Registration();
     }
 

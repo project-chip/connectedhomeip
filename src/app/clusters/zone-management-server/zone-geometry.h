@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/ZoneManagement/Attributes.h>
 #include <set>
 #include <vector>
 
