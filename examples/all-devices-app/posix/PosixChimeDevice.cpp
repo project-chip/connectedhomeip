@@ -83,7 +83,9 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
         }
         else
         {
-            // Two-tone sound (Ding-Dong): switch frequency halfway
+            // Two-tone sound (e.g., Ding-Dong): switch from freq1_hz to freq2_hz halfway through the total duration.
+            // This creates a classic two-note chime effect. We also reset the relative time (t_note) for the second
+            // tone so that the exponential decay applies to each note individually.
             if (t < pCustomDS->duration_sec / 2.0)
             {
                 freq   = pCustomDS->freq1_hz;
