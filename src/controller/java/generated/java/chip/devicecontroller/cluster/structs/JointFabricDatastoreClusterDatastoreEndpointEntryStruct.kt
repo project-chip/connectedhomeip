@@ -26,14 +26,12 @@ class JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
   val endpointID: UInt,
   val nodeID: ULong,
   val friendlyName: String,
-  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreEndpointEntryStruct {\n")
     append("\tendpointID : $endpointID\n")
     append("\tnodeID : $nodeID\n")
     append("\tfriendlyName : $friendlyName\n")
-    append("\tstatusEntry : $statusEntry\n")
     append("}\n")
   }
 
@@ -43,7 +41,6 @@ class JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
       put(ContextSpecificTag(TAG_ENDPOINT_ID), endpointID)
       put(ContextSpecificTag(TAG_NODE_ID), nodeID)
       put(ContextSpecificTag(TAG_FRIENDLY_NAME), friendlyName)
-      statusEntry.toTlv(ContextSpecificTag(TAG_STATUS_ENTRY), this)
       endStructure()
     }
   }
@@ -52,7 +49,6 @@ class JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
     private const val TAG_ENDPOINT_ID = 0
     private const val TAG_NODE_ID = 1
     private const val TAG_FRIENDLY_NAME = 2
-    private const val TAG_STATUS_ENTRY = 3
 
     fun fromTlv(
       tlvTag: Tag,
@@ -62,11 +58,6 @@ class JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
       val endpointID = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_ID))
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
-      val statusEntry =
-        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
-          ContextSpecificTag(TAG_STATUS_ENTRY),
-          tlvReader,
-        )
 
       tlvReader.exitContainer()
 
@@ -74,7 +65,6 @@ class JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
         endpointID,
         nodeID,
         friendlyName,
-        statusEntry,
       )
     }
   }

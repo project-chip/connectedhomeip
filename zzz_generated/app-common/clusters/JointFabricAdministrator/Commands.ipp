@@ -56,6 +56,7 @@ namespace ICACCSRResponse {
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatusCode), statusCode);
     encoder.Encode(to_underlying(Fields::kIcaccsr), icaccsr);
     return encoder.Finalize();
 }
@@ -70,7 +71,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kIcaccsr))
+        if (__context_tag == to_underlying(Fields::kStatusCode))
+        {
+            err = DataModel::Decode(reader, statusCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kIcaccsr))
         {
             err = DataModel::Decode(reader, icaccsr);
         }
