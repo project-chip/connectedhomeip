@@ -224,8 +224,8 @@ Data responses.
 -   **Unified Result**: It returns an `InvokeResult<ResponseType>` that holds
     both the status and the decoded response payload (if the command returns
     data).
--   **`IsSuccess()`**: Returns true if the status is a success and, for
-    commands that return data, a response is present.
+-   **`IsSuccess()`**: Returns true if the status is a success and, for commands
+    that return data, a response is present.
 -   **`GetStatusCode()`**: Returns `std::optional<ClusterStatusCode>` — a
     convenience method that lets tests check the status code with a single
     `EXPECT_EQ()` without a prior `ASSERT_TRUE(status.has_value())`.
