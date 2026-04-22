@@ -44,7 +44,7 @@ deep platform integration when needed.
 
 ## Supported Devices
 
-The application supports the following device types (selectable via the
+The application supports the following device types (specified via the
 `--device` flag). Note that this list represents what is supported currently,
 but the application is constantly evolving and new device types are added often:
 
