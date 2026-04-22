@@ -14,6 +14,8 @@
 
 # This file contains private utilities for use by the `configure` script.
 # It is self-contained and depends only on the Python 3 standard library.
+#
+# Some unit tests that can be run manually are in configure.impl.test.py.
 
 import collections
 import json
@@ -240,7 +242,8 @@ def fail(message):
     sys.exit(1)
 
 
-# `configure` invokes the top-level functions in this file by
-# passing the function name and arguments on the command line.
-[_, func, *args] = sys.argv
-globals()[func](*args)
+if __name__ == "__main__":
+    # `configure` invokes the top-level functions in this file by
+    # passing the function name and arguments on the command line.
+    [_, func, *args] = sys.argv
+    globals()[func](*args)
