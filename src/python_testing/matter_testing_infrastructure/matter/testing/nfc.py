@@ -297,26 +297,22 @@ def _read_cc_file_content(connection):
     _check_transmission_status(sw1, sw2, "read CC length")
 
     cc_len = (header[0] << 8) + header[1]
-    log.info(f"cc_len:{cc_len}")
 
     # 2. Read the remaining bytes (Total Length - 2 bytes already read)
     remaining_len = cc_len - 2
     if remaining_len > 0:
         body, sw1, sw2 = connection.transmit([CLA_ISO, INS_READ_BINARY, 0x00, 0x02, remaining_len])
         _check_transmission_status(sw1, sw2, "read CC body")
-        
+
         # Combine header and body for easy indexing
         cc_data = header + body
-        
+
         # 3. Directly access index 9 and 10
         # Ensure the data is long enough to prevent IndexError
         if len(cc_data) >= 11:
-            file_id_high = cc_data[9]
-            file_id_low = cc_data[10]
-            return file_id_high, file_id_low
-        else:
-            raise ValueError(f"CC file data too short: {len(cc_data)} bytes, expected at least 11")
-            
+            return cc_data[9], cc_data[10]
+        raise ValueError(f"CC file data too short: {len(cc_data)} bytes, expected at least 11")
+
     raise ValueError("CC length is invalid (less than 2)")
 
 
@@ -331,6 +327,8 @@ def _select_ndef_file(connection, file_id_high, file_id_low):
     Args:
         connection: The NFC reader connection object used to
                                     communicate with the NFC tag.
+        file_id_high (int): The high byte of the NDEF file ID (e.g., 0xE1).
+        file_id_low (int): The low byte of the NDEF file ID (e.g., 0x04).
 
     Raises:
         AssertionError: If the message transmission fails (SW1, SW2 != 0x90, 0x00).
