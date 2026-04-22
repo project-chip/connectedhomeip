@@ -49,6 +49,7 @@ enum chipBLEServiceDataType
  * Defines the over-the-air encoded format of the device identification information block that appears
  * within chip BLE service advertisement data.
  */
+// TODO: Support Network Recovery service data block
 struct ChipBLEDeviceIdentificationInfo
 {
     constexpr static uint16_t kDiscriminatorMask            = 0xfff;

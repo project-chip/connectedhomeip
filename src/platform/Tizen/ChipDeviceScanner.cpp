@@ -71,6 +71,7 @@ static bool __IsChipThingDevice(const bt_adapter_le_device_scan_result_info_s & 
                 strcasecmp(dataList[i].service_uuid, chip::Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR) == 0)
             {
                 __PrintLEScanData(dataList[i]);
+                // TODO: Support Network Recovery, the service data block size is different in that case
                 if (dataList[i].service_data_len == sizeof(info))
                 {
                     memcpy(&info, dataList[i].service_data, sizeof(info));
