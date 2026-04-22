@@ -25,7 +25,6 @@ source_set("microwave-oven-control-server") {
     "${chip_root}/src/app/clusters/mode-base-server",
     "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/MicrowaveOvenControl",
   ]

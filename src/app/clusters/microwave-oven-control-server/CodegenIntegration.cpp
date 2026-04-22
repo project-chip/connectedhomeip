@@ -66,6 +66,8 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
+    // Call Deinit() to clean up and unregister the cluster if it is constructed
+    // Return value is safely ignored because we are in the destructor
     RETURN_SAFELY_IGNORED Deinit();
 }
 
@@ -80,33 +82,26 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(
         mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts),
         CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl,
-                     "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts and PowerAsNumber"));
+        ChipLogError(Zcl, "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts or PowerAsNumber"));
 
     // Check that the feature bits do not include both PowerAsNumber and PowerInWatts
     VerifyOrReturnError(
         !(mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) &&
           mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)),
         CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl,
-                     "Microwave Oven Control: feature bits error, feature could not support both PowerAsNumber and PowerInWatts"));
+        ChipLogError(Zcl, "Microwave Oven Control: feature bits error, PowerAsNumber and PowerInWatts are mutually exclusive"));
 
     // Per spec, the PowerNumberLimits feature is only allowed if the PowerAsNumber feature is supported.
     VerifyOrReturnError(
         !mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) ||
             mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber),
         CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(
-            Zcl,
-            "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber"));
+        ChipLogError(Zcl, "Microwave Oven Control: feature bits error, PowerNumberLimits feature requires PowerAsNumber"));
 
     if (emberAfContainsAttribute(mEndpointId, mClusterId, MicrowaveOvenControl::Attributes::WattRating::Id))
     {
         mOptionalAttributeSet.Set<MicrowaveOvenControl::Attributes::WattRating::Id>();
     }
-
-    InteractionModelEngine * interactionModelEngine = InteractionModelEngine::GetInstance();
-    VerifyOrReturnError(interactionModelEngine != nullptr, CHIP_ERROR_INTERNAL);
 
     std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
     VerifyOrReturnError(OptionalAcceptedCommands(ConcreteClusterPath(mEndpointId, mClusterId), optionalAcceptedCommands) ==
@@ -127,6 +122,7 @@ CHIP_ERROR Instance::Deinit()
     if (mDelegate)
     {
         mDelegate->SetInstance(nullptr);
+        mDelegate = nullptr;
     }
     VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));

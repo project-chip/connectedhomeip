@@ -333,12 +333,10 @@ MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, cons
     opState = mOpStateInstance.GetCurrentOperationalState();
     VerifyOrExit(opState != to_underlying(OperationalState::OperationalStateEnum::kError), status = Status::InvalidInState);
 
+    // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
     VerifyOrExit(commandData.timeToAdd <= mDelegate.GetMaxCookTimeSec() &&
                      GetCookTimeSec() <= mDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
-                 status = Status::ConstraintError);
-
-    // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
-    VerifyOrExit(commandData.timeToAdd + GetCookTimeSec() <= mDelegate.GetMaxCookTimeSec(), status = Status::ConstraintError;
+                 status = Status::ConstraintError;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
     finalCookTimeSec = GetCookTimeSec() + commandData.timeToAdd;
