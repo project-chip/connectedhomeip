@@ -49,6 +49,17 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 
 } // namespace LocalTemperature
 
+
+namespace AbsMinHeatSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+} // namespace AbsMinHeatSetpointLimit
+
+namespace AbsMaxHeatSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+} // namespace AbsMaxHeatSetpointLimit
+
 namespace OccupiedCoolingSetpoint {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
@@ -78,6 +89,14 @@ Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeE
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum value);
 
 } // namespace ThermostatRunningMode
+
+namespace ThermostatRunningState {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value); // RelayStateBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> value);
+} // namespace ThermostatRunningState
+
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);

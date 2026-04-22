@@ -137,6 +137,80 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 } // namespace ThermostatRunningMode
 
+namespace ThermostatRunningState {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value)
+{
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    *value = cluster->GetRunningState();
+    return Status::Success;
+}
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> value)
+{
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    return cluster->SetRunningState(value);
+}
+} // namespace ThermostatRunningState
+
+namespace AbsMinHeatSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
+{
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    *value = cluster->mSetpoints.absoluteHeatLimits.minimum;
+    return Status::Success;
+}
+
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    return cluster->ChangeSetpointAttribute(Id, value);
+}
+} // namespace AbsMinHeatSetpointLimit
+
+namespace AbsMaxHeatSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
+{
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    *value = cluster->mSetpoints.absoluteHeatLimits.maximum;
+    return Status::Success;
+}
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    return cluster->ChangeSetpointAttribute(Id, value);
+}
+} // namespace AbsMaxHeatSetpointLimit
+
 namespace OccupiedCoolingSetpoint {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
