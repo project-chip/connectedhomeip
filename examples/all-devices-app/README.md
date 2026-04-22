@@ -62,7 +62,7 @@ You can run the application with `--help` to see the list of valid device types.
 Example output (trimmed):
 
 ```text
-Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices
+Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
