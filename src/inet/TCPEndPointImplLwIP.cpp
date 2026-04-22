@@ -342,14 +342,13 @@ CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
             // backing. Using TCP_WRITE_FLAG_COPY would eliminate this requirement, but overall
             // requires many more memory allocations which may be problematic when very
             // memory-constrained or when using pool-based allocations.
-            err_t lwipErr = ERR_OK;
-            RunOnTCPIP([this, sendData, sendLen, canSend, &lwipErr, &err]() {
+            err_t lwipErr = RunOnTCPIPRet([this, sendData, sendLen, canSend, &err]() -> err_t {
                 if (mTCP == nullptr)
                 {
                     err = CHIP_ERROR_CONNECTION_ABORTED;
-                    return;
+                    return ERR_OK;
                 }
-                lwipErr = tcp_write(mTCP, sendData, sendLen, (canSend) ? TCP_WRITE_FLAG_MORE : 0);
+                return tcp_write(mTCP, sendData, sendLen, (canSend) ? TCP_WRITE_FLAG_MORE : 0);
             });
             if (err != CHIP_NO_ERROR)
             {
@@ -386,14 +385,13 @@ CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
 
         if (err == CHIP_NO_ERROR)
         {
-            err_t lwipErr = ERR_OK;
-            RunOnTCPIP([this, &lwipErr, &err]() {
+            err_t lwipErr = RunOnTCPIPRet([this, &err]() -> err_t {
                 if (mTCP == nullptr)
                 {
                     err = CHIP_ERROR_CONNECTION_ABORTED;
-                    return;
+                    return ERR_OK;
                 }
-                lwipErr = tcp_output(mTCP);
+                return tcp_output(mTCP);
             });
             if (err == CHIP_NO_ERROR && lwipErr != ERR_OK)
             {
@@ -407,14 +405,13 @@ CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
         // If in the SendShutdown state and the unsent queue is now empty, shutdown the PCB for sending.
         if (mState == State::kSendShutdown && (RemainingToSend() == 0))
         {
-            err_t lwipErr = ERR_OK;
-            RunOnTCPIP([this, &lwipErr, &err]() {
+            err_t lwipErr = RunOnTCPIPRet([this, &err]() -> err_t {
                 if (mTCP == nullptr)
                 {
                     err = CHIP_ERROR_CONNECTION_ABORTED;
-                    return;
+                    return ERR_OK;
                 }
-                lwipErr = tcp_shutdown(mTCP, 0, 1);
+                return tcp_shutdown(mTCP, 0, 1);
             });
             if (err == CHIP_NO_ERROR && lwipErr != ERR_OK)
             {
