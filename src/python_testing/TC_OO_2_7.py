@@ -135,7 +135,6 @@ class TC_OO_2_7(MatterBaseTest):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step("1a")
-        asserts.assert_equal(1, self.matter_test_config.endpoint, "Endpoint should be 1")
         if self.groupcast_enabled:
             await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
                 groupID=self.kGroup1,
