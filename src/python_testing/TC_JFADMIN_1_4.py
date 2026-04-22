@@ -150,7 +150,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        
+
         self.fabric_a_ctrl = None
         self.fabric_a_admin = None
         self.cert_authority_manager_a = None
