@@ -17,6 +17,8 @@ This skill provides a checklist and set of principles for reviewing Python tests
 
 ### 1. Asyncio Usage
 - **Check**: Are all awaitable calls (like `devCtrl.ReadAttribute`) actually awaited?
+- **Propagate Exceptions in Parallel Code**: When using concurrent.futures or similar parallel execution mechanisms, ensure that exceptions thrown in background threads are not silently ignored. Call .result() on futures to propagate errors.
+
 
 ### 2. Mocking Cluster Interactions
 - **Guideline**: When mocking cluster responses, ensure the mock structure matches the `chip.clusters` attributes or commands exactly.
@@ -28,6 +30,10 @@ This skill provides a checklist and set of principles for reviewing Python tests
 - **Exceptions**: Avoid `except Exception` - use a specific exception
 - **try / except can hide bugs**: Avoid fixing CI issues with a try: except:. This pattern can hide real bugs that should be fixed and is a code smell. Try except blocks should only be used where the exception is expected and that should normally include an assertion that the exception happens or a comment explaining in detail why the exception is thrown and how this is spec compliant.
 - **Use dataclass**: Do not use dicts with string keys. Use dataclasses with named members instead. This helps programmers avoid uncaught typos.
+- **Avoid Decorative Separators**: Remove long lines of hashes (e.g., ###########) or other decorative separators. Use standard spacing or docstrings instead.
+- **Cleanup of Stale Code**: Remove outdated TODO comments, unbound variables, and leftover debugging code.
+- **Type Hints**: Use type hints for function signatures to improve readability and maintainability, especially for functions that are part of the test framework or are likely to be reused.
+
 
 
 ### 4. Matter-Specific Patterns
