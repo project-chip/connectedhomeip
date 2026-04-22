@@ -1553,8 +1553,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
             }
         }
 
-        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
-                                        containerType, cmafSessionNumber);
     }
 
     handler.AddStatus(commandPath, status);
