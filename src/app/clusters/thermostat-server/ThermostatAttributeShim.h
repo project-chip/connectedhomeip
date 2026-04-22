@@ -49,7 +49,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 
 } // namespace LocalTemperature
 
-
 namespace AbsMinHeatSetpointLimit {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
@@ -96,7 +95,6 @@ Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RelaySta
 Protocols::InteractionModel::Status Set(EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> value);
 } // namespace ThermostatRunningState
-
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
