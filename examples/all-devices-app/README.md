@@ -220,17 +220,15 @@ might need to ensure the following:
 ### Network Discovery and Firewall
 
 If you encounter network discovery issues (especially when pairing with
-controllers that require mDNS), you may need to disable the firewall on the
-device running the `all-devices-app` to allow incoming TCP/UDP connections.
+controllers that require mDNS), you may need to configure the firewall on the
+device running the `all-devices-app` to allow incoming connections.
 
-If using `ufw`, you can disable it with:
+Instead of disabling the firewall entirely, it is recommended to allow only the specific ports required for Matter and mDNS. If using `ufw`, you can allow them with:
 
 ```bash
-sudo ufw disable
+sudo ufw allow 5353/udp
+sudo ufw allow 5540/udp
 ```
-
-_Note: This command may need to be executed after every reboot in some
-environments._
 
 ### Same Wi-Fi Network
 
