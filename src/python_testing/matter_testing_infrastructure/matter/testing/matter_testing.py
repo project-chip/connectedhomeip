@@ -49,6 +49,8 @@ from mobly import asserts, base_test, signals
 
 import matter.clusters as Clusters
 import matter.logging
+import matter.CertificateAuthority
+import matter.FabricAdmin
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
