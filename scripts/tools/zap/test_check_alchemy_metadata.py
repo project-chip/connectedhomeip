@@ -16,7 +16,6 @@
 
 """Unit tests for check_alchemy_metadata.py."""
 
-import check_alchemy_metadata as cam
 import argparse
 import os
 import shutil
@@ -26,6 +25,8 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+
+import check_alchemy_metadata as cam
 
 # Make the module under test importable regardless of working directory.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
