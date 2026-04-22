@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# These settings are passed to an in initial `gn args` pass used by the
+# These settings are passed to an initial `gn args` pass used by the
 # configure script to discover available build arguments. Because this
 # actually executes all the GN files (including exec_script calls to
 # things like pkg-config), we need to pass some non-default settings to
 # avoid external dependencies that can cause GN to fail.
 
 chip_crypto = "platform"
-chip_device_platform = "none"
 chip_mdns = "none"

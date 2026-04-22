@@ -35,7 +35,7 @@ FIXTURE = [
     {"name": "chip_crypto", "comment": "Crypto implementation.", "default": {
         "file": "//third_party/connectedhomeip/src/crypto/crypto.gni", "line": 17, "value": "\"\""}},
     {"name": "chip_log_message_max_size", "default": {
-        "file": "//third_party/connectedhomeip/src/lib/support/logging.gni", "line": 5, "value": "134"}},
+        "file": "//third_party/connectedhomeip/src/lib/support/logging.gni", "line": 5, "value": "-1"}},
     {"name": "chip_project_config_include_dirs", "comment": "Extra include dirs.", "default": {
         "file": "//third_party/connectedhomeip/src/system/BUILD.gn", "line": 39, "value": "[]"}},
     # Collision: both reduce to alias "debug" when chip_ prefix is stripped

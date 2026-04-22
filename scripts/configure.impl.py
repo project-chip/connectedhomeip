@@ -110,7 +110,7 @@ class ProjectArgProcessor:
                              'matter_enable_', 'matter_use_', 'matter_config_', 'matter_', '')
         GENERIC_ARG_PREFIXES = ('chip_config_', 'chip_', 'matter_config_', 'matter_', '')
 
-        ARG_TYPE_TRANS = str.maketrans('"tf0123456789', 'sbbiiiiiiiiii')
+        ARG_TYPE_TRANS = str.maketrans('"tf0123456789-', 'sbbiiiiiiiiiii')
         DASH_TRANS = str.maketrans('_', '-')
 
         def __init__(self, data):
