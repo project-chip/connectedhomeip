@@ -344,9 +344,9 @@ bool PushAVTransport::HandleTriggerDetected()
         InBlindPeriod(mBlindStartTime, mClipInfo.mBlindDurationS, now))
     {
         ChipLogError(Camera,
-                     "PushAVTransport command/motion transport trigger received but ignored due to blind period. Clip duration "
-                     "[%d seconds]",
-                     mRecorder->mClipInfo.mMotionDetectedDurationS);
+                     "PushAVTransport command/motion transport trigger received but ignored due to blind period. Elapsed time: "
+                     "[%ld seconds], blind duration: [%d seconds]",
+                     std::chrono::duration_cast<std::chrono::seconds>(now - mBlindStartTime).count(), mClipInfo.mBlindDurationS);
         return false;
     }
 
