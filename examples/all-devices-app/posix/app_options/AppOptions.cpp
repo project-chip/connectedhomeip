@@ -28,22 +28,13 @@ using namespace chip;
 using namespace chip::ArgParser;
 
 // App custom argument handling
-constexpr uint16_t kOptionDeviceType = 0xffd0;
-constexpr uint16_t kOptionWiFi       = 0xffd2;
+constexpr uint16_t kOptionDeviceType    = 0xffd0;
+constexpr uint16_t kOptionWiFi          = 0xffd2;
+constexpr uint16_t kOptionKVS           = 0xffd3;
+constexpr uint16_t kOptionDiscriminator = 0xffd4;
 
 DeviceTypeParser AppOptions::sParser;
-bool AppOptions::mEnableWiFi = false;
-
-const std::vector<DeviceTypeParser::Entry> & AppOptions::GetDeviceTypeEntries()
-{
-    const auto & entries = sParser.GetDeviceTypeEntries();
-    if (entries.empty())
-    {
-        static const std::vector<DeviceTypeParser::Entry> kDefault = { { "contact-sensor", 1, kInvalidEndpointId } };
-        return kDefault;
-    }
-    return entries;
-}
+AppOptions::AppConfig AppOptions::mConfig;
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
@@ -55,11 +46,18 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         {
             return false;
         }
+        mConfig.deviceConfigs = sParser.GetDeviceTypeEntries();
         return true;
     }
     case kOptionWiFi:
-        mEnableWiFi = true;
+        mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
+        return true;
+    case kOptionKVS:
+        mConfig.kvsPath = value;
+        return true;
+    case kOptionDiscriminator:
+        mConfig.discriminator.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
         return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
@@ -76,6 +74,8 @@ OptionSet * AppOptions::GetOptions()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
+        { "KVS", kArgumentRequired, kOptionKVS },
+        { "discriminator", kArgumentRequired, kOptionDiscriminator },
         {}, // need empty terminator
     };
 

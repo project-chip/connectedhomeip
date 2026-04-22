@@ -29,16 +29,23 @@
 class AppOptions
 {
 public:
+    struct AppConfig
+    {
+        std::vector<DeviceTypeParser::Entry> deviceConfigs;
+        bool enableWiFi = false;
+        std::string kvsPath;
+        chip::Optional<uint16_t> discriminator;
+    };
+
     static chip::ArgParser::OptionSet * GetOptions();
+    static AppConfig & GetConfig() { return mConfig; }
 
-    static bool EnableWiFi() { return mEnableWiFi; }
-
-    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries();
+    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return mConfig.deviceConfigs; }
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
     static DeviceTypeParser sParser;
-    static bool mEnableWiFi;
+    static AppConfig mConfig;
 };

@@ -336,13 +336,12 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider)
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, const AppOptions::AppConfig & config)
 {
-    auto discriminator                              = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR);
-    chip::Optional<uint16_t> discriminatorFromParam = LinuxDeviceOptions::GetInstance().discriminator;
-    if (discriminatorFromParam.HasValue())
+    auto discriminator = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR);
+    if (config.discriminator.HasValue())
     {
-        discriminator = discriminatorFromParam.Value();
+        discriminator = config.discriminator.Value();
     }
 
     const auto setupPasscode             = MakeOptional(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
@@ -364,11 +363,18 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 {
     ChipLogProgress(AppServer, "Initializing...");
     ReturnErrorOnFailure(Platform::MemoryInit());
-    ReturnErrorOnFailure(ParseArguments(argc, argv, AppOptions::GetOptions()));
-    ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH));
+
+    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), nullptr };
+    if (!ArgParser::ParseArgs(argv[0], argc, argv, sAppOptionSets))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
+    ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider));
+    ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     ConfigurationMgr().LogDeviceConfig();
