@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib.util
 import json
 import os
 import tempfile
 import unittest
 
 # configure.impl uses a non-package filename; import it by path
-import importlib.util
 _spec = importlib.util.spec_from_file_location("configure_impl", os.path.join(os.path.dirname(__file__), "configure.impl.py"))
 impl = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(impl)
