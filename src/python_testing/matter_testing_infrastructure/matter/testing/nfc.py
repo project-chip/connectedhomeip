@@ -308,7 +308,7 @@ def _read_cc_file_content(connection) -> int:
     remaining_len = cc_len - 2
 
     if remaining_len < 0:
-        raise ValueError("Invalid CC length (less than 2)")
+        raise ValueError("Invalid CC length (must be greater than 2)")
 
     # Handle case where CC file is extremely small (edge case)
     if remaining_len == 0:
@@ -348,10 +348,7 @@ def _read_cc_file_content(connection) -> int:
         log.error(f"Full Data: {cc_data}")
         raise ValueError(f"NDEF File Control TLV (0x04) not found at expected index {target_idx}")
 
-    tlv_len = cc_data[target_idx + 1]
-
-    file_id = (cc_data[target_idx + 2] << 8) | cc_data[target_idx + 3]
-    return file_id
+    return (cc_data[target_idx + 2] << 8) | cc_data[target_idx + 3]
 
 
 def _select_ndef_file(connection, file_id):
