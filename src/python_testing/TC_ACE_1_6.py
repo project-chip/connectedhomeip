@@ -48,13 +48,27 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_operate_only_commands, is_groupcast_on_root_node
+from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -135,6 +149,9 @@ class TC_ACE_1_6(MatterBaseTest):
 
         # Check if Groupcast cluster is on RootNode (endpoint 0)
         gc_on_root = await is_groupcast_on_root_node(self)
+        pga_enabled = False
+        if gc_on_root:
+            _, _, pga_enabled = await get_feature_map(self)
 
         # Indicate endpoints to be used for test. These default values will be
         # verified or changed depending on use of groupcast or groups clusters
@@ -227,9 +244,10 @@ class TC_ACE_1_6(MatterBaseTest):
         INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL = 2
 
         if gc_on_root:
-            # Test both IANA and per group addressing
+            # Test both IANA and per group addressing (if PGA supported)
             self.default_controller.SetGroupInfo(groupID1, "Group 1", INTERNAL_USE_IANA_ADDR_AND_NO_AUX_ACL)
-            self.default_controller.SetGroupInfo(groupID2, "Group 2", INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL)
+            group2_policy = INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL if pga_enabled else INTERNAL_USE_IANA_ADDR_AND_NO_AUX_ACL
+            self.default_controller.SetGroupInfo(groupID2, "Group 2", group2_policy)
             self.default_controller.SetGroupInfo(groupID3, "Group 3", INTERNAL_USE_IANA_ADDR_AND_NO_AUX_ACL)
         else:
             # Legacy groups cluster does not support IANA addresses, only uses per group addressing
@@ -269,7 +287,8 @@ class TC_ACE_1_6(MatterBaseTest):
             self.skip_step("3c")
         else:
             self.step("3c")
-            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(groupID=groupID2, endpoints=[ep1], keySetID=keySetID1, mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup))
+            mcast_policy = Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup if pga_enabled else Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kIanaAddr
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(groupID=groupID2, endpoints=[ep1], keySetID=keySetID1, mcastAddrPolicy=mcast_policy))
 
         # Step 4: ACL Manage for group 0x0103
         self.step(4)

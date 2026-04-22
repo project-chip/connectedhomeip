@@ -172,7 +172,7 @@ public:
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
 
     typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
-    void Shutdown(OnCancelDeviceHandle OnCancelDevice);
+    void Shutdown();
     /** Cancel all active NAN publisher sessions, leaving subscriber sessions
      *  intact.  Call after WiFi connects to release the radio for IPv6 DAD
      *  and mDNS advertising. */

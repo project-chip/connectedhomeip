@@ -28,6 +28,7 @@ source_set("clusters") {
     "camera-av-settings-user-level-management-server",
     "chime-server",
     "closure-control-server",
+    "closure-dimension-server",
     "commissioner-control-server",
     "descriptor",
     "flow-measurement-server",

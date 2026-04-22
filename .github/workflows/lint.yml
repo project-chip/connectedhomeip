@@ -319,11 +319,7 @@ jobs:
             - name:
                   Check for use of 'SafeAttributePersistenceProvider' and
                   'AttributePersistenceProvider' symbols
-              # Keep this check running so violations remain visible in CI
-              # while the underlying issue is being addressed.
-              # https://github.com/project-chip/connectedhomeip/issues/71540
               if: always()
-              continue-on-error: true
               run: |
                   scripts/find_attribute_persistence_provider_usage.sh \
                   --skip-subtree .github/ \
@@ -340,7 +336,9 @@ jobs:
               if: always()
               run: |
                   git grep -I -n 'emberAfReadAttribute' -- './*'                                                    \
+                      ':(exclude).agents/skills/'                                                                   \
                       ':(exclude).github/workflows/lint.yml'                                                        \
+                      ':(exclude)AGENTS.md'                                                                  \
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                                      \
                       ':(exclude)src/app/util/attribute-table.cpp'                                                  \
                       ':(exclude)src/app/util/attribute-table.h'                                                    \
@@ -363,11 +361,13 @@ jobs:
               run: |
                   git grep -I -n 'emberAfWriteAttribute' -- './*'                                            \
                       ':(exclude).github/workflows/lint.yml'                                                 \
+                      ':(exclude).agents/skills/'                                                            \
+                      ':(exclude)AGENTS.md'                                                                  \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
                       ':(exclude)examples/common/server-cluster-shim/ServerClusterShim.cpp'                  \
                       ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'        \
                       ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'          \
-                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.h'                   \
+                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.h'            \
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                               \
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \

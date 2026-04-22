@@ -670,6 +670,17 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request,
                         Json::Value & value);
 

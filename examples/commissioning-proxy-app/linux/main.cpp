@@ -50,29 +50,16 @@ NamedPipeCommands sChipNamedPipeCommands;
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-static void CancelWiFiPAFPublish()
-{
-    uint32_t publishId = LinuxDeviceOptions::GetInstance().mPublishId;
-    if (publishId == 0)
-        return;
-
-    // Stop advertising the proxy as a NAN publisher — it is reached by chip-tool
-    // over TCP/IP, not NAN.  Cancel the publish and disconnect the nanreceive
-    // signal handler so that a subsequent _WiFiPAFSubscribe (triggered by
-    // ProxyConnectRequest) registers exactly one handler and packets are not
-    // delivered twice.
-    TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(publishId);
-    DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
-    LinuxDeviceOptions::GetInstance().mPublishId = 0;
-    ChipLogProgress(AppServer, "CommissioningProxy: cancelled WiFi-PAF publish and disconnected nanreceive handler");
-}
-
 static void OnChipDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        ChipLogProgress(AppServer, "CommissioningProxy: commissioning complete, cancelling WiFi-PAF publish");
-        CancelWiFiPAFPublish();
+        // CommissioningWindowManager cancels the NAN publish automatically.
+        // Disconnect the nanreceive signal handler so that a subsequent
+        // _WiFiPAFSubscribe (triggered by ProxyConnectRequest) registers
+        // exactly one handler and packets are not delivered twice.
+        ChipLogProgress(AppServer, "CommissioningProxy: commissioning complete, disconnecting nanreceive handler");
+        DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
@@ -278,7 +265,10 @@ void ApplicationInit()
     // the publish once commissioning completes.
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
     {
-        CancelWiFiPAFPublish();
+        // Already commissioned: disconnect the nanreceive handler so a subsequent
+        // _WiFiPAFSubscribe registers exactly one handler.  CommissioningWindowManager
+        // handles the actual publish cancel.
+        DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
     }
     else
     {
@@ -286,7 +276,6 @@ void ApplicationInit()
     }
 #endif
 
-    ChipLogProgress(AppServer, "===SHM %s()", __func__);
     ChipLogProgress(AppServer, "%s(): Main function is Proxy Commissioner on endpoint %u",
             __func__, CommissioningProxyEndpoint);
 }

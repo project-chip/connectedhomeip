@@ -46,11 +46,11 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    su_repl_tests_linux_build:
-        name: REPL Tests - Linux Software Update (BUILD)
+    nightly_repl_tests_linux_build:
+        name: Nightly REPL Tests - Linux (BUILD)
         if: github.actor != 'restyled-io[bot]'
         env:
-            BUILD_VARIANT: ipv6only-no-ble-no-wifi
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -76,7 +76,6 @@ jobs:
         steps:
             - name: Set up additional environment
               run: |
-                echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v6
@@ -84,7 +83,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}
 
             - name: Setup and Restore Cache
               id: ccache
@@ -103,22 +102,71 @@ jobs:
             - name: Build linux-x64-requestor-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-provider-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-ota-provider-${BUILD_VARIANT}-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-clang-test"
 
             - name: Build Software Update ota images with new version.
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
                   && rm -rf out/su_ota_images_min-v*"
+
+            - name: Build linux-x64-all-clusters
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-test
+                --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test"
+            - name: Build linux-x64-fabric-admin-rpc
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
+                --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
+
+            - name: Build linux-x64-fabric-bridge-rpc
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
+                --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
+
+            - name: Build linux-x64-fabric-sync
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
+                --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
+
+            - name: Build linux-x64-lit-icd
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-lit-icd-${BUILD_VARIANT}-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-clang-test"
+
+
+            - name: Build linux-x64-jf-control-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-control-app-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-control-app-${BUILD_VARIANT}-clang"
+
+            - name: Build linux-x64-jf-admin-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-admin-app-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-admin-app-${BUILD_VARIANT}-clang"
 
             - name: ccache stats
               run: ccache -s
@@ -156,9 +204,9 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
-    su_repl_tests_linux_run:
-        name: Software Update REPL Tests - Linux (RUN)
-        needs: su_repl_tests_linux_build
+    nightly_repl_tests_linux_run:
+        name: Nightly REPL Tests - Linux (RUN)
+        needs: nightly_repl_tests_linux_build
         if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 45
         strategy:
@@ -168,9 +216,9 @@ jobs:
                 # Regex filter by TC SU we think 45 minutes is more than engough for this task
                 # Each on one run to avoid all the jobs fail if one fails
                 # Add slow tests here as needed using the filter, individually or by group.
-                filter: ["", "TC_SU_2_5", "TC_SU_2_7"]
+                filter: ["", "TC_SU_2_5", "TC_SU_2_7", "!TC_SU"]
         env:
-            BUILD_VARIANT: ipv6only-no-ble-no-wifi
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -193,12 +241,19 @@ jobs:
                 --sysctl net.ipv6.conf.all.forwarding=0
 
         steps:
-            - name: Set up additional environment
-              run: |
-                echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v6
-            # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
+
+            # NOTE: we need bootstrap to be able to use ASAN symbolizer and get ASAN Stack traces
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}-${{ matrix.filter }}
+
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
@@ -214,11 +269,20 @@ jobs:
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
-                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
-                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
+                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
+                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   # SU OTA Images
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+                  
+                  # Slow Test Apps
+                  echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
+                  echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
+                  echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-clang-test/lit-icd-app" >> /tmp/test_env.yaml
+                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app-${BUILD_VARIANT}-clang/jfa-app" >> /tmp/test_env.yaml
+                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app-${BUILD_VARIANT}-clang/jfc-app" >> /tmp/test_env.yaml
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
@@ -242,9 +306,9 @@ jobs:
                   retention-days: 30
                   if-no-files-found: warn
 
-    su_repl_tests_report:
-        name: Software Update REPL Tests - Test Report
-        needs: su_repl_tests_linux_run
+    nightly_repl_tests_report:
+        name: Nightly REPL Tests - Test Report
+        needs: nightly_repl_tests_linux_run
         if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
 
         runs-on: ubuntu-latest
