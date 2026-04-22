@@ -105,7 +105,8 @@ class NFCReader:
             # Perform NDEF file system navigation sequence
             _select_ndef_application(connection)    # Select NDEF app
             _select_cc_file(connection)             # Select Capability Container (aka CC File)
-            _select_ndef_file(connection)           # Select data file
+            ndef_file_id_high, ndef_file_id_low = _read_cc_file_content(connection)     # Get NDEF File ID from CC Content
+            _select_ndef_file(connection, ndef_file_id_high, ndef_file_id_low)          # Select data file
 
             # Read NDEF message length and data
             ndef_length = _read_ndef_length(connection)
@@ -147,7 +148,9 @@ class NFCReader:
         with NFCConnection(self) as connection:
 
             _select_ndef_application(connection)    # Select NDEF app
-            _select_ndef_file(connection)           # Select NDEF file
+            _select_cc_file(connection)             # Select Capability Container (aka CC File)
+            ndef_file_id_high, ndef_file_id_low = _read_cc_file_content(connection)     # Get NDEF File ID from CC content
+            _select_ndef_file(connection, ndef_file_id_high, ndef_file_id_low)          # Select data file
 
             # Create NDEF message with a single URI record
             record = ndef.UriRecord(uri)
@@ -272,17 +275,60 @@ def _select_cc_file(connection):
     _check_transmission_status(sw1, sw2, "select CC file")
 
 
-def _select_ndef_file(connection):
+def _read_cc_file_content(connection):
+    """
+    Reads the Capability Container (CC) file and extracts the NDEF File ID.
+
+    Based on the standard Type 4 Tag structure:
+    - Bytes 0-1: CCLEN
+    - Bytes 2-8: Mapping Version, MLe, MLc, and TLV Header (Tag 0x04, Len 0x06)
+    - Bytes 9-10: NDEF File ID (Target)
+    - Bytes 11+: File Size and Access Conditions
+
+    Args:
+        connection: The NFC reader connection object.
+
+    Returns:
+        int: The NDEF File ID (e.g., 0xE104).
+    """
+    # 1. Read the first 2 bytes to get the total CC length (CCLEN)
+    # CCLEN is Big Endian
+    header, sw1, sw2 = connection.transmit([CLA_ISO, INS_READ_BINARY, 0x00, 0x00, 0x02])
+    _check_transmission_status(sw1, sw2, "read CC length")
+
+    cc_len = (header[0] << 8) + header[1]
+
+    # 2. Read the remaining bytes (Total Length - 2 bytes already read)
+    remaining_len = cc_len - 2
+    if remaining_len > 0:
+        body, sw1, sw2 = connection.transmit([CLA_ISO, INS_READ_BINARY, 0x00, 0x02, remaining_len])
+        _check_transmission_status(sw1, sw2, "read CC body")
+
+        # Combine header and body for easy indexing
+        cc_data = header + body
+
+        # 3. Directly access index 9 and 10
+        # Ensure the data is long enough to prevent IndexError
+        if len(cc_data) >= 11:
+            return cc_data[9], cc_data[10]
+        raise ValueError(f"CC file data too short: {len(cc_data)} bytes, expected at least 11")
+
+    raise ValueError("CC length is invalid (less than 2)")
+
+
+def _select_ndef_file(connection, file_id_high, file_id_low):
     """
     Select the NDEF data file on the NFC tag.
 
-    The NDEF file (E104) contains the actual NDEF message data that can be read
+    The NDEF file contains the actual NDEF message data that can be read
     from or written to the NFC tag. This file stores the structured NDEF records
     that contain the application data (such as URLs, text, or other payloads).
 
     Args:
         connection: The NFC reader connection object used to
                                     communicate with the NFC tag.
+        file_id_high (int): The high byte of the NDEF file ID (e.g., 0xE1).
+        file_id_low (int): The low byte of the NDEF file ID (e.g., 0x04).
 
     Raises:
         AssertionError: If the message transmission fails (SW1, SW2 != 0x90, 0x00).
@@ -291,10 +337,10 @@ def _select_ndef_file(connection):
         This function must be called after _select_ndef_application() and
         _select_cc_file() before reading or writing NDEF data.
     """
-    # ISO/IEC 7816-4 APDU command to select the NDEF file (file ID: 0xE104)
+    # ISO/IEC 7816-4 APDU command to select the NDEF file
     # (P1, P2)=(0x00, 0x0C) corresponds to select by file ID
     SELECT_NDEF_FILE = [CLA_ISO, INS_SELECT, 0x00, 0x0C, 0x02,  # CLA INS P1 P2 Lc
-                        0xE1, 0x04]                             # File ID
+                        file_id_high, file_id_low]  # File ID
     data, sw1, sw2 = connection.transmit(SELECT_NDEF_FILE)
     _check_transmission_status(sw1, sw2, "select NDEF file")
 
