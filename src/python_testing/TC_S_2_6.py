@@ -217,8 +217,8 @@ class TC_S_2_6(MatterBaseTest):
     ) -> int:
         """AddScene until this fabric's RemainingCapacity reaches 0; return next unused scene ID in this sequence."""
         next_scene_id = first_scene_id
+        rc_before = await self._read_remaining_capacity(ctrl, ep, fabric_index)
         while True:
-            rc_before = await self._read_remaining_capacity(ctrl, ep, fabric_index)
             if rc_before == 0:
                 break
             r = await ctrl.SendCommand(
@@ -232,6 +232,7 @@ class TC_S_2_6(MatterBaseTest):
             asserts.assert_equal(r.groupID, GROUP_ID, f"{log_label} AddScene groupID")
             asserts.assert_equal(r.sceneID, next_scene_id, f"{log_label} AddScene sceneID")
             self._wait_remaining_capacity(handler, fabric_index, rc_before - 1)
+            rc_before -= 1
             next_scene_id += 1
         return next_scene_id
 
