@@ -57,6 +57,7 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/microwave-oven-mode/"
                       "${CHEF}/common/clusters/microwave-oven-control/"
                       "${CHEF}/common/clusters/mode-base"
+                      "${CHEF}/common/clusters/mode-select/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
                       "${CHEF}/common/clusters/switch/"

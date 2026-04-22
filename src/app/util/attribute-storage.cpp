@@ -14,13 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/Span.h"
 #include <app/util/attribute-storage.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/PascalString.h>
@@ -32,9 +30,11 @@
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -82,6 +82,8 @@ static uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
 // Check whether there is an endpoint defined with the given endpoint id that is
 // enabled.
 static bool emberAfEndpointIsEnabled(EndpointId endpoint);
+
+static void emberAfIncreaseDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
 
 namespace {
 
@@ -679,70 +681,66 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 *metadata = am;
                             }
 
+                            uint8_t * attributeLocation = attributeData + attributeOffsetIndex;
+                            uint8_t *src, *dst;
+                            if (write)
                             {
-                                uint8_t * attributeLocation = attributeData + attributeOffsetIndex;
-                                uint8_t *src, *dst;
+                                src = buffer;
+                                dst = attributeLocation;
+                                if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                         am->attributeId))
+                                {
+                                    return Status::UnsupportedAccess;
+                                }
+                            }
+                            else
+                            {
+                                if (buffer == nullptr)
+                                {
+                                    return Status::Success;
+                                }
+
+                                src = attributeLocation;
+                                dst = buffer;
+                                if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId, am->attributeId))
+                                {
+                                    return Status::UnsupportedAccess;
+                                }
+                            }
+
+                            // Is the attribute externally stored?
+                            if (am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE)
+                            {
                                 if (write)
                                 {
-                                    src = buffer;
-                                    dst = attributeLocation;
-                                    if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                             am->attributeId))
-                                    {
-                                        return Status::UnsupportedAccess;
-                                    }
+                                    return emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId, am,
+                                                                                 buffer);
                                 }
-                                else
+
+                                if (readLength < emberAfAttributeSize(am))
                                 {
-                                    if (buffer == nullptr)
-                                    {
-                                        return Status::Success;
-                                    }
-
-                                    src = attributeLocation;
-                                    dst = buffer;
-                                    if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                            am->attributeId))
-                                    {
-                                        return Status::UnsupportedAccess;
-                                    }
+                                    // Prevent a potential buffer overflow
+                                    return Status::ResourceExhausted;
                                 }
 
-                                // Is the attribute externally stored?
-                                if (am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE)
-                                {
-                                    if (write)
-                                    {
-                                        return emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId, am,
-                                                                                     buffer);
-                                    }
-
-                                    if (readLength < emberAfAttributeSize(am))
-                                    {
-                                        // Prevent a potential buffer overflow
-                                        return Status::ResourceExhausted;
-                                    }
-
-                                    return emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId, am,
-                                                                                buffer, emberAfAttributeSize(am));
-                                }
-
-                                // Internal storage is only supported for fixed endpoints
-                                if (!isDynamicEndpoint)
-                                {
-                                    return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
-                                }
-
-                                return Status::Failure;
+                                return emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId, am, buffer,
+                                                                            emberAfAttributeSize(am));
                             }
-                        }
-                        else
-                        { // Not the attribute we are looking for
-                            // Increase the index if attribute is not externally stored
-                            if (!(am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE))
+
+                            // Internal storage is only supported for fixed endpoints
+                            if (!isDynamicEndpoint)
                             {
-                                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
+                                return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                             }
+
+                            return Status::Failure;
+                        }
+
+                        // Not the attribute we are looking for
+                        // Increase the index if attribute is not externally stored
+                        if (!(am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE))
+                        {
+                            attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
                         }
                     }
 
@@ -1002,7 +1000,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterCluste
         if (enable)
         {
             initializeEndpoint(&(emAfEndpoints[index]));
-            emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
         }
         else
         {
@@ -1010,11 +1007,13 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterCluste
             emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
         }
 
+        // The Descriptor cluster on Endpoint 0 subscribing to OnEndpointChanged events.
+        //
+        // NOTE: this should eventually be refactored for descriptor cluster to detect these changes
         EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
         while (parentEndpointId != kInvalidEndpointId)
         {
-            emberAfAttributeChanged(parentEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id,
-                                    emberAfGlobalInteractionModelAttributesChangedListener());
+            emberAfAttributeChanged(parentEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id);
             uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpointId);
             if (parentIndex == kEmberInvalidEndpointIndex)
             {
@@ -1024,8 +1023,9 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterCluste
             parentEndpointId = emberAfParentEndpointFromIndex(parentIndex);
         }
 
-        emberAfAttributeChanged(/* endpoint = */ 0, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id,
-                                emberAfGlobalInteractionModelAttributesChangedListener());
+        CodegenDataModelProvider::Instance().NotifyEndpointChanged(
+            endpoint, enable ? DataModel::EndpointChangeType::kAdded : DataModel::EndpointChangeType::kRemoved);
+        emberAfAttributeChanged(/* endpoint = */ 0, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id);
     }
 
     emberMetadataStructureGeneration++;
@@ -1595,32 +1595,27 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
     return ep.dataVersions + clusterIndex;
 }
 
-DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
+void emberAfIncreaseDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
 {
-    return &InteractionModelEngine::GetInstance()->GetReportingEngine();
-}
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             DataModel::ProviderChangeListener * listener)
-{
-    // Increase cluster data path
-    DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
+    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
     if (version == nullptr)
     {
-        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!", endpoint,
-                     ChipLogValueMEI(clusterId));
+        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in emberAfIncreaseDataVersion!",
+                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
     }
     else
     {
         (*(version))++;
-        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32, endpoint,
-                      ChipLogValueMEI(clusterId), *(version));
+        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32,
+                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *version);
     }
-
-    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
-    listener->MarkDirty(AttributePathParams(endpoint));
+    const ConcreteAttributePath path(endpoint, clusterId, attributeId);
+
+    emberAfIncreaseDataVersion(path);
+    CodegenDataModelProvider::Instance().NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
 }

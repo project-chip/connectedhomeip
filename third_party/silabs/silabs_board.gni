@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/silabs/tests/args.gni")
+import("${chip_root}/src/platform/silabs/tests/tests.gni")
 
 declare_args() {
   # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model.

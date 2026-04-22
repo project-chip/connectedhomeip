@@ -173,28 +173,47 @@ class TC_JFADMIN_1_4(MatterBaseTest):
             self.storage_fabric_a = self.storage_directory_ecosystem_a
             log.info("Temporary storage directory: %s", self.storage_fabric_a)
 
-        self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
-        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+        # If test is executed in CI environment, start JFA app for Fabric B
+        if self.is_pics_sdk_ci_only:
+            self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
+            self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            dut_rpc_server_ip = "127.0.0.1"
+            dut_rpc_server_port = "33033"
+            self.fabric_a_admin = JFAdministratorSubprocess(
+                self.jfa_server_app,
+                prefix="JFA-A",
+                storage_dir=self.storage_fabric_a,
+                port=random.randint(5001, 5999),
+                discriminator=self.jfadmin_fabric_a_discriminator,
+                passcode=self.jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port, "--min_commissioning_timeout", f"{self._MIN_COMMISSIONING_TIMEOUT}"])
+            self.fabric_a_admin.start(
+                expected_output="Updating services using commissioning mode 1",
+                timeout=30)
+        else:
+            dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            self.jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
+            if not self.jfadmin_fabric_a_passcode:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+            self.jfadmin_fabric_a_discriminator = self.matter_test_config.discriminators[0]
+            if not self.jfadmin_fabric_a_discriminator:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
-
-        self.fabric_a_admin = JFAdministratorSubprocess(
-            self.jfa_server_app,
-            prefix="JFA-A",
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=self.jfadmin_fabric_a_discriminator,
-            passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033", "--min_commissioning_timeout", f"{self._MIN_COMMISSIONING_TIMEOUT}"])
-        self.fabric_a_admin.start(
-            expected_output="Updating services using commissioning mode 1",
-            timeout=30)
-
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             prefix="JFC-A",
-            rpc_server_port=33033,
+            rpc_server_port=dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=30)
@@ -411,7 +430,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
             iterations=1000,
             salt=valid_32_byte_salt,
             expected_error_status=Status.Failure,
-            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kBusy,
+            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.ICACCSRResponseStatusCodeEnum.kBusy,
             expected_error_message="Expected BUSY cluster status while commissioning window is already open.",
         )
 

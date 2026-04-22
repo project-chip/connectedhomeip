@@ -105,7 +105,6 @@ silabs_executable("light_switch_app") {
   defines = []
 
   sources = [
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/BindingHandler.cpp",
     "src/DataModelCallbacks.cpp",

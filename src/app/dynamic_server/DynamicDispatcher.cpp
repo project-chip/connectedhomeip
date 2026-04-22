@@ -17,6 +17,7 @@
  */
 
 #include "AccessControl.h"
+#include "app/data-model-provider/AttributeChangeListener.h"
 
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>
@@ -28,11 +29,11 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
+#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/Decode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -311,16 +312,11 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             DataModel::ProviderChangeListener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     gMockDataVersion++;
-    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
-}
-
-void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
-{
-    listener->MarkDirty(AttributePathParams(endpoint));
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->NotifyAttributeChanged(
+        { endpoint, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
 }
 
 DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClusterPath)

@@ -2867,7 +2867,7 @@ limitations under the License.
         <typeName>Water Freeze Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0041</deviceId>
-        <revision editable="false">1</revision>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2898,7 +2898,7 @@ limitations under the License.
         <typeName>Water Leak Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0043</deviceId>
-        <revision editable="false">1</revision>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2914,7 +2914,7 @@ limitations under the License.
         <typeName>Rain Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0044</deviceId>
-        <revision editable="false">1</revision>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">

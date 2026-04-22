@@ -168,6 +168,8 @@
 #include <clusters/ModeSelect/MetadataProvider.h>
 #include <clusters/NetworkCommissioning/Ids.h>
 #include <clusters/NetworkCommissioning/MetadataProvider.h>
+#include <clusters/NetworkIdentityManagement/Ids.h>
+#include <clusters/NetworkIdentityManagement/MetadataProvider.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Ids.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/OccupancySensing/Ids.h>
@@ -713,6 +715,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == NetworkCommissioning::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NetworkCommissioning::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NetworkIdentityManagement::Id) || ...))
+    {
+        if (id == NetworkIdentityManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, NetworkIdentityManagement::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == NitrogenDioxideConcentrationMeasurement::Id) || ...))
     {
