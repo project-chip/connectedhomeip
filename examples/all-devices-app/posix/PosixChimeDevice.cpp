@@ -219,10 +219,11 @@ static ma_data_source_vtable g_custom_data_source_vtable = {
 } // namespace
 
 // SoundResource Factory: Initializes a specific sound based on its ID.
-std::unique_ptr<PosixChimeDevice::SoundResource> PosixChimeDevice::SoundResource::Create(ma_engine * engine, const ChimeDevice::Sound & soundInfo)
+std::unique_ptr<PosixChimeDevice::SoundResource> PosixChimeDevice::SoundResource::Create(ma_engine * engine,
+                                                                                         const ChimeDevice::Sound & soundInfo)
 {
     auto resource = std::make_unique<SoundResource>();
-    resource->id = soundInfo.id;
+    resource->id  = soundInfo.id;
 
     // Configure the custom data source parameters based on ID.
     // These hardcoded values define the characteristics of each chime.
@@ -231,26 +232,26 @@ std::unique_ptr<PosixChimeDevice::SoundResource> PosixChimeDevice::SoundResource
     if (soundInfo.id == 0)
     {
         // Chime 0: Two-tone "Ding-Dong" (880Hz then 660Hz)
-        resource->dataSource.freq1_hz    = 880;
-        resource->dataSource.freq2_hz    = 660;
+        resource->dataSource.freq1_hz     = 880;
+        resource->dataSource.freq2_hz     = 660;
         resource->dataSource.duration_sec = 1.0;
-        resource->dataSource.pulse       = false;
+        resource->dataSource.pulse        = false;
     }
     else if (soundInfo.id == 1)
     {
         // Chime 1: Pulsing warning tone (1000Hz pulsing)
-        resource->dataSource.freq1_hz    = 1000;
-        resource->dataSource.freq2_hz    = 1000;
+        resource->dataSource.freq1_hz     = 1000;
+        resource->dataSource.freq2_hz     = 1000;
         resource->dataSource.duration_sec = 1.0;
-        resource->dataSource.pulse       = true;
+        resource->dataSource.pulse        = true;
     }
     else
     {
         // Chime 2 (Default): Single short tone (440Hz)
-        resource->dataSource.freq1_hz    = 440;
-        resource->dataSource.freq2_hz    = 440;
+        resource->dataSource.freq1_hz     = 440;
+        resource->dataSource.freq2_hz     = 440;
         resource->dataSource.duration_sec = 0.5;
-        resource->dataSource.pulse       = false;
+        resource->dataSource.pulse        = false;
     }
 
     // Initialize the base data source with our vtable mapping to the callbacks above

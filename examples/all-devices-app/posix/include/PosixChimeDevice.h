@@ -34,9 +34,9 @@ public:
     struct CustomDataSource
     {
         ma_data_source_base base; // Base structure required by miniaudio
-        double freq1_hz;             // Primary frequency or first tone in Hz
-        double freq2_hz;             // Secondary frequency or second tone in Hz
-        double duration_sec;          // Total duration of the sound in seconds
+        double freq1_hz;          // Primary frequency or first tone in Hz
+        double freq2_hz;          // Secondary frequency or second tone in Hz
+        double duration_sec;      // Total duration of the sound in seconds
         bool pulse;               // Whether to apply a pulse modulation effect
         ma_uint64 cursor;         // Current playback position in samples
     };
