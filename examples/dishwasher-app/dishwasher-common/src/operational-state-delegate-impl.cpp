@@ -114,7 +114,7 @@ void OperationalState::Shutdown()
     }
 }
 
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);

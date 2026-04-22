@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 #pragma once
 
 // Backward-compat stub — do not add new content here.
-// The Instance classes live in CodegenIntegration.h; the delegate interfaces
-// live in OperationalStateDelegate.h.
-#include "CodegenIntegration.h"
+// The cluster class and legacy Instance wrappers live in OperationalStateCluster.h;
+// the delegate interfaces live in OperationalStateDelegate.h.
+#include "OperationalStateCluster.h"
 #include "OperationalStateDelegate.h"

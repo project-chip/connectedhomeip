@@ -54,7 +54,11 @@ source_set("clusters") {
     "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials-server",
+<<<<<<< HEAD
     "power-source-server",
+=======
+    "operational-state-server",
+>>>>>>> 142b66d825 (Operational State: Migrate to code-driven data model)
     "pressure-measurement-server",
     "proximity-ranging-server",
     "relative-humidity-measurement-server",

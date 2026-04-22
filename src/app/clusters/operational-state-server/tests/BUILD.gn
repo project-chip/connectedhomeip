@@ -13,23 +13,19 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-source_set("operational-state-server") {
-  sources = [
-    "OperationalStateCluster.cpp",
-    "OperationalStateCluster.h",
-    "OperationalStateDelegate.h",
-    "operational-state-cluster-objects.h",
-    "operational-state-server.h",
-  ]
+chip_test_suite("tests") {
+  output_name = "libTestOperationalStateCluster"
+
+  test_sources = [ "TestOperationalStateCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app/server-cluster:registry",
+    "${chip_root}/src/app/clusters/operational-state-server",
+    "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
-
-  public_configs = [ "${chip_root}/src:includes" ]
 }

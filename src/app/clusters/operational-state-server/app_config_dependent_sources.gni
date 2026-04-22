@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# CodegenIntegration.cpp depends on ZAP-generated headers and Ember APIs;
+# it must be compiled as part of the application, not the library.
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
-  "OperationalStateDelegate.h",
-  "operational-state-cluster-objects.h",
-  "operational-state-server.h",
 ]
