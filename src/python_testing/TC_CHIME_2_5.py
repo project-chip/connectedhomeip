@@ -92,8 +92,8 @@ class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
         # Pre-condition, make sure the ClusterRevision is at least 2
         clusterRevision = await self.read_chime_attribute_expect_success(endpoint=endpoint, attribute=attributes.ClusterRevision)
         if clusterRevision < 2:
-            log.info("Chime 2.5: skipping as cluster revision is less than 2")
-            self.mark_all_remaining_steps_skipped(6)
+            log.info("TC-CHIME-2.5: skipping as cluster revision is less than 2")
+            self.mark_all_remaining_steps_skipped(1)  # Skip rest of test.
             return
 
         self.step(1)  # Already done, immediately go to step 2
@@ -108,10 +108,10 @@ class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             if user_response is not None:
-                log.info(f"CHIME 2_5: response '{user_response}' received on confirmation of no chime sound")
+                log.info(f"TC-CHIME-2.5: response '{user_response}' received on confirmation of no chime sound")
                 asserts.assert_equal(user_response.lower(), "y")
             else:
-                log.info("CHIME 2_5: No response received for no chime sound played user prompt")
+                log.info("TC-CHIME-2.5: No response received for no chime sound played user prompt")
 
         self.step(4)
         await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, True)
@@ -134,10 +134,10 @@ class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
                                                          prompt_msg_placeholder="y",
                                                          default_value="y")
                 if user_response is not None:
-                    log.info(f"CHIME 2_5: response '{user_response}' received on confirmation of different chime sound")
+                    log.info(f"TC-CHIME-2.5: response '{user_response}' received on confirmation of different chime sound")
                     asserts.assert_equal(user_response.lower(), "y")
                 else:
-                    log.info("CHIME 2_5: No response received for different chime sound played user prompt")
+                    log.info("TC-CHIME-2.5: No response received for different chime sound played user prompt")
             else:
                 self.skip_step(6)
 

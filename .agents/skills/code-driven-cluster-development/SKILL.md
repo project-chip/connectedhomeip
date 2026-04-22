@@ -61,9 +61,15 @@ subdirectory while placing the new code-driven implementation in the root.
     `codegen/`) go in `app_config_dependent_sources.cmake` and
     `app_config_dependent_sources.gni` (these are the codegen-dependent files).
 -   All other files (`<ClusterName>Cluster.h/cpp`, test files) go in `BUILD.gn`.
+-   **Sources must belong to a single build target**: Files referenced in
+    `BUILD.gn` and `app_config_dependent_sources.*` must be mutually exclusive.
+-   `app_config_dependent_sources.cmake` and `app_config_dependent_sources.gni`
+    must not contain non-codegen files.
+-   The cluster should be added to the cluster list compiled in
+    `src/app/clusters/BUILD.gn`.
 -   Every source file must appear somewhere: either `BUILD.gn` (if no
     App-specific dependencies) or `app_config_dependent_sources.*` if depending
-    on application zap configuration. Unlisted headers or cpp files are a review
+    on application ZAP configuration. Unlisted headers or cpp files are a review
     red flag.
 
 ---
@@ -90,14 +96,22 @@ public:
         Foo::Attributes::SomeOptional::Id,
         Foo::Attributes::AnotherOptional::Id>;
 
-    // Use a Config/StartupConfiguration struct for constructor arguments that
-    // may be optional or have defaults.  Builder-style .WithXxx() setters are
-    // common for optional fields.
-    struct Config
+    // Use a Config/StartupConfiguration class (or struct for simple cases) for
+    // constructor arguments that may be optional or have defaults. Use a class
+    // with private members and builder-style .WithXxx() setters to prevent
+    // misconfiguration in non-trivial cases.
+    class Config
     {
-        DataModel::Nullable<int16_t> minValue{};
-        DataModel::Nullable<int16_t> maxValue{};
-        OptionalAttributeSet optionalAttributes{};
+    public:
+        Config & WithMinValue(DataModel::Nullable<int16_t> min) { mMinValue = min; return *this; }
+        Config & WithMaxValue(DataModel::Nullable<int16_t> max) { mMaxValue = max; return *this; }
+        Config & WithOptionalAttributes(OptionalAttributeSet attrs) { mOptionalAttributes = attrs; return *this; }
+
+    private:
+        friend class FooCluster;
+        DataModel::Nullable<int16_t> mMinValue{};
+        DataModel::Nullable<int16_t> mMaxValue{};
+        OptionalAttributeSet mOptionalAttributes{};
     };
 
     FooCluster(EndpointId endpointId, const Config & config = {});
@@ -113,7 +127,7 @@ public:
     DataModel::Nullable<int16_t> GetMeasuredValue() const { return mMeasuredValue; }
 
 protected:
-    BitFlags<Foo::Feature> mFeatureMap;
+    const BitFlags<Foo::Feature> mFeatureMap;
     OptionalAttributeSet mOptionalAttributeSet;
     DataModel::Nullable<int16_t> mMeasuredValue{};
     // ... other member variables
@@ -128,8 +142,13 @@ Key points:
     base constructor.
 -   Declare `OptionalAttributeSet` as a `using` alias so callers can refer to it
     via `FooCluster::OptionalAttributeSet`.
--   Use a `Config` struct (not a long constructor parameter list) when there are
-    optional or defaulted configuration fields.
+-   **Use a `Config` type:** For constructor arguments that may be optional or
+    have defaults. Prefer a `class` with private members and builder-style
+    `.WithXxx()` setters in non-trivial cases, and use a `struct` only for
+    simple passive configuration bundles.
+-   **Store Separate Variables:** Extract fields from the `Config` object into
+    separate member variables in the cluster class. This allows marking
+    immutable fields as `const` and prevents accidental runtime modification.
 -   Validate constructor arguments with `VerifyOrDie` (programming errors that
     indicate a logic bug at call site, not a recoverable runtime error).
 -   Expose application-facing setters/getters; keep attribute storage in
@@ -167,6 +186,10 @@ DataModel::ActionReturnStatus FooCluster::ReadAttribute(
 -   Always encode/handle `ClusterRevision` and `FeatureMap` explicitly.
 -   **Do not add path-validity checks** before the switch — they add code size
     and are redundant because the framework guarantees the path exists.
+-   **Do not add feature-flag checks inside the switch cases** for optional
+    attributes if those attributes are already conditionally included in the
+    `Attributes()` list. The framework pre-filters requests based on the
+    supported attributes list.
 -   Do not add returning `UnsupportedAttribute` inside attribute switch
     handling. Existent path checks ensure those code lines would never be used.
 
@@ -593,12 +616,18 @@ functions (`Foo::Attributes::Bar::Get/Set`).
 
 ---
 
-## README (optional but encouraged)
+## README & API Compatibility
 
-If the cluster has notable architecture decisions, scope constraints (e.g. node
-singleton), or a delegate interface, add a `README.md` next to the cluster
-files. See `src/app/clusters/actions-server/README.md` or
-`src/app/clusters/air-quality-server/README.md` for good examples.
+-   **Preserve API backwards compatibility** if converting an existing
+    legacy/Ember cluster to code-driven.
+-   If breaking compatibility is unavoidable, provide a `README.md` file
+    explaining the upgrade steps in the cluster folder.
+-   Providing a `README.md` every time is encouraged to explain the API and
+    usage further.
+-   If the cluster has notable architecture decisions, scope constraints (e.g.
+    node singleton), or a delegate interface, add a `README.md` next to the
+    cluster files. See `src/app/clusters/actions-server/README.md` or
+    `src/app/clusters/air-quality-server/README.md` for good examples.
 
 ---
 
@@ -617,14 +646,38 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
    each optional attribute enabled.
 6. **Typos in doc comments** — especially copy-paste errors from similar
    clusters (wrong cluster name in a comment).
-7. **Unnecessary setters for construction-time-fixed values** — min/max measured
-   value ranges set at construction typically do not need public setters; make
-   them `protected` if only tests need them.
+7. **No setters or updates for fixed attributes** — Attributes that describe
+   physical hardware or are fixed at construction (e.g., `MinMeasuredValue`,
+   `MaxMeasuredValue`, `MeasurementUnit`) must not have setters in the cluster
+   or the delegate. They should be read on-demand from the delegate to save RAM
+   and code size.
 8. **Global singletons in tests** — tests should use injected mocks/locals
    (`TestServerClusterContext`) rather than accessing `Server::GetInstance()`.
 9. **`LogErrorOnFailure` omitted on fire-and-forget calls** — use
    `LogErrorOnFailure(cluster->SetValue(...))` rather than silently ignoring
    errors from setters.
+10. **Unnecessary manual `AddStatus`** — Prefer returning the status directly
+    from `InvokeCommand` for simple status returns (no data payload), letting
+    the framework handle `AddStatus` automatically.
+11. **Cross-directory source inclusion in build files** — Avoid listing source
+    files from other clusters or directories directly in a target (e.g., in
+    tests). Use proper library dependencies instead to avoid duplicate
+    compilation and maintenance issues.
+12. **Dependency on heavy singletons** — Some singletons, such as
+    `Server::GetInstance()` and `InteractionModelEngine::GetInstance()`, are
+    very large and difficult to mock or use in tests. Review whether smaller,
+    more focused objects can be used or if additional decoupling is possible.
+    Example considerations:
+    - Instead of injecting a `Server` object, inject the specific objects needed
+      by the cluster (e.g., `FabricTable` and `EndpointTable`).
+    - Instead of using
+      `InteractionModelEngine::GetInstance()->GetDataModelProvider()`, use the
+      `DataModel::Provider` that is injected into the cluster context.
+    - For complex code that truly requires `Server` or `InteractionModelEngine`,
+      consider providing a delegate member and implementing the complex logic in
+      `CodegenIntegration.h/cpp` when the goal is to avoid direct coupling to
+      `Server` / `InteractionModelEngine` in the cluster itself when only a
+      small subset of their functionality is needed.
 
 ---
 

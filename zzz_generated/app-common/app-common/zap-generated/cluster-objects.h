@@ -339,6 +339,10 @@
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Events.h>
 #include <clusters/NetworkCommissioning/Structs.h>
+#include <clusters/NetworkIdentityManagement/Attributes.h>
+#include <clusters/NetworkIdentityManagement/Commands.h>
+#include <clusters/NetworkIdentityManagement/Events.h>
+#include <clusters/NetworkIdentityManagement/Structs.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Attributes.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Commands.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Events.h>

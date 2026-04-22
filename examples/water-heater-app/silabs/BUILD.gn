@@ -138,7 +138,6 @@ silabs_executable("water-heater-app") {
 
   sources = [
     # Actual application code
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
 
     # Water Heater Common files

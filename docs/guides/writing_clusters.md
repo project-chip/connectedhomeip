@@ -128,6 +128,10 @@ is the primary reference for this implementation pattern.
     constructor directly, not stored in the `Config` object. This allows the
     same `Config` instance to be reused across multiple cluster instances on
     different endpoints.
+-   **Separate Member Variables:** Extract configuration values from the
+    `Config` object into separate member variables within the cluster class,
+    rather than storing the `Config` object itself. This allows making immutable
+    configuration values `const` (enhancing safety) and reduces coupling.
 
 **Example Implementation (from LevelControlCluster):**
 
