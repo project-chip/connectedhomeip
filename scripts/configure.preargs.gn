@@ -1,3 +1,0 @@
-chip_crypto = "platform"
-chip_device_platform = "none"
-chip_mdns = "none"

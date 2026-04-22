@@ -177,7 +177,7 @@ class ProjectArgProcessor:
         if not (arg := self.gn_args.get(name, None)):
             info("Warning: Not propagating %s, project has no build arg '%s'" % (envvar, name))
             return
-        # by-pass add_arg() to handle list splitting / formatting directly
+        # bypass add_arg() to handle list splitting / formatting directly
         self.args[arg.name] = json.dumps(value if arg.type != '[' else value.split() if list else [value])
 
     def process_triplet_parameter(self, name, value):

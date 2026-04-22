@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# Copyright (c) 2023-2025 Project CHIP Authors
+# Copyright (c) 2023-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -223,7 +223,7 @@ function gn_generate() { # [project options]
     info "Configuring gn build arguments (see $BUILD_DIR/build-args.txt for supported arguments)"
     touch "${BUILD_DIR}/build.ninja"
     "${gn[@]}" -q args "$BUILD_DIR" \
-        --args="$(cat "${CHIP_ROOT}/scripts/configure.preargs.gn")" \
+        --args='import("//build_overrides/chip.gni") import("${chip_root}/scripts/configure.preargs.gni")' \
         --list --json >"${BUILD_DIR}/build-args.json"
     call_impl describe_args "${BUILD_DIR}/build-args.json" >"${BUILD_DIR}/build-args.txt"
     {
