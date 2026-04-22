@@ -27154,6 +27154,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ProximityRanging
 
+namespace NetworkIdentityManagement {
+namespace Attributes {} // namespace Attributes
+} // namespace NetworkIdentityManagement
+
 namespace WiFiNetworkManagement {
 namespace Attributes {
 

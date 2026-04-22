@@ -4346,6 +4346,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace ProximityRanging
 
+namespace NetworkIdentityManagement {
+namespace Attributes {} // namespace Attributes
+} // namespace NetworkIdentityManagement
+
 namespace WiFiNetworkManagement {
 namespace Attributes {
 
