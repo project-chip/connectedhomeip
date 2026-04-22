@@ -21,7 +21,7 @@ source_set("network-identity-management-server") {
     "AuthenticatorDriver.h",
     "DefaultNetworkIdentityStorage.cpp",
     "DefaultNetworkIdentityStorage.h",
-    "LoggingUtils.h",
+    "Logging.h",
     "NetworkAdministratorSecret.cpp",
     "NetworkAdministratorSecret.h",
     "NetworkIdentityKeystore.h",

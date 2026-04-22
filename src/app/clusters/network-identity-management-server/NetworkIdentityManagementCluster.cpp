@@ -17,7 +17,7 @@
 
 #include <app/clusters/network-identity-management-server/NetworkIdentityManagementCluster.h>
 
-#include <app/clusters/network-identity-management-server/LoggingUtils.h>
+#include <app/clusters/network-identity-management-server/Logging.h>
 #include <app/clusters/network-identity-management-server/NetworkAdministratorSecret.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/NetworkIdentityManagement/Attributes.h>
