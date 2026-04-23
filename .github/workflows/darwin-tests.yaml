@@ -66,8 +66,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup Environment
-        # coreutils for stdbuf
-        run: brew install coreutils
+        # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
+        run: |
+          brew install coreutils
+          echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
       - name: Try to ensure the directories for core dumping and diagnostic
           log collection exist and we can write them.
         run: |

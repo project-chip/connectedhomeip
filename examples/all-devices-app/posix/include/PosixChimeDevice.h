@@ -17,15 +17,57 @@
 #pragma once
 
 #include <devices/chime/ChimeDevice.h>
+#include <memory>
+#include <miniaudio.h>
+#include <vector>
 
 namespace chip {
 namespace app {
 
+// Platform-specific implementation of ChimeDevice for POSIX systems.
+// It uses miniaudio for audio playback and generates sounds on-the-fly (incremental synthesis).
 class PosixChimeDevice : public ChimeDevice
 {
 public:
-    using ChimeDevice::ChimeDevice;
+    // Custom data source for miniaudio to generate sound on-the-fly.
+    // This avoids loading large audio files or holding full PCM buffers in memory.
+    struct CustomDataSource
+    {
+        ma_data_source_base base; // Base structure required by miniaudio
+        double freq1_hz;          // Primary frequency or first tone in Hz
+        double freq2_hz;          // Secondary frequency or second tone in Hz
+        double duration_sec;      // Total duration of the sound in seconds
+        bool pulse;               // Whether to apply a pulse modulation effect
+        ma_uint64 cursor;         // Current playback position in samples
+    };
+
+    // RAII wrapper for sound resources. Manages the lifecycle of miniaudio structures.
+    // A "SoundResource" represents a single chime sound, binding a Matter Chime ID to a specific
+    // audio synthesis configuration (CustomDataSource) and the associated miniaudio sound object.
+    class SoundResource
+    {
+    public:
+        static std::unique_ptr<SoundResource> Create(ma_engine * engine, const ChimeDevice::Sound & soundInfo);
+        SoundResource() = default; // Needed for factory
+        ~SoundResource();
+
+        uint8_t id;                  // Chime ID matching the Matter spec
+        CustomDataSource dataSource; // Custom data source for this sound
+        ma_sound sound;              // Miniaudio sound object
+        bool mInitialized = false;   // Whether the resource was successfully initialized
+    };
+
+    PosixChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds);
+    ~PosixChimeDevice() override;
+
     Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
+
+private:
+    ma_engine mEngine;
+    bool mEngineInitialized = false;
+
+    std::vector<std::unique_ptr<SoundResource>> mSoundResources;
+    bool mSoundsInitialized = false;
 };
 
 } // namespace app
