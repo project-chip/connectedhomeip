@@ -125,6 +125,50 @@ def test_pics_double_application_raises():
         assert "more than once" in str(e).lower()
 
 
+def test_desc_from_docstring():
+    """Docstring is used as description when no desc_* method exists."""
+
+    class MyTest(MatterBaseTest):
+        @async_test_body
+        async def test_TC_FOO_1_1(self):
+            """4.2.4. [TC-FOO-1.1] Scenes Management Cluster Interaction"""
+            pass
+
+    inst = _make_test_instance(MyTest)
+    result = inst.get_test_desc("test_TC_FOO_1_1")
+    assert result == "4.2.4. [TC-FOO-1.1] Scenes Management Cluster Interaction", f"Unexpected desc: {result}"
+
+
+def test_desc_method_takes_precedence():
+    """Explicit desc_* method takes precedence over docstring."""
+
+    class MyTest(MatterBaseTest):
+        def desc_TC_FOO_1_1(self):
+            return "From method"
+
+        @async_test_body
+        async def test_TC_FOO_1_1(self):
+            """From docstring"""
+            pass
+
+    inst = _make_test_instance(MyTest)
+    result = inst.get_test_desc("test_TC_FOO_1_1")
+    assert result == "From method", f"Unexpected desc: {result}"
+
+
+def test_desc_falls_back_to_method_name():
+    """No desc_* and no docstring falls back to method name."""
+
+    class MyTest(MatterBaseTest):
+        @async_test_body
+        async def test_TC_FOO_1_1(self):
+            pass
+
+    inst = _make_test_instance(MyTest)
+    result = inst.get_test_desc("test_TC_FOO_1_1")
+    assert result == "test_TC_FOO_1_1", f"Unexpected desc: {result}"
+
+
 def main():
     failures = []
 
@@ -136,6 +180,9 @@ def main():
         test_pics_decorator_single_code,
         test_pics_empty_raises,
         test_pics_double_application_raises,
+        test_desc_from_docstring,
+        test_desc_method_takes_precedence,
+        test_desc_falls_back_to_method_name,
     ]
 
     for test_fn in test_functions:
