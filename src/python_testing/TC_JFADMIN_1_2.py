@@ -186,7 +186,7 @@ class TC_JFADMIN_1_2(MatterBaseTest):
         await self._assert_im_error(
             cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest(),
             expected_status=Status.Failure,
-            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kVIDNotVerified,
+            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.ICACCSRResponseStatusCodeEnum.kVIDNotVerified,
             error_label="VIDNotVerified",
         )
 
@@ -351,7 +351,7 @@ class TC_JFADMIN_1_2(MatterBaseTest):
         cluster_status = cm.exception.err & 0xFF
         asserts.assert_equal(
             cluster_status,
-            Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kInvalidAdministratorFabricIndex,
+            Clusters.JointFabricAdministrator.Enums.ICACCSRResponseStatusCodeEnum.kInvalidAdministratorFabricIndex,
             f'Expected InvalidAdministratorFabricIndex status code (0x06), but got 0x{(cluster_status):02x} ({str(cm.exception)})',
         )
 

@@ -1091,12 +1091,6 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & request,
                         Json::Value & value);
 
@@ -1133,6 +1127,12 @@ Setup(const char * label,
 
 static void
 Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type & request,

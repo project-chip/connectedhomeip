@@ -13611,7 +13611,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nullable groupCATVersion MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupPermission MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable groupPermission MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -13707,7 +13707,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRJointFabricDatastoreClusterUpdateAdminParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSString * _Nullable friendlyName MTR_PROVISIONALLY_AVAILABLE;
 
@@ -14157,7 +14157,9 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRJointFabricAdministratorClusterICACCSRResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull icaccsr MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable icaccsr MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRJointFabricAdministratorClusterICACCSRResponseParams with a response-value dictionary

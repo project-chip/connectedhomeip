@@ -374,7 +374,9 @@ void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICA
 
     ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse");
 
-    if ((CHIP_NO_ERROR == VerifyCertificateSigningRequest(icaccsr.icaccsr.data(), icaccsr.icaccsr.size(), pubKey)) &&
+    if (icaccsr.icaccsr.HasValue() &&
+        (CHIP_NO_ERROR ==
+         VerifyCertificateSigningRequest(icaccsr.icaccsr.Value().data(), icaccsr.icaccsr.Value().size(), pubKey)) &&
         jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
     {
         ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");

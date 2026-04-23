@@ -311,6 +311,13 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
+{
+    return SL_STATUS_OK;
+}
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+
 #if SL_MATTER_DEBUG_WATCHDOG_ENABLE
 void SilabsPlatform::WatchdogInit()
 {

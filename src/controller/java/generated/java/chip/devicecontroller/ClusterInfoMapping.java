@@ -21091,10 +21091,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(byte[] icaccsr) {
+    public void onSuccess(Integer statusCode, Optional<byte[]> icaccsr) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo icaccsrResponseValue = new CommandResponseInfo("icaccsr", "byte[]");
+      CommandResponseInfo statusCodeResponseValue = new CommandResponseInfo("statusCode", "Integer");
+      responseValues.put(statusCodeResponseValue, statusCode);
+      CommandResponseInfo icaccsrResponseValue = new CommandResponseInfo("icaccsr", "Optional<byte[]>");
       responseValues.put(icaccsrResponseValue, icaccsr);
       callback.onSuccess(responseValues);
     }
@@ -32334,10 +32336,10 @@ public class ClusterInfoMapping {
     CommandParameterInfo jointFabricDatastoreupdateAdminnodeIDCommandParameterInfo = new CommandParameterInfo("nodeID", Long.class, Long.class);
     jointFabricDatastoreupdateAdminCommandParams.put("nodeID",jointFabricDatastoreupdateAdminnodeIDCommandParameterInfo);
 
-    CommandParameterInfo jointFabricDatastoreupdateAdminfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", String.class, String.class);
+    CommandParameterInfo jointFabricDatastoreupdateAdminfriendlyNameCommandParameterInfo = new CommandParameterInfo("friendlyName", Optional.class, String.class);
     jointFabricDatastoreupdateAdminCommandParams.put("friendlyName",jointFabricDatastoreupdateAdminfriendlyNameCommandParameterInfo);
 
-    CommandParameterInfo jointFabricDatastoreupdateAdminicacCommandParameterInfo = new CommandParameterInfo("icac", byte[].class, byte[].class);
+    CommandParameterInfo jointFabricDatastoreupdateAdminicacCommandParameterInfo = new CommandParameterInfo("icac", Optional.class, byte[].class);
     jointFabricDatastoreupdateAdminCommandParams.put("icac",jointFabricDatastoreupdateAdminicacCommandParameterInfo);
     InteractionInfo jointFabricDatastoreupdateAdminInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -32345,9 +32347,9 @@ public class ClusterInfoMapping {
         .updateAdmin((DefaultClusterCallback) callback
         , (Long)
         commandArguments.get("nodeID")
-        , (String)
+        , (Optional<String>)
         commandArguments.get("friendlyName")
-        , (byte[])
+        , (Optional<byte[]>)
         commandArguments.get("icac")
         );
       },
