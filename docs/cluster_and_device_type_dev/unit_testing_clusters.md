@@ -81,7 +81,7 @@ spec-compliant base for implementing `ServerClusterInterface`. It handles:
 
 -   Data version management.
 -   Path management (single endpoint/cluster pair).
--   Default status responses for unhandled attributes and commands.
+-   Default status responses for attributes and commands that are not handled.
 -   Integration with `ServerClusterContext`.
 
 An example implementation:
