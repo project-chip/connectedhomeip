@@ -372,3 +372,26 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                 body(test_instance, *args, **kwargs), timeout=timeout))
         return per_endpoint_runner
     return run_if_endpoint_matches_internal
+
+
+def pics(*pics_list):
+    """Decorator to declare PICS codes required for a test method.
+
+    Provides an alternative to defining a separate pics_* method.
+    The pics_* method takes precedence if both are defined.
+
+    Usage:
+        @pics("OO.S", "S.S")
+        @async_test_body
+        async def test_TC_OO_2_1(self):
+            ...
+    """
+    if not pics_list:
+        raise ValueError("@pics requires at least one PICS code")
+
+    def decorator(fn):
+        if hasattr(fn, '_pics'):
+            raise ValueError("@pics cannot be applied more than once to the same method")
+        fn._pics = list(pics_list)
+        return fn
+    return decorator
