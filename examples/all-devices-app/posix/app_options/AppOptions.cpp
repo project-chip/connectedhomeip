@@ -78,7 +78,7 @@ bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
 
     // Find the first colon to separate type from endpoint
     const char * firstColon = strchr(value, ':');
-    
+
     // Case 1: No colon present. The entire value is treated as the device type.
     // Example: "chime" -> type="chime", endpoint=1, parentId=invalid
     if (firstColon == nullptr)
@@ -92,14 +92,14 @@ bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
 
     // Find the second colon to separate endpoint from parent
     const char * secondColon = strchr(firstColon + 1, ':');
-    
+
     // The endpoint ID starts immediately after the first colon
     const char * endpointStart = firstColon + 1;
-    
+
     // If a second colon exists, the endpoint ID is between the colons.
     // Otherwise, it extends to the end of the string.
     size_t endpointLen = secondColon ? static_cast<size_t>(secondColon - endpointStart) : strlen(endpointStart);
-    
+
     // Extract and parse the endpoint ID
     std::string endpointStr(endpointStart, endpointLen);
     if (!ParseEndpointId(endpointStr.c_str(), config.endpoint))
