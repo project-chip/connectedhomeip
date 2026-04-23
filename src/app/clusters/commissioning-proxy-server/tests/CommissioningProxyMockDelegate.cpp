@@ -133,6 +133,11 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyBackgro
     return Protocols::InteractionModel::Status::Success;
 }
 
+uint8_t CommissioningProxyMockDelegate::GetMaxSessions()
+{
+    return mMaxSessions;
+}
+
 uint8_t CommissioningProxyMockDelegate::GetScanMaxTime()
 {
     return mScanMaxTime;

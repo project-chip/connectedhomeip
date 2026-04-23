@@ -344,6 +344,9 @@ class COMPROBaseTest(MatterBaseTest):
     async def read_cache_timeout(self) -> int:
         return await self.read_cp_attribute(self.cp.Attributes.CacheTimeout)
 
+    async def read_max_sessions(self) -> int:
+        return await self.read_cp_attribute(self.cp.Attributes.MaxSessions)
+
     # ------------------------------------------------------------------
     # Feature flag helpers
     # ------------------------------------------------------------------

@@ -104,8 +104,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
         return encoder.Encode(GetSupportedTransports());
 
     case MaxSessions::Id:
-        // Current implementation supports a single concurrent proxy session.
-        return encoder.Encode(static_cast<uint8_t>(1));
+        return encoder.Encode(mDelegate.GetMaxSessions());
 
     case ScanMaxTime::Id:
         return encoder.Encode(mDelegate.GetScanMaxTime());

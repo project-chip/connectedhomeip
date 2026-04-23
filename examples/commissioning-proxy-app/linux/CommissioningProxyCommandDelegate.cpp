@@ -43,6 +43,9 @@ using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResult
 
 // Default ProxyConnectRequest timeout when the commissioner sends 0 (spec §10.5.7.1).
 constexpr uint16_t kProxyConnectDefaultTimeoutSecs = 30;
+// Maximum simultaneous proxy sessions (spec §10.5.6.3 MaxSessions).
+// This implementation supports one device at a time.
+constexpr uint8_t kMaxProxySessions = 1;
 // ------------------------------------------------------------------
 // Proxy session tracking
 //
@@ -726,6 +729,16 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     ChipLogProgress(AppServer, "ProxyConnectRequest transport:%d wiFiBand:%d timeout:%u discriminator:%u",
                     (int)transport, (int)wiFiBand, timeout, discriminator);
 
+    // Enforce the MaxSessions limit before touching the transport layer.
+    // This returns synchronously so the IM sends a response immediately,
+    // rather than going async and timing out waiting for an unreachable ED.
+    if (sProxySessions.size() >= GetMaxSessions())
+    {
+        ChipLogError(AppServer, "ProxyConnectRequest: session limit reached (%zu/%u active)",
+                     sProxySessions.size(), GetMaxSessions());
+        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
+    }
+
     // Per spec §10.5.7.1: if background scanning is active, pause it so that
     // the NAN subscribe slot can be reused for the PAF connect subscribe.
     // It will be resumed in ProxyDisconnectRequest when all sessions are gone.
@@ -762,7 +775,9 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     if (addErr != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: AddPafSession failed: %" CHIP_ERROR_FORMAT, addErr.Format());
-        return chip::Protocols::InteractionModel::Status::Failure;
+        return (addErr == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+            ? chip::Protocols::InteractionModel::Status::ResourceExhausted
+            : chip::Protocols::InteractionModel::Status::Failure;
     }
 
     // Reject a second connect if one is already in flight.
@@ -1322,6 +1337,11 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     }
 
     return chip::Protocols::InteractionModel::Status::Success;
+}
+
+uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetMaxSessions()
+{
+    return kMaxProxySessions;
 }
 
 uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetNumCachedResults()

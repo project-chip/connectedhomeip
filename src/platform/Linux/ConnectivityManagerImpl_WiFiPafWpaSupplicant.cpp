@@ -870,7 +870,11 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
     GAutoPtr<GError> err;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active  = false; // passive subscribe = discovery mode
-    unsigned int ttl   = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
+    // Set the NAN TTL to match the chip-level scan window.  A longer TTL leaves
+    // subscribe_id alive in wpa_supplicant after FinishWiFiPAFScan cancels it,
+    // causing stale nandiscovery-result events during the next scan that mask
+    // results from the new subscribe_id (wpa_supplicant is edge-triggered).
+    unsigned int ttl   = scanMaxTime;
     unsigned int freq  = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);

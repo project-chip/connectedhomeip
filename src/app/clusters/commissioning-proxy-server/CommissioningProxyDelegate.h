@@ -184,6 +184,7 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
+    virtual uint8_t GetMaxSessions()        = 0;
     virtual uint8_t GetScanMaxTime()        = 0;
     virtual uint8_t GetMaxCachedResults()   = 0;
     virtual uint8_t GetNumCachedResults()   = 0;

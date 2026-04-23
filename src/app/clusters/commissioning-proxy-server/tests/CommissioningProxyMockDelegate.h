@@ -81,6 +81,7 @@ public:
         chip::FabricIndex fabricIndex,
         chip::NodeId nodeId) override;
 
+    uint8_t GetMaxSessions() override;
     uint8_t GetMaxCachedResults() override { return 10; }
     uint8_t GetNumCachedResults() override { return 0; }
     uint16_t GetCacheTimeout() override { return 120; }
@@ -171,7 +172,7 @@ private:
     CommissioningProxyCluster * mServer = nullptr;
     uint8_t     mScanMaxTime        = 120;
     chip::BitMask<WiFiBandBitmap> mSupportedWiFiBands;
-    // uint8_t     mMaxSessions        = 1;
+    uint8_t     mMaxSessions        = 1;
     // uint8_t     mMaxCachedResult    = 1;
     // uint16_t    mCacheTimeout       = 120;
 #if 0
