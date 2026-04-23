@@ -19,7 +19,7 @@ import dataclasses
 import logging
 import threading
 from collections.abc import Iterator
-from multiprocessing.managers import SyncManager
+from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
 from typing import Self
 
@@ -41,15 +41,18 @@ _FIELD_STYLES = coloredlogs.DEFAULT_FIELD_STYLES | {
 class LogMessageCounter:
     """Cross-thread or cross-process cancellable counter for printed log messages."""
 
+    _counter: int | ValueProxy
+
     def __init__(self, mp_manager: SyncManager | None = None) -> None:
         if mp_manager is None:
             self._cond = threading.Condition()
+            self._counter = 0
             self._cancelled = threading.Event()
         else:
             self._cond = mp_manager.Condition()
+            self._counter = mp_manager.Value('i', 0)
             self._cancelled = mp_manager.Event()
 
-        self._counter: int = 0
 
     def increment(self) -> None:
         """Atomically increment the shared message count."""
@@ -57,7 +60,10 @@ class LogMessageCounter:
             if self.cancelled:
                 return
 
-            self._counter += 1
+            if isinstance(self._counter, int):
+                self._counter += 1
+            else:
+                self._counter.value += 1
             self._cond.notify_all()
 
     def cancel(self) -> None:
@@ -75,12 +81,12 @@ class LogMessageCounter:
     def total(self) -> int:
         """Return total number of printed messages."""
         with self._cond:
-            return self._counter
+            return self._counter if isinstance(self._counter, int) else self._counter.value
 
     def wait_for_count_or_cancel(self, count: int, timeout: float | None = None) -> bool:
         """Wait until the total message count reaches at least the specified count or until cancelled."""
         with self._cond:
-            return self._cond.wait_for(lambda: self._counter >= count or self.cancelled, timeout=timeout)
+            return self._cond.wait_for(lambda: self.total >= count or self.cancelled, timeout=timeout)
 
     def __enter__(self) -> Self:
         return self
