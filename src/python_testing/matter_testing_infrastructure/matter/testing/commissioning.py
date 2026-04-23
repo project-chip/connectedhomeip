@@ -457,7 +457,7 @@ async def _is_device_commissionable_via_dnssd(
     """
     Check if any device is advertising as commissionable via DNS-SD on the network.
 
-    This is a check that avoids long CASE timeouts when a device is in pairing mode.
+    This is a fast check that avoids long CASE timeouts when a device is in pairing mode.
     Devices advertise commissionable services on _matterc._udp.local.
 
     Args:
@@ -479,14 +479,14 @@ async def _is_device_commissionable_via_dnssd(
         )
 
         if services:
-            LOGGER.info(f"Found {len(services)} commissionable service(s) via DNS-SD")
+            LOGGER.info(f"Found {len(services)} commissionable device(s) via DNS-SD")
             return True
 
-        LOGGER.info("No commissionable services found via DNS-SD")
+        LOGGER.info("No commissionable devices found via DNS-SD")
         return False
 
-    except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
-        LOGGER.warning(f"DNS-SD check for commissionable services failed: {e}")
+    except (OSError, ValueError, RuntimeError, TypeError) as e:
+        LOGGER.warning(f"DNS-SD commissionable check failed: {e}")
         return False
 
 
@@ -601,18 +601,17 @@ async def is_commissioned(
        for this fabric and node, returns True immediately.
     2. DNS-SD commissionable check (_matterc._udp): if the device advertises a pairing
        window, returns False immediately (fast-fail — device is not operational).
-    3. Direct CASE fallback (allowPASE=False): if neither mDNS check is conclusive,
-       attempts a CASE-only connection. Success means the device is commissioned on
-       this fabric; failure means it is not.
+    3. If neither mDNS check is conclusive, returns False (device is off, broken,
+       or on another fabric without an open commissioning window).
 
-    For global fabric count (any fabric), use :func:`get_commissioned_fabric_count`.
+    This function is side-effect free: it does not open PASE or CASE sessions.
 
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
 
     Returns:
-        True if the device is confirmed to be commissioned on this fabric, False if it is factory fresh, in pairing mode, or unreachable.
+        True if the device is confirmed to be commissioned on this fabric, False otherwise.
     """
     try:
         # Step 1: Fast DNS-SD check — is the device operational on this fabric?
@@ -622,22 +621,17 @@ async def is_commissioned(
             LOGGER.info(f"Device {node_id} is operational via DNS-SD - confirmed commissioned")
             return True
 
-        # Step 2: Fast DNS-SD check — is the device commissionable (pairing window open)?
+        # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
         is_commissionable = await _is_device_commissionable_via_dnssd()
 
         if is_commissionable:
             LOGGER.info(f"Device {node_id} is commissionable via DNS-SD (pairing window open) - not commissioned")
             return False
 
-        # Step 3: Neither mDNS check was conclusive. Try a direct CASE connection.
-        LOGGER.info(f"Device {node_id} not found via DNS-SD, attempting direct CASE connection")
-        try:
-            await dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
-            LOGGER.info(f"CASE session to node {node_id} succeeded - confirmed commissioned")
-            return True
-        except (ChipStackError, RuntimeError, OSError) as e:
-            LOGGER.info(f"CASE connection failed to node {node_id}: {e} - not commissioned")
-            return False
+        # Step 3: Neither mDNS check was conclusive.
+        # Device is off, broken, or on another fabric without a commissioning window.
+        LOGGER.info(f"Device {node_id} not found via any DNS-SD check - not commissioned on this fabric")
+        return False
 
     except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
         LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
@@ -646,20 +640,20 @@ async def is_commissioned(
 
 async def get_commissioned_fabric_count(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
-    node_id: int
+    node_id: int,
+    pase_params: Optional[PaseParams] = None
 ) -> int:
     """
     Get the number of commissioned fabrics on a device.
 
-    Reads the TrustedRootCertificates attribute from endpoint 0 and returns the count.
+    Uses DNS-SD to check if the device is operational on this fabric, avoiding long timeouts.
+    Then reads the TrustedRootCertificates attribute from endpoint 0 and returns the count.
     OperationalCredentials is node-scoped per the Matter spec and always resides on endpoint 0.
-
-    This function assumes that the caller has already established the required connection
-    (via CASE or PASE). It does not manage sessions internally.
 
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
+        pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
 
     Returns:
         Number of commissioned fabrics (count of trusted root certificates).
@@ -667,13 +661,38 @@ async def get_commissioned_fabric_count(
 
     Raises:
         ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
     """
     try:
-        LOGGER.info(f"Getting fabric count for node {node_id}")
-        result = await dev_ctrl.ReadAttribute(
-            nodeId=node_id,
-            attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
-        )
+        # Fast DNS-SD check to determine if device is operational on this fabric
+        # This avoids the long CASE timeout if device is not commissioned
+        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
+
+        if is_operational:
+            # Device is operational on this fabric - use CASE
+            LOGGER.info(f"Device {node_id} is operational via DNS-SD, using CASE connection")
+            result = await dev_ctrl.ReadAttribute(
+                nodeId=node_id,
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        elif pase_params is not None:
+            # Device not operational on this fabric via DNS-SD - could be:
+            # 1. Not commissioned at all (factory fresh) - PASE will work
+            # 2. Commissioned but DNS-SD failed - CASE will work
+            # Try both in parallel for fastest response
+            LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
+            await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
+            result = await dev_ctrl.ReadAttribute(
+                nodeId=node_id,
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        else:
+            # No PASE params and not operational - can't proceed without risking long timeout
+            raise ValueError(
+                f"Device {node_id} is not operational on this fabric and no PASE parameters provided. "
+                "Cannot get fabric count without risking long connection timeout."
+            )
 
         # Extract the trusted root certificates list
         # OperationalCredentials is node-scoped, always on endpoint 0
@@ -684,6 +703,6 @@ async def get_commissioned_fabric_count(
         # Return the count
         return len(root_certs)
 
-    except (ChipStackError, OSError, RuntimeError, KeyError, IndexError, TypeError) as e:
-        LOGGER.error(f"Failed to get fabric count for node {node_id}: {e}")
+    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
+        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
         raise

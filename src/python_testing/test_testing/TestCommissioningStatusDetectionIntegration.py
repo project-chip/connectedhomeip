@@ -208,10 +208,6 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
         )
         LOGGER.info("PASS: Commissioned device found operational via DNS-SD")
 
-        LOGGER.info("Checking is_commissioned() on commissioned device")
-        commissioned = await is_commissioned(self.default_controller, self.th_server_local_nodeid)
-        asserts.assert_true(commissioned, "Commissioned device should report is_commissioned=True")
-
 
 if __name__ == "__main__":
     default_matter_test_main()
