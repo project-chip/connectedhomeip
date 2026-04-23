@@ -208,8 +208,8 @@ TEST_F(TestOTARequestorCluster, UnknownAnnouncementReasonIsRejected)
     Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Construct the payload with an unknown announcement reason. Sending the literal kUnknownEnumValue is rejected by the encoder,
-    // so use an undefined value instead.
+    // Construct the payload with an unknown announcement reason. Sending kUnknownEnumValue is rejected by the encoder, so use an
+    // undefined value instead.
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
     payload.providerNodeID     = 1234;
     payload.vendorID           = static_cast<VendorId>(4321);
