@@ -150,8 +150,7 @@ exit:
     return;
 }
 
-// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has
-// an on-board RGB-LED
+// ColorControl is supported when using an RMT/addressable LED
 #if CONFIG_LED_TYPE_RMT
 void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
