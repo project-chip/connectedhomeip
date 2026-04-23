@@ -21,10 +21,11 @@
 #  you've written is kosher to CI
 #
 # Usage:
-#  restyle-diff.sh [-d] [ref]
+#  restyle-diff.sh [-d] [-p] [ref]
 #
 # if unspecified, ref defaults to upstream/master (or master)
 # -d enables debug logging for Restyle CLI
+# -p pull restyler Docker images before running (default: skip pull, reuse cached images)
 #
 
 here=${0%/*}
@@ -39,7 +40,11 @@ cd "$CHIP_ROOT"
 restyle-paths() {
     [[ $# -eq 0 ]] && return 0
 
-    echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
+    if [[ "$PULL" == "True" ]]; then
+        echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
+    else
+        echo "[restyle-diff.sh] Please wait, Restyling files (using cached images; pass -p to pull updates)"
+    fi
     restyle --config-file=.restyled.yaml "$@"
 
     # warn if restyle left any files owned by root (which means older restyle-CLI is being used)
@@ -115,10 +120,20 @@ ensure_restyle_installed() {
 
 # This was added to be able to use xargs to call the function restyle-paths
 export -f restyle-paths
+
+# Default to skipping image pulls; image tags in .restyled.yaml are pinned, so cached images stay correct until the .restyled.yaml
+# config bumps a tag. When that happens, Restyle CLI's `docker run --pull never` fails with a "No such image" error;
+# if you see that error, re-run this script with -p to fetch the new image.
+export PULL=False
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d)
             export DEBUG=True
+            shift
+            ;;
+        -p)
+            export PULL=True
             shift
             ;;
         *)
