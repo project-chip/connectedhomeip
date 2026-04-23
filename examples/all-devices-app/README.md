@@ -94,16 +94,16 @@ Build the application using the following command:
 
 ## Running the Application
 
-To run the application, specify the device type using the `--device` flag. The
-application supports running multiple devices simultaneously by specifying the
-flag multiple times.
+To run the application, specify the device type using the `--device` flag. The format is `type:endpoint[:parent]`, where the optional `parent` field allows establishing parent/child endpoint relationships for logical grouping.
+
+The application supports running multiple devices simultaneously by specifying the flag multiple times.
 
 ```bash
 # Clean up KVS storage if needed
 rm -rf /tmp/chip_*
 
-# Run a chime on endpoint 1 and a speaker on endpoint 2
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2
+# Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2:1 --device dimmable-light:3
 ```
 
 ## Testing with chip-tool
