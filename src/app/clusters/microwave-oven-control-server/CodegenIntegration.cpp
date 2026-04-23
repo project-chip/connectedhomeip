@@ -33,7 +33,8 @@ using namespace Commands;
 
 CodegenMicrowaveOvenIntegrationDelegate::CodegenMicrowaveOvenIntegrationDelegate(
     Clusters::OperationalState::Instance & aOpStateInstance, Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
+    mOpStateInstance(aOpStateInstance),
+    mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
 uint8_t CodegenMicrowaveOvenIntegrationDelegate::GetCurrentOperationalState() const
@@ -59,7 +60,8 @@ Status CodegenMicrowaveOvenIntegrationDelegate::IsSupportedMode(uint8_t mode) co
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<Feature> aFeature,
                    OperationalState::Instance & aOpStateInstance, ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature),
+    mDelegate(aDelegate),
+    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature),
     mIntegrationDelegate(aOpStateInstance, aMicrowaveOvenModeInstance)
 {}
 
