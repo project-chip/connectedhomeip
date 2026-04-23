@@ -212,8 +212,4 @@ kill $APP_PID
 echo "Done! Check app.log for application logs."
 ```
 
-## Troubleshooting
 
-When testing with an external controller (such as the Google Home App), you might need to ensure correct network and firewall configurations.
-
-For detailed instructions, see the [Matter Linux Networking and Firewall Configuration](file:///usr/local/google/home/sergiosoares/connectedhomeip/docs/guides/linux_networking_and_firewall.md) guide.
