@@ -151,11 +151,20 @@ def _check_hand_edits(
 ) -> List[str]:
     """Flag Alchemy-generated XML files whose content changed but whose
     metadata comment is identical to *diff_base*, indicating a hand-edit."""
+    # Pass paths relative to root so git diff matches tracked repo paths
+    # correctly, regardless of whether --root was supplied as an absolute path.
+    rel_paths: List[str] = []
+    for f in xml_files:
+        try:
+            rel_paths.append(str(f.relative_to(root)))
+        except ValueError:
+            rel_paths.append(str(f))
+
     try:
         result = subprocess.run(
-            ["git", "diff", "--name-only", diff_base, "--"] +
-            [str(f) for f in xml_files],
+            ["git", "diff", "--name-only", diff_base, "--"] + rel_paths,
             capture_output=True, text=True, check=True,
+            cwd=root,
         )
     except (subprocess.CalledProcessError, FileNotFoundError) as exc:
         return [f"unable to run git diff: {exc}"]
@@ -378,10 +387,18 @@ def main() -> int:
                 continue
             has_alchemy = bool(_ALCHEMY_VER_RE.search(comment))
             spec_match = _SPEC_VER_RE.search(comment)
-            has_sha = bool(spec_match and _SHA_RE.search(spec_match.group(1)))
+            # Mirror validate_file(): a SHA is only required when the
+            # git-describe value has a distance component (-N-g<SHA>).
+            # Clean tags (HEAD exactly at a tag) have no SHA suffix and
+            # are considered valid without one.
+            if spec_match:
+                git_value = spec_match.group(1)
+                sha_ok = not _HAS_DISTANCE_RE.search(git_value) or bool(_SHA_RE.search(git_value))
+            else:
+                sha_ok = False
             has_source = bool(_SOURCE_RE.search(comment))
             has_params = bool(_PARAMS_RE.search(comment))
-            if has_alchemy and has_sha and has_source and has_params:
+            if has_alchemy and sha_ok and has_source and has_params:
                 stale_warnings.append(
                     f"INCOMPLETE_METADATA_ALLOWLIST entry '{fname}' now has "
                     "complete metadata — remove it from the allowlist"
