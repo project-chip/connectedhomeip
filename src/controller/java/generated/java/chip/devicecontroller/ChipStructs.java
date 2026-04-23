@@ -13193,8 +13193,8 @@ public static class CommissioningProxyClusterScanResultStruct {
   public @Nullable byte[] address;
   public Integer transport;
   public Integer discriminator;
-  public Integer vendorId;
-  public Integer productId;
+  public Integer vendorID;
+  public Integer productID;
   public @Nullable byte[] extendedData;
   public Optional<Integer> wiFiBand;
   private static final long ADDRESS_ID = 0L;
@@ -13209,16 +13209,16 @@ public static class CommissioningProxyClusterScanResultStruct {
     @Nullable byte[] address,
     Integer transport,
     Integer discriminator,
-    Integer vendorId,
-    Integer productId,
+    Integer vendorID,
+    Integer productID,
     @Nullable byte[] extendedData,
     Optional<Integer> wiFiBand
   ) {
     this.address = address;
     this.transport = transport;
     this.discriminator = discriminator;
-    this.vendorId = vendorId;
-    this.productId = productId;
+    this.vendorID = vendorID;
+    this.productID = productID;
     this.extendedData = extendedData;
     this.wiFiBand = wiFiBand;
   }
@@ -13228,8 +13228,8 @@ public static class CommissioningProxyClusterScanResultStruct {
     values.add(new StructElement(ADDRESS_ID, address != null ? new ByteArrayType(address) : new NullType()));
     values.add(new StructElement(TRANSPORT_ID, new UIntType(transport)));
     values.add(new StructElement(DISCRIMINATOR_ID, new UIntType(discriminator)));
-    values.add(new StructElement(VENDOR_ID_ID, new UIntType(vendorId)));
-    values.add(new StructElement(PRODUCT_ID_ID, new UIntType(productId)));
+    values.add(new StructElement(VENDOR_ID_ID, new UIntType(vendorID)));
+    values.add(new StructElement(PRODUCT_ID_ID, new UIntType(productID)));
     values.add(new StructElement(EXTENDED_DATA_ID, extendedData != null ? new ByteArrayType(extendedData) : new NullType()));
     values.add(new StructElement(WI_FI_BAND_ID, wiFiBand.<BaseTLVType>map((nonOptionalwiFiBand) -> new UIntType(nonOptionalwiFiBand)).orElse(new EmptyType())));
 
@@ -13243,8 +13243,8 @@ public static class CommissioningProxyClusterScanResultStruct {
     @Nullable byte[] address = null;
     Integer transport = null;
     Integer discriminator = null;
-    Integer vendorId = null;
-    Integer productId = null;
+    Integer vendorID = null;
+    Integer productID = null;
     @Nullable byte[] extendedData = null;
     Optional<Integer> wiFiBand = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -13266,12 +13266,12 @@ public static class CommissioningProxyClusterScanResultStruct {
       } else if (element.contextTagNum() == VENDOR_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          vendorId = castingValue.value(Integer.class);
+          vendorID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == PRODUCT_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          productId = castingValue.value(Integer.class);
+          productID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == EXTENDED_DATA_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -13289,8 +13289,8 @@ public static class CommissioningProxyClusterScanResultStruct {
       address,
       transport,
       discriminator,
-      vendorId,
-      productId,
+      vendorID,
+      productID,
       extendedData,
       wiFiBand
     );
@@ -13309,11 +13309,11 @@ public static class CommissioningProxyClusterScanResultStruct {
     output.append("\tdiscriminator: ");
     output.append(discriminator);
     output.append("\n");
-    output.append("\tvendorId: ");
-    output.append(vendorId);
+    output.append("\tvendorID: ");
+    output.append(vendorID);
     output.append("\n");
-    output.append("\tproductId: ");
-    output.append(productId);
+    output.append("\tproductID: ");
+    output.append(productID);
     output.append("\n");
     output.append("\textendedData: ");
     output.append(Arrays.toString(extendedData));

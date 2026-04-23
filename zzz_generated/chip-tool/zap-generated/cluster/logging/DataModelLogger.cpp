@@ -5466,18 +5466,18 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
+        CHIP_ERROR err = LogValue("VendorID", indent + 1, value.vendorID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VendorId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VendorID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("ProductId", indent + 1, value.productId);
+        CHIP_ERROR err = LogValue("ProductID", indent + 1, value.productID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProductID'");
             return err;
         }
     }

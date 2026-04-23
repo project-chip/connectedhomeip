@@ -573,11 +573,17 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    // Cancel PAF advertisement if PAF is selected and publishId is valid
-    if ((mIsWiFiPAF) && (aShuttingDown) && (mPublishId != 0) && (mPublishId != WiFiPAF::kUndefinedWiFiPafSessionId))
+    // Cancel PAF advertisement whenever the commissioning window closes (not only
+    // on shutdown).  The commissioning-window publisher (mPublishId) is separate
+    // from the device's startup publisher; cancelling it here avoids leaving a
+    // stale publisher slot occupied after RevokeCommissioning or after PASE is
+    // established, which would otherwise exhaust the PAF endpoint table when a
+    // subsequent ProxyConnectRequest tries to add a subscriber session.
+    if ((mIsWiFiPAF) && (mPublishId != 0) && (mPublishId != WiFiPAF::kUndefinedWiFiPafSessionId))
     {
         ChipLogProgress(WiFiPAF, "Canceling Wi-Fi PAF publish");
         TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false, mPublishId);
+        mPublishId = WiFiPAF::kUndefinedWiFiPafSessionId;
     }
 #endif
 

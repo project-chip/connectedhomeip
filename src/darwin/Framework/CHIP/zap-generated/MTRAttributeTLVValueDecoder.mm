@@ -17492,8 +17492,8 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
                     }
                     newElement_1.transport = [NSNumber numberWithUnsignedChar:entry_1.transport.Raw()];
                     newElement_1.discriminator = [NSNumber numberWithUnsignedShort:entry_1.discriminator];
-                    newElement_1.vendorId = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_1.vendorId)];
-                    newElement_1.productId = [NSNumber numberWithUnsignedShort:entry_1.productId];
+                    newElement_1.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_1.vendorID)];
+                    newElement_1.productID = [NSNumber numberWithUnsignedShort:entry_1.productID];
                     if (entry_1.extendedData.IsNull()) {
                         newElement_1.extendedData = nil;
                     } else {

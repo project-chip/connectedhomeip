@@ -66,12 +66,15 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 namespace Commands {
 
 namespace ProxyConnectRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ProxyConnectRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ProxyConnectRequest::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace ProxyConnectRequest
 namespace ProxyDisconnectRequest {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ProxyDisconnectRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
+    kMetadataEntry(ProxyDisconnectRequest::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace ProxyDisconnectRequest
 namespace ProxyScanRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ProxyScanRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
@@ -86,8 +89,9 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ProxyBackGroundScanStopRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
 } // namespace ProxyBackGroundScanStopRequest
 namespace ProxyMessageRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ProxyMessageRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ProxyMessageRequest::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace ProxyMessageRequest
 
 } // namespace Commands

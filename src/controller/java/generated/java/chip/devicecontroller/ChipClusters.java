@@ -55056,11 +55056,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorId, Integer productId, Integer timeout, Optional<Integer> wiFiBand) {
-      proxyConnectRequest(callback, address, transport, discriminator, vendorId, productId, timeout, wiFiBand, 0);
+    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorID, Integer productID, Integer timeout, Optional<Integer> wiFiBand) {
+      proxyConnectRequest(callback, address, transport, discriminator, vendorID, productID, timeout, wiFiBand, 0);
     }
 
-    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorId, Integer productId, Integer timeout, Optional<Integer> wiFiBand, int timedInvokeTimeoutMs) {
+    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorID, Integer productID, Integer timeout, Optional<Integer> wiFiBand, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -55076,13 +55076,13 @@ public class ChipClusters {
       BaseTLVType discriminatortlvValue = new UIntType(discriminator);
       elements.add(new StructElement(discriminatorFieldID, discriminatortlvValue));
 
-      final long vendorIdFieldID = 3L;
-      BaseTLVType vendorIdtlvValue = new UIntType(vendorId);
-      elements.add(new StructElement(vendorIdFieldID, vendorIdtlvValue));
+      final long vendorIDFieldID = 3L;
+      BaseTLVType vendorIDtlvValue = new UIntType(vendorID);
+      elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
 
-      final long productIdFieldID = 4L;
-      BaseTLVType productIdtlvValue = new UIntType(productId);
-      elements.add(new StructElement(productIdFieldID, productIdtlvValue));
+      final long productIDFieldID = 4L;
+      BaseTLVType productIDtlvValue = new UIntType(productID);
+      elements.add(new StructElement(productIDFieldID, productIDtlvValue));
 
       final long timeoutFieldID = 5L;
       BaseTLVType timeouttlvValue = new UIntType(timeout);

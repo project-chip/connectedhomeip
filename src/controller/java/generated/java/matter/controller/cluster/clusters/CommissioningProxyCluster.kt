@@ -101,8 +101,8 @@ class CommissioningProxyCluster(
     address: ByteArray?,
     transport: UByte,
     discriminator: UShort,
-    vendorId: UShort,
-    productId: UShort,
+    vendorID: UShort,
+    productID: UShort,
     timeout: UShort,
     wiFiBand: UShort?,
     timedInvokeTimeout: Duration? = null,
@@ -122,10 +122,10 @@ class CommissioningProxyCluster(
     tlvWriter.put(ContextSpecificTag(TAG_DISCRIMINATOR_REQ), discriminator)
 
     val TAG_VENDOR_ID_REQ: Int = 3
-    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorId)
+    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID)
 
     val TAG_PRODUCT_ID_REQ: Int = 4
-    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productId)
+    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productID)
 
     val TAG_TIMEOUT_REQ: Int = 5
     tlvWriter.put(ContextSpecificTag(TAG_TIMEOUT_REQ), timeout)

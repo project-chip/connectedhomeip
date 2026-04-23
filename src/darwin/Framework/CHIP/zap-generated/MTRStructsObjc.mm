@@ -9272,9 +9272,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _discriminator = @(0);
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _productId = @(0);
+        _productID = @(0);
 
         _extendedData = nil;
 
@@ -9290,8 +9290,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.address = self.address;
     other.transport = self.transport;
     other.discriminator = self.discriminator;
-    other.vendorId = self.vendorId;
-    other.productId = self.productId;
+    other.vendorID = self.vendorID;
+    other.productID = self.productID;
     other.extendedData = self.extendedData;
     other.wiFiBand = self.wiFiBand;
 
@@ -9300,7 +9300,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorId:%@; productId:%@; extendedData:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorId, _productId, [_extendedData base64EncodedStringWithOptions:0], _wiFiBand];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorID:%@; productID:%@; extendedData:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorID, _productID, [_extendedData base64EncodedStringWithOptions:0], _wiFiBand];
     return descriptionString;
 }
 

@@ -7517,7 +7517,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x00000091:
         return "Thread Border Router";
     case 0x00000092:
-        return "Commissioning Proxy";
+        return "Commissioning By Proxy";
     case 0x00000100:
         return "On/Off Light";
     case 0x00000101:
@@ -7564,10 +7564,6 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Camera Controller";
     case 0x00000148:
         return "Doorbell";
-    case 0x00000150:
-        return "Ambient Context Sensor";
-    case 0x00000152:
-        return "Proximity Ranger";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:

@@ -101,8 +101,8 @@ enum class Fields : uint8_t
     kAddress       = 0,
     kTransport     = 1,
     kDiscriminator = 2,
-    kVendorId      = 3,
-    kProductId     = 4,
+    kVendorID      = 3,
+    kProductID     = 4,
     kTimeout       = 5,
     kWiFiBand      = 6,
 };
@@ -117,8 +117,8 @@ public:
     DataModel::Nullable<chip::ByteSpan> address;
     chip::BitMask<CapabilitiesBitmap> transport = static_cast<chip::BitMask<CapabilitiesBitmap>>(0);
     uint16_t discriminator                      = static_cast<uint16_t>(0);
-    chip::VendorId vendorId                     = static_cast<chip::VendorId>(0);
-    uint16_t productId                          = static_cast<uint16_t>(0);
+    chip::VendorId vendorID                     = static_cast<chip::VendorId>(0);
+    uint16_t productID                          = static_cast<uint16_t>(0);
     uint16_t timeout                            = static_cast<uint16_t>(0);
     Optional<chip::BitMask<WiFiBandBitmap>> wiFiBand;
 
@@ -134,17 +134,17 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyConnectRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<chip::ByteSpan> address;
     chip::BitMask<CapabilitiesBitmap> transport = static_cast<chip::BitMask<CapabilitiesBitmap>>(0);
     uint16_t discriminator                      = static_cast<uint16_t>(0);
-    chip::VendorId vendorId                     = static_cast<chip::VendorId>(0);
-    uint16_t productId                          = static_cast<uint16_t>(0);
+    chip::VendorId vendorID                     = static_cast<chip::VendorId>(0);
+    uint16_t productID                          = static_cast<uint16_t>(0);
     uint16_t timeout                            = static_cast<uint16_t>(0);
     Optional<chip::BitMask<WiFiBandBitmap>> wiFiBand;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ProxyConnectRequest
 namespace ProxyConnectResponse {
@@ -207,11 +207,11 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyDisconnectRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t sessionId = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ProxyDisconnectRequest
 namespace ProxyScanRequest {
@@ -395,13 +395,13 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyMessageRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
     uint16_t sessionId      = static_cast<uint16_t>(0);
     uint8_t responseTimeout = static_cast<uint8_t>(0);
     DataModel::Nullable<chip::ByteSpan> message;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ProxyMessageRequest
 namespace ProxyMessageResponse {

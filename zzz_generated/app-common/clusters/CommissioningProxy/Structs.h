@@ -43,8 +43,8 @@ enum class Fields : uint8_t
     kAddress       = 0,
     kTransport     = 1,
     kDiscriminator = 2,
-    kVendorId      = 3,
-    kProductId     = 4,
+    kVendorID      = 3,
+    kProductID     = 4,
     kExtendedData  = 5,
     kWiFiBand      = 6,
 };
@@ -55,8 +55,8 @@ public:
     DataModel::Nullable<chip::ByteSpan> address;
     chip::BitMask<CapabilitiesBitmap> transport = static_cast<chip::BitMask<CapabilitiesBitmap>>(0);
     uint16_t discriminator                      = static_cast<uint16_t>(0);
-    chip::VendorId vendorId                     = static_cast<chip::VendorId>(0);
-    uint16_t productId                          = static_cast<uint16_t>(0);
+    chip::VendorId vendorID                     = static_cast<chip::VendorId>(0);
+    uint16_t productID                          = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::ByteSpan> extendedData;
     Optional<chip::BitMask<WiFiBandBitmap>> wiFiBand;
 

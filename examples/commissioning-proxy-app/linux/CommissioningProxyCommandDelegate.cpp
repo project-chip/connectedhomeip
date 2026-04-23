@@ -433,8 +433,8 @@ static void OnPafScanDone(void * context,
             chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
 
         r.discriminator = p.discriminator;
-        r.vendorId      = static_cast<chip::VendorId>(p.vid);
-        r.productId     = p.pid;
+        r.vendorID      = static_cast<chip::VendorId>(p.vid);
+        r.productID     = p.pid;
 
         if (p.hasExtendedData && !p.storage.empty())
         {
@@ -598,8 +598,8 @@ static ScanResultT NanPeerToScanResult(const chip::DeviceLayer::NanPeerInfo & p)
     r.transport = chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>(
         chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
     r.discriminator = p.discriminator;
-    r.vendorId      = static_cast<chip::VendorId>(p.vid);
-    r.productId     = p.pid;
+    r.vendorID      = static_cast<chip::VendorId>(p.vid);
+    r.productID     = p.pid;
     if (p.hasExtendedData && !p.storage.empty())
         r.extendedData.SetNonNull(chip::ByteSpan(p.storage.data(), p.storage.size()));
     else

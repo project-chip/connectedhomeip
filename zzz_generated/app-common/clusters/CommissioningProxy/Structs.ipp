@@ -36,8 +36,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kAddress), address);
     encoder.Encode(to_underlying(Fields::kTransport), transport);
     encoder.Encode(to_underlying(Fields::kDiscriminator), discriminator);
-    encoder.Encode(to_underlying(Fields::kVendorId), vendorId);
-    encoder.Encode(to_underlying(Fields::kProductId), productId);
+    encoder.Encode(to_underlying(Fields::kVendorID), vendorID);
+    encoder.Encode(to_underlying(Fields::kProductID), productID);
     encoder.Encode(to_underlying(Fields::kExtendedData), extendedData);
     encoder.Encode(to_underlying(Fields::kWiFiBand), wiFiBand);
     return encoder.Finalize();
@@ -65,13 +65,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, discriminator);
         }
-        else if (__context_tag == to_underlying(Fields::kVendorId))
+        else if (__context_tag == to_underlying(Fields::kVendorID))
         {
-            err = DataModel::Decode(reader, vendorId);
+            err = DataModel::Decode(reader, vendorID);
         }
-        else if (__context_tag == to_underlying(Fields::kProductId))
+        else if (__context_tag == to_underlying(Fields::kProductID))
         {
-            err = DataModel::Decode(reader, productId);
+            err = DataModel::Decode(reader, productID);
         }
         else if (__context_tag == to_underlying(Fields::kExtendedData))
         {

@@ -267,8 +267,8 @@ static Commands::ProxyConnectRequest::Type MakeConnectRequest(CapabilitiesBitmap
     cmd.address.SetNull();
     cmd.transport      = transport;
     cmd.discriminator  = 0;
-    cmd.vendorId       = chip::VendorId::Common;
-    cmd.productId      = 0;
+    cmd.vendorID       = chip::VendorId::Common;
+    cmd.productID      = 0;
     cmd.timeout        = timeout;
     return cmd;
 }

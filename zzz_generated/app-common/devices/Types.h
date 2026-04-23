@@ -244,9 +244,9 @@ constexpr DataModel::DeviceTypeEntry kThreadBorderRouter = {
     .deviceTypeRevision = kThreadBorderRouterDeviceTypeRevision,
 };
 
-constexpr DataModel::DeviceTypeEntry kCommissioningProxy = {
-    .deviceTypeId       = kCommissioningProxyDeviceTypeId,
-    .deviceTypeRevision = kCommissioningProxyDeviceTypeRevision,
+constexpr DataModel::DeviceTypeEntry kCommissioningByProxy = {
+    .deviceTypeId       = kCommissioningByProxyDeviceTypeId,
+    .deviceTypeRevision = kCommissioningByProxyDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kOnOffLight = {
@@ -362,16 +362,6 @@ constexpr DataModel::DeviceTypeEntry kCameraController = {
 constexpr DataModel::DeviceTypeEntry kDoorbell = {
     .deviceTypeId       = kDoorbellDeviceTypeId,
     .deviceTypeRevision = kDoorbellDeviceTypeRevision,
-};
-
-constexpr DataModel::DeviceTypeEntry kAmbientContextSensor = {
-    .deviceTypeId       = kAmbientContextSensorDeviceTypeId,
-    .deviceTypeRevision = kAmbientContextSensorDeviceTypeRevision,
-};
-
-constexpr DataModel::DeviceTypeEntry kProximityRanger = {
-    .deviceTypeId       = kProximityRangerDeviceTypeId,
-    .deviceTypeRevision = kProximityRangerDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kWindowCovering = {

@@ -1303,6 +1303,12 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::CommissioningProxy::Id: {
         switch (aCommand)
         {
+        case Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id:
+            return true;
         default:
             return false;
         }

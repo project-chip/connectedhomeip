@@ -9303,6 +9303,7 @@ provisional cluster CommissioningProxy = 1109 {
   bitmap CapabilitiesBitmap : bitmap8 {
     kBLE = 0x2 [spec_name = "BLE"];
     kWiFiPAF = 0x8;
+    kNTL = 0x10 [spec_name = "NTL"];
   }
 
   bitmap Feature : bitmap32 {
@@ -9319,9 +9320,9 @@ provisional cluster CommissioningProxy = 1109 {
     nullable octet_string<100> address = 0;
     CapabilitiesBitmap transport = 1;
     int16u discriminator = 2;
-    vendor_id vendorId = 3;
-    int16u productId = 4;
-    nullable octet_string extendedData = 5;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    nullable octet_string<128> extendedData = 5;
     optional WiFiBandBitmap wiFiBand = 6;
   }
 
@@ -9343,8 +9344,8 @@ provisional cluster CommissioningProxy = 1109 {
     nullable octet_string<100> address = 0;
     CapabilitiesBitmap transport = 1;
     int16u discriminator = 2;
-    vendor_id vendorId = 3;
-    int16u productId = 4;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
     int16u timeout = 5;
     optional WiFiBandBitmap wiFiBand = 6;
   }
@@ -9390,9 +9391,9 @@ provisional cluster CommissioningProxy = 1109 {
   }
 
   /** This command serves to establish a transport connection to a commissionable device discovered by the proxy. */
-  command ProxyConnectRequest(ProxyConnectRequestRequest): ProxyConnectResponse = 0;
+  fabric command ProxyConnectRequest(ProxyConnectRequestRequest): ProxyConnectResponse = 0;
   /** This disconnects a transport connection created via the ProxyConnectRequest command. */
-  command ProxyDisconnectRequest(ProxyDisconnectRequestRequest): DefaultSuccess = 2;
+  fabric command ProxyDisconnectRequest(ProxyDisconnectRequestRequest): DefaultSuccess = 2;
   /** This command requests the proxy to provide a list of all commissionable devices found on the requested transports and bands. */
   command ProxyScanRequest(ProxyScanRequestRequest): ProxyScanResponse = 3;
   /** This command requests the proxy to start background scanning for commissionable devices on the selected transports. */
@@ -9400,7 +9401,7 @@ provisional cluster CommissioningProxy = 1109 {
   /** This command requests the proxy to stop background scanning for commissionable devices on the selected transports. */
   command ProxyBackGroundScanStopRequest(ProxyBackGroundScanStopRequestRequest): DefaultSuccess = 6;
   /** This command sends a message packet to the proxy. */
-  command ProxyMessageRequest(ProxyMessageRequestRequest): ProxyMessageResponse = 7;
+  fabric command ProxyMessageRequest(ProxyMessageRequestRequest): ProxyMessageResponse = 7;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */

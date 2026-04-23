@@ -40714,20 +40714,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                         newElement_1_discriminatorClassName.c_str(), newElement_1_discriminatorCtorSignature.c_str(),
                         jninewElement_1_discriminator, newElement_1_discriminator);
-                    jobject newElement_1_vendorId;
-                    std::string newElement_1_vendorIdClassName     = "java/lang/Integer";
-                    std::string newElement_1_vendorIdCtorSignature = "(I)V";
-                    jint jninewElement_1_vendorId                  = static_cast<jint>(entry_1.vendorId);
+                    jobject newElement_1_vendorID;
+                    std::string newElement_1_vendorIDClassName     = "java/lang/Integer";
+                    std::string newElement_1_vendorIDCtorSignature = "(I)V";
+                    jint jninewElement_1_vendorID                  = static_cast<jint>(entry_1.vendorID);
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_1_vendorIdClassName.c_str(), newElement_1_vendorIdCtorSignature.c_str(),
-                        jninewElement_1_vendorId, newElement_1_vendorId);
-                    jobject newElement_1_productId;
-                    std::string newElement_1_productIdClassName     = "java/lang/Integer";
-                    std::string newElement_1_productIdCtorSignature = "(I)V";
-                    jint jninewElement_1_productId                  = static_cast<jint>(entry_1.productId);
+                        newElement_1_vendorIDClassName.c_str(), newElement_1_vendorIDCtorSignature.c_str(),
+                        jninewElement_1_vendorID, newElement_1_vendorID);
+                    jobject newElement_1_productID;
+                    std::string newElement_1_productIDClassName     = "java/lang/Integer";
+                    std::string newElement_1_productIDCtorSignature = "(I)V";
+                    jint jninewElement_1_productID                  = static_cast<jint>(entry_1.productID);
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_1_productIdClassName.c_str(), newElement_1_productIdCtorSignature.c_str(),
-                        jninewElement_1_productId, newElement_1_productId);
+                        newElement_1_productIDClassName.c_str(), newElement_1_productIDCtorSignature.c_str(),
+                        jninewElement_1_productID, newElement_1_productID);
                     jobject newElement_1_extendedData;
                     if (entry_1.extendedData.IsNull())
                     {
@@ -40785,8 +40785,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                         newElement_1 =
                             env->NewObject(scanResultStructStructClass_2, scanResultStructStructCtor_2, newElement_1_address,
-                                           newElement_1_transport, newElement_1_discriminator, newElement_1_vendorId,
-                                           newElement_1_productId, newElement_1_extendedData, newElement_1_wiFiBand);
+                                           newElement_1_transport, newElement_1_discriminator, newElement_1_vendorID,
+                                           newElement_1_productID, newElement_1_extendedData, newElement_1_wiFiBand);
                     }
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }

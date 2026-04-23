@@ -12433,8 +12433,8 @@ public:
         AddArgument("Address", &mRequest.address);
         AddArgument("Transport", 0, UINT8_MAX, &mRequest.transport);
         AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator);
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
+        AddArgument("ProductID", 0, UINT16_MAX, &mRequest.productID);
         AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
         AddArgument("WiFiBand", 0, UINT16_MAX, &mRequest.wiFiBand);
         ClusterCommand::AddArguments();

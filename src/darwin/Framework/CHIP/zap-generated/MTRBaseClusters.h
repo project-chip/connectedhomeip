@@ -22499,6 +22499,7 @@ typedef NS_OPTIONS(uint32_t, MTRThreadBorderRouterManagementFeature) {
 typedef NS_OPTIONS(uint8_t, MTRCommissioningProxyCapabilitiesBitmap) {
     MTRCommissioningProxyCapabilitiesBitmapBLE MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRCommissioningProxyCapabilitiesBitmapWiFiPAF MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRCommissioningProxyCapabilitiesBitmapNTL MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRCommissioningProxyFeature) {

@@ -75,8 +75,8 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyScanReq
     results[0] = ScanResult{};
     results[0].address       = Nullable<ByteSpan>(ByteSpan(kAddr1, sizeof(kAddr1)));
     results[0].discriminator = 3840;
-    results[0].vendorId      = chip::VendorId(0x1234);
-    results[0].productId     = 0x0001;
+    results[0].vendorID      = chip::VendorId(0x1234);
+    results[0].productID     = 0x0001;
     results[0].extendedData  = Nullable<ByteSpan>(ByteSpan(kExt1, sizeof(kExt1)));
     results[0].transport.Set(CP::CapabilitiesBitmap::kWiFiPAF);
     results[0].wiFiBand.SetValue(BitMask<WiFiBandBitmap>(CP::WiFiBandBitmap::k2g4));
@@ -84,8 +84,8 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyScanReq
     results[1] = ScanResult{};
     results[1].address       = Nullable<ByteSpan>(ByteSpan(kAddr2, sizeof(kAddr2)));
     results[1].discriminator = 1234;
-    results[1].vendorId      = chip::VendorId(0x1234);
-    results[1].productId     = 0x0002;
+    results[1].vendorID      = chip::VendorId(0x1234);
+    results[1].productID     = 0x0002;
     results[1].extendedData = Nullable<ByteSpan>();
     results[1].transport.Set(CP::CapabilitiesBitmap::kWiFiPAF);
     results[1].wiFiBand.ClearValue();

@@ -193,7 +193,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
                                                                                    CommandHandler * handler)
 {
     Commands::ProxyConnectRequest::DecodableType commandData;
-    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+    ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
     // Only a single transport SHALL be selected per spec
     VerifyOrReturnError(HasExactlyOneBitSet(commandData.transport.Raw()), Status::InvalidCommand);
@@ -236,7 +236,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
     // success callback (OnPafConnectSuccess) once the transport is actually up.
     auto delegateStatus = mDelegate.ProxyConnectRequest(
         commandData.address, commandData.transport, commandData.discriminator,
-        commandData.vendorId, commandData.productId, commandData.timeout, wiFiBand, handler, request);
+        commandData.vendorID, commandData.productID, commandData.timeout, wiFiBand, handler, request);
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
 
@@ -248,7 +248,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
                                                                                      CommandHandler * handler)
 {
     Commands::ProxyDisconnectRequest::DecodableType commandData;
-    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+    ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
     ChipLogProgress(Zcl, "HandleProxyDisconnectRequest: sessionId=0x%04x", commandData.sessionId);
 
@@ -430,7 +430,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageReque
                                                                                                CommandHandler * handler)
 {
     Commands::ProxyMessageRequest::DecodableType commandData;
-    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+    ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
     chip::Optional<chip::ByteSpan> message;
     if (!commandData.message.IsNull())

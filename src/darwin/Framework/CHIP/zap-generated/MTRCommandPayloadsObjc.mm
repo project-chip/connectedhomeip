@@ -29102,9 +29102,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _discriminator = @(0);
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _productId = @(0);
+        _productID = @(0);
 
         _timeout = @(0);
 
@@ -29122,8 +29122,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.address = self.address;
     other.transport = self.transport;
     other.discriminator = self.discriminator;
-    other.vendorId = self.vendorId;
-    other.productId = self.productId;
+    other.vendorID = self.vendorID;
+    other.productID = self.productID;
     other.timeout = self.timeout;
     other.wiFiBand = self.wiFiBand;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -29134,7 +29134,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorId:%@; productId:%@; timeout:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorId, _productId, _timeout, _wiFiBand];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorID:%@; productID:%@; timeout:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorID, _productID, _timeout, _wiFiBand];
     return descriptionString;
 }
 
@@ -29161,10 +29161,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.discriminator = self.discriminator.unsignedShortValue;
     }
     {
-        encodableStruct.vendorId = static_cast<std::remove_reference_t<decltype(encodableStruct.vendorId)>>(self.vendorId.unsignedShortValue);
+        encodableStruct.vendorID = static_cast<std::remove_reference_t<decltype(encodableStruct.vendorID)>>(self.vendorID.unsignedShortValue);
     }
     {
-        encodableStruct.productId = self.productId.unsignedShortValue;
+        encodableStruct.productID = self.productID.unsignedShortValue;
     }
     {
         encodableStruct.timeout = self.timeout.unsignedShortValue;
@@ -29572,8 +29572,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
                 newElement_0.transport = [NSNumber numberWithUnsignedChar:entry_0.transport.Raw()];
                 newElement_0.discriminator = [NSNumber numberWithUnsignedShort:entry_0.discriminator];
-                newElement_0.vendorId = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorId)];
-                newElement_0.productId = [NSNumber numberWithUnsignedShort:entry_0.productId];
+                newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
+                newElement_0.productID = [NSNumber numberWithUnsignedShort:entry_0.productID];
                 if (entry_0.extendedData.IsNull()) {
                     newElement_0.extendedData = nil;
                 } else {

@@ -30134,11 +30134,11 @@ public class ClusterInfoMapping {
     CommandParameterInfo commissioningProxyproxyConnectRequestdiscriminatorCommandParameterInfo = new CommandParameterInfo("discriminator", Integer.class, Integer.class);
     commissioningProxyproxyConnectRequestCommandParams.put("discriminator",commissioningProxyproxyConnectRequestdiscriminatorCommandParameterInfo);
 
-    CommandParameterInfo commissioningProxyproxyConnectRequestvendorIdCommandParameterInfo = new CommandParameterInfo("vendorId", Integer.class, Integer.class);
-    commissioningProxyproxyConnectRequestCommandParams.put("vendorId",commissioningProxyproxyConnectRequestvendorIdCommandParameterInfo);
+    CommandParameterInfo commissioningProxyproxyConnectRequestvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("vendorID",commissioningProxyproxyConnectRequestvendorIDCommandParameterInfo);
 
-    CommandParameterInfo commissioningProxyproxyConnectRequestproductIdCommandParameterInfo = new CommandParameterInfo("productId", Integer.class, Integer.class);
-    commissioningProxyproxyConnectRequestCommandParams.put("productId",commissioningProxyproxyConnectRequestproductIdCommandParameterInfo);
+    CommandParameterInfo commissioningProxyproxyConnectRequestproductIDCommandParameterInfo = new CommandParameterInfo("productID", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("productID",commissioningProxyproxyConnectRequestproductIDCommandParameterInfo);
 
     CommandParameterInfo commissioningProxyproxyConnectRequesttimeoutCommandParameterInfo = new CommandParameterInfo("timeout", Integer.class, Integer.class);
     commissioningProxyproxyConnectRequestCommandParams.put("timeout",commissioningProxyproxyConnectRequesttimeoutCommandParameterInfo);
@@ -30159,10 +30159,10 @@ public class ClusterInfoMapping {
              commandArguments.get("discriminator")
 
            , (Integer)
-             commandArguments.get("vendorId")
+             commandArguments.get("vendorID")
 
            , (Integer)
-             commandArguments.get("productId")
+             commandArguments.get("productID")
 
            , (Integer)
              commandArguments.get("timeout")

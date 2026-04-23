@@ -6151,9 +6151,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.discriminator", "discriminator",
                                                                   value.isMember("discriminator")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.vendorId", "vendorId", value.isMember("vendorId")));
+        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.vendorID", "vendorID", value.isMember("vendorID")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.productId", "productId", value.isMember("productId")));
+        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.productID", "productID", value.isMember("productID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.extendedData", "extendedData", value.isMember("extendedData")));
 
@@ -6170,13 +6170,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.discriminator, value["discriminator"]));
     valueCopy.removeMember("discriminator");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vendorId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.vendorId, value["vendorId"]));
-    valueCopy.removeMember("vendorId");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vendorID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.vendorID, value["vendorID"]));
+    valueCopy.removeMember("vendorID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.productId, value["productId"]));
-    valueCopy.removeMember("productId");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.productID, value["productID"]));
+    valueCopy.removeMember("productID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extendedData");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.extendedData, value["extendedData"]));
@@ -6197,8 +6197,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::CommissioningProxy::St
     ComplexArgumentParser::Finalize(request.address);
     ComplexArgumentParser::Finalize(request.transport);
     ComplexArgumentParser::Finalize(request.discriminator);
-    ComplexArgumentParser::Finalize(request.vendorId);
-    ComplexArgumentParser::Finalize(request.productId);
+    ComplexArgumentParser::Finalize(request.vendorID);
+    ComplexArgumentParser::Finalize(request.productID);
     ComplexArgumentParser::Finalize(request.extendedData);
     ComplexArgumentParser::Finalize(request.wiFiBand);
 }

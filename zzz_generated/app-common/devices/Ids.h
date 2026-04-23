@@ -155,8 +155,8 @@ constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 2;
 constexpr DeviceTypeId kThreadBorderRouterDeviceTypeId  = 0x00000091;
 constexpr uint8_t kThreadBorderRouterDeviceTypeRevision = 1;
 
-constexpr DeviceTypeId kCommissioningProxyDeviceTypeId  = 0x00000092;
-constexpr uint8_t kCommissioningProxyDeviceTypeRevision = 1;
+constexpr DeviceTypeId kCommissioningByProxyDeviceTypeId  = 0x00000092;
+constexpr uint8_t kCommissioningByProxyDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kOnOffLightDeviceTypeId  = 0x00000100;
 constexpr uint8_t kOnOffLightDeviceTypeRevision = 4;
@@ -226,12 +226,6 @@ constexpr uint8_t kCameraControllerDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kDoorbellDeviceTypeId  = 0x00000148;
 constexpr uint8_t kDoorbellDeviceTypeRevision = 1;
-
-constexpr DeviceTypeId kAmbientContextSensorDeviceTypeId  = 0x00000150;
-constexpr uint8_t kAmbientContextSensorDeviceTypeRevision = 1;
-
-constexpr DeviceTypeId kProximityRangerDeviceTypeId  = 0x00000152;
-constexpr uint8_t kProximityRangerDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kWindowCoveringDeviceTypeId  = 0x00000202;
 constexpr uint8_t kWindowCoveringDeviceTypeRevision = 4;

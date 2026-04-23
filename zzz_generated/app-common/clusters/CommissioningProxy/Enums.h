@@ -33,6 +33,7 @@ enum class CapabilitiesBitmap : uint8_t
 {
     kBle     = 0x2,
     kWiFiPAF = 0x8,
+    kNtl     = 0x10,
 };
 
 // Bitmap for Feature

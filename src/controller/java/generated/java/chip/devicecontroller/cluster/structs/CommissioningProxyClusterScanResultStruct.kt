@@ -27,8 +27,8 @@ class CommissioningProxyClusterScanResultStruct(
   val address: ByteArray?,
   val transport: UInt,
   val discriminator: UInt,
-  val vendorId: UInt,
-  val productId: UInt,
+  val vendorID: UInt,
+  val productID: UInt,
   val extendedData: ByteArray?,
   val wiFiBand: Optional<UInt>,
 ) {
@@ -37,8 +37,8 @@ class CommissioningProxyClusterScanResultStruct(
     append("\taddress : $address\n")
     append("\ttransport : $transport\n")
     append("\tdiscriminator : $discriminator\n")
-    append("\tvendorId : $vendorId\n")
-    append("\tproductId : $productId\n")
+    append("\tvendorID : $vendorID\n")
+    append("\tproductID : $productID\n")
     append("\textendedData : $extendedData\n")
     append("\twiFiBand : $wiFiBand\n")
     append("}\n")
@@ -54,8 +54,8 @@ class CommissioningProxyClusterScanResultStruct(
       }
       put(ContextSpecificTag(TAG_TRANSPORT), transport)
       put(ContextSpecificTag(TAG_DISCRIMINATOR), discriminator)
-      put(ContextSpecificTag(TAG_VENDOR_ID), vendorId)
-      put(ContextSpecificTag(TAG_PRODUCT_ID), productId)
+      put(ContextSpecificTag(TAG_VENDOR_ID), vendorID)
+      put(ContextSpecificTag(TAG_PRODUCT_ID), productID)
       if (extendedData != null) {
         put(ContextSpecificTag(TAG_EXTENDED_DATA), extendedData)
       } else {
@@ -89,8 +89,8 @@ class CommissioningProxyClusterScanResultStruct(
         }
       val transport = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSPORT))
       val discriminator = tlvReader.getUInt(ContextSpecificTag(TAG_DISCRIMINATOR))
-      val vendorId = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_ID))
-      val productId = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_ID))
+      val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_ID))
+      val productID = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_ID))
       val extendedData =
         if (!tlvReader.isNull()) {
           tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_DATA))
@@ -111,8 +111,8 @@ class CommissioningProxyClusterScanResultStruct(
         address,
         transport,
         discriminator,
-        vendorId,
-        productId,
+        vendorID,
+        productID,
         extendedData,
         wiFiBand,
       )
