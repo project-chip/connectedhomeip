@@ -53,7 +53,6 @@ class LogMessageCounter:
             self._counter = mp_manager.Value('i', 0)
             self._cancelled = mp_manager.Event()
 
-
     def increment(self) -> None:
         """Atomically increment the shared message count."""
         with self._cond:
