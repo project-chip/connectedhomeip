@@ -50,6 +50,16 @@ USAGE="./scripts/examples/gn_silabs_example.sh <AppRootFolder> <outputFolder> <s
 PROTOCOL_DIR_SUFFIX="thread"
 NCP_DIR_SUFFIX=""
 
+SLT_CLI="$CHIP_ROOT/scripts/setup/silabs/slt"
+
+if [ ! -f "$SLT_CLI" ]; then
+    echo "SLT not found at $SLT_CLI"
+    echo "Please run 'python3 $CHIP_ROOT/scripts/setup/silabs/install-packages.py' to install SLT"
+    exit 1
+fi
+
+MATTER_ARM_GCC_PREFIX=$("$SLT_CLI" where gcc-arm-none-eabi/12.2.rel1)
+
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps
     Format:
@@ -160,6 +170,13 @@ if [ "$#" == "0" ]; then
             Add additional logs.
         --bootloader
             Add bootloader to the generated image.
+        --arm_gcc_prefix <path>
+            Directory prefix for arm-none-eabi-* tools (GNU Arm Embedded layout),
+            passed to GN as pw_toolchain_ARM_NONE_EABI_PREFIX. Example:
+            /opt/gcc-arm-none-eabi-12/bin/ (trailing slash recommended).
+            Overrides MATTER_ARM_GCC_PREFIX when both are set.
+        MATTER_ARM_GCC_PREFIX
+            Same semantics as --arm_gcc_prefix when set in the environment.
 
 
     "
@@ -170,6 +187,7 @@ elif [ "$#" -lt "2" ]; then
 else
     ROOT=$1
     OUTDIR=$2
+    ARM_GCC_PREFIX="${MATTER_ARM_GCC_PREFIX:-}"
 
     if [ "$#" -gt "2" ]; then
         SILABS_BOARD=$3
@@ -282,6 +300,16 @@ else
                 shift
                 shift
                 ;;
+            --arm_gcc_prefix)
+                if [ -z "$2" ]; then
+                    echo "--arm_gcc_prefix requires a directory prefix (e.g. /opt/gcc-arm-none-eabi/bin/)"
+                    exit 1
+                fi
+                ARM_GCC_PREFIX="$2"
+                optArgs+="pw_toolchain_ARM_NONE_EABI_PREFIX=\"${ARM_GCC_PREFIX}\" "
+                shift
+                shift
+                ;;
             *"sl_matter_version_str="*)
                 optArgs+="$1 "
                 USE_GIT_SHA_FOR_VERSION=false
@@ -298,6 +326,12 @@ else
                 ;;
         esac
     done
+
+    # Vendor ARM GCC: pass pw_toolchain_ARM_NONE_EABI_PREFIX when only MATTER_ARM_GCC_PREFIX is set.
+    if [ -n "$ARM_GCC_PREFIX" ] &&
+        [[ "$optArgs" != *pw_toolchain_ARM_NONE_EABI_PREFIX* ]]; then
+        optArgs+="pw_toolchain_ARM_NONE_EABI_PREFIX=\"${ARM_GCC_PREFIX}\" "
+    fi
 
     if [ -z "$SILABS_BOARD" ]; then
         echo "SILABS_BOARD not defined"
@@ -388,8 +422,17 @@ EOF
 
     ninja -C "$BUILD_DIR"/
 
-    #print stats
-    arm-none-eabi-size -A "$BUILD_DIR"/*.out
+    # print stats (match vendor toolchain when pw_toolchain_ARM_NONE_EABI_PREFIX is used).
+    # Use ${prefix%/}/arm-none-eabi-size so a missing trailing slash cannot merge into
+    # a bogus path (e.g. .../p + arm-none-eabi-size -> parm-none-eabi-size).
+    ARM_NONE_EABI_SIZE_CMD="arm-none-eabi-size"
+    if [ -n "$ARM_GCC_PREFIX" ]; then
+        _arm_none_eabi_size="${ARM_GCC_PREFIX%/}/arm-none-eabi-size"
+        if [ -x "$_arm_none_eabi_size" ]; then
+            ARM_NONE_EABI_SIZE_CMD="$_arm_none_eabi_size"
+        fi
+    fi
+    "$ARM_NONE_EABI_SIZE_CMD" -A "$BUILD_DIR"/*.out
 
     if [ "$VERBOSE_MODE" == true ]; then
         echo "================= Warning!!!!! ================"
