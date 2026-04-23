@@ -93,6 +93,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <performance_test_commands.h>
 #endif
 
+#if SILABS_LOG_OUT_UART
+#include "uart.h"
+#endif // SILABS_LOG_OUT_UART
+
 #include <AppTask.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -210,6 +214,9 @@ void ApplicationStart(void * unused)
         appError(err);
 
     VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
+#if SILABS_LOG_OUT_UART
+    sendLogImmediately(false);
+#endif // SILABS_LOG_OUT_UART
     sMainTaskHandle = nullptr;
 }
 } // namespace
