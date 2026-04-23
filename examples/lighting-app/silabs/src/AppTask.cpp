@@ -612,8 +612,8 @@ bool AppTask::InitiateLightCtrlAction(int32_t aActor, AppTask::Action_t aAction,
 
     case COLOR_ACTION_CT:
         colorData.ct.ctMireds = sCurrentCTMireds;
-        VerifyOrReturnValue(colorData.ct.ctMireds != *(uint16_t *) value, action_initiated);
-        colorData.ct.ctMireds = *(uint16_t *) value;
+        VerifyOrReturnValue(colorData.ct.ctMireds != *reinterpret_cast<uint16_t *>(value), action_initiated);
+        colorData.ct.ctMireds = *reinterpret_cast<uint16_t *>(value);
         action_initiated      = true;
         break;
 
@@ -633,73 +633,61 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
     AttributeId attributeId                = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    switch (clusterId)
     {
-        CustomerAppTask::GetAppTask().InitiateAction(AppEvent::kEventType_Light, *value ? AppTask::ON_ACTION : AppTask::OFF_ACTION,
-                                                     value);
-    }
-    // WIP Apply attribute change to Light
-    else if (clusterId == LevelControl::Id)
-    {
-        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
+    case OnOff::Id:
+        if (attributeId == OnOff::Attributes::OnOff::Id && value != nullptr)
+        {
+            CustomerAppTask::GetAppTask().InitiateAction(AppEvent::kEventType_Light,
+                                                         *value ? AppTask::ON_ACTION : AppTask::OFF_ACTION, value);
+        }
+        break;
 
+    case LevelControl::Id:
         if (attributeId == LevelControl::Attributes::CurrentLevel::Id && value != nullptr)
         {
             CustomerAppTask::GetAppTask().InitiateAction(AppEvent::kEventType_Light, AppTask::LEVEL_ACTION, value);
         }
-    }
-    // WIP Apply attribute change to Light
-    if (clusterId == ColorControl::Id)
-    {
-        ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
+        break;
+
+    case ColorControl::Id:
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-
-        if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentX::Id)
+        switch (attributeId)
         {
-            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                            ChipLogValueMEI(attributeId), type, *value, size);
-
+        case ColorControl::Attributes::CurrentX::Id:
+        case ColorControl::Attributes::CurrentY::Id:
             CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_XY, attributeId,
                                                                   value);
-        }
-        else if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentY::Id)
-        {
-            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                            ChipLogValueMEI(attributeId), type, *value, size);
-            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_XY, attributeId,
+            break;
+
+        case ColorControl::Attributes::CurrentHue::Id:
+        case ColorControl::Attributes::CurrentSaturation::Id:
+            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV, attributeId,
                                                                   value);
-        }
-        if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentHue::Id)
-        {
-            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                            ChipLogValueMEI(attributeId), type, *value, size);
-            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV,
-                                                                  attributeId, value);
-        }
-        else if (clusterId == ColorControl::Id && attributeId == ColorControl::Attributes::CurrentSaturation::Id)
-        {
-            ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                            ChipLogValueMEI(attributeId), type, *value, size);
-            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV,
-                                                                  attributeId, value);
-        }
-        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
-        {
+            break;
+
+        case ColorControl::Attributes::ColorTemperatureMireds::Id:
             if (size != sizeof(uint16_t))
             {
-                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
             CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_CT, attributeId,
                                                                   value);
+            break;
+
+        default:
+            break;
         }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    }
-    else if (clusterId == Identify::Id)
-    {
+        break;
+
+    case Identify::Id:
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
+        break;
+
+    default:
+        break;
     }
 }
