@@ -108,12 +108,10 @@ rm -rf /tmp/chip_*
 
 ## Testing with chip-tool
 
-You can use `chip-tool` as a controller to interact with the `all-devices-app`. For detailed instructions on how to build and use `chip-tool` for commissioning and sending commands, please refer to the central [chip-tool documentation](https://project-chip.github.io/connectedhomeip-doc/examples/chip-tool/README.html#using-the-client-to-commission-a-device).
-
-
-
-
-
+You can use `chip-tool` as a controller to interact with the `all-devices-app`.
+For detailed instructions on how to build and use `chip-tool` for commissioning
+and sending commands, please refer to the central
+[chip-tool documentation](https://project-chip.github.io/connectedhomeip-doc/examples/chip-tool/README.html#using-the-client-to-commission-a-device).
 ### Example Interaction: Chime Device
 
 If you ran the application with `--device chime`, you can send commands to the
