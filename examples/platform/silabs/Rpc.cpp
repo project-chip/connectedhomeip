@@ -89,7 +89,7 @@ class Efr32Button final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-#if defined(CHIP_SILABS_APP_USE_COMMON_APP_TASK)
+#if defined(CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK)
         // Same entry point as SetButtonsCb (CRTP CustomerAppTask static); not AppTask::ButtonEventHandler (base static).
         CustomerAppTask::ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
 #else

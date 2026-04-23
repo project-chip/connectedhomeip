@@ -150,7 +150,6 @@ private:
 #include "AppEvent.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-#include <platform/silabs/tracing/SilabsTracingMacros.h>
 
 using namespace ::chip::DeviceLayer::Silabs;
 

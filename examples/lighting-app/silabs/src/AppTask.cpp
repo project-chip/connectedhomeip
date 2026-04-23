@@ -47,7 +47,6 @@
 #include <cmsis_os2.h>
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-#include <platform/silabs/tracing/SilabsTracingMacros.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -252,7 +251,6 @@ CHIP_ERROR AppTask::AppInit()
 
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(IsLightOn());
-    SILABS_TRACE_NAMED_INSTANT("LightOn", "Reboot");
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
