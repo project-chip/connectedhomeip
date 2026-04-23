@@ -63,13 +63,15 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
     async def setup_test(self):
         super().setup_test()
         # ALARM PRIORITY
+        # These PIXIT values might change depending of the manufacturer or also if one or both of the
+        # interconnect alarms attributes are disabled. Update accordigly here or in the arguments if required.
         self.pixit_hiest_pri_alarm_1 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_1", 1)
         self.pixit_hiest_pri_alarm_2 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_2", 7)
         self.pixit_hiest_pri_alarm_3 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_3", 7)
         self.pixit_hiest_pri_alarm_4 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_4", 7)
         self.pixit_hiest_pri_alarm_5 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_5", 3)
 
-        # Verify we have these attributes to use in during the test case
+        # Verify we have these attributes are available to use in during the test case
         attribute_list = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.AttributeList)
         self.has_interconnected_co_alarm = self.smokeco_cluster.Attributes.InterconnectCOAlarm.attribute_id in attribute_list
         self.has_interconnected_smoke_alarm = self.smokeco_cluster.Attributes.InterconnectSmokeAlarm.attribute_id in attribute_list
