@@ -134,9 +134,6 @@ if (is_si917_board) {
     silabs_mcu = "SiWG917M111MGTBA"
   }
 
-  assert(!sl_enable_si70xx_sensor,
-         "${silabs_board} does not support the si90xx sensor!")
-
   # EFR32 MG24 series ----------
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
   variant = string_replace(silabs_board, "A", "C")
