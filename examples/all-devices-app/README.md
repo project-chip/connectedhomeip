@@ -219,6 +219,8 @@ might need to ensure the following:
 
 ### Network Discovery and Firewall
 
+*Note: While these troubleshooting steps are generic for any Matter application running on Linux, they are included here for convenience.*
+
 If you encounter network discovery issues (especially when pairing with
 controllers that require mDNS), you may need to configure the firewall on the
 device running the `all-devices-app` to allow incoming connections.
