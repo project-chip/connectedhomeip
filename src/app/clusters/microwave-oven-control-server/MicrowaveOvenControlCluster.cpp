@@ -321,8 +321,6 @@ std::optional<DataModel::ActionReturnStatus>
 MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                const Commands::AddMoreTime::DecodableType & commandData)
 {
-    Status status = Status::Success;
-
     uint8_t opState = mIntegrationDelegate.GetCurrentOperationalState();
     VerifyOrReturnError(opState != to_underlying(OperationalState::OperationalStateEnum::kError), Status::InvalidInState);
 
@@ -333,9 +331,7 @@ MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, cons
                         ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
     uint32_t finalCookTimeSec = GetCookTimeSec() + commandData.timeToAdd;
-    status                    = mDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
-
-    return status;
+    return mDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
 }
 
 } // namespace chip::app::Clusters
