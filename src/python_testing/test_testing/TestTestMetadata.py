@@ -19,10 +19,12 @@
 
 import sys
 
+from mobly import signals
+
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import generate_mobly_test_config
+from matter.testing.runner import TestStep, generate_mobly_test_config
 
 
 def _make_test_instance(test_class):
@@ -169,6 +171,87 @@ def test_desc_falls_back_to_method_name():
     assert result == "test_TC_FOO_1_1", f"Unexpected desc: {result}"
 
 
+def test_steps_from_explicit_method():
+    """Explicit steps_* method is used when defined."""
+
+    class MyTest(MatterBaseTest):
+        def steps_TC_FOO_1_1(self):
+            return [TestStep(1, "Explicit step")]
+
+        @async_test_body
+        async def test_TC_FOO_1_1(self):
+            self.step(1, "Inline step")
+
+    inst = _make_test_instance(MyTest)
+    steps = inst.get_defined_test_steps("test_TC_FOO_1_1")
+    assert len(steps) == 1
+    assert steps[0].description == "Explicit step", f"Expected explicit method to win, got: {steps[0].description}"
+
+
+def test_steps_from_ast_fallback():
+    """AST extraction is used when no steps_* method exists."""
+
+    class MyTest(MatterBaseTest):
+        @async_test_body
+        async def test_TC_FOO_1_1(self):
+            self.step(1, "First inline step")
+            self.step(2, "Second inline step")
+
+    inst = _make_test_instance(MyTest)
+    steps = inst.get_defined_test_steps("test_TC_FOO_1_1")
+    assert steps is not None, "Expected AST fallback to find steps"
+    assert len(steps) == 2
+    assert steps[0].test_plan_number == 1
+    assert steps[0].description == "First inline step"
+    assert steps[1].test_plan_number == 2
+    assert steps[1].description == "Second inline step"
+
+
+def test_steps_inline_runtime_validation():
+    """Inline step descriptions work end-to-end with step validation."""
+    from types import SimpleNamespace
+
+    class MyTest(MatterBaseTest):
+        @async_test_body
+        async def test_TC_FOO_1_1(self):
+            self.step(1, "First step")
+            self.step(2, "Second step")
+
+    inst = _make_test_instance(MyTest)
+    # Manually set up the per-test state that Mobly normally initializes
+    # before each test method. We can't call setup_test() because it
+    # requires the full Mobly test runner lifecycle and chip stack.
+    inst.current_test_info = SimpleNamespace(name="test_TC_FOO_1_1")
+    inst.current_step_index = 0
+    inst.step_skipped = False
+    inst.step_start_time = None
+
+    # These should succeed — steps match the AST-extracted plan
+    inst.step(1, "First step")
+    inst.step(2, "Second step")
+
+    # Calling a step out of order should fail
+    inst.current_step_index = 0
+    try:
+        inst.step(2, "Wrong order")
+        assert False, "Expected TestFailure for out-of-order step"
+    except signals.TestFailure:
+        pass
+
+
+def test_steps_none_when_no_steps():
+    """No steps_* and no self.step() calls returns None."""
+
+    class MyTest(MatterBaseTest):
+        @async_test_body
+        async def test_TC_FOO_1_1(self):
+            pass
+
+    inst = _make_test_instance(MyTest)
+    steps = inst.get_defined_test_steps("test_TC_FOO_1_1")
+    assert steps is None, f"Expected None, got: {steps}"
+
+
 def main():
     failures = []
 
@@ -183,6 +266,10 @@ def main():
         test_desc_from_docstring,
         test_desc_method_takes_precedence,
         test_desc_falls_back_to_method_name,
+        test_steps_from_explicit_method,
+        test_steps_from_ast_fallback,
+        test_steps_inline_runtime_validation,
+        test_steps_none_when_no_steps,
     ]
 
     for test_fn in test_functions:

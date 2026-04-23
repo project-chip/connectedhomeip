@@ -176,7 +176,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -620,18 +620,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
-        """Retrieves test steps from a 'steps_*' function, using a cache."""
-        steps_name = f'steps_{test.removeprefix("test_")}'
+        """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
+
+        Checks for an explicit steps_* method first. If none exists, falls back to
+        extracting steps from self.step() calls in the test method's source code.
+
+        Returns None if no steps are defined by either mechanism.
+        """
         if test in self.cached_steps:
             return self.cached_steps[test]
 
-        try:
-            fn = getattr(self, steps_name)
-            steps = fn()
-            self.cached_steps[test] = steps
-            return fn()
-        except AttributeError:
-            return None
+        steps = None
+        if steps_method := getattr(self, 'steps_' + test.removeprefix('test_'), None):
+            steps = steps_method()
+        else:
+            test_method = getattr(self, test)
+            from matter.testing.step_extractor import extract_steps_from_method
+            steps = extract_steps_from_method(test_method) or None
+
+        self.cached_steps[test] = steps
+        return steps
 
     def get_restart_flag_file(self) -> Optional[str]:
         if self.matter_test_config.restart_flag_file is None:
@@ -692,17 +700,30 @@ class MatterBaseTest(base_test.BaseTestClass):
     # These methods are used to mark test progress for the test harness and logs, to help with test
     # debugging, issue creation and log analysis by the test labs.
 
-    def step(self, step: typing.Union[int, str]):
+    def step(self, step: typing.Union[int, str], description: str = "", *,
+             is_commissioning: bool = False, expectation: str = ""):
         """Execute a test step and manage step progression.
 
         Validates step order, prints step information, and notifies runner hooks.
 
         Args:
             step: The step number or identifier to execute.
+            description: Step description for inline step definitions.
+                Should always be provided (not empty) when any keyword arguments
+                (is_commissioning, expectation) are passed.
+            is_commissioning: Mark this step as the commissioning step (keyword-only).
+            expectation: Expected outcome for test plan generation (keyword-only).
+
+            All arguments to step() must be constants for automatic extraction of
+            the test step list to work. If dynamic step() parameters are required
+            an explicit `steps_` method must be defined.
 
         Raises:
             AssertionError: If steps are called out of order or step doesn't exist.
         """
+        # description, is_commissioning, and expectation are not used at runtime.
+        # They exist so the AST step extractor can read them from source code to
+        # build the step list without needing a separate steps_* method.
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
