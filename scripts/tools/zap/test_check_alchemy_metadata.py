@@ -17,6 +17,7 @@
 """Unit tests for check_alchemy_metadata.py."""
 
 import argparse
+import contextlib
 import os
 import shutil
 import subprocess
@@ -26,10 +27,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import check_alchemy_metadata as cam
-
 # Make the module under test importable regardless of working directory.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import check_alchemy_metadata as cam
 
 
 # ---------------------------------------------------------------------------
@@ -113,10 +114,8 @@ class TestValidateFile(unittest.TestCase):
 
     def tearDown(self):
         for p in self._temp_files:
-            try:
+            with contextlib.suppress(OSError):
                 p.unlink()
-            except OSError:
-                pass
 
     def _write_xml(self, content: str) -> Path:
         p = _make_xml_file(content)
