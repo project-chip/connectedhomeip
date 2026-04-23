@@ -541,6 +541,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     with (multiprocessing.Manager() as mp_manager,
           LogMessageCounter(mp_manager) as log_msg_counter):
+        prev_counter = context.obj.log_config.filter.msg_counter
         try:
             context.obj.log_config.filter.msg_counter = log_msg_counter
 
@@ -656,7 +657,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                     log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
                     errors.append(e)
 
-            context.obj.log_config.filter.msg_counter = None
+            context.obj.log_config.filter.msg_counter = prev_counter
 
     # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
     # encountered during execution and cleanup.
