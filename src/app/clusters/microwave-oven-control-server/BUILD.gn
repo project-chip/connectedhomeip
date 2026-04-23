@@ -19,6 +19,7 @@ source_set("microwave-oven-control-server") {
     "Delegate.h",
     "MicrowaveOvenControlCluster.cpp",
     "MicrowaveOvenControlCluster.h",
+    "MicrowaveOvenIntegrationDelegate.h",
   ]
 
   public_deps = [
@@ -28,6 +29,4 @@ source_set("microwave-oven-control-server") {
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/MicrowaveOvenControl",
   ]
-
-  check_includes = false
 }
