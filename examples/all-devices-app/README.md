@@ -108,7 +108,10 @@ rm -rf /tmp/chip_*
 
 ## Testing with chip-tool
 
-You can use `chip-tool` as a controller to interact with the `all-devices-app`. For detailed instructions on how to build and use `chip-tool` for commissioning and sending commands, please refer to the in-project [chip-tool documentation](../chip-tool/README.md).
+You can use `chip-tool` as a controller to interact with the `all-devices-app`.
+For detailed instructions on how to build and use `chip-tool` for commissioning
+and sending commands, please refer to the in-project
+[chip-tool documentation](../chip-tool/README.md).
 
 ### Example Interaction: Chime Device
 
