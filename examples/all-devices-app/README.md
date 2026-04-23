@@ -32,7 +32,7 @@ platform-specific specializations kept separate:
     -   The **`DeviceFactory`** (in
         `all-devices-common/devices/device-factory/DeviceFactory.h`), which
         enables runtime registration and creation of supported device types.
--   **`esp32/`, `linux/`, `posix/`**: Contain platform-specific implementations,
+-   **`esp32/`, `posix/`**: Contain platform-specific implementations (with `posix/` containing `linux/` and `darwin/` subdirectories),
     entry points, and build configurations.
     -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
         platform-specific overrides for devices at build-time.
