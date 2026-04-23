@@ -209,7 +209,6 @@ extern "C" otError otPlatUartEnable(void)
 extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
 #ifdef PW_RPC_ENABLED
-#error "PW_RPC_ENABLED"
     return OT_ERROR_NOT_IMPLEMENTED;
 #else
     if (uartConsoleWrite((const char *) aBuf, aBufLength) > 0)
@@ -224,7 +223,6 @@ extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 extern "C" void efr32UartProcess(void)
 {
 #if !defined(PW_RPC_ENABLED) && !defined(ENABLE_CHIP_SHELL)
-#error "hello"
     uint8_t tempBuf[128] = { 0 };
     // will read the data available up to 128bytes
     int16_t count = uartConsoleRead((char *) tempBuf, 128);
