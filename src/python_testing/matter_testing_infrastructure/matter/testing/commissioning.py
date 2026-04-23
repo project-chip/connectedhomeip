@@ -451,6 +451,45 @@ async def _is_device_operational_via_dnssd(
         return False
 
 
+async def _is_device_commissionable_via_dnssd(
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
+) -> bool:
+    """
+    Check if any device is advertising as commissionable via DNS-SD on the network.
+
+    This check avoids long CASE timeouts when a device is in pairing mode.
+    Devices advertise commissionable services on _matterc._udp.local.
+
+    Args:
+        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
+
+    Returns:
+        True if any device is advertising as commissionable, False otherwise
+    """
+    from mdns_discovery.mdns_discovery import MdnsDiscovery
+
+    try:
+        LOGGER.info("Checking DNS-SD for commissionable service (_matterc._udp.local.)")
+
+        # Discover commissionable services
+        mdns = MdnsDiscovery()
+        services = await mdns.get_commissionable_services(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        if services:
+            LOGGER.info(f"Found {len(services)} commissionable device(s) via DNS-SD")
+            return True
+
+        LOGGER.info("No commissionable devices found via DNS-SD")
+        return False
+
+    except (OSError, ValueError, RuntimeError, TypeError) as e:
+        LOGGER.warning(f"DNS-SD commissionable check failed: {e}")
+        return False
+
+
 async def _establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
@@ -551,65 +590,50 @@ async def _establish_pase_or_case_session(
 
 async def is_commissioned(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
-    node_id: int,
-    pase_params: Optional[PaseParams] = None
+    node_id: int
 ) -> bool:
     """
     Check if the device is commissioned on the current fabric (Controller's fabric).
 
-    Uses DNS-SD first: if the device advertises as operational for this fabric and node,
-    returns True without opening a session.
+    Uses a passive detection strategy:
 
-    If DNS-SD does not see the device on this fabric, tries PASE and CASE in parallel.
-    Whichever session wins determines the answer: **CASE** means operational on this
-    fabric; **PASE** means we only have a commissioning channel, not operational
-    membership on this fabric (even if the device might hold other fabrics).
+    1. DNS-SD operational check (_matter._tcp): if the device advertises as operational
+       for this fabric and node, returns True immediately.
+    2. DNS-SD commissionable check (_matterc._udp): if the device advertises a pairing
+       window, returns False immediately (fast-fail — device is not operational).
+    3. If neither mDNS check is conclusive, returns False (device is off, broken,
+       or on another fabric without an open commissioning window).
 
-    For global fabric count (any fabric), use :func:`get_commissioned_fabric_count`.
+    This function is side-effect free: it does not open PASE or CASE sessions.
 
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
 
     Returns:
-        True if the device is operational on this fabric, False otherwise.
-
-    Raises:
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
-        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
+        True if the device is confirmed to be commissioned on this fabric, False otherwise.
     """
     try:
-        # Fast DNS-SD check to determine if device is operational on this fabric
-        # If device is advertising as operational, it's definitely commissioned - no need to read attributes
+        # Step 1: Fast DNS-SD check — is the device operational on this fabric?
         is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
 
         if is_operational:
-            # Device is operational on this fabric - it's commissioned, no need for CASE read
             LOGGER.info(f"Device {node_id} is operational via DNS-SD - confirmed commissioned")
             return True
 
-        # Device not found via DNS-SD on this fabric. This could mean:
-        # - Factory fresh device (PASE will work if commissioning window is open)
-        # - Commissioned to other fabric(s) without open commissioning window (both will fail)
-        # - DNS-SD timing issue on our fabric (CASE may work if there's a cached address)
-        #
-        # Try both PASE and CASE in parallel - whichever succeeds first is used.
-        # If both fail, commissioning status cannot be determined.
+        # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
+        is_commissionable = await _is_device_commissionable_via_dnssd()
 
-        if pase_params is None:
-            # No PASE params and not operational via DNS-SD - can't safely proceed
-            raise ValueError(
-                f"Device {node_id} is not operational on this fabric and no PASE parameters provided. "
-                "Cannot check commissioning status without risking long connection timeout."
-            )
+        if is_commissionable:
+            LOGGER.info(f"Device {node_id} is commissionable via DNS-SD (pairing window open) - not commissioned")
+            return False
 
-        # Try both PASE and CASE in parallel - use whichever succeeds first
-        LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
-        session_kind = await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
-        return session_kind == EstablishedSessionKind.CASE
+        # Step 3: Neither mDNS check was conclusive.
+        # Device is off, broken, or on another fabric without a commissioning window.
+        LOGGER.info(f"Device {node_id} not found via any DNS-SD check - not commissioned on this fabric")
+        return False
 
-    except Exception as e:
+    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
         LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
         raise
 
@@ -679,6 +703,6 @@ async def get_commissioned_fabric_count(
         # Return the count
         return len(root_certs)
 
-    except Exception as e:
-        LOGGER.error(f"Failed to get fabric count for node {node_id}: {e}")
+    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
+        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
         raise

@@ -374,54 +374,6 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
 
 # Commissioning-related assertions
 
-async def assert_is_commissioned_to_any_fabric(
-    dev_ctrl,
-    node_id: int,
-    description: str = "Device",
-    pase_params: Optional[PaseParams] = None
-) -> None:
-    """
-    Asserts that the device has at least one commissioned fabric.
-
-    Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
-    and verifies that the list is not empty. An empty list indicates factory fresh state.
-
-    This assertion works over PASE (before a CASE session is established) or CASE.
-
-    Args:
-        dev_ctrl: The chip device controller instance
-        node_id: Node ID of the device to check
-        description: User-defined description for error messages (default: "Device")
-        pase_params: Optional parameters for establishing PASE if needed.
-                    See get_commissioned_fabric_count() for format details.
-
-    Raises:
-        AssertionError: If device has no commissioned fabrics (is factory fresh)
-        ChipStackError: If unable to read the TrustedRootCertificates attribute
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
-        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
-
-    Example:
-        # Verify device is commissioned before running multi-fabric test
-        await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT")
-
-        # Check that device has been successfully commissioned in previous step
-        await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="Newly commissioned device")
-
-        # Verify device is commissioned (establishes PASE if needed)
-        pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT", pase_params=pase_params)
-    """
-    from matter.testing.commissioning import get_commissioned_fabric_count
-
-    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
-    asserts.assert_true(
-        fabric_count > 0,
-        f"{description} must have at least one commissioned fabric. "
-        "TrustedRootCertificates list is empty (device is factory fresh)."
-    )
-
-
 async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,

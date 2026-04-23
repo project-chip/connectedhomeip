@@ -53,7 +53,7 @@ from python_path import PythonPath
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.commissioning import PaseParams, _is_device_operational_via_dnssd, is_commissioned
+from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -156,16 +156,10 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
         LOGGER.info("=== Test: Factory Fresh Device - is_commissioned() ===")
         self.start_th_server()
 
-        pase_params = PaseParams(
-            discriminator=self.th_server_discriminator,
-            passcode=self.th_server_passcode,
-        )
-
         LOGGER.info("Checking is_commissioned() on factory-fresh device")
         commissioned = await is_commissioned(
             self.default_controller,
-            self.th_server_local_nodeid,
-            pase_params=pase_params
+            self.th_server_local_nodeid
         )
         asserts.assert_false(
             commissioned,
