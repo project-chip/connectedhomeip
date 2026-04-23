@@ -191,9 +191,11 @@ source_set("siwx917-common") {
 
   if (sl_enable_si70xx_sensor) {
     sources += [
-      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
       "${silabs_common_plat_dir}/Si70xxSensor.h",
+      "${silabs_common_plat_dir}/Si70xxSensorWiseMcu.cpp",
     ]
+    public_deps +=
+        [ "${chip_root}/src/platform/silabs/platformAbstraction:common" ]
   }
 
   if (app_data_model != "") {
