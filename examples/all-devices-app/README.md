@@ -3,9 +3,8 @@
 The `all-devices-app` is a sample application for the Matter SDK that
 demonstrates the **Code-Driven paradigm**, which removes the dependency on
 generated code (ZAP tool) and global instances. This is the recommended approach
-for developing Matter applications, as it allows testing various
-device types and clusters without requiring recompilation for each
-configuration.
+for developing Matter applications, as it allows testing various device types
+and clusters without requiring recompilation for each configuration.
 
 ## What’s The “All Devices App”?
 
@@ -112,6 +111,7 @@ You can use `chip-tool` as a controller to interact with the `all-devices-app`.
 For detailed instructions on how to build and use `chip-tool` for commissioning
 and sending commands, please refer to the central
 [chip-tool documentation](https://project-chip.github.io/connectedhomeip-doc/examples/chip-tool/README.html#using-the-client-to-commission-a-device).
+
 ### Example Interaction: Chime Device
 
 If you ran the application with `--device chime`, you can send commands to the
@@ -146,7 +146,3 @@ Change the selected chime to `1`:
 ```bash
 chip-tool chime write selected-chime 1 1 1
 ```
-
-
-
-
