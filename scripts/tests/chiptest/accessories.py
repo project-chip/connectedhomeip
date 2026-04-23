@@ -138,7 +138,7 @@ class XmlRpcServerProcessManager(threading.Thread):
     """
 
     def __init__(self, apps: AppsRegister, net_ns_wrapper: str | None, log_config: LogConfig) -> None:
-        super().__init__(name="XmlRpcMgr")
+        super().__init__(name="XmlRpcMgr", daemon=True)
 
         self.apps = apps
         self.net_ns_wrapper = net_ns_wrapper
