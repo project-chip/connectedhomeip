@@ -214,28 +214,6 @@ echo "Done! Check app.log for application logs."
 
 ## Troubleshooting
 
-When testing with an external controller (such as the Google Home App), you
-might need to ensure the following:
+When testing with an external controller (such as the Google Home App), you might need to ensure correct network and firewall configurations.
 
-### Network Discovery and Firewall
-
-*Note: While these troubleshooting steps are generic for any Matter application running on Linux, they are included here for convenience.*
-
-If you encounter network discovery issues (especially when pairing with
-controllers that require mDNS), you may need to configure the firewall on the
-device running the `all-devices-app` to allow incoming connections.
-
-Instead of disabling the firewall entirely, it is recommended to allow only the
-specific ports required for Matter and mDNS. If using `ufw`, you can allow them
-with:
-
-```bash
-sudo ufw allow 5353/udp
-sudo ufw allow 5540/udp
-```
-
-### Same Wi-Fi Network
-
-Ensure your device running the `all-devices-app` (laptop or workstation) is on
-the same local network (Wi-Fi) as the controller. This is critical for local
-discovery and communication.
+For detailed instructions, see the [Matter Linux Networking and Firewall Configuration](file:///usr/local/google/home/sergiosoares/connectedhomeip/docs/guides/linux_networking_and_firewall.md) guide.
