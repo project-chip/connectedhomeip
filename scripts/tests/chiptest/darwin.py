@@ -12,18 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import shutil
 from typing import IO, Any
 
 from .runner import Executor, LogPipe, SubprocessInfo
-
-# Older Homebrew coreutils installed 'stdbuf' directly on $PATH; newer versions only expose it as 'gstdbuf',
-# with the unprefixed name installed only in libexec/gnubin (not on $PATH by default). Use whichever is available.
-_STDBUF = shutil.which('stdbuf') or shutil.which('gstdbuf')
 
 
 class DarwinExecutor(Executor):
     def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None, stderr: IO[Any] | LogPipe | None = None):
         # Try harder to avoid any stdout buffering in our tests
-        wrapped = subproc.wrap_with(_STDBUF, '-o0', '-i0') if _STDBUF else subproc
+        wrapped = subproc.wrap_with('stdbuf', '-o0', '-i0')
         return super().run(wrapped, stdin, stdout, stderr)
