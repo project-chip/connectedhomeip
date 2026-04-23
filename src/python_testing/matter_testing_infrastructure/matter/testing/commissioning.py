@@ -20,7 +20,6 @@ This module contains classes and functions designed to handle the commissioning 
 """
 
 import logging
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
@@ -124,7 +123,7 @@ class PairingStatus:
         return str(self.exception) if self.exception else "Pairing Successful"
 
 
-class CommissioningMethod(ABC):
+class Commission():
     def __init__(
         self,
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
@@ -185,147 +184,20 @@ class CommissioningMethod(ABC):
         if commissionee is None:
             raise RuntimeError("Failed to find or establish PASE session")
 
-    @abstractmethod
     async def _prepare(self):
-        pass
+        if self.commissioning_info.wifi_ssid is not None and self.commissioning_info.wifi_passphrase is not None:
+            self.dev_ctrl.SetWiFiCredentials(
+                self.commissioning_info.wifi_ssid,
+                self.commissioning_info.wifi_passphrase
+            )
+
+        if self.commissioning_info.thread_operational_dataset is not None:
+            self.dev_ctrl.SetThreadOperationalDataset(
+                self.commissioning_info.thread_operational_dataset
+            )
 
     async def _commission(self):
         return await self.dev_ctrl.Commission(self.node_id)
-
-
-class CommissioningNetworkOnNetwork(CommissioningMethod):
-    async def _prepare(self):
-        pass
-
-
-class CommissioningBleWiFi(CommissioningMethod):
-    async def _prepare(self):
-        asserts.assert_is_not_none(
-            self.commissioning_info.wifi_ssid,
-            "WiFi SSID must be provided for ble-wifi commissioning"
-        )
-        asserts.assert_is_not_none(
-            self.commissioning_info.wifi_passphrase,
-            "WiFi Passphrase must be provided for ble-wifi commissioning"
-        )
-
-        self.dev_ctrl.SetWiFiCredentials(
-            self.commissioning_info.wifi_ssid,
-            self.commissioning_info.wifi_passphrase
-        )
-
-
-class CommissioningBleThread(CommissioningMethod):
-    async def _prepare(self):
-        asserts.assert_is_not_none(
-            self.commissioning_info.thread_operational_dataset,
-            "Thread dataset must be provided for ble-thread commissioning"
-        )
-
-        self.dev_ctrl.SetThreadOperationalDataset(
-            self.commissioning_info.thread_operational_dataset
-        )
-
-
-class CommissioningNfcThread(CommissioningMethod):
-    async def _prepare(self):
-        asserts.assert_is_not_none(
-            self.commissioning_info.thread_operational_dataset,
-            "Thread dataset must be provided for nfc-thread commissioning"
-        )
-
-        self.dev_ctrl.SetThreadOperationalDataset(
-            self.commissioning_info.thread_operational_dataset
-        )
-
-    async def _find_or_establish_pase_if_needed(self):
-        pass
-
-    async def _commission(self):
-        return await self.dev_ctrl.CommissionNfcThread(
-            self.info.filter_value,
-            self.info.passcode,
-            self.node_id,
-            self.commissioning_info.thread_operational_dataset
-        )
-
-
-class CommissioningNfcWiFi(CommissioningMethod):
-    async def _prepare(self):
-        asserts.assert_is_not_none(
-            self.commissioning_info.wifi_ssid,
-            "WiFi SSID must be provided for nfc-wifi commissioning"
-        )
-        asserts.assert_is_not_none(
-            self.commissioning_info.wifi_passphrase,
-            "WiFi Passphrase must be provided for nfc-wifi commissioning"
-        )
-
-        self.dev_ctrl.SetWiFiCredentials(
-            self.commissioning_info.wifi_ssid,
-            self.commissioning_info.wifi_passphrase
-        )
-
-    async def _find_or_establish_pase_if_needed(self):
-        pass
-
-    async def _commission(self):
-        return await self.dev_ctrl.CommissionNfcWiFi(
-            self.info.filter_value,
-            self.info.passcode,
-            self.node_id,
-            self.commissioning_info.wifi_ssid,
-            self.commissioning_info.wifi_passphrase
-        )
-
-
-class CommissioningThreadMeshcop(CommissioningMethod):
-    async def _prepare(self):
-        asserts.assert_is_not_none(
-            self.commissioning_info.thread_operational_dataset,
-            "Thread dataset must be provided for thread-meshcop commissioning"
-        )
-        asserts.assert_is_not_none(
-            self.commissioning_info.thread_ba_host,
-            "thread_ba_host must be provided for thread-meshcop commissioning"
-        )
-        asserts.assert_is_not_none(
-            self.commissioning_info.thread_ba_port,
-            "thread_ba_port must be provided for thread-meshcop commissioning"
-        )
-
-    async def _find_or_establish_pase_if_needed(self):
-        # Thread MeshCoP commissioning does not require creating a new PASE session here
-        pass
-
-    async def _commission(self):
-        return await self.dev_ctrl.CommissionThreadMeshcop(
-            self.node_id,
-            self.info.passcode,
-            self.info.filter_value,
-            self.commissioning_info.thread_ba_host,
-            self.commissioning_info.thread_ba_port,
-            self.commissioning_info.thread_operational_dataset
-        )
-
-
-class CommissioningFlow:
-    @staticmethod
-    def create(commissioning_method: str | None, dev_ctrl, node_id, info, commissioning_info):
-        if commissioning_method == "on-network":
-            return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info)
-        if commissioning_method == "ble-wifi":
-            return CommissioningBleWiFi(dev_ctrl, node_id, info, commissioning_info)
-        if commissioning_method == "ble-thread":
-            return CommissioningBleThread(dev_ctrl, node_id, info, commissioning_info)
-        if commissioning_method == "nfc-thread":
-            return CommissioningNfcThread(dev_ctrl, node_id, info, commissioning_info)
-        if commissioning_method == "nfc-wifi":
-            return CommissioningNfcWiFi(dev_ctrl, node_id, info, commissioning_info)
-        if commissioning_method == "thread-meshcop":
-            return CommissioningThreadMeshcop(dev_ctrl, node_id, info, commissioning_info)
-
-        raise ValueError(f"Invalid commissioning method {commissioning_method}")
 
 
 async def commission_device(
@@ -350,14 +222,7 @@ async def commission_device(
 
     """
     try:
-        commissioning = CommissioningFlow.create(
-            commissioning_method=commissioning_info.commissioning_method,
-            dev_ctrl=dev_ctrl,
-            node_id=node_id,
-            info=info,
-            commissioning_info=commissioning_info
-        )
-
+        commissioning = Commission(dev_ctrl, node_id, info, commissioning_info)
         await commissioning.start()
         return PairingStatus()
 
