@@ -94,9 +94,12 @@ Build the application using the following command:
 
 ## Running the Application
 
-To run the application, specify the device type using the `--device` flag. The format is `type:endpoint[:parent]`, where the optional `parent` field allows establishing parent/child endpoint relationships for logical grouping.
+To run the application, specify the device type using the `--device` flag. The
+format is `type:endpoint[:parent]`, where the optional `parent` field allows
+establishing parent/child endpoint relationships for logical grouping.
 
-The application supports running multiple devices simultaneously by specifying the flag multiple times.
+The application supports running multiple devices simultaneously by specifying
+the flag multiple times.
 
 ```bash
 # Clean up KVS storage if needed
