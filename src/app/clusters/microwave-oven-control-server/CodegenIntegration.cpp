@@ -23,47 +23,15 @@
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::DataModel;
 
 namespace chip::app::Clusters::MicrowaveOvenControl {
 
 using namespace Attributes;
 using namespace Commands;
 
-namespace {
-
-CHIP_ERROR OptionalAcceptedCommands(const ConcreteClusterPath & path,
-                                    std::bitset<Commands::kAcceptedCommandsCount> & optionalAcceptedCommands)
-{
-    // Make sure that the cluster actually exists on this endpoint.
-    const EmberAfCluster * serverCluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
-    VerifyOrReturnValue(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
-    VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
-
-    const CommandId * endOfList = serverCluster->acceptedCommandList;
-    while (*endOfList != kInvalidCommandId)
-    {
-        endOfList++;
-    }
-
-    for (const CommandId * p = serverCluster->acceptedCommandList; p != endOfList; p++)
-    {
-        if (*p == Commands::AddMoreTime::Id)
-        {
-            optionalAcceptedCommands.set(Commands::AddMoreTime::Id);
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace
-
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<Feature> aFeature,
                    OperationalState::Instance & aOpStateInstance, ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
@@ -104,16 +72,30 @@ CHIP_ERROR Instance::Init()
         mOptionalAttributeSet.Set<WattRating::Id>();
     }
 
-    std::bitset<Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
-    VerifyOrReturnError(OptionalAcceptedCommands(ConcreteClusterPath(mEndpointId, mClusterId), optionalAcceptedCommands) ==
-                            CHIP_NO_ERROR,
-                        CHIP_ERROR_INTERNAL);
+    const EmberAfCluster * cluster = emberAfFindServerCluster(mEndpointId, mClusterId);
+    VerifyOrReturnValue(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    bool supportsAddMoreTime = false;
+    // NOTE: acceptedCommandList is KNOWN to not be nullptr because MicrowaveOvenControl should have mandatory commands
+    //       as such we iterate here directly without an 'empty list' (i.e. nullptr) check.
+    for (const CommandId * cmd = cluster->acceptedCommandList; *cmd != kInvalidCommandId; cmd++)
+    {
+        if (*cmd == Commands::AddMoreTime::Id)
+        {
+            supportsAddMoreTime = true;
+            break;
+        }
+    }
+
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDelegate->SetInstance(this);
 
-    MicrowaveOvenControlCluster::Config config{ mFeature,         mOptionalAttributeSet,      optionalAcceptedCommands,
-                                                mOpStateInstance, mMicrowaveOvenModeInstance, *mDelegate };
+    MicrowaveOvenControlCluster::Config config{ .feature                   = mFeature,
+                                                .optionalAttributeSet      = mOptionalAttributeSet,
+                                                .supportsAddMoreTime       = supportsAddMoreTime,
+                                                .opStateInstance           = mOpStateInstance,
+                                                .microwaveOvenModeInstance = mMicrowaveOvenModeInstance,
+                                                .delegate                  = *mDelegate };
     mCluster.Create(mEndpointId, config);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }

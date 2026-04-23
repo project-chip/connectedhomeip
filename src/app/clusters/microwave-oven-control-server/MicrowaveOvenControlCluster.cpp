@@ -21,17 +21,17 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/MicrowaveOvenControl/Metadata.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::MicrowaveOvenControl;
-using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
+
+using namespace MicrowaveOvenControl;
+using namespace MicrowaveOvenControl::Attributes;
+using namespace MicrowaveOvenControl::Commands;
 
 namespace {
 
@@ -55,7 +55,7 @@ bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNu
 
 MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(config.feature),
-    mOptionalAttributeSet(config.optionalAttributeSet), mOptionalAcceptedCommands(config.optionalAcceptedCommands),
+    mOptionalAttributeSet(config.optionalAttributeSet), mSupportsAddMoreTime(config.supportsAddMoreTime),
     mOpStateInstance(config.opStateInstance), mMicrowaveOvenModeInstance(config.microwaveOvenModeInstance),
     mDelegate(config.delegate), mCookTimeSec(kDefaultCookTimeSec)
 {}
@@ -136,7 +136,7 @@ DataModel::ActionReturnStatus MicrowaveOvenControlCluster::ReadAttribute(const D
     case WattRating::Id:
         return encoder.Encode(mDelegate.GetWattRating());
     case FeatureMap::Id:
-        return encoder.Encode(mFeature.Raw());
+        return encoder.Encode(mFeature);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -186,7 +186,7 @@ CHIP_ERROR MicrowaveOvenControlCluster::AcceptedCommands(const ConcreteClusterPa
 {
     ReturnErrorOnFailure(builder.AppendElements({ Commands::SetCookingParameters::kMetadataEntry }));
 
-    if (mOptionalAcceptedCommands.test(Commands::AddMoreTime::Id))
+    if (mSupportsAddMoreTime)
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::AddMoreTime::kMetadataEntry }));
     }

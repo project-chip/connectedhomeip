@@ -16,14 +16,13 @@
  */
 #pragma once
 
-#include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/Delegate.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <clusters/MicrowaveOvenControl/Commands.h>
-#include <clusters/MicrowaveOvenControl/Enums.h>
+#include <cstdint>
+#include <optional>
 
 namespace chip::app::Clusters {
 
@@ -38,7 +37,7 @@ public:
     {
         BitMask<MicrowaveOvenControl::Feature> feature;
         OptionalAttributeSet optionalAttributeSet;
-        std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> optionalAcceptedCommands;
+        bool supportsAddMoreTime{};
         Clusters::OperationalState::Instance & opStateInstance;
         Clusters::ModeBase::Instance & microwaveOvenModeInstance;
         MicrowaveOvenControl::Delegate & delegate;
@@ -66,7 +65,7 @@ public:
 private:
     const BitMask<MicrowaveOvenControl::Feature> mFeature;
     const OptionalAttributeSet mOptionalAttributeSet;
-    std::bitset<MicrowaveOvenControl::Commands::kAcceptedCommandsCount> mOptionalAcceptedCommands;
+    const bool mSupportsAddMoreTime;
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
     MicrowaveOvenControl::Delegate & mDelegate;

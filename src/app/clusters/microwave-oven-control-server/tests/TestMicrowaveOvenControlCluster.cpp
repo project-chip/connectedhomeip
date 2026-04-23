@@ -198,12 +198,12 @@ struct TestMicrowaveOvenControlCluster : public ::testing::Test
     ModeBaseDelegate modeBaseDelegate;
     ModeBase::Instance microwaveOvenModeInstance{ &modeBaseDelegate, kRootEndpointId, MicrowaveOvenControl::Id, 0 };
     MicrowaveOvenControlDelegate microwaveOvenControlDelegate;
-    std::bitset<Commands::kAcceptedCommandsCount> optionalAcceptedCommands{ Commands::AddMoreTime::Id };
+    bool supportsAddMoreTime = true;
     MicrowaveOvenControlCluster::OptionalAttributeSet optionalAttributeSet{};
     MicrowaveOvenControlCluster::Config defaultConfig{
         .feature                   = BitFlags<Feature>{},
         .optionalAttributeSet      = optionalAttributeSet,
-        .optionalAcceptedCommands  = optionalAcceptedCommands,
+        .supportsAddMoreTime       = supportsAddMoreTime,
         .opStateInstance           = operationalStateInstance,
         .microwaveOvenModeInstance = microwaveOvenModeInstance,
         .delegate                  = microwaveOvenControlDelegate,
