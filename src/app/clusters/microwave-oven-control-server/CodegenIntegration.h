@@ -20,11 +20,28 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
+#include <app/clusters/microwave-oven-control-server/MicrowaveOvenIntegrationDelegate.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 namespace chip::app::Clusters::MicrowaveOvenControl {
+
+class CodegenMicrowaveOvenIntegrationDelegate : public MicrowaveOvenIntegrationDelegate
+{
+public:
+    CodegenMicrowaveOvenIntegrationDelegate(Clusters::OperationalState::Instance & aOpStateInstance,
+                                            Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance);
+    virtual ~CodegenMicrowaveOvenIntegrationDelegate() = default;
+
+    virtual uint8_t GetCurrentOperationalState() const override;
+    virtual Protocols::InteractionModel::Status GetNormalOperatingMode(uint8_t & mode) const override;
+    virtual Protocols::InteractionModel::Status IsSupportedMode(uint8_t mode) const override;
+
+private:
+    Clusters::OperationalState::Instance & mOpStateInstance;
+    Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+};
 
 class Instance
 {
@@ -96,8 +113,7 @@ private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
     BitMask<MicrowaveOvenControl::Feature> mFeature{};
-    Clusters::OperationalState::Instance & mOpStateInstance;
-    Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+    CodegenMicrowaveOvenIntegrationDelegate mIntegrationDelegate;
     MicrowaveOvenControlCluster::OptionalAttributeSet mOptionalAttributeSet{};
 
     // The Code Driven ChimeCluster instance (lazy-initialized)

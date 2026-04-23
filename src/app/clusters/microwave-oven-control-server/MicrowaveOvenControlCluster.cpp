@@ -56,8 +56,7 @@ bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNu
 MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(config.feature),
     mOptionalAttributeSet(config.optionalAttributeSet), mSupportsAddMoreTime(config.supportsAddMoreTime),
-    mOpStateInstance(config.opStateInstance), mMicrowaveOvenModeInstance(config.microwaveOvenModeInstance),
-    mDelegate(config.delegate), mCookTimeSec(kDefaultCookTimeSec)
+    mIntegrationDelegate(config.integrationDelegate), mDelegate(config.delegate), mCookTimeSec(kDefaultCookTimeSec)
 {}
 
 CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
@@ -198,20 +197,15 @@ std::optional<DataModel::ActionReturnStatus>
 MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                         const Commands::SetCookingParameters::DecodableType & commandData)
 {
-    Status status = Status::Success;
-    uint8_t opState;
-    uint8_t modeValue;
-    uint8_t reqCookMode;
-    uint32_t reqCookTimeSec;
-    bool reqStartAfterSetting;
+    Status status            = Status::Success;
     auto & cookMode          = commandData.cookMode;
     auto & cookTimeSec       = commandData.cookTime;
     auto & powerSetting      = commandData.powerSetting;
     auto & wattSettingIndex  = commandData.wattSettingIndex;
     auto & startAfterSetting = commandData.startAfterSetting;
 
-    opState = mOpStateInstance.GetCurrentOperationalState();
-    VerifyOrExit(opState == to_underlying(OperationalState::OperationalStateEnum::kStopped), status = Status::InvalidInState);
+    uint8_t opState = mIntegrationDelegate.GetCurrentOperationalState();
+    VerifyOrReturnError(opState == to_underlying(OperationalState::OperationalStateEnum::kStopped), Status::InvalidInState);
 
     if (startAfterSetting.HasValue())
     {
@@ -226,26 +220,27 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
                 return entry.commandId == OperationalState::Commands::Start::Id;
             }) != acceptedCommands.end();
 
-        VerifyOrExit(
-            commandExists, status = Status::InvalidCommand; ChipLogError(
+        VerifyOrReturnError(
+            commandExists, Status::InvalidCommand,
+            ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set cooking parameters, Start command of operational state is not supported"));
     }
-    reqStartAfterSetting = startAfterSetting.ValueOr(false);
+    bool reqStartAfterSetting = startAfterSetting.ValueOr(false);
 
-    modeValue = 0;
-    VerifyOrExit(mMicrowaveOvenModeInstance.GetModeValueByModeTag(to_underlying(MicrowaveOvenMode::ModeTag::kNormal), modeValue) ==
-                     CHIP_NO_ERROR,
-                 status = Status::InvalidCommand;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, Normal mode is not found"));
+    uint8_t modeValue = 0;
+    status            = mIntegrationDelegate.GetNormalOperatingMode(modeValue);
+    VerifyOrReturnError(status == Status::Success, status,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, Normal mode is not found"));
 
-    reqCookMode = cookMode.ValueOr(modeValue);
-    VerifyOrExit(mMicrowaveOvenModeInstance.IsSupportedMode(reqCookMode), status = Status::ConstraintError;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
+    uint8_t reqCookMode = cookMode.ValueOr(modeValue);
+    status              = mIntegrationDelegate.IsSupportedMode(reqCookMode);
+    VerifyOrReturnError(status == Status::Success, status,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
 
-    reqCookTimeSec = cookTimeSec.ValueOr(kDefaultCookTimeSec);
-    VerifyOrExit(IsCookTimeSecondsInRange(reqCookTimeSec, mDelegate.GetMaxCookTimeSec()), status = Status::ConstraintError;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
+    uint32_t reqCookTimeSec = cookTimeSec.ValueOr(kDefaultCookTimeSec);
+    VerifyOrReturnError(IsCookTimeSecondsInRange(reqCookTimeSec, mDelegate.GetMaxCookTimeSec()), Status::ConstraintError,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
     if (mFeature.Has(Feature::kPowerAsNumber))
     {
@@ -254,11 +249,13 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
         uint8_t maxPowerNum  = kDefaultMaxPowerNum;
         uint8_t minPowerNum  = kDefaultMinPowerNum;
         uint8_t powerStepNum = kDefaultPowerStepNum;
-        VerifyOrExit(!wattSettingIndex.HasValue(), status = Status::InvalidCommand; ChipLogError(
-            Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for wattSettingIndex"));
+        VerifyOrReturnError(
+            !wattSettingIndex.HasValue(), Status::InvalidCommand,
+            ChipLogError(Zcl,
+                         "Microwave Oven Control: Failed to set cooking parameters, should have no value for wattSettingIndex"));
 
-        VerifyOrExit(
-            cookMode.HasValue() || cookTimeSec.HasValue() || powerSetting.HasValue(), status = Status::InvalidCommand;
+        VerifyOrReturnError(
+            cookMode.HasValue() || cookTimeSec.HasValue() || powerSetting.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
         if (mFeature.Has(Feature::kPowerNumberLimits))
@@ -268,11 +265,13 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
             powerStepNum = mDelegate.GetPowerStepNum();
         }
         reqPowerSettingNum = powerSetting.ValueOr(maxPowerNum);
-        VerifyOrExit(IsPowerSettingNumberInRange(reqPowerSettingNum, minPowerNum, maxPowerNum), status = Status::ConstraintError;
-                     ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
+        VerifyOrReturnError(
+            IsPowerSettingNumberInRange(reqPowerSettingNum, minPowerNum, maxPowerNum), Status::ConstraintError,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
 
-        VerifyOrExit(
-            (reqPowerSettingNum - minPowerNum) % powerStepNum == 0, status = Status::ConstraintError; ChipLogError(
+        VerifyOrReturnError(
+            (reqPowerSettingNum - minPowerNum) % powerStepNum == 0, Status::ConstraintError,
+            ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 
@@ -293,27 +292,28 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
     {
         // if using power in watt, check if the param is invalid and set wattSettingIndex number.
         uint8_t reqWattSettingIndex;
-        VerifyOrExit(!powerSetting.HasValue(), status = Status::InvalidCommand; ChipLogError(
-            Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for powerSetting "));
+        VerifyOrReturnError(
+            !powerSetting.HasValue(), Status::InvalidCommand,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for powerSetting "));
 
-        VerifyOrExit(
-            cookMode.HasValue() || cookTimeSec.HasValue() || wattSettingIndex.HasValue(), status = Status::InvalidCommand;
+        VerifyOrReturnError(
+            cookMode.HasValue() || cookTimeSec.HasValue() || wattSettingIndex.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
         // count of supported watt levels must greater than 0
-        VerifyOrExit(
-            mSupportedWattLevels > 0,
+        VerifyOrReturnError(
+            mSupportedWattLevels > 0, Status::ConstraintError,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, count of supported watt levels is 0"));
         uint8_t maxWattSettingIndex = static_cast<uint8_t>(mSupportedWattLevels - 1);
         reqWattSettingIndex         = wattSettingIndex.ValueOr(maxWattSettingIndex);
-        VerifyOrExit(reqWattSettingIndex <= maxWattSettingIndex, status = Status::ConstraintError;
-                     ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
+        VerifyOrReturnError(
+            reqWattSettingIndex <= maxWattSettingIndex, Status::ConstraintError,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
 
         status = mDelegate.HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting, NullOptional,
                                                               MakeOptional(reqWattSettingIndex));
     }
 
-exit:
     return status;
 }
 
@@ -322,22 +322,19 @@ MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, cons
                                                const Commands::AddMoreTime::DecodableType & commandData)
 {
     Status status = Status::Success;
-    uint8_t opState;
-    uint32_t finalCookTimeSec;
 
-    opState = mOpStateInstance.GetCurrentOperationalState();
-    VerifyOrExit(opState != to_underlying(OperationalState::OperationalStateEnum::kError), status = Status::InvalidInState);
+    uint8_t opState = mIntegrationDelegate.GetCurrentOperationalState();
+    VerifyOrReturnError(opState != to_underlying(OperationalState::OperationalStateEnum::kError), Status::InvalidInState);
 
     // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
-    VerifyOrExit(commandData.timeToAdd <= mDelegate.GetMaxCookTimeSec() &&
-                     GetCookTimeSec() <= mDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
-                 status = Status::ConstraintError;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
+    VerifyOrReturnError(commandData.timeToAdd <= mDelegate.GetMaxCookTimeSec() &&
+                            GetCookTimeSec() <= mDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
+                        Status::ConstraintError,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
-    finalCookTimeSec = GetCookTimeSec() + commandData.timeToAdd;
-    status           = mDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
+    uint32_t finalCookTimeSec = GetCookTimeSec() + commandData.timeToAdd;
+    status                    = mDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
 
-exit:
     return status;
 }
 

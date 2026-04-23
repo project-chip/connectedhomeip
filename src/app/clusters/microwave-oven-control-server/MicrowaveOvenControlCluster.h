@@ -17,8 +17,7 @@
 #pragma once
 
 #include <app/clusters/microwave-oven-control-server/Delegate.h>
-#include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/clusters/microwave-oven-control-server/MicrowaveOvenIntegrationDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <cstdint>
@@ -38,8 +37,7 @@ public:
         BitMask<MicrowaveOvenControl::Feature> feature;
         OptionalAttributeSet optionalAttributeSet;
         bool supportsAddMoreTime{};
-        Clusters::OperationalState::Instance & opStateInstance;
-        Clusters::ModeBase::Instance & microwaveOvenModeInstance;
+        MicrowaveOvenControl::MicrowaveOvenIntegrationDelegate & integrationDelegate;
         MicrowaveOvenControl::Delegate & delegate;
     };
 
@@ -66,8 +64,7 @@ private:
     const BitMask<MicrowaveOvenControl::Feature> mFeature;
     const OptionalAttributeSet mOptionalAttributeSet;
     const bool mSupportsAddMoreTime;
-    Clusters::OperationalState::Instance & mOpStateInstance;
-    Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+    MicrowaveOvenControl::MicrowaveOvenIntegrationDelegate & mIntegrationDelegate;
     MicrowaveOvenControl::Delegate & mDelegate;
 
     uint32_t mCookTimeSec{};

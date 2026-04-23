@@ -21,10 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace MicrowaveOvenControl {
+namespace chip::app::Clusters::MicrowaveOvenControl {
 
 class Instance;
 
@@ -119,7 +116,4 @@ protected:
     Instance * GetInstance() { return mInstance; }
 };
 
-} // namespace MicrowaveOvenControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::MicrowaveOvenControl

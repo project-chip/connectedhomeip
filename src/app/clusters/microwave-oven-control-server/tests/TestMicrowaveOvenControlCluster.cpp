@@ -23,7 +23,6 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/MicrowaveOvenControl/Metadata.h>
-#include <clusters/OperationalState/Metadata.h>
 
 namespace {
 
@@ -33,10 +32,29 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
 using namespace chip::Testing;
+using Status = Protocols::InteractionModel::Status;
 
 constexpr uint32_t kDefaultCookTimeSec = 30u;
 
-class MicrowaveOvenControlDelegate : public MicrowaveOvenControl::Delegate
+class MicrowaveOvenControlIntegrationDelegate : public MicrowaveOvenIntegrationDelegate
+{
+public:
+    virtual uint8_t GetCurrentOperationalState() const override { return 0; }
+
+    virtual Protocols::InteractionModel::Status GetNormalOperatingMode(uint8_t & mode) const override
+    {
+        mode = 0;
+        return Status::Success;
+    }
+
+    virtual Protocols::InteractionModel::Status IsSupportedMode(uint8_t mode) const override
+    {
+        VerifyOrReturnError(mode == 0, Status::ConstraintError);
+        return Status::Success;
+    }
+};
+
+class MicrowaveOvenControlDelegate : public Delegate
 {
 public:
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
@@ -87,103 +105,6 @@ private:
     const uint16_t mWattSettingList[5] = { 100u, 300u, 500u, 800u, 1000u };
 };
 
-class OperationalStateDelegate : public OperationalState::Delegate
-{
-public:
-    app::DataModel::Nullable<uint32_t> mCountDownTime;
-
-    app::DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountDownTime; }
-
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState) override
-    {
-        if (index >= mOperationalStateList.size())
-        {
-            return CHIP_ERROR_NOT_FOUND;
-        }
-        operationalState = mOperationalStateList[index];
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override
-    {
-        if (index >= mOperationalPhaseList.size())
-        {
-            return CHIP_ERROR_NOT_FOUND;
-        }
-        return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
-    }
-
-    void HandlePauseStateCallback(OperationalState::GenericOperationalError & err) override {}
-    void HandleResumeStateCallback(OperationalState::GenericOperationalError & err) override {}
-    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override {}
-    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override {}
-
-private:
-    Span<const OperationalState::GenericOperationalState> mOperationalStateList;
-    Span<const CharSpan> mOperationalPhaseList;
-};
-
-class ModeBaseDelegate : public ModeBase::Delegate
-{
-private:
-    using ModeTagStructType = Clusters::detail::Structs::ModeTagStruct::Type;
-
-    ModeTagStructType modeTagsNormal[1] = { { .mfgCode = {}, .value = 0 } };
-    ModeTagStructType modeTagsHeavy[2]  = { { .mfgCode = {}, .value = 1 }, { .mfgCode = {}, .value = 2 } };
-    ModeTagStructType modeTagsLight[3]  = { { .mfgCode = {}, .value = 3 },
-                                            { .mfgCode = {}, .value = 4 },
-                                            { .mfgCode = {}, .value = 5 } };
-
-    const Clusters::detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        Clusters::detail::Structs::ModeOptionStruct::Type{
-            .label = "Normal"_span, .mode = 0, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
-        Clusters::detail::Structs::ModeOptionStruct::Type{
-            .label = "Heavy"_span, .mode = 1, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsHeavy) },
-        Clusters::detail::Structs::ModeOptionStruct::Type{
-            .label = "Light"_span, .mode = 2, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsLight) }
-    };
-
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
-
-    void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override {}
-
-    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override
-    {
-        if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-        {
-            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-        }
-        return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-    }
-
-    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override
-    {
-        if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-        {
-            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-        }
-        value = kModeOptions[modeIndex].mode;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override
-    {
-        if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-        {
-            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-        }
-
-        if (tags.size() < kModeOptions[modeIndex].modeTags.size())
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
-        tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
-        return CHIP_NO_ERROR;
-    }
-};
-
 struct TestMicrowaveOvenControlCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -193,20 +114,16 @@ struct TestMicrowaveOvenControlCluster : public ::testing::Test
     TestMicrowaveOvenControlCluster() {}
 
     TestServerClusterContext testContext;
-    OperationalStateDelegate operationalStateDelegate;
-    OperationalState::Instance operationalStateInstance{ &operationalStateDelegate, kRootEndpointId };
-    ModeBaseDelegate modeBaseDelegate;
-    ModeBase::Instance microwaveOvenModeInstance{ &modeBaseDelegate, kRootEndpointId, MicrowaveOvenControl::Id, 0 };
     MicrowaveOvenControlDelegate microwaveOvenControlDelegate;
     bool supportsAddMoreTime = true;
     MicrowaveOvenControlCluster::OptionalAttributeSet optionalAttributeSet{};
+    MicrowaveOvenControlIntegrationDelegate microwaveOvenControlIntegrationDelegate;
     MicrowaveOvenControlCluster::Config defaultConfig{
-        .feature                   = BitFlags<Feature>{},
-        .optionalAttributeSet      = optionalAttributeSet,
-        .supportsAddMoreTime       = supportsAddMoreTime,
-        .opStateInstance           = operationalStateInstance,
-        .microwaveOvenModeInstance = microwaveOvenModeInstance,
-        .delegate                  = microwaveOvenControlDelegate,
+        .feature              = BitFlags<Feature>{},
+        .optionalAttributeSet = optionalAttributeSet,
+        .supportsAddMoreTime  = supportsAddMoreTime,
+        .integrationDelegate  = microwaveOvenControlIntegrationDelegate,
+        .delegate             = microwaveOvenControlDelegate,
     };
 };
 
