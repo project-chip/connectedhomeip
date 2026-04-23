@@ -253,6 +253,31 @@ TEST_F(TestCommissioningProxyCluster, TestMandatoryAttributes)
     ASSERT_EQ(tester.ReadAttribute(CPAttributes::ScanMaxTime::Id, scanMaxTime), CHIP_NO_ERROR);
     EXPECT_EQ(scanMaxTime, 120);
 
+    uint8_t maxSessions = 0;
+    ASSERT_EQ(tester.ReadAttribute(CPAttributes::MaxSessions::Id, maxSessions), CHIP_NO_ERROR);
+    EXPECT_EQ(maxSessions, mockDelegate.GetMaxSessions());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// MaxSessions attribute must reflect the delegate's GetMaxSessions() value,
+// not a hardcoded constant.
+TEST_F(TestCommissioningProxyCluster, TestMaxSessionsAttributeReadsFromDelegate)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> noFeatures;
+
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    // Default mMaxSessions == 1.
+    uint8_t maxSessions = 0;
+    ASSERT_EQ(tester.ReadAttribute(CPAttributes::MaxSessions::Id, maxSessions), CHIP_NO_ERROR);
+    EXPECT_EQ(maxSessions, 1u);
+
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
