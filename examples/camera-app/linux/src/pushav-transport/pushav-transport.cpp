@@ -487,6 +487,12 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneIds count: [%zu], Sensitivity: [%d]",
                     (uint16_t) activationReason, zoneIds.size(), sensitivity);
 
+    if (mTransportStatus == TransportStatusEnum::kInactive)
+    {
+        ChipLogProgress(Camera, "PushAVTransport trigger ignored- transport status is Inactive");
+        return;
+    }
+
     // Handle edge case where zoneIds is empty
     if (zoneIds.empty())
     {
