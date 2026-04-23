@@ -38,6 +38,7 @@ public:
     {
         std::string type;
         chip::EndpointId endpoint;
+        chip::EndpointId parentId = chip::kInvalidEndpointId;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();

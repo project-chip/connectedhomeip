@@ -72,23 +72,53 @@ bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
 {
     VerifyOrReturnValue(value != nullptr, false);
 
-    config.endpoint = 1; // Default to endpoint 1
+    // Set default values for optional fields
+    config.endpoint = 1;
+    config.parentId = chip::kInvalidEndpointId;
 
-    const char * colonPos = strchr(value, ':');
-    if (colonPos != nullptr)
+    // Find the first colon to separate type from endpoint
+    const char * firstColon = strchr(value, ':');
+    
+    // Case 1: No colon present. The entire value is treated as the device type.
+    // Example: "chime" -> type="chime", endpoint=1, parentId=invalid
+    if (firstColon == nullptr)
     {
-        config.type.assign(value, static_cast<size_t>(colonPos - value));
+        config.type = value;
+        return true;
+    }
 
-        if (!ParseEndpointId(colonPos + 1, config.endpoint))
+    // Extract the type (all characters before the first colon)
+    config.type.assign(value, static_cast<size_t>(firstColon - value));
+
+    // Find the second colon to separate endpoint from parent
+    const char * secondColon = strchr(firstColon + 1, ':');
+    
+    // The endpoint ID starts immediately after the first colon
+    const char * endpointStart = firstColon + 1;
+    
+    // If a second colon exists, the endpoint ID is between the colons.
+    // Otherwise, it extends to the end of the string.
+    size_t endpointLen = secondColon ? static_cast<size_t>(secondColon - endpointStart) : strlen(endpointStart);
+    
+    // Extract and parse the endpoint ID
+    std::string endpointStr(endpointStart, endpointLen);
+    if (!ParseEndpointId(endpointStr.c_str(), config.endpoint))
+    {
+        ChipLogError(Support, "Invalid endpoint ID in device config: %s\n", value);
+        return false;
+    }
+
+    // Case 2: Two colons present (format: type:endpoint:parent)
+    // Extract and parse the parent ID after the second colon.
+    if (secondColon != nullptr)
+    {
+        if (!ParseEndpointId(secondColon + 1, config.parentId))
         {
-            ChipLogError(Support, "Invalid endpoint ID in device config: %s\n", value);
+            ChipLogError(Support, "Invalid parent endpoint ID in device config: %s\n", value);
             return false;
         }
     }
-    else
-    {
-        config.type = value;
-    }
+
     return true;
 }
 
