@@ -29,7 +29,7 @@ from unittest.mock import MagicMock, patch
 
 # Make the module under test importable regardless of working directory.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import check_alchemy_metadata as cam # noqa: E402 isort:skip
+import check_alchemy_metadata as cam  # noqa: E402 isort:skip
 
 # ---------------------------------------------------------------------------
 # Shared XML content helpers
