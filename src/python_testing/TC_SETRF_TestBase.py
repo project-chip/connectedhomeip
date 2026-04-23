@@ -996,7 +996,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                                  "DefaultRandomizationType must be Null when TariffInfo is Null")
 
         # check if RNDM feature is enabled
-        if (await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
+        if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
                 self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
             # if feature is enabled, DefaultRandomizationType attribute must not be None
             asserts.assert_is_not_none(

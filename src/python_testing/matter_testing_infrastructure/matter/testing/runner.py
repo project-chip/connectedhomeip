@@ -460,46 +460,46 @@ def run_tests_no_exit(
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
-                setup_code: Optional[str] = None
+            setup_code: Optional[str] = None
 
-                if matter_test_config.manual_code:
-                    setup_code = matter_test_config.manual_code[0]
-                elif matter_test_config.qr_code_content:
-                    setup_code = matter_test_config.qr_code_content[0]
-                elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
-                    setup_code = default_controller.CreateManualCode(
-                        matter_test_config.discriminators[0],
-                        matter_test_config.setup_passcodes[0],
+            if matter_test_config.manual_code:
+                setup_code = matter_test_config.manual_code[0]
+            elif matter_test_config.qr_code_content:
+                setup_code = matter_test_config.qr_code_content[0]
+            elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
+                setup_code = default_controller.CreateManualCode(
+                    matter_test_config.discriminators[0],
+                    matter_test_config.setup_passcodes[0],
+                )
+
+            if setup_code is not None:
+                node_id = matter_test_config.dut_node_ids[0]
+
+                commissionee = event_loop.run_until_complete(
+                    default_controller.FindOrEstablishPASESession(
+                        setupCode=setup_code,
+                        nodeId=node_id
                     )
+                )
 
-                if setup_code is not None:
-                    node_id = matter_test_config.dut_node_ids[0]
-
-                    commissionee = event_loop.run_until_complete(
-                        default_controller.FindOrEstablishPASESession(
-                            setupCode=setup_code,
-                            nodeId=node_id
+                if commissionee is not None:
+                    stored_global_wildcard = event_loop.run_until_complete(
+                        asyncio.wait_for(
+                            default_controller.Read(
+                                node_id,
+                                [
+                                    (Clusters.Descriptor),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                                ],
+                            ),
+                            timeout=60,
                         )
                     )
-
-                    if commissionee is not None:
-                        stored_global_wildcard = event_loop.run_until_complete(
-                            asyncio.wait_for(
-                                default_controller.Read(
-                                    node_id,
-                                    [
-                                        (Clusters.Descriptor),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                    ],
-                                ),
-                                timeout=60,
-                            )
-                        )
-                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
-                    else:
-                        LOGGER.error("FindOrEstablishPASESession returned None, stored_global_wildcard will not be pre-populated.")
+                    test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                else:
+                    LOGGER.error("FindOrEstablishPASESession returned None, stored_global_wildcard will not be pre-populated.")
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:

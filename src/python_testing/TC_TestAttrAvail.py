@@ -105,7 +105,7 @@ class TC_TestAttrAvail(BasicCompositionTests):
         self.print_step("Operational State Attr", attr_should_be_there)
 
         self.step(3)
-        cmd_should_be_there = await self.command_guard(endpoint=self.endpoint, command=commands.Resume)
+        cmd_should_be_there = self.command_guard(endpoint=self.endpoint, command=commands.Resume)
         asserts.assert_true(cmd_should_be_there, True)
         self.print_step("Operational Resume Command available ", cmd_should_be_there)
 
