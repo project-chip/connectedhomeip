@@ -636,7 +636,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
     switch (clusterId)
     {
     case OnOff::Id:
-        if (attributeId == OnOff::Attributes::OnOff::Id && value != nullptr)
+        if (attributeId == OnOff::Attributes::OnOff::Id && value != nullptr && size == sizeof(uint8_t))
         {
             CustomerAppTask::GetAppTask().InitiateAction(AppEvent::kEventType_Light,
                                                          *value ? AppTask::ON_ACTION : AppTask::OFF_ACTION, value);
@@ -644,7 +644,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
         break;
 
     case LevelControl::Id:
-        if (attributeId == LevelControl::Attributes::CurrentLevel::Id && value != nullptr)
+        if (attributeId == LevelControl::Attributes::CurrentLevel::Id && value != nullptr && size == sizeof(uint8_t))
         {
             CustomerAppTask::GetAppTask().InitiateAction(AppEvent::kEventType_Light, AppTask::LEVEL_ACTION, value);
         }
@@ -656,12 +656,22 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
         {
         case ColorControl::Attributes::CurrentX::Id:
         case ColorControl::Attributes::CurrentY::Id:
+            if (size != sizeof(uint16_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
+                return;
+            }
             CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_XY, attributeId,
                                                                   value);
             break;
 
         case ColorControl::Attributes::CurrentHue::Id:
         case ColorControl::Attributes::CurrentSaturation::Id:
+            if (size != sizeof(uint8_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
+                return;
+            }
             CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV, attributeId,
                                                                   value);
             break;
@@ -683,8 +693,11 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
         break;
 
     case Identify::Id:
-        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
+        if (value != nullptr && size == sizeof(uint8_t))
+        {
+            ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                            ChipLogValueMEI(attributeId), type, *value, size);
+        }
         break;
 
     default:
