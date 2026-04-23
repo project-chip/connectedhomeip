@@ -103,7 +103,7 @@ class TC_DD_3_24(MatterBaseTest):
             f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
         )
 
-        self.matter_test_config.commissioning_method = commissioning_method        
+        self.matter_test_config.commissioning_method = commissioning_method
 
         log.info("default_controller in test: %s (id=%s)",
                  getattr(self, "default_controller", None),
