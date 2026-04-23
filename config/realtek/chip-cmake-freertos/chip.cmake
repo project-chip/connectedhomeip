@@ -124,6 +124,8 @@ string(APPEND CHIP_GN_ARGS "${import_str}")
 # Set arm_platform_config based on RT_PLATFORM
 if(RT_PLATFORM STREQUAL "rtl87x2g")
   set(arm_gni_path "//config/realtek/chip-gn-freertos/rtl87x2g/arm.gni")
+else()
+  message(FATAL_ERROR "RT_PLATFORM is not set or set to an unsupported value: '${RT_PLATFORM}'")
 endif()
 string(APPEND CHIP_GN_ARGS "arm_platform_config = \"${arm_gni_path}\"\n")
 
@@ -226,6 +228,7 @@ ExternalProject_Add(
                             --dotfile=${CHIP_ROOT}/config/realtek/chip-gn-freertos/.gn
                             gen
                             --check
+                            --fail-on-unused-args
                             "${CHIP_OUTPUT}"
     BUILD_COMMAND           ninja -C "${CHIP_OUTPUT}" rtk
     INSTALL_COMMAND         ""
