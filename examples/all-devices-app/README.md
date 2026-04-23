@@ -3,7 +3,7 @@
 The `all-devices-app` is a sample application for the Matter SDK that
 demonstrates the **Code-Driven paradigm**, which removes the dependency on
 generated code (ZAP tool) and global instances. This is the recommended approach
-for developing Matter applications moving forward, as it allows testing various
+for developing Matter applications, as it allows testing various
 device types and clusters without requiring recompilation for each
 configuration.
 
