@@ -669,9 +669,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     def get_test_desc(self, test: str) -> str:
         ''' Returns a description of this test
 
-            Test description is defined in the function called desc_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            desc_TC_TEST_1_1.
+            Test description is defined in the function called desc_<functionname>,
+            or as a docstring on the test method itself.
+            The desc_* method takes precedence if both are defined.
 
             Format:
             <Test plan reference> [<test plan number>] <test plan name>
@@ -679,12 +679,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = f'desc_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, desc_name)
-            return fn()
-        except AttributeError:
-            return test
+        if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
+            return desc_method()
+        test_method = getattr(self, test)
+        if doc := test_method.__doc__:
+            return doc.strip()
+        return test
 
     #
     # Matter Test API - Step Management & Execution
