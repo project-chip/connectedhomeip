@@ -68,8 +68,6 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
 
     if (newSpeed != currentSpeed)
     {
-        cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed));
-
         if (currentSpeed == 0 && newSpeed > 0)
         {
             cluster.SetOnOffState(true);
@@ -82,7 +80,7 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
 
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from %u to %u", currentSpeed, newSpeed);
 
-    return Protocols::InteractionModel::Status::Success;
+    return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed)).GetStatusCode().GetStatus();
 }
 
 void LoggingFanDevice::OnFanStateChanged(bool isOn)

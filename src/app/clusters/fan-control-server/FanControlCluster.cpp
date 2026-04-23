@@ -393,7 +393,7 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
         }
 
         bool wrapValue      = commandData.wrap.ValueOr(false);
-        bool lowestOffValue = commandData.lowestOff.ValueOr(false);
+        bool lowestOffValue = commandData.lowestOff.ValueOr(true);
 
         if (mDelegate == nullptr)
         {
