@@ -2,15 +2,21 @@
 name: code-driven-cluster-development
 description: >
     Guidelines for implementing Matter server clusters using the
-    DefaultServerCluster base class (code-driven approach). Use this skill
-    when writing a new cluster or adding features to an already-migrated one.
+    DefaultServerCluster base class (code-driven approach). Use this skill when
+    working in src/app/clusters/ — writing a new cluster, adding features to an
+    existing one, or reviewing any change in that directory.
 ---
 
 # Code-Driven Cluster Development
 
 ## What Is a Code-Driven Cluster?
 
-A _code-driven_ cluster is a `ServerClusterInterface` implementation that lives in `src/app/clusters/<cluster-folder>/` and extends `DefaultServerCluster`. It stores its own attribute state in C++ member variables instead of the legacy Ember RAM store. The framework calls methods like `ReadAttribute` directly; ZAP-generated accessors (`emberAfReadAttribute`) must not be used inside the cluster class.
+A _code-driven_ cluster is a `ServerClusterInterface` implementation that lives
+in `src/app/clusters/<cluster-folder>/` and extends `DefaultServerCluster`. It
+stores its own attribute state in C++ member variables instead of the legacy
+Ember RAM store. The framework calls methods like `ReadAttribute` directly;
+ZAP-generated accessors (`emberAfReadAttribute`) must not be used inside the
+cluster class.
 
 ---
 
@@ -62,35 +68,43 @@ subdirectory while placing the new code-driven implementation in the root.
 ## Core Cluster Class
 
 ### Header Pattern
-- **Nested `Config`**: Use a nested `Config` struct for constructor arguments.
-- **Builders**: Use `WithXxx()` methods for optional attributes to ensure flags and values are set together.
-- **No `Init()`**: Use `Startup()` and `Shutdown()`.
-- **No Redundant Members**: Do not store `EndpointId`, `mIsRegistered`, or `mContext`. These are handled by the base class.
+
+-   **Nested `Config`**: Use a nested `Config` struct for constructor arguments.
+-   **Builders**: Use `WithXxx()` methods for optional attributes to ensure
+    flags and values are set together.
+-   **No `Init()`**: Use `Startup()` and `Shutdown()`.
+-   **No Redundant Members**: Do not store `EndpointId`, `mIsRegistered`, or
+    `mContext`. These are handled by the base class.
 
 ### Implementation Pattern
 
+**When to call the base class**: You MUST call the base class from `Startup()`
+and `Shutdown()`. Do NOT call the base class from `ReadAttribute`,
+`WriteAttribute`, or `InvokeCommand` — there is no base-class behavior for these
+methods; return `UnsupportedAttribute` / `UnsupportedCommand` directly in the
+`default` case instead.
+
 #### `ReadAttribute`
-- **Exhaustive**: Handle `ClusterRevision`, `FeatureMap`, and all attributes in one `switch`.
-- **Direct Return**: Return `UnsupportedAttribute` in the `default` case. No redundant path-validity checks.
+
+-   **Exhaustive**: Handle `ClusterRevision`, `FeatureMap`, and all attributes
+    in one `switch`.
+-   **No Delegation**: Return `UnsupportedAttribute` directly in the `default`
+    case. Do not call `DefaultServerCluster::ReadAttribute` — it has no base
+    behavior.
+-   **No pre-switch path checks**: The framework only calls `ReadAttribute` for
+    paths in the `Attributes()` list; pre-switch validity checks add code size
+    and are redundant.
+-   **No feature-flag checks inside switch cases**: If optional attributes are
+    already conditionally included in `Attributes()`, do not re-check their
+    feature flags inside the switch — the framework has already pre-filtered.
 
 #### `WriteAttribute`
-- **Delegate**: Return `DefaultServerCluster::WriteAttribute` in the `default` case to handle base behavior.
-- **No Double-Notify**: If a setter (e.g., `SetAttributeValue`) already notifies, don't wrap it in `NotifyAttributeChangedIfSuccess`.
 
--   **Return `Protocols::InteractionModel::Status::UnsupportedAttribute`
-    directly in the `default` case.**
--   The framework pre-filters requests so `ReadAttribute` is only called for
-    paths that are in the `Attributes()` list; returning `UnsupportedAttribute`
-    for anything unrecognised is the correct and consistent pattern.
--   Always encode/handle `ClusterRevision` and `FeatureMap` explicitly.
--   **Do not add path-validity checks** before the switch — they add code size
-    and are redundant because the framework guarantees the path exists.
--   **Do not add feature-flag checks inside the switch cases** for optional
-    attributes if those attributes are already conditionally included in the
-    `Attributes()` list. The framework pre-filters requests based on the
-    supported attributes list.
--   Do not add returning `UnsupportedAttribute` inside attribute switch
-    handling. Existent path checks ensure those code lines would never be used.
+-   **No Delegation**: Return `UnsupportedAttribute` directly in the `default`
+    case. Do not call `DefaultServerCluster::WriteAttribute` — there is no base
+    behavior.
+-   **No Double-Notify**: If a setter (e.g., `SetAttributeValue`) already
+    notifies, don't wrap it in `NotifyAttributeChangedIfSuccess`.
 
 #### `Attributes`
 
@@ -182,9 +196,8 @@ DataModel::ActionReturnStatus FooCluster::WriteAttribute(
 ```
 
 Return `Protocols::InteractionModel::Status::UnsupportedAttribute` directly in
-the `default` case to avoid the overhead of a virtual call to
-`DefaultServerCluster::WriteAttribute`. This is consistent with the pattern used
-in `ReadAttribute`.
+the `default` case. Do not delegate to `DefaultServerCluster::WriteAttribute` —
+there is no base-class behavior for write operations.
 
 #### Commands
 
@@ -293,26 +306,55 @@ Override `EventInfo` only when non-default read privileges are needed.
 
 ## CodegenIntegration Layer
 
-This is the **only** place where Ember/ZAP APIs (`Accessors::Get/Set`) are allowed.
-1. Allocate via `LazyRegisteredServerCluster`.
-2. Read ZAP defaults in an `IntegrationDelegate` to populate the `Config`.
-3. Provide `FindClusterOnEndpoint()` for application access.
+This is the **only** place where Ember/ZAP APIs (`Accessors::Get/Set`) are
+allowed. Typical pattern:
+
+1. Allocate the cluster via `LazyRegisteredServerCluster`.
+2. Read ZAP defaults in an `IntegrationDelegate` to populate the `Config`. The
+   delegate is used only during init/lookup/shutdown, so it is safe — and
+   preferred — to allocate it **on the stack**.
+3. Register with the data model via `CodegenClusterIntegration::RegisterServer`.
+4. Provide `FindClusterOnEndpoint()` for application access.
+
+```cpp
+void MatterFooPluginServerInitCallback()
+{
+    // IntegrationDelegate is only used during lookups — stack allocation is fine.
+    IntegrationDelegate delegate;
+    LazyRegisteredServerCluster<FooCluster> * cluster = /* allocate */;
+    CodegenClusterIntegration::RegisterServer(*cluster, delegate);
+}
+```
+
+See `src/data-model-providers/codegen/ClusterIntegration.h` for the full API.
 
 ---
 
 ## Unit Testing with ClusterTester
 
-The `ClusterTester` helper class (in `src/app/server-cluster/testing/ClusterTester.h`) is mandatory for testing. It abstracts TLV handling, memory management for views, and fabric context.
+The `ClusterTester` helper class (in
+`src/app/server-cluster/testing/ClusterTester.h`) is mandatory for testing. It
+abstracts TLV handling, memory management for views, and fabric context. See
+`src/app/server-cluster/testing/` for full documentation and examples.
 
 ### Capabilities & Patterns
-- **Direct Testing**: Instantiate the cluster class directly using `TestServerClusterContext`.
-- **Automatic TLV**: Use `tester.ReadAttribute(Id, outValue)`, `tester.WriteAttribute(Id, inValue)`, and `tester.Invoke(requestStruct)`.
-- **Side Effects**: Verify events via `tester.GetNextGeneratedEvent()` and dirty markings via `tester.GetDirtyList()`.
-- **Fabric Scoping**: Use `tester.SetFabricIndex(idx)` to simulate actions from specific fabrics.
-- **Coverage**:
-    - Every feature combination in `Attributes()` and `AcceptedCommands()`.
-    - Boundary cases (min, max, null sentinel rejection).
-    - Dirty markings (reporting) for every state change.
+
+-   **Direct Testing**: Instantiate the cluster class directly using
+    `TestServerClusterContext`.
+-   **Automatic TLV**: Use `tester.ReadAttribute(Id, outValue)`,
+    `tester.WriteAttribute(Id, inValue)`, and `tester.Invoke(requestStruct)`.
+-   **Side Effects**: Verify events via `tester.GetNextGeneratedEvent()` and
+    dirty markings via `tester.GetDirtyList()`.
+-   **Fabric Scoping**: Use `tester.SetFabricIndex(idx)` to simulate actions
+    from specific fabrics.
+-   **Coverage**:
+    -   Every feature combination in `Attributes()` and `AcceptedCommands()`.
+    -   Boundary cases (min, max, null sentinel rejection).
+    -   Dirty markings (reporting) for every state change.
+-   **No `sleep` in tests**: Unit tests must never call `sleep()` or rely on
+    real-time delays. If the cluster has time-dependent behavior, use a mock
+    clock. Test-plan steps that say "wait X seconds" should advance the mock
+    clock, not sleep.
 
 ---
 
@@ -321,9 +363,16 @@ The `ClusterTester` helper class (in `src/app/server-cluster/testing/ClusterTest
 Tests must prove the cluster adheres to the Matter Specification and Test Plans.
 
 ### Consult the Source of Truth
-Use the `matter-specification-access` skill to obtain and read the latest specification and test plans.
-- **Validate Semantics**: Ensure `ReadAttribute` and `WriteAttribute` handle constraints exactly as defined in the spec.
-- **Mirror Test Plans**: Use the `.adoc` test plans (e.g., `src/cluster/<name>.adoc` in `chip-test-plans` repo) as the blueprint for your unit tests. If a test plan requires a specific error (e.g., `ConstraintError`), the unit test must assert it.
+
+Use the `matter-specification-access` skill to obtain and read the latest
+specification and test plans.
+
+-   **Validate Semantics**: Ensure `ReadAttribute` and `WriteAttribute` handle
+    constraints exactly as defined in the spec.
+-   **Mirror Test Plans**: Use the `.adoc` test plans (e.g.,
+    `src/cluster/<name>.adoc` in `chip-test-plans` repo) as the blueprint for
+    your unit tests. If a test plan requires a specific error (e.g.,
+    `ConstraintError`), the unit test must assert it.
 
 ---
 
@@ -348,8 +397,9 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
 
 1. **Unlisted headers** — every `.h` file must appear in a build file.
 2. **Ember APIs in cluster core** — move them to `CodegenIntegration.cpp`.
-3. **Missing `VerifyOrDie` / null checks on singleton pointers** — e.g.
-   `Server::GetInstance().GetCASESessionManager()` may return null.
+3. **Missing null checks on pointer-returning singletons** — e.g.
+   `Server::GetInstance().GetCASESessionManager()` may return null; check with
+   `VerifyOrDie` or `VerifyOrReturnError` before use.
 4. **Invalid ZAP defaults not handled gracefully** — e.g. if `min` > `max` in
    ZAP, the cluster should handle this safely (e.g. by nulling the range) rather
    than crashing.
@@ -389,6 +439,23 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
       `CodegenIntegration.h/cpp` when the goal is to avoid direct coupling to
       `Server` / `InteractionModelEngine` in the cluster itself when only a
       small subset of their functionality is needed.
+13. **Namespace pollution in headers** — Do not add top-level
+    `using DataModel::X` aliases in headers. Exception: within a class body,
+    `using Feature = SomeConcreteCluster::Feature` is acceptable (and useful)
+    for base-cluster type aliasing so that codegen-derived types are accessible
+    through the base.
+14. **Unnecessary forward declarations** — Avoid forward declarations in cluster
+    headers; they often signal poor coupling. Exception: a delegate interface
+    header may forward-declare the cluster class when delegate methods take the
+    cluster as an argument (e.g.,
+    `void OnFooChanged(BarCluster & cluster, Foo newValue)`).
+15. **Storing mEndpointId** — Do not add a member `mEndpointId`. Use
+    `mPath.mEndpointId` (inherited from `DefaultServerCluster`) directly.
+16. **Numeric literal format** — Use whichever base is most readable for the
+    value. Decimal is clearer for small bounds (e.g., `9999`), but hex is better
+    for bitmasks, nullable sentinels (e.g., `0xFFFE`, `0xFF`), and range
+    boundaries that are naturally expressed in hex (e.g., `0x3FFF`, `0x7FFF`).
+    Do not mechanically convert hex to decimal just to avoid hex.
 
 ---
 
@@ -396,20 +463,21 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
 
 Study these clusters to understand specific implementation patterns:
 
-| Pattern | Reference Cluster | PR |
-|---|---|---|
-| Simple Measurement | `relative-humidity-measurement-server` | [#71424](https://github.com/project-chip/connectedhomeip/pull/71424) |
-| Command-heavy + Delegate | `actions-server` | [#43471](https://github.com/project-chip/connectedhomeip/pull/43471) |
-| Multi-instance | `closure-dimension-server` | [#43720](https://github.com/project-chip/connectedhomeip/pull/43720) |
-| Singleton (Node-scoped) | `basic-information` | [#40422](https://github.com/project-chip/connectedhomeip/pull/40422) |
-| Runtime-only (no defaults) | `flow-measurement-server` | [#71552](https://github.com/project-chip/connectedhomeip/pull/71552) |
-| Identify/Timer-driven | `identify-server` | [#41232](https://github.com/project-chip/connectedhomeip/pull/41232) |
-| Writable scalar + features | `switch-server` | [#42968](https://github.com/project-chip/connectedhomeip/pull/42968) |
+| Pattern                    | Reference Cluster                      | PR                                                                   |
+| -------------------------- | -------------------------------------- | -------------------------------------------------------------------- |
+| Simple Measurement         | `relative-humidity-measurement-server` | [#71424](https://github.com/project-chip/connectedhomeip/pull/71424) |
+| Command-heavy + Delegate   | `actions-server`                       | [#43471](https://github.com/project-chip/connectedhomeip/pull/43471) |
+| Multi-instance             | `closure-dimension-server`             | [#43720](https://github.com/project-chip/connectedhomeip/pull/43720) |
+| Singleton (Node-scoped)    | `basic-information`                    | [#40422](https://github.com/project-chip/connectedhomeip/pull/40422) |
+| Runtime-only (no defaults) | `flow-measurement-server`              | [#71552](https://github.com/project-chip/connectedhomeip/pull/71552) |
+| Identify/Timer-driven      | `identify-server`                      | [#41232](https://github.com/project-chip/connectedhomeip/pull/41232) |
+| Writable scalar + features | `switch-server`                        | [#42968](https://github.com/project-chip/connectedhomeip/pull/42968) |
 
 ---
 
 ## References
 
-- **Base Class**: `src/app/server-cluster/DefaultServerCluster.h`
-- **Testing**: `src/app/server-cluster/testing/`
-- **Integration Helper**: `src/data-model-providers/codegen/ClusterIntegration.h`
+-   **Base Class**: `src/app/server-cluster/DefaultServerCluster.h`
+-   **Testing**: `src/app/server-cluster/testing/`
+-   **Integration Helper**:
+    `src/data-model-providers/codegen/ClusterIntegration.h`
