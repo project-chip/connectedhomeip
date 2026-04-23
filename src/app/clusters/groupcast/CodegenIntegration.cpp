@@ -17,6 +17,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/groupcast/GroupcastContext.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/Groupcast.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -59,6 +60,7 @@ public:
                 .fabricTable       = Server::GetInstance().GetFabricTable(),
                 .groupDataProvider = *groupDataProvider,
                 .timerDelegate     = sTimerDelegate,
+                .accessControl     = Server::GetInstance().GetAccessControl(),
             },
             BitFlags<Groupcast::Feature>(featureMap));
         return gServer.Registration();

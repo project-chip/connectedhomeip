@@ -123,7 +123,6 @@ silabs_executable("air_quality_sensor_app") {
 
   sources = [
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/DataModelCallbacks.cpp",
     "src/SensorManager.cpp",

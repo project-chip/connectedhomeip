@@ -138,7 +138,6 @@ silabs_executable("dishwasher_app") {
     "${example_enegy_management_dir}/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
     "${example_enegy_management_dir}/energy-management-common/energy-reporting/src/FakeReadings.cpp",
     "${example_enegy_management_dir}/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/DataModelCallbacks.cpp",
     "src/DataModelHelper.cpp",

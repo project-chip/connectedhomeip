@@ -33,6 +33,7 @@ from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
+from chiptest.status import PeriodicStatusThread
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chiptest.work_queue import CancellableQueue
 from chiptest.worker import TaskQueueT, WorkerThread
@@ -376,6 +377,13 @@ class CommissioningMethod(enum.StrEnum):
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
     help='If provided, write a JSON test-run summary to this file at the end of the run.')
+@click.option(
+    '--periodic-status',
+    default=50,
+    show_default=True,
+    type=click.IntRange(min=0),
+    help=('Periodically show the status of test execution. '
+          '0: turn off, other values: periodicity of report in number of logged messages.'))
 # Deprecated flags:
 @click.option(
     '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
@@ -431,7 +439,7 @@ class CommissioningMethod(enum.StrEnum):
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
             help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
-            commissioning_method: CommissioningMethod, summary_file: Path | None,
+            commissioning_method: CommissioningMethod, summary_file: Path | None, periodic_status: int,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -516,6 +524,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
+    run_summary = RunSummary(iterations, tests_per_iteration=len(context.obj.tests))
     ble_controller_app = None
     ble_controller_tool = None
     thread_ba_host = None
@@ -526,8 +535,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     try:
         # Initialize result thread first so that it's closed last.
-        to_terminate.append(result_thread := ResultProcessingThread(iterations, len(context.obj.tests), expected_failures,
-                                                                    keep_going, summary_file))
+        to_terminate.append(result_thread := ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file))
 
         if sys.platform == 'linux':
             app_name = 'wlx-app' if wifi_required else 'eth-app'
@@ -540,8 +548,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if wifi_required else 'eth-app',
-                tool_link_name=tool_name))
+                app_link_name=app_name, tool_link_name=tool_name))
 
             match commissioning_method:
                 case CommissioningMethod.BLE_WIFI:
@@ -575,6 +582,10 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
+
+        to_terminate.append(status_thread := PeriodicStatusThread(run_summary, context.obj.log_config.filter.msg_counter,
+                                                                  periodicity=periodic_status))
+        status_thread.start()
 
         # Initialize the worker thread last, to ensure it's terminated first.
         to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
@@ -621,27 +632,33 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 break
 
             time.sleep(0.5)
-    except KeyboardInterrupt as e:
-        log.info("Interrupting execution on user request")
-        errors.append(e)
-    except ResultError as e:
-        # We just print the message without stack trace, as the actual failure with stack trace has already been logged.
-        log.error("%s", e)
-        errors.append(SystemExit(2))
-    except Exception as e:
-        log.error("Caught exception during test execution: %r", e, exc_info=True)
+    except BaseException as e:
         errors.append(e)
     finally:
         for item in reversed(to_terminate):
+            item_name = item.__class__.__name__
             try:
-                log.info("Cleaning up %s", item.__class__.__name__)
+                log.info("Cleaning up %s", item_name)
                 item.terminate()
             except Exception as e:
-                log.warning("Encountered exception during cleanup: %r", e, exc_info=True)
+                log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
                 errors.append(e)
 
+    # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
+    # encountered during execution and cleanup.
     if len(errors) == 1:
-        raise errors[0]
+        match error := errors[0]:
+            case KeyboardInterrupt():
+                log.info("Interrupting execution on user request")
+                raise error
+            case ResultError():
+                # We just print the message, as the actual test failure with stack trace has already been logged.
+                log.error("%s", error)
+                raise SystemExit(2)
+            case _:
+                # Reraise the single exception with its original traceback preserved.
+                raise error.with_traceback(error.__traceback__)
+
     if errors:
         raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
 

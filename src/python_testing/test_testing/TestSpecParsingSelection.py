@@ -16,11 +16,11 @@
 #
 
 
-from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, ConformanceException
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.global_attribute_ids import is_standard_attribute_id
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version

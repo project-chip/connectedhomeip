@@ -185,6 +185,8 @@ jobs:
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
                       build \
                   "
+            - name: clean build
+              run: rm -rf ./out
             - name: Build NXP Zephyr Unit Tests
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp

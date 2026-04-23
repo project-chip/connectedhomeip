@@ -33,6 +33,14 @@ constexpr CommandId kGeneratedCommands[] = {
     Groupcast::Commands::LeaveGroupResponse::Id,
 };
 
+bool HasAdminPrivileges(Access::AccessControl & accessControl, const chip::Access::SubjectDescriptor & subjectDescriptor,
+                        const ConcreteCommandPath & path)
+{
+    Access::RequestPath requestPath{ path.mClusterId, path.mEndpointId, Access::RequestType::kCommandInvokeRequest,
+                                     std::make_optional<uint32_t>(path.mCommandId) };
+    return CHIP_NO_ERROR == accessControl.Check(subjectDescriptor, requestPath, Access::Privilege::kAdminister);
+}
+
 } // namespace
 
 GroupcastCluster::GroupcastCluster(GroupcastContext && context) : GroupcastCluster(std::move(context), {}) {}
@@ -106,9 +114,9 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
                                                                              CommandHandler * handler)
 {
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
-    FabricIndex fabric_index = handler->GetAccessingFabricIndex();
 
     const chip::Access::SubjectDescriptor subjectDescriptor = request.subjectDescriptor;
+    FabricIndex fabric_index                                = subjectDescriptor.fabricIndex;
 
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
 
@@ -117,7 +125,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::JoinGroup::Id: {
         Groupcast::Commands::JoinGroup::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = JoinGroup(fabric_index, data, subjectDescriptor);
+        status = JoinGroup(request.path, data, subjectDescriptor);
     }
     break;
     case Groupcast::Commands::LeaveGroup::Id: {
@@ -125,10 +133,9 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::LeaveGroupResponse::Type response;
         EndpointList endpoints;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = LeaveGroup(fabric_index, data, endpoints, subjectDescriptor);
+        status = LeaveGroup(data, endpoints, subjectDescriptor);
         if (Protocols::InteractionModel::Status::Success == status)
         {
-            NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
             response.groupID   = data.groupID;
             response.endpoints = DataModel::List<const chip::EndpointId>(endpoints.entries, endpoints.count);
             handler->AddResponse(request.path, response);
@@ -139,13 +146,13 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::UpdateGroupKey::Id: {
         Groupcast::Commands::UpdateGroupKey::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = UpdateGroupKey(fabric_index, data);
+        status = UpdateGroupKey(request.path, data, subjectDescriptor);
     }
     break;
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = ConfigureAuxiliaryACL(fabric_index, data, subjectDescriptor);
+        status = ConfigureAuxiliaryACL(data, subjectDescriptor);
     }
     break;
     case Groupcast::Commands::GroupcastTesting::Id: {
@@ -354,20 +361,27 @@ CHIP_ERROR GroupcastCluster::ReadUsedMcastAddrCount(EndpointId endpoint, Attribu
     return aEncoder.Encode(mUsedMcastAddrCount);
 }
 
-Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Groupcast::Commands::JoinGroup::DecodableType & data,
                                    const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
-    GroupDataProvider & groups = Provider();
-    CHIP_ERROR err             = CHIP_NO_ERROR;
+    const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
+    GroupDataProvider & groups    = Provider();
+    CHIP_ERROR err                = CHIP_NO_ERROR;
 
-    // Check groupID
+    // Check GroupID and KeySetID constraints.
     VerifyOrReturnError(data.groupID != kUndefinedGroupId, Status::ConstraintError);
+    VerifyOrReturnError(data.keySetID != 0, Status::ConstraintError);
 
     // Check useAuxiliaryACL
     if (data.useAuxiliaryACL.HasValue())
     {
         // AuxiliaryACL can only be present if LN feature is supported
         VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
+
+        // AuxiliaryACL state can only be touched if the client has admin privileges, but this is called from a command that only
+        // require Manage privileges. We do the check here before touching AuxACL.
+        VerifyOrReturnError(HasAdminPrivileges(mGroupcastContext.accessControl, subjectDescriptor, path),
+                            Status::UnsupportedAccess);
     }
 
     // ReplaceEndpoints can only be present if kListener feature is supported
@@ -420,7 +434,7 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
 
     // Check fabric membership entries limit
     GroupDataProvider::GroupInfo info;
-    err               = groups.GetGroupInfo(fabric_index, data.groupID, info);
+    err               = groups.GetGroupInfo(fabricIndex, data.groupID, info);
     bool is_new_group = (CHIP_ERROR_NOT_FOUND == err);
     VerifyOrReturnError(is_new_group || (CHIP_NO_ERROR == err), Status::Failure);
     // If the group is new, the fabric entries will increase
@@ -464,17 +478,17 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
     }
 
     // Key handling
-    Status stat = SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
+    Status stat = SetKeySet(path, subjectDescriptor, data.groupID, data.keySetID, data.key);
     VerifyOrReturnError(Status::Success == stat, stat);
 
     // Add/update entry in the group table
-    err = groups.SetGroupInfo(fabric_index, info);
+    err = groups.SetGroupInfo(fabricIndex, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
     if (data.replaceEndpoints.HasValue() && data.replaceEndpoints.Value())
     {
         // Replace endpoints
-        err = groups.RemoveEndpoints(fabric_index, data.groupID);
+        err = groups.RemoveEndpoints(fabricIndex, data.groupID);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     }
 
@@ -484,7 +498,7 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
         auto iter          = data.endpoints.begin();
         while (iter.Next() && (group_count++ < kMaxCommandEndpoints))
         {
-            err = groups.AddEndpoint(fabric_index, data.groupID, iter.GetValue());
+            err = groups.AddEndpoint(fabricIndex, data.groupID, iter.GetValue());
             VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
         }
     }
@@ -497,9 +511,11 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
     return Status::Success;
 }
 
-Status GroupcastCluster::LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                                    EndpointList & endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints,
+                                    const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
+    const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
+
     GroupDataProvider & groups = Provider();
     Status err                 = Status::Success;
 
@@ -507,7 +523,7 @@ Status GroupcastCluster::LeaveGroup(FabricIndex fabric_index, const Groupcast::C
     if (kUndefinedGroupId == data.groupID)
     {
         // Apply changes to all groups
-        GroupInfoIterator * iter = groups.IterateGroupInfo(fabric_index);
+        GroupInfoIterator * iter = groups.IterateGroupInfo(fabricIndex);
         VerifyOrReturnError(nullptr != iter, Status::ResourceExhausted);
         VerifyOrReturnError(iter->Count() > 0, Status::NotFound);
 
@@ -515,43 +531,52 @@ Status GroupcastCluster::LeaveGroup(FabricIndex fabric_index, const Groupcast::C
         while (iter->Next(info) && (Status::Success == err))
         {
             // For leave group, the leaveGroupResponse SHALL NOT contain the endpoints that were removed.
-            err = RemoveGroup(fabric_index, info.group_id, data, nullptr /* endpoints */, subjectDescriptor);
+            err = RemoveGroup(info.group_id, data, nullptr /* endpoints */, subjectDescriptor);
         }
         iter->Release();
     }
     else
     {
         // Modify specific group
-        err = RemoveGroup(fabric_index, data.groupID, data, &endpoints, subjectDescriptor);
+        err = RemoveGroup(data.groupID, data, &endpoints, subjectDescriptor);
     }
 
     return err;
 }
 
-Status GroupcastCluster::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
+Status GroupcastCluster::UpdateGroupKey(const ConcreteCommandPath & path,
+                                        const Groupcast::Commands::UpdateGroupKey::DecodableType & data,
+                                        const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
+    // Check GroupID and KeySetID constraints.
+    VerifyOrReturnError(data.groupID != kUndefinedGroupId, Status::ConstraintError);
+    VerifyOrReturnError(data.keySetID != 0, Status::ConstraintError);
+
+    const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
+
     // Validate that the group exists early before trying to set the keyset
     GroupDataProvider::GroupInfo info;
-    CHIP_ERROR err = Provider().GetGroupInfo(fabric_index, data.groupID, info);
+    CHIP_ERROR err = Provider().GetGroupInfo(fabricIndex, data.groupID, info);
     VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
-    return SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
+    return SetKeySet(path, subjectDescriptor, data.groupID, data.keySetID, data.key);
 }
 
-Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
-                                               const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
                                                const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
-    GroupDataProvider & groups = Provider();
-    CHIP_ERROR err             = CHIP_NO_ERROR;
+    const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
+    GroupDataProvider & groups    = Provider();
+    CHIP_ERROR err                = CHIP_NO_ERROR;
 
     // AuxiliaryACL can only be present if LN feature is supported
     VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
+    VerifyOrReturnError(data.groupID != kUndefinedGroupId, Status::ConstraintError);
 
     // Get group info
     GroupDataProvider::GroupInfo info;
-    err = groups.GetGroupInfo(fabric_index, data.groupID, info);
+    err = groups.GetGroupInfo(fabricIndex, data.groupID, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
 
     // Update group info
@@ -563,7 +588,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     {
         info.flags &= ~chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
     }
-    err = groups.SetGroupInfo(fabric_index, info);
+    err = groups.SetGroupInfo(fabricIndex, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
     if (groups.ConsumeAuxAclNotificationNeeded())
@@ -574,13 +599,22 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     return Status::Success;
 }
 
-Status GroupcastCluster::SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id,
-                                   const chip::Optional<chip::ByteSpan> & key)
+Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip::Access::SubjectDescriptor & subjectDescriptor,
+                                   GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key)
 {
-    GroupDataProvider & groups = Provider();
+    const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
+    GroupDataProvider & groups    = Provider();
     GroupDataProvider::KeySet ks;
 
-    CHIP_ERROR err = groups.GetKeySet(fabric_index, keyset_id, ks);
+    // Keys can only be touched if the client has admin privileges, but this is called from commands that only require
+    // Manage privileges. We do the check here before touching the keys.
+    if (key.HasValue())
+    {
+        VerifyOrReturnError(HasAdminPrivileges(mGroupcastContext.accessControl, subjectDescriptor, path),
+                            Status::UnsupportedAccess);
+    }
+
+    CHIP_ERROR err = groups.GetKeySet(fabricIndex, keyset_id, ks);
     if (key.HasValue())
     {
         // Key provided, the keyset must not exist
@@ -588,7 +622,7 @@ Status GroupcastCluster::SetKeySet(FabricIndex fabric_index, GroupId group_id, K
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND == err, Status::Failure);
 
         // Create new key
-        const FabricInfo * fabric = Fabrics().FindFabricWithIndex(fabric_index);
+        const FabricInfo * fabric = Fabrics().FindFabricWithIndex(fabricIndex);
         VerifyOrReturnValue(nullptr != fabric, Status::NotFound);
 
         ks.keyset_id     = keyset_id;
@@ -600,12 +634,12 @@ Status GroupcastCluster::SetKeySet(FabricIndex fabric_index, GroupId group_id, K
         memcpy(epoch.key, key.Value().data(), GroupDataProvider::EpochKey::kLengthBytes);
         {
             // Get compressed fabric
-            uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
-            MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
-            err = fabric->GetCompressedFabricIdBytes(compressed_fabric_id);
+            uint8_t compressedFabricIdBuffer[sizeof(uint64_t)];
+            MutableByteSpan compressedFabricId(compressedFabricIdBuffer);
+            err = fabric->GetCompressedFabricIdBytes(compressedFabricId);
             VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
             // Set keys
-            err = groups.SetKeySet(fabric_index, compressed_fabric_id, ks);
+            err = groups.SetKeySet(fabricIndex, compressedFabricId, ks);
             VerifyOrReturnError(CHIP_ERROR_INVALID_LIST_LENGTH != err, Status::ResourceExhausted);
             VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
         }
@@ -618,21 +652,22 @@ Status GroupcastCluster::SetKeySet(FabricIndex fabric_index, GroupId group_id, K
     }
 
     // Assign keyset to group
-    err = groups.SetGroupKey(fabric_index, group_id, keyset_id);
+    err = groups.SetGroupKey(fabricIndex, group_id, keyset_id);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
     return Status::Success;
 }
 
-Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
-                                     const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints,
-                                     const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                                     EndpointList * endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
+    const FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
+
     GroupDataProvider & groups = Provider();
     Status stat                = Status::Success;
 
     GroupInfo info;
-    CHIP_ERROR err = groups.GetGroupInfo(fabric_index, group_id, info);
+    CHIP_ERROR err = groups.GetGroupInfo(fabricIndex, group_id, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
 
     if (data.endpoints.HasValue())
@@ -642,9 +677,9 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
         while (iter.Next())
         {
             auto endpoint_id = iter.GetValue();
-            if (groups.HasEndpoint(fabric_index, group_id, endpoint_id))
+            if (groups.HasEndpoint(fabricIndex, group_id, endpoint_id))
             {
-                stat = RemoveGroupEndpoint(fabric_index, group_id, endpoint_id, endpoints);
+                stat = RemoveGroupEndpoint(fabricIndex, group_id, endpoint_id, endpoints);
                 VerifyOrReturnError(Status::Success == stat, stat);
             }
         }
@@ -654,7 +689,7 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
         if (endpoints != nullptr)
         {
             // Get the endpoints list for the LeaveGroupResponse
-            EndpointIterator * epIter = groups.IterateEndpoints(fabric_index, group_id);
+            EndpointIterator * epIter = groups.IterateEndpoints(fabricIndex, group_id);
             VerifyOrReturnError(nullptr != epIter, Status::ResourceExhausted);
 
             if (epIter->Count() <= kMaxCommandEndpoints)
@@ -668,7 +703,7 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
             epIter->Release();
         }
         // Remove whole group (with all endpoints)
-        err = groups.RemoveGroupInfo(fabric_index, group_id);
+        err = groups.RemoveGroupInfo(fabricIndex, group_id);
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     }
@@ -680,12 +715,12 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
     return Status::Success;
 }
 
-Status GroupcastCluster::RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+Status GroupcastCluster::RemoveGroupEndpoint(FabricIndex fabricIndex, GroupId group_id, EndpointId endpoint_id,
                                              EndpointList * endpoints)
 {
     GroupDataProvider & groups = Provider();
 
-    CHIP_ERROR err = groups.RemoveEndpoint(fabric_index, group_id, endpoint_id,
+    CHIP_ERROR err = groups.RemoveEndpoint(fabricIndex, group_id, endpoint_id,
                                            mFeatures.Has(Groupcast::Feature::kSender)
                                                ? GroupDataProvider::GroupCleanupPolicy::kKeepGroupIfEmpty
                                                : GroupDataProvider::GroupCleanupPolicy::kDeleteGroupIfEmpty);

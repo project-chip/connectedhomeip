@@ -199,6 +199,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { P
 #include "microwave-oven-control/chef-microwave-oven-control.h"
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/mode-select/chef-supported-modes-manager.h"
+#endif
+
 #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "laundry-dryer-controls/chef-laundry-dryer-controls-delegate.h"
 #endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
@@ -757,6 +761,23 @@ void ChimeInit()
 #endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
 }
 
+void InitModeSelect()
+{
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kModeSelectDeviceTypeId))
+    {
+        using namespace chip::app::Clusters::ModeSelect;
+        using namespace chip::app::Clusters::ModeSelect::Chef;
+        static ChefSupportedModesManager supportedModesManager;
+        static SupportedModesManager::ModeOptionsProvider modeOptions(
+            kDefaultModeOptions, kDefaultModeOptions + (sizeof(kDefaultModeOptions) / sizeof(kDefaultModeOptions[0])));
+        VerifyOrDieWithMsg(supportedModesManager.AddModeOptionsProvider(1, modeOptions) == CHIP_NO_ERROR, Zcl,
+                           "InitModeSelect: Failed to AddModeOptionsProvider");
+        setSupportedModesManager(&supportedModesManager);
+    }
+#endif // MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -768,6 +789,7 @@ void ApplicationInit()
     CastingvideoplayerContentappInit();
     WaterHeaterInit();
     ChimeInit();
+    InitModeSelect();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER

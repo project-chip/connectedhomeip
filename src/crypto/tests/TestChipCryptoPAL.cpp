@@ -652,10 +652,9 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataBuffer)
 {
     HeapChecker heapChecker;
 
-    constexpr size_t kCapacity         = 32;
-    constexpr size_t kLength           = 16;
-    using Buffer                       = SensitiveDataBuffer<kCapacity>;
-    const uint8_t kAllZeros[kCapacity] = { 0 };
+    constexpr size_t kCapacity = 32;
+    constexpr size_t kLength   = 16;
+    using Buffer               = SensitiveDataBuffer<kCapacity>;
     uint8_t testVector[kCapacity];
 
     // Give us some data.
@@ -677,20 +676,27 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataBuffer)
     EXPECT_EQ(buffer.Length(), buffer.Span().size());
 
     // Test sanitization of entire buffer (even though length < capacity)
-    const void * bufferStorage = buffer.ConstBytes();
+    [[maybe_unused]] const void * bufferStorage = buffer.ConstBytes();
     buffer.~Buffer();
+    // This check reads memory after the SensitiveDataBuffer destructor is called explicitly to verify secure erasure.
+    // MSan (correctly) flags the memcmp after destructor call as use-of-uninitialized-value, so skip under MSan.
+#if !CHIP_MEMORY_SANITIZER_ENABLED
+    const uint8_t kAllZeros[kCapacity] = { 0 };
     EXPECT_EQ(memcmp(bufferStorage, kAllZeros, kCapacity), 0);
     EXPECT_TRUE(memcmp(bufferStorage, testVector, kCapacity));
+#endif
+
+    // Reconstruct so the automatic destructor at scope exit does not double-destroy.
+    new (&buffer) Buffer();
 }
 
 TEST_F(TestChipCryptoPAL, TestSensitiveDataFixedBuffer)
 {
     HeapChecker heapChecker;
 
-    constexpr size_t kCapacity         = 32;
-    using Buffer                       = SensitiveDataFixedBuffer<kCapacity>;
-    using BufferSpan                   = FixedByteSpan<kCapacity>;
-    const uint8_t kAllZeros[kCapacity] = { 0 };
+    constexpr size_t kCapacity = 32;
+    using Buffer               = SensitiveDataFixedBuffer<kCapacity>;
+    using BufferSpan           = FixedByteSpan<kCapacity>;
     uint8_t testVector[kCapacity];
 
     // Give us some data.
@@ -703,11 +709,16 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataFixedBuffer)
     EXPECT_EQ(buffer.ConstBytes(), buffer.Span().data());
     EXPECT_EQ(memcmp(buffer.ConstBytes(), testVector, kCapacity), 0);
 
-    // Test sanitization
-    const void * bufferStorage = buffer.ConstBytes();
+    // Verify that the destructor clears sensitive data
+    [[maybe_unused]] const void * bufferStorage = buffer.ConstBytes();
     buffer.~Buffer();
+    // This check reads memory after the SensitiveDataBuffer destructor is called explicitly to verify secure erasure.
+    // MSan (correctly) flags the memcmp after destructor call as use-of-uninitialized-value, so skip under MSan.
+#if !CHIP_MEMORY_SANITIZER_ENABLED
+    const uint8_t kAllZeros[kCapacity] = { 0 };
     EXPECT_EQ(memcmp(bufferStorage, kAllZeros, kCapacity), 0);
     EXPECT_TRUE(memcmp(bufferStorage, testVector, kCapacity));
+#endif
 
     // Give us different data
     err = DRBG_get_bytes(testVector, sizeof(testVector));
@@ -1136,6 +1147,28 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
     EXPECT_EQ(numOfTestsExecuted, numOfTestCases);
 }
 
+#if CHIP_CRYPTO_PSA
+// Regression test for a bug where HMAC_SHA256 returned CHIP_NO_ERROR even when the underlying PSA call failed.
+// Fault Injection: A key larger than PSA_MAX_KEY_BITS makes the PAL's internal psa_import_key() return
+// PSA_ERROR_NOT_SUPPORTED; the PAL must return a non-success CHIP_ERROR.
+TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey_PsaFailurePropagates)
+{
+    constexpr size_t kOversizedKeyBytes = PSA_BITS_TO_BYTES(PSA_MAX_KEY_BITS) + 1;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> oversizedKey;
+    oversizedKey.Alloc(kOversizedKeyBytes);
+    ASSERT_TRUE(oversizedKey);
+    memset(oversizedKey.Get(), 0, kOversizedKeyBytes);
+
+    const uint8_t msg[8]                          = {};
+    uint8_t mac[PSA_HASH_LENGTH(PSA_ALG_SHA_256)] = {};
+
+    TestHMAC_sha mHMAC;
+    CHIP_ERROR err = mHMAC.HMAC_SHA256(oversizedKey.Get(), kOversizedKeyBytes, msg, sizeof(msg), mac, sizeof(mac));
+
+    EXPECT_NE(err, CHIP_NO_ERROR);
+}
+#endif
+
 #if !(CHIP_CRYPTO_KEYSTORE_APP)
 TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
 {
@@ -1475,10 +1508,11 @@ TEST_F(TestChipCryptoPAL, TestECDH_EstablishSecret)
     EXPECT_EQ(keypair2.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
-    out_secret1.Bytes()[0] = 0;
+    memset(out_secret1.Bytes(), 0, out_secret1.Capacity());
 
     P256ECDHDerivedSecret out_secret2;
-    out_secret2.Bytes()[0] = 1;
+    // Initialise out_secret2 to 1s to ensure that we pass the sanity check below
+    memset(out_secret2.Bytes(), 1, out_secret2.Capacity());
 
     CHIP_ERROR error = CHIP_NO_ERROR;
     EXPECT_NE(memcmp(out_secret1.ConstBytes(), out_secret2.ConstBytes(), out_secret1.Capacity()),
@@ -1553,6 +1587,28 @@ TEST_F(TestChipCryptoPAL, TestPBKDF2_SHA256_TestVectors)
     }
     EXPECT_GT(numOfTestsRan, 0);
 }
+
+#if CHIP_CRYPTO_PSA
+// Regression test for a bug where pbkdf2_sha256 returned CHIP_NO_ERROR even when the underlying PSA call failed.
+// Fault Injection: A password larger than PSA_MAX_KEY_BITS makes the PAL's internal psa_import_key() return
+// PSA_ERROR_NOT_SUPPORTED; the PAL must return a non-success CHIP_ERROR.
+TEST_F(TestChipCryptoPAL, TestPBKDF2_SHA256_PsaFailurePropagates)
+{
+    constexpr size_t kOversizedPassBytes = PSA_BITS_TO_BYTES(PSA_MAX_KEY_BITS) + 1;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> oversizedPass;
+    oversizedPass.Alloc(kOversizedPassBytes);
+    ASSERT_TRUE(oversizedPass);
+    memset(oversizedPass.Get(), 0, kOversizedPassBytes);
+
+    const uint8_t salt[16] = {};
+    uint8_t outKey[32]     = {};
+
+    TestPBKDF2_sha256 pbkdf;
+    CHIP_ERROR err = pbkdf.pbkdf2_sha256(oversizedPass.Get(), kOversizedPassBytes, salt, sizeof(salt), 1, sizeof(outKey), outKey);
+
+    EXPECT_NE(err, CHIP_NO_ERROR);
+}
+#endif
 
 TEST_F(TestChipCryptoPAL, TestP256_Keygen)
 {
