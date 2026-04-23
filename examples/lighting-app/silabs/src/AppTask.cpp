@@ -672,8 +672,8 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
-            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV, attributeId,
-                                                                  value);
+            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV,
+                                                                  attributeId, value);
             break;
 
         case ColorControl::Attributes::ColorTemperatureMireds::Id:
