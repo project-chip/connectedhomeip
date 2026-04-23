@@ -108,23 +108,11 @@ rm -rf /tmp/chip_*
 
 ## Testing with chip-tool
 
-You can use `chip-tool` as a controller to interact with the `all-devices-app`.
+You can use `chip-tool` as a controller to interact with the `all-devices-app`. For detailed instructions on how to build and use `chip-tool` for commissioning and sending commands, please refer to the central [chip-tool documentation](https://project-chip.github.io/connectedhomeip-doc/examples/chip-tool/README.html#using-the-client-to-commission-a-device).
 
-### Building chip-tool
 
-```bash
-./scripts/build/build_examples.py --target linux-x64-chip-tool-boringssl build
-```
 
-### Commissioning (Pairing)
 
-Pair the device using on-network pairing. The default setup code is usually
-`20202021`.
-
-```bash
-# Assuming node ID 1
-./out/linux-x64-chip-tool-boringssl/chip-tool pairing onnetwork 1 20202021
-```
 
 ### Example Interaction: Chime Device
 
@@ -138,19 +126,19 @@ Trigger the chime sound playback (Node ID `1`, Endpoint `1`).
 Playing Chime 0 (Ding Dong):
 
 ```bash
-./out/linux-x64-chip-tool-boringssl/chip-tool chime play-chime-sound 1 1 --ChimeID 0
+chip-tool chime play-chime-sound 1 1 --ChimeID 0
 ```
 
 Playing Chime 1 (Ring Ring):
 
 ```bash
-./out/linux-x64-chip-tool-boringssl/chip-tool chime play-chime-sound 1 1 --ChimeID 1
+chip-tool chime play-chime-sound 1 1 --ChimeID 1
 ```
 
 #### Read Attribute
 
 ```bash
-./out/linux-x64-chip-tool-boringssl/chip-tool chime read selected-chime 1 1
+chip-tool chime read selected-chime 1 1
 ```
 
 #### Write Attribute
@@ -158,58 +146,9 @@ Playing Chime 1 (Ring Ring):
 Change the selected chime to `1`:
 
 ```bash
-./out/linux-x64-chip-tool-boringssl/chip-tool chime write selected-chime 1 1 1
+chip-tool chime write selected-chime 1 1 1
 ```
 
-### Bash Script Example
 
-You can use the following bash script to automate the build, run, and test
-process for the Chime device. Copy and save it as `test_chime.sh` and run it
-from the repository root.
-
-```bash
-#!/bin/bash
-
-# Exit on error
-set -e
-
-# Kill any leftover instances
-pkill all-devices-app || true
-
-echo "Activating Environment..."
-source scripts/activate.sh
-
-echo "Building all-devices-app..."
-./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl-no-ble build
-
-echo "Building chip-tool..."
-./scripts/build/build_examples.py --target linux-x64-chip-tool-boringssl build
-
-echo "Cleaning up state..."
-rm -f /tmp/chip_tool_kvs /tmp/chip_kvs /tmp/chip_factory.ini /tmp/chip_config.ini /tmp/chip_counters.ini
-
-echo "Running all-devices-app..."
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime > app.log 2>&1 &
-APP_PID=$!
-
-echo "Waiting for initialization..."
-sleep 5
-
-echo "Pairing device..."
-./out/linux-x64-chip-tool-boringssl/chip-tool pairing onnetwork 1 20202021
-
-echo "Playing Chime 0..."
-./out/linux-x64-chip-tool-boringssl/chip-tool chime play-chime-sound 1 1 --ChimeID 0
-sleep 3
-
-echo "Playing Chime 1..."
-./out/linux-x64-chip-tool-boringssl/chip-tool chime play-chime-sound 1 1 --ChimeID 1
-sleep 3
-
-echo "Stopping application..."
-kill $APP_PID
-
-echo "Done! Check app.log for application logs."
-```
 
 
