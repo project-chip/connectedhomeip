@@ -25,6 +25,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
+#include <ESP32DimmableLightDevice.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -279,6 +280,15 @@ void InitServer(intptr_t context)
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
+    });
+
+    // Override dimmable-light with ESP32 hardware implementation that drives a real LED
+    DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return std::make_unique<ESP32DimmableLightDevice>(ESP32DimmableLightDevice::Context{
+            .groupDataProvider = gGroupDataProvider,
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .timerDelegate     = gTimerDelegate,
+        });
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
