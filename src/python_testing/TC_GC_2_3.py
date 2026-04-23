@@ -61,7 +61,7 @@ class TC_GC_2_3(MatterBaseTest):
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
             TestStep("1d", "Join Group G1 generating a new Key with KeySetID K1 using JoinGroup"),
-            TestStep("1e", "TH reads back KeySetID K1 via GroupKeyManagement KeySetRead and validates the returned GroupKeySetStruct"),
+            TestStep("1e", "TH reads back the Key Set with KeySetID K1 via GroupKeyManagement KeySetRead and validates the returned GroupKeySetStruct"),
             TestStep("1f", "Join Group G2 generating a new Key with KeySetID K2 using JoinGroup"),
             TestStep(2, "Update Group G1 to use a new KeySetID K3 and create it by providing a Key: TH sends command UpdateGroupKey (GroupID=G1, KeySetID=K3, Key=InputKey3)"),
             TestStep(3, "TH awaits subscription report showing KeySetID=K3 for G1"),
