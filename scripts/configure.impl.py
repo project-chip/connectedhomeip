@@ -14,6 +14,8 @@
 
 # This file contains private utilities for use by the `configure` script.
 # It is self-contained and depends only on the Python 3 standard library.
+#
+# Some unit tests that can be run manually are in configure.impl.test.py.
 
 import collections
 import json
@@ -45,27 +47,115 @@ def process_project_args(gn_args_json_file, *params):
         print("%s = %s" % (arg, value))
 
 
-class ProjectArgProcessor:
-    # Prefixes to try when mapping parameters to GN arguments
-    BOOL_ARG_PREFIXES = ('is_', 'enable_', 'use_',
-                         'chip_', 'chip_enable_', 'chip_use_', 'chip_config_',
-                         'matter_', 'matter_enable_', 'matter_use_', 'matter_config_')
-    GENERIC_ARG_PREFIXES = ('chip_', 'chip_config_', 'matter_', 'matter_config_')
+def describe_args(gn_args_json_file):
+    processor = ProjectArgProcessor(gn_args_json_file)
 
-    gn_args = {}  # GN arg -> type ('s'tring, 'b'ool, 'i'integer, '[' list, '{' struct)
-    args = collections.OrderedDict()  # collected arguments
+    # Header / Built-ins handled by process_triplet_parameter
+    print("Available configure options and default values:\n"
+          "\n"
+          "### Target Options\n"
+          "\n"
+          "--build=...\n"
+          "  # host_cpu, host_os: GN built-in\n"
+          "  # The system on which the software is being built, as cpu-os or cpu-vendor-os[-abi]\n"
+          "\n"
+          "--host=...\n"
+          "--target=...\n"
+          "  # target_cpu, target_os: GN built-in\n"
+          "  # The system on which the software will run, as cpu-os or cpu-vendor-os[-abi]\n"
+          )
+
+    def describe_group(group, heading):
+        if not group:
+            return
+        print(f"### {heading}\n")
+        for arg in sorted(group, key=lambda a: a.alias):
+            if arg.type == 'b':
+                print(f"--enable-{arg.alias}{'=no' if arg.default == 'false' else ''}")
+            else:
+                # Abbreviate long list / structs
+                default = arg.default if len(arg.default) <= 40 \
+                    else '[...]' if arg.type == '[' \
+                    else '{...}' if arg.type == '{' \
+                    else arg.default
+                print(f"--{arg.alias}={default}")
+            if arg.source:
+                print(f"  # {arg.name}: {arg.source}")
+            if arg.comment:
+                print("  #", arg.comment.replace("\n", "\n  # "))
+            print()
+
+    project, sdk, third_party, overrides = [], [], [], []
+    for arg in processor.gn_args.values():
+        if (source := arg.source) and arg.alias:
+            group = third_party if source.startswith('//third_party/connectedhomeip/third_party/') \
+                else sdk if source.startswith('//third_party/connectedhomeip/') \
+                else third_party if source.startswith('//third_party/') \
+                else overrides if source.startswith('//build_overrides/') \
+                else project
+            group.append(arg)
+
+    describe_group(project, "Project Options")
+    describe_group(sdk, "Matter SDK Options")
+    describe_group(overrides, "Build Override Paths")
+    describe_group(third_party, "Third-Party Options")
+
+
+class ProjectArgProcessor:
+
+    class GnArg:
+        # Prefixes for mapping between configure parameters and GN arguments (longer prefixes first)
+        BOOL_ARG_PREFIXES = ('is_', 'enable_', 'use_',
+                             'chip_enable_', 'chip_use_', 'chip_config_', 'chip_',
+                             'matter_enable_', 'matter_use_', 'matter_config_', 'matter_', '')
+        GENERIC_ARG_PREFIXES = ('chip_config_', 'chip_', 'matter_config_', 'matter_', '')
+
+        ARG_TYPE_TRANS = str.maketrans('"tf0123456789-', 'sbbiiiiiiiiiii')
+        DASH_TRANS = str.maketrans('_', '-')
+
+        def __init__(self, data):
+            self.name = str(data['name'])
+            self.alias = None  # will be set below
+            self.default = str(data['default']['value'])
+            self.type = self.default[0].translate(self.ARG_TYPE_TRANS)  # 's'tring, 'b'ool, 'i'integer, '[' list, '{' struct
+            file = data['default'].get('file', None)
+            self.source = '%s:%d' % (file, data['default']['line']) if file else None
+            self.comment = str(data.get('comment', '')).strip()
+
+        def alias_candidates(self):
+            prefixes = self.BOOL_ARG_PREFIXES if self.type == 'b' else self.GENERIC_ARG_PREFIXES
+            return (self.name.removeprefix(p).lower().translate(self.DASH_TRANS) for p in prefixes if self.name.startswith(p))
+
+        def __str__(self):
+            return self.name
+
+    args: collections.OrderedDict  # collected arguments
+    gn_args: dict[str, GnArg]  # by GN name
+    options: dict[str, GnArg]  # by all unique option aliases
 
     def __init__(self, gn_args_json_file):
-        # Parse `gn args --list --json` output and derive arg types from default values
-        argtype = str.maketrans('"tf0123456789', 'sbbiiiiiiiiii')
+        self.args = collections.OrderedDict()
+
+        # Parse `gn args --list --json` output into gn_args
         with open(gn_args_json_file) as fh:
-            for arg in json.load(fh):
-                self.gn_args[arg['name']] = arg['default']['value'][0].translate(argtype)
+            self.gn_args = {arg.name: arg for arg in (self.GnArg(rec) for rec in json.load(fh))}
+
+        # Count collisions first then index options by all unique aliases
+        counts = collections.defaultdict(int)
+        for arg in self.gn_args.values():
+            for alias in arg.alias_candidates():
+                counts[alias] += 1
+        self.options = {}
+        for arg in self.gn_args.values():
+            for alias in arg.alias_candidates():
+                if counts[alias] <= 1:
+                    self.options[alias] = arg
+                    arg.alias = arg.alias or alias  # canonical (shortest unique) alias
 
     def process_env(self):
         self.add_env_arg('chip_code_pre_generated_directory', 'CHIP_PREGEN_DIR')
 
-        self.add_default('custom_toolchain', 'custom')
+        self.add_arg('custom_toolchain', 'custom', required=False)
         self.add_env_arg('target_cc', 'CC', 'cc')
         self.add_env_arg('target_cxx', 'CXX', 'cxx')
         self.add_env_arg('target_ar', 'AR', 'ar')
@@ -75,80 +165,71 @@ class ProjectArgProcessor:
         self.add_env_arg('target_cflags_objc', 'OBJCFLAGS', list=True)
         self.add_env_arg('target_ldflags', 'LDFLAGS', list=True)
 
-    def add_arg(self, arg, value):
-        # format strings and booleans as JSON, otherwise pass through as is
-        self.args[arg] = (json.dumps(value) if self.gn_args.get(arg, 's') in 'sb' else value)
+    def add_arg(self, nameOrArg, value, required=True):
+        if arg := self.gn_args.get(nameOrArg, None) if isinstance(nameOrArg, str) else nameOrArg:
+            # format strings and booleans as JSON, otherwise pass through as is
+            self.args[arg.name] = (json.dumps(value) if arg.type in 'sb' else value)
+        elif required:
+            fail("Project has no build arg '%s'" % nameOrArg)
 
-    def add_default(self, arg, value):
-        """Add an argument, if supported by the GN build"""
-        if arg in self.gn_args:
-            self.add_arg(arg, value)
-
-    def add_env_arg(self, arg, envvar, default=None, list=False):
+    def add_env_arg(self, name, envvar, default=None, list=False):
         """Add an argument from an environment variable"""
-        value = os.environ.get(envvar, default)
-        if not value:
+        if not (value := os.environ.get(envvar, default)):
             return
-        type = self.gn_args.get(arg, None)
-        if not type:
-            info("Warning: Not propagating %s, project has no build arg '%s'" % (envvar, arg))
+        if not (arg := self.gn_args.get(name, None)):
+            info("Warning: Not propagating %s, project has no build arg '%s'" % (envvar, name))
             return
-        self.args[arg] = json.dumps(value if type != '[' else value.split() if list else [value])
-
-    def gn_arg(self, name, prefixes=(), type=None):
-        """Finds the GN argument corresponding to a parameter name"""
-        arg = name.translate(str.maketrans('-', '_'))
-        candidates = [p + arg for p in (('',) + prefixes) if (p + arg) in self.gn_args]
-        preferred = [c for c in candidates if self.gn_args[c] == type] if type else []
-        match = next(iter(preferred + candidates), None)
-        if not match:
-            info("Warning: Project has no build arg '%s'" % arg)
-        return match
+        # bypass add_arg() to handle list splitting / formatting directly
+        self.args[arg.name] = json.dumps(value if arg.type != '[' else value.split() if list else [value])
 
     def process_triplet_parameter(self, name, value):
         if value is None:
             fail("Project option --%s requires an argument" % name)
         triplet = value.split('-')
         if len(triplet) not in (2, 3, 4):
-            fail("Project option --%s argument must be a cpu-vendor-os[-abi] triplet" % name)
+            fail("Project option --%s argument must be a cpu-os pair or cpu-vendor-os[-abi] triplet" % name)
         prefix = 'host_' if name == 'build' else 'target_'  # "host" has different meanings in GNU and GN!
         self.add_arg(prefix + 'cpu', triplet[0])
         self.add_arg(prefix + 'os', triplet[1 if len(triplet) == 2 else 2])
 
-    def process_enable_parameter(self, name, value):
-        arg = self.gn_arg(name[len('enable-'):], self.BOOL_ARG_PREFIXES, 'b')
-        if not arg:
+    def option(self, option):
+        """Returns the GnArg for the given option name, or None"""
+        if not (arg := self.options.get(option, None)):
+            info("Warning: Project has no build option '%s'" % option)
+        return arg
+
+    def process_enable_parameter(self, option, value):
+        if not (arg := self.option(option.removeprefix('enable-'))):
             return
-        if self.gn_args[arg] != 'b':
+        if arg.type != 'b':
             fail("Project build arg '%s' is not a boolean" % arg)
         if value != 'no' and value is not None:
-            fail("Invalid argument for --%s, must be absent or 'no'" % name)
+            fail("Invalid argument for --%s, must be absent or 'no'" % option)
         self.add_arg(arg, value is None)
 
-    def process_generic_parameter(self, name, value):
-        arg = self.gn_arg(name, self.GENERIC_ARG_PREFIXES)
-        if not arg:
+    def process_generic_parameter(self, option, value):
+        if not (arg := self.option(option)):
             return
-        if self.gn_args[arg] == 'b':
+        if arg.type == 'b':
             fail("Project build arg '%s' is a boolean, use --enable-..." % arg)
         if value is None:
-            fail("Project option --%s requires an argument" % name)
+            fail("Project option --%s requires an argument" % option)
         self.add_arg(arg, value)
 
-    def process_parameter(self, name, value):
-        if name in ('build', 'host', 'target'):
-            self.process_triplet_parameter(name, value)
-        elif name.startswith('enable-'):
-            self.process_enable_parameter(name, value)
+    def process_parameter(self, option, value):
+        if option in ('build', 'host', 'target'):
+            self.process_triplet_parameter(option, value)
+        elif option.startswith('enable-'):
+            self.process_enable_parameter(option, value)
         else:
-            self.process_generic_parameter(name, value)
+            self.process_generic_parameter(option, value)
 
-    def process_parameters(self, args):
+    def process_parameters(self, params):
         """Process GNU-style configure command line parameters"""
-        for arg in args:
-            match = re.fullmatch(r'--([a-z][a-z0-9-]*)(?:=(.*))?', arg)
+        for param in params:
+            match = re.fullmatch(r'--([a-z][a-z0-9-]*)(?:=(.*))?', param)
             if not match:
-                fail("Invalid argument: '%s'" % arg)
+                fail("Invalid argument: '%s'" % param)
             self.process_parameter(match.group(1), match.group(2))
 
 
@@ -161,7 +242,8 @@ def fail(message):
     sys.exit(1)
 
 
-# `configure` invokes the top-level functions in this file by
-# passing the function name and arguments on the command line.
-[_, func, *args] = sys.argv
-globals()[func](*args)
+if __name__ == "__main__":
+    # `configure` invokes the top-level functions in this file by
+    # passing the function name and arguments on the command line.
+    [_, func, *args] = sys.argv
+    globals()[func](*args)
