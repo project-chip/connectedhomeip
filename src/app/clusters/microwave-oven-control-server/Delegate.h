@@ -18,8 +18,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/Optional.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <cstdint>
 
 namespace chip::app::Clusters::MicrowaveOvenControl {
 

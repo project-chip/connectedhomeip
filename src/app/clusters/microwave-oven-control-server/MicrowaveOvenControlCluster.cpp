@@ -20,7 +20,6 @@
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/MicrowaveOvenControl/Metadata.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;

@@ -22,7 +22,6 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <clusters/MicrowaveOvenControl/Metadata.h>
 
 namespace {
 

@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenIntegrationDelegate.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>

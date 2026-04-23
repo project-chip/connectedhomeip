@@ -20,6 +20,9 @@
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenIntegrationDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/MicrowaveOvenControl/Commands.h>
+#include <clusters/MicrowaveOvenControl/Metadata.h>
+
 #include <cstdint>
 #include <optional>
 
