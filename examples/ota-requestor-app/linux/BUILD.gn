@@ -17,9 +17,9 @@ import("//build_overrides/chip.gni")
 
 executable("chip-ota-requestor-app") {
   sources = [
+    "OTAConsentHandler.cpp",
     "OtaRequestorAppCommandDelegate.cpp",
     "OtaRequestorAppCommandDelegate.h",
-    "OTAConsentHandler.cpp",
     "main.cpp",
   ]
 
