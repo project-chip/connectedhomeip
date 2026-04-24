@@ -288,7 +288,7 @@ protected:
     virtual CHIP_ERROR SyncDeleteKeyValueInternal(const char * key)
     {
         // Make sure writes are allowed and poison keys are not accessed
-        if (IsWritePoisoned(key) || mRejectWrites)
+        if (mRejectWrites || /* has side effect */ IsWritePoisoned(key))
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
