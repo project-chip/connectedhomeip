@@ -498,10 +498,16 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRefCount(uint16_t videoStr
 
     if (shouldIncrement)
     {
-        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+        VerifyOrReturnError(it->referenceCount < UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        it->referenceCount++;
+    }
+    else
+    {
+        VerifyOrReturnError(it->referenceCount > 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        it->referenceCount--;
     }
 
-    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+    return PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateAudioStreamRefCount(uint16_t audioStreamId, bool shouldIncrement)
@@ -516,10 +522,16 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateAudioStreamRefCount(uint16_t audioStr
 
     if (shouldIncrement)
     {
-        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+        VerifyOrReturnError(it->referenceCount < UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        it->referenceCount++;
+    }
+    else
+    {
+        VerifyOrReturnError(it->referenceCount > 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        it->referenceCount--;
     }
 
-    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+    return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement)
@@ -535,10 +547,16 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRefCount(uint16_t snaps
 
     if (shouldIncrement)
     {
-        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+        VerifyOrReturnError(it->referenceCount < UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        it->referenceCount++;
+    }
+    else
+    {
+        VerifyOrReturnError(it->referenceCount > 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        it->referenceCount--;
     }
 
-    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+    return PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
 }
 
 // AttributeAccessInterface
