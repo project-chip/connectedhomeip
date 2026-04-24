@@ -266,11 +266,26 @@ void WindowCoveringCluster::SetCurrentPositionTiltPercentage100ths(NPercent100th
     }
 }
 
+void WindowCoveringCluster::UpdateConfigStatusFromMode()
+{
+    chip::BitMask<ConfigStatus> newStatus = mConfigStatus;
+    newStatus.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    newStatus.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
+    SetConfigStatus(newStatus);
+}
+
 void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
 {
+    // Spec: maintenance lock takes priority over calibration
+    if (mode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
+    {
+        mode.Clear(Mode::kCalibrationMode);
+    }
+
     VerifyOrReturn(mMode != mode);
     mMode = mode;
     NotifyAttributeChanged(Attributes::Mode::Id);
+    UpdateConfigStatusFromMode();
 }
 
 void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)
@@ -330,7 +345,6 @@ DataModel::ActionReturnStatus WindowCoveringCluster::WriteAttribute(const DataMo
     case Attributes::Mode::Id: {
         chip::BitMask<Mode> mode;
         ReturnErrorOnFailure(decoder.Decode(mode));
-        VerifyOrReturnValue(mMode != mode, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         VerifyOrReturnValue(mode.Raw() <= 0x0F, Status::ConstraintError);
         SetMode(mode);
         return Status::Success;
