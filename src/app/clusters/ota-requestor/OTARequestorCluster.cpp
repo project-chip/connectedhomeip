@@ -39,8 +39,8 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands,
                                          OTARequestorAttributes & attributes) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaCommands(otaCommands),
-    mAttributes(attributes)
+    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
+    mOtaCommands(otaCommands), mAttributes(attributes)
 {}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
