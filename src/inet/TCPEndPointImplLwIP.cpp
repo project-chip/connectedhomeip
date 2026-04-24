@@ -308,8 +308,8 @@ CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
     // CHIP_ERROR_CONNECTION_ABORTED if the PCB is gone.
 
     // Determine the current send window size. This is the maximum amount we can write to the connection.
-    uint16_t sendWindowSize  = 0;
-    err_t sendWindowLwipErr  = RunOnTCPIPRet([this, &sendWindowSize, &err]() -> err_t {
+    uint16_t sendWindowSize = 0;
+    err_t sendWindowLwipErr = RunOnTCPIPRet([this, &sendWindowSize, &err]() -> err_t {
         if (mTCP == nullptr)
         {
             err = CHIP_ERROR_CONNECTION_ABORTED;
