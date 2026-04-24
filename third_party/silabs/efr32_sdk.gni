@@ -350,7 +350,10 @@ template("efr32_sdk") {
         defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
       }
 
-      defines += [ "MGM24", "_SILICON_LABS_MODULE=1" ]
+      defines += [
+        "MGM24",
+        "_SILICON_LABS_MODULE=1",
+      ]
     } else if (silabs_family == "efr32mg26") {
       _include_dirs += [
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/EFR32MG26/Include",
