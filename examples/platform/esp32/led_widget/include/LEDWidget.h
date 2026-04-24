@@ -31,6 +31,8 @@
 class LEDWidget
 {
 public:
+    using StateChangeCallback = void (*)(LEDWidget * led, bool state);
+
     /**
      * Initialize the LED using the Kconfig-configured GPIO pin (CONFIG_LED_GPIO).
      * Uses LED_TYPE_RMT or LED_TYPE_GPIO based on Kconfig selection.
@@ -55,15 +57,12 @@ public:
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
     void Animate();
 
-    void BlinkOnError();
     void SetStateMask(bool state);
+
+    void SetStateChangeCallback(StateChangeCallback cb) { mStateChangeCb = cb; }
 
 #if CONFIG_LED_TYPE_RMT
     void SetColor(uint8_t Hue, uint8_t Saturation);
-#endif
-
-#if CONFIG_HAVE_DISPLAY
-    void SetVLED(int id1, int id2 = -1);
 #endif
 
 private:
@@ -72,8 +71,7 @@ private:
     int64_t mLastChangeTimeUS = 0;
     uint32_t mBlinkOnTimeMS   = 0;
     uint32_t mBlinkOffTimeMS  = 0;
-    bool mError               = false;
-    TimerHandle_t mErrorTimer = NULL;
+    StateChangeCallback mStateChangeCb = nullptr;
 
 #if CONFIG_LED_TYPE_RMT
     uint8_t mHue              = 0;
@@ -83,13 +81,6 @@ private:
     gpio_num_t mGPIONum = GPIO_NUM_MAX;
 #endif
 
-#if CONFIG_HAVE_DISPLAY
-    int mVLED1 = -1;
-    int mVLED2 = -1;
-#endif
-
     void DoSet(bool state);
     void UpdateLED(void);
-
-    friend void ClearErrorState(TimerHandle_t);
 };

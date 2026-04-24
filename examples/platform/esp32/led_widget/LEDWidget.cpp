@@ -22,7 +22,6 @@
  *
  * Implements a widget for controlling an LED, including brightness and blinking patterns,
  * with optional support for RGB color (if using RMT-based LED control).
- * It also supports the virtual LEDs that are visible on the M5Stack display.
  */
 
 #include "LEDWidget.h"
@@ -32,10 +31,6 @@
 #if !CONFIG_LED_TYPE_RMT
 #include "driver/ledc.h"
 #include "hal/ledc_types.h"
-#endif
-
-#if CONFIG_HAVE_DISPLAY
-#include "ScreenManager.h"
 #endif
 
 static constexpr char TAG[] = "LEDWidget";
@@ -52,8 +47,6 @@ void LEDWidget::Init(gpio_num_t gpioNum)
     mLastChangeTimeUS = 0;
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
-    mError            = false;
-    mErrorTimer       = NULL;
 
 #if CONFIG_LED_TYPE_RMT
     mHue        = 0;
@@ -101,11 +94,6 @@ void LEDWidget::Init(gpio_num_t gpioNum)
     }
 #endif // CONFIG_LED_TYPE_RMT
 
-#if CONFIG_HAVE_DISPLAY
-    mVLED1 = -1;
-    mVLED2 = -1;
-#endif // CONFIG_HAVE_DISPLAY
-
     ESP_LOGI(TAG, "Initialized on GPIO %d", gpioNum);
 }
 
@@ -131,13 +119,6 @@ void LEDWidget::SetBrightness(uint8_t brightness)
 
     mBrightness = brightness;
     UpdateLED();
-
-#if CONFIG_HAVE_DISPLAY
-    if (mVLED1 != -1)
-    {
-        ScreenManager::SetVLED(mVLED1, mState);
-    }
-#endif
 }
 
 uint8_t LEDWidget::GetLevel(void)
@@ -178,38 +159,8 @@ void LEDWidget::Animate()
     }
 }
 
-void ClearErrorState(TimerHandle_t handle)
-{
-#if CONFIG_HAVE_DISPLAY
-    LEDWidget * pWidget = static_cast<LEDWidget *>(pvTimerGetTimerID(handle));
-    pWidget->mError     = false;
-    if (pWidget->mVLED2 != -1)
-    {
-        ScreenManager::SetVLED(pWidget->mVLED2, false);
-    }
-#endif
-}
-
-void LEDWidget::BlinkOnError()
-{
-#if CONFIG_HAVE_DISPLAY
-    mError = true;
-    if (mErrorTimer != NULL)
-    {
-        xTimerDelete(mErrorTimer, 0);
-    }
-    mErrorTimer = xTimerCreate("ErrorTimer", pdMS_TO_TICKS(2000), false, this, ClearErrorState);
-    xTimerStart(mErrorTimer, 0);
-    if (mVLED2 != -1)
-    {
-        ScreenManager::SetVLED(mVLED2, true);
-    }
-#endif
-}
-
 void LEDWidget::SetStateMask(bool state)
 {
-    // Used to visually indicate a state overlay (e.g., error combined with normal state)
     DoSet(state);
 }
 
@@ -226,37 +177,15 @@ void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
 }
 #endif // CONFIG_LED_TYPE_RMT
 
-#if CONFIG_HAVE_DISPLAY
-void LEDWidget::SetVLED(int id1, int id2)
-{
-    mVLED1 = id1;
-    if (mVLED1 != -1)
-    {
-        ScreenManager::SetVLED(mVLED1, mState);
-    }
-    mVLED2 = id2;
-    if (mVLED2 != -1)
-    {
-        ScreenManager::SetVLED(mVLED2, mError);
-    }
-}
-#endif // CONFIG_HAVE_DISPLAY
-
 void LEDWidget::DoSet(bool state)
 {
     bool stateChange = (mState != state);
     mState           = state;
-
     UpdateLED();
 
-    if (stateChange)
+    if (stateChange && mStateChangeCb)
     {
-#if CONFIG_HAVE_DISPLAY
-        if (mVLED1 != -1)
-        {
-            ScreenManager::SetVLED(mVLED1, mState);
-        }
-#endif // CONFIG_HAVE_DISPLAY
+        mStateChangeCb(this, mState);
     }
 }
 
