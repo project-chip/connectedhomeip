@@ -33,9 +33,10 @@ public:
     IntegrationDelegate()          = default;
     virtual ~IntegrationDelegate() = default;
 
-    virtual uint8_t GetCurrentOperationalState() const              = 0;
-    virtual CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const = 0;
-    virtual bool IsSupportedMode(uint8_t mode) const                = 0;
+    virtual uint8_t GetCurrentOperationalState() const                                                = 0;
+    virtual CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const                                   = 0;
+    virtual bool IsSupportedMode(uint8_t mode) const                                                  = 0;
+    virtual bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const = 0;
 };
 
 } // namespace chip::app::Clusters::MicrowaveOvenControl

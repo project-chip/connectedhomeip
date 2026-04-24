@@ -32,8 +32,7 @@ using namespace Commands;
 
 CodegenIntegrationDelegate::CodegenIntegrationDelegate(Clusters::OperationalState::Instance & aOpStateInstance,
                                                        Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mOpStateInstance(aOpStateInstance),
-    mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
+    mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
 uint8_t CodegenIntegrationDelegate::GetCurrentOperationalState() const
@@ -51,10 +50,23 @@ bool CodegenIntegrationDelegate::IsSupportedMode(uint8_t mode) const
     return mMicrowaveOvenModeInstance.IsSupportedMode(mode);
 }
 
+bool CodegenIntegrationDelegate::IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const
+{
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
+
+    CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
+
+    TEMPORARY_RETURN_IGNORED model.AcceptedCommands(ConcreteClusterPath(endpointId, OperationalState::Id), acceptedCommandsList);
+    auto acceptedCommands = acceptedCommandsList.TakeBuffer();
+
+    return std::find_if(acceptedCommands.begin(), acceptedCommands.end(),
+                        [commandId](const DataModel::AcceptedCommandEntry & entry) { return entry.commandId == commandId; }) !=
+        acceptedCommands.end();
+}
+
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<Feature> aFeature,
                    OperationalState::Instance & aOpStateInstance, ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature),
     mIntegrationDelegate(aOpStateInstance, aMicrowaveOvenModeInstance)
 {}
 

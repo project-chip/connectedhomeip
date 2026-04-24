@@ -208,19 +208,9 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
 
     if (startAfterSetting.HasValue())
     {
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
-
-        TEMPORARY_RETURN_IGNORED mContext->provider.AcceptedCommands(
-            ConcreteClusterPath(commandPath.mEndpointId, OperationalState::Id), acceptedCommandsList);
-        auto acceptedCommands = acceptedCommandsList.TakeBuffer();
-
-        bool commandExists =
-            std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [](const DataModel::AcceptedCommandEntry & entry) {
-                return entry.commandId == OperationalState::Commands::Start::Id;
-            }) != acceptedCommands.end();
-
         VerifyOrReturnError(
-            commandExists, Status::InvalidCommand,
+            mIntegrationDelegate.IsSupportedOperationalStateCommand(commandPath.mEndpointId, OperationalState::Commands::Start::Id),
+            Status::InvalidCommand,
             ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set cooking parameters, Start command of operational state is not supported"));
@@ -239,21 +229,21 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
     VerifyOrReturnError(IsCookTimeSecondsInRange(reqCookTimeSec, mAppDelegate.GetMaxCookTimeSec()), Status::ConstraintError,
                         ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
+    VerifyOrReturnError(
+        cookMode.HasValue() || cookTimeSec.HasValue() || powerSetting.HasValue(), Status::InvalidCommand,
+        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing"));
+
     if (mFeature.Has(Feature::kPowerAsNumber))
     {
         // if using power as number, check if the param is invalid and set PowerSetting number.
-        uint8_t reqPowerSettingNum;
         uint8_t maxPowerNum  = kDefaultMaxPowerNum;
         uint8_t minPowerNum  = kDefaultMinPowerNum;
         uint8_t powerStepNum = kDefaultPowerStepNum;
+
         VerifyOrReturnError(
             !wattSettingIndex.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl,
                          "Microwave Oven Control: Failed to set cooking parameters, should have no value for wattSettingIndex"));
-
-        VerifyOrReturnError(
-            cookMode.HasValue() || cookTimeSec.HasValue() || powerSetting.HasValue(), Status::InvalidCommand,
-            ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
         if (mFeature.Has(Feature::kPowerNumberLimits))
         {
@@ -261,7 +251,8 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
             minPowerNum  = mAppDelegate.GetMinPowerNum();
             powerStepNum = mAppDelegate.GetPowerStepNum();
         }
-        reqPowerSettingNum = powerSetting.ValueOr(maxPowerNum);
+
+        uint8_t reqPowerSettingNum = powerSetting.ValueOr(maxPowerNum);
         VerifyOrReturnError(
             IsPowerSettingNumberInRange(reqPowerSettingNum, minPowerNum, maxPowerNum), Status::ConstraintError,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
@@ -272,9 +263,9 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
                 Zcl,
                 "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 
-        // Snapshot PowerSetting before the delegate call so this cluster server can emit the
-        // attribute-change report when the delegate updates its internal value.  The delegate owns
-        // storage for PowerSetting, but reporting is the server's responsibility (mirrors CookTime).
+        // Snapshot PowerSetting before the delegate call so this cluster server can notify that the
+        // attribute changed when the delegate updates its internal value.  The delegate owns storage for
+        // this attribute, but to notify the change is the server's responsibility.
         uint8_t oldPowerSettingNum = mAppDelegate.GetPowerSettingNum();
 
         status = mAppDelegate.HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting,
@@ -288,27 +279,38 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
     else
     {
         // if using power in watt, check if the param is invalid and set wattSettingIndex number.
-        uint8_t reqWattSettingIndex;
         VerifyOrReturnError(
             !powerSetting.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for powerSetting "));
-
-        VerifyOrReturnError(
-            cookMode.HasValue() || cookTimeSec.HasValue() || wattSettingIndex.HasValue(), Status::InvalidCommand,
-            ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
         // count of supported watt levels must greater than 0
         VerifyOrReturnError(
             mSupportedWattLevels > 0, Status::ConstraintError,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, count of supported watt levels is 0"));
+
         uint8_t maxWattSettingIndex = static_cast<uint8_t>(mSupportedWattLevels - 1);
-        reqWattSettingIndex         = wattSettingIndex.ValueOr(maxWattSettingIndex);
+        uint8_t reqWattSettingIndex = wattSettingIndex.ValueOr(maxWattSettingIndex);
         VerifyOrReturnError(
             reqWattSettingIndex <= maxWattSettingIndex, Status::ConstraintError,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
 
+        // Snapshot WattSettingIndex and WattRating before the delegate call so this cluster server can notify that the
+        // attribute changed when the delegate updates its internal value. The delegate owns storage for these attributes,
+        // but to notify the change is the server's responsibility.
+        uint8_t oldWattSettingIndex = mAppDelegate.GetCurrentWattIndex();
+        uint16_t oldWattRating      = mAppDelegate.GetWattRating();
+
         status = mAppDelegate.HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting, NullOptional,
                                                                  MakeOptional(reqWattSettingIndex));
+
+        if (oldWattSettingIndex != mAppDelegate.GetCurrentWattIndex())
+        {
+            NotifyAttributeChanged(SelectedWattIndex::Id);
+        }
+        if (oldWattRating != mAppDelegate.GetWattRating())
+        {
+            NotifyAttributeChanged(WattRating::Id);
+        }
     }
 
     return status;

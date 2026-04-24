@@ -37,6 +37,7 @@ public:
     virtual uint8_t GetCurrentOperationalState() const override;
     virtual CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const override;
     virtual bool IsSupportedMode(uint8_t mode) const override;
+    virtual bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const override;
 
 private:
     Clusters::OperationalState::Instance & mOpStateInstance;

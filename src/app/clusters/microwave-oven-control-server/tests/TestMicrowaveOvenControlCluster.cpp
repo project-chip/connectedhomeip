@@ -48,6 +48,11 @@ public:
     }
 
     virtual bool IsSupportedMode(uint8_t mode) const override { return mode == 0; }
+
+    virtual bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const override
+    {
+        return endpointId == kRootEndpointId && commandId == OperationalState::Commands::Start::Id;
+    }
 };
 
 class TestDelegate : public AppDelegate
