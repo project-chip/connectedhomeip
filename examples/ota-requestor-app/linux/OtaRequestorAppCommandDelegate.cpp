@@ -65,7 +65,7 @@ static std::string ToString(const Json::Value & v)
 Json::Value OtaRequestorAppCommandHandler::BuildCanConsent(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
-    bool canConsent = gConsentHandler.GetRequestorConsent().ValueOr(false);
+    bool canConsent                = gConsentHandler.GetRequestorConsent().ValueOr(false);
     payload["RequestorCanConsent"] = canConsent;
 
     return payload;

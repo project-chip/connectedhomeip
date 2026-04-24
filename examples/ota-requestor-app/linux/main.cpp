@@ -17,6 +17,7 @@
  */
 
 #include "AppMain.h"
+#include "OTAConsentHandler.h"
 #include "OtaRequestorAppCommandDelegate.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/CodegenIntegration.h>
@@ -25,7 +26,6 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
-#include "OTAConsentHandler.h"
 
 #include <optional>
 

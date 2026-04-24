@@ -6,7 +6,8 @@
 
 namespace chip {
 
-class OTAConsentHandler {
+class OTAConsentHandler
+{
 public:
     OTAConsentHandler() = default;
 
