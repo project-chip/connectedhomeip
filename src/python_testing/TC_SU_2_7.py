@@ -378,7 +378,8 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             self.restart_requestor()
         else:
             # Skip the test step as the RequestorDevice can't consent
-            self.skip_step()
+            logger.warning("Step #4 skipped because Requestor can NOT consent.")
+            self.mark_current_step_skipped()
 
         self.step(5)
         self.start_provider(
