@@ -39,11 +39,7 @@ from matter.testing.runner import TestStep
 
 
 class _StepExtractorVisitor(ast.NodeVisitor):
-    """Walks the AST finding self.step() calls.
-
-    When the same step number appears in multiple branches of an if/else,
-    the merge logic deduplicates them, keeping the first entry found.
-    """
+    """Walks the AST finding self.step() calls."""
 
     def __init__(self):
         self.steps: list[TestStep] = []
