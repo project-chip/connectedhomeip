@@ -54,19 +54,17 @@ static bool _HexToBytes(const std::string & octetString, chip::MutableByteSpan &
         return false;
     }
 
-    if (octetString.length() > outBuffer.size() * 2)
+    if (octetString.length() != outBuffer.size() * 2)
     {
         return false;
     }
 
     size_t decodedSize = chip::Encoding::HexToBytes(octetString.c_str(), octetString.length(), outBuffer.data(), outBuffer.size());
 
-    if (decodedSize == 0)
+    if (decodedSize != outBuffer.size())
     {
         return false;
     }
-
-    outBuffer.reduce_size(decodedSize);
 
     return true;
 }
@@ -101,10 +99,16 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
     chip::MutableByteSpan deviceInfoSpan(reinterpret_cast<uint8_t *>(&aDeviceInfo),
                                          sizeof(chip::Ble::ChipBLEDeviceIdentificationInfo));
 
-    return _HexToBytes(aDevice["serviceData"].asString(), deviceInfoSpan);
-}
 
-} // namespace
+    bool success = _HexToBytes(aDevice["serviceData"].asString(), deviceInfoSpan);
+
+    if (!success)
+    {
+        return false;
+    }
+
+    return true;
+}
 
 CHIP_ERROR WbsDeviceScanner::Init(WbsDeviceScannerDelegate * delegate)
 {
