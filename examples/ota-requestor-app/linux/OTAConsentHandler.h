@@ -11,7 +11,7 @@ public:
     OTAConsentHandler() = default;
 
     /**
-     * FIX: Remove the 'chip::' prefix because we are already 
+     * FIX: Remove the 'chip::' prefix because we are already
      * inside the chip namespace.
      */
     void SetRequestorCanConsent(Optional<bool> consent);
