@@ -19,6 +19,7 @@ executable("chip-ota-requestor-app") {
   sources = [
     "OtaRequestorAppCommandDelegate.cpp",
     "OtaRequestorAppCommandDelegate.h",
+    "OTAConsentHandler.cpp",
     "main.cpp",
   ]
 

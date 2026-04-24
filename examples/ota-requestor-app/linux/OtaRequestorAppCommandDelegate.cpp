@@ -17,6 +17,7 @@
  */
 
 #include "OtaRequestorAppCommandDelegate.h"
+#include "OTAConsentHandler.h"
 #include <lib/support/Defer.h>
 #include <platform/PlatformManager.h>
 
@@ -64,15 +65,8 @@ static std::string ToString(const Json::Value & v)
 Json::Value OtaRequestorAppCommandHandler::BuildCanConsent(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
-
-    // payload["VendorID"]            = GetOtaProviderExample().GetVendorId();
-    // payload["ProductID"]           = GetOtaProviderExample().GetProductId();
-    // payload["SoftwareVersion"]     = GetOtaProviderExample().GetSoftwareVersion();
-    // payload["HardwareVersion"]     = GetOtaProviderExample().GetHardwareVersion();
-    // payload["Location"]            = GetOtaProviderExample().GetLocation();
-    // payload["RequestorCanConsent"] = GetOtaProviderExample().GetRequestorCanConsent();
-
-    payload["RequestorCanConsent"] = true;
+    bool canConsent = gConsentHandler.GetRequestorConsent().ValueOr(false);
+    payload["RequestorCanConsent"] = canConsent;
 
     return payload;
 }

@@ -25,6 +25,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
+#include "OTAConsentHandler.h"
 
 #include <optional>
 
@@ -89,7 +90,7 @@ NamedPipeCommands sChipNamedPipeCommands;
 OtaRequestorAppCommandDelegate sOtaRequestorAppCommandDelegate;
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
-chip::Optional<bool> gRequestorCanConsent;
+// chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize]  = "/tmp/test.bin";
 bool gAutoApplyImage                            = false;
 bool gSendNotifyUpdateApplied                   = true;
@@ -154,7 +155,7 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 bool CustomOTARequestorDriver::CanConsent()
 {
-    return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
+    return gConsentHandler.GetRequestorConsent().ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
 }
 
 void CustomOTARequestorDriver::UpdateDownloaded()
@@ -269,11 +270,11 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionRequestorCanConsent:
         if (strcmp(aValue, "true") == 0)
         {
-            gRequestorCanConsent.SetValue(true);
+            gConsentHandler.SetRequestorCanConsent(true);
         }
         else if (strcmp(aValue, "false") == 0)
         {
-            gRequestorCanConsent.SetValue(false);
+            gConsentHandler.SetRequestorCanConsent(false);
         }
         else
         {
