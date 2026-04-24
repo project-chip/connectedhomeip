@@ -215,6 +215,12 @@ public:
 
 private:
     /**
+     * @brief Updates ConfigStatus to reflect the current Mode.
+     *        Called after mMode is committed.
+     */
+    void UpdateConfigStatusFromMode();
+
+    /**
      * @brief Computes the motion lock status from the current Mode and ConfigStatus members.
      *
      * @return Status::Success if motion is allowed.
