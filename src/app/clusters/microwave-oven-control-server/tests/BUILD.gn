@@ -28,11 +28,8 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
     "${chip_root}/src/app/clusters/microwave-oven-control-server",
-    "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/lib/support",
   ]
 }
