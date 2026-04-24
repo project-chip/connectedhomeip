@@ -153,14 +153,7 @@ public:
         {
             auto device = DeviceFactory::GetInstance().Create(config.type);
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
-            if (config.parentId == chip::kInvalidEndpointId)
-            {
-                ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent None", config.type.c_str(), config.endpoint);
-            }
-            else
-            {
-                ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent %u", config.type.c_str(), config.endpoint, config.parentId);
-            }
+            ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", config.type.c_str(), config.endpoint, config.parentId);
             ReturnErrorOnFailure(device->Register(config.endpoint, mDataModelProvider, config.parentId));
             mConstructedDevices.push_back(std::move(device));
         }
