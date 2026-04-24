@@ -12,27 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This block adds the codegen integration sources
+# This is the equivalent to app_config_dependent_sources.gni
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
-)
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/AuthenticatorDriver.h"
-    "${CLUSTER_DIR}/DefaultNetworkIdentityStorage.cpp"
-    "${CLUSTER_DIR}/DefaultNetworkIdentityStorage.h"
-    "${CLUSTER_DIR}/LoggingUtils.h"
-    "${CLUSTER_DIR}/NetworkAdministratorSecret.cpp"
-    "${CLUSTER_DIR}/NetworkAdministratorSecret.h"
-    "${CLUSTER_DIR}/NetworkIdentityKeystore.h"
-    "${CLUSTER_DIR}/NetworkIdentityManagementCluster.cpp"
-    "${CLUSTER_DIR}/NetworkIdentityManagementCluster.h"
-    "${CLUSTER_DIR}/NetworkIdentityStorage.cpp"
-    "${CLUSTER_DIR}/NetworkIdentityStorage.h"
 )

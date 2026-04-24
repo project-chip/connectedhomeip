@@ -259,14 +259,20 @@ public:
 
     void OnClientAdded(const ReadOnlyNetworkIdentityStorage::ClientEntry & entry) override
     {
+        EXPECT_NE(entry.index, 0u);
+        EXPECT_NE(entry.identifier, Credentials::CertificateKeyIdStorage{});
+        EXPECT_FALSE(entry.compactIdentity.empty());
         mEvents.push_back(ClientAddedEvent{ entry.index });
     }
 
-    void OnClientRemoved(uint16_t clientIndex, ByteSpan clientIdentifier) override
+    void OnClientRemoved(const ReadOnlyNetworkIdentityStorage::ClientEntry & entry) override
     {
+        EXPECT_NE(entry.index, 0u);
+        EXPECT_NE(entry.identifier, Credentials::CertificateKeyIdStorage{});
+        EXPECT_FALSE(entry.compactIdentity.empty());
         ClientRemovedEvent event;
-        event.clientIndex = clientIndex;
-        memcpy(event.identifier.data(), clientIdentifier.data(), std::min(clientIdentifier.size(), event.identifier.size()));
+        event.clientIndex = entry.index;
+        event.identifier  = entry.identifier;
         mEvents.push_back(event);
     }
 

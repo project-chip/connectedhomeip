@@ -208,6 +208,8 @@ CHIP_ERROR NetworkIdentityManagementCluster::RetireNetworkIdentity(uint16_t inde
 
     // Finally notify the authenticator
     mAuthenticator.OnNetworkIdentityRemoved(entry);
+
+    // Note: Calling NotifyAttributeChanged() is handled by the caller
     return CHIP_NO_ERROR;
 }
 
@@ -549,21 +551,24 @@ NetworkIdentityManagementCluster::HandleRemoveClient(const DataModel::InvokeRequ
     int fieldCount = commandData.clientIndex.HasValue() + commandData.clientIdentifier.HasValue();
     VerifyOrReturnValue(fieldCount == 1, Status::InvalidCommand);
 
-    // Find the client entry — need the identifier for AD notification and disconnect
+    // Find the client entry — need the full entry for the authenticator driver notification,
+    // and must load before RemoveClient deletes the detail record.
+    uint8_t clientIdentityBuf[Credentials::kMaxCHIPCompactNetworkIdentityLength];
     NetworkIdentityStorage::ClientEntry entry;
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
 
     if (commandData.clientIndex.HasValue())
     {
-        err = mStorage.FindClient(commandData.clientIndex.Value(), entry, NetworkIdentityStorage::ClientFlags::kPopulateIdentifier,
-                                  MutableByteSpan());
+        err = mStorage.FindClient(commandData.clientIndex.Value(), entry, NetworkIdentityStorage::ClientFlags::kPopulateAll,
+                                  MutableByteSpan(clientIdentityBuf));
     }
     else if (commandData.clientIdentifier.HasValue())
     {
         ByteSpan idSpan = commandData.clientIdentifier.Value();
         VerifyOrReturnValue(idSpan.size() == Credentials::kKeyIdentifierLength, Status::ConstraintError);
         Credentials::CertificateKeyId keyId(idSpan.data());
-        err = mStorage.FindClient(keyId, entry, NetworkIdentityStorage::ClientFlags::kPopulateIdentifier, MutableByteSpan());
+        err = mStorage.FindClient(keyId, entry, NetworkIdentityStorage::ClientFlags::kPopulateAll,
+                                  MutableByteSpan(clientIdentityBuf));
     }
 
     VerifyOrReturnValue(err != CHIP_ERROR_NOT_FOUND, Status::NotFound);
@@ -574,7 +579,7 @@ NetworkIdentityManagementCluster::HandleRemoveClient(const DataModel::InvokeRequ
     ReturnErrorAndLogOnFailure(err, Zcl, "RemoveClient: Failed to remove client");
 
     // Notify the AuthenticatorDriver. This disconnects the client.
-    mAuthenticator.OnClientRemoved(entry.index, ByteSpan(entry.identifier));
+    mAuthenticator.OnClientRemoved(entry);
 
     NotifyAttributeChanged(Clients::Id);
 

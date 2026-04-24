@@ -23,31 +23,15 @@
 
 namespace chip::app::Clusters::NetworkIdentityManagement {
 
-/**
- * @brief Callback interface provided to the AuthenticatorDriver by the cluster
- */
-class AuthenticatorDriverCallback
-{
-public:
-    virtual ~AuthenticatorDriverCallback() = default;
-
-    /**
-     * To be called by the AuthenticatorDriver when a client authenticates. The cluster uses this
-     * callback to update meta-data about the client, specifically the Network Identity most
-     * recently used by the client.
-     *
-     * @param clientIndex          The index of the client that authenticated.
-     * @param networkIdentityIndex The index of the Network Identity the client authenticated against.
-     */
-    virtual void OnClientAuthenticated(uint16_t clientIndex, uint16_t networkIdentityIndex) = 0;
-};
+class AuthenticatorDriverCallback;
 
 /**
  * @brief Authenticator integration interface for the Network Identity Management cluster
  *
  * The cluster informs the authenticator driver about changes to the Network Identities
  * and Clients tables. The driver is also provided read-only access to the storage backend
- * of the cluster.
+ * of the cluster. (See `ReadOnlyNetworkIdentityStorage` in NetworkIdentityStorage.h for
+ * an overview of the cluster's data model.)
  *
  * Depending on the integration strategy, the driver can update the authenticator
  * configuration based on the events from the cluster (push strategy), or the
@@ -88,8 +72,8 @@ public:
     /// Lifecycle events
 
     /**
-     * Called from the cluster's Startup(). The driver should stash the provided references
-     * and perform initial synchronization (e.g., Pattern 1 pushes all NIs/clients to hostapd).
+     * Called from the cluster's Startup().
+     * The provided callback and storage references will be valid until after `OnShutdown()`.
      *
      * @param callback Cluster callback for OnClientAuthenticated notifications.
      * @param storage  Read-only access to the cluster's storage.
@@ -141,11 +125,31 @@ public:
 
     /**
      * Called after a client has been removed from the cluster storage.
-     * The ClientEntry will be fully populated with pre-deletion state. The authenticator
-     * driver configures the authenticator to no longer allow the given client to authenticate,
-     * and to disconnect any associated client(s) that were authenticated with this identity.
+     * The ClientEntry will be fully populated with the pre-deletion state of the client.
+     * The authenticator driver configures the authenticator to no longer allow the given
+     * client to authenticate, and to disconnect any associated client(s) that were
+     * authenticated with this identity.
      */
-    virtual void OnClientRemoved(uint16_t clientIndex, ByteSpan clientIdentifier) {}
+    virtual void OnClientRemoved(const ReadOnlyNetworkIdentityStorage::ClientEntry & entry) {}
+};
+
+/**
+ * @brief Callback interface provided to the AuthenticatorDriver by the cluster
+ */
+class AuthenticatorDriverCallback
+{
+public:
+    virtual ~AuthenticatorDriverCallback() = default;
+
+    /**
+     * To be called by the AuthenticatorDriver when a client successfully authenticates. The
+     * cluster uses this callback to update meta-data about the client, specifically the reference
+     * to the Network Identity most recently used by the client.
+     *
+     * @param clientIndex          The index of the client that authenticated.
+     * @param networkIdentityIndex The index of the Network Identity the client authenticated against.
+     */
+    virtual void OnClientAuthenticated(uint16_t clientIndex, uint16_t networkIdentityIndex) = 0;
 };
 
 } // namespace chip::app::Clusters::NetworkIdentityManagement

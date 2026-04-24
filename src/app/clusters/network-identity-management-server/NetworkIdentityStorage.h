@@ -33,6 +33,14 @@ namespace chip::app::Clusters {
  * Provides query access to Client Identities, Network Identities, and the Network Administrator
  * Shared Secret (NASS). The full mutable interface is `NetworkIdentityStorage` below.
  *
+ * The primary key for each stored Network Identity and Client Identity are the Network Identity
+ * Index and Client Index, respectively. These are 16 bit unsigned integers allocated by the storage
+ * implementation from a spec-defined range (1-65534 and 1-2047 respectively), and are exposed
+ * externally via the cluster's attributes and commands. Additionally, each Network and Client
+ * Identity also has an Identifier; this is a 20 byte CertificateKeyId that is derived from the
+ * public key of the underlying identity certificate. The derivation of the Identifier is handled by
+ * the cluster code; in terms of the storage interface it is simply a secondary key for the identity.
+ *
  * Keypair handles are stored as opaque bytes; the cluster layer handles typed handle conversions.
  */
 class ReadOnlyNetworkIdentityStorage
