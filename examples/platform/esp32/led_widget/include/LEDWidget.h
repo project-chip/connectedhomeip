@@ -66,11 +66,11 @@ public:
 #endif
 
 private:
-    bool mState               = false;
-    uint8_t mBrightness       = UINT8_MAX;
-    int64_t mLastChangeTimeUS = 0;
-    uint32_t mBlinkOnTimeMS   = 0;
-    uint32_t mBlinkOffTimeMS  = 0;
+    bool mState                        = false;
+    uint8_t mBrightness                = UINT8_MAX;
+    int64_t mLastChangeTimeUS          = 0;
+    uint32_t mBlinkOnTimeMS            = 0;
+    uint32_t mBlinkOffTimeMS           = 0;
     StateChangeCallback mStateChangeCb = nullptr;
 
 #if CONFIG_LED_TYPE_RMT
