@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <app/clusters/microwave-oven-control-server/Delegate.h>
-#include <app/clusters/microwave-oven-control-server/MicrowaveOvenIntegrationDelegate.h>
+#include <app/clusters/microwave-oven-control-server/AppDelegate.h>
+#include <app/clusters/microwave-oven-control-server/IntegrationDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/MicrowaveOvenControl/Commands.h>
@@ -40,8 +40,8 @@ public:
         BitMask<MicrowaveOvenControl::Feature> feature;
         OptionalAttributeSet optionalAttributeSet;
         bool supportsAddMoreTime{};
-        MicrowaveOvenControl::MicrowaveOvenIntegrationDelegate & integrationDelegate;
-        MicrowaveOvenControl::Delegate & delegate;
+        MicrowaveOvenControl::IntegrationDelegate & integrationDelegate;
+        MicrowaveOvenControl::AppDelegate & appDelegate;
     };
 
     MicrowaveOvenControlCluster(EndpointId endpointId, const Config & context);
@@ -67,8 +67,8 @@ private:
     const BitMask<MicrowaveOvenControl::Feature> mFeature;
     const OptionalAttributeSet mOptionalAttributeSet;
     const bool mSupportsAddMoreTime;
-    MicrowaveOvenControl::MicrowaveOvenIntegrationDelegate & mIntegrationDelegate;
-    MicrowaveOvenControl::Delegate & mDelegate;
+    MicrowaveOvenControl::IntegrationDelegate & mIntegrationDelegate;
+    MicrowaveOvenControl::AppDelegate & mAppDelegate;
 
     uint32_t mCookTimeSec{};
     uint8_t mSupportedWattLevels{};

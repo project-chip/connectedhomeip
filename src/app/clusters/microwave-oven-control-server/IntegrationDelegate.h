@@ -24,15 +24,18 @@
 
 namespace chip::app::Clusters::MicrowaveOvenControl {
 
-class MicrowaveOvenIntegrationDelegate
+// Per spec this cluster depends on operational state and microwave oven mode clusters.
+// This delegate class is used to decouple microwave oven control cluster from these dependencies.
+// Subclasses of this class are responsible for providing the current operational state and microwave oven mode values.
+class IntegrationDelegate
 {
 public:
-    MicrowaveOvenIntegrationDelegate()          = default;
-    virtual ~MicrowaveOvenIntegrationDelegate() = default;
+    IntegrationDelegate()          = default;
+    virtual ~IntegrationDelegate() = default;
 
-    virtual uint8_t GetCurrentOperationalState() const                                       = 0;
-    virtual Protocols::InteractionModel::Status GetNormalOperatingMode(uint8_t & mode) const = 0;
-    virtual Protocols::InteractionModel::Status IsSupportedMode(uint8_t mode) const          = 0;
+    virtual uint8_t GetCurrentOperationalState() const              = 0;
+    virtual CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const = 0;
+    virtual bool IsSupportedMode(uint8_t mode) const                = 0;
 };
 
 } // namespace chip::app::Clusters::MicrowaveOvenControl

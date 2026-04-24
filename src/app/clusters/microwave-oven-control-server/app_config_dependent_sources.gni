@@ -14,5 +14,6 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "Delegate.h",
   "microwave-oven-control-server.h",
 ]

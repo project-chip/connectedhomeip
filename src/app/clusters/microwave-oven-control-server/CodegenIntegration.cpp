@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023-2026 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,37 +30,29 @@ namespace chip::app::Clusters::MicrowaveOvenControl {
 using namespace Attributes;
 using namespace Commands;
 
-CodegenMicrowaveOvenIntegrationDelegate::CodegenMicrowaveOvenIntegrationDelegate(
-    Clusters::OperationalState::Instance & aOpStateInstance, Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mOpStateInstance(aOpStateInstance),
-    mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
+CodegenIntegrationDelegate::CodegenIntegrationDelegate(Clusters::OperationalState::Instance & aOpStateInstance,
+                                                       Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
+    mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
-uint8_t CodegenMicrowaveOvenIntegrationDelegate::GetCurrentOperationalState() const
+uint8_t CodegenIntegrationDelegate::GetCurrentOperationalState() const
 {
     return mOpStateInstance.GetCurrentOperationalState();
 }
 
-Status CodegenMicrowaveOvenIntegrationDelegate::GetNormalOperatingMode(uint8_t & mode) const
+CHIP_ERROR CodegenIntegrationDelegate::GetNormalOperatingMode(uint8_t & mode) const
 {
-    uint8_t modeValue = 0;
-    VerifyOrReturnError(mMicrowaveOvenModeInstance.GetModeValueByModeTag(to_underlying(MicrowaveOvenMode::ModeTag::kNormal),
-                                                                         modeValue) == CHIP_NO_ERROR,
-                        Status::InvalidCommand);
-    mode = modeValue;
-    return Status::Success;
+    return mMicrowaveOvenModeInstance.GetModeValueByModeTag(to_underlying(MicrowaveOvenMode::ModeTag::kNormal), mode);
 }
 
-Status CodegenMicrowaveOvenIntegrationDelegate::IsSupportedMode(uint8_t mode) const
+bool CodegenIntegrationDelegate::IsSupportedMode(uint8_t mode) const
 {
-    VerifyOrReturnError(mMicrowaveOvenModeInstance.IsSupportedMode(mode), Status::ConstraintError);
-    return Status::Success;
+    return mMicrowaveOvenModeInstance.IsSupportedMode(mode);
 }
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<Feature> aFeature,
                    OperationalState::Instance & aOpStateInstance, ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature),
     mIntegrationDelegate(aOpStateInstance, aMicrowaveOvenModeInstance)
 {}
 
@@ -116,14 +108,14 @@ CHIP_ERROR Instance::Init()
         }
     }
 
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->SetInstance(this);
 
     MicrowaveOvenControlCluster::Config config{ .feature              = mFeature,
                                                 .optionalAttributeSet = mOptionalAttributeSet,
                                                 .supportsAddMoreTime  = supportsAddMoreTime,
                                                 .integrationDelegate  = mIntegrationDelegate,
-                                                .delegate             = *mDelegate };
+                                                .appDelegate          = *mDelegate };
     mCluster.Create(mEndpointId, config);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
@@ -133,7 +125,6 @@ CHIP_ERROR Instance::Deinit()
     if (mDelegate)
     {
         mDelegate->SetInstance(nullptr);
-        mDelegate = nullptr;
     }
     VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
