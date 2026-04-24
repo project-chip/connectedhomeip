@@ -76,6 +76,15 @@ if(CONFIG_CHIP)
         endif()
     endif()
 
+    
+    # IMU task has no Kconfig for priority; on RW platforms it is critical infrastructure,
+    # so its priority is forced to cooperative to prevent starvation.
+    if(CONFIG_SOC_FAMILY_NXP_RW)
+        if(DEFINED CONFIG_NUM_COOP_PRIORITIES AND CONFIG_NUM_COOP_PRIORITIES GREATER 0)
+            zephyr_compile_definitions(IMU_TASK_PRIORITY=-1)
+        endif()
+    endif()
+
     zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
     matter_add_cflags("${ZEPHYR_CFLAGS_C}")
     zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
