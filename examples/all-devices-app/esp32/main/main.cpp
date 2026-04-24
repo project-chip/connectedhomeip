@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <ESP32DimmableLightDevice.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -25,7 +26,6 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
-#include <ESP32DimmableLightDevice.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>

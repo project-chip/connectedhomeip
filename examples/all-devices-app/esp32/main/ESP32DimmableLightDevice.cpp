@@ -59,8 +59,7 @@ void ESP32DimmableLightDevice::OnOptionsChanged(BitMask<LevelControl::OptionsBit
 
 void ESP32DimmableLightDevice::OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnOnLevelChanged -> %s",
-                    onLevel.IsNull() ? "NULL" : "set");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnOnLevelChanged -> %s", onLevel.IsNull() ? "NULL" : "set");
 }
 
 void ESP32DimmableLightDevice::OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate)
