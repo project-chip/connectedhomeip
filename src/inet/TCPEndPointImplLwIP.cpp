@@ -170,14 +170,16 @@ CHIP_ERROR TCPEndPointImplLwIP::GetPeerInfo(IPAddress * retAddr, uint16_t * retP
     // mTCP is shared with the LwIP TCP/IP task and may be cleared by LwIPHandleError at
     // any time. The null-check and dereference must both happen under the LwIP core lock.
     CHIP_ERROR err = CHIP_ERROR_CONNECTION_ABORTED;
-    RunOnTCPIP([this, retAddr, retPort, &err]() {
+    err_t lwipErr  = RunOnTCPIPRet([this, retAddr, retPort, &err]() -> err_t {
         if (mTCP != nullptr)
         {
             *retPort = mTCP->remote_port;
             *retAddr = IPAddress(mTCP->remote_ip);
             err      = CHIP_NO_ERROR;
         }
+        return ERR_OK;
     });
+    VerifyOrReturnError(lwipErr == ERR_OK, chip::System::MapErrorLwIP(lwipErr));
     return err;
 }
 
@@ -186,14 +188,16 @@ CHIP_ERROR TCPEndPointImplLwIP::GetLocalInfo(IPAddress * retAddr, uint16_t * ret
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = CHIP_ERROR_CONNECTION_ABORTED;
-    RunOnTCPIP([this, retAddr, retPort, &err]() {
+    err_t lwipErr  = RunOnTCPIPRet([this, retAddr, retPort, &err]() -> err_t {
         if (mTCP != nullptr)
         {
             *retPort = mTCP->local_port;
             *retAddr = IPAddress(mTCP->local_ip);
             err      = CHIP_NO_ERROR;
         }
+        return ERR_OK;
     });
+    VerifyOrReturnError(lwipErr == ERR_OK, chip::System::MapErrorLwIP(lwipErr));
     return err;
 }
 
@@ -226,13 +230,15 @@ CHIP_ERROR TCPEndPointImplLwIP::EnableNoDelay()
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = CHIP_ERROR_CONNECTION_ABORTED;
-    RunOnTCPIP([this, &err]() {
+    err_t lwipErr  = RunOnTCPIPRet([this, &err]() -> err_t {
         if (mTCP != nullptr)
         {
             tcp_nagle_disable(mTCP);
             err = CHIP_NO_ERROR;
         }
+        return ERR_OK;
     });
+    VerifyOrReturnError(lwipErr == ERR_OK, chip::System::MapErrorLwIP(lwipErr));
     return err;
 }
 
@@ -242,7 +248,7 @@ CHIP_ERROR TCPEndPointImplLwIP::EnableKeepAlive(uint16_t interval, uint16_t time
 
 #if LWIP_TCP_KEEPALIVE
     CHIP_ERROR err = CHIP_ERROR_CONNECTION_ABORTED;
-    RunOnTCPIP([this, interval, timeoutCount, &err]() {
+    err_t lwipErr  = RunOnTCPIPRet([this, interval, timeoutCount, &err]() -> err_t {
         if (mTCP != nullptr)
         {
             // Set the idle interval
@@ -258,7 +264,9 @@ CHIP_ERROR TCPEndPointImplLwIP::EnableKeepAlive(uint16_t interval, uint16_t time
             ip_set_option(mTCP, SOF_KEEPALIVE);
             err = CHIP_NO_ERROR;
         }
+        return ERR_OK;
     });
+    VerifyOrReturnError(lwipErr == ERR_OK, chip::System::MapErrorLwIP(lwipErr));
     return err;
 #else  // LWIP_TCP_KEEPALIVE
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -271,13 +279,15 @@ CHIP_ERROR TCPEndPointImplLwIP::DisableKeepAlive()
 
 #if LWIP_TCP_KEEPALIVE
     CHIP_ERROR err = CHIP_ERROR_CONNECTION_ABORTED;
-    RunOnTCPIP([this, &err]() {
+    err_t lwipErr  = RunOnTCPIPRet([this, &err]() -> err_t {
         if (mTCP != nullptr)
         {
             ip_reset_option(mTCP, SOF_KEEPALIVE);
             err = CHIP_NO_ERROR;
         }
+        return ERR_OK;
     });
+    VerifyOrReturnError(lwipErr == ERR_OK, chip::System::MapErrorLwIP(lwipErr));
     return err;
 #else  // LWIP_TCP_KEEPALIVE
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -298,15 +308,17 @@ CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
     // CHIP_ERROR_CONNECTION_ABORTED if the PCB is gone.
 
     // Determine the current send window size. This is the maximum amount we can write to the connection.
-    uint16_t sendWindowSize = 0;
-    RunOnTCPIP([this, &sendWindowSize, &err]() {
+    uint16_t sendWindowSize  = 0;
+    err_t sendWindowLwipErr  = RunOnTCPIPRet([this, &sendWindowSize, &err]() -> err_t {
         if (mTCP == nullptr)
         {
             err = CHIP_ERROR_CONNECTION_ABORTED;
-            return;
+            return ERR_OK;
         }
         sendWindowSize = tcp_sndbuf(mTCP);
+        return ERR_OK;
     });
+    VerifyOrReturnError(sendWindowLwipErr == ERR_OK, chip::System::MapErrorLwIP(sendWindowLwipErr));
     if (err != CHIP_NO_ERROR)
     {
         return err;
@@ -498,13 +510,15 @@ CHIP_ERROR TCPEndPointImplLwIP::AckReceive(size_t len)
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err = CHIP_ERROR_CONNECTION_ABORTED;
-    RunOnTCPIP([this, len, &err]() {
+    err_t lwipErr  = RunOnTCPIPRet([this, len, &err]() -> err_t {
         if (mTCP != nullptr)
         {
             tcp_recved(mTCP, static_cast<uint16_t>(len));
             err = CHIP_NO_ERROR;
         }
+        return ERR_OK;
     });
+    VerifyOrReturnError(lwipErr == ERR_OK, chip::System::MapErrorLwIP(lwipErr));
     return err;
 }
 
