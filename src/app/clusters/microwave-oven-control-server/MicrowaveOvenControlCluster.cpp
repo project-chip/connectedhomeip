@@ -16,10 +16,10 @@
  *
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/OperationalState/Commands.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
