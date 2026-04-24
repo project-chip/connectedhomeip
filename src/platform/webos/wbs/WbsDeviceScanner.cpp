@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -46,22 +47,26 @@ namespace Internal {
 
 namespace {
 
-static bool _HexToBytes(std::string octetString, uint8_t * dataBytes)
+static bool _HexToBytes(const std::string & octetString, chip::MutableByteSpan & outBuffer)
 {
-    chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-    size_t argLen = octetString.length();
-    if (!buffer.Calloc(argLen))
+    if (octetString.empty() || outBuffer.empty())
     {
         return false;
     }
 
-    size_t octetCount = chip::Encoding::HexToBytes(octetString.c_str(), argLen, buffer.Get(), argLen);
-
-    if (octetCount == 0)
+    if (octetString.length() > outBuffer.size() * 2)
     {
         return false;
     }
-    memcpy(dataBytes, buffer.Get(), octetCount);
+
+    size_t decodedSize = chip::Encoding::HexToBytes(octetString.c_str(), octetString.length(), outBuffer.data(), outBuffer.size());
+
+    if (decodedSize == 0)
+    {
+        return false;
+    }
+
+    outBuffer.reduce_size(decodedSize);
 
     return true;
 }
@@ -69,7 +74,7 @@ static bool _HexToBytes(std::string octetString, uint8_t * dataBytes)
 /// Retrieve CHIP device identification info from the device advertising data
 bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
 {
-    VerifyOrReturnError(aDevice.hasKey("serviceData") == true, false);
+    VerifyOrReturnError(aDevice.hasKey("serviceData"), false);
     bool bChipDevice = false;
 
     if (aDevice.hasKey("serviceUuid") == true)
@@ -92,10 +97,11 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
         }
     }
 
-    VerifyOrReturnError(bChipDevice == true, false);
-    VerifyOrReturnError(_HexToBytes(aDevice["serviceData"].asString(), reinterpret_cast<uint8_t *>(&aDeviceInfo)) == true, false);
+    VerifyOrReturnError(bChipDevice, false);
+    chip::MutableByteSpan deviceInfoSpan(reinterpret_cast<uint8_t *>(&aDeviceInfo),
+                                         sizeof(chip::Ble::ChipBLEDeviceIdentificationInfo));
 
-    return bChipDevice;
+    return _HexToBytes(aDevice["serviceData"].asString(), deviceInfoSpan);
 }
 
 } // namespace
