@@ -48,10 +48,9 @@ public:
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // Assessors for subclasses/implementations to interact with clusters
+    // Accessors for subclasses/implementations to interact with clusters
     Clusters::FanControlCluster & FanControlCluster();
     Clusters::OnOffCluster & OnOffCluster();
-    Clusters::GroupsCluster & GroupsCluster();
 
 private:
     class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
