@@ -429,10 +429,7 @@ jobs:
             - name: Verify MSAN sysroot
               run: ./scripts/run_in_build_env.sh "scripts/build/build_msan_sysroot.sh --check"
 
-            - name: Build MSAN tests
+            - name: Build and Run MSAN unit tests
               run: >-
                   ./scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-tests-msan-clang build"
-
-            - name: Run MSAN tests
-              run: ./scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-msan-clang check"
