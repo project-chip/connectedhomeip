@@ -79,16 +79,11 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void FanControlCluster::SetFanModeToOff()
+void FanControlCluster::CommitFanModeOffState()
 {
     VerifyOrReturn(SetAttributeValue(mFanMode, FanModeEnum::kOff, FanMode::Id)); // noop if already off
     ApplyFanModeOffSideEffects();
     StoreFanModePersistence();
-    NotifyDelegateFanDriveState();
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnFanStateChanged(false);
-    }
 }
 
 void FanControlCluster::ApplyFanModeOffSideEffects()
@@ -211,7 +206,7 @@ void FanControlCluster::ApplyPercentSettingChanged()
 
     if (mPercentSetting.Value() == 0)
     {
-        SetFanModeToOff();
+        CommitFanModeOffState();
         return;
     }
 
@@ -246,7 +241,7 @@ void FanControlCluster::ApplySpeedSettingChanged()
 
     if (mSpeedSetting.Value() == 0)
     {
-        SetFanModeToOff();
+        CommitFanModeOffState();
         return;
     }
 
@@ -497,6 +492,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
         return Status::ConstraintError;
     }
 
+    const FanModeEnum previousFanMode = mFanMode;
     SetAttributeValue(mPercentSetting, value, PercentSetting::Id);
     ApplyPercentSettingChanged();
     if (!mIsOnOffOn)
@@ -504,6 +500,10 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
         NotifyAttributeChanged(PercentCurrent::Id);
     }
     NotifyDelegateFanDriveState();
+    if (mDelegate != nullptr && previousFanMode != FanModeEnum::kOff && mFanMode == FanModeEnum::kOff)
+    {
+        mDelegate->OnFanStateChanged(false);
+    }
     return Status::Success;
 }
 
@@ -519,6 +519,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
         return Status::ConstraintError;
     }
 
+    const FanModeEnum previousFanMode = mFanMode;
     SetAttributeValue(mSpeedSetting, value, SpeedSetting::Id);
     ApplySpeedSettingChanged();
     if (!mIsOnOffOn)
@@ -526,6 +527,10 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
     NotifyDelegateFanDriveState();
+    if (mDelegate != nullptr && previousFanMode != FanModeEnum::kOff && mFanMode == FanModeEnum::kOff)
+    {
+        mDelegate->OnFanStateChanged(false);
+    }
     return Status::Success;
 }
 

@@ -162,7 +162,7 @@ private:
     bool SupportsStep() const { return mFeatureMap.Has(FanControl::Feature::kStep); }
     bool SupportsAirflowDirection() const { return mOptionalAttributes.IsSet(FanControl::Attributes::AirflowDirection::Id); }
 
-    void SetFanModeToOff();
+    void CommitFanModeOffState();
     void ApplyFanModeOffSideEffects();
     void ApplyFanModeAutoSideEffects();
 
