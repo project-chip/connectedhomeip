@@ -362,6 +362,7 @@ class HostBoard(Enum):
 
     # cross-compile support
     ARM64 = auto()
+    ARM = auto()
 
     # for test support
     FAKE = auto()
@@ -382,6 +383,8 @@ class HostBoard(Enum):
             return arch
         if self == HostBoard.ARM64:
             return 'arm64'
+        if self == HostBoard.ARM:
+            return 'arm'
         if self == HostBoard.FAKE:
             return 'fake'
         raise Exception('Unknown host board type: %r' % self)
@@ -604,13 +607,13 @@ class HostBuilder(GnBuilder):
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
 
-        if self.board == HostBoard.ARM64:
+        if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:
                 raise Exception("Cross compile only supported using clang")
 
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl
-            if self.board == HostBoard.ARM64 and crypto_library == HostCryptoLibrary.MBEDTLS:
+            if self.board in (HostBoard.ARM64, HostBoard.ARM) and crypto_library == HostCryptoLibrary.MBEDTLS:
                 raise Exception("MbedTLS not supported for cross compiling cert tool")
             self.build_command = 'src/tools/chip-cert'
         elif app == HostApp.ADDRESS_RESOLVE:
@@ -649,6 +652,12 @@ class HostBuilder(GnBuilder):
                 args.extend([
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
+                ]
+                )
+            case HostBoard.ARM:
+                args.extend([
+                    'target_cpu="arm"',
+                    'sysroot="%s"' % self.SysRootPath('SYSROOT_ARMHF'),
                 ])
             case HostBoard.FAKE:
                 args.extend([
@@ -673,6 +682,9 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.board == HostBoard.ARM:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(
+                self.SysRootPath('SYSROOT_ARMHF'), 'lib/arm-linux-gnueabihf/pkgconfig')
         if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
             # Every test is expected to have a distinct build ID, so `%m` will be
             # distinct.
