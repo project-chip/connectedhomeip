@@ -235,7 +235,7 @@ CHIP_ERROR GetWiFiParameter(int skfd,            /* Socket to the kernel */
 
 CHIP_ERROR GetWiFiStats(int skfd, const char * ifname, struct iw_statistics * stats)
 {
-    struct iwreq wrq;
+    struct iwreq wrq = {};
 
     wrq.u.data.pointer = stats;
     wrq.u.data.length  = sizeof(struct iw_statistics);
@@ -355,7 +355,7 @@ CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t 
 
 CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
@@ -392,10 +392,13 @@ CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInt
             err  = CHIP_NO_ERROR;
             size = index;
         }
+        else
+        {
+            err = CHIP_ERROR_NOT_FOUND;
+        }
 
         freeifaddrs(ifaddr);
     }
-
     return err;
 }
 
@@ -437,6 +440,10 @@ CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInt
         {
             err  = CHIP_NO_ERROR;
             size = index;
+        }
+        else
+        {
+            err = CHIP_ERROR_NOT_FOUND;
         }
 
         freeifaddrs(ifaddr);
@@ -480,7 +487,7 @@ CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
 
-    struct iwreq wrq;
+    struct iwreq wrq = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -505,8 +512,8 @@ CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 
 CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    struct iw_statistics stats;
+    CHIP_ERROR err             = CHIP_ERROR_READ_FAILED;
+    struct iw_statistics stats = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -566,8 +573,8 @@ CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi)
 
 CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    struct iw_statistics stats;
+    CHIP_ERROR err             = CHIP_ERROR_READ_FAILED;
+    struct iw_statistics stats = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -589,8 +596,8 @@ CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCoun
 
 CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    struct iwreq wrq;
+    CHIP_ERROR err   = CHIP_ERROR_READ_FAILED;
+    struct iwreq wrq = {};
     int skfd;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
