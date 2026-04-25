@@ -101,6 +101,7 @@
 #include <clusters/MicrowaveOvenMode/EnumsCheck.h>
 #include <clusters/ModeSelect/EnumsCheck.h>
 #include <clusters/NetworkCommissioning/EnumsCheck.h>
+#include <clusters/NetworkIdentityManagement/EnumsCheck.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EnumsCheck.h>
 #include <clusters/OccupancySensing/EnumsCheck.h>
 #include <clusters/OnOff/EnumsCheck.h>

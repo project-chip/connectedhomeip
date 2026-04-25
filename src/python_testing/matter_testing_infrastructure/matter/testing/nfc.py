@@ -105,7 +105,8 @@ class NFCReader:
             # Perform NDEF file system navigation sequence
             _select_ndef_application(connection)    # Select NDEF app
             _select_cc_file(connection)             # Select Capability Container (aka CC File)
-            _select_ndef_file(connection)           # Select data file
+            ndef_file_id = _read_cc_file_content(connection)     # Get NDEF File ID from CC Content
+            _select_ndef_file(connection, ndef_file_id)          # Select data file
 
             # Read NDEF message length and data
             ndef_length = _read_ndef_length(connection)
@@ -147,7 +148,9 @@ class NFCReader:
         with NFCConnection(self) as connection:
 
             _select_ndef_application(connection)    # Select NDEF app
-            _select_ndef_file(connection)           # Select NDEF file
+            _select_cc_file(connection)             # Select Capability Container (aka CC File)
+            ndef_file_id = _read_cc_file_content(connection)    # Get NDEF File ID from CC content
+            _select_ndef_file(connection, ndef_file_id)         # Select data file
 
             # Create NDEF message with a single URI record
             record = ndef.UriRecord(uri)
@@ -272,17 +275,94 @@ def _select_cc_file(connection):
     _check_transmission_status(sw1, sw2, "select CC file")
 
 
-def _select_ndef_file(connection):
+def _read_cc_file_content(connection) -> int:
+    """
+    Reads the Capability Container (CC) file and extracts the NDEF File ID.
+
+    This function handles the reading of the CC file by:
+    1. Reading the length field (CCLEN).
+    2. Reading the rest of the file in chunks if necessary (handling large CC files).
+    3. Parsing the TLV structure to find the NDEF File Control TLV (Tag 0x04).
+    4. Extracting the File ID using struct for binary interpretation.
+
+    Args:
+        connection: The NFC reader connection object.
+
+    Returns:
+        int: The NDEF File ID (e.g., 0xE104).
+
+    Raises:
+        ValueError: If the NDEF File Control TLV is not found or data is invalid.
+        AssertionError: If the message transmission fails.
+    """
+    # 1. Read the first 2 bytes to get the total CC length (CCLEN)
+    header, sw1, sw2 = connection.transmit([CLA_ISO, INS_READ_BINARY, 0x00, 0x00, 0x02])
+    _check_transmission_status(sw1, sw2, "read CC length")
+    if len(header) < 2:
+        raise ValueError("CC file data too short to contain length field")
+
+    cc_len = (header[0] << 8) | header[1]
+
+    # 2. Read the remaining bytes
+    # CCLEN includes the 2 length bytes, so we need (cc_len - 2) more bytes
+    remaining_len = cc_len - 2
+
+    if remaining_len < 0:
+        raise ValueError("Invalid CC length (must be greater than 2)")
+
+    # Handle case where CC file is extremely small (edge case)
+    if remaining_len == 0:
+        raise ValueError("CC file has no content beyond length field")
+
+    # Read body with chunking logic to satisfy MAX_SHORT_APDU_LENGTH constraints
+    cc_body = []
+    offset = 2
+    bytes_to_read = remaining_len
+
+    while bytes_to_read > 0:
+        chunk_size = min(bytes_to_read, MAX_SHORT_APDU_LENGTH)
+        p1 = (offset >> 8) & 0xFF
+        p2 = offset & 0xFF
+
+        chunk, sw1, sw2 = connection.transmit([CLA_ISO, INS_READ_BINARY, p1, p2, chunk_size])
+        _check_transmission_status(sw1, sw2, f"read CC body at offset {offset}")
+
+        cc_body.extend(chunk)
+        offset += chunk_size
+        bytes_to_read -= chunk_size
+
+    # Combine for parsing (header + body)
+    cc_data = header + cc_body
+
+    # 3. Parse TLV to find NDEF File Control TLV (Tag 0x04)
+    # CC structure [CCLEN(2)] [Version(1)] [MLe(2)] [MLc(2)] [TLV_Tag(1)=04] [TLV_Len(1)] [FileID(2)] ...
+    target_idx = 7  # TLV tag start at index 7
+
+    if len(cc_data) <= target_idx:
+        raise ValueError("CC data too short to contain NDEF TLV")
+
+    tag = cc_data[target_idx]
+
+    if tag != 0x04:
+        log.error(f"Expected TLV Tag 0x04 at index {target_idx}, but got 0x{tag:02X}")
+        log.error(f"Full Data: {cc_data}")
+        raise ValueError(f"NDEF File Control TLV (0x04) not found at expected index {target_idx}")
+
+    return (cc_data[target_idx + 2] << 8) | cc_data[target_idx + 3]
+
+
+def _select_ndef_file(connection, file_id):
     """
     Select the NDEF data file on the NFC tag.
 
-    The NDEF file (E104) contains the actual NDEF message data that can be read
+    The NDEF file contains the actual NDEF message data that can be read
     from or written to the NFC tag. This file stores the structured NDEF records
     that contain the application data (such as URLs, text, or other payloads).
 
     Args:
         connection: The NFC reader connection object used to
                                     communicate with the NFC tag.
+        file_id (int): The the NDEF file ID (e.g., 0xE104).
 
     Raises:
         AssertionError: If the message transmission fails (SW1, SW2 != 0x90, 0x00).
@@ -291,10 +371,10 @@ def _select_ndef_file(connection):
         This function must be called after _select_ndef_application() and
         _select_cc_file() before reading or writing NDEF data.
     """
-    # ISO/IEC 7816-4 APDU command to select the NDEF file (file ID: 0xE104)
+    # ISO/IEC 7816-4 APDU command to select the NDEF file
     # (P1, P2)=(0x00, 0x0C) corresponds to select by file ID
     SELECT_NDEF_FILE = [CLA_ISO, INS_SELECT, 0x00, 0x0C, 0x02,  # CLA INS P1 P2 Lc
-                        0xE1, 0x04]                             # File ID
+                        (file_id >> 8) & 0xFF, file_id & 0xFF]  # File ID
     data, sw1, sw2 = connection.transmit(SELECT_NDEF_FILE)
     _check_transmission_status(sw1, sw2, "select NDEF file")
 

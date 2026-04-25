@@ -34,18 +34,21 @@ public:
     struct CustomDataSource
     {
         ma_data_source_base base; // Base structure required by miniaudio
-        double freq1;             // Primary frequency or first tone
-        double freq2;             // Secondary frequency or second tone
-        double duration;          // Total duration of the sound in seconds
+        double freq1_hz;          // Primary frequency or first tone in Hz
+        double freq2_hz;          // Secondary frequency or second tone in Hz
+        double duration_sec;      // Total duration of the sound in seconds
         bool pulse;               // Whether to apply a pulse modulation effect
         ma_uint64 cursor;         // Current playback position in samples
     };
 
     // RAII wrapper for sound resources. Manages the lifecycle of miniaudio structures.
+    // A "SoundResource" represents a single chime sound, binding a Matter Chime ID to a specific
+    // audio synthesis configuration (CustomDataSource) and the associated miniaudio sound object.
     class SoundResource
     {
     public:
-        SoundResource(ma_engine * engine, const ChimeDevice::Sound & soundInfo);
+        static std::unique_ptr<SoundResource> Create(ma_engine * engine, const ChimeDevice::Sound & soundInfo);
+        SoundResource() = default; // Needed for factory
         ~SoundResource();
 
         uint8_t id;                  // Chime ID matching the Matter spec
