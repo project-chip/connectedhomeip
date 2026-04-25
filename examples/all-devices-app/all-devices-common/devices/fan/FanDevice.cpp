@@ -123,11 +123,5 @@ Clusters::FanControlCluster & FanDevice::FanControlCluster()
     return mFanControlCluster.Cluster();
 }
 
-Clusters::GroupsCluster & FanDevice::GroupsCluster()
-{
-    VerifyOrDie(mGroupsCluster.IsConstructed());
-    return mGroupsCluster.Cluster();
-}
-
 } // namespace app
 } // namespace chip
