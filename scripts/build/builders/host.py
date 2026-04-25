@@ -23,7 +23,6 @@ from typing import Optional
 from .builder import BuilderOutput
 from .gn import GnBuilder
 
-
 _MSAN_DEFAULT_SYSROOT = os.path.expanduser('~/.cache/matter/msan_sysroot')
 _MSAN_BUILD_SCRIPT = 'scripts/build/build_msan_sysroot.sh'
 

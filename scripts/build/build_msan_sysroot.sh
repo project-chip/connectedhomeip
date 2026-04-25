@@ -74,11 +74,27 @@ CHECK_ONLY=0
 OUT_DIR=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --out-dir) OUT_DIR="$2"; shift 2 ;;
-        --force) FORCE=1; shift ;;
-        --check) CHECK_ONLY=1; shift ;;
-        --help|-h) usage; exit 0 ;;
-        *) echo "Unknown argument: $1" >&2; usage >&2; exit 1 ;;
+        --out-dir)
+            OUT_DIR="$2"
+            shift 2
+            ;;
+        --force)
+            FORCE=1
+            shift
+            ;;
+        --check)
+            CHECK_ONLY=1
+            shift
+            ;;
+        --help | -h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 1
+            ;;
     esac
 done
 
@@ -103,8 +119,8 @@ fi
 # host.py's MSAN check computes the same hash to detect staleness.
 compute_input_hash() {
     {
-        sha256sum < "$SCRIPT_PATH" | cut -d' ' -f1
-        sha256sum < "$IGNORELIST" | cut -d' ' -f1
+        sha256sum <"$SCRIPT_PATH" | cut -d' ' -f1
+        sha256sum <"$IGNORELIST" | cut -d' ' -f1
         "$PW_CLANG/clang" --version
     } | sha256sum | cut -d' ' -f1
 }
@@ -215,7 +231,7 @@ echo ">>> GLib"
 cd "$SRC"
 [[ -d glib-2.80.0 ]] || { wget -q https://download.gnome.org/sources/glib/2.80/glib-2.80.0.tar.xz && tar xf glib-2.80.0.tar.xz; }
 
-cat > "$SRC/msan-native.ini" << EOF
+cat >"$SRC/msan-native.ini" <<EOF
 [binaries]
 c = '$PW_CLANG/clang'
 cpp = '$PW_CLANG/clang++'
@@ -236,7 +252,7 @@ EOF
 cd glib-2.80.0
 rm -rf builddir
 PKG_CONFIG_PATH="$SYSROOT/lib/pkgconfig:$SYSROOT/lib64/pkgconfig" \
-meson setup builddir --native-file "$SRC/msan-native.ini" --prefix="$SYSROOT" \
+    meson setup builddir --native-file "$SRC/msan-native.ini" --prefix="$SYSROOT" \
     --default-library=static --buildtype=debugoptimized \
     -Dselinux=disabled -Dxattr=false -Dlibmount=disabled -Dnls=disabled \
     -Dtests=false -Dglib_checks=false -Dglib_assert=false \
@@ -245,7 +261,7 @@ meson setup builddir --native-file "$SRC/msan-native.ini" --prefix="$SYSROOT" \
 ninja -C builddir -j"$(nproc)" && ninja -C builddir install
 
 # Stamp file written last; only exists on full success.
-echo "$EXPECTED_HASH" > "$STAMP"
+echo "$EXPECTED_HASH" >"$STAMP"
 
 trap - ERR
 echo ">>> Sysroot ready at $SYSROOT"
