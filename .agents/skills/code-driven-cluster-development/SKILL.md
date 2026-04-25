@@ -61,9 +61,15 @@ subdirectory while placing the new code-driven implementation in the root.
     `codegen/`) go in `app_config_dependent_sources.cmake` and
     `app_config_dependent_sources.gni` (these are the codegen-dependent files).
 -   All other files (`<ClusterName>Cluster.h/cpp`, test files) go in `BUILD.gn`.
+-   **Sources must belong to a single build target**: Files referenced in
+    `BUILD.gn` and `app_config_dependent_sources.*` must be mutually exclusive.
+-   `app_config_dependent_sources.cmake` and `app_config_dependent_sources.gni`
+    must not contain non-codegen files.
+-   The cluster should be added to the cluster list compiled in
+    `src/app/clusters/BUILD.gn`.
 -   Every source file must appear somewhere: either `BUILD.gn` (if no
     App-specific dependencies) or `app_config_dependent_sources.*` if depending
-    on application zap configuration. Unlisted headers or cpp files are a review
+    on application ZAP configuration. Unlisted headers or cpp files are a review
     red flag.
 
 ---
@@ -180,6 +186,10 @@ DataModel::ActionReturnStatus FooCluster::ReadAttribute(
 -   Always encode/handle `ClusterRevision` and `FeatureMap` explicitly.
 -   **Do not add path-validity checks** before the switch — they add code size
     and are redundant because the framework guarantees the path exists.
+-   **Do not add feature-flag checks inside the switch cases** for optional
+    attributes if those attributes are already conditionally included in the
+    `Attributes()` list. The framework pre-filters requests based on the
+    supported attributes list.
 -   Do not add returning `UnsupportedAttribute` inside attribute switch
     handling. Existent path checks ensure those code lines would never be used.
 
@@ -606,12 +616,18 @@ functions (`Foo::Attributes::Bar::Get/Set`).
 
 ---
 
-## README (optional but encouraged)
+## README & API Compatibility
 
-If the cluster has notable architecture decisions, scope constraints (e.g. node
-singleton), or a delegate interface, add a `README.md` next to the cluster
-files. See `src/app/clusters/actions-server/README.md` or
-`src/app/clusters/air-quality-server/README.md` for good examples.
+-   **Preserve API backwards compatibility** if converting an existing
+    legacy/Ember cluster to code-driven.
+-   If breaking compatibility is unavoidable, provide a `README.md` file
+    explaining the upgrade steps in the cluster folder.
+-   Providing a `README.md` every time is encouraged to explain the API and
+    usage further.
+-   If the cluster has notable architecture decisions, scope constraints (e.g.
+    node singleton), or a delegate interface, add a `README.md` next to the
+    cluster files. See `src/app/clusters/actions-server/README.md` or
+    `src/app/clusters/air-quality-server/README.md` for good examples.
 
 ---
 
@@ -630,9 +646,11 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
    each optional attribute enabled.
 6. **Typos in doc comments** — especially copy-paste errors from similar
    clusters (wrong cluster name in a comment).
-7. **Unnecessary setters for construction-time-fixed values** — min/max measured
-   value ranges set at construction typically do not need public setters; make
-   them `protected` if only tests need them.
+7. **No setters or updates for fixed attributes** — Attributes that describe
+   physical hardware or are fixed at construction (e.g., `MinMeasuredValue`,
+   `MaxMeasuredValue`, `MeasurementUnit`) must not have setters in the cluster
+   or the delegate. They should be read on-demand from the delegate to save RAM
+   and code size.
 8. **Global singletons in tests** — tests should use injected mocks/locals
    (`TestServerClusterContext`) rather than accessing `Server::GetInstance()`.
 9. **`LogErrorOnFailure` omitted on fire-and-forget calls** — use

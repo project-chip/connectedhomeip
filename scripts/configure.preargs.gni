@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2023 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,19 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-name: "CodeQL"
 
-on:
-  workflow_dispatch:
-#   push:
-#     branches: [ "master", "sve*", "test_event_*", "v1.*" ]
-#   pull_request:
-  schedule:
-    - cron: '0 5 * * *'
+# These settings are passed to an initial `gn args` pass used by the
+# configure script to discover available build arguments. Because this
+# actually executes all the GN files (including exec_script calls to
+# things like pkg-config), we need to pass some non-default settings to
+# avoid external dependencies that can cause GN to fail.
 
-jobs:
-  analyze:
-    uses: ./.github/workflows/build.yaml
-    with:
-      run-codeql: true
-  
+chip_crypto = "platform"
+chip_mdns = "none"
