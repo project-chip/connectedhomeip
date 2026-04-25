@@ -37,6 +37,12 @@ on:
                 required: false
                 default: ''
                 type: string
+            force_msan_sysroot_rebuild:
+                description: 'MSAN: force a fresh sysroot build (skip cache)'
+                required: false
+                default: 'false'
+                type: choice
+                options: ['false', 'true']
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -371,3 +377,62 @@ jobs:
                   publish_dir: allure-history/allure-report/nightly
                   destination_dir: allure-report/nightly
                   keep_files: true
+
+    nightly_msan_tests_linux:
+        name: Nightly MSAN Tests - Linux
+        if: github.actor != 'restyled-io[bot]'
+        timeout-minutes: 60
+
+        # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
+        # bound, we run these on larger/faster machines.
+        runs-on: namespace-profile-4x16
+
+        container:
+            image: ghcr.io/project-chip/chip-build:184
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-msan
+
+            - name: Restore MSAN sysroot cache
+              id: msan-sysroot-cache
+              if: github.event.inputs.force_msan_sysroot_rebuild != 'true'
+              uses: actions/cache@v5
+              with:
+                  path: ~/.cache/matter/msan_sysroot
+                  key: msan-sysroot-${{ hashFiles('scripts/build/build_msan_sysroot.sh', 'build/config/compiler/msan_ignorelist.txt') }}
+
+            - name: Build MSAN sysroot (cache miss or forced)
+              if: steps.msan-sysroot-cache.outputs.cache-hit != 'true' || github.event.inputs.force_msan_sysroot_rebuild == 'true'
+              run: ./scripts/run_in_build_env.sh "scripts/build/build_msan_sysroot.sh${{ github.event.inputs.force_msan_sysroot_rebuild == 'true' && ' --force' || '' }}"
+
+            # Sanity check: validate the sysroot before compiling. Catches the case where the cache restored
+            # but the stamp's hash disagrees with the current script/ignorelist.
+            - name: Verify MSAN sysroot
+              run: ./scripts/run_in_build_env.sh "scripts/build/build_msan_sysroot.sh --check"
+
+            - name: Build MSAN tests
+              run: >-
+                  ./scripts/run_in_build_env.sh "scripts/build/build_examples.py
+                  --target linux-x64-tests-msan-clang build"
+
+            - name: Run MSAN tests
+              run: ./scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-msan-clang check"
