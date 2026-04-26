@@ -327,8 +327,8 @@ TEST_F(TestZoneManagementCluster, StartupLoadsPersistedZonesAndTriggersFromDeleg
 {
     const auto vertices = MakeTriangle(0);
     TwoDCartesianZoneStorage zone;
-    zone.Set(CharSpan::fromCharString("Entry"), ZoneUseEnum::kMotion,
-             std::vector<TwoDCartesianVertexStruct>(vertices.begin(), vertices.end()), NullOptional);
+    zone.Set("Entry"_span, ZoneUseEnum::kMotion, std::vector<TwoDCartesianVertexStruct>(vertices.begin(), vertices.end()),
+             NullOptional);
 
     ZoneInformationStorage zoneInfo;
     zoneInfo.Set(55, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kMfg, MakeOptional(zone));
@@ -371,12 +371,12 @@ TEST_F(TestZoneManagementCluster, InvokeCreateUpdateAndRemoveZoneCommands)
     ASSERT_EQ(mDelegate.mCreateZoneCalls, 1u);
     ASSERT_EQ(cluster.GetZones().size(), 1u);
     ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.HasValue());
-    ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.Value().name.data_equal(CharSpan::fromCharString("Zone One")));
+    ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.Value().name.data_equal("Zone One"_span));
 
     const auto updateVertices = MakeTriangle(100);
     Commands::UpdateTwoDCartesianZone::Type updateRequest;
     updateRequest.zoneID        = 1;
-    updateRequest.zone.name     = CharSpan::fromCharString("Zone Two");
+    updateRequest.zone.name     = "Zone Two"_span;
     updateRequest.zone.use      = ZoneUseEnum::kMotion;
     updateRequest.zone.vertices = DataModel::List<const TwoDCartesianVertexStruct>(updateVertices.data(), updateVertices.size());
     updateRequest.zone.color    = NullOptional;
@@ -385,7 +385,7 @@ TEST_F(TestZoneManagementCluster, InvokeCreateUpdateAndRemoveZoneCommands)
     ASSERT_TRUE(updateResult.IsSuccess());
     ASSERT_EQ(mDelegate.mUpdateZoneCalls, 1u);
     ASSERT_EQ(cluster.GetZones().size(), 1u);
-    ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.Value().name.data_equal(CharSpan::fromCharString("Zone Two")));
+    ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.Value().name.data_equal("Zone Two"_span));
 
     Commands::RemoveZone::Type removeRequest;
     removeRequest.zoneID = 1;

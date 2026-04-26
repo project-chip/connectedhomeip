@@ -26,8 +26,8 @@ source_set("testing") {
     "FabricTestFixture.h",
     "MockCommandHandler.cpp",
     "MockCommandHandler.h",
+    "TestAttributeChangeListener.h",
     "TestEventGenerator.h",
-    "TestProviderChangeListener.h",
     "TestServerClusterContext.h",
     "ValidateGlobalAttributes.cpp",
     "ValidateGlobalAttributes.h",
@@ -35,6 +35,7 @@ source_set("testing") {
 
   public_deps = [
     "${chip_root}/src/app:command-handler",
+    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/MessageDef:MessageDef",
     "${chip_root}/src/app/data-model:data-model",
@@ -44,6 +45,7 @@ source_set("testing") {
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/persistence:default",
+    "${chip_root}/src/app/server:server",
     "${chip_root}/src/app/server-cluster:server-cluster",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",

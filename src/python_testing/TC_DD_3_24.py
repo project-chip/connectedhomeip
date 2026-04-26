@@ -95,7 +95,15 @@ class TC_DD_3_24(MatterBaseTest):
         self.step(2)
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
-        self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+
+        commissioning_method = self.matter_test_config.in_test_commissioning_method
+        asserts.assert_is_not_none(commissioning_method, "in_test_commissioning_method must not be None")
+        asserts.assert_true(
+            str(commissioning_method).startswith("nfc-"),
+            f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
+        )
+
+        self.matter_test_config.commissioning_method = commissioning_method
 
         log.info("default_controller in test: %s (id=%s)",
                  getattr(self, "default_controller", None),

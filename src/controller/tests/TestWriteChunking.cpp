@@ -1041,7 +1041,7 @@ void TestWriteChunking::RunTest(Instructions instructions, EncodingMethod encodi
     };
 
     ByteSpan list[kTestListLength];
-    uint8_t badList[kTestListLength];
+    uint8_t badList[kTestListLength] = {};
 
     if (instructions.data.size() == 0)
     {
@@ -1296,7 +1296,7 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions,
     constexpr uint8_t kTestListLength2 = 10;
 
     ByteSpan list[kTestListLength2];
-    uint8_t badList[kTestListLength2];
+    uint8_t badList[kTestListLength2] = {};
 
     if (instructions.data.size() == 0)
     {

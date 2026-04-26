@@ -37,8 +37,7 @@ from support_modules.binfo_attributes_verification import BasicInformationAttrib
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_BRBINFO_2_1(BasicInformationAttributesVerificationBase):
@@ -46,9 +45,9 @@ class TC_BRBINFO_2_1(BasicInformationAttributesVerificationBase):
         return "[TC-BRBINFO-2.1] Attributes [DUT-Server]"
 
     def steps_TC_BRBINFO_2_1(self) -> list[TestStep]:
-        # BRBINFO doesn't have DataModelRevision, Location, LocalConfigDisabled, CapabilityMinima, SpecificationVersion, MaxPathsPerInvoke
-        # and ConfigurationVersion (29) as mandatory attributes
-        # so skip steps 1, 7, 17, 20, 22, 23
+        # BRBINFO test plan omits Basic Information attributes not present on Bridged Device Basic Information:
+        # DataModelRevision (1), Location (7), LocalConfigDisabled (17), CapabilityMinima (20),
+        # SpecificationVersion (22), MaxPathsPerInvoke (23).
         return self.steps()
 
     def pics_TC_BRBINFO_2_1(self) -> list[str]:

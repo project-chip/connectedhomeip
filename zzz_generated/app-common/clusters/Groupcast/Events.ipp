@@ -100,7 +100,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GroupcastTesting.
+} // namespace GroupcastTesting
 } // namespace Events
 } // namespace Groupcast
 } // namespace Clusters

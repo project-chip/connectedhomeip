@@ -37,7 +37,7 @@ tests:
     - label: "Pre-Conditions"
       verification: |
           TH2 supports On/Off server on Endpoint 1.
-          TH2 supports Groups server on Endpoint 1.
+          TH2 supports Groupcast Listener on the RootNode endpoint or Groups server on Endpoint 1.
           DUT behaves as Group Admin
           TH2 should have an ACL entry with the AuthMode as Group by DUT
           DUT supports On/Off client
@@ -51,14 +51,14 @@ tests:
 
     - label: "Step 2: Commission DUT to TH1s fabric"
       verification: |
-          Advertise the [ light-switch-app ] on [ nRF52840-DK ]Thread device  and  pair the TH using below cmmd.
+          Advertise the [ light-switch-app ] on [ nrf54L15-DK ]Thread device  and  pair the TH using below cmmd.
 
           ./chip-tool pairing ble-thread 74 hex:0e080000000000010000000300000f35060004001fffe0020810101191022022920708fd6587bfe9821353051000112237945966880899aabbccddeeff030f7070656e5468726561644465696f6c010212340410f23d85dd55d9748cc6a1fd5fccbb1da20c0402a0fff8 20202021 3840
       disabled: true
 
     - label: "Step 3: TH1 enables DUT as Controller"
       verification: |
-
+          TH1 enables DUT as Controller
       disabled: true
 
     - label: "Step 4: Commission TH2 to TH1s fabric (Node ID = 2)"
@@ -88,7 +88,7 @@ tests:
           key and EpochKey0."
       PICS: GRPKEY.C.C00.Tx
       verification: |
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
+          Run this command for [nrf54L15-DK ]Thread device in chip-tool:
 
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
           "groupKeySecurityPolicy": 0, "epochKey0":
@@ -175,7 +175,7 @@ tests:
           attribute on GroupKeyManagement cluster, to TH2 on Endpoint 0"
       PICS: GRPKEY.C.A0000
       verification: |
-          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+          Run this command for [nrf54L15-DK ]Thread device in chip-tool:
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 1, "fabricIndex": 1}]' 74 0
 
@@ -205,7 +205,7 @@ tests:
           on Endpoint 1."
       PICS: G.C.C00.Tx
       verification: |
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
+          Run this command for [nrf54L15-DK ]Thread device in chip-tool:
 
           ./chip-tool groups add-group 0x0001 grp1 74 1
 
@@ -255,7 +255,12 @@ tests:
           endpoint, skip to step 10. Otherwise, TH1 reads the DUT Groupcast
           featuremap attribute."
       verification: |
+          Run this command for DUT in chip-tool:
+          ./chip-tool groupcast read feature-map 74 0
+
           TH1 receives the featuremap attribute and verify that Sender feature (bit 1) is set.
+          [1775574668.300] [2974038:2974040] [TOO] Endpoint: 0 Cluster: 0x0000_0065 Attribute 0x0000_FFFC DataVersion: 347818230
+          [1775574668.304] [2974038:2974040] [TOO]   FeatureMap: 2
       disabled: true
 
     - label:
@@ -263,7 +268,21 @@ tests:
           Endpoints=[EP1], KeySetID=1, Key=(randomly generated) key to TH2
           endpoint 0."
       verification: |
-          TH2 responds with SUCCESS
+          ./chip-tool groupcast join-group 0x1 [] 0x1 74 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
+
+          Verify the SUCCESS status response on the TH1 (chip-tool) log; below is the sample log provided for the raspi platform:
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+
+          ./chip-tool groupcast join-group 0x1 [1] 0x1 2 0 --Key "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
+
+          Verify that TH2 responds with SUCCESS response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
       disabled: true
 
     - label:
@@ -272,7 +291,7 @@ tests:
       verification: |
           Before write the binding entries run the ACL Commands:
 
-          Run this commandd for [ nRF52840-DK ]Thread device in chip-tool:
+          Run this command for [nrf54L15-DK ]Thread device in chip-tool:
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 74 0
 
@@ -292,7 +311,7 @@ tests:
           [1659075680.944052][2687:2692] CHIP:DMG:                         {
           [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
 
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
+          Run this command for [nrf54L15-DK ]Thread device in chip-tool:
 
           ./chip-tool binding write binding '[{"group" : "0x0001"}]' 74 1
 
@@ -310,7 +329,7 @@ tests:
           binding entries"
       PICS: OO.C.C01.Tx
       verification: |
-          Press button no.2 on [ nRF52840-DK ]thread board
+          Press button no.1 on [ nrf54L15-DK ]thread board
       disabled: true
 
     - label: "Step 11b: TH1 reads OnOff attribute from TH2 (Endpoint 1)"
@@ -328,7 +347,7 @@ tests:
 
     - label: "Step 12: TH1 removes all the binding entries from DUT"
       verification: |
-          Run this command for [ nRF52840-DK ]Thread device in chip-tool:
+          Run this command for [ nrf54L15-DK ]Thread device in chip-tool:
 
           ./chip-tool binding write binding '[]' 74 1
 
@@ -345,7 +364,7 @@ tests:
           its binding entries"
       PICS: OO.C.C00.Tx
       verification: |
-          Press button no.2 on [ nRF52840-DK ] thread board
+          Press button no.1 on [ nrf54L15-DK ]thread board
       disabled: true
 
     - label: "Step 13b: TH1 reads OnOff attribute from TH2 (Endpoint 1)"

@@ -219,13 +219,12 @@ TEST_F(TestActionsCluster, TestActionListConstraints)
     delegate.mNumActions = 0;
     for (uint16_t i = 0; i < delegate.kMaxActions; i++)
     {
-        ActionStructStorage action(i, CharSpan::fromCharString("Action"), ActionTypeEnum::kScene, 0, BitMask<CommandBits>(),
-                                   ActionStateEnum::kInactive);
+        ActionStructStorage action(i, "Action"_span, ActionTypeEnum::kScene, 0, BitMask<CommandBits>(), ActionStateEnum::kInactive);
         EXPECT_EQ(delegate.AddTestAction(action), CHIP_NO_ERROR);
     }
 
     // Try to add one more action beyond the limit
-    ActionStructStorage extraAction(99, CharSpan::fromCharString("Extra"), ActionTypeEnum::kScene, 0, BitMask<CommandBits>(),
+    ActionStructStorage extraAction(99, "Extra"_span, ActionTypeEnum::kScene, 0, BitMask<CommandBits>(),
                                     ActionStateEnum::kInactive);
     EXPECT_EQ(delegate.AddTestAction(extraAction), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
@@ -255,14 +254,12 @@ TEST_F(TestActionsCluster, TestEndpointListConstraints)
     delegate.mNumEndpointLists = 0;
     for (uint16_t i = 0; i < delegate.kMaxEndpointLists; i++)
     {
-        EndpointListStorage epList(i, CharSpan::fromCharString("List"), EndpointListTypeEnum::kOther,
-                                   DataModel::List<const EndpointId>(endpoints));
+        EndpointListStorage epList(i, "List"_span, EndpointListTypeEnum::kOther, DataModel::List<const EndpointId>(endpoints));
         EXPECT_EQ(delegate.AddTestEndpointList(epList), CHIP_NO_ERROR);
     }
 
     // Try to add one more endpoint list beyond the limit
-    EndpointListStorage extraEpList(99, CharSpan::fromCharString("Extra"), EndpointListTypeEnum::kOther,
-                                    DataModel::List<const EndpointId>(endpoints));
+    EndpointListStorage extraEpList(99, "Extra"_span, EndpointListTypeEnum::kOther, DataModel::List<const EndpointId>(endpoints));
     EXPECT_EQ(delegate.AddTestEndpointList(extraEpList), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Test 3: Maximum endpoints per list
@@ -273,7 +270,7 @@ TEST_F(TestActionsCluster, TestEndpointListConstraints)
         tooManyEndpoints[i] = i;
     }
 
-    EndpointListStorage epListWithTooManyEndpoints(1, CharSpan::fromCharString("List"), EndpointListTypeEnum::kOther,
+    EndpointListStorage epListWithTooManyEndpoints(1, "List"_span, EndpointListTypeEnum::kOther,
                                                    DataModel::List<const EndpointId>(tooManyEndpoints));
 
     // The list should be added but truncated to kEndpointListMaxSize
@@ -290,9 +287,9 @@ TEST_F(TestActionsCluster, TestActionListAttributeAccess)
     delegate->mNumActions              = 0;
 
     // Add test actions
-    ActionStructStorage action1(1, CharSpan::fromCharString("FirstAction"), ActionTypeEnum::kScene, 0, BitMask<CommandBits>(),
+    ActionStructStorage action1(1, "FirstAction"_span, ActionTypeEnum::kScene, 0, BitMask<CommandBits>(),
                                 ActionStateEnum::kInactive);
-    ActionStructStorage action2(2, CharSpan::fromCharString("SecondAction"), ActionTypeEnum::kScene, 1, BitMask<CommandBits>(),
+    ActionStructStorage action2(2, "SecondAction"_span, ActionTypeEnum::kScene, 1, BitMask<CommandBits>(),
                                 ActionStateEnum::kActive);
 
     EXPECT_EQ(delegate->AddTestAction(action1), CHIP_NO_ERROR);
@@ -374,9 +371,9 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     const EndpointId endpoints1[] = { 1, 2 };
     const EndpointId endpoints2[] = { 3, 4, 5 };
 
-    EndpointListStorage epList1(1, CharSpan::fromCharString("FirstList"), EndpointListTypeEnum::kOther,
+    EndpointListStorage epList1(1, "FirstList"_span, EndpointListTypeEnum::kOther,
                                 DataModel::List<const EndpointId>(endpoints1, 2));
-    EndpointListStorage epList2(2, CharSpan::fromCharString("SecondList"), EndpointListTypeEnum::kOther,
+    EndpointListStorage epList2(2, "SecondList"_span, EndpointListTypeEnum::kOther,
                                 DataModel::List<const EndpointId>(endpoints2, 3));
 
     EXPECT_EQ(delegate->AddTestEndpointList(epList1), CHIP_NO_ERROR);

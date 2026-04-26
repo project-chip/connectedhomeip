@@ -67,5 +67,7 @@ chip_test_suite("tests-backwards-compatibility") {
     "${chip_root}/src/app/tests:app-test-stubs",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/protocols",  # Awkward, because Sessionmanager layering
+                                   # issues.
   ]
 }

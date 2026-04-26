@@ -19,12 +19,12 @@ import logging
 from enum import StrEnum
 from typing import Any
 
-from DeviceConformanceTests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import arls_populated
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces

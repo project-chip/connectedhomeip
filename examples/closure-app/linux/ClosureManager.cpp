@@ -198,34 +198,17 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
     DataModel::Nullable<GenericDimensionStateStruct> targetState(GenericDimensionStateStruct(targetPosition, targetLatch, speed));
     ReturnErrorOnFailure(closurePanelEndpoint.GetClusterInstance().SetTargetState(targetState));
 
-    if (conformance.HasFeature(ClosureDimension::Feature::kPositioning))
-    {
-        ReturnErrorOnFailure(closurePanelEndpoint.GetClusterInstance().SetResolution(Percent100ths(100)));
-        ReturnErrorOnFailure(closurePanelEndpoint.GetClusterInstance().SetStepValue(1000));
-    }
     if (conformance.HasFeature(ClosureDimension::Feature::kUnit))
     {
-        ReturnErrorOnFailure(closurePanelEndpoint.GetClusterInstance().SetUnit(ClosureUnitEnum::kMillimeter));
         ReturnErrorOnFailure(
             closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
                 .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
-    }
-    if (conformance.HasFeature(ClosureDimension::Feature::kRotation))
-    {
-        ReturnErrorOnFailure(closurePanelEndpoint.GetClusterInstance().SetOverflow(OverflowEnum::kTopInside));
     }
     if (conformance.HasFeature(ClosureDimension::Feature::kLimitation))
     {
         ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{ .min = static_cast<Percent100ths>(0),
                                                                               .max = static_cast<Percent100ths>(10000) };
         ReturnErrorOnFailure(closurePanelEndpoint.GetClusterInstance().SetLimitRange(limitRange));
-    }
-    if (conformance.HasFeature(ClosureDimension::Feature::kMotionLatching))
-    {
-        BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes;
-        latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
-            .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
-        ReturnErrorOnFailure(closurePanelEndpoint.GetClusterInstance().SetLatchControlModes(latchControlModes));
     }
 
     return CHIP_NO_ERROR;

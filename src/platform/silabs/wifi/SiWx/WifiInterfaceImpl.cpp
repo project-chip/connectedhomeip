@@ -531,7 +531,8 @@ sl_status_t SetWifiConfigurations()
         chip::ByteSpan inBssid(wfx_rsi.ap_bssid.data(), kWiFiBSSIDLength);
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
         // Enabling quick-join since we have the channel and BSSID
-        join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
+        // TODO: Uncomment this once the quick-join issue is fixed
+        // join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
     }
 
     status = sl_wifi_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, join_feature_bitmap);
