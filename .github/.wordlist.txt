@@ -606,6 +606,7 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+FormaldehydeConcentrationMeasurement
 formatter
 formatters
 FOTA
@@ -1170,6 +1171,9 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+Pm1ConcentrationMeasurement
+Pm10ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 PluginServerCallback
 png
 Podman
@@ -1244,6 +1248,7 @@ queryImageStatus
 Quickstart
 qvCHIP
 RADVD
+RadonConcentrationMeasurement
 raspberryPi
 RasPi
 rAv
@@ -1482,6 +1487,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+templated
 templating
 Tera
 testability
@@ -1543,6 +1549,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
