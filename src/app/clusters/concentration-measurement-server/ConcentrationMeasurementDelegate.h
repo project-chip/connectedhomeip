@@ -73,60 +73,8 @@ public:
     virtual void SetLevelValue(LevelValueEnum) {}
 };
 
-/**
- * DefaultDelegate — the recommended delegate for most applications.
- *
- * DefaultDelegate  handles all 10 aliased
- * concentration clusters.
- * Full example — three pollutants, one file, no subclassing:
- *
- *   static ConcentrationMeasuremntCluster gCO2(ep, CarbonDioxideConcentrationMeasurement::Id,
- *       BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kLevelIndication),
- *       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
- *
- *   static ConcentrationMeasuremntCluster gCO(ep, CarbonMonoxideConcentrationMeasurement::Id,
- *       BitFlags<Feature>(Feature::kNumericMeasurement),
- *       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
- *
- *   static ConcentrationMeasuremntCluster gPM25(ep, Pm25ConcentrationMeasurement::Id,
- *       BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement),
- *       MeasurementMediumEnum::kAir, MeasurementUnitEnum::kUgm3);
- *
- *   // Push new readings from your sensor driver:
- *   gCO2.GetDelegate().HandleNewMeasuredValue(DataModel::MakeNullable(412.5f));
- *   gCO2.GetDelegate().HandleNewLevelValue(LevelValueEnum::kMedium);
- *   gPM25.GetDelegate().HandleNewPeakMeasuredValue(DataModel::MakeNullable(18.0f));
- *
-   For better RAM usage you can also choose to implement your own delegate class and only
-   implement the features you need, then pass an instance of that to ConcentrationMeasurementCluster.
-   class CO2SensorDelegate : public ConcentrationMeasurement::Delegate
-   {
-   public:
-      MeasurementMediumEnum GetMeasurementMedium() override
-    { return MeasurementMediumEnum::kAir; }
-
-    MeasurementUnitEnum GetMeasurementUnit() override
-    { return MeasurementUnitEnum::kPpm; }
-
-    DataModel::Nullable<float> GetMeasuredValue() override { return mValue; }
-    DataModel::Nullable<float> GetMinMeasuredValue() override { return mMin; }
-    DataModel::Nullable<float> GetMaxMeasuredValue() override { return mMax; }
-    LevelValueEnum GetLevelValue() override { return mLevel; }
-
-    // Setters for app code
-    void SetMeasuredValue(DataModel::Nullable<float> v) { mValue = v; }
-    void SetLevelValue(LevelValueEnum v) { mLevel = v; }
-
-private:
-    // Only the fields this sensor needs — peak/average NOT compiled
-    DataModel::Nullable<float> mValue;
-    DataModel::Nullable<float> mMin;
-    DataModel::Nullable<float> mMax;
-    LevelValueEnum mLevel = LevelValueEnum::kUnknown;
-    // Total: ~28 bytes (vs ~60 bytes if all fields were forced)
-};
-*/
-
+// DefaultDelegate — in-memory storage for every attribute. Recommended for most applications.
+// See README.md for usage examples and a custom subclass pattern for RAM-constrained devices.
 class DefaultDelegate : public Delegate
 {
 public:
@@ -143,8 +91,7 @@ public:
     DefaultDelegate(MeasurementMediumEnum medium, MeasurementUnitEnum unit,
                     DataModel::Nullable<float> minMeasured = DataModel::MakeNullable(0.0f),
                     DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>(), float uncertainty = 0.0f) :
-        mMinMeasuredValue(minMeasured),
-        mMaxMeasuredValue(maxMeasured), mUncertainty(uncertainty), mMedium(medium), mUnit(unit)
+        mMinMeasuredValue(minMeasured), mMaxMeasuredValue(maxMeasured), mUncertainty(uncertainty), mMedium(medium), mUnit(unit)
     {}
 
     // ── Getter overrides ─────────────────────────────────────────────────────
