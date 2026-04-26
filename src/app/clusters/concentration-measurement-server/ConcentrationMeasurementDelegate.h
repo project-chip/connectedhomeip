@@ -91,7 +91,8 @@ public:
     DefaultDelegate(MeasurementMediumEnum medium, MeasurementUnitEnum unit,
                     DataModel::Nullable<float> minMeasured = DataModel::MakeNullable(0.0f),
                     DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>(), float uncertainty = 0.0f) :
-        mMinMeasuredValue(minMeasured), mMaxMeasuredValue(maxMeasured), mUncertainty(uncertainty), mMedium(medium), mUnit(unit)
+        mMinMeasuredValue(minMeasured),
+        mMaxMeasuredValue(maxMeasured), mUncertainty(uncertainty), mMedium(medium), mUnit(unit)
     {}
 
     // ── Getter overrides ─────────────────────────────────────────────────────
