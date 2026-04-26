@@ -34,15 +34,7 @@ from matter.idl.generators.cpp.application import CppApplicationGenerator
 from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter.idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter.idl.generators.storage import GeneratorStorage
-from matter.idl.matter_idl_types import (
-    Cluster,
-    Command,
-    DataType,
-    Field,
-    FieldQuality,
-    Idl,
-    Struct,
-)
+from matter.idl.matter_idl_types import Cluster, Command, DataType, Field, FieldQuality, Idl, Struct
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
 EXAMPLES_DIR = os.path.abspath(
