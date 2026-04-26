@@ -21,6 +21,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
@@ -34,7 +35,28 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
                                                                  BitFlags<Feature> features, Delegate & delegate) :
     DefaultServerCluster({ endpointId, clusterId }),
     mFeatures(features), mDelegate(delegate)
-{}
+{
+    bool validCluster = false;
+    for (ClusterId id : AliasedClusters)
+    {
+        if (id == clusterId)
+        {
+            validCluster = true;
+            break;
+        }
+    }
+    VerifyOrDie(validCluster);
+    if (mFeatures.HasAny(Feature::kMediumLevel, Feature::kCriticalLevel))
+    {
+        mFeatures.Set(Feature::kLevelIndication);
+    }
+
+    // Peak and Average require Numeric
+    if (mFeatures.HasAny(Feature::kPeakMeasurement, Feature::kAverageMeasurement))
+    {
+        mFeatures.Set(Feature::kNumericMeasurement);
+    }
+}
 
 ConcentrationMeasurementCluster::~ConcentrationMeasurementCluster() {}
 
@@ -44,11 +66,6 @@ CHIP_ERROR ConcentrationMeasurementCluster::Startup(ServerClusterContext & conte
 
     return mDelegate.Init();
 }
-void ConcentrationMeasurementCluster::Shutdown(ClusterShutdownType shutdownType)
-{
-    DefaultServerCluster::Shutdown(shutdownType);
-}
-
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
 {
@@ -58,106 +75,163 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(con
         return encoder.Encode(mDelegate.GetMeasurementMedium());
 
     case Attributes::FeatureMap::Id:
-        // mFeatures was set at construction and never changes.
-        // Raw() returns it as a uint32_t as required by the wire format.
-        return encoder.Encode(mFeatures.Raw());
+        return encoder.Encode(mFeatures);
 
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(kClusterRevision);
 
-    // ── Feature::kNumericMeasurement
     case MeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMeasuredValue());
 
     case MinMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMinMeasuredValue());
 
     case MaxMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMaxMeasuredValue());
 
     case Uncertainty::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetUncertainty());
 
     case MeasurementUnit::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetMeasurementUnit());
 
-    // ── Feature::kPeakMeasurement
     case PeakMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetPeakMeasuredValue());
 
     case PeakMeasuredValueWindow::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetPeakMeasuredValueWindow());
 
-    // ── Feature::kAverageMeasurement
     case AverageMeasuredValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetAverageMeasuredValue());
 
     case AverageMeasuredValueWindow::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetAverageMeasuredValueWindow());
 
-    // ── Feature::kLevelIndication
     case LevelValue::Id:
-        VerifyOrReturnError(mFeatures.Has(Feature::kLevelIndication), Status::UnsupportedAttribute);
         return encoder.Encode(mDelegate.GetLevelValue());
 
     default:
         return Status::UnsupportedAttribute;
     }
 }
-
 CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath & path,
                                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // The base class appends the global attributes that every cluster must
-    // expose: AttributeList, AcceptedCommandList, GeneratedCommandList,
-    // EventList, FeatureMap, ClusterRevision.
+    // 1 mandatory + 5 numeric + 2 peak + 2 average + 1 level + 10 globals
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(21));
+
     ReturnErrorOnFailure(DefaultServerCluster::Attributes(path, builder));
 
-    // Shorthand — all concentration attributes are read-only with kView privilege.
-    using Flags = BitFlags<DataModel::AttributeQualityFlags>;
-    using Priv  = chip::Access::Privilege;
+    using Flags                                 = BitFlags<DataModel::AttributeQualityFlags>;
+    constexpr chip::Access::Privilege kViewPriv = chip::Access::Privilege::kView;
 
-    // MeasurementMedium is mandatory for all concentration measurement clusters.
-    ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementMedium::Id, Flags{}, Priv::kView, std::nullopt)));
+    ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementMedium::Id, Flags{}, kViewPriv, std::nullopt)));
 
     if (mFeatures.Has(Feature::kNumericMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MinMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MaxMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(Uncertainty::Id, Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementUnit::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MinMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MaxMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(Uncertainty::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementUnit::Id, Flags{}, kViewPriv, std::nullopt)));
     }
 
     if (mFeatures.Has(Feature::kPeakMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(PeakMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(PeakMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
         ReturnErrorOnFailure(
-            builder.Append(DataModel::AttributeEntry(PeakMeasuredValueWindow::Id, Flags{}, Priv::kView, std::nullopt)));
+            builder.Append(DataModel::AttributeEntry(PeakMeasuredValueWindow::Id, Flags{}, kViewPriv, std::nullopt)));
     }
 
     if (mFeatures.Has(Feature::kAverageMeasurement))
     {
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(AverageMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
         ReturnErrorOnFailure(
-            builder.Append(DataModel::AttributeEntry(AverageMeasuredValue::Id, Flags{}, Priv::kView, std::nullopt)));
-        ReturnErrorOnFailure(
-            builder.Append(DataModel::AttributeEntry(AverageMeasuredValueWindow::Id, Flags{}, Priv::kView, std::nullopt)));
+            builder.Append(DataModel::AttributeEntry(AverageMeasuredValueWindow::Id, Flags{}, kViewPriv, std::nullopt)));
     }
 
     if (mFeatures.Has(Feature::kLevelIndication))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(LevelValue::Id, Flags{}, Priv::kView, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(LevelValue::Id, Flags{}, kViewPriv, std::nullopt)));
     }
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (mDelegate.GetMeasuredValue() != value)
+    {
+        mDelegate.SetMeasuredValue(value);
+        NotifyAttributeChanged(MeasuredValue::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValue(DataModel::Nullable<float> value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (mDelegate.GetPeakMeasuredValue() != value)
+    {
+        mDelegate.SetPeakMeasuredValue(value);
+        NotifyAttributeChanged(PeakMeasuredValue::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValueWindow(uint32_t value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    if (mDelegate.GetPeakMeasuredValueWindow() != value)
+    {
+        mDelegate.SetPeakMeasuredValueWindow(value);
+        NotifyAttributeChanged(PeakMeasuredValueWindow::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValue(DataModel::Nullable<float> value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (mDelegate.GetAverageMeasuredValue() != value)
+    {
+        mDelegate.SetAverageMeasuredValue(value);
+        NotifyAttributeChanged(AverageMeasuredValue::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValueWindow(uint32_t value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    if (mDelegate.GetAverageMeasuredValueWindow() != value)
+    {
+        mDelegate.SetAverageMeasuredValueWindow(value);
+        NotifyAttributeChanged(AverageMeasuredValueWindow::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetLevelValue(LevelValueEnum value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kLevelIndication), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(value < LevelValueEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    if ((value == LevelValueEnum::kMedium) && !mFeatures.Has(Feature::kMediumLevel))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    if ((value == LevelValueEnum::kCritical) && !mFeatures.Has(Feature::kCriticalLevel))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    if (mDelegate.GetLevelValue() != value)
+    {
+        mDelegate.SetLevelValue(value);
+        NotifyAttributeChanged(LevelValue::Id);
+    }
     return CHIP_NO_ERROR;
 }
 

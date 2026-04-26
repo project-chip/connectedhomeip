@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Codegen integration — the backwards-compat wrapper included by generated app code.
-# CodegenIntegration.h is header-only so no .cpp is listed here.
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/concentration-measurement-server.h"
-)
+# All sources for this cluster live in the CMake target defined in CMakeLists.txt.
+# No per-app codegen integration files are needed for the new server-cluster API.
+TARGET_SOURCES(${APP_TARGET} PRIVATE)

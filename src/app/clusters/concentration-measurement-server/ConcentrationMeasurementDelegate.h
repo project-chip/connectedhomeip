@@ -39,7 +39,7 @@ public:
     virtual CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
     // ── Always required ──────────────────────────────────────────────────────
-    virtual MeasurementMediumEnum GetMeasurementMedium() = 0;
+    virtual MeasurementMediumEnum GetMeasurementMedium() { return MeasurementMediumEnum::kAir; }
 
     // ── Feature::kNumericMeasurement ─────────────────────────────────────────
     // Override if cluster was constructed with Feature::kNumericMeasurement.
@@ -59,6 +59,18 @@ public:
 
     // ── Feature::kLevelIndication ─────────────────────────────────────────────
     virtual LevelValueEnum GetLevelValue() { return LevelValueEnum::kUnknown; }
+
+    // ── Writable setters — called by ConcentrationMeasurementCluster::Set*() after validation.
+    // Override these (not Handle*()) when implementing a custom Delegate.
+    // Default implementations are no-ops; DefaultDelegate provides storage.
+    // Fixed attributes (MinMeasuredValue, MaxMeasuredValue, Uncertainty) have no setters —
+    // supply them at construction time instead.
+    virtual void SetMeasuredValue(DataModel::Nullable<float>) {}
+    virtual void SetPeakMeasuredValue(DataModel::Nullable<float>) {}
+    virtual void SetPeakMeasuredValueWindow(uint32_t) {}
+    virtual void SetAverageMeasuredValue(DataModel::Nullable<float>) {}
+    virtual void SetAverageMeasuredValueWindow(uint32_t) {}
+    virtual void SetLevelValue(LevelValueEnum) {}
 };
 
 /**
@@ -119,14 +131,23 @@ class DefaultDelegate : public Delegate
 {
 public:
     /**
-     * @param medium  Measurement medium (Air, Water, Soil). Fixed at construction.
-     * @param unit    Measurement unit (ppm, ppb, µg/m³ …). Fixed at construction.
-     *                Both are fixed — they describe the physical sensor hardware,
-     *                not mutable runtime state.
+     * @param medium       Measurement medium (Air, Water, Soil). Fixed at construction.
+     * @param unit         Measurement unit (ppm, ppb, µg/m³ …). Fixed at construction.
+     * @param minMeasured  Sensor minimum range. Fixed at construction.
+     * @param maxMeasured  Sensor maximum range. Fixed at construction.
+     * @param uncertainty  Sensor uncertainty. Fixed at construction.
      */
-    DefaultDelegate(MeasurementMediumEnum medium, MeasurementUnitEnum unit) : mMedium(medium), mUnit(unit) {}
+    // minMeasured defaults to 0.0 — the spec-defined lower bound for any concentration (non-negative).
+    // maxMeasured should be set to the sensor's physical upper range; applications that use a
+    // broader range should pass an explicit value.
+    DefaultDelegate(MeasurementMediumEnum medium, MeasurementUnitEnum unit,
+                    DataModel::Nullable<float> minMeasured = DataModel::MakeNullable(0.0f),
+                    DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>(), float uncertainty = 0.0f) :
+        mMinMeasuredValue(minMeasured),
+        mMaxMeasuredValue(maxMeasured), mUncertainty(uncertainty), mMedium(medium), mUnit(unit)
+    {}
 
-    // ── Delegate overrides ────────────────────────────────────────────────────
+    // ── Getter overrides ─────────────────────────────────────────────────────
     MeasurementMediumEnum GetMeasurementMedium() override { return mMedium; }
     MeasurementUnitEnum GetMeasurementUnit() override { return mUnit; }
     DataModel::Nullable<float> GetMeasuredValue() override { return mMeasuredValue; }
@@ -139,29 +160,24 @@ public:
     uint32_t GetAverageMeasuredValueWindow() override { return mAverageMeasuredValueWindow; }
     LevelValueEnum GetLevelValue() override { return mLevelValue; }
 
-    // ── Handle*()
-    // Each method stores the value. The cluster will report the change to subscribed
-    // controllers on the next read cycle via DefaultServerCluster::NotifyAttributeChanged().
-    // Only call Handle*() methods that correspond to features that are enabled —
-    // calling others is harmless (cluster won't expose them) but wastes RAM.
+    // ── Setter overrides ─────────────────────────────────────────────────────
+    void SetMeasuredValue(DataModel::Nullable<float> v) override { mMeasuredValue = v; }
+    void SetMinMeasuredValue(DataModel::Nullable<float> v) { mMinMeasuredValue = v; }
+    void SetMaxMeasuredValue(DataModel::Nullable<float> v) { mMaxMeasuredValue = v; }
+    void SetUncertainty(float v) { mUncertainty = v; }
+    void SetPeakMeasuredValue(DataModel::Nullable<float> v) override { mPeakMeasuredValue = v; }
+    void SetPeakMeasuredValueWindow(uint32_t v) override { mPeakMeasuredValueWindow = v; }
+    void SetAverageMeasuredValue(DataModel::Nullable<float> v) override { mAverageMeasuredValue = v; }
+    void SetAverageMeasuredValueWindow(uint32_t v) override { mAverageMeasuredValueWindow = v; }
+    void SetLevelValue(LevelValueEnum v) override { mLevelValue = v; }
 
-    void HandleNewMeasuredValue(DataModel::Nullable<float> v) { mMeasuredValue = v; }
-
-    void HandleNewMinMeasuredValue(DataModel::Nullable<float> v) { mMinMeasuredValue = v; }
-
-    void HandleNewMaxMeasuredValue(DataModel::Nullable<float> v) { mMaxMeasuredValue = v; }
-
-    void HandleNewUncertainty(float v) { mUncertainty = v; }
-
-    void HandleNewPeakMeasuredValue(DataModel::Nullable<float> v) { mPeakMeasuredValue = v; }
-
-    void HandleNewPeakMeasuredValueWindow(uint32_t v) { mPeakMeasuredValueWindow = v; }
-
-    void HandleNewAverageMeasuredValue(DataModel::Nullable<float> v) { mAverageMeasuredValue = v; }
-
-    void HandleNewAverageMeasuredValueWindow(uint32_t v) { mAverageMeasuredValueWindow = v; }
-
-    void HandleNewLevelValue(LevelValueEnum v) { mLevelValue = v; }
+    // ── Handle*() — backwards-compatible aliases for Set*()
+    void HandleNewMeasuredValue(DataModel::Nullable<float> v) { SetMeasuredValue(v); }
+    void HandleNewPeakMeasuredValue(DataModel::Nullable<float> v) { SetPeakMeasuredValue(v); }
+    void HandleNewPeakMeasuredValueWindow(uint32_t v) { SetPeakMeasuredValueWindow(v); }
+    void HandleNewAverageMeasuredValue(DataModel::Nullable<float> v) { SetAverageMeasuredValue(v); }
+    void HandleNewAverageMeasuredValueWindow(uint32_t v) { SetAverageMeasuredValueWindow(v); }
+    void HandleNewLevelValue(LevelValueEnum v) { SetLevelValue(v); }
 
 private:
     // All fields start null/zero/unknown — safe defaults before first reading.

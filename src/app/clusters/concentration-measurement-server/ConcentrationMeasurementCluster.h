@@ -39,36 +39,11 @@ namespace ConcentrationMeasurement {
  *   TotalVolatileOrganicCompoundsConcentrationMeasurement,
  *   FormaldehydeConcentrationMeasurement
  *
- * They all share an identical attribute structure. The only difference between
- * them is the ClusterId, which is passed to the constructor.
+ * They  share an identical attribute structure. Only difference is the
+ * ClusterId, which is passed to the constructor.
  *
-
  * This cluster stores NO attribute data. Every Read request is forwarded
  * to the Delegate, which provides values on demand.
- *
- * Cluster takes BitFlags<Feature> at construction. The same flags drive three things:
- *   1. Attributes() — which attribute IDs are advertised to the DataModel layer
- *   2. ReadAttribute() — which attributes are readable (returns UnsupportedAttribute
- *      for any attribute whose feature flag is not set)
- *   3. FeatureMap attribute value (mFeatures.Raw())
- *
- *  USAGE
- *   // 1. Implement the delegate (see ConcentrationMeasuremntDelegate.h)
- *   class MyCO2Sensor : public Delegate { ... };
- *
- *   // 2. Instantiate — one cluster per ConcentrationType per endpoint
- *   static MyCO2Sensor gCO2Delegate;
- *   static ConcentrationMeasurementCluster gCO2(
- *       kAirQualityEndpointId,
- *       CarbonDioxideConcentrationMeasurement::Id,       // cluster ID for CO2
- *       BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kLevelIndication),
- *       gCO2Delegate);
- *
- *   // 3. Register with the data model (this also calls Startup() automatically)
- *   static ServerClusterRegistration gCO2Registration(gCO2);
- *
- *   // 4. Push a new reading from your sensor driver
- *   gCO2Delegate.Update(412.5f);  // calls NotifyChanged() internally
  */
 class ConcentrationMeasurementCluster : public DefaultServerCluster
 {
@@ -92,11 +67,6 @@ public:
      */
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-    /**
-     * Called once by the framework when the cluster is unregistered (via ServerClusterRegistration).
-     * Calls DefaultServerCluster::Shutdown()
-     */
-    void Shutdown(ClusterShutdownType shutdownType) override;
     /**
      * Fills 'builder' with the AttributeEntry IDs this instance exposes.
      * Called by the DataModel layer to enumerate supported attributes.
@@ -123,6 +93,16 @@ public:
     /** Returns true if the given feature flag was set at construction. */
     bool HasFeature(Feature f) const { return mFeatures.Has(f); }
 
+    // ── Setters for measured (dynamic) attributes — write through to the delegate and notify subscribers.
+    // Fixed attributes (Min/MaxMeasuredValue, Uncertainty, MeasurementUnit, MeasurementMedium) are read
+    // directly from the delegate and have no cluster-level setters.
+    CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> value);
+    CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> value);
+    CHIP_ERROR SetPeakMeasuredValueWindow(uint32_t value);
+    CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> value);
+    CHIP_ERROR SetAverageMeasuredValueWindow(uint32_t value);
+    CHIP_ERROR SetLevelValue(LevelValueEnum value);
+
 private:
     // Per-spec maximum window for PeakMeasuredValueWindow / AverageMeasuredValueWindow: 7 days
     static constexpr uint32_t kWindowMaxSeconds = 604800;
@@ -132,25 +112,6 @@ private:
 
     BitFlags<Feature> mFeatures;
     Delegate & mDelegate;
-
-    static bool CheckConstraintMinMax(DataModel::Nullable<float> value, DataModel::Nullable<float> minValue,
-                                      DataModel::Nullable<float> maxValue)
-    {
-        return (minValue.IsNull() || value.IsNull() || (value.Value() >= minValue.Value())) &&
-            (maxValue.IsNull() || value.IsNull() || (value.Value() <= maxValue.Value()));
-    }
-
-    static bool CheckConstraintsLessThanOrEqualTo(DataModel::Nullable<float> value,
-                                                  DataModel::Nullable<float> valueToBeLessThanOrEqualTo)
-    {
-        return valueToBeLessThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() <= valueToBeLessThanOrEqualTo.Value());
-    }
-
-    static bool CheckConstraintsGreaterThanOrEqualTo(DataModel::Nullable<float> value,
-                                                     DataModel::Nullable<float> valueToBeGreaterThanOrEqualTo)
-    {
-        return valueToBeGreaterThanOrEqualTo.IsNull() || value.IsNull() || (value.Value() >= valueToBeGreaterThanOrEqualTo.Value());
-    }
 };
 
 } // namespace ConcentrationMeasurement

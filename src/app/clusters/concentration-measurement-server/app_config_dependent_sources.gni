@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Sources needed when this cluster is enabled in the app's ZAP config.
-# CodegenIntegration.h is header-only — no .cpp needed.
-app_config_dependent_sources = [
-  "CodegenIntegration.h",
-  "concentration-measurement-server.h",
-]
+# All sources for this cluster live in the source_set defined in BUILD.gn.
+# No per-app codegen integration files are needed for the new server-cluster API.
+app_config_dependent_sources = []
