@@ -176,14 +176,15 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
 extern "C" __attribute__((used, naked)) void LogFault_Handler(void)
 {
     /* bx + "r"(fn): LTO can place debugHardfault out of b/b.w range; address comes from the compiler. */
+    /* r0 holds SP for debugHardfault (AAPCS); %[dbg] must not use r0—use "h" (r8–r15) and clobber r0. */
     __asm__ volatile("tst lr, #4\n\t"
                      "ite eq\n\t"
                      "mrseq r0, msp\n\t"
                      "mrsne r0, psp\n\t"
                      "bx %[dbg]\n"
                      :
-                     : [dbg] "r"(reinterpret_cast<void (*)(uint32_t *)>(debugHardfault))
-                     : "memory", "cc");
+                     : [dbg] "h"(reinterpret_cast<void (*)(uint32_t *)>(debugHardfault))
+                     : "r0", "memory", "cc");
 }
 
 #ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
