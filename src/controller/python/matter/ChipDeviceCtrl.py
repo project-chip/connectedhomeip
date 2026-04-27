@@ -284,29 +284,26 @@ class CallbackContext:
     The context manager makes sure that no concurrent operations which use the same callback
     handlers are executed.
     """
-    _future: concurrent.futures.Future
-
     def __init__(self, lock: asyncio.Lock) -> None:
         self._lock = lock
+        self._future: concurrent.futures.Future | None = None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> concurrent.futures.Future:
         await self._lock.acquire()
         self._future = concurrent.futures.Future()
-        return self
+        return self._future
 
     @property
-    def future(self) -> concurrent.futures.Future:
-        if not hasattr(self, '_future'):
-            raise RuntimeError("CallbackContext future is not available outside of the context")
+    def future(self) -> concurrent.futures.Future | None:
         return self._future
 
     async def __aexit__(self, exc_type, exc_value, traceback):
-        if not self._future.done():
+        if self._future is not None and not self._future.done():
             # In case the initial call (which sets up for the callback) fails,
             # the future will never be used actually. So just cancel it here
             # for completeness, in case somebody is expecting it to be completed.
             self._future.cancel()
-        del self._future
+        self._future = None
         self._lock.release()
 
 
@@ -320,10 +317,10 @@ class CommissioningContext(CallbackContext):
         super().__init__(lock)
         self._devCtrl = devCtrl
 
-    async def __aenter__(self) -> typing.Self:
-        await super().__aenter__()
+    async def __aenter__(self) -> concurrent.futures.Future:
+        future = await super().__aenter__()
         self._devCtrl._fabricCheckNodeId = -1
-        return self
+        return future
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         await super().__aexit__(exc_type, exc_value, traceback)
@@ -758,14 +755,14 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
-        async with self._commissioning_context as ctx:
+        async with self._commissioning_context as ctx_future:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                     self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeId)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     async def ConnectNFC(self, discriminator: int, setupPinCode: int, nodeId: int) -> int:
         '''
@@ -781,14 +778,14 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
-        async with self._commissioning_context as ctx:
+        async with self._commissioning_context as ctx_future:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectNFC(
                     self.devCtrl, discriminator, setupPinCode, nodeId)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     async def ContinueCommissioningAfterConnectNetworkRequest(self, nodeId: int) -> int:
         '''
@@ -804,14 +801,14 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
-        async with self._commissioning_context as ctx:
+        async with self._commissioning_context as ctx_future:
             self._enablePairingCompleteCallback(False)
 
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest(
                     self.devCtrl, nodeId)
             )
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     async def UnpairDevice(self, nodeId: int) -> None:
         '''
@@ -825,13 +822,13 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
-        async with self._unpair_device_context as ctx:
+        async with self._unpair_device_context as ctx_future:
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                     self.devCtrl, nodeId, self.cbHandleDeviceUnpairCompleteFunct)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     def CloseBLEConnection(self) -> None:
         '''
@@ -961,10 +958,10 @@ class ChipDeviceControllerBase():
     async def _establishPASESession(self, callFunct: typing.Callable[[], None]) -> None:
         self.CheckIsActive()
 
-        async with self._pase_establishment_context as ctx:
+        async with self._pase_establishment_context as ctx_future:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(callFunct)
-            await asyncio.futures.wrap_future(ctx.future)
+            await asyncio.futures.wrap_future(ctx_future)
 
     async def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeId: int) -> None:
         '''
@@ -1275,13 +1272,13 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
-        async with self._open_window_context as ctx:
+        async with self._open_window_context as ctx_future:
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                     self.devCtrl, self.pairingDelegate, nodeId, timeout, iteration, discriminator, option)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     async def OpenJointCommissioningWindow(self, nodeId: int, endpointId: int, timeout: int, iteration: int,
                                            discriminator: int) -> CommissioningParameters:
@@ -1300,13 +1297,13 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
-        async with self._open_window_context as ctx:
+        async with self._open_window_context as ctx_future:
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow(
                     self.devCtrl, self.pairingDelegate, nodeId, endpointId, timeout, iteration, discriminator)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     def GetCompressedFabricId(self) -> int:
         '''
@@ -2917,14 +2914,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         self.CheckIsActive()
 
-        async with self._commissioning_context as ctx:
+        async with self._commissioning_context as ctx_future:
             self._enablePairingCompleteCallback(False)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_Commission(
                     self.devCtrl, nodeId)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     async def CommissionBleThread(self, discriminator: int, setupPinCode: int, nodeId: int, threadOperationalDataset: bytes,
                                   isShortDiscriminator: bool = False) -> int:
@@ -3243,14 +3240,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         if isinstance(filter, int):
             filter = str(filter)
 
-        async with self._commissioning_context as ctx:
+        async with self._commissioning_context as ctx_future:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     async def CommissionThreadMeshcop(self, nodeId: int, setupPinCode: int,
                                       discriminator: int, borderAgentIPAddr: str,
@@ -3270,14 +3267,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
 
         self.SetThreadOperationalDataset(threadOperationalDataset)
-        async with self._commissioning_context as ctx:
+        async with self._commissioning_context as ctx_future:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ThreadMeshcopCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, discriminator, borderAgentIPAddr.encode("utf-8"), borderAgentPort)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     def get_rcac(self) -> bytes | None:
         '''
@@ -3329,14 +3326,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         self.CheckIsActive()
 
-        async with self._commissioning_context as ctx:
+        async with self._commissioning_context as ctx_future:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                     self.devCtrl, setupPayload.encode("utf-8"), nodeId, discoveryType.value)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     def NOCChainCallback(self, nocChain):
         '''
@@ -3368,13 +3365,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         self.CheckIsActive()
 
-        async with self._issue_node_chain_context as ctx:
+        async with self._issue_node_chain_context as ctx_future:
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
                     self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
             )
 
-            return await asyncio.futures.wrap_future(ctx.future)
+            return await asyncio.futures.wrap_future(ctx_future)
 
     def SetDACRevocationSetPath(self, dacRevocationSetPath: str | None) -> None:
         '''
