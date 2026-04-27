@@ -185,13 +185,20 @@ void AssertKeysEqual(SessionKeystore & keystore, HkdfKeyHandle & left, const Hkd
 } // namespace
   //
 
-#if CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_MBEDTLS
+#if CHIP_CRYPTO_MBEDTLS
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
 {
     *olen = len;
     gs_test_entropy_source_called++;
+    return 0;
+}
+#elif CHIP_CRYPTO_OPENSSL
+
+static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
+{
+    *olen = len;
     return 0;
 }
 
