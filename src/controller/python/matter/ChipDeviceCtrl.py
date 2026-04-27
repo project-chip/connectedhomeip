@@ -31,6 +31,7 @@ from __future__ import absolute_import, annotations, print_function
 import asyncio
 import builtins
 import concurrent.futures
+import contextlib
 import copy
 import ctypes
 import enum
@@ -940,9 +941,12 @@ class ChipDeviceControllerBase():
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetLocalMRPConfig(idle_ms, active_ms, active_threshold_ms)
-        ).raise_on_error()
+        try:
+            self._ChipStack.Call(
+                lambda: self._dmLib.pychip_DeviceController_SetLocalMRPConfig(idle_ms, active_ms, active_threshold_ms)
+            ).raise_on_error()
+        except AttributeError:
+            raise NotImplementedError("Dynamic MRP config support is not available in this Matter SDK build")
 
     def ResetLocalMRPConfig(self) -> None:
         '''
@@ -952,9 +956,12 @@ class ChipDeviceControllerBase():
             ChipStackError: On failure.
         '''
         self.CheckIsActive()
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_ResetLocalMRPConfig()
-        ).raise_on_error()
+        try:
+            self._ChipStack.Call(
+                lambda: self._dmLib.pychip_DeviceController_ResetLocalMRPConfig()
+            ).raise_on_error()
+        except AttributeError:
+            raise NotImplementedError("Dynamic MRP config support is not available in this Matter SDK build")
 
     async def _establishPASESession(self, callFunct: typing.Callable[[], None]) -> None:
         self.CheckIsActive()
@@ -1299,10 +1306,13 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         async with self._open_window_context as ctx_future:
-            await self._ChipStack.CallAsync(
-                lambda: self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow(
-                    self.devCtrl, self.pairingDelegate, nodeId, endpointId, timeout, iteration, discriminator)
-            )
+            try:
+                await self._ChipStack.CallAsync(
+                    lambda: self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow(
+                        self.devCtrl, self.pairingDelegate, nodeId, endpointId, timeout, iteration, discriminator)
+                )
+            except AttributeError:
+                raise NotImplementedError("Joint Fabric support is not available in this Matter SDK build.")
 
             return await asyncio.futures.wrap_future(ctx_future)
 
@@ -2618,18 +2628,12 @@ class ChipDeviceControllerBase():
         dm_lib.pychip_DeviceController_DeleteAllSessionResumption.argtypes = [c_void_p]
         dm_lib.pychip_DeviceController_DeleteAllSessionResumption.restype = PyChipError
 
-        try:
+        with contextlib.suppress(AttributeError):
             dm_lib.pychip_DeviceController_SetLocalMRPConfig.restype = PyChipError
             dm_lib.pychip_DeviceController_SetLocalMRPConfig.argtypes = [c_uint32, c_uint32, c_uint16]
 
             dm_lib.pychip_DeviceController_ResetLocalMRPConfig.restype = PyChipError
             dm_lib.pychip_DeviceController_ResetLocalMRPConfig.argtypes = []
-        except AttributeError:
-            # This can happen if the SDK is not built with CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
-            def _unsupported_dynamic_mrp(*args, **kwargs):
-                raise NotImplementedError("Dynamic MRP config support is not available in this Matter SDK build.")
-            dm_lib.pychip_DeviceController_SetLocalMRPConfig = _unsupported_dynamic_mrp
-            dm_lib.pychip_DeviceController_ResetLocalMRPConfig = _unsupported_dynamic_mrp
 
         dm_lib.pychip_DeviceController_GetAddressAndPort.argtypes = [c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
         dm_lib.pychip_DeviceController_GetAddressAndPort.restype = PyChipError
@@ -2686,16 +2690,12 @@ class ChipDeviceControllerBase():
             c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
         dm_lib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
 
-        try:
+        with contextlib.suppress(AttributeError):
             # NOTE: Joint Fabric is an optional feature in the Matter SDK core library.
             #       Build with CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1 to enable it.
             dm_lib.pychip_DeviceController_OpenJointCommissioningWindow.argtypes = [
                 c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
             dm_lib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
-        except AttributeError:
-            def _unsupported_joint_fabric(*args, **kwargs):
-                raise NotImplementedError("Joint Fabric support is not available in this Matter SDK build.")
-            dm_lib.pychip_DeviceController_OpenJointCommissioningWindow = _unsupported_joint_fabric
 
         dm_lib.pychip_TestCommissionerUsed.argtypes = []
         dm_lib.pychip_TestCommissionerUsed.restype = c_bool
