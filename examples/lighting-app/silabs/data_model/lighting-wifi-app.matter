@@ -3089,7 +3089,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_extendedcolorlight = 269, version 4;
+  device type ma_extendedcolorlight = 269, version 5;
 
 
   server cluster Identify {
@@ -3131,7 +3131,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0007;
+    ram      attribute clusterRevision default = 6;
 
     handle command Off;
     handle command On;

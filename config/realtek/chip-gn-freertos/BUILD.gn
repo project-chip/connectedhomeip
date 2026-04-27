@@ -24,14 +24,22 @@ declare_args() {
   chip_build_pw_rpc_lib = false
 }
 
-group("bee") {
+group("rtk_freertos") {
   deps = [ "//src/lib" ]
 
   if (chip_build_pw_rpc_lib) {
-    deps += [ "//config/realtek/bee/lib/pw_rpc" ]
+    deps += [ "//config/realtek/chip-gn-freertos/lib/pw_rpc" ]
   }
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
   }
+}
+
+group("rtk") {
+  deps = [ ":rtk_freertos" ]
+}
+
+group("default") {
+  deps = [ ":rtk_freertos" ]
 }
