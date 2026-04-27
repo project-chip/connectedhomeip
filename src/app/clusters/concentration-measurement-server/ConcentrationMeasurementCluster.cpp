@@ -161,6 +161,21 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
 CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    auto min = mDelegate.GetMinMeasuredValue();
+    auto max = mDelegate.GetMaxMeasuredValue();
+    if (!value.IsNull())
+    {
+        if (!min.IsNull() && value.Value() < min.Value())
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+        if (!max.IsNull() && value.Value() > max.Value())
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
     if (mDelegate.GetMeasuredValue() != value)
     {
         mDelegate.SetMeasuredValue(value);
@@ -172,6 +187,21 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable
 CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    auto min = mDelegate.GetMinMeasuredValue();
+    auto max = mDelegate.GetMaxMeasuredValue();
+    if (!value.IsNull())
+    {
+        if (!min.IsNull() && value.Value() < min.Value())
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+        if (!max.IsNull() && value.Value() > max.Value())
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
     if (mDelegate.GetPeakMeasuredValue() != value)
     {
         mDelegate.SetPeakMeasuredValue(value);
@@ -195,6 +225,21 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValueWindow(uint32_t 
 CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    auto min = mDelegate.GetMinMeasuredValue();
+    auto max = mDelegate.GetMaxMeasuredValue();
+    if (!value.IsNull())
+    {
+        if (!min.IsNull() && value.Value() < min.Value())
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+        if (!max.IsNull() && value.Value() > max.Value())
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
     if (mDelegate.GetAverageMeasuredValue() != value)
     {
         mDelegate.SetAverageMeasuredValue(value);
