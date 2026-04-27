@@ -87,8 +87,8 @@ Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
                                              OptionalAttributeSet & optionalAttributeSet, Config & config) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mFeatureMap(features),
-    mOptionalAttributes(optionalAttributeSet), mType(config.type), mConfigStatus(config.configStatus),
+    DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)),
+    mFeatureMap(features), mOptionalAttributes(optionalAttributeSet), mType(config.type), mConfigStatus(config.configStatus),
     mOperationalStatus(config.operationalStatus), mEndProductType(config.endProductType), mMode(config.mode)
 {}
 
