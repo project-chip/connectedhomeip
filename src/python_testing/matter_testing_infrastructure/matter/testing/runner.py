@@ -474,51 +474,45 @@ def run_tests_no_exit(
             node_id = matter_test_config.dut_node_ids[0]
 
             if matter_test_config.commissioning_method is not None and setup_code is not None:
-                # PASE path: commissioning in this run
+                # Path 1: PASE + commissioning
                 commissionee = event_loop.run_until_complete(
                     default_controller.FindOrEstablishPASESession(
-                        setupCode=setup_code,
-                        nodeId=node_id
+                        setupCode=setup_code, nodeId=node_id
                     )
                 )
                 if commissionee is not None:
                     stored_global_wildcard = event_loop.run_until_complete(
-                        asyncio.wait_for(
-                            default_controller.Read(
-                                node_id,
-                                [
-                                    (Clusters.Descriptor),
-                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                    Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                ],
-                            ),
-                            timeout=60,
-                        )
+                        asyncio.wait_for(default_controller.Read(node_id, [...]), timeout=60)
                     )
                     test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                 else:
-                    LOGGER.error("FindOrEstablishPASESession returned None, stored_global_wildcard will not be pre-populated.")
+                    LOGGER.error("FindOrEstablishPASESession returned None")
+
+            elif setup_code is not None:
+                # Path 2: PASE without commissioning (e.g., manual-code only)
+                try:
+                    commissionee = event_loop.run_until_complete(
+                        default_controller.FindOrEstablishPASESession(
+                            setupCode=setup_code, nodeId=node_id
+                        )
+                    )
+                    if commissionee is not None:
+                        stored_global_wildcard = event_loop.run_until_complete(
+                            asyncio.wait_for(default_controller.Read(node_id, [...]), timeout=60)
+                        )
+                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                except Exception:
+                    LOGGER.warning("Could not pre-populate global wildcard via PASE")
+
             else:
-                # CASE path: device already commissioned or no commissioning method
+                # Path 3: CASE (already commissioned, no setup code)
                 try:
                     stored_global_wildcard = event_loop.run_until_complete(
-                        asyncio.wait_for(
-                            default_controller.Read(
-                                node_id,
-                                [
-                                    (Clusters.Descriptor),
-                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                    Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                ],
-                            ),
-                            timeout=60,
-                        )
+                        asyncio.wait_for(default_controller.Read(node_id, [...]), timeout=60)
                     )
                     test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                 except Exception:
-                    LOGGER.warning("Could not pre-populate global wildcard via CASE - guard functions may not work")
+                    LOGGER.warning("Could not pre-populate global wildcard via CASE")
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
