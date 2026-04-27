@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Uploading Size Reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       if: ${{ !env.ACT }}
       with:
         name: Size,${{ inputs.platform-name }}-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
