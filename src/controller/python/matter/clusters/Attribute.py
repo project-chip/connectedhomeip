@@ -352,7 +352,7 @@ class AttributeCache:
         # For this path the attribute cache still requires an update.
         self._attributeCacheUpdateNeeded.add(path)
 
-    def GetUpdatedAttributeCache(self) -> Dict[int, List[Cluster]]:
+    def GetUpdatedAttributeCache(self) -> dict[int, list[Cluster]]:
         ''' This converts the raw TLV data into a cluster object format.
 
             Two formats are available:
@@ -685,7 +685,7 @@ def _BuildEventIndex():
 class AsyncReadTransaction:
     @dataclass
     class ReadResponse:
-        attributes: dict[Any, Any]
+        attributes: dict[int, list[Cluster]]
         events: list[ClusterEvent]
         tlvAttributes: dict[int, Any]
 
