@@ -139,6 +139,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/humidistat-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proximity-ranging-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
@@ -635,8 +636,10 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v6
             - name: Setup Environment
-              # coreutils for stdbuf
-              run: brew install coreutils
+              # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
+              run: |
+                brew install coreutils
+                echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
             - name: Install ccache
               run: |
                 brew install ccache
@@ -1207,8 +1210,10 @@ jobs:
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
+              env:
+                  KEEP_GOING: ${{ github.event_name != 'pull_request' && '--keep-going' || '' }}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name "REPL Tests Linux - ${{github.ref_name}}"'
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
@@ -1286,14 +1291,14 @@ jobs:
             uses: actions/checkout@v6
 
           - name: Download all JUnit XML results
-            uses: actions/download-artifact@v7
+            uses: actions/download-artifact@v8
             with:
                 pattern: junit-results-*
                 path: junit-results
                 merge-multiple: true
 
           - name: Publish test results to GitHub Actions
-            uses: mikepenz/action-junit-report@v5
+            uses: mikepenz/action-junit-report@v6
             with:
                 report_paths: junit-results/**/*.xml
                 detailed_summary: true
@@ -1313,7 +1318,7 @@ jobs:
                 gh_pages: gh-pages
                 allure_history: allure-history
                 subfolder: allure-report/ci_tests
-                keep_reports: 200
+                keep_reports: 2000
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
 
@@ -1359,8 +1364,10 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v6
             - name: Setup Environment
-              # coreutils for stdbuf
-              run: brew install coreutils
+              # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
+              run: |
+                brew install coreutils
+                echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |

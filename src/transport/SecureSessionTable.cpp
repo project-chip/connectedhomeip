@@ -14,11 +14,10 @@
  *    limitations under the License.
  */
 
-#include "lib/support/CHIPMem.h"
-#include "lib/support/CodeUtils.h"
-#include "lib/support/ScopedMemoryBuffer.h"
 #include <access/AuthMode.h>
-#include <lib/support/Defer.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
 
@@ -97,7 +96,7 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
 
     mRunningEvictionLogic = true;
 
-    auto cleanup = MakeDefer([this]() { mRunningEvictionLogic = false; });
+    auto cleanup = ScopeExit([this]() { mRunningEvictionLogic = false; });
 
     ChipLogProgress(SecureChannel, "Evicting a slot for session with LSID: %d, type: %u", localSessionId,
                     (uint8_t) secureSessionType);

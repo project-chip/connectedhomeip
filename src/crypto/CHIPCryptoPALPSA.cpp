@@ -554,7 +554,7 @@ exit:
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
@@ -664,7 +664,7 @@ exit:
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR add_entropy_source(entropy_source /* fn_source */, void * /* p_source */, size_t /* threshold */)
@@ -679,11 +679,6 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
     const psa_status_t status = psa_generate_random(out_buffer, out_length);
 
     return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
-}
-
-static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
-{
-    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
@@ -976,6 +971,11 @@ typedef struct Spake2p_Context
 static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
 {
     return SafePointerCast<Spake2p_Context *>(context);
+}
+
+static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
+{
+    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
