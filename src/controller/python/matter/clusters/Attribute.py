@@ -63,7 +63,7 @@ class AttributePath:
     AttributeId: Optional[int] = None
 
     @staticmethod
-    def from_cluster(EndpointId: int, Cluster: Cluster) -> AttributePath:
+    def from_cluster(EndpointId: int, Cluster: type[Cluster]) -> AttributePath:
         if Cluster is None:
             raise ValueError("Cluster cannot be None")
         return AttributePath(EndpointId=EndpointId, ClusterId=Cluster.id)
@@ -85,7 +85,7 @@ class DataVersionFilter:
     DataVersion: Optional[int] = None
 
     @staticmethod
-    def from_cluster(EndpointId: int, Cluster: Cluster, DataVersion: int) -> DataVersionFilter:
+    def from_cluster(EndpointId: int, Cluster: type[Cluster], DataVersion: int) -> DataVersionFilter:
         if Cluster is None:
             raise ValueError("Cluster cannot be None")
         return DataVersionFilter(EndpointId=EndpointId, ClusterId=Cluster.id, DataVersion=DataVersion)

@@ -2053,23 +2053,19 @@ class ChipDeviceControllerBase():
         raise ValueError("Unsupported Attribute Path")
 
     def _parseDataVersionFilterTuple(
-            self, pathTuple: list[tuple[int, type[ClusterObjects.Cluster], int]]) -> ClusterAttribute.DataVersionFilter:
-        endpoint = None
-        cluster = None
-
+            self, pathTuple: tuple[int, type[ClusterObjects.Cluster], int]) -> ClusterAttribute.DataVersionFilter:
         # endpoint + (cluster) attribute / endpoint + cluster
         endpoint = pathTuple[0]
         # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
         # Fixing these typing errors is a high risk to affect existing functionality.
         # These mismatches are intentional and safe within the current logic.
         # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
-        if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):
             cluster = pathTuple[1]
         else:
             raise ValueError("Unsupported Cluster Path")
         dataVersion = pathTuple[2]
-        return ClusterAttribute.DataVersionFilter.from_cluster(
-            EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)  # type: ignore[arg-type]
+        return ClusterAttribute.DataVersionFilter.from_cluster(EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)
 
     def _parseEventPathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
@@ -2211,8 +2207,8 @@ class ChipDeviceControllerBase():
         device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
         attributePaths = [self._parseAttributePathTuple(
             v) for v in attributes] if attributes else None
-        clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
-            v) for v in dataVersionFilters] if dataVersionFilters else None  # type: ignore[arg-type]
+        clusterDataVersionFilters = [self._parseDataVersionFilterTuple(v)
+                                     for v in dataVersionFilters] if dataVersionFilters else None
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
