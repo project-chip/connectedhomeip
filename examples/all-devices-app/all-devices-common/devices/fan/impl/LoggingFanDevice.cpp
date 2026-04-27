@@ -66,19 +66,19 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
         }
     }
 
-    if (newSpeed != currentSpeed)
+    if (newSpeed > 0)
     {
-        if (newSpeed == 0)
-        {
-            cluster.SetOnOffState(false);
-        }
-        else
-        {
-            cluster.SetOnOffState(true);
-        }
+        cluster.SetOnOffState(true);
+    }
+    else
+    {
+        cluster.SetOnOffState(false);
     }
 
-    ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from %u to %u", currentSpeed, newSpeed);
+    if (newSpeed != currentSpeed)
+    {
+        ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from %u to %u", currentSpeed, newSpeed);
+    }
 
     return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed)).GetStatusCode().GetStatus();
 }
