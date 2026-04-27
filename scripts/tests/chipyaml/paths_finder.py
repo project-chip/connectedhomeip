@@ -35,6 +35,8 @@ class PathsFinder:
 
     def get(self, target_name: str) -> Path | None:
         path = _PATHS_CACHE.get(target_name)
+        if isinstance(path, str):
+            path = Path(path)
         if path and isinstance(path, Path) and path.is_file():
             return path
 
@@ -73,9 +75,9 @@ def view() -> None:
 @finder.command()
 @click.argument('key', type=str)
 @click.argument('value', type=str)
-def add(key: str, value: str) -> None:
+def add(key: str, value: str | Path) -> None:
     """Add a cache entry."""
-    _PATHS_CACHE[key] = value
+    _PATHS_CACHE[key] = Path(value)
 
 
 @finder.command()
