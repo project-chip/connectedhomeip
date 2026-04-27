@@ -284,6 +284,7 @@ class CallbackContext:
     The context manager makes sure that no concurrent operations which use the same callback
     handlers are executed.
     """
+
     def __init__(self, lock: asyncio.Lock) -> None:
         self._lock = lock
         self._future: concurrent.futures.Future | None = None
