@@ -291,7 +291,7 @@ def generate_mobly_test_config(matter_test_config: "MatterTestConfig") -> TestRu
     return test_run_config
 
 
-def _find_test_class() -> type[MatterBaseTest]:
+def _find_test_class() -> "type[MatterBaseTest]":
     """Finds the test class in a test script.
     Walk through module members and find the subclass of MatterBaseTest. Only
     one subclass is allowed in a test script.
@@ -308,6 +308,7 @@ def _find_test_class() -> type[MatterBaseTest]:
     def has_subclasses(cls: type) -> bool:
         return get_subclasses(cls) != []
 
+    from matter.testing.matter_testing import MatterBaseTest
     subclasses_matter_test_base = get_subclasses(MatterBaseTest)
     leaf_subclasses = [s for s in subclasses_matter_test_base if not has_subclasses(s)]
 
@@ -342,7 +343,7 @@ def default_matter_test_main() -> None:
     run_tests(test_class, matter_test_config, hooks)
 
 
-def get_test_info(test_class: type[MatterBaseTest], matter_test_config: "MatterTestConfig") -> list[TestInfo]:
+def get_test_info(test_class: "type[MatterBaseTest]", matter_test_config: "MatterTestConfig") -> list[TestInfo]:
     test_config = generate_mobly_test_config(matter_test_config)
     base = test_class(test_config)
 
@@ -359,8 +360,9 @@ def get_test_info(test_class: type[MatterBaseTest], matter_test_config: "MatterT
     return info
 
 
-def run_tests_no_exit(test_class: type[MatterBaseTest], matter_test_config: "MatterTestConfig", event_loop: asyncio.AbstractEventLoop,
-                      hooks: InternalTestRunnerHooks | None, default_controller: ChipDeviceController | None = None,
+def run_tests_no_exit(test_class: "type[MatterBaseTest]", matter_test_config: "MatterTestConfig",
+                      event_loop: asyncio.AbstractEventLoop, hooks: InternalTestRunnerHooks | None,
+                      default_controller: ChipDeviceController | None = None,
                       external_stack: MatterStackState | None = None) -> bool:
     """
     Run Matter tests without exiting the process on failure.
@@ -495,7 +497,7 @@ def run_tests_no_exit(test_class: type[MatterBaseTest], matter_test_config: "Mat
     return ok
 
 
-def run_tests(test_class: type[MatterBaseTest], matter_test_config: "MatterTestConfig", hooks: InternalTestRunnerHooks | None,
+def run_tests(test_class: "type[MatterBaseTest]", matter_test_config: "MatterTestConfig", hooks: InternalTestRunnerHooks | None,
               default_controller: ChipDeviceController | None = None, external_stack: MatterStackState | None = None) -> None:
     """
     Run Matter tests and exit the process with status code 1 on failure.
