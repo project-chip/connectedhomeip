@@ -21,6 +21,7 @@
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "ICDUtil.h"
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 
@@ -43,7 +44,7 @@ using namespace chip::app::Clusters;
 TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
-    TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void CooksurfaceApp::AppTask::PreInitMatterStack()
@@ -55,7 +56,7 @@ void CooksurfaceApp::AppTask::PostInitMatterStack()
 {
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void CooksurfaceApp::AppTask::AppMatter_RegisterCustomCliCommands()
