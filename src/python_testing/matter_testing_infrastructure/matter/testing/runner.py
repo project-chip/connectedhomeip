@@ -262,7 +262,7 @@ class TestInfo:
     pics: list[str]
 
 
-def generate_mobly_test_config(matter_test_config: MatterTestConfig) -> TestRunConfig:
+def generate_mobly_test_config(matter_test_config: "MatterTestConfig") -> TestRunConfig:
     """
     Generate a Mobly test configuration from Matter test configuration.
 
@@ -342,7 +342,7 @@ def default_matter_test_main() -> None:
     run_tests(test_class, matter_test_config, hooks)
 
 
-def get_test_info(test_class: type[MatterBaseTest], matter_test_config: MatterTestConfig) -> list[TestInfo]:
+def get_test_info(test_class: type[MatterBaseTest], matter_test_config: "MatterTestConfig") -> list[TestInfo]:
     test_config = generate_mobly_test_config(matter_test_config)
     base = test_class(test_config)
 
@@ -359,7 +359,7 @@ def get_test_info(test_class: type[MatterBaseTest], matter_test_config: MatterTe
     return info
 
 
-def run_tests_no_exit(test_class: type[MatterBaseTest], matter_test_config: MatterTestConfig, event_loop: asyncio.AbstractEventLoop,
+def run_tests_no_exit(test_class: type[MatterBaseTest], matter_test_config: "MatterTestConfig", event_loop: asyncio.AbstractEventLoop,
                       hooks: InternalTestRunnerHooks | None, default_controller: ChipDeviceController | None = None,
                       external_stack: MatterStackState | None = None) -> bool:
     """
@@ -495,7 +495,7 @@ def run_tests_no_exit(test_class: type[MatterBaseTest], matter_test_config: Matt
     return ok
 
 
-def run_tests(test_class: type[MatterBaseTest], matter_test_config: MatterTestConfig, hooks: InternalTestRunnerHooks | None,
+def run_tests(test_class: type[MatterBaseTest], matter_test_config: "MatterTestConfig", hooks: InternalTestRunnerHooks | None,
               default_controller: ChipDeviceController | None = None, external_stack: MatterStackState | None = None) -> None:
     """
     Run Matter tests and exit the process with status code 1 on failure.
@@ -601,7 +601,7 @@ class MockTestRunner():
 
 # Argument parsing helper functions
 
-def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConfig) -> bool:
+def populate_commissioning_args(args: argparse.Namespace, config: "MatterTestConfig") -> bool:
     config.root_of_trust_index = args.root_index
     # Follow root of trust index if ID not provided to have same behavior as legacy
     # chip-tool that fabricID == commissioner_name == root of trust index
@@ -725,7 +725,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     return True
 
 
-def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
+def convert_args_to_matter_config(args: argparse.Namespace) -> "MatterTestConfig":
     # Lazy import to avoid circular dependency
     from matter.testing.matter_test_config import MatterTestConfig
 
@@ -925,7 +925,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: list[str] | None = None) -> MatterTestConfig:
+def parse_matter_test_args(argv: list[str] | None = None) -> "MatterTestConfig":
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
