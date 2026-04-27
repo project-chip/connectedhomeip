@@ -1,0 +1,7 @@
+# Version defaults to "0" if not defined
+version = "0"
+
+
+[dependency]
+# Get a specific version of the package
+gcc-arm-none-eabi = { version = "12.2.rel1", installer ="conan", prerelease=false }
