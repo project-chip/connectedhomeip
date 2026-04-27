@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 #include <inet/InetInterfaceImpl.h>
-
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/Compiler.h>
-#include <string.h>
 
 #if CHIP_MEMORY_SANITIZER_ENABLED
 #include <sanitizer/msan_interface.h>

@@ -37,12 +37,6 @@ on:
                 required: false
                 default: ''
                 type: string
-            force_msan_sysroot_rebuild:
-                description: 'MSAN: force a fresh sysroot build (skip cache)'
-                required: false
-                default: 'false'
-                type: choice
-                options: ['false', 'true']
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
