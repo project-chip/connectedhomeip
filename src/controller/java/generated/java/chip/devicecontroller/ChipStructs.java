@@ -13126,6 +13126,97 @@ public static class AmbientContextSensingClusterPredictedActivityStruct {
     return output.toString();
   }
 }
+public static class AmbientSensingUnionClusterUnionContributorStruct {
+  public @Nullable Long contributorNodeID;
+  public @Nullable Integer contributorEndpointID;
+  public Optional<String> contributorName;
+  public Integer contributorHealth;
+  private static final long CONTRIBUTOR_NODE_ID_ID = 0L;
+  private static final long CONTRIBUTOR_ENDPOINT_ID_ID = 1L;
+  private static final long CONTRIBUTOR_NAME_ID = 2L;
+  private static final long CONTRIBUTOR_HEALTH_ID = 3L;
+
+  public AmbientSensingUnionClusterUnionContributorStruct(
+    @Nullable Long contributorNodeID,
+    @Nullable Integer contributorEndpointID,
+    Optional<String> contributorName,
+    Integer contributorHealth
+  ) {
+    this.contributorNodeID = contributorNodeID;
+    this.contributorEndpointID = contributorEndpointID;
+    this.contributorName = contributorName;
+    this.contributorHealth = contributorHealth;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTRIBUTOR_NODE_ID_ID, contributorNodeID != null ? new UIntType(contributorNodeID) : new NullType()));
+    values.add(new StructElement(CONTRIBUTOR_ENDPOINT_ID_ID, contributorEndpointID != null ? new UIntType(contributorEndpointID) : new NullType()));
+    values.add(new StructElement(CONTRIBUTOR_NAME_ID, contributorName.<BaseTLVType>map((nonOptionalcontributorName) -> new StringType(nonOptionalcontributorName)).orElse(new EmptyType())));
+    values.add(new StructElement(CONTRIBUTOR_HEALTH_ID, new UIntType(contributorHealth)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Long contributorNodeID = null;
+    @Nullable Integer contributorEndpointID = null;
+    Optional<String> contributorName = Optional.empty();
+    Integer contributorHealth = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTRIBUTOR_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorNodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorEndpointID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          contributorName = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_HEALTH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorHealth = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorStruct(
+      contributorNodeID,
+      contributorEndpointID,
+      contributorName,
+      contributorHealth
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorStruct {\n");
+    output.append("\tcontributorNodeID: ");
+    output.append(contributorNodeID);
+    output.append("\n");
+    output.append("\tcontributorEndpointID: ");
+    output.append(contributorEndpointID);
+    output.append("\n");
+    output.append("\tcontributorName: ");
+    output.append(contributorName);
+    output.append("\n");
+    output.append("\tcontributorHealth: ");
+    output.append(contributorHealth);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ProximityRangingClusterRDRStruct {
   public Integer azimuth;
   public Integer elevation;

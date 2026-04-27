@@ -4983,6 +4983,133 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::AmbientSensingUnion;
+    switch (aEventId) {
+    case Events::UnionContributorAdded::Id: {
+        Events::UnionContributorAdded::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAmbientSensingUnionClusterUnionContributorAddedEvent new];
+
+        do {
+            MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull memberValue;
+            memberValue = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+            if (cppValue.addedContributor.contributorNodeID.IsNull()) {
+                memberValue.contributorNodeID = nil;
+            } else {
+                memberValue.contributorNodeID = [NSNumber numberWithUnsignedLongLong:cppValue.addedContributor.contributorNodeID.Value()];
+            }
+            if (cppValue.addedContributor.contributorEndpointID.IsNull()) {
+                memberValue.contributorEndpointID = nil;
+            } else {
+                memberValue.contributorEndpointID = [NSNumber numberWithUnsignedShort:cppValue.addedContributor.contributorEndpointID.Value()];
+            }
+            if (cppValue.addedContributor.contributorName.HasValue()) {
+                memberValue.contributorName = AsString(cppValue.addedContributor.contributorName.Value());
+                if (memberValue.contributorName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.contributorName = nil;
+            }
+            memberValue.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.addedContributor.contributorHealth)];
+            value.addedContributor = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::UnionContributorRemoved::Id: {
+        Events::UnionContributorRemoved::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAmbientSensingUnionClusterUnionContributorRemovedEvent new];
+
+        do {
+            MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull memberValue;
+            memberValue = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+            if (cppValue.removedContributor.contributorNodeID.IsNull()) {
+                memberValue.contributorNodeID = nil;
+            } else {
+                memberValue.contributorNodeID = [NSNumber numberWithUnsignedLongLong:cppValue.removedContributor.contributorNodeID.Value()];
+            }
+            if (cppValue.removedContributor.contributorEndpointID.IsNull()) {
+                memberValue.contributorEndpointID = nil;
+            } else {
+                memberValue.contributorEndpointID = [NSNumber numberWithUnsignedShort:cppValue.removedContributor.contributorEndpointID.Value()];
+            }
+            if (cppValue.removedContributor.contributorName.HasValue()) {
+                memberValue.contributorName = AsString(cppValue.removedContributor.contributorName.Value());
+                if (memberValue.contributorName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.contributorName = nil;
+            }
+            memberValue.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.removedContributor.contributorHealth)];
+            value.removedContributor = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::UnionContributorHealthChanged::Id: {
+        Events::UnionContributorHealthChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAmbientSensingUnionClusterUnionContributorHealthChangedEvent new];
+
+        do {
+            MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull memberValue;
+            memberValue = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
+            if (cppValue.contributorHealth.contributorNodeID.IsNull()) {
+                memberValue.contributorNodeID = nil;
+            } else {
+                memberValue.contributorNodeID = [NSNumber numberWithUnsignedLongLong:cppValue.contributorHealth.contributorNodeID.Value()];
+            }
+            if (cppValue.contributorHealth.contributorEndpointID.IsNull()) {
+                memberValue.contributorEndpointID = nil;
+            } else {
+                memberValue.contributorEndpointID = [NSNumber numberWithUnsignedShort:cppValue.contributorHealth.contributorEndpointID.Value()];
+            }
+            if (cppValue.contributorHealth.contributorName.HasValue()) {
+                memberValue.contributorName = AsString(cppValue.contributorHealth.contributorName.Value());
+                if (memberValue.contributorName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.contributorName = nil;
+            }
+            memberValue.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.contributorHealth.contributorHealth)];
+            value.contributorHealth = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known AmbientSensingUnion event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ProximityRanging;
@@ -6410,6 +6537,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::AmbientContextSensing::Id: {
         return DecodeEventPayloadForAmbientContextSensingCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::AmbientSensingUnion::Id: {
+        return DecodeEventPayloadForAmbientSensingUnionCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ProximityRanging::Id: {
         return DecodeEventPayloadForProximityRangingCluster(aPath.mEventId, aReader, aError);

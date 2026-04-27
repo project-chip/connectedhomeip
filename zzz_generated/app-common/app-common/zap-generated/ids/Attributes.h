@@ -27,6 +27,7 @@
 #include <clusters/AdministratorCommissioning/AttributeIds.h>
 #include <clusters/AirQuality/AttributeIds.h>
 #include <clusters/AmbientContextSensing/AttributeIds.h>
+#include <clusters/AmbientSensingUnion/AttributeIds.h>
 #include <clusters/ApplicationBasic/AttributeIds.h>
 #include <clusters/ApplicationLauncher/AttributeIds.h>
 #include <clusters/AudioOutput/AttributeIds.h>

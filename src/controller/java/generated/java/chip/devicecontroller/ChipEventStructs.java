@@ -6891,6 +6891,144 @@ public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
     return output.toString();
   }
 }
+public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
+  public ChipStructs.AmbientSensingUnionClusterUnionContributorStruct addedContributor;
+  private static final long ADDED_CONTRIBUTOR_ID = 0L;
+
+  public AmbientSensingUnionClusterUnionContributorAddedEvent(
+    ChipStructs.AmbientSensingUnionClusterUnionContributorStruct addedContributor
+  ) {
+    this.addedContributor = addedContributor;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ADDED_CONTRIBUTOR_ID, addedContributor.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorAddedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.AmbientSensingUnionClusterUnionContributorStruct addedContributor = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ADDED_CONTRIBUTOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          addedContributor = ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorAddedEvent(
+      addedContributor
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorAddedEvent {\n");
+    output.append("\taddedContributor: ");
+    output.append(addedContributor);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
+  public ChipStructs.AmbientSensingUnionClusterUnionContributorStruct removedContributor;
+  private static final long REMOVED_CONTRIBUTOR_ID = 0L;
+
+  public AmbientSensingUnionClusterUnionContributorRemovedEvent(
+    ChipStructs.AmbientSensingUnionClusterUnionContributorStruct removedContributor
+  ) {
+    this.removedContributor = removedContributor;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(REMOVED_CONTRIBUTOR_ID, removedContributor.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorRemovedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.AmbientSensingUnionClusterUnionContributorStruct removedContributor = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == REMOVED_CONTRIBUTOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          removedContributor = ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorRemovedEvent(
+      removedContributor
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorRemovedEvent {\n");
+    output.append("\tremovedContributor: ");
+    output.append(removedContributor);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientSensingUnionClusterUnionContributorHealthChangedEvent {
+  public ChipStructs.AmbientSensingUnionClusterUnionContributorStruct contributorHealth;
+  private static final long CONTRIBUTOR_HEALTH_ID = 0L;
+
+  public AmbientSensingUnionClusterUnionContributorHealthChangedEvent(
+    ChipStructs.AmbientSensingUnionClusterUnionContributorStruct contributorHealth
+  ) {
+    this.contributorHealth = contributorHealth;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTRIBUTOR_HEALTH_ID, contributorHealth.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorHealthChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.AmbientSensingUnionClusterUnionContributorStruct contributorHealth = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTRIBUTOR_HEALTH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          contributorHealth = ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorHealthChangedEvent(
+      contributorHealth
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorHealthChangedEvent {\n");
+    output.append("\tcontributorHealth: ");
+    output.append(contributorHealth);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ProximityRangingClusterRangingResultEvent {
   public Integer sessionID;
   public ChipStructs.ProximityRangingClusterRangingMeasurementDataStruct rangingResultData;

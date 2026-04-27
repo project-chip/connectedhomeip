@@ -9138,6 +9138,50 @@ provisional cluster AmbientContextSensing = 1073 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides data modeling and protocol implementation of multi-node ambient sensing system. */
+provisional cluster AmbientSensingUnion = 1074 {
+  revision 1;
+
+  enum UnionContributorHealthEum : enum8 {
+    kUnionContributorOnline = 0;
+    kUnionContributorOffline = 1;
+  }
+
+  enum UnionHealthEnum : enum8 {
+    kFullyFunctional = 0;
+    kLimitedDegraded = 1;
+    kNonFunctional = 2;
+  }
+
+  struct UnionContributorStruct {
+    nullable node_id contributorNodeID = 0;
+    nullable endpoint_no contributorEndpointID = 1;
+    optional char_string<128> contributorName = 2;
+    UnionContributorHealthEum contributorHealth = 3;
+  }
+
+  info event UnionContributorAdded = 0 {
+    UnionContributorStruct addedContributor = 0;
+  }
+
+  info event UnionContributorRemoved = 1 {
+    UnionContributorStruct removedContributor = 0;
+  }
+
+  info event UnionContributorHealthChanged = 2 {
+    UnionContributorStruct contributorHealth = 0;
+  }
+
+  attribute char_string<128> unionName = 0;
+  readonly attribute UnionHealthEnum unionHealth = 1;
+  readonly attribute UnionContributorStruct unionContributorList[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster enables the configuration of proximity ranging sessions and reporting of proximity ranging data. */
 provisional cluster ProximityRanging = 1075 {
   revision 1;

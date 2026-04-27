@@ -2137,6 +2137,29 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAmbientSensingUnionClusterUnionContributorStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable contributorNodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable contributorEndpointID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable contributorName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull contributorHealth MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAmbientSensingUnionClusterUnionContributorAddedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull addedContributor MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAmbientSensingUnionClusterUnionContributorRemovedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull removedContributor MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAmbientSensingUnionClusterUnionContributorHealthChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRAmbientSensingUnionClusterUnionContributorStruct * _Nonnull contributorHealth MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRProximityRangingClusterRDRStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull azimuth MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull elevation MTR_PROVISIONALLY_AVAILABLE;
