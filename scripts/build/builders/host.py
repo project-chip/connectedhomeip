@@ -740,7 +740,6 @@ class HostBuilder(GnBuilder):
             # false positives from uninstrumented dependencies at runtime.
             sysroot = _msan_sysroot_path()
             self.build_env['PKG_CONFIG_PATH'] = ':'.join([
-                f'{sysroot}/lib/x86_64-linux-gnu/pkgconfig',
                 f'{sysroot}/lib/pkgconfig',
                 f'{sysroot}/lib64/pkgconfig',
             ])
