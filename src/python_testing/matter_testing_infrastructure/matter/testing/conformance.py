@@ -37,7 +37,7 @@ import operator
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable, Optional
+from typing import Callable
 
 from matter.tlv import uint
 
@@ -90,7 +90,7 @@ class Choice:
         return '.' + self.marker + more_str
 
 
-def parse_choice(element: ElementTree.Element) -> Optional[Choice]:
+def parse_choice(element: ElementTree.Element) -> Choice | None:
     choice = element.get('choice', '')
     if not choice:
         return None
@@ -111,7 +111,7 @@ class ConformanceDecision(Enum):
 @dataclass
 class ConformanceDecisionWithChoice:
     decision: ConformanceDecision
-    choice: Optional[Choice] = None
+    choice: Choice | None = None
 
     def is_mandatory(self) -> bool:
         return self.decision == ConformanceDecision.MANDATORY
@@ -153,12 +153,12 @@ def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice,
     return True
 
 
-def is_disallowed(conformance: Callable) -> bool:
+def is_disallowed(conformance: Callable[[ConformanceAssessmentData], ConformanceDecisionWithChoice]) -> bool:
     # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
     return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.DISALLOWED
 
 
-def is_provisional(conformance: Callable) -> bool:
+def is_provisional(conformance: Callable[[ConformanceAssessmentData], ConformanceDecisionWithChoice]) -> bool:
     return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL
 
 
@@ -175,7 +175,7 @@ class Conformance:
             Raises: ConformanceException if the conformance is invalid
         '''
         raise ConformanceException('Base conformance called')
-    choice: Optional[Choice] = None
+    choice: Choice | None = None
 
 
 class zigbee(Conformance):
@@ -195,7 +195,7 @@ class mandatory(Conformance):
 
 
 class optional(Conformance):
-    def __init__(self, choice: Optional[Choice] = None):
+    def __init__(self, choice: Choice | None = None):
         self.choice = choice
 
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
@@ -254,7 +254,7 @@ class literal(ValueConformance):
 
 class revision(ValueConformance):
     def __init__(self, value: str):
-        self.value: Optional[int]
+        self.value: int | None
         if value.lower() == 'current':
             self.value = None
         else:
@@ -347,7 +347,7 @@ def strip_outer_parentheses(inner: str) -> str:
 
 
 class optional_wrapper(Conformance):
-    def __init__(self, op: Conformance, choice: Optional[Choice] = None):
+    def __init__(self, op: Conformance, choice: Choice | None = None):
         self.op = op
         self.choice = choice
 
