@@ -21,9 +21,9 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
-#include <app/util/endpoint-config-api.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 
 using chip::Protocols::InteractionModel::Status;
