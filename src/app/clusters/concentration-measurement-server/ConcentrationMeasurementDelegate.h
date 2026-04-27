@@ -52,19 +52,19 @@ public:
 
     // ── Feature::kPeakMeasurement (requires kNumericMeasurement) ─────────────
     virtual DataModel::Nullable<float> GetPeakMeasuredValue() = 0;
-    virtual uint32_t GetPeakMeasuredValueWindow()              = 0;
+    virtual uint32_t GetPeakMeasuredValueWindow()             = 0;
 
     // ── Feature::kAverageMeasurement (requires kNumericMeasurement) ──────────
     virtual DataModel::Nullable<float> GetAverageMeasuredValue() = 0;
-    virtual uint32_t GetAverageMeasuredValueWindow()              = 0;
+    virtual uint32_t GetAverageMeasuredValueWindow()             = 0;
 
     // ── Feature::kLevelIndication ─────────────────────────────────────────────
     virtual LevelValueEnum GetLevelValue() = 0;
 
     // ── Writable setters — called by ConcentrationMeasurementCluster::Set*() after validation.
-    virtual void SetMeasuredValue(DataModel::Nullable<float>)    = 0;
-    virtual void SetPeakMeasuredValue(DataModel::Nullable<float>) = 0;
-    virtual void SetPeakMeasuredValueWindow(uint32_t)             = 0;
+    virtual void SetMeasuredValue(DataModel::Nullable<float>)        = 0;
+    virtual void SetPeakMeasuredValue(DataModel::Nullable<float>)    = 0;
+    virtual void SetPeakMeasuredValueWindow(uint32_t)                = 0;
     virtual void SetAverageMeasuredValue(DataModel::Nullable<float>) = 0;
     virtual void SetAverageMeasuredValueWindow(uint32_t)             = 0;
     virtual void SetLevelValue(LevelValueEnum)                       = 0;
