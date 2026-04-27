@@ -477,8 +477,7 @@ def run_tests_no_exit(test_class: type[MatterBaseTest], matter_test_config: Matt
                 ok = False
 
     if hooks:
-        duration = (datetime.now(timezone.utc) -
-                    runner_start_time) / timedelta(microseconds=1)
+        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(milliseconds=1)
         hooks.stop(duration=duration)
 
     if not external_stack:
