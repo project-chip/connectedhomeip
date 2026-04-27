@@ -91,8 +91,7 @@ def delete(name: str) -> None:
 @finder.command()
 def reset() -> None:
     """Delete all cache entries."""
-    for name in _PATHS_CACHE:
-        del _PATHS_CACHE[name]
+    _PATHS_CACHE.clear()
 
 
 @finder.command()
