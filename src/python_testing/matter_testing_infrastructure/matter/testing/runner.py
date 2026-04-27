@@ -472,7 +472,7 @@ def run_tests_no_exit(
                     matter_test_config.setup_passcodes[0],
                 )
 
-            if setup_code is not None:
+            if matter_test_config.commissioning_method is not None and setup_code is not None:
                 node_id = matter_test_config.dut_node_ids[0]
 
                 commissionee = event_loop.run_until_complete(
