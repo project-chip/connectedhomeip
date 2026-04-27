@@ -12,26 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Options from standalone-chip.mk that differ from configure defaults. These
-# options are used from examples/.
-
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("//build/chip/tests.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
 
 declare_args() {
-  chip_build_pw_rpc_lib = false
+  rtk_ar = ""
+  rtk_cc = ""
+  rtk_cxx = ""
+  rtk_cpu = ""
 }
 
-group("bee") {
-  deps = [ "//src/lib" ]
+gcc_toolchain("rtkFreeRTOS") {
+  ar = rtk_ar
+  cc = rtk_cc
+  cxx = rtk_cxx
 
-  if (chip_build_pw_rpc_lib) {
-    deps += [ "//config/realtek/bee/lib/pw_rpc" ]
-  }
-
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
+  toolchain_args = {
+    current_os = "freertos"
+    current_cpu = rtk_cpu
+    is_clang = false
+    import("${chip_root}/src/platform/realtek/freertos/args.gni")
   }
 }

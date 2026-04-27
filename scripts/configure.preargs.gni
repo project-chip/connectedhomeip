@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,27 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
+# These settings are passed to an initial `gn args` pass used by the
+# configure script to discover available build arguments. Because this
+# actually executes all the GN files (including exec_script calls to
+# things like pkg-config), we need to pass some non-default settings to
+# avoid external dependencies that can cause GN to fail.
 
-import("${build_root}/toolchain/gcc_toolchain.gni")
-
-declare_args() {
-  bee_ar = ""
-  bee_cc = ""
-  bee_cxx = ""
-  bee_cpu = ""
-}
-
-gcc_toolchain("bee") {
-  ar = bee_ar
-  cc = bee_cc
-  cxx = bee_cxx
-
-  toolchain_args = {
-    current_os = "freertos"
-    current_cpu = bee_cpu
-    is_clang = false
-    import("${chip_root}/src/platform/realtek/freertos/args.gni")
-  }
-}
+chip_crypto = "platform"
+chip_mdns = "none"

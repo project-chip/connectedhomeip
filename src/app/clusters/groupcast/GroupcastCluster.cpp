@@ -632,6 +632,7 @@ Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip:
         GroupDataProvider::EpochKey & epoch = ks.epoch_keys[0];
         VerifyOrReturnValue(key.Value().size() == GroupDataProvider::EpochKey::kLengthBytes, Status::ConstraintError);
         memcpy(epoch.key, key.Value().data(), GroupDataProvider::EpochKey::kLengthBytes);
+        epoch.start_time = 1;
         {
             // Get compressed fabric
             uint8_t compressedFabricIdBuffer[sizeof(uint64_t)];
