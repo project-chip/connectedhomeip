@@ -2519,320 +2519,285 @@ class ChipDeviceControllerBase():
 
     # ----- Private Members -----
     def _InitLib(self) -> CDLL:
-        if self._dmLib is None:
-            self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
-
-            self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [
-                c_void_p, c_void_p]
-            self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [
-                c_void_p, c_uint16, c_bool, c_uint32, c_uint64]
-            self._dmLib.pychip_DeviceController_ConnectBLE.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_ConnectNFC.argtypes = [
-                c_void_p, c_uint16, c_uint32, c_uint64]
-            self._dmLib.pychip_DeviceController_ConnectNFC.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.argtypes = [
-                c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
-                c_char_p, c_uint32]
-            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_SetWiFiCredentials.argtypes = [
-                c_char_p, c_char_p]
-            self._dmLib.pychip_DeviceController_SetWiFiCredentials.restype = PyChipError
-
-            # Currently only supports 1 list item
-            self._dmLib.pychip_DeviceController_SetTimeZone.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetTimeZone.argtypes = [
-                c_int32, c_uint64, c_char_p]
-
-            # Currently only supports 1 list item
-            self._dmLib.pychip_DeviceController_SetDSTOffset.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetDSTOffset.argtypes = [
-                c_int32, c_uint64, c_uint64]
-
-            self._dmLib.pychip_DeviceController_SetDefaultNtp.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetDefaultNtp.argtypes = [c_char_p]
-
-            self._dmLib.pychip_DeviceController_SetTrustedTimeSource.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetTrustedTimeSource.argtypes = [c_uint64, c_uint16]
-
-            self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.argtypes = [c_bool]
-
-            self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters.argtypes = [
-                c_bool, c_void_p
-            ]
-
-            self._dmLib.pychip_DeviceController_ResetCommissioningParameters.restype = PyChipError
-            self._dmLib.pychip_DeviceController_ResetCommissioningParameters.argtypes = []
-
-            self._dmLib.pychip_DeviceController_Commission.argtypes = [
-                c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_Commission.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [
-                c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
-            self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
-
-            if hasattr(self._dmLib, "pychip_DeviceController_ThreadMeshcopCommission"):
-                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.argtypes = [
-                    c_void_p, c_void_p, c_uint64, c_uint32, c_uint16, c_char_p, c_uint16]
-                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.restype = PyChipError
-            else:
-                logging.getLogger(__name__).warning(
-                    "pychip_DeviceController_ThreadMeshcopCommission is not available in the loaded CHIP library; "
-                    "Thread Meshcop commissioning is disabled.")
-
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
-                c_void_p, c_uint8, c_char_p]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_StopCommissionableDiscovery.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_DeviceController_StopCommissionableDiscovery.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [
-                c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
-            self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
-                c_void_p, c_uint32, c_uint16, c_uint64]
-            self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_EstablishPASESession.argtypes = [
-                c_void_p, c_char_p, c_uint64]
-            self._dmLib.pychip_DeviceController_EstablishPASESession.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.argtypes = [c_void_p]
-            self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.restype = c_bool
-
-            self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.argtypes = [
-                c_void_p, c_int, c_char_p, c_uint32]
-            self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.restype = c_bool
-
-            self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
-                c_void_p, c_char_p, c_uint32, c_uint64]
-            self._dmLib.pychip_DeviceController_ConnectIP.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_ConnectWithCode.argtypes = [
-                c_void_p, c_char_p, c_uint64, c_uint8]
-            self._dmLib.pychip_DeviceController_ConnectWithCode.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_UnpairDevice.argtypes = [
-                c_void_p, c_uint64, _DeviceUnpairingCompleteFunct]
-            self._dmLib.pychip_DeviceController_UnpairDevice.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_MarkSessionDefunct.argtypes = [
-                c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_MarkSessionDefunct.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_MarkSessionForEviction.argtypes = [
-                c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_MarkSessionForEviction.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.restype = PyChipError
-
-            try:
-                self._dmLib.pychip_DeviceController_SetLocalMRPConfig.restype = PyChipError
-                self._dmLib.pychip_DeviceController_SetLocalMRPConfig.argtypes = [c_uint32, c_uint32, c_uint16]
-
-                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig.restype = PyChipError
-                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig.argtypes = []
-            except AttributeError:
-                # This can happen if the SDK is not built with CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
-                def _unsupported_dynamic_mrp(*args, **kwargs):
-                    raise NotImplementedError("Dynamic MRP config support is not available in this Matter SDK build.")
-                self._dmLib.pychip_DeviceController_SetLocalMRPConfig = _unsupported_dynamic_mrp
-                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig = _unsupported_dynamic_mrp
-
-            self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
-                c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
-            self._dmLib.pychip_DeviceController_GetAddressAndPort.restype = PyChipError
-
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [
-                c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = PyChipError
-
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.argtypes = [
-                c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = PyChipError
-
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback.argtypes = [
-                c_void_p, _DevicePairingDelegate_OnOpenWindowCompleteFunct]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback.restype = PyChipError
-
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
-                c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.restype = PyChipError
-
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.argtypes = [
-                c_void_p, _DevicePairingDelegate_OnCommissioningStageStartFunct]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.restype = PyChipError
-
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.argtypes = [
-                c_void_p, _DevicePairingDelegate_OnFabricCheckFunct]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
-
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.argtypes = [
-                c_void_p, c_bool]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.restype = PyChipError
-
-            self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
-                c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct, c_int]
-            self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = PyChipError
-
-            self._dmLib.pychip_FreeOperationalDeviceProxy.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_FreeOperationalDeviceProxy.restype = PyChipError
-
-            self._dmLib.pychip_GetDeviceBeingCommissioned.argtypes = [
-                c_void_p, c_uint64, c_void_p]
-            self._dmLib.pychip_GetDeviceBeingCommissioned.restype = PyChipError
-
-            self._dmLib.pychip_ExpireSessions.argtypes = [c_void_p, c_uint64]
-            self._dmLib.pychip_ExpireSessions.restype = PyChipError
-
-            self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.restype = PyChipError
-
-            self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
-            self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
+        dm_lib = CDLL(self._ChipStack.LocateChipDLL())
 
-            self._dmLib.pychip_DeviceController_GetCompressedFabricId.argtypes = [
-                c_void_p, POINTER(c_uint64)]
-            self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = PyChipError
+        dm_lib.pychip_DeviceController_DeleteDeviceController.argtypes = [c_void_p, c_void_p]
+        dm_lib.pychip_DeviceController_DeleteDeviceController.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
-                c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
-            self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
+        dm_lib.pychip_DeviceController_ConnectBLE.argtypes = [c_void_p, c_uint16, c_bool, c_uint32, c_uint64]
+        dm_lib.pychip_DeviceController_ConnectBLE.restype = PyChipError
 
-            try:
-                # NOTE: Joint Fabric is an optional feature in the Matter SDK core library.
-                #       Build with CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1 to enable it.
-                self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.argtypes = [
-                    c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
-                self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
-            except AttributeError:
-                def _unsupported_joint_fabric(*args, **kwargs):
-                    raise NotImplementedError("Joint Fabric support is not available in this Matter SDK build.")
-                self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow = _unsupported_joint_fabric
+        dm_lib.pychip_DeviceController_ConnectNFC.argtypes = [c_void_p, c_uint16, c_uint32, c_uint64]
+        dm_lib.pychip_DeviceController_ConnectNFC.restype = PyChipError
 
-            self._dmLib.pychip_TestCommissionerUsed.argtypes = []
-            self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
+        dm_lib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.argtypes = [c_void_p, c_uint64]
+        dm_lib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.restype = PyChipError
 
-            self._dmLib.pychip_TestCommissioningCallbacks.argtypes = []
-            self._dmLib.pychip_TestCommissioningCallbacks.restype = c_bool
+        dm_lib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [c_char_p, c_uint32]
+        dm_lib.pychip_DeviceController_SetThreadOperationalDataset.restype = PyChipError
 
-            self._dmLib.pychip_TestCommissioningStageSuccessful.argtypes = [c_uint8]
-            self._dmLib.pychip_TestCommissioningStageSuccessful.restype = c_bool
+        dm_lib.pychip_DeviceController_SetWiFiCredentials.argtypes = [c_char_p, c_char_p]
+        dm_lib.pychip_DeviceController_SetWiFiCredentials.restype = PyChipError
 
-            self._dmLib.pychip_ResetCommissioningTests.argtypes = []
-            self._dmLib.pychip_TestPaseConnection.argtypes = [c_uint64]
+        # Currently only supports 1 list item
+        dm_lib.pychip_DeviceController_SetTimeZone.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetTimeZone.argtypes = [c_int32, c_uint64, c_char_p]
 
-            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.argtypes = [
-                c_uint8]
-            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.restype = c_bool
+        # Currently only supports 1 list item
+        dm_lib.pychip_DeviceController_SetDSTOffset.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetDSTOffset.argtypes = [c_int32, c_uint64, c_uint64]
 
-            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [
-                c_uint8]
-            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool
+        dm_lib.pychip_DeviceController_SetDefaultNtp.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetDefaultNtp.argtypes = [c_char_p]
 
-            self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter.argtypes = [
-                c_uint8]
-            self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter.restype = c_bool
+        dm_lib.pychip_DeviceController_SetTrustedTimeSource.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetTrustedTimeSource.argtypes = [c_uint64, c_uint16]
 
-            self._dmLib.pychip_GetCompletionError.argtypes = []
-            self._dmLib.pychip_GetCompletionError.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetCheckMatchingFabric.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetCheckMatchingFabric.argtypes = [c_bool]
 
-            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(
-                ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
-            self._dmLib.pychip_GetCommissioningRCACData.restype = None
+        dm_lib.pychip_DeviceController_SetIcdRegistrationParameters.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetIcdRegistrationParameters.argtypes = [c_bool, c_void_p]
 
-            self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
-                c_void_p, py_object, c_char_p, c_size_t, c_uint64]
-            self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
+        dm_lib.pychip_DeviceController_ResetCommissioningParameters.restype = PyChipError
+        dm_lib.pychip_DeviceController_ResetCommissioningParameters.argtypes = []
 
-            self._dmLib.pychip_OpCreds_InitGroupTestingData.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_OpCreds_InitGroupTestingData.restype = PyChipError
+        dm_lib.pychip_DeviceController_Commission.argtypes = [c_void_p, c_uint64]
+        dm_lib.pychip_DeviceController_Commission.restype = PyChipError
 
-            self._dmLib.pychip_OpCreds_SetKeySet.argtypes = [
-                c_void_p, c_uint16, c_uint8, c_uint8,
-                c_char_p, c_uint64,
-                c_char_p, c_uint64,
-                c_char_p, c_uint64]
-            self._dmLib.pychip_OpCreds_SetKeySet.restype = PyChipError
+        dm_lib.pychip_DeviceController_OnNetworkCommission.argtypes = [c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p,
+                                                                       c_uint32]
+        dm_lib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
-            self._dmLib.pychip_OpCreds_SetGroupInfo.argtypes = [c_void_p, c_uint16, c_char_p, c_uint8]
-            self._dmLib.pychip_OpCreds_SetGroupInfo.restype = PyChipError
+        if hasattr(dm_lib, "pychip_DeviceController_ThreadMeshcopCommission"):
+            dm_lib.pychip_DeviceController_ThreadMeshcopCommission.argtypes = [
+                c_void_p, c_void_p, c_uint64, c_uint32, c_uint16, c_char_p, c_uint16]
+            dm_lib.pychip_DeviceController_ThreadMeshcopCommission.restype = PyChipError
+        else:
+            logging.getLogger(__name__).warning(
+                "pychip_DeviceController_ThreadMeshcopCommission is not available in the loaded CHIP library; "
+                "Thread Meshcop commissioning is disabled.")
 
-            self._dmLib.pychip_OpCreds_AddGroupEndpoint.argtypes = [c_void_p, c_uint16, c_uint16]
-            self._dmLib.pychip_OpCreds_AddGroupEndpoint.restype = PyChipError
+        dm_lib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [c_void_p, c_uint8, c_char_p]
+        dm_lib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
 
-            self._dmLib.pychip_OpCreds_SetGroupKey.argtypes = [c_void_p, c_uint16, c_uint16]
-            self._dmLib.pychip_OpCreds_SetGroupKey.restype = PyChipError
+        dm_lib.pychip_DeviceController_StopCommissionableDiscovery.argtypes = [c_void_p]
+        dm_lib.pychip_DeviceController_StopCommissionableDiscovery.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
-                _IssueNOCChainCallbackPythonCallbackFunct]
-            self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.restype = None
+        dm_lib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
+        dm_lib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_GetNodeId.argtypes = [c_void_p, POINTER(c_uint64)]
-            self._dmLib.pychip_DeviceController_GetNodeId.restype = PyChipError
+        dm_lib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [c_void_p, c_uint32, c_uint16, c_uint64]
+        dm_lib.pychip_DeviceController_EstablishPASESessionBLE.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
-            self._dmLib.pychip_DeviceController_GetFabricId.restype = PyChipError
+        dm_lib.pychip_DeviceController_EstablishPASESession.argtypes = [c_void_p, c_char_p, c_uint64]
+        dm_lib.pychip_DeviceController_EstablishPASESession.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_GetFabricIndex.argtypes = [c_void_p, POINTER(c_uint8)]
-            self._dmLib.pychip_DeviceController_GetFabricIndex.restype = PyChipError
+        dm_lib.pychip_DeviceController_HasDiscoveredCommissionableNode.argtypes = [c_void_p]
+        dm_lib.pychip_DeviceController_HasDiscoveredCommissionableNode.restype = c_bool
 
-            self._dmLib.pychip_DeviceController_GetLogFilter = [None]
-            self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8
+        dm_lib.pychip_DeviceController_GetIPForDiscoveredDevice.argtypes = [c_void_p, c_int, c_char_p, c_uint32]
+        dm_lib.pychip_DeviceController_GetIPForDiscoveredDevice.restype = c_bool
 
-            self._dmLib.pychip_DeviceController_GetRootPublicKeyBytes.argtypes = [c_void_p, POINTER(c_uint8), POINTER(c_size_t)]
-            self._dmLib.pychip_DeviceController_GetRootPublicKeyBytes.restype = PyChipError
+        dm_lib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
+        dm_lib.pychip_DeviceController_ConnectIP.restype = PyChipError
 
-            self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
-                c_void_p), POINTER(c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32, c_void_p]
-            self._dmLib.pychip_OpCreds_AllocateController.restype = PyChipError
+        dm_lib.pychip_DeviceController_ConnectWithCode.argtypes = [c_void_p, c_char_p, c_uint64, c_uint8]
+        dm_lib.pychip_DeviceController_ConnectWithCode.restype = PyChipError
 
-            self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.argtypes = [
-                POINTER(c_void_p), POINTER(c_void_p), c_void_p, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, c_uint16, c_bool]
-            self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.restype = PyChipError
+        dm_lib.pychip_DeviceController_UnpairDevice.argtypes = [c_void_p, c_uint64, _DeviceUnpairingCompleteFunct]
+        dm_lib.pychip_DeviceController_UnpairDevice.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_char), c_size_t]
-            self._dmLib.pychip_DeviceController_SetIpk.restype = PyChipError
+        dm_lib.pychip_DeviceController_MarkSessionDefunct.argtypes = [c_void_p, c_uint64]
+        dm_lib.pychip_DeviceController_MarkSessionDefunct.restype = PyChipError
 
-            self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.restype = None
-            self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.argtypes = [_OnCheckInCompleteFunct]
+        dm_lib.pychip_DeviceController_MarkSessionForEviction.argtypes = [c_void_p, c_uint64]
+        dm_lib.pychip_DeviceController_MarkSessionForEviction.restype = PyChipError
 
-            self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback(_OnCheckInComplete)
+        dm_lib.pychip_DeviceController_DeleteAllSessionResumption.argtypes = [c_void_p]
+        dm_lib.pychip_DeviceController_DeleteAllSessionResumption.restype = PyChipError
 
-            self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.restype = PyChipError
-            self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.argtypes = [c_void_p, c_char_p]
+        try:
+            dm_lib.pychip_DeviceController_SetLocalMRPConfig.restype = PyChipError
+            dm_lib.pychip_DeviceController_SetLocalMRPConfig.argtypes = [c_uint32, c_uint32, c_uint16]
 
-            self._dmLib.pychip_CreateManualCode.restype = PyChipError
-            self._dmLib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t, POINTER(c_size_t)]
+            dm_lib.pychip_DeviceController_ResetLocalMRPConfig.restype = PyChipError
+            dm_lib.pychip_DeviceController_ResetLocalMRPConfig.argtypes = []
+        except AttributeError:
+            # This can happen if the SDK is not built with CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+            def _unsupported_dynamic_mrp(*args, **kwargs):
+                raise NotImplementedError("Dynamic MRP config support is not available in this Matter SDK build.")
+            dm_lib.pychip_DeviceController_SetLocalMRPConfig = _unsupported_dynamic_mrp
+            dm_lib.pychip_DeviceController_ResetLocalMRPConfig = _unsupported_dynamic_mrp
 
-            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.argtypes = [c_bool]
+        dm_lib.pychip_DeviceController_GetAddressAndPort.argtypes = [c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
+        dm_lib.pychip_DeviceController_GetAddressAndPort.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [
+            c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.restype = PyChipError
-            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.argtypes = [c_char_p]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.argtypes = [
+            c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = PyChipError
 
-        return self._dmLib
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback.argtypes = [
+            c_void_p, _DevicePairingDelegate_OnOpenWindowCompleteFunct]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback.restype = PyChipError
+
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
+            c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.restype = PyChipError
+
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.argtypes = [
+            c_void_p, _DevicePairingDelegate_OnCommissioningStageStartFunct]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.restype = PyChipError
+
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.argtypes = [
+            c_void_p, _DevicePairingDelegate_OnFabricCheckFunct]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
+
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.argtypes = [c_void_p, c_bool]
+        dm_lib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.restype = PyChipError
+
+        dm_lib.pychip_GetConnectedDeviceByNodeId.argtypes = [c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct, c_int]
+        dm_lib.pychip_GetConnectedDeviceByNodeId.restype = PyChipError
+
+        dm_lib.pychip_FreeOperationalDeviceProxy.argtypes = [c_void_p]
+        dm_lib.pychip_FreeOperationalDeviceProxy.restype = PyChipError
+
+        dm_lib.pychip_GetDeviceBeingCommissioned.argtypes = [c_void_p, c_uint64, c_void_p]
+        dm_lib.pychip_GetDeviceBeingCommissioned.restype = PyChipError
+
+        dm_lib.pychip_ExpireSessions.argtypes = [c_void_p, c_uint64]
+        dm_lib.pychip_ExpireSessions.restype = PyChipError
+
+        dm_lib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [c_void_p]
+        dm_lib.pychip_DeviceCommissioner_CloseBleConnection.restype = PyChipError
+
+        dm_lib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
+        dm_lib.pychip_GetCommandSenderHandle.restype = c_uint64
+
+        dm_lib.pychip_DeviceController_GetCompressedFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
+        dm_lib.pychip_DeviceController_GetCompressedFabricId.restype = PyChipError
+
+        dm_lib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
+            c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
+        dm_lib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
+
+        try:
+            # NOTE: Joint Fabric is an optional feature in the Matter SDK core library.
+            #       Build with CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1 to enable it.
+            dm_lib.pychip_DeviceController_OpenJointCommissioningWindow.argtypes = [
+                c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
+            dm_lib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
+        except AttributeError:
+            def _unsupported_joint_fabric(*args, **kwargs):
+                raise NotImplementedError("Joint Fabric support is not available in this Matter SDK build.")
+            dm_lib.pychip_DeviceController_OpenJointCommissioningWindow = _unsupported_joint_fabric
+
+        dm_lib.pychip_TestCommissionerUsed.argtypes = []
+        dm_lib.pychip_TestCommissionerUsed.restype = c_bool
+
+        dm_lib.pychip_TestCommissioningCallbacks.argtypes = []
+        dm_lib.pychip_TestCommissioningCallbacks.restype = c_bool
+
+        dm_lib.pychip_TestCommissioningStageSuccessful.argtypes = [c_uint8]
+        dm_lib.pychip_TestCommissioningStageSuccessful.restype = c_bool
+
+        dm_lib.pychip_ResetCommissioningTests.argtypes = []
+        dm_lib.pychip_TestPaseConnection.argtypes = [c_uint64]
+
+        dm_lib.pychip_SetTestCommissionerSimulateFailureOnStage.argtypes = [c_uint8]
+        dm_lib.pychip_SetTestCommissionerSimulateFailureOnStage.restype = c_bool
+
+        dm_lib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [c_uint8]
+        dm_lib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool
+
+        dm_lib.pychip_SetTestCommissionerPrematureCompleteAfter.argtypes = [c_uint8]
+        dm_lib.pychip_SetTestCommissionerPrematureCompleteAfter.restype = c_bool
+
+        dm_lib.pychip_GetCompletionError.argtypes = []
+        dm_lib.pychip_GetCompletionError.restype = PyChipError
+
+        dm_lib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t),
+                                                           ctypes.c_size_t]
+        dm_lib.pychip_GetCommissioningRCACData.restype = None
+
+        dm_lib.pychip_DeviceController_IssueNOCChain.argtypes = [c_void_p, py_object, c_char_p, c_size_t, c_uint64]
+        dm_lib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
+
+        dm_lib.pychip_OpCreds_InitGroupTestingData.argtypes = [c_void_p]
+        dm_lib.pychip_OpCreds_InitGroupTestingData.restype = PyChipError
+
+        dm_lib.pychip_OpCreds_SetKeySet.argtypes = [
+            c_void_p, c_uint16, c_uint8, c_uint8,
+            c_char_p, c_uint64,
+            c_char_p, c_uint64,
+            c_char_p, c_uint64]
+        dm_lib.pychip_OpCreds_SetKeySet.restype = PyChipError
+
+        dm_lib.pychip_OpCreds_SetGroupInfo.argtypes = [c_void_p, c_uint16, c_char_p, c_uint8]
+        dm_lib.pychip_OpCreds_SetGroupInfo.restype = PyChipError
+
+        dm_lib.pychip_OpCreds_AddGroupEndpoint.argtypes = [c_void_p, c_uint16, c_uint16]
+        dm_lib.pychip_OpCreds_AddGroupEndpoint.restype = PyChipError
+
+        dm_lib.pychip_OpCreds_SetGroupKey.argtypes = [c_void_p, c_uint16, c_uint16]
+        dm_lib.pychip_OpCreds_SetGroupKey.restype = PyChipError
+
+        dm_lib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [_IssueNOCChainCallbackPythonCallbackFunct]
+        dm_lib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.restype = None
+
+        dm_lib.pychip_DeviceController_GetNodeId.argtypes = [c_void_p, POINTER(c_uint64)]
+        dm_lib.pychip_DeviceController_GetNodeId.restype = PyChipError
+
+        dm_lib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
+        dm_lib.pychip_DeviceController_GetFabricId.restype = PyChipError
+
+        dm_lib.pychip_DeviceController_GetFabricIndex.argtypes = [c_void_p, POINTER(c_uint8)]
+        dm_lib.pychip_DeviceController_GetFabricIndex.restype = PyChipError
+
+        dm_lib.pychip_DeviceController_GetLogFilter.argtypes = []
+        dm_lib.pychip_DeviceController_GetLogFilter.restype = c_uint8
+
+        dm_lib.pychip_DeviceController_GetRootPublicKeyBytes.argtypes = [c_void_p, POINTER(c_uint8), POINTER(c_size_t)]
+        dm_lib.pychip_DeviceController_GetRootPublicKeyBytes.restype = PyChipError
+
+        dm_lib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(c_void_p), POINTER(c_void_p), c_uint64, c_uint64,
+                                                             c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32,
+                                                             c_void_p]
+        dm_lib.pychip_OpCreds_AllocateController.restype = PyChipError
+
+        dm_lib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.argtypes = [
+            POINTER(c_void_p), POINTER(c_void_p), c_void_p, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char),
+            c_uint32, POINTER(c_char), c_uint32, c_uint16, c_bool]
+        dm_lib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.restype = PyChipError
+
+        dm_lib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_char), c_size_t]
+        dm_lib.pychip_DeviceController_SetIpk.restype = PyChipError
+
+        dm_lib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.restype = None
+        dm_lib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.argtypes = [_OnCheckInCompleteFunct]
+
+        dm_lib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback(_OnCheckInComplete)
+
+        dm_lib.pychip_DeviceProxy_GetRemoteSessionParameters.restype = PyChipError
+        dm_lib.pychip_DeviceProxy_GetRemoteSessionParameters.argtypes = [c_void_p, c_char_p]
+
+        dm_lib.pychip_CreateManualCode.restype = PyChipError
+        dm_lib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t, POINTER(c_size_t)]
+
+        dm_lib.pychip_DeviceController_SetSkipCommissioningComplete.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetSkipCommissioningComplete.argtypes = [c_bool]
+
+        dm_lib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
+
+        dm_lib.pychip_DeviceController_SetDACRevocationSetPath.restype = PyChipError
+        dm_lib.pychip_DeviceController_SetDACRevocationSetPath.argtypes = [c_char_p]
+
+        return dm_lib
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
