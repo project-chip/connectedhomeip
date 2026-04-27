@@ -16,7 +16,7 @@ import signal
 from dataclasses import dataclass
 from sys import stderr, stdout
 from tempfile import NamedTemporaryFile
-from typing import BinaryIO, Optional, Union
+from typing import Any, BinaryIO
 
 from matter.testing.tasks import Subprocess
 
@@ -53,7 +53,7 @@ class AppServerSubprocess(Subprocess):
     err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 passcode: int, port: int = 5540, extra_args: list[str] | None = None, kvs_path: str | None = None,
                  f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
 
         if kvs_path is None:
@@ -82,27 +82,27 @@ class AppServerSubprocess(Subprocess):
 class IcdAppServerSubprocess(AppServerSubprocess):
     """Wrapper class for starting an ICD application server in a subprocess."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.paused = False
 
-    def pause(self, check_state: bool = True):
+    def pause(self, check_state: bool = True) -> None:
         if check_state and self.paused:
             raise ValueError("ICD TH Server unexpectedly is already paused")
-        if not self.paused:
+        if not self.paused and self.p is not None:
             # Stop (halt) the ICD server process by sending a SIGTOP signal.
             self.p.send_signal(signal.SIGSTOP)
             self.paused = True
 
-    def resume(self, check_state: bool = True):
+    def resume(self, check_state: bool = True) -> None:
         if check_state and not self.paused:
             raise ValueError("ICD TH Server unexpectedly is already running")
-        if self.paused:
+        if self.paused and self.p is not None:
             # Resume (continue) the ICD server process by sending a SIGCONT signal.
             self.p.send_signal(signal.SIGCONT)
             self.paused = False
 
-    def terminate(self):
+    def terminate(self) -> None:
         # Make sure the ICD server process is not paused before terminating it.
         self.resume(check_state=False)
         super().terminate()
@@ -116,7 +116,7 @@ class JFAdministratorSubprocess(Subprocess):
     err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, prefix: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 passcode: int, port: int = 5540, extra_args: list[str] | None = None, kvs_path: str | None = None,
                  f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
 
         if kvs_path is None:
@@ -146,7 +146,7 @@ class JFControllerSubprocess(Subprocess):
     """Wrapper class for starting a joint fabric controller in a subprocess."""
 
     def __init__(self, app: str, prefix: str, rpc_server_port: int, storage_dir: str,
-                 vendor_id: int, extra_args: list[str] = []):
+                 vendor_id: int, extra_args: list[str] | None = None):
 
         # Build the command list
         command = [app]
@@ -170,9 +170,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
-    def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+    def __init__(self, app: str, storage_dir: str, discriminator: int, passcode: int, ota_source: OtaImagePath | ImageListPath,
+                 port: int = 5541, extra_args: list[str] | None = None, kvs_path: str | None = None,
                  log_file: str | BinaryIO = stdout.buffer, err_log_file: str | BinaryIO = stderr.buffer):
         """Initialize the OTA Provider subprocess.
 
@@ -202,21 +201,24 @@ class OTAProviderSubprocess(AppServerSubprocess):
             err_log_file = self._err_log_file
 
         # Build OTA-specific arguments using the ota_source property
-        combined_extra_args = ota_source.ota_args + extra_args
+        combined_extra_args = ota_source.ota_args + (extra_args or [])
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator, passcode=passcode, port=port,
                          extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=log_file, f_stderr=err_log_file)
 
-    def terminate(self):
+    def terminate(self) -> None:
         if self._log_file is not None:
             self._log_file.close()
         if self._err_log_file is not None:
             self._err_log_file.close()
         return super().terminate()
 
-    def kill(self):
-        self.p.send_signal(signal.SIGKILL)
+    def kill(self) -> None:
+        if self.p is not None:
+            self.p.send_signal(signal.SIGKILL)
 
-    def get_pid(self) -> int:
+    def get_pid(self) -> int | None:
+        if self.p is None:
+            return None
         return self.p.pid

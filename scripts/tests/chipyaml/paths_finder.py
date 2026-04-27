@@ -35,7 +35,7 @@ class PathsFinder:
 
     def get(self, target_name: str) -> Path | None:
         path = _PATHS_CACHE.get(target_name)
-        if path and path.is_file():
+        if path and isinstance(path, Path) and path.is_file():
             return path
 
         if path:
@@ -59,12 +59,12 @@ class PathsFinder:
 
 
 @click.group()
-def finder():
+def finder() -> None:
     pass
 
 
 @finder.command()
-def view():
+def view() -> None:
     """View the cache entries."""
     for name in _PATHS_CACHE:
         print(click.style(f'{name}', bold=True) + f':\t{_PATHS_CACHE[name]}')
@@ -73,21 +73,21 @@ def view():
 @finder.command()
 @click.argument('key', type=str)
 @click.argument('value', type=str)
-def add(key: str, value: str):
+def add(key: str, value: str) -> None:
     """Add a cache entry."""
     _PATHS_CACHE[key] = value
 
 
 @finder.command()
 @click.argument('name', type=str)
-def delete(name: str):
+def delete(name: str) -> None:
     """Delete a cache entry."""
     if name in _PATHS_CACHE:
         del _PATHS_CACHE[name]
 
 
 @finder.command()
-def reset():
+def reset() -> None:
     """Delete all cache entries."""
     for name in _PATHS_CACHE:
         del _PATHS_CACHE[name]
@@ -95,7 +95,7 @@ def reset():
 
 @finder.command()
 @click.argument('name', type=str)
-def search(name: str):
+def search(name: str) -> None:
     """Search for a target and add it to the cache."""
     paths_finder = PathsFinder()
     path = paths_finder.get(name)

@@ -31,11 +31,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.tlv
-from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
-from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
@@ -85,7 +83,7 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
         type(None): "NULL",
     }
 
-    def ConvertValue(value) -> Any:
+    def ConvertValue(value: Any) -> Any:
         if isinstance(value, ValueDecodeFailure):
             raise ValueError(f"Bad Value: {str(value)}")
 
@@ -139,18 +137,6 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
 
 
 class BasicCompositionTests(MatterBaseTest):
-    # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
-    # or its setup process. Providing type hints here for mypy.
-    default_controller: ChipDeviceController
-    matter_test_config: MatterTestConfig
-    user_params: dict[str, Any]
-    dut_node_id: int
-    problems: list[ProblemNotice]
-    endpoints: dict[int, Any]  # Wildcard read result
-    endpoints_tlv: dict[int, Any]  # Wildcard read result (raw TLV)
-    xml_clusters: dict[int, Any]
-    xml_device_types: dict[int, Any]
-
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
         """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
             Returns the json and txt as strings.
@@ -166,12 +152,12 @@ class BasicCompositionTests(MatterBaseTest):
                 pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
         return (json_dump_string, pformat(self.endpoints, indent=1, width=200, compact=True))
 
-    async def setup_class_helper(self, allow_pase: bool = True):
+    async def setup_class_helper(self, allow_pase: bool = True) -> None:
         dev_ctrl = self.default_controller
         self.problems: list[ProblemNotice] = []
         self.test_from_file = self.user_params.get("test_from_file", None)
 
-        def log_test_start():
+        def log_test_start() -> None:
             LOGGER.info("###########################################################")
             LOGGER.info("Start of actual tests")
             LOGGER.info("###########################################################")
@@ -259,7 +245,7 @@ class BasicCompositionTests(MatterBaseTest):
         except ConformanceException as e:
             asserts.fail(f"Unable to identify specification version: {e}")
 
-    def build_spec_xmls(self):
+    def build_spec_xmls(self) -> None:
         dm = self._get_dm()
         LOGGER.info("----------------------------------------------------------------------------------")
         LOGGER.info(f"-- Running tests against Specification version {dm.dirname}")

@@ -59,7 +59,7 @@ class App:
         return repr(self.subproc)
 
     @property
-    def returncode(self):
+    def returncode(self) -> int | None:
         """Exposes return code of the underlying process, so that
            common code can be used between subprocess.Popen and Apps.
         """
@@ -107,7 +107,7 @@ class App:
 
         return True
 
-    def waitForApplicationUp(self):
+    def waitForApplicationUp(self) -> None:
         # Watch for both mDNS advertisement start as well as event loop start.
         # These two messages can appear in any order depending on the implementation.
         # Waiting for both makes the startup detection more robust.
@@ -122,7 +122,7 @@ class App:
 
         self.__waitFor(what)
 
-    def waitForMessage(self, message: str, timeoutInSeconds: float = 10):
+    def waitForMessage(self, message: str, timeoutInSeconds: float = 10) -> bool:
         self.__waitFor([message], timeoutInSeconds=timeoutInSeconds)
         return True
 
@@ -164,7 +164,7 @@ class App:
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(subproc, name='APP ', wait=False)
 
-    def __waitFor(self, patterns: Iterable[str], timeoutInSeconds: float = 10):
+    def __waitFor(self, patterns: Iterable[str], timeoutInSeconds: float = 10) -> None:
         """
         Wait for all provided pattern strings to appear in the process output pipe (capture log).
         """
@@ -199,14 +199,14 @@ class App:
         self.lastLogIndex = lastLogIndex + 1
         log.debug('Success waiting for: %r', patterns)
 
-    def __updateSetUpCode(self):
+    def __updateSetUpCode(self) -> None:
         assert self.outpipe is not None, "__updateSetUpCode needs to happen after __startServer"
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
         if not qrLine:
             raise RuntimeError("Unable to find QR code")
         self.setupCode = qrLine.group(1)
 
-    def __terminateProcess(self):
+    def __terminateProcess(self) -> bool:
         """
         Returns False if the process existed and had a nonzero exit code.
         """
@@ -291,18 +291,17 @@ class PathsFinderProto(typing.Protocol):
         pass
 
 
-class SubprocessInfoRepo(dict):
+class SubprocessInfoRepo(dict[str, SubprocessInfo]):
     # We don't want to explicitly reference PathsFinder type because we
     # don't want to create a dependency on the diskcache module which PathsFinder imports.
     # Instead we just want a dict-like object
-    def __init__(self, paths: PathsFinderProto,
-                 subproc_knowhow: MappingProxyType[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_DATA,
-                 *args, **kwargs):
+    def __init__(self, paths: PathsFinderProto, subproc_knowhow: MappingProxyType[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_DATA,
+                 *args: typing.Any, **kwargs: typing.Any):
         super().__init__(*args, **kwargs)
         self.paths = paths
         self.subproc_knowhow = subproc_knowhow
 
-    def addSpec(self, spec: str, kind: SubprocessKind | None = None):
+    def addSpec(self, spec: str, kind: SubprocessKind | None = None) -> None:
         """Add a path to the repo as specified on the command line"""
         el = spec.split(':')
         if len(el) == 2:
@@ -324,14 +323,14 @@ class SubprocessInfoRepo(dict):
             s = s.wrap_with('python3')
         self[key] = s
 
-    def missing_keys(self):
+    def missing_keys(self) -> list[str]:
         """
         Return a list of keys for tools or apps missing (not specified) based on the
         know-how dictionary.
         """
         return [k for k in self.subproc_knowhow if k not in self]
 
-    def discover(self):
+    def discover(self) -> None:
         """
         Try to discover paths to all apps and tools in the know-how which we are still missing.
         Reuse the `require` method but ignore failures, we expect the test-cases to fail if they
@@ -349,7 +348,7 @@ class SubprocessInfoRepo(dict):
                 log.warning("Exception while trying to discover '%s': %r", key, e)
         log.info("Discovery of %d paths took %.2f seconds", discovered_count, time.time() - start_ts)
 
-    def require(self, key: str, kind: SubprocessKind | None = None, target_name: str | None = None):
+    def require(self, key: str, kind: SubprocessKind | None = None, target_name: str | None = None) -> SubprocessInfo:
         """
         Indicate that a subprocess path is required. Throw exception if it's not already in the repo
         and can't be discovered using the paths finder.
@@ -392,7 +391,7 @@ class ExecutionCapture:
         self.lock = threading.Lock()
         self.captures: list[CaptureLine] = []
 
-    def Log(self, source: str, line: str):
+    def Log(self, source: str, line: str) -> None:
         with self.lock:
             self.captures.append(CaptureLine(
                 when=datetime.now(),
@@ -400,7 +399,7 @@ class ExecutionCapture:
                 line=line.strip('\n')
             ))
 
-    def LogContents(self):
+    def LogContents(self) -> None:
         log.error("================ CAPTURED LOG START ==================")
         with self.lock:
             for entry in self.captures:
@@ -424,7 +423,7 @@ class TestTag(StrEnum):
     EXTRA_SLOW = auto()      # test uses Sleep and is generally _very_ slow (>= 60s is a typical threshold)
     PURPOSEFUL_FAILURE = auto()  # test fails on purpose
 
-    def to_s(self):
+    def to_s(self) -> str:
         for (k, v) in TestTag.__members__.items():
             if self == v:
                 return k
@@ -469,7 +468,7 @@ class TestDefinition:
             thread_ba_host: str | None = None,
             thread_ba_port: int | None = None,
             wifipaf_wifi: bool = False
-            ):
+            ) -> None:
         """
         Executes the given test case using the provided runner for execution.
         Will iterate and execute every target.
@@ -488,10 +487,10 @@ class TestDefinition:
                  op_network: str = 'WiFi',
                  thread_ba_host: str | None = None,
                  thread_ba_port: int | None = None,
-                 wifipaf_wifi: bool = False):
+                 wifipaf_wifi: bool = False) -> None:
         runner.capture_delegate = ExecutionCapture()
 
-        tool_storage_dir = None
+        tool_storage_dir: str | None = None
 
         loggedCapturedLogs = False
         try:

@@ -30,7 +30,8 @@ class ChoiceConformanceProblemNotice(ProblemNotice):
         self.count = count
 
 
-def _add_to_counts_if_required(conformance_decision_with_choice: ConformanceDecisionWithChoice, element_present: bool, counts: dict[Choice, int]):
+def _add_to_counts_if_required(conformance_decision_with_choice: ConformanceDecisionWithChoice, element_present: bool,
+                               counts: dict[Choice, int]) -> None:
     choice = conformance_decision_with_choice.choice
     if not choice:
         return

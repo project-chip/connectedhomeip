@@ -25,7 +25,7 @@ import asyncio
 import logging
 from enum import IntFlag
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Type
+from typing import TYPE_CHECKING, Awaitable, Callable, Concatenate, ParamSpec, Type, TypeVar
 
 from mobly import asserts
 
@@ -247,13 +247,19 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
-def _async_runner(body, test_instance, *args, **kwargs):
+TestInstanceT = TypeVar("TestInstanceT", bound="MatterBaseTest")
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def _async_runner(body: Callable[Concatenate[TestInstanceT, P], Awaitable[R]], test_instance: TestInstanceT, *args: P.args,
+                  **kwargs: P.kwargs) -> R:
     timeout = getattr(test_instance.matter_test_config,
                       'timeout', None) or test_instance.default_timeout
     return test_instance.event_loop.run_until_complete(asyncio.wait_for(body(test_instance, *args, **kwargs), timeout=timeout))
 
 
-def async_test_body(body):
+def async_test_body(body: Callable[Concatenate[TestInstanceT, P], Awaitable[R]]) -> Callable[Concatenate[TestInstanceT, P], R]:
     """Decorator required to be applied whenever a `test_*` method is `async def`.
 
     Since Mobly doesn't support asyncio directly, and the test methods are called
@@ -261,19 +267,19 @@ def async_test_body(body):
     a asyncio-run synchronous method. This decorator does the wrapping.
     """
 
-    def async_runner(self: "MatterBaseTest", *args, **kwargs):
+    def async_runner(self: TestInstanceT, *args: P.args, **kwargs: P.kwargs) -> R:
         return _async_runner(body, self, *args, **kwargs)
     return async_runner
 
 
-async def _get_all_matching_endpoints(test_instance, accept_function: EndpointCheckFunction) -> list[int]:
+async def _get_all_matching_endpoints(test_instance: "MatterBaseTest", accept_function: EndpointCheckFunction) -> list[int]:
     """ Returns a list of endpoints matching the accept condition. """
     wildcard = await test_instance.default_controller.Read(test_instance.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
 
 
-async def should_run_test_on_endpoint(test_instance, accept_function: EndpointCheckFunction) -> bool:
+async def should_run_test_on_endpoint(test_instance: "MatterBaseTest", accept_function: EndpointCheckFunction) -> bool:
     """ Helper function for the run_if_endpoint_matches decorator.
 
         Returns True if test_instance.matter_test_config.endpoint matches the accept function.
@@ -287,14 +293,16 @@ async def should_run_test_on_endpoint(test_instance, accept_function: EndpointCh
     return test_instance.matter_test_config.endpoint in matching
 
 
-def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
+def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction) -> Callable[
+        [Callable[Concatenate[TestInstanceT, P], Awaitable[object]]], Callable[Concatenate[TestInstanceT, P], None]]:
     """ Test decorator for a test that needs to be run on the endpoint that matches the given accept function.
 
         This decorator should be used for tests where the endpoint is not known a-priori (dynamic endpoints).
         Note that currently this test is limited to devices with a SINGLE matching endpoint.
     """
-    def run_on_singleton_matching_endpoint_internal(body):
-        def matching_runner(self: "MatterBaseTest", *args, **kwargs):
+    def run_on_singleton_matching_endpoint_internal(
+            body: Callable[Concatenate[TestInstanceT, P], Awaitable[R]]) -> Callable[Concatenate[TestInstanceT, P], None]:
+        def matching_runner(self: TestInstanceT, *args: P.args, **kwargs: P.kwargs) -> None:
             # Import locally to avoid circular dependency
             from matter.testing.matter_testing import MatterBaseTest
             assert isinstance(self, MatterBaseTest)
@@ -309,22 +317,22 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
                     "Test is not applicable to any endpoint - skipping test")
                 asserts.skip('No endpoint matches test requirements')
                 return
+            old_endpoint = self.matter_test_config.endpoint
             try:
-                old_endpoint = self.matter_test_config.endpoint
                 self.matter_test_config.endpoint = matching[0]
                 LOGGER.info(
                     f'Running test on endpoint {self.matter_test_config.endpoint}')
                 timeout = getattr(self.matter_test_config,
                                   'timeout', None) or self.default_timeout
-                self.event_loop.run_until_complete(asyncio.wait_for(
-                    body(self, *args, **kwargs), timeout=timeout))
+                self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
             finally:
                 self.matter_test_config.endpoint = old_endpoint
         return matching_runner
     return run_on_singleton_matching_endpoint_internal
 
 
-def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
+def run_if_endpoint_matches(accept_function: EndpointCheckFunction) -> Callable[
+        [Callable[Concatenate[TestInstanceT, P], Awaitable[object]]], Callable[Concatenate[TestInstanceT, P], None]]:
     """ Test decorator for a test that needs to be run only if the endpoint meets the accept_function criteria.
 
         Place this decorator above the test_ method to have the test framework run this test only if the endpoint matches.
@@ -350,8 +358,9 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
         Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
         PICS values internally.
     """
-    def run_if_endpoint_matches_internal(body):
-        def per_endpoint_runner(test_instance, *args, **kwargs):
+    def run_if_endpoint_matches_internal(
+            body: Callable[Concatenate[TestInstanceT, P], Awaitable[R]]) -> Callable[Concatenate[TestInstanceT, P], None]:
+        def per_endpoint_runner(test_instance: TestInstanceT, *args: P.args, **kwargs: P.kwargs) -> None:
             runner_with_timeout = asyncio.wait_for(
                 should_run_test_on_endpoint(test_instance, accept_function), timeout=60)
             should_run_test = test_instance.event_loop.run_until_complete(

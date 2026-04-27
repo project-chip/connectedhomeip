@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from itertools import chain
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Self, Tuple
 from unittest.mock import MagicMock
 
 from mobly import signals, utils
@@ -55,19 +55,22 @@ try:
     from matter.tracing import TracingContext
 except ImportError:
     class TracingContext:  # type: ignore[no-redef] # Conditional fallback, not a true redefinition
-        def __enter__(self):
+        def __enter__(self) -> Self:
             return self
 
-        def __exit__(self, *args):
+        def __exit__(self, *args: Any) -> None:
             pass
 
-        def StartFromString(self, destination):
+        def StartFromString(self, destination: str) -> None:
             pass
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from matter.ChipDeviceCtrl import ChipDeviceController
+    from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import MatterBaseTest
 
 LOGGER = logging.getLogger(__name__)
 
@@ -119,7 +122,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     status, including test starts, stops, steps, and failures.
     """
 
-    def start(self, count: int):
+    def start(self, count: int) -> None:
         """
         Called when the test runner starts a new test set.
 
@@ -128,7 +131,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         LOGGER.info(f'Starting test set, running {count} tests')
 
-    def stop(self, duration: int):
+    def stop(self, duration: float) -> None:
         """
         Called when the test runner finishes a test set.
 
@@ -137,12 +140,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         LOGGER.info(f'Finished test set, ran for {duration}ms')
 
-    def test_start(
-            self,
-            filename: str,
-            name: str,
-            count: int,
-            steps: list[str] = []):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] | None = None) -> None:
         """
         Called when an individual test starts.
 
@@ -154,7 +152,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         LOGGER.info(f'Starting test from {filename}: {name} - {count} steps')
 
-    def test_stop(self, exception: Exception, duration: int):
+    def test_stop(self, exception: Exception, duration: int) -> None:
         """
         Called when an individual test completes.
 
@@ -164,7 +162,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         LOGGER.info(f'Finished test in {duration}ms')
 
-    def step_skipped(self, name: str, expression: str):
+    def step_skipped(self, name: str, expression: str) -> None:
         """
         Called when a test step is skipped.
 
@@ -176,7 +174,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         # this in code very easily
         LOGGER.info(f'\t\t**** Skipping: {name}')
 
-    def step_start(self, name: str):
+    def step_start(self, name: str) -> None:
         """
         Called when a test step starts.
 
@@ -187,7 +185,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         # number, but it seems like it might be good to separate these
         LOGGER.info(f'\t\t***** Test Step {name}')
 
-    def step_success(self, logger, logs, duration: int, request):
+    def step_success(self, logger: Any, logs: list | None, duration: float, request: dict[str, str] | None = None) -> None:
         """
         Called when a test step completes successfully.
 
@@ -197,9 +195,9 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             duration: Step execution duration in milliseconds
             request: The original test request
         """
-        pass
 
-    def step_failure(self, logger, logs, duration: int, request, received):
+    def step_failure(self, logger: Any, logs: list | None, duration: float, request: dict[str, str] | None = None,
+                     received: dict[str, str] | None = None) -> None:
         """
         Called when a test step fails.
 
@@ -216,11 +214,10 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         if request is not None:
             LOGGER.info(f'\t\t      Expected: {request}')
 
-    def step_unknown(self):
+    def step_unknown(self) -> None:
         """
         This method is called when the result of running a step is unknown. For example during a dry-run.
         """
-        pass
 
     def show_prompt(self,
                     msg: str,
@@ -234,9 +231,8 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             placeholder: Optional placeholder for user input
             default_value: Optional default value for user input
         """
-        pass
 
-    def test_skipped(self, filename: str, name: str):
+    def test_skipped(self, filename: str, name: str) -> None:
         """
         Called when a test is skipped.
 
@@ -254,7 +250,7 @@ class TestStep:
     expectation: str = ""
     is_commissioning: bool = False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.test_plan_number}: {self.description}\tExpected outcome: {self.expectation}'
 
 
@@ -266,7 +262,7 @@ class TestInfo:
     pics: list[str]
 
 
-def generate_mobly_test_config(matter_test_config):
+def generate_mobly_test_config(matter_test_config: MatterTestConfig) -> TestRunConfig:
     """
     Generate a Mobly test configuration from Matter test configuration.
 
@@ -286,7 +282,7 @@ def generate_mobly_test_config(matter_test_config):
     if ENV_MOBLY_LOGPATH in os.environ:
         log_path = os.environ[ENV_MOBLY_LOGPATH]
 
-    test_run_config.log_path = log_path
+    test_run_config.log_path = str(log_path)
     # TODO: For later, configure controllers
     test_run_config.controller_configs = {}
 
@@ -295,7 +291,7 @@ def generate_mobly_test_config(matter_test_config):
     return test_run_config
 
 
-def _find_test_class():
+def _find_test_class() -> type[MatterBaseTest]:
     """Finds the test class in a test script.
     Walk through module members and find the subclass of MatterBaseTest. Only
     one subclass is allowed in a test script.
@@ -304,13 +300,12 @@ def _find_test_class():
     Raises:
       SystemExit: Raised if the number of test classes is not exactly one.
     """
-    from matter.testing.matter_testing import MatterBaseTest
 
-    def get_subclasses(cls: Any):
+    def get_subclasses(cls: type) -> list[type]:
         subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
         return [c for c in subclasses if c.__name__ != cls.__name__]
 
-    def has_subclasses(cls: Any):
+    def has_subclasses(cls: type) -> bool:
         return get_subclasses(cls) != []
 
     subclasses_matter_test_base = get_subclasses(MatterBaseTest)
@@ -325,7 +320,7 @@ def _find_test_class():
     return leaf_subclasses[0]
 
 
-def default_matter_test_main():
+def default_matter_test_main() -> None:
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
@@ -347,7 +342,7 @@ def default_matter_test_main():
     run_tests(test_class, matter_test_config, hooks)
 
 
-def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
+def get_test_info(test_class: type[MatterBaseTest], matter_test_config: MatterTestConfig) -> list[TestInfo]:
     test_config = generate_mobly_test_config(matter_test_config)
     base = test_class(test_config)
 
@@ -364,13 +359,9 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
-def run_tests_no_exit(
-        test_class,
-        matter_test_config,
-        event_loop: asyncio.AbstractEventLoop,
-        hooks: TestRunnerHooks,
-        default_controller=None,
-        external_stack=None) -> bool:
+def run_tests_no_exit(test_class: type[MatterBaseTest], matter_test_config: MatterTestConfig, event_loop: asyncio.AbstractEventLoop,
+                      hooks: InternalTestRunnerHooks | None, default_controller: ChipDeviceController | None = None,
+                      external_stack: MatterStackState | None = None) -> bool:
     """
     Run Matter tests without exiting the process on failure.
 
@@ -442,7 +433,7 @@ def run_tests_no_exit(
         # Execute the test class with the config
         ok = True
 
-        def _handler(loop, context):
+        def _handler(loop: asyncio.AbstractEventLoop, context: dict[str, Any]) -> None:
             loop.default_exception_handler(context)
             nonlocal ok
             # Fail the test run on unhandled exceptions.
@@ -491,7 +482,7 @@ def run_tests_no_exit(
         hooks.stop(duration=duration)
 
     if not external_stack:
-        async def shutdown():
+        async def shutdown() -> None:
             stack.Shutdown()
         # Shutdown the stack when all done. Use the async runner to ensure that
         # during the shutdown callbacks can use tha same async context which was used
@@ -505,12 +496,8 @@ def run_tests_no_exit(
     return ok
 
 
-def run_tests(
-        test_class,
-        matter_test_config,
-        hooks: TestRunnerHooks,
-        default_controller=None,
-        external_stack=None) -> None:
+def run_tests(test_class: type[MatterBaseTest], matter_test_config: MatterTestConfig, hooks: InternalTestRunnerHooks | None,
+              default_controller: ChipDeviceController | None = None, external_stack: MatterStackState | None = None) -> None:
     """
     Run Matter tests and exit the process with status code 1 on failure.
 
@@ -542,7 +529,7 @@ class AsyncMock(MagicMock):
     This is useful for testing async code without actual async execution.
     """
 
-    async def __call__(self, *args, **kwargs):
+    async def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return super(AsyncMock, self).__call__(*args, **kwargs)
 
 
@@ -554,8 +541,8 @@ class MockTestRunner():
     mocking the controller's Read method and other interactions.
     """
 
-    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
+                 pics: dict[str, bool] | None = None, paa_trust_store_path: Path | None = None) -> None:
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -575,12 +562,12 @@ class MockTestRunner():
             catTags=self.config.controller_cat_tags
         )
 
-    def set_test(self, abs_filename: str, classname: str, test: str):
+    def set_test(self, abs_filename: str, classname: str, test: str) -> None:
         self.test = test
         self.config.tests = [self.test]
 
+        filename_path = Path(abs_filename)
         try:
-            filename_path = Path(abs_filename)
             module = importlib.import_module(filename_path.stem)
         except ModuleNotFoundError:
             sys.path.append(str(filename_path.parent.resolve()))
@@ -588,7 +575,7 @@ class MockTestRunner():
 
         self.test_class = getattr(module, classname)
 
-    def set_test_config(self, test_config: Optional['MatterTestConfig'] = None):
+    def set_test_config(self, test_config: Optional['MatterTestConfig'] = None) -> None:
         from matter.testing.matter_test_config import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
@@ -599,10 +586,11 @@ class MockTestRunner():
         if not self.config.dut_node_ids:
             self.config.dut_node_ids = [1]
 
-    def Shutdown(self):
+    def Shutdown(self) -> None:
         self.stack.Shutdown()
 
-    def run_test_with_mock_read(self, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
+    def run_test_with_mock_read(self, read_cache: Attribute.AsyncReadTransaction.ReadResponse,
+                                hooks: InternalTestRunnerHooks | None = None) -> bool:
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         # This doesn't need to do anything since we are overriding the read anyway
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
@@ -614,7 +602,7 @@ class MockTestRunner():
 
 # Argument parsing helper functions
 
-def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
+def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConfig) -> bool:
     config.root_of_trust_index = args.root_index
     # Follow root of trust index if ID not provided to have same behavior as legacy
     # chip-tool that fabricID == commissioner_name == root of trust index
@@ -738,7 +726,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     return True
 
 
-def convert_args_to_matter_config(args: argparse.Namespace):
+def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     # Lazy import to avoid circular dependency
     from matter.testing.matter_test_config import MatterTestConfig
 
@@ -938,7 +926,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[List[str]] = None):
+def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")

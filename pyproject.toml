@@ -68,6 +68,7 @@ ignore = [
 
 [tool.mypy]
 check_untyped_defs = true
+disallow_incomplete_defs = true
 explicit_package_bases = true
 ignore_missing_imports = true
 namespace_packages = true

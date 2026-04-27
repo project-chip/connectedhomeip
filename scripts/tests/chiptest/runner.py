@@ -23,7 +23,7 @@ import shlex
 import subprocess
 import threading
 from contextlib import suppress
-from typing import IO, TYPE_CHECKING, Any, Protocol
+from typing import IO, TYPE_CHECKING, Any, Match, Protocol
 
 import python_path
 
@@ -68,18 +68,18 @@ class LogPipe(threading.Thread):
                 return True, index + i
         return False, len(self.captured_logs)
 
-    def FindLastMatchingLine(self, matcher: str):
+    def FindLastMatchingLine(self, matcher: str) -> Match[str] | None:
         for line in reversed(self.captured_logs):
             match = re.match(matcher, line)
             if match:
                 return match
         return None
 
-    def fileno(self):
+    def fileno(self) -> int:
         """Return the write file descriptor of the pipe."""
         return self.fd_write
 
-    def run(self):
+    def run(self) -> None:
         """Run the thread, logging everything."""
         while True:
             try:
@@ -96,7 +96,7 @@ class LogPipe(threading.Thread):
                 self.capture_delegate.Log(self.name, line)
         self.reader.close()
 
-    def close(self):
+    def close(self) -> None:
         """Close the write end of the pipe."""
         os.close(self.fd_write)
 
@@ -115,7 +115,7 @@ class RunnerWaitQueue:
         self.timeout_seconds = timeout_seconds
         self.timed_out = False
 
-    def __wait(self, process: Process, userdata: AppsRegister | None):
+    def __wait(self, process: Process, userdata: AppsRegister | None) -> None:
         if userdata is None:
             # We're the main process for this wait queue.
             timeout = self.timeout_seconds
@@ -130,12 +130,12 @@ class RunnerWaitQueue:
             process.wait()
         self.queue.put((process, userdata))
 
-    def add_process(self, process: Process, userdata: AppsRegister | None = None):
+    def add_process(self, process: Process, userdata: AppsRegister | None = None) -> None:
         t = threading.Thread(target=self.__wait, args=(process, userdata))
         t.daemon = True
         t.start()
 
-    def get(self):
+    def get(self) -> tuple[Process, AppsRegister | None]:
         return self.queue.get()
 
 
@@ -145,7 +145,8 @@ class Executor:
     def __init__(self) -> None:
         self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
 
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None, stderr: IO[Any] | LogPipe | None = None):
+    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
+            stderr: IO[Any] | LogPipe | None = None) -> subprocess.Popen[bytes]:
         # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr,
         # but mypy doesn't think the same.
         self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin,

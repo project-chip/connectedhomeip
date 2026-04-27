@@ -144,7 +144,8 @@ class EmptyClusterGlobalAttributes(ConformanceAssessmentData):
 EMPTY_CLUSTER_GLOBAL_ATTRIBUTES = EmptyClusterGlobalAttributes()
 
 
-def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional_test_event_only_disallowed_for_certification: bool):
+def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice,
+                        allow_provisional_test_event_only_disallowed_for_certification: bool) -> bool:
     if conformance_decision.decision in [ConformanceDecision.NOT_APPLICABLE, ConformanceDecision.DISALLOWED]:
         return False
     if conformance_decision.decision == ConformanceDecision.PROVISIONAL:
@@ -152,12 +153,12 @@ def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, all
     return True
 
 
-def is_disallowed(conformance: Callable):
+def is_disallowed(conformance: Callable) -> bool:
     # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
     return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.DISALLOWED
 
 
-def is_provisional(conformance: Callable):
+def is_provisional(conformance: Callable) -> bool:
     return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL
 
 
@@ -229,7 +230,7 @@ class provisional(Conformance):
 
 
 class ValueConformance(Conformance):
-    def __call__(self, conformance_assessment_data: ConformanceAssessmentData):
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
         # This should never be called
         raise ConformanceException('Value conformance function should not be called - this is simply a value holder')
 
@@ -454,7 +455,7 @@ class or_operation(Conformance):
 class ArithmeticConformance(Conformance):
     ''' Base class for arithmetic operations - do not use directly.'''
 
-    def _type_ok(self, op1: Conformance, op2: Conformance):
+    def _type_ok(self, op1: Conformance, op2: Conformance) -> bool:
         def _is_valid_operand(op: Conformance) -> bool:
             return issubclass(type(op), ValueConformance) or type(op) == attribute
         return _is_valid_operand(op1) and _is_valid_operand(op2)

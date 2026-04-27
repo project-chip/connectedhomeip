@@ -17,9 +17,9 @@
 import json
 import logging
 import os
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, Set
 
 import yaml
 
@@ -77,7 +77,7 @@ def _IsValidYamlTest(name: str) -> bool:
     return name not in INVALID_TESTS
 
 
-def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
+def _LoadManualTestsJson(json_file_path: str) -> Iterable[str]:
     with open(json_file_path) as f:
         data = json.load(f)
         for c in data["collection"]:
@@ -85,7 +85,7 @@ def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
                 yield f"{name}.yaml"
 
 
-def _GetManualTests() -> Set[str]:
+def _GetManualTests() -> set[str]:
     manualtests: set[str] = set()
 
     # Flagged as manual from: src/app/tests/suites/manualTests.json
@@ -95,7 +95,7 @@ def _GetManualTests() -> Set[str]:
     return manualtests
 
 
-def _GetFlakyTests() -> Set[str]:
+def _GetFlakyTests() -> set[str]:
     """List of flaky tests.
 
     While this list is empty, it remains here in case we need to quickly add a new test
@@ -104,7 +104,7 @@ def _GetFlakyTests() -> Set[str]:
     return set()
 
 
-def _GetSlowTests() -> Set[str]:
+def _GetSlowTests() -> set[str]:
     """Generally tests using sleep() a bit too freely.
 
        10s seems like a good threshold to consider something slow
@@ -139,7 +139,7 @@ def _GetSlowTests() -> Set[str]:
     }
 
 
-def _GetExtraSlowTests() -> Set[str]:
+def _GetExtraSlowTests() -> set[str]:
     """Generally tests using sleep() so much they should never run in CI.
 
        1 minute seems like a good threshold to consider something extra slow
@@ -149,7 +149,7 @@ def _GetExtraSlowTests() -> Set[str]:
     }
 
 
-def _GetInDevelopmentTests() -> Set[str]:
+def _GetInDevelopmentTests() -> set[str]:
     """Tests that fail in YAML for some reason."""
     return {
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
@@ -169,14 +169,14 @@ def _GetInDevelopmentTests() -> Set[str]:
     }
 
 
-def _GetChipToolUnsupportedTests() -> Set[str]:
+def _GetChipToolUnsupportedTests() -> set[str]:
     """Tests that fail in chip-tool for some reason"""
     return {
         "TestDiagnosticLogsDownloadCommand",  # chip-tool does not implement a bdx download command.
     }
 
 
-def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
+def _GetDarwinFrameworkToolUnsupportedTests() -> set[str]:
     """Tests that fail in darwin-framework-tool for some reason"""
     return {
         "DL_LockUnlock",  # darwin-framework-tool does not currently support reading or subscribing to Events
@@ -233,7 +233,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
     }
 
 
-def _GetReplUnsupportedTests() -> Set[str]:
+def _GetReplUnsupportedTests() -> set[str]:
     """Tests that fail in matter-repl for some reason"""
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
@@ -255,7 +255,7 @@ def _GetReplUnsupportedTests() -> Set[str]:
     }
 
 
-def _GetPurposefulFailureTests() -> Set[str]:
+def _GetPurposefulFailureTests() -> set[str]:
     """Tests that fail in YAML on purpose."""
     return {
         "TestPurposefulFailureEqualities.yaml",
@@ -264,7 +264,7 @@ def _GetPurposefulFailureTests() -> Set[str]:
     }
 
 
-def _AllYamlTests():
+def _AllYamlTests() -> Iterable[Path]:
     yaml_test_suite_path = Path(_YAML_TEST_SUITE_PATH)
 
     if not yaml_test_suite_path.exists():
@@ -298,7 +298,8 @@ def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
     return targets
 
 
-def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
+def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool,
+                       treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool) -> Iterable[TestDefinition]:
     """
     use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
     """
@@ -357,16 +358,16 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         )
 
 
-def AllReplYamlTests():
+def AllReplYamlTests() -> Iterable[TestDefinition]:
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=False):
         yield test
 
 
-def AllChipToolYamlTests(use_short_run_name: bool = True):
+def AllChipToolYamlTests(use_short_run_name: bool = True) -> Iterable[TestDefinition]:
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=use_short_run_name):
         yield test
 
 
-def AllDarwinFrameworkToolYamlTests():
+def AllDarwinFrameworkToolYamlTests() -> Iterable[TestDefinition]:
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
