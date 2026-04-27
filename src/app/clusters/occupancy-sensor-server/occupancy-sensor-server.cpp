@@ -193,7 +193,7 @@ CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime)
     if (previousHoldTime != newHoldTime)
     {
         MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
-        // HoldTime is aliased to the deprecated *OccupiedToUnoccupiedDelay attributes.  
+        // HoldTime is aliased to the deprecated *OccupiedToUnoccupiedDelay attributes.
         // For each alias enabled in ZAP on this endpoint, report so legacy subscribers see the change.
         constexpr AttributeId kAliasAttributes[] = {
             Attributes::PIROccupiedToUnoccupiedDelay::Id,
