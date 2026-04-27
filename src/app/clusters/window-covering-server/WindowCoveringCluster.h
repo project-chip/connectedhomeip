@@ -28,15 +28,15 @@
 #include <lib/support/BitMask.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-static constexpr chip::Percent100ths WC_PERCENT100THS_MIN_OPEN   = 0;
-static constexpr chip::Percent100ths WC_PERCENT100THS_MAX_CLOSED = 10000;
-static constexpr chip::Percent100ths WC_PERCENT100THS_MIDDLE     = 5000;
-static constexpr chip::Percent100ths WC_PERCENT100THS_COEF       = 100;
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
+
+static constexpr Percent100ths WC_PERCENT100THS_MIN_OPEN   = 0;
+static constexpr Percent100ths WC_PERCENT100THS_MAX_CLOSED = 10000;
+static constexpr Percent100ths WC_PERCENT100THS_MIDDLE     = 5000;
+static constexpr Percent100ths WC_PERCENT100THS_COEF       = 100;
 
 typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
@@ -168,7 +168,7 @@ public:
     bool HasFeaturePaTilt() const;
     BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
 
-    void SetType(Type type) { mType = type; }
+    void SetType(Type type) { SetAttributeValue(mType, type, Attributes::Type::Id); }
     Type GetType() const { return mType; }
 
     void SetNumberOfActuationsLift(uint16_t numOfLifts);
@@ -288,6 +288,7 @@ bool IsPercent100thsValid(Percent100ths percent100ths);
 bool IsPercent100thsValid(NPercent100ths npercent100ths);
 
 uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
+Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);

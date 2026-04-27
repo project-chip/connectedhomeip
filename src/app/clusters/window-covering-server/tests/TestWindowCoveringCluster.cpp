@@ -1044,6 +1044,7 @@ TEST_F(TestWindowCoveringCluster, StartupShutdownCycle)
     WindowCoveringCluster cluster(kRootEndpointId, kFeaturesAll, optAttrs, config);
 
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
