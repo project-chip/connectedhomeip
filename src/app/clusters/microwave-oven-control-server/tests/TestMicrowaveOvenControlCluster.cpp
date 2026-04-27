@@ -116,7 +116,7 @@ struct TestMicrowaveOvenControlCluster : public ::testing::Test
 
     TestServerClusterContext testContext;
     TestDelegate testDelegate;
-    bool supportsAddMoreTime = true;
+    bool supportsAddMoreTime{};
     MicrowaveOvenControlCluster::OptionalAttributeSet optionalAttributeSet{};
     TestIntegrationDelegate testIntegrationDelegate;
     MicrowaveOvenControlCluster::Config defaultConfig{
@@ -345,6 +345,43 @@ TEST_F(TestMicrowaveOvenControlCluster, SetCookTimeSecTest)
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         ASSERT_EQ(cluster.SetCookTimeSec(testDelegate.GetMaxCookTimeSec()), CHIP_NO_ERROR);
         ASSERT_EQ(cluster.GetCookTimeSec(), testDelegate.GetMaxCookTimeSec());
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        MicrowaveOvenControlCluster::Config config = defaultConfig;
+        MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.SetCookTimeSec(testDelegate.GetMaxCookTimeSec() + 1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestMicrowaveOvenControlCluster, AcceptedCommandsTest)
+{
+    {
+        MicrowaveOvenControlCluster::Config config = defaultConfig;
+        MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, MicrowaveOvenControl::Id), builder), CHIP_NO_ERROR);
+        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = builder.TakeBuffer();
+        ASSERT_EQ(acceptedCommands.size(), 1u);
+        ASSERT_EQ(acceptedCommands[0].commandId, MicrowaveOvenControl::Commands::SetCookingParameters::Id);
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        MicrowaveOvenControlCluster::Config config = defaultConfig;
+        config.supportsAddMoreTime                 = true;
+        MicrowaveOvenControlCluster cluster(kRootEndpointId, config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, MicrowaveOvenControl::Id), builder), CHIP_NO_ERROR);
+        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = builder.TakeBuffer();
+        ASSERT_EQ(acceptedCommands.size(), 2u);
+        ASSERT_EQ(acceptedCommands[0].commandId, MicrowaveOvenControl::Commands::SetCookingParameters::Id);
+        ASSERT_EQ(acceptedCommands[1].commandId, MicrowaveOvenControl::Commands::AddMoreTime::Id);
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
