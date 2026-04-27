@@ -76,9 +76,8 @@ class TC_DD_3_23(MatterBaseTest):
     @async_test_body
     async def test_TC_DD_3_23(self):
 
-
         self.wait_for_user_input(prompt_msg="Put the DUT in commissionable mode, bring its NFC interface close to the NFC reader"
-                                             " and keep the DUT powered")
+                                 " and keep the DUT powered")
 
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)
