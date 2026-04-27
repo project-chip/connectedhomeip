@@ -176,11 +176,10 @@ The old implementation used a heavily templated
 
 | Old                                                                       | New                                                                       |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `ConcentrationMeasurementServer<true, false, ...>` template instantiation | `ConcentrationMeasurementCluster` with `BitFlags<Feature>`                |
+| `Instance<true, false, false, false, true, true>` template instantiation  | `ConcentrationMeasurementCluster` with `BitFlags<Feature>`                |
 | `MatterConcentrationMeasurementPluginServerInitCallback()` + ZAP glue     | `registry.Register(myRegistration)` in application code                   |
-| `GetInstance()->SetMeasuredValue()`                                       | `cluster.SetMeasuredValue()` — same names, no singleton                   |
-| Attribute storage baked into the template                                 | Delegate owns storage; `DefaultDelegate` is a drop-in replacement         |
-| `delegate.HandleNewMeasuredValue(v)` / `HandleNew*()` aliases             | Removed — call `cluster.SetMeasuredValue(v)` directly (validates + notifies) |
+| `instance.SetMeasuredValue(v)` on the template instance                   | `cluster.SetMeasuredValue(v)` — identical method names and signatures     |
+| Attribute storage baked into the template (conditional inheritance)       | Delegate owns storage; `DefaultDelegate` is a drop-in replacement         |
 
 Migration steps:
 
