@@ -56,7 +56,7 @@ ConcentrationMeasurement::DefaultDelegate gCO2Delegate(ConcentrationMeasurement:
 `Delegate` is a pure-virtual interface — subclassing it directly requires
 implementing every method. For partial overrides (e.g. reading sensor values
 from hardware instead of storing them in RAM), subclass `DefaultDelegate` and
-override only the methods you need. Unoverridden methods fall back to the
+override only the methods you need. Non-overridden methods fall back to the
 in-memory storage in `DefaultDelegate`.
 
 ```cpp
@@ -174,12 +174,12 @@ The old implementation used a heavily templated
 `ConcentrationMeasurementServer<NumericMeasurementEnabled, ...>` class from
 `concentration-measurement-server.h`.
 
-| Old                                                                       | New                                                                       |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `Instance<true, false, false, false, true, true>` template instantiation  | `ConcentrationMeasurementCluster` with `BitFlags<Feature>`                |
-| `MatterConcentrationMeasurementPluginServerInitCallback()` + ZAP glue     | `registry.Register(myRegistration)` in application code                   |
-| `instance.SetMeasuredValue(v)` on the template instance                   | `cluster.SetMeasuredValue(v)` — identical method names and signatures     |
-| Attribute storage baked into the template (conditional inheritance)       | Delegate owns storage; `DefaultDelegate` is a drop-in replacement         |
+| Old                                                                      | New                                                                   |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `Instance<true, false, false, false, true, true>` template instantiation | `ConcentrationMeasurementCluster` with `BitFlags<Feature>`            |
+| `MatterConcentrationMeasurementPluginServerInitCallback()` + ZAP glue    | `registry.Register(myRegistration)` in application code               |
+| `instance.SetMeasuredValue(v)` on the template instance                  | `cluster.SetMeasuredValue(v)` — identical method names and signatures |
+| Attribute storage baked into the template (conditional inheritance)      | Delegate owns storage; `DefaultDelegate` is a drop-in replacement     |
 
 Migration steps:
 
