@@ -21,11 +21,25 @@
 #  you've written is kosher to CI
 #
 # Usage:
-#  restyle-diff.sh [-d] [-p] [ref]
+#  restyle-diff.sh [-d] [-p] [-c] [-u] [-h] [ref]
 #
 # if unspecified, ref defaults to upstream/master (or master)
 # -d enables debug logging for Restyle CLI
 # -p pull restyler Docker images before running (default: skip pull, reuse cached images)
+# -c explicitly pass --commit to restyle CLI to generate commits per tool
+# -u automatically push resulting commits using 'git push'
+# -h show this help message
+
+show_help() {
+    echo "Usage: restyle-diff.sh [-d] [-p] [-c] [-u] [-h] [ref]"
+    echo
+    echo "  [ref]  Base reference for restyle (defaults to upstream/master or master)"
+    echo "  -d     Enable debug logging for Restyle CLI"
+    echo "  -p     Pull restyler Docker images before running"
+    echo "  -c     Explicitly pass --commit to restyle CLI to generate commits per tool"
+    echo "  -u     Automatically push resulting commits using 'git push'"
+    echo "  -h     Show this help message"
+}
 #
 
 here=${0%/*}
@@ -145,6 +159,10 @@ while [[ $# -gt 0 ]]; do
         -u)
             export PUSH=True
             shift
+            ;;
+        -h|--help)
+            show_help
+            exit 0
             ;;
         *)
             ref="$1"
