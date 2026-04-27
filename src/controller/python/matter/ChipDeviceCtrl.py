@@ -2034,10 +2034,10 @@ class ChipDeviceControllerBase():
         if not isinstance(pathTuple, tuple):
             if isinstance(pathTuple, int):
                 return ClusterAttribute.AttributePath(EndpointId=pathTuple)
-            if issubclass(pathTuple, ClusterObjects.Cluster):
-                return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)
-            if issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):
-                return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)
+            if issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[misc, arg-type]
+                return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
+            if issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):  # type: ignore[arg-type]
+                return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)  # type: ignore[arg-type]
             raise ValueError("Unsupported Attribute Path")
         # endpoint + (cluster) attribute / endpoint + cluster
         if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[misc]
