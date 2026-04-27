@@ -23,6 +23,8 @@
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffEffectDelegate.h>
 #include <devices/dimmable-light/DimmableLightDevice.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/timers.h>
 
 namespace chip {
 namespace app {
@@ -63,7 +65,12 @@ public:
     bool IsTriggerEffectEnabled() const override;
 
 private:
+    void StartBlinkTimer();
+    void StopBlinkTimer();
+    static void BlinkTimerCallback(TimerHandle_t handle);
+
     LEDWidget mLED;
+    TimerHandle_t mBlinkTimer = nullptr;
 };
 
 } // namespace app

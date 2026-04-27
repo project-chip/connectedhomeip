@@ -138,8 +138,9 @@ void LEDWidget::Blink(uint32_t changeRateMS)
 
 void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 {
-    mBlinkOnTimeMS  = onTimeMS;
-    mBlinkOffTimeMS = offTimeMS;
+    mBlinkOnTimeMS    = onTimeMS;
+    mBlinkOffTimeMS   = offTimeMS;
+    mLastChangeTimeUS = ::esp_timer_get_time();
     Animate();
 }
 

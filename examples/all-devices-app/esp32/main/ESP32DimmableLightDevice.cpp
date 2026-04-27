@@ -90,11 +90,13 @@ void ESP32DimmableLightDevice::OnIdentifyStart(IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: Identify START");
     mLED.Blink(500);
+    StartBlinkTimer();
 }
 
 void ESP32DimmableLightDevice::OnIdentifyStop(IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: Identify STOP");
+    StopBlinkTimer();
     mLED.Set(mLED.IsTurnedOn());
 }
 
@@ -102,6 +104,30 @@ void ESP32DimmableLightDevice::OnTriggerEffect(IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: TriggerEffect");
     mLED.Blink(250);
+    StartBlinkTimer();
+}
+
+void ESP32DimmableLightDevice::BlinkTimerCallback(TimerHandle_t handle)
+{
+    auto * self = static_cast<ESP32DimmableLightDevice *>(pvTimerGetTimerID(handle));
+    self->mLED.Animate();
+}
+
+void ESP32DimmableLightDevice::StartBlinkTimer()
+{
+    if (mBlinkTimer == nullptr)
+    {
+        mBlinkTimer = xTimerCreate("LedBlink", pdMS_TO_TICKS(50), pdTRUE, this, BlinkTimerCallback);
+    }
+    xTimerStart(mBlinkTimer, 0);
+}
+
+void ESP32DimmableLightDevice::StopBlinkTimer()
+{
+    if (mBlinkTimer != nullptr)
+    {
+        xTimerStop(mBlinkTimer, 0);
+    }
 }
 
 bool ESP32DimmableLightDevice::IsTriggerEffectEnabled() const
