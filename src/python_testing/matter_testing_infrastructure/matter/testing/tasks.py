@@ -93,6 +93,7 @@ class Subprocess(threading.Thread):
         self.f_stderr = f_stderr
         self.output_match: Pattern | None = None
         self.returncode: int | None = None
+        self.p: subprocess.Popen[bytes] | None = None
 
     def set_output_match(self, pattern: str | Pattern) -> None:
         if isinstance(pattern, str):
@@ -113,9 +114,8 @@ class Subprocess(threading.Thread):
         command = [self.program] + list(self.args)
 
         LOGGER.info("RUN: %s", shlex.join(command))
-        self.p: subprocess.Popen[bytes] | None = None
-        forwarding_stdout_thread = None
-        forwarding_stderr_thread = None
+        forwarding_stdout_thread: threading.Thread | None = None
+        forwarding_stderr_thread: threading.Thread | None = None
         try:
             self.p = subprocess.Popen(command,
                                       stdin=subprocess.PIPE,
