@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from itertools import chain
 from pathlib import Path
-from typing import Any, List, Optional, Self, Tuple
+from typing import Any, Self, Tuple
 from unittest.mock import MagicMock
 
 from mobly import signals, utils
@@ -75,7 +75,7 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
-def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
+def default_paa_rootstore_from_root(root_path: pathlib.Path) -> pathlib.Path | None:
     """Attempt to find a PAA trust store following SDK convention at `root_path`
 
     This attempts to find {root_path}/credentials/development/paa-root-certs.
@@ -221,8 +221,8 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
     def show_prompt(self,
                     msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    placeholder: str | None = None,
+                    default_value: str | None = None) -> None:
         """
         This method is called when the test runner needs to prompt the user for input.
 
@@ -575,7 +575,7 @@ class MockTestRunner():
 
         self.test_class = getattr(module, classname)
 
-    def set_test_config(self, test_config: Optional['MatterTestConfig'] = None) -> None:
+    def set_test_config(self, test_config: "MatterTestConfig | None" = None) -> None:
         from matter.testing.matter_test_config import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
@@ -926,7 +926,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig:
+def parse_matter_test_args(argv: list[str] | None = None) -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
