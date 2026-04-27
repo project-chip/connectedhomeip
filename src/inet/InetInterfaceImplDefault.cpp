@@ -16,6 +16,7 @@
  */
 #include <inet/InetInterfaceImpl.h>
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/Compiler.h>
 #include <string.h>
 
