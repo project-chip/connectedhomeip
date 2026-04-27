@@ -24,5 +24,5 @@ default_args = {
   target_cpu = "arm"
   target_os = "freertos"
 
-  import("//config/realtek/bee/args.gni")
+  import("//config/realtek/chip-gn-freertos/args.gni")
 }
