@@ -16,13 +16,11 @@
  */
 
 #include "WindowCoveringCluster.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WindowCovering/Metadata.h>
 #include <lib/support/TypeTraits.h>
-#include <string.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h> // nogncheck
@@ -32,11 +30,6 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WindowCovering;
 using chip::Protocols::InteractionModel::Status;
-
-#define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
-#define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
-
-#define FAKE_MOTION_DELAY_MS 5000
 
 namespace {
 
@@ -84,16 +77,17 @@ uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t 
     return outputMax;
 }
 
-Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
-{
-    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
-}
 } // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
+
+Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
+{
+    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
+}
 
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
                                              OptionalAttributeSet & optionalAttributeSet, Config & config) :
@@ -159,9 +153,7 @@ void WindowCoveringCluster::SetNumberOfActuationsTilt(uint16_t numOfTilts)
 
 void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
 {
-    VerifyOrReturn(mConfigStatus != status);
-    mConfigStatus = status;
-    NotifyAttributeChanged(Attributes::ConfigStatus::Id);
+    SetAttributeValue(mConfigStatus, status, Attributes::ConfigStatus::Id);
 }
 
 void WindowCoveringCluster::SetCurrentPositionLiftPercentage(NPercent curLiftPercentage)
@@ -194,16 +186,13 @@ void WindowCoveringCluster::SetCurrentPositionTiltPercentage(NPercent curTiltPer
 
 void WindowCoveringCluster::SetOperationalStatus(chip::BitMask<OperationalStatus> newStatus)
 {
-    VerifyOrReturn(mOperationalStatus != newStatus);
-    mOperationalStatus = newStatus;
-    NotifyAttributeChanged(Attributes::OperationalStatus::Id);
+    SetAttributeValue(mOperationalStatus, newStatus, Attributes::OperationalStatus::Id);
 }
 
 void WindowCoveringCluster::SetTargetPositionLiftPercent100ths(NPercent100ths newTargetLift)
 {
-    VerifyOrReturn(mTargetPositionLiftPercentage100ths != newTargetLift);
-    mTargetPositionLiftPercentage100ths = newTargetLift;
-    NotifyAttributeChanged(Attributes::TargetPositionLiftPercent100ths::Id);
+    VerifyOrReturn(
+        SetAttributeValue(mTargetPositionLiftPercentage100ths, newTargetLift, Attributes::TargetPositionLiftPercent100ths::Id));
 
     OperationalState opLift = ComputeOperationalState(mTargetPositionLiftPercentage100ths, mCurrentPositionLiftPercentage100ths);
     UpdateOperationalStateForField(OperationalStatus::kLift, opLift);
@@ -211,9 +200,8 @@ void WindowCoveringCluster::SetTargetPositionLiftPercent100ths(NPercent100ths ne
 
 void WindowCoveringCluster::SetTargetPositionTiltPercent100ths(NPercent100ths newTargetTilt)
 {
-    VerifyOrReturn(mTargetPositionTiltPercentage100ths != newTargetTilt);
-    mTargetPositionTiltPercentage100ths = newTargetTilt;
-    NotifyAttributeChanged(Attributes::TargetPositionTiltPercent100ths::Id);
+    VerifyOrReturn(
+        SetAttributeValue(mTargetPositionTiltPercentage100ths, newTargetTilt, Attributes::TargetPositionTiltPercent100ths::Id));
 
     OperationalState opTilt = ComputeOperationalState(mTargetPositionTiltPercentage100ths, mCurrentPositionTiltPercentage100ths);
     UpdateOperationalStateForField(OperationalStatus::kTilt, opTilt);
@@ -221,9 +209,7 @@ void WindowCoveringCluster::SetTargetPositionTiltPercent100ths(NPercent100ths ne
 
 void WindowCoveringCluster::SetEndProductType(EndProductType type)
 {
-    VerifyOrReturn(mEndProductType != type);
-    mEndProductType = type;
-    NotifyAttributeChanged(Attributes::EndProductType::Id);
+    SetAttributeValue(mEndProductType, type, Attributes::EndProductType::Id);
 }
 
 void WindowCoveringCluster::SetCurrentPositionLiftPercentage100ths(NPercent100ths curLiftPercentage100ths)
@@ -290,9 +276,7 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
 
 void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)
 {
-    VerifyOrReturn(mSafetyStatus != status);
-    mSafetyStatus = status;
-    NotifyAttributeChanged(Attributes::SafetyStatus::Id);
+    SetAttributeValue(mSafetyStatus, status, Attributes::SafetyStatus::Id);
 }
 
 DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -528,7 +512,7 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
 
 bool IsPercent100thsValid(Percent100ths percent100ths)
 {
-    return CHECK_BOUNDS_VALID(WC_PERCENT100THS_MIN_OPEN, percent100ths, WC_PERCENT100THS_MAX_CLOSED);
+    return (percent100ths >= WC_PERCENT100THS_MIN_OPEN) && (percent100ths <= WC_PERCENT100THS_MAX_CLOSED);
 }
 
 bool IsPercent100thsValid(NPercent100ths percent100ths)
@@ -544,54 +528,6 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
 uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
 {
     return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
-}
-
-// Zigbee only and is only kept for backwards compatibility
-uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-    return ValueToPercent100ths(limits, lift);
-}
-
-uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-    return Percent100thsToValue(limits, percent100ths);
-}
-
-// Zigbee only and is only kept for backwards compatibility
-uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-
-    return ValueToPercent100ths(limits, tilt);
-}
-
-uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-
-    return Percent100thsToValue(limits, percent100ths);
 }
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
