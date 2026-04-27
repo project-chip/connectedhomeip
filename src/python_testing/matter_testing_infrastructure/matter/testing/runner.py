@@ -152,7 +152,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         LOGGER.info(f'Starting test from {filename}: {name} - {count} steps')
 
-    def test_stop(self, exception: Exception, duration: int) -> None:
+    def test_stop(self, exception: Exception | None, duration: int) -> None:
         """
         Called when an individual test completes.
 
