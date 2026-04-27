@@ -68,13 +68,13 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
 
     if (newSpeed != currentSpeed)
     {
-        if (currentSpeed == 0 && newSpeed > 0)
-        {
-            cluster.SetOnOffState(true);
-        }
-        else if (newSpeed == 0)
+        if (newSpeed == 0)
         {
             cluster.SetOnOffState(false);
+        }
+        else
+        {
+            cluster.SetOnOffState(true);
         }
     }
 
