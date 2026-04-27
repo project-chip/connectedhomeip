@@ -51,40 +51,36 @@ ConcentrationMeasurement::DefaultDelegate gCO2Delegate(ConcentrationMeasurement:
                                                        /* uncertainty = */ 0.0f);
 ```
 
-#### Option B — Custom `Delegate` subclass
+#### Option B — Custom `DefaultDelegate` subclass (RAM-constrained devices)
 
-Override only the getters/setters for the features your sensor supports. Fields
-for unsupported features are never compiled in.
+`Delegate` is a pure-virtual interface — subclassing it directly requires
+implementing every method. For partial overrides (e.g. reading sensor values
+from hardware instead of storing them in RAM), subclass `DefaultDelegate` and
+override only the methods you need. Unoverridden methods fall back to the
+in-memory storage in `DefaultDelegate`.
 
 ```cpp
 #include <app/clusters/concentration-measurement-server/ConcentrationMeasurementDelegate.h>
 
-class CO2SensorDelegate : public ConcentrationMeasurement::Delegate
+// Reads MeasuredValue live from hardware; everything else uses DefaultDelegate storage.
+class CO2SensorDelegate : public ConcentrationMeasurement::DefaultDelegate
 {
 public:
-    ConcentrationMeasurement::MeasurementMediumEnum GetMeasurementMedium() override
+    CO2SensorDelegate() :
+        DefaultDelegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                        chip::app::DataModel::MakeNullable(0.0f),    // MinMeasuredValue
+                        chip::app::DataModel::MakeNullable(5000.0f)) // MaxMeasuredValue
+    {}
+
+    chip::app::DataModel::Nullable<float> GetMeasuredValue() override
     {
-        return ConcentrationMeasurement::MeasurementMediumEnum::kAir;
+        // Read directly from your sensor driver instead of cached storage.
+        return chip::app::DataModel::MakeNullable(ReadCO2FromHardware());
     }
-
-    ConcentrationMeasurement::MeasurementUnitEnum GetMeasurementUnit() override
-    {
-        return ConcentrationMeasurement::MeasurementUnitEnum::kPpm;
-    }
-
-    chip::app::DataModel::Nullable<float> GetMeasuredValue() override { return mValue; }
-    chip::app::DataModel::Nullable<float> GetMinMeasuredValue() override { return mMin; }
-    chip::app::DataModel::Nullable<float> GetMaxMeasuredValue() override { return mMax; }
-    ConcentrationMeasurement::LevelValueEnum GetLevelValue() override { return mLevel; }
-
-    void SetMeasuredValue(chip::app::DataModel::Nullable<float> v) override { mValue = v; }
-    void SetLevelValue(ConcentrationMeasurement::LevelValueEnum v) override { mLevel = v; }
 
 private:
-    chip::app::DataModel::Nullable<float> mValue;
-    chip::app::DataModel::Nullable<float> mMin      = chip::app::DataModel::MakeNullable(0.0f);
-    chip::app::DataModel::Nullable<float> mMax      = chip::app::DataModel::MakeNullable(5000.0f);
-    ConcentrationMeasurement::LevelValueEnum mLevel = ConcentrationMeasurement::LevelValueEnum::kUnknown;
+    float ReadCO2FromHardware(); // application-defined
 };
 ```
 
@@ -178,12 +174,13 @@ The old implementation used a heavily templated
 `ConcentrationMeasurementServer<NumericMeasurementEnabled, ...>` class from
 `concentration-measurement-server.h`.
 
-| Old                                                                       | New                                                               |
-| ------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `ConcentrationMeasurementServer<true, false, ...>` template instantiation | `ConcentrationMeasurementCluster` with `BitFlags<Feature>`        |
-| `MatterConcentrationMeasurementPluginServerInitCallback()` + ZAP glue     | `registry.Register(myRegistration)` in application code           |
-| `GetInstance()->SetMeasuredValue()`                                       | `cluster.SetMeasuredValue()` — same names, no singleton           |
-| Attribute storage baked into the template                                 | Delegate owns storage; `DefaultDelegate` is a drop-in replacement |
+| Old                                                                       | New                                                                       |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `ConcentrationMeasurementServer<true, false, ...>` template instantiation | `ConcentrationMeasurementCluster` with `BitFlags<Feature>`                |
+| `MatterConcentrationMeasurementPluginServerInitCallback()` + ZAP glue     | `registry.Register(myRegistration)` in application code                   |
+| `GetInstance()->SetMeasuredValue()`                                       | `cluster.SetMeasuredValue()` — same names, no singleton                   |
+| Attribute storage baked into the template                                 | Delegate owns storage; `DefaultDelegate` is a drop-in replacement         |
+| `delegate.HandleNewMeasuredValue(v)` / `HandleNew*()` aliases             | Removed — call `cluster.SetMeasuredValue(v)` directly (validates + notifies) |
 
 Migration steps:
 

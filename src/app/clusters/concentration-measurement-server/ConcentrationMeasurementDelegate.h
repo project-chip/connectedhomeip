@@ -28,6 +28,8 @@ namespace Clusters {
 namespace ConcentrationMeasurement {
 
 // Delegate — abstract interface your application implements to supply attribute values.
+// All Get*/Set* methods are pure virtual: every concrete delegate must implement them.
+// To partially override only some methods, subclass DefaultDelegate instead.
 class Delegate
 {
 public:
@@ -39,42 +41,38 @@ public:
     virtual CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
     // ── Always required ──────────────────────────────────────────────────────
-    virtual MeasurementMediumEnum GetMeasurementMedium() { return MeasurementMediumEnum::kAir; }
+    virtual MeasurementMediumEnum GetMeasurementMedium() = 0;
 
     // ── Feature::kNumericMeasurement ─────────────────────────────────────────
-    // Override if cluster was constructed with Feature::kNumericMeasurement.
-    virtual DataModel::Nullable<float> GetMeasuredValue() { return DataModel::Nullable<float>(); }
-    virtual DataModel::Nullable<float> GetMinMeasuredValue() { return DataModel::Nullable<float>(); }
-    virtual DataModel::Nullable<float> GetMaxMeasuredValue() { return DataModel::Nullable<float>(); }
-    virtual float GetUncertainty() { return 0.0f; }
-    virtual MeasurementUnitEnum GetMeasurementUnit() { return MeasurementUnitEnum::kPpm; }
+    virtual DataModel::Nullable<float> GetMeasuredValue()    = 0;
+    virtual DataModel::Nullable<float> GetMinMeasuredValue() = 0;
+    virtual DataModel::Nullable<float> GetMaxMeasuredValue() = 0;
+    virtual float GetUncertainty()                           = 0;
+    virtual MeasurementUnitEnum GetMeasurementUnit()         = 0;
 
     // ── Feature::kPeakMeasurement (requires kNumericMeasurement) ─────────────
-    virtual DataModel::Nullable<float> GetPeakMeasuredValue() { return DataModel::Nullable<float>(); }
-    virtual uint32_t GetPeakMeasuredValueWindow() { return 0; }
+    virtual DataModel::Nullable<float> GetPeakMeasuredValue() = 0;
+    virtual uint32_t GetPeakMeasuredValueWindow()              = 0;
 
     // ── Feature::kAverageMeasurement (requires kNumericMeasurement) ──────────
-    virtual DataModel::Nullable<float> GetAverageMeasuredValue() { return DataModel::Nullable<float>(); }
-    virtual uint32_t GetAverageMeasuredValueWindow() { return 0; }
+    virtual DataModel::Nullable<float> GetAverageMeasuredValue() = 0;
+    virtual uint32_t GetAverageMeasuredValueWindow()              = 0;
 
     // ── Feature::kLevelIndication ─────────────────────────────────────────────
-    virtual LevelValueEnum GetLevelValue() { return LevelValueEnum::kUnknown; }
+    virtual LevelValueEnum GetLevelValue() = 0;
 
     // ── Writable setters — called by ConcentrationMeasurementCluster::Set*() after validation.
-    // Override these (not Handle*()) when implementing a custom Delegate.
-    // Default implementations are no-ops; DefaultDelegate provides storage.
-    // Fixed attributes (MinMeasuredValue, MaxMeasuredValue, Uncertainty) have no setters —
-    // supply them at construction time instead.
-    virtual void SetMeasuredValue(DataModel::Nullable<float>) {}
-    virtual void SetPeakMeasuredValue(DataModel::Nullable<float>) {}
-    virtual void SetPeakMeasuredValueWindow(uint32_t) {}
-    virtual void SetAverageMeasuredValue(DataModel::Nullable<float>) {}
-    virtual void SetAverageMeasuredValueWindow(uint32_t) {}
-    virtual void SetLevelValue(LevelValueEnum) {}
+    virtual void SetMeasuredValue(DataModel::Nullable<float>)    = 0;
+    virtual void SetPeakMeasuredValue(DataModel::Nullable<float>) = 0;
+    virtual void SetPeakMeasuredValueWindow(uint32_t)             = 0;
+    virtual void SetAverageMeasuredValue(DataModel::Nullable<float>) = 0;
+    virtual void SetAverageMeasuredValueWindow(uint32_t)             = 0;
+    virtual void SetLevelValue(LevelValueEnum)                       = 0;
 };
 
 // DefaultDelegate — in-memory storage for every attribute. Recommended for most applications.
-// See README.md for usage examples and a custom subclass pattern for RAM-constrained devices.
+// For partial overrides (e.g. live hardware reads), subclass DefaultDelegate and override only
+// what you need. See README.md for examples.
 class DefaultDelegate : public Delegate
 {
 public:
@@ -118,14 +116,6 @@ public:
     void SetAverageMeasuredValue(DataModel::Nullable<float> v) override { mAverageMeasuredValue = v; }
     void SetAverageMeasuredValueWindow(uint32_t v) override { mAverageMeasuredValueWindow = v; }
     void SetLevelValue(LevelValueEnum v) override { mLevelValue = v; }
-
-    // ── Handle*() — backwards-compatible aliases for Set*()
-    void HandleNewMeasuredValue(DataModel::Nullable<float> v) { SetMeasuredValue(v); }
-    void HandleNewPeakMeasuredValue(DataModel::Nullable<float> v) { SetPeakMeasuredValue(v); }
-    void HandleNewPeakMeasuredValueWindow(uint32_t v) { SetPeakMeasuredValueWindow(v); }
-    void HandleNewAverageMeasuredValue(DataModel::Nullable<float> v) { SetAverageMeasuredValue(v); }
-    void HandleNewAverageMeasuredValueWindow(uint32_t v) { SetAverageMeasuredValueWindow(v); }
-    void HandleNewLevelValue(LevelValueEnum v) { SetLevelValue(v); }
 
 private:
     // All fields start null/zero/unknown — safe defaults before first reading.
