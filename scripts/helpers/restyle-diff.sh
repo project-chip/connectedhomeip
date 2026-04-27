@@ -45,7 +45,7 @@ restyle-paths() {
     else
         echo "[restyle-diff.sh] Please wait, Restyling files (using cached images; pass -p to pull updates)"
     fi
-    restyle --config-file=.restyled.yaml ${COMMIT_FLAG:+"$COMMIT_FLAG"} "$@"
+    restyle --config-file=.restyled.yaml "${COMMIT_FLAG:+"$COMMIT_FLAG"}" "$@"
 
     # warn if restyle left any files owned by root (which means older restyle-CLI is being used)
     root_owned=$(find "$@" -maxdepth 0 -user 0 2>/dev/null || true)
