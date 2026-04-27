@@ -98,7 +98,8 @@ done
 GITHUB_PAT=""
 if [ -n "$USE_SECRET" ]; then
     echo "Fetching PAT from secret: $USE_SECRET"
-    GITHUB_PAT=$(gcloud secrets versions access latest --secret="$USE_SECRET")
+    # Trim newline from token
+    GITHUB_PAT=$(gcloud secrets versions access latest --secret="$USE_SECRET" | tr -d '\n')
 fi
 
 # Ensure output directory exists
@@ -115,44 +116,41 @@ update_or_clone() {
         return
     fi
 
-    # Setup GIT_ASKPASS if we have a token
-    local cleanup_askpass=false
-    if [ -n "$GITHUB_PAT" ]; then
-        local askpass_path="out/askpass.sh"
-        echo '#!/bin/sh' > "$askpass_path"
-        echo 'echo "$GITHUB_PAT"' >> "$askpass_path"
-        chmod +x "$askpass_path"
-        export GIT_ASKPASS="$(pwd)/$askpass_path"
-        cleanup_askpass=true
-        
-        # Modify URL to include x-access-token username if it's an HTTPS URL
-        if [[ "$url" == https://* ]]; then
-            url="https://x-access-token@${url#https://}"
-        fi
-    fi
-
     if [ -d "$dir" ]; then
         echo "Updating $name to $branch..."
         (
             cd "$dir"
+            if [ -n "$GITHUB_PAT" ] && [[ "$url" == https://* ]]; then
+                # Temporarily set URL with token for fetch
+                git remote set-url origin "https://${GITHUB_PAT}@github.com/CHIP-Specifications/connectedhomeip-spec.git"
+            fi
+            
             git fetch origin "$branch"
             git checkout FETCH_HEAD
+            
+            if [ -n "$GITHUB_PAT" ] && [[ "$url" == https://* ]]; then
+                # Restore clean URL
+                git remote set-url origin "https://github.com/CHIP-Specifications/connectedhomeip-spec.git"
+            fi
         )
     else
         echo "Cloning $name ($branch)..."
-        git clone --branch "$branch" "$url" "$dir"
-    fi
-
-    # Cleanup
-    if [ "$cleanup_askpass" = true ]; then
-        rm -f "out/askpass.sh"
-        unset GIT_ASKPASS
+        if [ -n "$GITHUB_PAT" ] && [[ "$url" == https://* ]]; then
+            git clone --branch "$branch" "https://${GITHUB_PAT}@github.com/CHIP-Specifications/connectedhomeip-spec.git" "$dir"
+            # Immediately restore clean URL in the cloned repo
+            (
+                cd "$dir"
+                git remote set-url origin "https://github.com/CHIP-Specifications/connectedhomeip-spec.git"
+            )
+        else
+            git clone --branch "$branch" "$url" "$dir"
+        fi
     fi
 }
 
 # Clone/Update Spec (Private)
 if [ -n "$GITHUB_PAT" ]; then
-    update_or_clone "$SPEC_ROOT" "https://${GITHUB_PAT}@github.com/CHIP-Specifications/connectedhomeip-spec.git" "Spec" "$SPEC_BRANCH"
+    update_or_clone "$SPEC_ROOT" "https://github.com/CHIP-Specifications/connectedhomeip-spec.git" "Spec" "$SPEC_BRANCH"
 else
     update_or_clone "$SPEC_ROOT" "git@github.com:CHIP-Specifications/connectedhomeip-spec.git" "Spec" "$SPEC_BRANCH"
 fi
@@ -166,7 +164,7 @@ if [ "$SKIP_UPDATE" = true ] && [ -f "out/alchemy" ]; then
 else
     echo "Downloading Alchemy v${ALCHEMY_VERSION}..."
     curl -L "$ALCHEMY_URL" -o "out/${ALCHEMY_ASSET}"
-
+    
     echo "Extracting Alchemy..."
     tar -xzf "out/${ALCHEMY_ASSET}" -C out/
     chmod +x out/alchemy
