@@ -15,5 +15,5 @@
 #    limitations under the License.
 #
 
-from . import Attribute, CHIPClusters, Command, Objects  # noqa: F401
+from . import Attribute, CHIPClusters, ClusterObjects, Command, Objects  # noqa: F401
 from .Objects import *  # noqa: F401, F403

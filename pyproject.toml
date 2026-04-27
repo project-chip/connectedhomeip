@@ -67,8 +67,8 @@ ignore = [
 ]
 
 [tool.mypy]
-mypy_path = ["matter/typings"]
+check_untyped_defs = true
+explicit_package_bases = true
+ignore_missing_imports = true
 namespace_packages = true
 warn_unused_configs = true
-ignore_missing_imports = true
-explicit_package_bases = true

@@ -1453,8 +1453,8 @@ class YamlTests:
 
 @dataclass
 class TestParserConfig:
-    pics: str = None
-    definitions: SpecDefinitions = None
+    pics: str | None = None
+    definitions: SpecDefinitions | None = None
     config_override: dict = field(default_factory=dict)
 
 
