@@ -91,8 +91,15 @@ if (CONFIG_CHIP_LOG_FILE_NAME)
 endif()
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
+
+# Zephyr may emit unqualified TARGET_PROPERTY genex (e.g. $<TARGET_PROPERTY:LTO>)
+# that cannot be evaluated by file(GENERATE) in matter_generate_args_tmp_file().
+set(ZEPHYR_CFLAGS_C "${ZEPHYR_CFLAGS_C}")
+string(REPLACE "$<TARGET_PROPERTY:LTO>" "$<TARGET_PROPERTY:zephyr_interface,LTO>" ZEPHYR_CFLAGS_C "${ZEPHYR_CFLAGS_C}")
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
+set(ZEPHYR_CFLAGS_CC "${ZEPHYR_CFLAGS_CC}")
+string(REPLACE "$<TARGET_PROPERTY:LTO>" "$<TARGET_PROPERTY:zephyr_interface,LTO>" ZEPHYR_CFLAGS_CC "${ZEPHYR_CFLAGS_CC}")
 matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
