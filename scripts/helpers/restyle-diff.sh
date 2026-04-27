@@ -160,7 +160,7 @@ while [[ $# -gt 0 ]]; do
             export PUSH=True
             shift
             ;;
-        -h|--help)
+        -h | --help)
             show_help
             exit 0
             ;;
