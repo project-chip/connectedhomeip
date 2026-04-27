@@ -90,7 +90,7 @@ class IcdAppServerSubprocess(AppServerSubprocess):
         if check_state and self.paused:
             raise ValueError("ICD TH Server unexpectedly is already paused")
         if not self.paused and self.p is not None:
-            # Stop (halt) the ICD server process by sending a SIGTOP signal.
+            # Stop (halt) the ICD server process by sending a SIGSTOP signal.
             self.p.send_signal(signal.SIGSTOP)
             self.paused = True
 
