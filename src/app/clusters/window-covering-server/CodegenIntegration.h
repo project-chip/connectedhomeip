@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/window-covering-server/window-covering-server.h>
+#include <app/clusters/window-covering-server/WindowCoveringCluster.h>
 
 namespace chip {
 namespace app {

@@ -166,7 +166,7 @@ WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    ServerClusterInterface * WindowCovering = CodegenClusterIntegration::FindClusterOnEndpoint(
+    ServerClusterInterface * cluster = CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = WindowCovering::Id,
@@ -175,7 +175,7 @@ WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId)
         },
         integrationDelegate);
 
-    return static_cast<WindowCoveringCluster *>(WindowCovering);
+    return static_cast<WindowCoveringCluster *>(cluster);
 }
 
 void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate)
@@ -345,7 +345,50 @@ chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
     return cluster->GetSafetyStatus();
 }
 
-// LiftPositionSet() and
+uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
+{
+    uint16_t openLimit   = 0;
+    uint16_t closedLimit = 0;
+    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+    return ValueToPercent100ths(limits, lift);
+}
+
+uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
+{
+    uint16_t openLimit   = 0;
+    uint16_t closedLimit = 0;
+    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+    return Percent100thsToValue(limits, percent100ths);
+}
+
+uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
+{
+    uint16_t openLimit   = 0;
+    uint16_t closedLimit = 0;
+    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+    return ValueToPercent100ths(limits, tilt);
+}
+
+uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
+{
+    uint16_t openLimit   = 0;
+    uint16_t closedLimit = 0;
+    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+    return Percent100thsToValue(limits, percent100ths);
+}
+
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
