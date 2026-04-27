@@ -125,6 +125,7 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
+    "${silabs_common_plat_dir}/main.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
@@ -190,9 +191,11 @@ source_set("siwx917-common") {
 
   if (sl_enable_si70xx_sensor) {
     sources += [
-      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
       "${silabs_common_plat_dir}/Si70xxSensor.h",
+      "${silabs_common_plat_dir}/Si70xxSensorWiseMcu.cpp",
     ]
+    public_deps +=
+        [ "${chip_root}/src/platform/silabs/platformAbstraction:common" ]
   }
 
   if (app_data_model != "") {

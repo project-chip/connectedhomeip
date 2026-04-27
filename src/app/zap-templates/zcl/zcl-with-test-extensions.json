@@ -90,6 +90,7 @@
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
+        "network-identity-management-cluster.xml",
         "proximity-ranging-cluster.xml",
         "push-av-stream-transport-cluster.xml",
         "semantic-tag-namespace-enums.xml",
@@ -415,6 +416,11 @@
             "SupportedThreadFeatures",
             "SupportedWiFiBands",
             "ThreadVersion"
+        ],
+        "Network Identity Management": [
+            "ClientTableSize",
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Occupancy Sensing": [
             "HoldTimeLimits",

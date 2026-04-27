@@ -17,7 +17,7 @@
  */
 
 #include "OtaProviderAppCommandDelegate.h"
-#include <lib/support/Defer.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -91,7 +91,7 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         return;
     }
 
-    auto cleanup = MakeDefer([&]() { Platform::Delete(self); });
+    auto cleanup = ScopeExit([&]() { Platform::Delete(self); });
 
     std::string name;
     std::string cluster;

@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_GC_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
@@ -60,7 +61,8 @@ class TC_GC_2_3(MatterBaseTest):
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
             TestStep("1d", "Join Group G1 generating a new Key with KeySetID K1 using JoinGroup"),
-            TestStep("1e", "Join Group G2 generating a new Key with KeySetID K2 using JoinGroup"),
+            TestStep("1e", "TH reads back the Key Set with KeySetID K1 via GroupKeyManagement KeySetRead and validates the returned GroupKeySetStruct"),
+            TestStep("1f", "Join Group G2 generating a new Key with KeySetID K2 using JoinGroup"),
             TestStep(2, "Update Group G1 to use a new KeySetID K3 and create it by providing a Key: TH sends command UpdateGroupKey (GroupID=G1, KeySetID=K3, Key=InputKey3)"),
             TestStep(3, "TH awaits subscription report showing KeySetID=K3 for G1"),
             TestStep(4, "Update Group G2 generating a new key with an existing KeySetID K1. UpdateGroupKey (GroupID=G2, KeySetID=K1, Key=InputKey4)"),
@@ -119,6 +121,22 @@ class TC_GC_2_3(MatterBaseTest):
         )
 
         self.step("1e")
+        response = await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRead(groupKeySetID=keySetID1))
+
+        # Validate KeySet contents per spec 11.27.7.1.4 (JoinGroup Command / Key Field):
+        # a keyset created via JoinGroup with a Key SHALL have GroupKeySecurityPolicy = TrustFirst,
+        # EpochStartTime0 = 1, and EpochKey1/EpochStartTime1/EpochKey2/EpochStartTime2 = null.
+        # EpochKey0 is also null in KeySetRead responses because key material is never read back.
+        expected = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
+            groupKeySetID=keySetID1,
+            groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=NullValue, epochStartTime0=1,
+            epochKey1=NullValue, epochStartTime1=NullValue,
+            epochKey2=NullValue, epochStartTime2=NullValue,
+        )
+        asserts.assert_equal(response.groupKeySet, expected, "Unexpected GroupKeySetStruct returned by KeySetRead")
+
+        self.step("1f")
         groupID2 = 2
         keySetID2 = 2
         inputKey2 = secrets.token_bytes(16)
