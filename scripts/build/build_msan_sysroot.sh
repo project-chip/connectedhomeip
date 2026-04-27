@@ -42,6 +42,16 @@ SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 SRC="${TMPDIR:-/tmp}/msan-build"
 MSAN="-fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer -fPIC"
 
+# Pinned for reproducibility and to keep msan_ignorelist.txt source paths
+# matching. On bump: verify clean MSAN build, no new false positives, and
+# ignorelist paths still match. libc++/libc++abi track Pigweed clang.
+OPENSSL_VERSION="3.5.3"
+ZLIB_VERSION="1.3.1"
+LIBFFI_VERSION="3.4.6"
+PCRE2_VERSION="10.43"
+GLIB_VERSION="2.80.0"
+GLIB_SERIES="${GLIB_VERSION%.*}" # GNOME download path uses major.minor (e.g. 2.80)
+
 usage() {
     cat <<EOF
 Usage: $(basename "$0") [--out-dir PATH] [--force] [--check] [--help]
@@ -116,7 +126,8 @@ fi
 # Hash inputs that determine sysroot contents. Path-independent so local
 # and CI agree even when CHIP_ROOT differs. Format: each file contributes
 # only its content sha (no path), followed by clang --version output.
-# host.py's MSAN check computes the same hash to detect staleness.
+# This hash is used by this script's --check mode to detect staleness for
+# callers.
 compute_input_hash() {
     {
         sha256sum <"$SCRIPT_PATH" | cut -d' ' -f1
@@ -181,8 +192,10 @@ echo ">>> Building MSAN sysroot at $SYSROOT (this takes 5-15 min)"
 echo ">>> libc++ / libc++abi"
 if [[ ! -d "$SRC/llvm-project" ]]; then
     git clone --depth 1 https://llvm.googlesource.com/llvm-project "$SRC/llvm-project"
-    cd "$SRC/llvm-project" && git fetch --depth 1 origin "$LLVM_COMMIT" && git checkout FETCH_HEAD
 fi
+cd "$SRC/llvm-project"
+git fetch --depth 1 origin "$LLVM_COMMIT"
+git checkout FETCH_HEAD
 cmake -GNinja -S "$SRC/llvm-project/runtimes" -B "$SRC/libcxx" \
     -DCMAKE_C_COMPILER="$PW_CLANG/clang" -DCMAKE_CXX_COMPILER="$PW_CLANG/clang++" \
     -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" -DCMAKE_BUILD_TYPE=Release \
@@ -194,25 +207,25 @@ ninja -C "$SRC/libcxx" install-cxx install-cxxabi
 # OpenSSL
 echo ">>> OpenSSL"
 cd "$SRC"
-[[ -d openssl-3.0.13 ]] || { wget -q https://www.openssl.org/source/openssl-3.0.13.tar.gz && tar xzf openssl-3.0.13.tar.gz; }
-cd openssl-3.0.13
+[[ -d "openssl-$OPENSSL_VERSION" ]] || { wget -q "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && tar xzf "openssl-$OPENSSL_VERSION.tar.gz"; }
+cd "openssl-$OPENSSL_VERSION"
 CC="$PW_CLANG/clang $MSAN" ./Configure linux-x86_64 --prefix="$SYSROOT" --openssldir="$SYSROOT/ssl" no-asm no-shared -DPURIFY
 make -j"$(nproc)" build_libs
-make install_sw || true
+make install_dev
 
 # zlib
 echo ">>> zlib"
 cd "$SRC"
-[[ -d zlib-1.3.1 ]] || { wget -q https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz && tar xzf zlib-1.3.1.tar.gz; }
-cd zlib-1.3.1
+[[ -d "zlib-$ZLIB_VERSION" ]] || { wget -q "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.gz" && tar xzf "zlib-$ZLIB_VERSION.tar.gz"; }
+cd "zlib-$ZLIB_VERSION"
 CC="$PW_CLANG/clang" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" ./configure --prefix="$SYSROOT" --static
 make -j"$(nproc)" && make install
 
 # libffi
 echo ">>> libffi"
 cd "$SRC"
-[[ -d libffi-3.4.6 ]] || { wget -q https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz && tar xzf libffi-3.4.6.tar.gz; }
-cd libffi-3.4.6
+[[ -d "libffi-$LIBFFI_VERSION" ]] || { wget -q "https://github.com/libffi/libffi/releases/download/v$LIBFFI_VERSION/libffi-$LIBFFI_VERSION.tar.gz" && tar xzf "libffi-$LIBFFI_VERSION.tar.gz"; }
+cd "libffi-$LIBFFI_VERSION"
 CC="$PW_CLANG/clang" CXX="$PW_CLANG/clang++" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
@@ -220,8 +233,8 @@ make -j"$(nproc)" && make install
 # pcre2
 echo ">>> pcre2"
 cd "$SRC"
-[[ -d pcre2-10.43 ]] || { wget -q https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.43/pcre2-10.43.tar.gz && tar xzf pcre2-10.43.tar.gz; }
-cd pcre2-10.43
+[[ -d "pcre2-$PCRE2_VERSION" ]] || { wget -q "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$PCRE2_VERSION/pcre2-$PCRE2_VERSION.tar.gz" && tar xzf "pcre2-$PCRE2_VERSION.tar.gz"; }
+cd "pcre2-$PCRE2_VERSION"
 CC="$PW_CLANG/clang" CXX="$PW_CLANG/clang++" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
@@ -229,7 +242,7 @@ make -j"$(nproc)" && make install
 # GLib
 echo ">>> GLib"
 cd "$SRC"
-[[ -d glib-2.80.0 ]] || { wget -q https://download.gnome.org/sources/glib/2.80/glib-2.80.0.tar.xz && tar xf glib-2.80.0.tar.xz; }
+[[ -d "glib-$GLIB_VERSION" ]] || { wget -q "https://download.gnome.org/sources/glib/$GLIB_SERIES/glib-$GLIB_VERSION.tar.xz" && tar xf "glib-$GLIB_VERSION.tar.xz"; }
 
 cat >"$SRC/msan-native.ini" <<EOF
 [binaries]
@@ -249,10 +262,11 @@ cpp_link_args = ['-fsanitize=memory']
 pkg_config_path = '$SYSROOT/lib/pkgconfig:$SYSROOT/lib64/pkgconfig'
 EOF
 
-cd glib-2.80.0
+cd "glib-$GLIB_VERSION"
 rm -rf builddir
 PKG_CONFIG_PATH="$SYSROOT/lib/pkgconfig:$SYSROOT/lib64/pkgconfig" \
     meson setup builddir --native-file "$SRC/msan-native.ini" --prefix="$SYSROOT" \
+    --libdir=lib \
     --default-library=static --buildtype=debugoptimized \
     -Dselinux=disabled -Dxattr=false -Dlibmount=disabled -Dnls=disabled \
     -Dtests=false -Dglib_checks=false -Dglib_assert=false \
