@@ -213,10 +213,10 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
-    VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
 #if SILABS_LOG_OUT_UART
     sendLogImmediately(false);
-#endif // SILABS_LOG_OUT_UART
+#endif                                                       // SILABS_LOG_OUT_UART
+    VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
     sMainTaskHandle = nullptr;
 }
 } // namespace
