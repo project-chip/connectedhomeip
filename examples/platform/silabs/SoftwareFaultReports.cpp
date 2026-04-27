@@ -332,7 +332,7 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
 extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode)
 {
     char faultMessage[kMaxFaultStringLen] = { 0 };
-    snprintf(faultMessage, sizeof faultMessage, "RAIL Assert:%" PRIx32, errorCode);
+    snprintf(faultMessage, sizeof faultMessage, "RAIL Assert:%" PRIu32, errorCode);
 #if SILABS_LOG_ENABLED
 #ifdef RAIL_ASSERT_DEBUG_STRING
     static const char * railErrorMessages[] = RAIL_ASSERT_ERROR_MESSAGES;
