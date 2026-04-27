@@ -1648,7 +1648,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             await asyncio.sleep(0.1)
 
 
-
 EndpointCheckFunction = Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
