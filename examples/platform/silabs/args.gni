@@ -25,4 +25,5 @@ segger_rtt_buffer_size_down = 1024
 
 declare_args() {
   app_data_model = ""
+  sl_matter_use_code_driven_dm = false
 }

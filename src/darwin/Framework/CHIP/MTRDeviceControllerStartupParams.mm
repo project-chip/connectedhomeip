@@ -316,14 +316,14 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 + (nullable NSNumber *)nodeIDFromNOC:(MTRCertificateDERBytes)noc
 {
     NSNumber * nodeID = nil;
-    ExtractNodeIDFromNOC(noc, &nodeID);
+    TEMPORARY_RETURN_IGNORED ExtractNodeIDFromNOC(noc, &nodeID);
     return nodeID;
 }
 
 + (nullable NSNumber *)fabricIDFromNOC:(MTRCertificateDERBytes)noc
 {
     NSNumber * fabricID = nil;
-    ExtractFabricIDFromNOC(noc, &fabricID);
+    TEMPORARY_RETURN_IGNORED ExtractFabricIDFromNOC(noc, &fabricID);
     return fabricID;
 }
 
@@ -372,6 +372,12 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 - (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
                          uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 {
+    return [self initWithXPCConnectionBlock:xpcConnectionBlock uniqueIdentifier:uniqueIdentifier];
+}
+
+- (instancetype)initWithXPCConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                          uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+{
     if (self = [super _initInternal]) {
         _xpcConnectionBlock = [xpcConnectionBlock copy];
         _uniqueIdentifier = [uniqueIdentifier copy];
@@ -379,6 +385,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 
     return self;
 }
+
 @end
 
 @implementation MTRDeviceControllerStartupParamsInternal

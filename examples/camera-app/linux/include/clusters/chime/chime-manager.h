@@ -19,26 +19,32 @@
 #pragma once
 #include <app/clusters/chime-server/chime-server.h>
 
-namespace Camera {
+namespace chip {
+namespace app {
+namespace Clusters {
 
-class ChimeManager : public chip::app::Clusters::ChimeDelegate
+class ChimeManager : public ChimeDelegate
 {
 
 public:
     ChimeManager() {}
 
     // Chime Delegate methods
-    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name);
-    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID);
+    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override;
+    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
 
-    chip::Protocols::InteractionModel::Status PlayChimeSound();
+    chip::Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
 
 private:
     using ChimeSoundStructType = chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type;
 
-    const ChimeSoundStructType mChimeSounds[1] = {
-        ChimeSoundStructType{ .chimeID = 0, .name = chip::CharSpan::fromCharString("Basic Door Chime") },
+    const ChimeSoundStructType mChimeSounds[3] = {
+        ChimeSoundStructType{ .chimeID = 0, .name = "Basic Door Chime"_span },
+        ChimeSoundStructType{ .chimeID = 1, .name = "Enhanced Door Chime"_span },
+        ChimeSoundStructType{ .chimeID = 2, .name = "Star Wars Door Chime"_span },
     };
 };
 
-} // namespace Camera
+} // namespace Clusters
+} // namespace app
+} // namespace chip

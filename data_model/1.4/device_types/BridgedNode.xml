@@ -86,13 +86,13 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x003C" name="Administrator Commissioning" side="server">
       <mandatoryConform>
-        <attribute name="FabricSynchronizedNode"/>
+        <condition name="FabricSynchronizedNode"/>
       </mandatoryConform>
     </cluster>
     <cluster id="0x0750" name="Ecosystem Information" side="server">
       <otherwiseConform>
         <mandatoryConform>
-          <attribute name="FabricSynchronizedNode"/>
+          <condition name="FabricSynchronizedNode"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>

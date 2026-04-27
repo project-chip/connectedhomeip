@@ -30,10 +30,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LinkedList.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 
 namespace {
@@ -45,6 +46,8 @@ struct TestAttributePathExpandIterator : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
+
+TestPersistentStorageDelegate gStorageDelegate;
 
 TEST_F(TestAttributePathExpandIterator, TestAllWildcard)
 {
@@ -117,7 +120,7 @@ TEST_F(TestAttributePathExpandIterator, TestAllWildcard)
     while (true)
     {
         // re-create the iterator
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
         if (!iter.Next(path))
         {
@@ -136,8 +139,8 @@ TEST_F(TestAttributePathExpandIterator, TestAllWildcard)
 TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
-    clusInfo.mValue.mClusterId   = chip::Test::MockClusterId(3);
-    clusInfo.mValue.mAttributeId = chip::Test::MockAttributeId(3);
+    clusInfo.mValue.mClusterId   = MockClusterId(3);
+    clusInfo.mValue.mAttributeId = MockAttributeId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -150,7 +153,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
     while (true)
     {
         // re-create the iterator
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
         if (!iter.Next(path))
         {
@@ -158,8 +161,8 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
-        EXPECT_EQ(paths[index], path);
+        ASSERT_LT(index, MATTER_ARRAY_SIZE(paths));
+        EXPECT_EQ(paths[index], path); // NOLINT(clang-analyzer-security.ArrayBound): checked above
         index++;
     }
     EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
@@ -168,7 +171,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
 TEST_F(TestAttributePathExpandIterator, TestWildcardCluster)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
-    clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint3;
+    clusInfo.mValue.mEndpointId  = kMockEndpoint3;
     clusInfo.mValue.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
     app::ConcreteAttributePath path;
@@ -185,7 +188,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardCluster)
     while (true)
     {
         // re-create the iterator
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
         if (!iter.Next(path))
         {
@@ -203,7 +206,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardCluster)
 TEST_F(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMetadata)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
-    clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint3;
+    clusInfo.mValue.mEndpointId  = kMockEndpoint3;
     clusInfo.mValue.mAttributeId = app::Clusters::Globals::Attributes::AttributeList::Id;
 
     app::ConcreteAttributePath path;
@@ -221,7 +224,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInM
     while (true)
     {
         // re-create the iterator
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
         if (!iter.Next(path))
         {
@@ -239,8 +242,8 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInM
 TEST_F(TestAttributePathExpandIterator, TestWildcardAttribute)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
-    clusInfo.mValue.mEndpointId = chip::Test::kMockEndpoint2;
-    clusInfo.mValue.mClusterId  = chip::Test::MockClusterId(3);
+    clusInfo.mValue.mEndpointId = kMockEndpoint2;
+    clusInfo.mValue.mClusterId  = MockClusterId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -261,7 +264,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardAttribute)
     while (true)
     {
         // re-create the iterator
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
         if (!iter.Next(path))
         {
@@ -279,9 +282,9 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardAttribute)
 TEST_F(TestAttributePathExpandIterator, TestNoWildcard)
 {
     SingleLinkedListNode<app::AttributePathParams> clusInfo;
-    clusInfo.mValue.mEndpointId  = chip::Test::kMockEndpoint2;
-    clusInfo.mValue.mClusterId   = chip::Test::MockClusterId(3);
-    clusInfo.mValue.mAttributeId = chip::Test::MockAttributeId(3);
+    clusInfo.mValue.mEndpointId  = kMockEndpoint2;
+    clusInfo.mValue.mClusterId   = MockClusterId(3);
+    clusInfo.mValue.mAttributeId = MockAttributeId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -294,7 +297,7 @@ TEST_F(TestAttributePathExpandIterator, TestNoWildcard)
     while (true)
     {
         // re-create the iterator
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
         if (!iter.Next(path))
         {
@@ -302,8 +305,8 @@ TEST_F(TestAttributePathExpandIterator, TestNoWildcard)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
-        EXPECT_EQ(paths[index], path);
+        ASSERT_LT(index, MATTER_ARRAY_SIZE(paths));
+        EXPECT_EQ(paths[index], path); // NOLINT(clang-analyzer-security.ArrayBound): checked above
         index++;
     }
     EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
@@ -321,7 +324,7 @@ TEST_F(TestAttributePathExpandIterator, TestFixedPathExpansion)
         clusInfo.mValue.mAttributeId = 122333;
 
         auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
         ConcreteAttributePath path;
 
         EXPECT_FALSE(iter.Next(path));
@@ -334,7 +337,7 @@ TEST_F(TestAttributePathExpandIterator, TestFixedPathExpansion)
         clusInfo.mValue.mAttributeId = Clusters::Globals::Attributes::FeatureMap::Id;
 
         auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
         ConcreteAttributePath path;
 
         EXPECT_FALSE(iter.Next(path));
@@ -346,7 +349,7 @@ TEST_F(TestAttributePathExpandIterator, TestFixedPathExpansion)
         clusInfo.mValue.mClusterId = 122333;
 
         auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
         ConcreteAttributePath path;
 
         EXPECT_FALSE(iter.Next(path));
@@ -360,7 +363,7 @@ TEST_F(TestAttributePathExpandIterator, TestFixedPathExpansion)
         clusInfo.mValue.mAttributeId = 122333;
 
         auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
         ConcreteAttributePath path;
 
         EXPECT_TRUE(iter.Next(path));
@@ -378,21 +381,21 @@ TEST_F(TestAttributePathExpandIterator, TestMultipleClusInfo)
     SingleLinkedListNode<app::AttributePathParams> clusInfo1;
 
     SingleLinkedListNode<app::AttributePathParams> clusInfo2;
-    clusInfo2.mValue.mClusterId   = chip::Test::MockClusterId(3);
-    clusInfo2.mValue.mAttributeId = chip::Test::MockAttributeId(3);
+    clusInfo2.mValue.mClusterId   = MockClusterId(3);
+    clusInfo2.mValue.mAttributeId = MockAttributeId(3);
 
     SingleLinkedListNode<app::AttributePathParams> clusInfo3;
-    clusInfo3.mValue.mEndpointId  = chip::Test::kMockEndpoint3;
+    clusInfo3.mValue.mEndpointId  = kMockEndpoint3;
     clusInfo3.mValue.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
     SingleLinkedListNode<app::AttributePathParams> clusInfo4;
-    clusInfo4.mValue.mEndpointId = chip::Test::kMockEndpoint2;
-    clusInfo4.mValue.mClusterId  = chip::Test::MockClusterId(3);
+    clusInfo4.mValue.mEndpointId = kMockEndpoint2;
+    clusInfo4.mValue.mClusterId  = MockClusterId(3);
 
     SingleLinkedListNode<app::AttributePathParams> clusInfo5;
-    clusInfo5.mValue.mEndpointId  = chip::Test::kMockEndpoint2;
-    clusInfo5.mValue.mClusterId   = chip::Test::MockClusterId(3);
-    clusInfo5.mValue.mAttributeId = chip::Test::MockAttributeId(3);
+    clusInfo5.mValue.mEndpointId  = kMockEndpoint2;
+    clusInfo5.mValue.mClusterId   = MockClusterId(3);
+    clusInfo5.mValue.mAttributeId = MockAttributeId(3);
 
     clusInfo1.mpNext = &clusInfo2;
     clusInfo2.mpNext = &clusInfo3;
@@ -478,7 +481,7 @@ TEST_F(TestAttributePathExpandIterator, TestMultipleClusInfo)
         size_t index = 0;
 
         auto position = AttributePathExpandIterator::Position::StartIterating(&clusInfo1);
-        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+        app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
         while (iter.Next(path))
         {
@@ -500,7 +503,7 @@ TEST_F(TestAttributePathExpandIterator, TestMultipleClusInfo)
         while (true)
         {
             // re-create the iterator
-            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(nullptr /* delegate */), position);
+            app::AttributePathExpandIterator iter(CodegenDataModelProviderInstance(&gStorageDelegate), position);
 
             if (!iter.Next(path))
             {

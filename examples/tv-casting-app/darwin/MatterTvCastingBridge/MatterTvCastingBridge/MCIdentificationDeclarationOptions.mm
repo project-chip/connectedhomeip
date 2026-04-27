@@ -43,6 +43,7 @@
         _commissionerPasscodeReady = NO;
         _cancelPasscode = NO;
         _targetAppInfos = [[NSMutableArray alloc] init];
+        _passcodeLength = 0;
     }
     return self;
 }
@@ -57,6 +58,39 @@
         _commissionerPasscodeReady = NO;
         _cancelPasscode = NO;
         _targetAppInfos = [[NSMutableArray alloc] init];
+        _passcodeLength = 0;
+    }
+    return self;
+}
+
+- (instancetype)initWithPasscodeLengthOnly:(NSInteger)passcodeLength
+{
+    self = [super init];
+    if (self) {
+        _noPasscode = NO;
+        _cdUponPasscodeDialog = NO;
+        _commissionerPasscode = NO;
+        _commissionerPasscodeReady = NO;
+        _cancelPasscode = NO;
+        _targetAppInfos = [[NSMutableArray alloc] init];
+        _passcodeLength = passcodeLength;
+    }
+    return self;
+}
+
+- (instancetype)initWithInstanceName:(NSString *)instanceName
+                          noPasscode:(BOOL)noPasscode
+{
+    self = [super init];
+    if (self) {
+        _noPasscode = noPasscode;
+        _cdUponPasscodeDialog = NO;
+        _commissionerPasscode = NO;
+        _commissionerPasscodeReady = NO;
+        _cancelPasscode = NO;
+        _targetAppInfos = [[NSMutableArray alloc] init];
+        _passcodeLength = 0;
+        _instanceName = instanceName;
     }
     return self;
 }
@@ -87,6 +121,16 @@
     return _cancelPasscode;
 }
 
+- (NSInteger)getPasscodeLength
+{
+    return _passcodeLength;
+}
+
+- (NSString *)getInstanceName
+{
+    return _instanceName;
+}
+
 - (BOOL)addTargetAppInfo:(MCTargetAppInfo *)targetAppInfo
 {
     if (self.targetAppInfos.count >= CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS) {
@@ -109,6 +153,8 @@
     [sb appendFormat:@"MCIdentificationDeclarationOptions::commissionerPasscode:      %d\n", self.commissionerPasscode];
     [sb appendFormat:@"MCIdentificationDeclarationOptions::commissionerPasscodeReady: %d\n", self.commissionerPasscodeReady];
     [sb appendFormat:@"MCIdentificationDeclarationOptions::cancelPasscode:            %d\n", self.cancelPasscode];
+    [sb appendFormat:@"MCIdentificationDeclarationOptions::passcodeLength:            %d\n", self.passcodeLength];
+    [sb appendFormat:@"MCIdentificationDeclarationOptions::instanceName:              %@\n", self.instanceName];
     [sb appendString:@"MCIdentificationDeclarationOptions::targetAppInfos list:\n"];
 
     for (MCTargetAppInfo * targetAppInfo in self.targetAppInfos) {
@@ -126,6 +172,14 @@
     cppIdOptions.mCommissionerPasscode = [self getCommissionerPasscode];
     cppIdOptions.mCommissionerPasscodeReady = [self getCommissionerPasscodeReady];
     cppIdOptions.mCancelPasscode = [self getCancelPasscode];
+    cppIdOptions.mPasscodeLength = [self getPasscodeLength];
+
+    NSString * instanceNameStr = [self getInstanceName];
+    if (instanceNameStr != nil && instanceNameStr.length > 0) {
+        const char * instanceName = [instanceNameStr UTF8String];
+        strncpy(cppIdOptions.mCommissioneeInstanceName, instanceName, sizeof(cppIdOptions.mCommissioneeInstanceName) - 1);
+        cppIdOptions.mCommissioneeInstanceName[sizeof(cppIdOptions.mCommissioneeInstanceName) - 1] = '\0';
+    }
 
     NSArray<MCTargetAppInfo *> * targetAppInfos = [self getTargetAppInfoList];
     for (MCTargetAppInfo * appInfo in targetAppInfos) {

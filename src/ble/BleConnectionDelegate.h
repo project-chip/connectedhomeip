@@ -29,6 +29,7 @@
 
 #include <lib/support/DLLUtil.h>
 #include <lib/support/SetupDiscriminator.h>
+#include <lib/support/Span.h>
 
 #include "BleConfig.h"
 #include "BleError.h"
@@ -52,6 +53,11 @@ public:
     typedef void (*OnConnectionCompleteFunct)(void * appState, BLE_CONNECTION_OBJECT connObj);
     OnConnectionCompleteFunct OnConnectionComplete;
 
+    // A callback indicating that a connection was established to a device with (long) discriminator
+    // matchedDiscriminator.
+    typedef void (*OnConnectionByDiscriminatorsCompleteFunct)(void * appState, uint16_t matchedLongDiscriminator,
+                                                              BLE_CONNECTION_OBJECT connObj);
+
     typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
     OnConnectionErrorFunct OnConnectionError;
 
@@ -65,6 +71,32 @@ public:
 
     // Call this function to stop the connection
     virtual CHIP_ERROR CancelConnection() = 0;
+
+    // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
+    // out of a peripheral that matches any of the given discriminators.
+    //
+    // The provided onConnectionComplete callback may be called multiple times, if multiple
+    // connections are created.
+    //
+    // If the onConnectionError callback is called, that indicates that there will be no more
+    // onConnectionComplete callbacks until the next NewConnection call.
+    //
+    // Calling CancelConnection will ensure no more calls to onConnectionComplete or
+    // onConnectionError until the next NewConnection call.
+    //
+    // The implementation must not assume that the memory backing the "discriminators" argument will
+    // outlive this call returning.
+    //
+    virtual CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
+                                     OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
+                                     OnConnectionErrorFunct onConnectionError)
+    {
+        // Should this handle the case when "discriminators" has length 1 automatically by
+        // delegating to the NewConnection overload that takes a single SetupDiscriminator?  It adds
+        // some unavoidable codesize and storage for the discriminator to do that.  Probably better
+        // to have the API consumers handle that.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 } /* namespace Ble */

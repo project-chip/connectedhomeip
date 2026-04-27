@@ -49,7 +49,7 @@ void TransferTimeoutCheckHandler(System::Layer * systemLayer, void * appState)
     else
     {
         // Else restart the timer
-        systemLayer->StartTimer(bdxDownloader->GetTimeout(), TransferTimeoutCheckHandler, appState);
+        TEMPORARY_RETURN_IGNORED systemLayer->StartTimer(bdxDownloader->GetTimeout(), TransferTimeoutCheckHandler, appState);
     }
 }
 
@@ -119,7 +119,7 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
 
     // Note that due to the nature of this timer function, the actual time taken to detect a stalled BDX connection might be
     // anywhere in the range of [mTimeout, 2*mTimeout)
-    DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
 
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
 
@@ -178,7 +178,7 @@ void BDXDownloader::OnDownloadTimeout()
         mBdxTransfer.Reset();
         if (mImageProcessor != nullptr)
         {
-            mImageProcessor->Abort();
+            TEMPORARY_RETURN_IGNORED mImageProcessor->Abort();
         }
         SetState(State::kIdle, OTAChangeReasonEnum::kTimeOut);
     }
@@ -205,12 +205,11 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
         }
 
         // There is no method for a BDX receiving driver to cleanly end a transfer
-        mBdxTransfer.AbortTransfer(status);
+        TEMPORARY_RETURN_IGNORED mBdxTransfer.AbortTransfer(status);
         if (mImageProcessor != nullptr)
         {
-            mImageProcessor->Abort();
+            TEMPORARY_RETURN_IGNORED mImageProcessor->Abort();
         }
-
         // Because AbortTransfer() will generate a StatusReport to send.
         PollTransferSession();
 
@@ -244,7 +243,7 @@ void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason)
     SetState(State::kIdle, reason);
     if (mImageProcessor)
     {
-        mImageProcessor->Abort();
+        TEMPORARY_RETURN_IGNORED mImageProcessor->Abort();
     }
 }
 
@@ -280,7 +279,7 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         // TODO: this will cause problems if Finalize() is not guaranteed to do its work after ProcessBlock().
         if (outEvent.blockdata.IsEof)
         {
-            mBdxTransfer.PrepareBlockAck();
+            TEMPORARY_RETURN_IGNORED mBdxTransfer.PrepareBlockAck();
             ReturnErrorOnFailure(mImageProcessor->Finalize());
         }
 

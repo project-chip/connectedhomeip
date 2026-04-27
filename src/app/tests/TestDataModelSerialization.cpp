@@ -25,6 +25,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 namespace {
@@ -65,14 +66,14 @@ void TestDataModelSerialization::SetupBuf()
     buf = System::PacketBufferHandle::New(1024);
     mStore.Init(std::move(buf));
 
-    mWriter.Init(mStore);
-    mReader.Init(mStore);
+    EXPECT_SUCCESS(mWriter.Init(mStore));
+    EXPECT_SUCCESS(mReader.Init(mStore));
 }
 
 void TestDataModelSerialization::DumpBuf()
 {
     TLV::TLVReader reader;
-    reader.Init(mStore);
+    EXPECT_SUCCESS(reader.Init(mStore));
 
     //
     // Enable this once the TLV pretty printer has been checked in.
@@ -85,7 +86,7 @@ void TestDataModelSerialization::DumpBuf()
 void TestDataModelSerialization::SetupReader()
 {
 
-    mReader.Init(mStore);
+    EXPECT_SUCCESS(mReader.Init(mStore));
     EXPECT_EQ(mReader.Next(), CHIP_NO_ERROR);
 }
 
@@ -109,7 +110,7 @@ CHIP_ERROR EncodeStruct(TLV::TLVWriter & writer, TLV::Tag tag, ArgTypes... Args)
     TLV::TLVType type;
 
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, type));
-    (void) (expand_type{ (DataModel::Encode(writer, Args.tag, Args.value), 0)... });
+    (void) (expand_type{ (TEMPORARY_RETURN_IGNORED DataModel::Encode(writer, Args.tag, Args.value), 0)... });
     ReturnErrorOnFailure(writer.EndContainer(type));
 
     return CHIP_NO_ERROR;
@@ -873,7 +874,7 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(bool encode
             encodable.nullableList.SetNull();
         }
 
-        EXPECT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), encodable), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(DataModel::Encode(mWriter, TLV::AnonymousTag(), encodable));
         EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
     }
 

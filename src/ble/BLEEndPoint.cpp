@@ -445,7 +445,7 @@ void BLEEndPoint::ReleaseBleConnection()
         if (mConnStateFlags.Has(ConnectionStateFlag::kAutoClose))
         {
             ChipLogProgress(Ble, "Auto-closing end point's BLE connection.");
-            mBle->mPlatformDelegate->CloseConnection(mConnObj);
+            TEMPORARY_RETURN_IGNORED mBle->mPlatformDelegate->CloseConnection(mConnObj);
         }
         else
         {
@@ -876,7 +876,7 @@ CHIP_ERROR BLEEndPoint::DoSendStandAloneAck()
     ChipLogDebugBleEndPoint(Ble, "entered DoSendStandAloneAck; sending stand-alone ack");
 
     // Encode and transmit stand-alone ack.
-    mBtpEngine.EncodeStandAloneAck(mAckToSend);
+    ReturnErrorOnFailure(mBtpEngine.EncodeStandAloneAck(mAckToSend));
     ReturnErrorOnFailure(SendCharacteristic(mAckToSend.Retain()));
 
     // Reset local receive window counter.

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "thermostat-server-presets.h"
 #include "thermostat-server.h"
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -243,6 +244,17 @@ bool PresetTypeSupportsNames(Delegate * delegate, PresetScenarioEnum scenario)
     return false;
 }
 
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+extern ThermostatAttrAccess gThermostatAttrAccess;
+extern int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint);
+extern int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint);
+
 /**
  * @brief Checks if the given preset handle is present in the  presets attribute
  * @param[in] delegate The delegate to use.
@@ -278,17 +290,6 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
     }
     return false;
 }
-
-} // namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
-
-extern ThermostatAttrAccess gThermostatAttrAccess;
-extern int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint);
-extern int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint);
 
 Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle)
 {

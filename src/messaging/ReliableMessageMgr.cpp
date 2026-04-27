@@ -131,6 +131,11 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
     {
         event.retransmissionCount = entry.sendCount;
     }
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kAcknowledged)
+    {
+        auto now           = System::SystemClock().GetMonotonicTimestamp();
+        event.ackLatencyMs = now - entry.initialSentTime;
+    }
 
     mAnalyticsDelegate->OnTransmitEvent(event);
 }
@@ -152,7 +157,7 @@ void ReliableMessageMgr::ExecuteActions()
 #if defined(RMP_TICKLESS_DEBUG)
                 ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions sending ACK %p", rc);
 #endif
-                rc->SendStandaloneAckMessage();
+                TEMPORARY_RETURN_IGNORED rc->SendStandaloneAckMessage();
             }
         }
     });
@@ -221,8 +226,7 @@ void ReliableMessageMgr::ExecuteActions()
                         Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
         MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
 
-        CalculateNextRetransTime(*entry);
-        SendFromRetransTable(entry);
+        TEMPORARY_RETURN_IGNORED SendFromRetransTable(entry);
 
         return Loop::Continue;
     });
@@ -326,6 +330,7 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     CalculateNextRetransTime(*entry);
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    entry->initialSentTime = System::SystemClock().GetMonotonicTimestamp();
     NotifyMessageSendAnalytics(*entry, entry->ec->GetSessionHandle(), ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     StartTimer();
@@ -378,6 +383,8 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+        CalculateNextRetransTime(*entry);
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -469,7 +476,7 @@ void ReliableMessageMgr::StartTimer()
                       "ms (in 0x" ChipLogFormatX64 "ms)",
                       ChipLogValueX64(now.count()), ChipLogValueX64(nextWakeTime.count()), ChipLogValueX64(nextWakeDelay.count()));
 #endif
-        VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
+        SuccessOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this));
     }
     else
     {

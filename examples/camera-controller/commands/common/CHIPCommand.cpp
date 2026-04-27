@@ -21,10 +21,11 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <device-manager/DeviceManager.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
 
@@ -50,6 +51,7 @@ constexpr char kCDTrustStorePathVariable[]      = "CAMERACONTROLLER_CD_TRUST_STO
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
 
 namespace {
 
@@ -109,6 +111,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
+    factoryInitParams.sessionKeystore          = &sSessionKeystore;
     factoryInitParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&mDefaultStorage);
 
     // Init group data provider that will be used for all group keys and IPKs for the
@@ -167,6 +170,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     bool allowTestCdSigningKey = !mOnlyAllowTrustedCdKeys.ValueOr(false);
     mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
                                                allowTestCdSigningKey);
+
+    ReturnLogErrorOnFailure(camera::DeviceManager::Instance().Init(&CurrentCommissioner()));
 
     return CHIP_NO_ERROR;
 }
@@ -321,7 +326,7 @@ std::string CHIPCommand::GetIdentity()
             // normalize name since it is used in persistent storage
 
             char s[24];
-            sprintf(s, "%lx", fabricId);
+            sprintf(s, "%" PRIx64, fabricId);
 
             name = s;
         }

@@ -32,30 +32,16 @@
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/GLibTypeDeleter.h>
 
 namespace chip {
 namespace Dnssd {
 
 class DnssdTizen;
 
-enum class ContextType
+struct RegisterContext
 {
-    Register,
-    Browse,
-    Resolve,
-};
-
-struct GenericContext
-{
-    ContextType mContextType;
-    DnssdTizen * mInstance;
-
-    GenericContext(ContextType contextType, DnssdTizen * instance) : mContextType(contextType), mInstance(instance) {}
-    virtual ~GenericContext() = default;
-};
-
-struct RegisterContext : public GenericContext
-{
+    DnssdTizen & mInstance;
     char mName[Common::kInstanceNameMaxLength + 1];
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
     uint32_t mInterfaceId;
@@ -67,13 +53,16 @@ struct RegisterContext : public GenericContext
     dnssd_service_h mServiceHandle = 0;
     bool mIsRegistered             = false;
 
-    RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
+    RegisterContext(DnssdTizen & instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
                     void * context);
-    ~RegisterContext() override;
+    ~RegisterContext();
+
+    void RemoveFromOwner();
 };
 
-struct BrowseContext : public GenericContext
+struct BrowseContext
 {
+    DnssdTizen & mInstance;
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
     Dnssd::DnssdServiceProtocol mProtocol;
     uint32_t mInterfaceId;
@@ -88,13 +77,16 @@ struct BrowseContext : public GenericContext
     std::vector<DnssdService> mServices;
     bool mIsBrowsing = false;
 
-    BrowseContext(DnssdTizen * instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
+    BrowseContext(DnssdTizen & instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
                   DnssdBrowseCallback callback, void * context);
-    ~BrowseContext() override;
+    ~BrowseContext();
+
+    void RemoveFromOwner();
 };
 
-struct ResolveContext : public GenericContext
+struct ResolveContext
 {
+    DnssdTizen & mInstance;
     char mName[Common::kInstanceNameMaxLength + 1];
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
     uint32_t mInterfaceId;
@@ -106,15 +98,16 @@ struct ResolveContext : public GenericContext
     bool mIsResolving              = false;
 
     // Resolved service
-    DnssdService mResult               = {};
-    uint8_t * mResultTxtRecord         = nullptr;
+    DnssdService mResult = {};
+    GAutoPtr<char> mResultTxtRecord;
     unsigned short mResultTxtRecordLen = 0;
 
-    ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
+    ResolveContext(DnssdTizen & instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
                    void * context);
-    ~ResolveContext() override;
+    ~ResolveContext() = default;
 
     void Finalize(CHIP_ERROR error);
+    void RemoveFromOwner();
 };
 
 class DnssdTizen
@@ -135,12 +128,13 @@ public:
     CHIP_ERROR Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
 
-    // TODO (a.bokowy): Make this method private
-    CHIP_ERROR RemoveContext(GenericContext * context);
-
     static DnssdTizen & GetInstance() { return sInstance; }
 
 private:
+    friend struct RegisterContext;
+    friend struct BrowseContext;
+    friend struct ResolveContext;
+
     DnssdTizen() = default;
     static DnssdTizen sInstance;
 
@@ -151,8 +145,14 @@ private:
     ResolveContext * CreateResolveContext(const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
                                           void * context);
 
+    void RemoveRegisterContext(RegisterContext * context);
+    void RemoveBrowseContext(BrowseContext * context);
+    void RemoveResolveContext(ResolveContext * context);
+
     std::mutex mMutex;
-    std::set<std::unique_ptr<GenericContext>> mContexts;
+    std::set<std::unique_ptr<RegisterContext>> mRegisterContexts;
+    std::set<std::unique_ptr<BrowseContext>> mBrowseContexts;
+    std::set<std::unique_ptr<ResolveContext>> mResolveContexts;
 };
 
 } // namespace Dnssd

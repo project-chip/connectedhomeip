@@ -26,6 +26,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${LIGHT_COMMON_DIR}/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
 )
+
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${APP_COMMON_GEN_DIR}/attributes"
@@ -37,6 +38,11 @@ set(SRC_DIRS_LIST
                       "${CHIP_ROOT}/examples/platform/esp32/shell_extension"
 )
 
+if (CONFIG_ESP_INSIGHTS_ENABLED AND CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics/insights/")
+    list(APPEND SRC_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics/insights/")
+endif()
+
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
@@ -46,6 +52,7 @@ set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CHIP_ROOT}/examples/common/pigweed/esp32"
                      "${CHIP_ROOT}/src/lib/support"
 )
+
 
 if (${IDF_VERSION_MAJOR} LESS 5)
     list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/include/freertos")
@@ -65,10 +72,10 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
 
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 chip_configure_data_model(${COMPONENT_LIB}
-    ZAP_FILE ${LIGHT_COMMON_DIR}/lighting-app.zap
+    ZAP_FILE ${CMAKE_SOURCE_DIR}/data_model/lighting-app.zap
 )
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+if ((CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS) AND (CONFIG_ESP_INSIGHTS_ENABLED))
     target_add_binary_data(${COMPONENT_TARGET} "insights_auth_key.txt" TEXT)
 endif()
 
@@ -76,11 +83,17 @@ if (CONFIG_ENABLE_SET_CERT_DECLARATION_API)
     target_add_binary_data(${COMPONENT_TARGET} "certification_declaration.der" BINARY)
 endif()
 
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
+
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+	create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
+			   ${project_dir}/esp_image_encryption_public_key.pem
+			   ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-encrypted.bin
+			   app)
+endif()
 
 if (CONFIG_ENABLE_PW_RPC)
 

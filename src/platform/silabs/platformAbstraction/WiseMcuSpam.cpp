@@ -18,25 +18,38 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <sl_si91x_common_flash_intf.h>
 
+#include "sl_si91x_driver_gpio.h"
+#include "sl_si91x_gpio.h"
+
 #include <FreeRTOS.h>
 #include <task.h>
 
 #include <app/icd/server/ICDServerConfig.h>
-#include <lib/support/CodeUtils.h>
 
 #include <lib/support/CodeUtils.h>
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
-
 #endif // SILABS_LOG_ENABLED
+
+#define SOC_PLL_REF_FREQUENCY 40000000 // /* PLL input REFERENCE clock 40MHZ */
+// Note: Change this macro to required PLL frequency in hertz
+#define PS4_SOC_FREQ 180000000 /* PLL out clock 180MHz */
+#define SWITCH_QSPI_TO_SOC_PLL
+#define ICACHE_DISABLE
+#define DEBUG_DISABLE
+
+/* QSPI clock config params */
+#define INTF_PLL_500_CTRL_VALUE 0xD900
+#define INTF_PLL_CLK 80000000 /* PLL out clock 80 MHz */
 
 // TODO add includes ?
 extern "C" {
-#include "em_core.h"
 #if defined(SL_SI91X_BOARD_INIT)
 #include "rsi_board.h"
 #endif // SL_SI91X_BOARD_INIT
-#include "sl_event_handler.h"
+
+#include "rsi_rom_clks.h"
+#include "sl_si91x_hal_soc_soft_reset.h"
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_button.h"
@@ -57,12 +70,8 @@ const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
 #include "sl_si91x_led_instances.h"
 #define SL_LED_COUNT SL_SI91x_LED_COUNT
 uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
-#endif // SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 #endif // ENABLE_WSTK_LEDS
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
-void soc_pll_config(void);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
@@ -82,9 +91,44 @@ namespace {
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
 bool btn0_pressed = false;
-#endif /* SL_ICD_ENABLED */
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
+int soc_pll_config(void)
+{
+    int32_t status = RSI_OK;
+
+    RSI_CLK_M4SocClkConfig(M4CLK, M4_ULPREFCLK, 0);
+    // Configures the required registers for 180 Mhz clock in PS4
+    RSI_PS_PS4SetRegisters();
+    // Configure the PLL frequency
+    // Configure the SOC PLL to 180MHz
+    RSI_CLK_SetSocPllFreq(M4CLK, PS4_SOC_FREQ, SOC_PLL_REF_FREQUENCY);
+    // Switch M4 clock to PLL clock for speed operations
+    RSI_CLK_M4SocClkConfig(M4CLK, M4_SOCPLLCLK, 0);
+
+    SysTick_Config(SystemCoreClock / configTICK_RATE_HZ);
+
+#ifdef SWITCH_QSPI_TO_SOC_PLL
+    /* program intf pll to 160Mhz */
+    SPI_MEM_MAP_PLL(INTF_PLL_500_CTRL_REG9) = INTF_PLL_500_CTRL_VALUE;
+    status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
+    if (status != RSI_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: %ld", status);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "Configured Interface PLL Clock to %d", INTF_PLL_CLK);
+    }
+
+    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);
+#endif /* SWITCH_QSPI_TO_SOC_PLL */
+    return status;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
@@ -93,9 +137,6 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     mButtonCallback = nullptr;
-
-    // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
-    NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
     // Configuration the clock rate
@@ -134,7 +175,7 @@ CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
     (state) ? sl_si91x_simple_rgb_led_on(SL_RGB_LED_INSTANCE(led)) : sl_si91x_simple_rgb_led_off(SL_RGB_LED_INSTANCE(led));
 #else
     (state) ? sl_si91x_led_set(ledPinArray[led]) : sl_si91x_led_clear(ledPinArray[led]);
-#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     return CHIP_NO_ERROR;
 }
 
@@ -151,15 +192,35 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     sl_si91x_simple_rgb_led_toggle(SL_RGB_LED_INSTANCE(led));
 #else
     sl_si91x_led_toggle(ledPinArray[led]);
-#endif // defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
-
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
 void SilabsPlatform::StartScheduler()
 {
     vTaskStartScheduler();
 }
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+bool SilabsPlatform::GetRGBLedState(uint8_t led)
+{
+    return sl_si91x_simple_rgb_led_get_current_state(SL_RGB_LED_INSTANCE(led));
+}
+CHIP_ERROR SilabsPlatform::SetLedColor(uint8_t led, uint8_t red, uint8_t green, uint8_t blue)
+{
+    uint32_t rgb_color;
+    rgb_color = (red) << 16 | (green) << 8 | (blue);
+    sl_si91x_simple_rgb_led_set_colour(SL_RGB_LED_INSTANCE(led), rgb_color);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, uint16_t & b)
+{
+    sl_si91x_simple_rgb_led_get_colour(SL_RGB_LED_INSTANCE(led), &r, &g, &b);
+    return CHIP_NO_ERROR;
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
@@ -197,6 +258,12 @@ extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
 }
 
+extern "C" void sl_si91x_button_isr(uint8_t pin, int8_t state)
+{
+    (pin == SL_BUTTON_BTN0_PIN) ? sl_button_on_change(SL_BUTTON_BTN0_NUMBER, state)
+                                : sl_button_on_change(SL_BUTTON_BTN1_NUMBER, state);
+}
+
 uint8_t SilabsPlatform::GetButtonState(uint8_t button)
 {
     return (button < SL_SI91x_BUTTON_COUNT) ? sButtonStates[button] : 0;
@@ -207,6 +274,11 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     return 0;
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
+void SilabsPlatform::SoftwareReset()
+{
+    sl_si91x_soc_nvic_reset();
+}
 
 CHIP_ERROR SilabsPlatform::FlashInit()
 {
@@ -224,6 +296,61 @@ CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, s
     rsi_flash_write((uint32_t *) addr, (unsigned char *) data, size);
     return CHIP_NO_ERROR;
 }
+
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
+{
+    sl_status_t status = SL_STATUS_OK;
+
+    // Sensor enable is on an NPSS / UULP pin (board defines SENSOR_ENABLE_GPIO_MAPPED_TO_UULP).
+#if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
+    if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) == LOW)
+    {
+        // Enable GPIO ULP_CLK
+        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) ULPCLK_GPIO);
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+        // Set NPSS GPIO pin MUX
+        status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(SENSOR_ENABLE_GPIO_PIN, NPSS_GPIO_PIN_MUX_MODE0);
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+        // Set NPSS GPIO pin direction
+        status = sl_si91x_gpio_driver_set_uulp_npss_direction(SENSOR_ENABLE_GPIO_PIN, (sl_si91x_gpio_direction_t) GPIO_OUTPUT);
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+        // Set UULP GPIO pin
+        status = sl_si91x_gpio_driver_set_uulp_npss_pin_value(SENSOR_ENABLE_GPIO_PIN, GPIO_PIN_SET);
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+    }
+#else // Sensor enable is a normal GPIO (ULP domain or M4 HP GPIO; see SENSOR_ENABLE_GPIO_MAPPED_TO_ULP for clock).
+    sl_gpio_t sensor_enable_port_pin = { (sl_gpio_port_t) SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN };
+    uint8_t pin_value;
+
+    status                        = sl_gpio_driver_get_pin(&sensor_enable_port_pin, &pin_value);
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    if (pin_value == LOW)
+    {
+        // GPIO peripheral clock: ULP vs M4 HP domain for this board pinout.
+#ifdef SENSOR_ENABLE_GPIO_MAPPED_TO_ULP
+        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) ULPCLK_GPIO);
+#else
+        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) M4CLK_GPIO);
+#endif // SENSOR_ENABLE_GPIO_MAPPED_TO_ULP
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+
+        // Set the pin mode for GPIO pins.
+        status = sl_gpio_driver_set_pin_mode(&sensor_enable_port_pin, SL_GPIO_MODE_0, HIGH);
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+        // Select the direction of GPIO pin whether Input/ Output
+        status = sl_si91x_gpio_driver_set_pin_direction(SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN,
+                                                        (sl_si91x_gpio_direction_t) GPIO_OUTPUT);
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+        // Set GPIO pin
+        status = sl_gpio_driver_set_pin(&sensor_enable_port_pin); // Set ULP GPIO pin
+        VerifyOrReturnError(status == SL_STATUS_OK, status);
+    }
+#endif // SENSOR_ENABLE_GPIO_MAPPED_TO_UULP
+
+    return status;
+}
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
 } // namespace Silabs
 } // namespace DeviceLayer

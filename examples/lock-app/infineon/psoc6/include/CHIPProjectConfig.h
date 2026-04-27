@@ -111,3 +111,6 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

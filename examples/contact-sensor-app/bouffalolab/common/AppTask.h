@@ -107,7 +107,7 @@ private:
     static void AppTaskMain(void * pvParameter);
 
 #if CONFIG_ENABLE_CHIP_SHELL
-    static CHIP_ERROR StartAppShellTask();
+    static void StartAppShellTask();
     static void AppShellTask(void * args);
 #endif
 

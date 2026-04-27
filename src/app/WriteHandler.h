@@ -192,7 +192,13 @@ private:
     ///
     /// Returns a success status if all is ok, failure otherwise.
     DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
-                                                    const ConcreteAttributePath & aPath);
+                                                    const ConcreteDataAttributePath & aPath);
+
+    /// Validate that a write on the given path has aRequiredPrivilege.
+    ///
+    /// Returns a success status if the ACL check is successful, otherwise the relevant status will be returned.
+    Status CheckWriteAccess(const Access::SubjectDescriptor & aSubject, const ConcreteAttributePath & aPath,
+                            const Access::Privilege aRequiredPrivilege);
 
     // Write the given data to the given path
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,

@@ -73,8 +73,8 @@ public:
 
     // Get the BorderAgentId of the Thread BR.
     // @return
-    //   -IncorrectState When Thread stack is not initialized.
-    //   -InvalidArgument When the size of borderAgentId is not 16 bytes.
+    //   -CHIP_ERROR_INCORRECT_STATE When Thread stack is not initialized.
+    //   -CHIP_ERROR_INVALID_ARGUMENT When the size of borderAgentId is not 16 bytes.
     //   -ThreadErrors When failing to get BorderAgentId.
     virtual CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) = 0;
 
@@ -86,8 +86,8 @@ public:
 
     // Get the active dataset or the pending dataset.
     // @return
-    //   -IncorrectState When Thread stack is not initialized.
-    //   -NotFound when failing to get the dataset.
+    //   -CHIP_ERROR_INCORRECT_STATE When Thread stack is not initialized.
+    //   -CHIP_ERROR_NOT_FOUND when failing to get the dataset.
     virtual CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) = 0;
 
     // There should be no active dataset configured when calling this API, otherwise we should use SetPendingDataset.

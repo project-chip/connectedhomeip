@@ -71,7 +71,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="6"/>
+      <constraint>
+        <maxCount value="6"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

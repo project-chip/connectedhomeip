@@ -128,7 +128,7 @@ public:
     void Init(chip::System::PacketBufferHandle && buffer, bool useChainedBuffers = false)
     {
         mBackingStore.Init(std::move(buffer), useChainedBuffers);
-        chip::TLV::TLVWriter::Init(mBackingStore);
+        TEMPORARY_RETURN_IGNORED chip::TLV::TLVWriter::Init(mBackingStore);
     }
     /**
      * Finish the writing of a TLV encoding and release ownership of the underlying PacketBuffer.

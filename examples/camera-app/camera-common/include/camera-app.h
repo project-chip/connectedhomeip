@@ -23,6 +23,7 @@
 #include "camera-device-interface.h"
 #include <app/util/config.h>
 #include <cstring>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
@@ -32,16 +33,31 @@ class CameraApp
 
 public:
     // This class is responsible for initialising all the camera clusters and managing the interactions between them
-    explicit CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice) :
-        mChimeServer(aClustersEndpoint, cameraDevice->GetChimeDelegate())
-    {}
+    CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice);
 
     // Initialize all the camera device clusters.
     void InitCameraDeviceClusters();
 
+    // Shutdown all the camera device clusters
+    void ShutdownCameraDeviceClusters();
+
 private:
+    chip::EndpointId mEndpoint;
+    CameraDeviceInterface * mCameraDevice;
+
     // SDK cluster servers
-    chip::app::Clusters::ChimeServer mChimeServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
+        mWebRTCTransportProviderServer;
+    std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvSettingsUserLevelManagementCluster>
+        mAVSettingsUserLevelMgmtServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementCluster>
+        mAVStreamMgmtServer;
+    std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
+
+    // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
+    void CreateAndInitializeCameraAVStreamMgmt();
+    CHIP_ERROR InitializeCameraAVStreamMgmt();
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);

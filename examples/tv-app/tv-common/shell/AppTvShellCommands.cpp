@@ -86,8 +86,8 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         }
 
         char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
-                                            sizeof(rotatingIdString));
+        TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(),
+                                                                     rotatingIdString, sizeof(rotatingIdString));
 
         CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
 
@@ -431,14 +431,13 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         Access::AccessControl::Entry entry;
         while (iterator.Next(entry) == CHIP_NO_ERROR)
         {
-            DumpAccessControlEntry(entry);
+            TEMPORARY_RETURN_IGNORED DumpAccessControlEntry(entry);
         }
         return CHIP_NO_ERROR;
     }
     else if (strcmp(argv[0], "remove-app-access") == 0)
     {
-        Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
-        return CHIP_NO_ERROR;
+        return Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
     }
     else if (strcmp(argv[0], "print-installed-apps") == 0)
     {

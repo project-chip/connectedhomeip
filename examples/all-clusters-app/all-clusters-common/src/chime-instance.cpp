@@ -43,9 +43,8 @@ CHIP_ERROR ChimeCommandDelegate::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     auto & selectedChime = supportedChimes[chimeIndex];
-    chip::CopyCharSpanToMutableCharSpan(selectedChime.name, name);
-    chimeID = selectedChime.chimeID;
-    return CHIP_NO_ERROR;
+    chimeID              = selectedChime.chimeID;
+    return chip::CopyCharSpanToMutableCharSpan(selectedChime.name, name);
 }
 
 CHIP_ERROR ChimeCommandDelegate::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
@@ -59,7 +58,7 @@ CHIP_ERROR ChimeCommandDelegate::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t &
     return CHIP_NO_ERROR;
 }
 
-Status ChimeCommandDelegate::PlayChimeSound()
+Status ChimeCommandDelegate::PlayChimeSound(uint8_t chimeID)
 {
     return Status::Success;
 }
@@ -68,5 +67,7 @@ static ChimeServer gChimeClusterServerInstance = ChimeServer(EndpointId(1), Chim
 
 void emberAfChimeClusterInitCallback(EndpointId endpoint)
 {
-    gChimeClusterServerInstance.Init();
+    TEMPORARY_RETURN_IGNORED gChimeClusterServerInstance.Init();
 }
+
+void emberAfChimeClusterShutdownCallback(EndpointId endpoint) {}

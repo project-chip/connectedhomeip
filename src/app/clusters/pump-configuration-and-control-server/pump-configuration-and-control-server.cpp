@@ -369,3 +369,4 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
 }
 
 void MatterPumpConfigurationAndControlPluginServerInitCallback() {}
+void MatterPumpConfigurationAndControlPluginServerShutdownCallback() {}

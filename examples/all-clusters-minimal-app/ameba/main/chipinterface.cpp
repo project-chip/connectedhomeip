@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  *    limitations under the License.
  */
 
+#include <chip_porting.h>
 #include <platform_stdlib.h>
 
-#include "AmebaObserver.h"
-#include "CHIPDeviceManager.h"
-#include "DeviceCallbacks.h"
-#include "Globals.h"
-#include "LEDWidget.h"
-#include "chip_porting.h"
-#include <lwip_netconf.h>
+#include <AmebaObserver.h>
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
+#include <Globals.h>
+#include <LEDWidget.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -34,6 +33,7 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/DeviceInfoProviderImpl.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -45,6 +45,7 @@
 #if CONFIG_ENABLE_OTA_REQUESTOR
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
@@ -53,7 +54,15 @@
 #endif
 
 #if CONFIG_ENABLE_PW_RPC
-#include "Rpc.h"
+#include <Rpc.h>
+#endif
+
+#ifdef CONFIG_PLATFORM_8721D
+#define STATUS_LED_GPIO_NUM PB_5
+#elif defined(CONFIG_PLATFORM_8710C)
+#define STATUS_LED_GPIO_NUM PA_20
+#else
+#define STATUS_LED_GPIO_NUM NC
 #endif
 
 using namespace ::chip;
@@ -62,6 +71,19 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
+
+static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#if CONFIG_ENABLE_OTA_REQUESTOR
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+ExtendedOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+AmebaOTAImageProcessor gImageProcessor;
+chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
+#endif
 
 namespace { // Network Commissioning
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
@@ -81,39 +103,12 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
-Identify gIdentify0 = {
-    chip::EndpointId{ 0 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-};
-
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
 };
-
-#ifdef CONFIG_PLATFORM_8721D
-#define STATUS_LED_GPIO_NUM PB_5
-#elif defined(CONFIG_PLATFORM_8710C)
-#define STATUS_LED_GPIO_NUM PA_20
-#else
-#define STATUS_LED_GPIO_NUM NC
-#endif
-
-static DeviceCallbacks EchoCallbacks;
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-DefaultOTARequestor gRequestorCore;
-DefaultOTARequestorStorage gRequestorStorage;
-ExtendedOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-AmebaOTAImageProcessor gImageProcessor;
-chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
-static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
-#endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
 extern "C" void amebaQueryImageCmdHandler()
@@ -136,7 +131,8 @@ static void InitOTARequestor(void)
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
 
     // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes(),
+                        GetDefaultOTARequestorEventGenerator());
 
     gImageProcessor.SetOTADownloader(&gDownloader);
 
@@ -158,16 +154,16 @@ static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
     initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
-    static AmebaObserver sAmebaObserver;
-    initParams.appDelegate = &sAmebaObserver;
-
     chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    // TODO: Use our own DeviceInfoProvider
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
@@ -179,7 +175,9 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
+
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 

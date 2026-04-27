@@ -23,8 +23,8 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
-#include "controller/python/chip/crypto/p256keypair.h"
-#include "controller/python/chip/interaction_model/Delegate.h"
+#include "controller/python/matter/crypto/p256keypair.h"
+#include "controller/python/matter/interaction_model/Delegate.h"
 
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
@@ -34,12 +34,12 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <controller/python/chip/commissioning/PlaceholderOperationalCredentialsIssuer.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/commissioning/PlaceholderOperationalCredentialsIssuer.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -65,10 +65,15 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
 
 Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
 {
-    VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
+    if (dacRevocationSetPath == nullptr)
+    {
+        ChipLogError(Controller,
+                     "Received a nullptr dacRevocationSetPath. Using empty string so that attestation checks don't fail!");
+        dacRevocationSetPath = "";
+    }
 
     static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
-    testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
+    TEMPORARY_RETURN_IGNORED testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
     return &testDacRevocationDelegate;
 }
 
@@ -91,6 +96,8 @@ public:
     {
         return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, pubKey, rcac, icac, noc);
     }
+
+    void SetAlwaysOmitIcac(bool enabled) { mExampleOpCredsIssuer.SetAlwaysOmitIcac(enabled); }
 
     void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
 
@@ -173,7 +180,7 @@ public:
                 // Convert RCAC to CHIP cert format to be deciphered by TLV later in python3
                 std::vector<uint8_t> chipRcac(Credentials::kMaxCHIPCertLength);
                 MutableByteSpan chipRcacSpan(chipRcac.data(), chipRcac.size());
-                chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
+                TEMPORARY_RETURN_IGNORED chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
 
                 mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
 
@@ -328,9 +335,13 @@ public:
             auto proxy        = chip::Controller::AutoCommissioner::GetCommissioneeDeviceProxy();
             if (proxy != nullptr)
             {
-                commissioner->StopPairing(proxy->GetDeviceId());
+                TEMPORARY_RETURN_IGNORED commissioner->StopPairing(proxy->GetDeviceId());
             }
         }
+    }
+    void OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+    {
+        ChipLogProgress(Controller, "OpCredsBinding OnCommissioningStageStart %s", stage);
     }
 
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
@@ -380,6 +391,9 @@ private:
         case chip::Controller::CommissioningStage::kSecurePairing:
         // "not valid" because attestation verification always fails after entering revocation check step
         case chip::Controller::CommissioningStage::kAttestationVerification:
+            return false;
+        case chip::Controller::CommissioningStage::kJCMTrustVerification:
+            // JCM Trust Verification is not supported in Python tests
             return false;
         default:
             return true;
@@ -444,6 +458,11 @@ void pychip_OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::
 void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR err)
 {
     return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
+}
+
+void pychip_OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+{
+    return sTestCommissioner.OnCommissioningStageStart(nodeId, stage);
 }
 
 /**
@@ -534,8 +553,13 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     ChipLogProgress(Support, "Using device attestation PAA trust store path %s.", paaTrustStorePath);
 
     // Initialize device attestation verifier
+    // TODO: Ensure that attestation revocation data is actually provided.
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    auto * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+    VerifyOrDie(dacVerifier != nullptr);
+    dacVerifier->EnableVerboseLogs(true);
+
     SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;
@@ -598,6 +622,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
         pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
+        pairingDelegate->SetCommissioningStageStartCallback(pychip_OnCommissioningStageStart);
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
@@ -619,7 +644,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    TEMPORARY_RETURN_IGNORED sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
     pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
 
     *outDevCtrl         = devCtrl.release();
@@ -643,11 +668,78 @@ PyChipError pychip_OpCreds_InitGroupTestingData(chip::Controller::DeviceCommissi
     return ToPyChipError(err);
 }
 
+PyChipError pychip_OpCreds_SetKeySet(chip::Controller::DeviceCommissioner * devCtrl, uint16_t keysetId, uint8_t securityPolicy,
+                                     uint8_t numKeysUsed, const uint8_t * epochKey0, uint64_t startTime0, const uint8_t * epochKey1,
+                                     uint64_t startTime1, const uint8_t * epochKey2, uint64_t startTime2)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(numKeysUsed >= 1 && numKeysUsed <= 3, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    const uint8_t * keys[] = { epochKey0, epochKey1, epochKey2 };
+    for (uint8_t i = 0; i < numKeysUsed; i++)
+    {
+        VerifyOrReturnError(keys[i] != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    }
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+    CHIP_ERROR err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    auto policy = static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(securityPolicy);
+    chip::Credentials::GroupDataProvider::KeySet keyset(keysetId, policy, numKeysUsed);
+
+    const uint64_t startTimes[] = { startTime0, startTime1, startTime2 };
+    for (uint8_t i = 0; i < numKeysUsed; i++)
+    {
+        keyset.epoch_keys[i].start_time = startTimes[i];
+        memcpy(keyset.epoch_keys[i].key, keys[i], chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes);
+    }
+
+    err = sGroupDataProvider.SetKeySet(devCtrl->GetFabricIndex(), compressedFabricIdSpan, keyset);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_SetGroupInfo(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId, const char * groupName,
+                                        uint8_t flags)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    chip::Credentials::GroupDataProvider::GroupInfo groupInfo(groupId, groupName ? groupName : "", flags);
+    CHIP_ERROR err = sGroupDataProvider.SetGroupInfo(devCtrl->GetFabricIndex(), groupInfo);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_AddGroupEndpoint(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId, uint16_t endpointId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.AddEndpoint(devCtrl->GetFabricIndex(), groupId, endpointId);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_SetGroupKey(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId, uint16_t keysetId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.SetGroupKey(devCtrl->GetFabricIndex(), groupId, keysetId);
+    return ToPyChipError(err);
+}
+
 PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, bool enabled)
 {
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
     context->mAdapter->SetMaximallyLargeCertsUsed(enabled);
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_OpCreds_SetAlwaysOmitIcac(OpCredsContext * context, bool enabled)
+{
+    VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    context->mAdapter->SetAlwaysOmitIcac(enabled);
 
     return ToPyChipError(CHIP_NO_ERROR);
 }

@@ -58,7 +58,7 @@ public:
 
 namespace chip {
 namespace app {
-class TestInteractionModelEngine : public chip::Test::AppContext
+class TestInteractionModelEngine : public chip::Testing::AppContext
 {
 public:
     void TestSubjectHasActiveSubscriptionSingleSubOneEntry();
@@ -68,6 +68,7 @@ public:
     void TestSubjectHasActiveSubscriptionSubWithCAT();
     void TestSubscriptionResumptionTimer();
     void TestDecrementNumSubscriptionsToResume();
+    void TestHasSubscriptionsToResumeHandlesNullIterator();
     void TestFabricHasAtLeastOneActiveSubscription();
     void TestFabricHasAtLeastOneActiveSubscriptionWithMixedStates();
     static int GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apattributePathParamsList);
@@ -102,17 +103,14 @@ TEST_F(TestInteractionModelEngine, TestAttributePathParamsPushRelease)
     attributePathParams2.mEndpointId = 2;
     attributePathParams3.mEndpointId = 3;
 
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    ASSERT_NE(attributePathParamsList, nullptr);
-    EXPECT_EQ(attributePathParams1.mEndpointId, attributePathParamsList->mValue.mEndpointId);
-    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
 
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
     ASSERT_NE(attributePathParamsList, nullptr);
     EXPECT_EQ(attributePathParams2.mEndpointId, attributePathParamsList->mValue.mEndpointId);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 2);
 
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3));
     ASSERT_NE(attributePathParamsList, nullptr);
     EXPECT_EQ(attributePathParams3.mEndpointId, attributePathParamsList->mValue.mEndpointId);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
@@ -135,21 +133,21 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     AttributePathParams attributePathParams3;
 
     // Three concrete paths, no duplicates
-    attributePathParams1.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams1.mAttributeId = chip::Test::MockAttributeId(1);
+    attributePathParams1.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams1.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams1.mAttributeId = chip::Testing::MockAttributeId(1);
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams3.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3));
     engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
     engine->ReleaseAttributePathList(attributePathParamsList);
@@ -158,54 +156,54 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     attributePathParams1.mClusterId   = kInvalidClusterId;
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams3.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
     // 1st path is wildcard endpoint, 2nd, 3rd paths are concrete paths, the concrete ones would be removed.
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3));
     engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
     engine->ReleaseAttributePathList(attributePathParamsList);
 
     // 2nd path is wildcard endpoint, 1st, 3rd paths are concrete paths, the latter two would be removed.
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3));
     engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
     engine->ReleaseAttributePathList(attributePathParamsList);
 
     // 3nd path is wildcard endpoint, 1st, 2nd paths are concrete paths, the latter two would be removed.
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
     engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
     engine->ReleaseAttributePathList(attributePathParamsList);
 
-    attributePathParams1.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams1.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams1.mClusterId   = chip::Testing::MockClusterId(2);
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint2;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint2;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint2;
-    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Testing::kMockEndpoint2;
+    attributePathParams3.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
     // 1st is wildcard one, but not intersect with the latter two concrete paths, so the paths in total are 3 finally
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3));
     engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
     engine->ReleaseAttributePathList(attributePathParamsList);
@@ -214,33 +212,33 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     attributePathParams1.mClusterId   = kInvalidClusterId;
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
     attributePathParams2.mClusterId   = kInvalidClusterId;
     attributePathParams2.mAttributeId = kInvalidAttributeId;
 
     attributePathParams3.mEndpointId  = kInvalidEndpointId;
     attributePathParams3.mClusterId   = kInvalidClusterId;
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
     // Wildcards cannot be deduplicated.
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3));
     engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
     engine->ReleaseAttributePathList(attributePathParamsList);
 
     attributePathParams1.mEndpointId  = kInvalidEndpointId;
-    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams1.mAttributeId = chip::Test::MockAttributeId(10);
+    attributePathParams1.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams1.mAttributeId = chip::Testing::MockAttributeId(10);
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(10);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(10);
 
     // 1st path is wildcard endpoint, 2nd path is invalid attribute
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
+    EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
     engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 2);
     engine->ReleaseAttributePathList(attributePathParamsList);
@@ -622,8 +620,8 @@ TEST_F(TestInteractionModelEngine, TestSubjectHasPersistedSubscription)
     EXPECT_FALSE(engine->SubjectHasPersistedSubscription(fabric1, nodeId1));
 
     // Clean Up entries
-    subscriptionStorage.DeleteAll(fabric1);
-    subscriptionStorage.DeleteAll(fabric2);
+    EXPECT_SUCCESS(subscriptionStorage.DeleteAll(fabric1));
+    EXPECT_SUCCESS(subscriptionStorage.DeleteAll(fabric2));
 }
 
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -829,6 +827,56 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestFabricHasAtLeastOneActiveSub
     // Verify that the fabric has no active subscriptions
     EXPECT_FALSE(engine->FabricHasAtLeastOneActiveSubscription(fabricIndex));
 }
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+// Mock SubscriptionResumptionStorage that always returns nullptr from IterateSubscriptions(). Used to test null-check handling in
+// the InteractionModelEngine.
+class NullIteratorSubscriptionResumptionStorage : public chip::app::SubscriptionResumptionStorage
+{
+public:
+    SubscriptionInfoIterator * IterateSubscriptions() override { return nullptr; }
+    CHIP_ERROR Save(SubscriptionInfo & subscriptionInfo) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Delete(chip::NodeId nodeId, chip::FabricIndex fabricIndex, chip::SubscriptionId subscriptionId) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR DeleteAll(chip::FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
+};
+
+// Test verifies that ResumeSubscriptions handles a nullptr iterator gracefully by returning CHIP_ERROR_NO_MEMORY and not crashing
+TEST_F(TestInteractionModelEngine, TestResumeSubscriptionsHandlesNullIterators)
+{
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+
+    NullIteratorSubscriptionResumptionStorage nullIteratorStorage;
+
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr,
+                           &nullIteratorStorage));
+
+    EXPECT_EQ(engine->ResumeSubscriptions(), CHIP_ERROR_NO_MEMORY);
+}
+
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+// Test verifies that HasSubscriptionsToResume handles a nullptr iterator gracefully by returning true and not crashing.
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHandlesNullIterator)
+{
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+
+    NullIteratorSubscriptionResumptionStorage nullIteratorStorage;
+
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr,
+                           &nullIteratorStorage));
+
+    EXPECT_TRUE(engine->HasSubscriptionsToResume());
+}
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 } // namespace app
 } // namespace chip

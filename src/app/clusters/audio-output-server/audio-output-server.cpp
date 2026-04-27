@@ -246,3 +246,8 @@ void MatterAudioOutputPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gAudioOutputAttrAccess);
 }
+
+void MatterAudioOutputPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAudioOutputAttrAccess);
+}

@@ -18,8 +18,9 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/scenes-server/ExtensionFieldSets.h>
+#include <app/data-model-provider/Provider.h>
+#include <app/storage/TableEntry.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/CommonIterator.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Span.h>
@@ -27,17 +28,19 @@
 namespace chip {
 namespace scenes {
 
+static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
+static_assert(kMaxScenesPerEndpoint >= 16, "Per spec, kMaxScenesPerEndpoint must be at least 16");
+
+static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
+
 // Storage index for scenes in nvm
-typedef uint16_t SceneIndex;
+using SceneIndex          = app::Storage::Data::EntryIndex;
+using TransitionTimeMs    = uint32_t;
+using SceneTransitionTime = uint32_t;
 
-typedef uint32_t TransitionTimeMs;
-typedef uint32_t SceneTransitionTime;
+inline constexpr GroupId kGlobalGroupSceneId = 0x0000;
+inline constexpr SceneId kUndefinedSceneId   = 0xff;
 
-inline constexpr GroupId kGlobalGroupSceneId     = 0x0000;
-inline constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
-inline constexpr SceneId kUndefinedSceneId       = 0xff;
-
-static constexpr size_t kIteratorsMax            = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength      = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
 static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 
@@ -57,16 +60,8 @@ static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 class SceneHandler : public IntrusiveListNodeBase<>
 {
 public:
-    SceneHandler(){};
+    SceneHandler()          = default;
     virtual ~SceneHandler() = default;
-
-    /// @brief Copies the list of supported clusters for an endpoint in a Span and resizes the span to fit the actual number of
-    /// supported clusters
-    /// @param endpoint target endpoint
-    /// @param clusterBuffer Buffer to hold the supported cluster IDs, cannot hold more than
-    /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE. The function shall use the reduce_size() method in the event it is supporting
-    /// less than CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE clusters.
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) = 0;
 
     /// @brief Returns whether or not a cluster for scenes is supported on an endpoint
     ///
@@ -79,14 +74,14 @@ public:
     /// the supported ones.
     ///
     /// @param endpoint[in] Endpoint ID
-    /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
-    /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
+    /// @param extensionFieldSet[in] ExtensionFieldSetStruct provided by the AddScene Command, pre initialized
+    /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSetStruct in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster pair is supported by
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR
     SerializeAdd(EndpointId endpoint,
-                 const app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+                 const app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & extensionFieldSet,
                  MutableByteSpan & serialisedBytes) = 0;
 
     /// @brief Called when handling StoreScene, and only if the handler supports the given endpoint and cluster.
@@ -101,24 +96,24 @@ public:
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) = 0;
 
-    /// @brief Deserialize an ExtensionFieldSet into a cluster object (e.g. when handling ViewScene).
+    /// @brief Deserialize an ExtensionFieldSetStruct into a cluster object (e.g. when handling ViewScene).
     ///
     /// @param endpoint[in] Endpoint ID
     /// @param cluster[in] Cluster ID
-    /// @param serializedBytes[in] ExtensionFieldSet stored in NVM
+    /// @param serializedBytes[in] ExtensionFieldSetStruct stored in NVM
     ///
-    /// @param extensionFieldSet[out] ExtensionFieldSet in command format
+    /// @param extensionFieldSet[out] ExtensionFieldSetStruct in command format
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called for handlers for which SupportsCluster() is true for the given endpoint and cluster.
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
 
-                                   app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
+                                   app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & extensionFieldSet) = 0;
 
     /// @brief Restore a stored scene for the given cluster instance, over timeMs milliseconds (e.g. when handling RecallScene)
     ///
     /// @param endpoint[in] Endpoint ID
     /// @param cluster[in] Cluster ID
-    /// @param serializedBytes[in] ExtensionFieldSet stored in NVM
+    /// @param serializedBytes[in] ExtensionFieldSetStruct stored in NVM
     ///
     /// @param timeMs[in] Transition time in ms to apply the scene
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
@@ -222,30 +217,7 @@ public:
         }
     };
 
-    /// @brief Struct combining both ID and data of a table entry
-    struct SceneTableEntry
-    {
-        // ID
-        SceneStorageId mStorageId;
-
-        // DATA
-        SceneData mStorageData;
-
-        SceneTableEntry() = default;
-        SceneTableEntry(SceneStorageId id) : mStorageId(id) {}
-        SceneTableEntry(const SceneStorageId id, const SceneData data) : mStorageId(id), mStorageData(data) {}
-
-        bool operator==(const SceneTableEntry & other) const
-        {
-            return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
-        }
-
-        void operator=(const SceneTableEntry & other)
-        {
-            mStorageId   = other.mStorageId;
-            mStorageData = other.mStorageData;
-        }
-    };
+    using SceneTableEntry = app::Storage::Data::TableEntry<SceneStorageId, SceneData>;
 
     SceneTable(){};
 
@@ -256,8 +228,11 @@ public:
 
     SceneTable & operator=(const SceneTable &) = delete;
 
-    virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
-    virtual void Finish()                                        = 0;
+    virtual CHIP_ERROR Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel) = 0;
+    virtual void Finish()                                                                              = 0;
+
+    // Table size
+    virtual uint16_t GetTableSize() const = 0;
 
     // Global scene count
     virtual CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count)                         = 0;
@@ -294,11 +269,6 @@ public:
      */
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
     virtual CHIP_ERROR RemoveEndpoint()                       = 0;
-
-    // Iterators
-    using SceneEntryIterator = CommonIterator<SceneTableEntry>;
-
-    virtual SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) = 0;
 
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }

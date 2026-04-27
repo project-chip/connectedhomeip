@@ -187,7 +187,7 @@ void StopSignalHandler(int signal)
 {
     gMdnsServer.Shutdown();
 
-    DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 } // namespace
@@ -280,7 +280,7 @@ int main(int argc, char ** args)
     }
 
     mdns::Minimal::ResponseSender responseSender(&gMdnsServer);
-    responseSender.AddQueryResponder(&queryResponder);
+    TEMPORARY_RETURN_IGNORED responseSender.AddQueryResponder(&queryResponder);
 
     ReplyDelegate delegate(&responseSender);
     gMdnsServer.SetDelegate(&delegate);

@@ -30,11 +30,12 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::Inet;
 
 namespace {
@@ -129,7 +130,7 @@ protected:
         MockTransportMgrDelegate gMockTransportMgrDelegate;
         TransportMgrBase gTransportMgrBase;
         gTransportMgrBase.SetSessionManager(&gMockTransportMgrDelegate);
-        gTransportMgrBase.Init(&udp);
+        EXPECT_SUCCESS(gTransportMgrBase.Init(&udp));
 
         ReceiveHandlerCallCount = 0;
 

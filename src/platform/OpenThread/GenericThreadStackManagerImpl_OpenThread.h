@@ -26,8 +26,14 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/ip6.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
+#include <openthread/thread.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+#include <openthread/seeker.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 #include <openthread/srp_client.h>
@@ -41,7 +47,8 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/GeneralFaults.h>
-#include <platform/NetworkCommissioning.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -77,6 +84,8 @@ public:
         mpStatusChangeCallback = statusChangeCallback;
     }
 
+    void InjectNetworkCommissioningDriver(NetworkCommissioning::GenericThreadDriver * driver) { mpCommissioningDriver = driver; }
+
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
@@ -91,7 +100,7 @@ protected:
     CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
     CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
-                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+                                      NetworkCommissioning::ThreadDriver::ConnectCallback * callback);
     void _OnThreadAttachFinished();
     void _ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
@@ -105,15 +114,9 @@ protected:
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    bool _HaveMeshConnectivity();
-    CHIP_ERROR _GetAndLogThreadStatsCounters();
-    CHIP_ERROR _GetAndLogThreadTopologyMinimal();
-    CHIP_ERROR _GetAndLogThreadTopologyFull();
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
     void _ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart();
     void _OnWoBLEAdvertisingStop();
 
@@ -145,6 +148,11 @@ protected:
 
     CHIP_ERROR ConfigureThreadStack(otInstance * otInst);
     CHIP_ERROR DoInit(otInstance * otInst);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    void _RendezvousStop();
+    CHIP_ERROR _RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context);
+    void _CancelRendezvousAnnouncement();
+#endif
     bool IsThreadAttachedNoLock();
     bool IsThreadInterfaceUpNoLock();
 
@@ -152,13 +160,30 @@ private:
     // ===== Private members for use by this class only.
 
     otInstance * mOTInst;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    static otSeekerVerdict _HandleSeekerScanEvaluator(void * aContext, const otSeekerScanResult * aResult);
+    static void _HandleRendezvousRetransmissionTimer(System::Layer * aLayer, void * aAppState);
+    void SendRendezvousAnnouncement();
+#endif
+
     uint64_t mOverrunCount      = 0;
     bool mIsAttached            = false;
     bool mTemporaryRxOnWhenIdle = false;
 
+    chip::Transport::PeerAddress mRendezvousPeerAddr;
+
+    static constexpr uint8_t kMaxRendezvousRetransmissions                       = 5;
+    uint8_t mRendezvousRetransmissionCount                                       = 0;
+    RendezvousAnnouncementRequestCallback mRendezvousAnnouncementRequestCallback = nullptr;
+    void * mRendezvousAnnouncementRequestContext                                 = nullptr;
+
+    NetworkCommissioning::GenericThreadDriver * mpCommissioningDriver = nullptr;
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+
+    void TryNextNetwork();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 

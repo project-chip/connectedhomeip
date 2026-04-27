@@ -54,7 +54,7 @@ chip_data_model("chef-common") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_common_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -63,12 +63,8 @@ efr32_sdk("sdk") {
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
+    "${examples_common_plat_dir}/freertos_config",
   ]
-
-  if (use_wf200) {
-    # TODO efr32_sdk should not need a header from this location
-    include_dirs += [ "${examples_plat_dir}/wf200" ]
-  }
 
   defines = []
   if (chip_enable_pw_rpc) {
@@ -86,8 +82,8 @@ silabs_executable("chef_app") {
 
   sources = [
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/LightingManager.cpp",
-    "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
@@ -101,6 +97,7 @@ silabs_executable("chef_app") {
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",
+      "PW_RPC_ACTIONS_SERVICE=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",

@@ -169,7 +169,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         ChipLogProgress(AppServer, "Commissioning completed successfully");
-        DeviceLayer::Internal::CC32XXConfig::WriteKVSToNV();
+        TEMPORARY_RETURN_IGNORED DeviceLayer::Internal::CC32XXConfig::WriteKVSToNV();
     }
 }
 
@@ -188,7 +188,7 @@ void ConnectivityManagerImpl::_OnLwipEvent(struct netif * pNetIf, NetIfStatus_e 
     switch (status)
     {
     case E_NETIF_STATUS_IP_ACQUIRED:
-        PlatformMgr().ScheduleWork(_OnIpAcquired);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(_OnIpAcquired);
         cc32xxLog("ConnectivityManagerImpl::OnLwipEvent() : Scheduled OnIpAcquired");
         break;
     default:

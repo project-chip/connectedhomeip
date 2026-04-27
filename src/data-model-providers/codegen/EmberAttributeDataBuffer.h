@@ -16,11 +16,11 @@
  */
 #pragma once
 
-#include "lib/core/TLVWriter.h"
 #include <app/util/attribute-metadata.h>
 #include <app/util/ember-io-storage.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVTypes.h>
+#include <lib/core/TLVWriter.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>

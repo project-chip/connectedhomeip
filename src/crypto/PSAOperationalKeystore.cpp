@@ -60,17 +60,28 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     psa_status_t status             = PSA_SUCCESS;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
     psa_key_id_t keyId              = 0;
-    size_t publicKeyLength;
+    size_t publicKeyLength          = 0;
 
-    Destroy();
+    // Only destroy a prior pending key if it is volatile; do not destroy the persistent operational key.
+    if (GetKeyId() != PSA_KEY_ID_NULL)
+    {
+        status = psa_get_key_attributes(GetKeyId(), &attributes);
+
+        if (status == PSA_SUCCESS && PSA_KEY_LIFETIME_IS_VOLATILE(psa_get_key_lifetime(&attributes)))
+        {
+            TEMPORARY_RETURN_IGNORED Destroy();
+        }
+
+        psa_reset_key_attributes(&attributes);
+    }
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
     psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
-    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
-    psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
-    psa_set_key_id(&attributes, GetKeyId());
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_COPY);
+
+    // Update the key attributes if needed
     GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
 
     status = psa_generate_key(&attributes, &keyId);
@@ -81,6 +92,17 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     VerifyOrExit(publicKeyLength == kP256_PublicKey_Length, error = CHIP_ERROR_INTERNAL);
 
 exit:
+
+    if (error != CHIP_NO_ERROR)
+    {
+        psa_destroy_key(keyId);
+    }
+    else
+    {
+        // Save the volatile key id to the context
+        ToPsaContext(mKeypair).key_id = keyId;
+    }
+
     psa_reset_key_attributes(&attributes);
 
     return error;
@@ -88,7 +110,9 @@ exit:
 
 CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Destroy()
 {
-    psa_status_t status = psa_destroy_key(GetKeyId());
+    psa_status_t status = PSA_SUCCESS;
+
+    status = psa_destroy_key(GetKeyId());
 
     VerifyOrReturnError(status != PSA_ERROR_INVALID_HANDLE, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
@@ -146,7 +170,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     psa_key_id_t keyId              = 0;
     VerifyOrReturnError(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    Destroy();
+    TEMPORARY_RETURN_IGNORED Destroy();
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
@@ -183,9 +207,45 @@ CHIP_ERROR PSAOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fabricIn
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && mPendingFabricIndex == fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mIsPendingKeypairActive, CHIP_ERROR_INCORRECT_STATE);
 
-    ReleasePendingKeypair();
+    psa_status_t status             = PSA_SUCCESS;
+    CHIP_ERROR error                = CHIP_NO_ERROR;
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t keyId              = 0;
 
-    return CHIP_NO_ERROR;
+    PersistentP256Keypair keyPairToCommit(fabricIndex);
+
+    status = psa_get_key_attributes(mPendingKeypair->GetKeyId(), &attributes);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    status = psa_destroy_key(keyPairToCommit.GetKeyId());
+    VerifyOrExit(status == PSA_SUCCESS || status == PSA_ERROR_INVALID_HANDLE, error = CHIP_ERROR_INTERNAL);
+
+    // Switch to the persistent key
+    psa_set_key_id(&attributes, keyPairToCommit.GetKeyId());
+    psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
+
+    {
+        // The committed persistent key should be not copyable.
+        psa_key_usage_t usage = psa_get_key_usage_flags(&attributes);
+        usage &= ~PSA_KEY_USAGE_COPY;
+        psa_set_key_usage_flags(&attributes, usage);
+    }
+
+    // Update the key attributes if needed
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
+
+    status = psa_copy_key(mPendingKeypair->GetKeyId(), &attributes, &keyId);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(keyId == keyPairToCommit.GetKeyId(), error = CHIP_ERROR_INTERNAL);
+
+    // Copied was done, so we can revert the pending keypair
+    RevertPendingKeypair();
+
+exit:
+    LogPsaError(status);
+    psa_reset_key_attributes(&attributes);
+
+    return error;
 }
 
 CHIP_ERROR PSAOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIndex, Crypto::P256SerializedKeypair & outKeypair)
@@ -214,9 +274,7 @@ CHIP_ERROR PSAOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIn
         return CHIP_ERROR_INTERNAL;
     }
 
-    outKeypair.SetLength(outSize);
-
-    return CHIP_NO_ERROR;
+    return outKeypair.SetLength(outSize);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
@@ -238,7 +296,7 @@ CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIn
 void PSAOperationalKeystore::RevertPendingKeypair()
 {
     VerifyOrReturn(HasPendingOpKeypair());
-    mPendingKeypair->Destroy();
+    TEMPORARY_RETURN_IGNORED mPendingKeypair->Destroy();
     ReleasePendingKeypair();
 }
 

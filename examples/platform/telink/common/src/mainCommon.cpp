@@ -21,12 +21,17 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
 #include <zephyr/kernel.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
 
 #ifdef CONFIG_USB_DEVICE_STACK
 #include <zephyr/usb/usb_device.h>
@@ -34,6 +39,20 @@
 
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+K_SEM_DEFINE(gThreadPrescanDoneSem, 0, 1);
+
+class InitScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
+{
+public:
+    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
+                    NetworkCommissioning::ThreadScanResponseIterator * networks) override
+    {
+        k_sem_give(&gThreadPrescanDoneSem);
+    }
+};
 #endif
 
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -46,6 +65,11 @@ using namespace ::chip::DeviceLayer;
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::TelinkWiFiDriver::Instance()));
 #endif
 
+#if CHIP_ENABLE_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
 static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
 static constexpr char kFactoryResetOnBootStoreKey[]       = "TelinkFactoryResetOnBootCnt";
@@ -56,7 +80,7 @@ static k_timer FactoryResetUsualBootTimer;
 static void FactoryResetUsualBoot(struct k_timer * dummy)
 {
     (void) dummy;
-    (void) chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey);
+    LogErrorOnFailure(chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey));
     LOG_INF("Schedule factory counter deleted");
 }
 
@@ -164,8 +188,20 @@ int main(void)
         LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
+
+    LogErrorOnFailure(sThreadNetworkDriver.Init());
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        static InitScanCallback sInitScanCallback;
+        LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInitScanCallback));
+        k_sem_take(&gThreadPrescanDoneSem, K_SECONDS(15));
+    }
+#endif
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sWiFiCommissioningInstance.Init();
+    LogErrorOnFailure(sWiFiCommissioningInstance.Init());
 #else
     err = CHIP_ERROR_INTERNAL;
     goto exit;

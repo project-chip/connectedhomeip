@@ -27,14 +27,6 @@ class MCConnectionExampleViewModel: ObservableObject {
     
     // VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
     let kDesiredEndpointVendorId: UInt16 = 65521;
-
-    // VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connecting
-    // using the MCCastingPlayer/Commissioner-Generated passcode (CGP) commissioning flow.  Use this Target Content
-    // Application Vendor ID, which is configured on the tv-app. This Target Content Application Vendor ID (1111), does
-    // not implement the AccountLogin cluster, which would otherwise auto commission using the Commissionee-Generated
-    // passcode upon recieving the IdentificationDeclaration Message. See
-    // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-    let kDesiredEndpointVendorIdCGP: UInt16 = 1111;
     
     @Published var connectionSuccess: Bool?;
 
@@ -156,19 +148,17 @@ class MCConnectionExampleViewModel: ObservableObject {
         }
 
         let identificationDeclarationOptions: MCIdentificationDeclarationOptions
-        let targetAppInfo: MCTargetAppInfo
+        let targetAppInfo: MCTargetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorId)
         let connectionCallbacks: MCConnectionCallbacks
 
         if useCommissionerGeneratedPasscode {
             identificationDeclarationOptions = MCIdentificationDeclarationOptions(commissionerPasscodeOnly: true)
-            targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorIdCGP)
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
                 commissionerDeclarationCallback: commissionerDeclarationCallback
             )
         } else {
             identificationDeclarationOptions = MCIdentificationDeclarationOptions()
-            targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorId)
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
                 commissionerDeclarationCallback: commissionerDeclarationCallback

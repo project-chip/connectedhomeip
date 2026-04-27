@@ -23,7 +23,7 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
-#include <app/EventPathParams.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
@@ -44,26 +44,23 @@ namespace DataModel {
 class Provider : public ProviderMetadataTree
 {
 public:
-    virtual ~Provider() = default;
+    ~Provider() override = default;
 
-    // `context` pointers  will be guaranteed valid until Shutdown is called()
-    virtual CHIP_ERROR Startup(InteractionModelContext context)
-    {
-        mContext = context;
-        return CHIP_NO_ERROR;
-    }
-    virtual CHIP_ERROR Shutdown() = 0;
-
-    // During the transition phase, we expect a large subset of code to require access to
-    // event emitting, path marking and other operations
-    virtual InteractionModelContext CurrentContext() const { return mContext; }
+    // `context` references  will be guaranteed valid until Shutdown is called()
+    virtual CHIP_ERROR Startup(InteractionModelContext context) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     /// NOTE: this code is NOT required to handle `List` global attributes:
     ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
     ///
     ///       Users of DataModel::Provider are expected to get these lists
     ///       from ProviderMetadataTree (in particular IM Reads of these
-    ///       attributes will the automatically filled from metadata).
+    ///       attributes will be automatically filled from metadata).
+    ///
+    /// When this is invoked, caller is expected to have already done some validations:
+    ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
+    ///    - Attribute is readable according to the ProviderMetadataTree/AttributeEntry data
+    ///    - Appropriate ACL checks done according to the attribute's AttributeEntry
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
@@ -77,6 +74,9 @@ public:
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
     ///    - validation of ACL/timed interaction flags/writability, if those checks are desired.
+    ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
+    ///    - Attribute is writable according to the ProviderMetadataTree/AttributeEntry data
+    ///    - Appropriate ACL checks done according to the attribute's AttributeEntry
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     ///   Indicates the start/end of a series of list operations. This function will be called either before the first
@@ -86,7 +86,8 @@ public:
     ///   2) This function will only be called at the beginning and end of a series of consecutive attribute data
     ///   blocks for the same attribute, no matter what list operations those data blocks represent.
     ///   3) The opType argument indicates the type of notification (Start, Failure, Success).
-    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, ListWriteOperation opType) = 0;
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, ListWriteOperation opType,
+                                                FabricIndex accessingFabric) = 0;
 
     /// `handler` is used to send back the reply.
     ///    - returning `std::nullopt` means that return value was placed in handler directly.
@@ -117,8 +118,32 @@ public:
     virtual std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                             CommandHandler * handler) = 0;
 
+    // Attribute Change Listener Management
+    //
+    // NOTE:
+    //   - Listeners MAY be unregistered at any time, however implementation assumes the processing
+    //     is single threaded (Register/Unregister/Notify MUST be called from the chip event loop).
+    void RegisterAttributeChangeListener(AttributeChangeListener & listener);
+    void UnregisterAttributeChangeListener(AttributeChangeListener & listener);
+    void NotifyAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type);
+    void NotifyEndpointChanged(EndpointId endpointId, EndpointChangeType type);
+
 private:
-    InteractionModelContext mContext = { nullptr };
+    /// Represents an active iteration over the listener list.
+    /// Since listeners can be unregistered during notification, and notifications
+    /// can be nested, we need to track all active iterators and update them
+    /// if the element they are about to process is removed.
+    ///
+    /// Active iterators are allocated on the stack during Notify* calls and
+    /// registered in the `mActiveIterators` linked list.
+    struct ActiveIterator
+    {
+        AttributeChangeListener * expectedNext; // The next listener this iterator expects to process
+        ActiveIterator * nextIterator;          // Link to the next active iterator in the stack
+    };
+
+    AttributeChangeListener * mAttributeChangeListenersHead = nullptr;
+    ActiveIterator * mActiveIterators                       = nullptr; // Head of the stack of active iterators
 };
 
 } // namespace DataModel

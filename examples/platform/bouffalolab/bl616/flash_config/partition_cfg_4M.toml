@@ -25,22 +25,22 @@ type = 0
 name = "FW"
 device = 0
 address0 = 0x10000
-size0 = 0x200000
-address1 = 0x210000
-size1 = 0x168000
+size0 = 0x1FA000
+address1 = 0x20A000
+size1 = 0x164000
 # compressed image must set len,normal image can left it to 0
 len = 0
 # If header is 1, it will add the header.
 header = 1
 # If header is 1 and security is 1, It will be encrypted.
-security = 1
+security= 1
 
 [[pt_entry]]
 type = 10
 name = "mfg"
 device = 0
-address0 = 0x210000
-size0 = 0x168000
+address0 = 0x20A000
+size0 = 0x164000
 address1 = 0
 size1 = 0
 # compressed image must set len,normal image can left it to 0
@@ -48,13 +48,13 @@ len = 0
 # If header is 1, it will add the header.
 header = 1
 # If header is 1 and security is 1, It will be encrypted.
-security = 1
+security= 1
 
 [[pt_entry]]
 type = 2
 name = "media"
 device = 0
-address0 = 0x378000
+address0 = 0x36E000
 size0 = 0x71000
 address1 = 0
 size1 = 0
@@ -63,14 +63,14 @@ len = 0
 # If header is 1, it will add the header.
 header = 0
 # If header is 1 and security is 1, It will be encrypted.
-security = 0
+security= 0
 
 [[pt_entry]]
 type = 3
 name = "PSM"
 device = 0
-address0 = 0x3E9000
-size0 = 0x8000
+address0 = 0x3DF000
+size0 = 0x10000
 address1 = 0
 size1 = 0
 # compressed image must set len,normal image can left it to 0
@@ -78,13 +78,13 @@ len = 0
 # If header is 1, it will add the header.
 header = 0
 # If header is 1 and security is 1, It will be encrypted.
-security = 0
+security= 0
 
 [[pt_entry]]
 type = 4
 name = "KEY"
 device = 0
-address0 = 0x3F1000
+address0 = 0x3EF000
 size0 = 0x2000
 address1 = 0
 size1 = 0
@@ -93,7 +93,7 @@ len = 0
 # If header is 1, it will add the header.
 header = 0
 # If header is 1 and security is 1, It will be encrypted.
-security = 0
+security= 0
 
 [[pt_entry]]
 type = 5
@@ -123,7 +123,7 @@ len = 0
 # If header is 1, it will add the header.
 header = 0
 # If header is 1 and security is 1, It will be encrypted.
-security = 0
+security= 0
 
 [[pt_entry]]
 type = 7
@@ -138,4 +138,4 @@ len = 0
 # If header is 1, it will add the header.
 header = 0
 # If header is 1 and security is 1, It will be encrypted.
-security = 0
+security= 0

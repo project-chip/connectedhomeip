@@ -49,7 +49,7 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2:18446744073709551614"
+          8)EpochStartTime2:18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -65,6 +65,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
@@ -89,6 +90,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: null,
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
@@ -97,7 +99,7 @@ tests:
           follows:1)GroupKeySetID: 0x01a 2) GroupKeySecurityPolicy: TrustFirst
           (0) 3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: null 6)EpochStartTime1:null 7)EpochKey2: null
-          8)EpochStartTime2:null"
+          8)EpochStartTime2:null 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -113,6 +115,7 @@ tests:
                         EpochStartTime1: null,
                         EpochKey2: null,
                         EpochStartTime2: null,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
@@ -122,7 +125,7 @@ tests:
           (0) 3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
           6)EpochStartTime1:18446744073709551613 7)EpochKey2: null
-          8)EpochStartTime2:null"
+          8)EpochStartTime2:null 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -138,6 +141,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: null,
                         EpochStartTime2: null,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
@@ -147,7 +151,7 @@ tests:
           4)EpochStartTime0: 1 5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
           6)EpochStartTime1:18446744073709551613 7)EpochKey2:
           d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2:18446744073709551614"
+          8)EpochStartTime2:18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -163,6 +167,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -174,7 +179,7 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: null
           5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2: 18446744073709551614"
+          8)EpochStartTime2: 18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -190,6 +195,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -201,7 +207,7 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 0
           5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2:18446744073709551614"
+          8)EpochStartTime2:18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -217,6 +223,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -228,7 +235,7 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: null 6)EpochStartTime1: 18446744073709551613 7)EpochKey2:
           d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2:18446744073709551614"
+          8)EpochStartTime2:18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -244,6 +251,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -255,7 +263,7 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1: null
           7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2:18446744073709551614"
+          8)EpochStartTime2:18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -271,6 +279,7 @@ tests:
                         EpochStartTime1: null,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -282,7 +291,7 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0:
           18446744073709551613 5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
           6)EpochStartTime1: 1 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2: 18446744073709551614"
+          8)EpochStartTime2: 18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -298,6 +307,7 @@ tests:
                         EpochStartTime1: 1,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -309,8 +319,9 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: null 6)EpochStartTime1: null 7)EpochKey2:
           d2d1d2d3d4d5d6d7d8d9dadbdcdddedf 8)EpochStartTime2:
-          18446744073709551614 Note: EpochKey1 and EpochStartTime1 are null when
-          EpochKey2 and EpochStartTime2 are not null"
+          18446744073709551614 9)GroupKeyMulticastPolicy: 0 Note: EpochKey1 and
+          EpochStartTime1 are null when EpochKey2 and EpochStartTime2 are not
+          null "
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -326,6 +337,7 @@ tests:
                         EpochStartTime1: null,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -337,8 +349,8 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: null 8)EpochStartTime2:
-          18446744073709551614 Note: EpochKey2 is set to null and
-          EpochStartTime2 is not null"
+          18446744073709551614 9)GroupKeyMulticastPolicy: 0 Note: EpochKey2 is
+          set to null and EpochStartTime2 is not null"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -354,6 +366,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: null,
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -365,8 +378,8 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2: null Note: EpochKey2 is not null and
-          EpochStartTime2 is null"
+          8)EpochStartTime2: null 9)GroupKeyMulticastPolicy: 0 Note: EpochKey2
+          is not null and EpochStartTime2 is null"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -382,6 +395,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: null,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -393,8 +407,8 @@ tests:
           3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           6)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 7)EpochStartTime1:
           18446744073709551613 8)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          9)EpochStartTime2: 1 Note: EpochStartTime2 is earlier than
-          EpochStartTime1"
+          9)EpochStartTime2: 1 10)GroupKeyMulticastPolicy: 0 Note:
+          EpochStartTime2 is earlier than EpochStartTime1"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -410,6 +424,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: INVALID_COMMAND
@@ -421,8 +436,8 @@ tests:
           3)EpochKey0: d0 4)EpochStartTime0: 1 5)EpochKey1:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2: 1 Note1: Repeat the step by sending EpochKey1 and
-          EpochKey2 with 1 byte value (< 16 bytes)"
+          8)EpochStartTime2: 1 9)GroupKeyMulticastPolicy: 0 Note1: Repeat the
+          step by sending EpochKey1 and EpochKey2 with 1 byte value (< 16 bytes)"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -438,6 +453,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -460,6 +476,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -482,6 +499,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -506,6 +524,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -528,6 +547,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -550,6 +570,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcddde",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -574,6 +595,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -596,6 +618,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -618,6 +641,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedfde",
                         EpochStartTime2: 1,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: CONSTRAINT_ERROR
@@ -629,9 +653,9 @@ tests:
           3)EpochKey0: d3d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
           5)EpochKey1: d4d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           17446744073709551613 7)EpochKey2: d5d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2: 17446744073709551614 Note: KeySetWrite command is
-          sent with different EpochKeys,EpochStartTime1 and EpochStartTime2
-          values"
+          8)EpochStartTime2: 17446744073709551614 9)GroupKeyMulticastPolicy: 0
+          Note: KeySetWrite command is sent with different
+          EpochKeys,EpochStartTime1 and EpochStartTime2 values"
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:
@@ -647,6 +671,7 @@ tests:
                         EpochStartTime1: "17446744073709551613",
                         EpochKey2: "hex:d5d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "17446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
@@ -671,6 +696,7 @@ tests:
                         EpochStartTime1: "17446744073709551613",
                         EpochKey2: null,
                         EpochStartTime2: "17446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:
@@ -702,7 +728,7 @@ tests:
           TH’s fabric in GroupKeyMap attribute contains Max_GrpKey entries,
           starting with GroupKeySetID 1 and incrementing by 1 each time."
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614, "groupKeyMulticastPolicy": 0 }' 1 0
 
           Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs:
 
@@ -736,7 +762,7 @@ tests:
           [1692341708.963328][8072:8074] CHIP:DMG:         InteractionModelRevision = 1
           [1692341708.963333][8072:8074] CHIP:DMG: },
 
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 2,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 2,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614, "groupKeyMulticastPolicy": 0 }' 1 0
 
           Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs:
 
@@ -797,6 +823,7 @@ tests:
                         EpochStartTime1: "18446744073709551613",
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: "18446744073709551614",
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: RESOURCE_EXHAUSTED

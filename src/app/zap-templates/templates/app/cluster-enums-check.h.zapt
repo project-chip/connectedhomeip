@@ -1,0 +1,11 @@
+{{> header}}
+// This file is generated from cluster-enums-check.h.zapt
+
+#pragma once
+
+#include <clusters/shared/EnumsCheck.h>
+
+{{#zcl_clusters}}
+#include <clusters/{{asUpperCamelCase name}}/EnumsCheck.h>
+{{/zcl_clusters}}
+

@@ -26,8 +26,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::Chime::Structs;
 
-using namespace Camera;
-
 // Chime Cluster Methods
 CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
 {
@@ -35,9 +33,9 @@ CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chim
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    chimeID = mChimeSounds[chimeIndex].chimeID;
-
-    return CopyCharSpanToMutableCharSpan(mChimeSounds[chimeIndex].name, name);
+    auto & selectedChime = mChimeSounds[chimeIndex];
+    chimeID              = selectedChime.chimeID;
+    return chip::CopyCharSpanToMutableCharSpan(selectedChime.name, name);
 }
 
 CHIP_ERROR ChimeManager::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
@@ -46,12 +44,12 @@ CHIP_ERROR ChimeManager::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-
-    chimeID = mChimeSounds[chimeIndex].chimeID;
+    auto & selectedChime = mChimeSounds[chimeIndex];
+    chimeID              = selectedChime.chimeID;
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status ChimeManager::PlayChimeSound()
+Protocols::InteractionModel::Status ChimeManager::PlayChimeSound(uint8_t chimeID)
 {
     // check if we are enabled
     if (!mChimeServer->GetEnabled())
@@ -59,10 +57,7 @@ Protocols::InteractionModel::Status ChimeManager::PlayChimeSound()
         return Protocols::InteractionModel::Status::Failure;
     }
 
-    // Get the Active Chime ID
-    auto activeChimeID = mChimeServer->GetActiveChimeID();
-
     // Play chime sound
-    ChipLogDetail(Zcl, "Playing Chime with sound ID: %u", unsigned(activeChimeID));
+    ChipLogDetail(Camera, "Playing Chime with sound ID: %u", unsigned(chimeID));
     return Protocols::InteractionModel::Status::Success;
 }

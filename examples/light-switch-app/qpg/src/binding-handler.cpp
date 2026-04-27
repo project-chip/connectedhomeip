@@ -23,10 +23,11 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 static bool sEnabled = false;
 
-static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
+static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const Binding::TableEntry & binding,
                                                Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle,
                                                BindingCommandData * data)
 {
@@ -45,16 +46,19 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
         {
         case Clusters::OnOff::Commands::Toggle::Id:
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand,
+                                                                      onSuccess, onFailure);
             break;
         case Clusters::OnOff::Commands::On::Id:
             Clusters::OnOff::Commands::On::Type onCommand;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand,
+                                                                      onSuccess, onFailure);
             break;
 
         case Clusters::OnOff::Commands::Off::Id:
             Clusters::OnOff::Commands::Off::Type offCommand;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand,
+                                                                      onSuccess, onFailure);
             break;
         default:
             ChipLogError(NotSpecified, "Unsupported Command Id");
@@ -67,7 +71,8 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
         {
             Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
             moveToLevelCommand.level = data->level;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToLevelCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote,
+                                                                      moveToLevelCommand, onSuccess, onFailure);
         }
         else
         {
@@ -81,7 +86,8 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
             Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
             moveToColorCommand.colorX = data->colorXY.x;
             moveToColorCommand.colorY = data->colorXY.y;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToColorCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote,
+                                                                      moveToColorCommand, onSuccess, onFailure);
         }
         else
         {
@@ -95,7 +101,7 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
     }
 }
 
-static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, BindingCommandData * data)
+static void ProcessSwitchGroupBindingCommand(CommandId commandId, const Binding::TableEntry & binding, BindingCommandData * data)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
@@ -106,16 +112,19 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBin
         {
         case Clusters::OnOff::Commands::Toggle::Id:
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           toggleCommand);
             break;
         case Clusters::OnOff::Commands::On::Id:
             Clusters::OnOff::Commands::On::Type onCommand;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           onCommand);
 
             break;
         case Clusters::OnOff::Commands::Off::Id:
             Clusters::OnOff::Commands::Off::Type offCommand;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           offCommand);
             break;
         default:
             ChipLogError(NotSpecified, "Unsupported Command Id");
@@ -128,7 +137,8 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBin
         {
             Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
             moveToLevelCommand.level = data->level;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToLevelCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           moveToLevelCommand);
         }
         else
         {
@@ -142,7 +152,8 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBin
             Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
             moveToColorCommand.colorX = data->colorXY.x;
             moveToColorCommand.colorY = data->colorXY.y;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           moveToColorCommand);
         }
         else
         {
@@ -156,12 +167,12 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBin
     }
 }
 
-static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
+static void LightSwitchChangedHandler(const Binding::TableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "nullptr pointer passed"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == MATTER_MULTICAST_BINDING && data->isGroup)
+    if (binding.type == Binding::MATTER_MULTICAST_BINDING && data->isGroup)
     {
         switch (data->clusterId)
         {
@@ -172,7 +183,7 @@ static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Op
             break;
         }
     }
-    else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
+    else if (binding.type == Binding::MATTER_UNICAST_BINDING && !data->isGroup)
     {
         switch (data->clusterId)
         {
@@ -202,17 +213,17 @@ static void LightSwitchContextReleaseHandler(void * context)
 
 void InitBindingManager(intptr_t context)
 {
-    auto & server                          = chip::Server::GetInstance();
-    BindingManagerInitParams bindingParams = { &server.GetFabricTable(), server.GetCASESessionManager(),
-                                               &server.GetPersistentStorage() };
-    CHIP_ERROR error                       = BindingManager::GetInstance().Init(bindingParams);
+    auto & server                            = chip::Server::GetInstance();
+    Binding::ManagerInitParams bindingParams = { &server.GetFabricTable(), server.GetCASESessionManager(),
+                                                 &server.GetPersistentStorage() };
+    CHIP_ERROR error                         = Binding::Manager::GetInstance().Init(bindingParams);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "BindingManager initialization failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
-    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     sEnabled = true;
 }
 
@@ -228,5 +239,6 @@ void SwitchWorkerFunction(intptr_t context)
         Platform::Delete(data);
     }
 
-    BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
+                                                                                       static_cast<void *>(data));
 }

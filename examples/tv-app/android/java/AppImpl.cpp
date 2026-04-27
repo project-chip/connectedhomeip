@@ -272,8 +272,8 @@ std::vector<SupportedCluster> make_default_supported_clusters()
 ContentAppFactoryImpl::ContentAppFactoryImpl() :
     mContentApps{ new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", make_default_supported_clusters(),
                                      nullptr, nullptr),
-                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021",
-                                     make_default_supported_clusters(), nullptr, nullptr),
+                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "0", make_default_supported_clusters(),
+                                     nullptr, nullptr),
                   new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", make_default_supported_clusters(),
                                      nullptr, nullptr),
                   new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021",
@@ -431,8 +431,8 @@ void refreshConnectedClientsAcl(uint16_t vendorId, uint16_t productId, ContentAp
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
-        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
+        TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                             &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
 }
 
@@ -481,7 +481,7 @@ EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
 {
     for (size_t i = 0; i < mContentApps.size(); ++i)
     {
-        auto & app = mContentApps.at(i);
+        auto app = mContentApps.at(i);
         if (app->GetEndpointId() == epId)
         {
             ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl RemoveContentApp endpointId %d", epId);
@@ -584,7 +584,7 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
     {
         ContentAppCommandDelegate * delegate =
             new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);
-        app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(delegate);
+        TEMPORARY_RETURN_IGNORED app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(delegate);
         ChipLogProgress(AppServer, "Registered command handler delegate for cluster %d", contentAppClusters[i].clusterId);
     }
 

@@ -69,16 +69,17 @@ if (slc_generate) {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     defines = []
@@ -92,7 +93,7 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -102,20 +103,8 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
-
-    if (use_wf200) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
-
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
 
     defines = []
     if (chip_enable_pw_rpc) {
@@ -126,12 +115,11 @@ if (wifi_soc) {
     }
   }
 }
-silabs_executable("closure-app") {
+silabs_executable("closure_app") {
   output_name = "matter-silabs-closure-example.out"
   include_dirs = [
     "include",
-    "${example_closure_dir}/closure-common/closure-control/include",
-    "${example_closure_dir}/closure-common/common/include",
+    "${example_closure_dir}/closure-common/include",
   ]
   defines = []
 
@@ -140,14 +128,16 @@ silabs_executable("closure-app") {
   }
 
   sources = [
-    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlDelegateImpl.cpp",
-    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlInstance.cpp",
-    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlMain.cpp",
-    "${example_closure_dir}/closure-common/common/src/ClosureAppCommonMain.cpp",
-    "${examples_common_plat_dir}/main.cpp",
+    "${example_closure_dir}/closure-common/src/ClosureControlEndpoint.cpp",
+    "${example_closure_dir}/closure-common/src/ClosureDimensionEndpoint.cpp",
     "src/AppTask.cpp",
+    "src/ClosureManager.cpp",
     "src/DataModelCallbacks.cpp",
   ]
+
+  if (!disable_lcd) {
+    sources += [ "src/ClosureUI.cpp" ]
+  }
 
   deps = [ ":sdk" ]
 
@@ -231,7 +221,7 @@ silabs_executable("closure-app") {
 }
 
 group("silabs") {
-  deps = [ ":closure-app" ]
+  deps = [ ":closure_app" ]
 }
 
 group("default") {

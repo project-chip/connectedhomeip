@@ -47,7 +47,7 @@
 
 - (void)start
 {
-    if (@available(macOS 13.0, *)) {
+    if (@available(macOS 13.0, iOS 16.0, *)) {
         objc_enumerateClasses(nil, nil, @protocol(XPCServerBaseProtocol), nil, ^(Class cls, BOOL * stop) {
             id server = [[cls alloc] init];
             [_servers addObject:server];

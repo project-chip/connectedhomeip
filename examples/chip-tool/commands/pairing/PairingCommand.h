@@ -27,6 +27,7 @@
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <optional>
+#include <thread>
 
 enum class PairingMode
 {
@@ -42,6 +43,10 @@ enum class PairingMode
     AlreadyDiscoveredByIndex,
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
+    Nfc,
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    ThreadMeshcop,
+#endif
 };
 
 enum class PairingNetworkType
@@ -104,6 +109,12 @@ public:
         {
         case PairingMode::None:
             break;
+#if CHIP_SUPPORT_THREAD_MESHCOP
+        case PairingMode::ThreadMeshcop:
+            AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
+            AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
+            FALLTHROUGH;
+#endif
         case PairingMode::Code:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("dcl-hostname", &mDCLHostName,
@@ -114,9 +125,16 @@ public:
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
-            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
+            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery,
+                        "Whether to only use DNS-SD for discovery. The default is true if no network credentials are provided, "
+                        "false otherwise.");
             break;
         case PairingMode::Ble:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Nfc:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
@@ -215,6 +233,12 @@ public:
                         "Version number of the Terms and Conditions that were accepted by the user. This value is sent to the "
                         "device during commissioning to indicate which T&C version was acknowledged");
         }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        if ((mode == PairingMode::WiFiPAF) || (mode == PairingMode::Code))
+        {
+            AddArgument("freq", &mApFreqStr, "Frequency of the connected AP. It's required if AP is not at chnl#6 of 2.4G");
+        }
+#endif
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
@@ -231,6 +255,9 @@ public:
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
     void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
+    void OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting) override;
+    CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
+    CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
@@ -283,7 +310,9 @@ private:
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDSTOffsetList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::Optional<char *> mApFreqStr;
+#endif
     uint16_t mRemotePort = 0;
     // mDiscriminator is only used for some situations, but in those situations
     // it's mandatory.  Track whether we're actually using it; the cases that do
@@ -310,4 +339,15 @@ private:
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    chip::Optional<char *> mThreadBaHost;
+    chip::Optional<uint16_t> mThreadBaPort;
+#endif
+
+    std::optional<std::thread> mPrompterThread;
+
+    std::string mPromptedSSID;
+    std::string mPromptedPassword;
+    std::string mPromptedOperationalDataset;
 };

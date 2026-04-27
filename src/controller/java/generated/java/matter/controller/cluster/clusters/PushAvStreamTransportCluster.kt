@@ -29,7 +29,6 @@ import matter.controller.ReadData
 import matter.controller.ReadRequest
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
-import matter.controller.UByteSubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.UShortSubscriptionState
 import matter.controller.cluster.structs.*
@@ -45,19 +44,33 @@ class PushAvStreamTransportCluster(
   private val endpointId: UShort,
 ) {
   class AllocatePushTransportResponse(
-    val connectionID: UShort,
-    val transportOptions: PushAvStreamTransportClusterTransportOptionsStruct,
-    val transportStatus: UByte,
+    val transportConfiguration: PushAvStreamTransportClusterTransportConfigurationStruct
   )
 
   class FindTransportResponse(
-    val streamConfigurations: List<PushAvStreamTransportClusterTransportConfigurationStruct>
+    val transportConfigurations: List<PushAvStreamTransportClusterTransportConfigurationStruct>
   )
 
-  class CurrentConnectionsAttribute(val value: List<UShort>)
+  class SupportedFormatsAttribute(
+    val value: List<PushAvStreamTransportClusterSupportedFormatStruct>
+  )
+
+  sealed class SupportedFormatsAttributeSubscriptionState {
+    data class Success(val value: List<PushAvStreamTransportClusterSupportedFormatStruct>) :
+      SupportedFormatsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SupportedFormatsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SupportedFormatsAttributeSubscriptionState()
+  }
+
+  class CurrentConnectionsAttribute(
+    val value: List<PushAvStreamTransportClusterTransportConfigurationStruct>
+  )
 
   sealed class CurrentConnectionsAttributeSubscriptionState {
-    data class Success(val value: List<UShort>) : CurrentConnectionsAttributeSubscriptionState()
+    data class Success(val value: List<PushAvStreamTransportClusterTransportConfigurationStruct>) :
+      CurrentConnectionsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : CurrentConnectionsAttributeSubscriptionState()
 
@@ -82,16 +95,6 @@ class PushAvStreamTransportCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -129,53 +132,28 @@ class PushAvStreamTransportCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_CONNECTION_ID: Int = 0
-    var connectionID_decoded: UShort? = null
-
-    val TAG_TRANSPORT_OPTIONS: Int = 1
-    var transportOptions_decoded: PushAvStreamTransportClusterTransportOptionsStruct? = null
-
-    val TAG_TRANSPORT_STATUS: Int = 2
-    var transportStatus_decoded: UByte? = null
+    val TAG_TRANSPORT_CONFIGURATION: Int = 0
+    var transportConfiguration_decoded: PushAvStreamTransportClusterTransportConfigurationStruct? =
+      null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_CONNECTION_ID)) {
-        connectionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSPORT_OPTIONS)) {
-        transportOptions_decoded =
-          PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(tag, tlvReader)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSPORT_STATUS)) {
-        transportStatus_decoded = tlvReader.getUByte(tag)
+      if (tag == ContextSpecificTag(TAG_TRANSPORT_CONFIGURATION)) {
+        transportConfiguration_decoded =
+          PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(tag, tlvReader)
       } else {
         tlvReader.skipElement()
       }
     }
 
-    if (connectionID_decoded == null) {
-      throw IllegalStateException("connectionID not found in TLV")
-    }
-
-    if (transportOptions_decoded == null) {
-      throw IllegalStateException("transportOptions not found in TLV")
-    }
-
-    if (transportStatus_decoded == null) {
-      throw IllegalStateException("transportStatus not found in TLV")
+    if (transportConfiguration_decoded == null) {
+      throw IllegalStateException("transportConfiguration not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return AllocatePushTransportResponse(
-      connectionID_decoded,
-      transportOptions_decoded,
-      transportStatus_decoded,
-    )
+    return AllocatePushTransportResponse(transportConfiguration_decoded)
   }
 
   suspend fun deallocatePushTransport(connectionID: UShort, timedInvokeTimeout: Duration? = null) {
@@ -228,7 +206,7 @@ class PushAvStreamTransportCluster(
   }
 
   suspend fun setTransportStatus(
-    connectionID: UShort,
+    connectionID: UShort?,
     transportStatus: UByte,
     timedInvokeTimeout: Duration? = null,
   ) {
@@ -238,7 +216,7 @@ class PushAvStreamTransportCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_CONNECTION_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_ID_REQ), connectionID)
+    connectionID?.let { tlvWriter.put(ContextSpecificTag(TAG_CONNECTION_ID_REQ), connectionID) }
 
     val TAG_TRANSPORT_STATUS_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_TRANSPORT_STATUS_REQ), transportStatus)
@@ -259,6 +237,7 @@ class PushAvStreamTransportCluster(
     connectionID: UShort,
     activationReason: UByte,
     timeControl: PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct?,
+    userDefined: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 5u
@@ -274,6 +253,9 @@ class PushAvStreamTransportCluster(
 
     val TAG_TIME_CONTROL_REQ: Int = 2
     timeControl?.let { timeControl.toTlv(ContextSpecificTag(TAG_TIME_CONTROL_REQ), tlvWriter) }
+
+    val TAG_USER_DEFINED_REQ: Int = 3
+    userDefined?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_DEFINED_REQ), userDefined) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -312,16 +294,16 @@ class PushAvStreamTransportCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_STREAM_CONFIGURATIONS: Int = 0
-    var streamConfigurations_decoded:
+    val TAG_TRANSPORT_CONFIGURATIONS: Int = 0
+    var transportConfigurations_decoded:
       List<PushAvStreamTransportClusterTransportConfigurationStruct>? =
       null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_STREAM_CONFIGURATIONS)) {
-        streamConfigurations_decoded =
+      if (tag == ContextSpecificTag(TAG_TRANSPORT_CONFIGURATIONS)) {
+        transportConfigurations_decoded =
           buildList<PushAvStreamTransportClusterTransportConfigurationStruct> {
             tlvReader.enterArray(tag)
             while (!tlvReader.isEndOfContainer()) {
@@ -339,16 +321,16 @@ class PushAvStreamTransportCluster(
       }
     }
 
-    if (streamConfigurations_decoded == null) {
-      throw IllegalStateException("streamConfigurations not found in TLV")
+    if (transportConfigurations_decoded == null) {
+      throw IllegalStateException("transportConfigurations not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return FindTransportResponse(streamConfigurations_decoded)
+    return FindTransportResponse(transportConfigurations_decoded)
   }
 
-  suspend fun readSupportedContainerFormatsAttribute(): UByte {
+  suspend fun readSupportedFormatsAttribute(): SupportedFormatsAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -370,19 +352,26 @@ class PushAvStreamTransportCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Supportedcontainerformats attribute not found in response" }
+    requireNotNull(attributeData) { "Supportedformats attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+    val decodedValue: List<PushAvStreamTransportClusterSupportedFormatStruct> =
+      buildList<PushAvStreamTransportClusterSupportedFormatStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(PushAvStreamTransportClusterSupportedFormatStruct.fromTlv(AnonymousTag, tlvReader))
+        }
+        tlvReader.exitContainer()
+      }
 
-    return decodedValue
+    return SupportedFormatsAttribute(decodedValue)
   }
 
-  suspend fun subscribeSupportedContainerFormatsAttribute(
+  suspend fun subscribeSupportedFormatsAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
+  ): Flow<SupportedFormatsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
@@ -401,7 +390,7 @@ class PushAvStreamTransportCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            UByteSubscriptionState.Error(
+            SupportedFormatsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -415,107 +404,33 @@ class PushAvStreamTransportCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Supportedcontainerformats attribute not found in Node State update"
+            "Supportedformats attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+          val decodedValue: List<PushAvStreamTransportClusterSupportedFormatStruct> =
+            buildList<PushAvStreamTransportClusterSupportedFormatStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  PushAvStreamTransportClusterSupportedFormatStruct.fromTlv(AnonymousTag, tlvReader)
+                )
+              }
+              tlvReader.exitContainer()
+            }
 
-          emit(UByteSubscriptionState.Success(decodedValue))
+          emit(SupportedFormatsAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readSupportedIngestMethodsAttribute(): UByte {
-    val ATTRIBUTE_ID: UInt = 1u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Supportedingestmethods attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
-    return decodedValue
-  }
-
-  suspend fun subscribeSupportedIngestMethodsAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 1u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Supportedingestmethods attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
-          emit(UByteSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
+          emit(SupportedFormatsAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
   suspend fun readCurrentConnectionsAttribute(): CurrentConnectionsAttribute {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -540,11 +455,16 @@ class PushAvStreamTransportCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UShort> =
-      buildList<UShort> {
+    val decodedValue: List<PushAvStreamTransportClusterTransportConfigurationStruct> =
+      buildList<PushAvStreamTransportClusterTransportConfigurationStruct> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUShort(AnonymousTag))
+          add(
+            PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(
+              AnonymousTag,
+              tlvReader,
+            )
+          )
         }
         tlvReader.exitContainer()
       }
@@ -556,7 +476,7 @@ class PushAvStreamTransportCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<CurrentConnectionsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -593,11 +513,16 @@ class PushAvStreamTransportCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UShort> =
-            buildList<UShort> {
+          val decodedValue: List<PushAvStreamTransportClusterTransportConfigurationStruct> =
+            buildList<PushAvStreamTransportClusterTransportConfigurationStruct> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUShort(AnonymousTag))
+                add(
+                  PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader,
+                  )
+                )
               }
               tlvReader.exitContainer()
             }
@@ -800,101 +725,6 @@ class PushAvStreamTransportCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

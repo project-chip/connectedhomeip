@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -25,9 +25,22 @@ namespace Silabs {
  * @brief WifiInterface implementation for the SiWx platform
  *
  */
-class WifiInterfaceImpl final : public WiseconnectWifiInterface
+class WifiInterfaceImpl final : public WifiInterface
 {
 public:
+    enum class WifiPlatformEvent : uint8_t
+    {
+        kStationConnect     = 0,
+        kStationDisconnect  = 1,
+        kAPStart            = 2,
+        kAPStop             = 3,
+        kStationStartScan   = 5,
+        kStationStartJoin   = 6,
+        kConnectionComplete = 7, /* This combines the DHCP and Notify */
+        kStationDhcpDone    = 8,
+        kStationDhcpPoll    = 9,
+    };
+
     static WifiInterfaceImpl & GetInstance() { return mInstance; }
 
     WifiInterfaceImpl(const WifiInterfaceImpl &)             = delete;
@@ -37,33 +50,71 @@ public:
      * WifiInterface impl
      */
 
+    CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & addr) override;
+    CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback) override;
+    CHIP_ERROR StartWifiTask() override;
+    void ConfigureStationMode() override;
+    bool IsStationConnected() override;
+    bool IsStationModeEnabled() override;
+    bool IsStationReady() override;
+    void TriggerDisconnection() override;
+    void ClearWifiCredentials() override;
+    CHIP_ERROR SetWifiCredentials(const WiFiCredentials & credentials) override;
+    CHIP_ERROR GetWifiCredentials(WiFiCredentials & credentials) override;
+    CHIP_ERROR ConnectToAccessPoint(void) override;
+    bool HasAnIPv4Address() override;
+    bool HasAnIPv6Address() override;
+    void CancelScanNetworks() override;
+    bool IsWifiProvisioned() override;
     CHIP_ERROR InitWiFiStack(void) override;
-    CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) override;
+    CHIP_ERROR GetAccessPointInfo(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse & info) override;
     CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info) override;
     CHIP_ERROR ResetCounters() override;
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter) override;
-    CHIP_ERROR ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                                  sl_si91x_performance_profile_t sl_si91x_wifi_state, uint32_t listenInterval) override;
+    CHIP_ERROR ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval) override;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
      * @brief Processes the wifi platform events for the SiWx platform
      *
-     * TODO: Current inheritance structure with the task creation in the parent forces this function to be public when it shouldn't
-     *       be. This isn't the best practice and we should try to move this to protected.
-     *
      * @param event
      */
-    void ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent event);
+    void ProcessEvent(WifiPlatformEvent event);
 
 protected:
-    /*
-     * WiseconnectWifiInterface impl
+    /**
+     * @brief Function calls the underlying platforms disconnection API.
+     *
+     * @return sl_status_t SL_STATUS_OK, the Wi-Fi disconnection was succesfully triggered
+     *                     SL_STATUS_FAILURE, otherwise
      */
+    sl_status_t TriggerPlatformWifiDisconnection();
+    /**
+     * @brief Posts an event to the Wi-Fi task
+     *
+     * @param[in] event Event to process.
+     */
+    void PostWifiPlatformEvent(WifiPlatformEvent event);
+    /**
+     * @brief Main worker function for the Matter Wi-Fi task responsible of processing Wi-Fi platform events.
+     *        Function is used in the StartWifiTask.
+     *
+     * @param[in] arg context pointer
+     */
+    static void MatterWifiTask(void * arg);
 
-    sl_status_t TriggerPlatformWifiDisconnection() override;
-    void PostWifiPlatformEvent(WifiPlatformEvent event) override;
+    /**
+     * @brief Notify the application about the connectivity status if it has not been notified yet.
+     */
+    void NotifyConnectivity(void);
+
+    /**
+     * @brief Function resets the IP and connectiity flags and triggers the DHCP operation
+     *
+     */
+    void ResetConnectivityNotificationFlags();
 
 private:
     WifiInterfaceImpl()  = default;
@@ -97,10 +148,13 @@ private:
     sl_status_t JoinWifiNetwork();
 
     /**
-     * @brief Processing function responsible of executing the DHCP polling operation until we have an IPv6 or IPv4 address
+     * @brief Processing function responsible for notifying the upper layers of a succesful connection attempt.
      *
      */
-    void HandleDHCPPolling();
+    void NotifySuccessfulConnection();
+
+    bool mHasNotifiedWifiConnectivity = false;
+    bool mUseQuickJoin                = false;
 
     static WifiInterfaceImpl mInstance;
 };

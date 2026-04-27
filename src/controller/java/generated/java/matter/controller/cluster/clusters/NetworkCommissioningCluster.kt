@@ -142,16 +142,6 @@ class NetworkCommissioningCluster(
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
 
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
-  }
-
   class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
@@ -211,9 +201,7 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -225,9 +213,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS)) {
+      } else if (tag == ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS)) {
         wiFiScanResults_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -250,9 +236,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_THREAD_SCAN_RESULTS)) {
+      } else if (tag == ContextSpecificTag(TAG_THREAD_SCAN_RESULTS)) {
         threadScanResults_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -365,9 +349,7 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -379,9 +361,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -393,9 +373,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -407,9 +385,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -490,9 +466,7 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -504,9 +478,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -518,9 +490,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -532,9 +502,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -615,9 +583,7 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -629,9 +595,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -643,9 +607,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -657,9 +619,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -734,9 +694,7 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -748,9 +706,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_ERROR_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_ERROR_VALUE)) {
         errorValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -830,9 +786,7 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -844,9 +798,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -858,9 +810,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -872,9 +822,7 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -948,9 +896,7 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_IDENTITY)) {
         identity_decoded = tlvReader.getByteArray(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -2222,101 +2168,6 @@ class NetworkCommissioningCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

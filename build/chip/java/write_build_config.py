@@ -42,8 +42,8 @@ def ParseGnList(value):
             "\"", "").replace(" ", "").split(",")
         if not gn_list[0]:
             return []
-        else:
-            return gn_list
+        return gn_list
+    return None
 
 
 def GetAllDependentJars(deps_configs_data):

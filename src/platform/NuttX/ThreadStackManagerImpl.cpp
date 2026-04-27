@@ -519,35 +519,6 @@ CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Millisecon
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
-bool ThreadStackManagerImpl::_HaveMeshConnectivity()
-{
-    // TODO: Remove Weave legacy APIs
-    // For a leader with a child, the child is considered to have mesh connectivity
-    // and the leader is not, which is a very confusing definition.
-    // This API is Weave legacy and should be removed.
-
-    ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
-    return false;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyMinimal()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
@@ -562,28 +533,10 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
     // TODO https://github.com/project-chip/connectedhomeip/issues/30602
     // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
-{
-    // TODO: Remove Weave legacy APIs
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 

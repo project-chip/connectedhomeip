@@ -30,7 +30,7 @@ directory:**
     > </struct>
     > ```
 
-6. [src/controller/python/chip/clusters/\_\_init\_\_.py](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/chip/clusters/__init__.py)
+6. [src/controller/python/matter/clusters/\_\_init\_\_.py](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/matter/clusters/__init__.py)
 
 **Enable your new cluster in the Python and Android clients** in
 [src/controller/data_model/controller-clusters.zap](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/data_model/controller-clusters.zap)
@@ -56,12 +56,6 @@ Use the ZAP GUI tool to edit the file above:
 6. In the Enable column, select "Client" from the drop-down box.
 7. Click `File->Save` to save the configuration.
 8. Close the GUI.
-
-**Add entries for your new cluster to
-[BUILD.gn](c/src/controller/data_model/BUILD.gn)** in the outputs section of the
-java-jni-generate bits. The entries should look like
-"jni/YourClusterNameClient-InvokeSubscribeImpl.cpp" and
-"jni/YourClusterNameClient-ReadImpl.cpp".
 
 **Add an entry to the ClientDirectories** section of
 [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json).
@@ -101,6 +95,9 @@ related SDK tests.
 
 1. Implement new clusters here:
    [src/app/clusters](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters)
+
+    Documentation [here](../guides/writing_clusters.md)
+
 2. Implement tests here:
    [src/app/tests/suites](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites)
 3. Implement the example cluster server application:
@@ -244,4 +241,4 @@ code and to commit the results to the git repo?
 
 **Q5**: Where can I find ZAP documentation?
 
-**A5**: https://github.com/project-chip/zap/blob/master/README.md
+**A5**: <https://github.com/project-chip/zap/blob/master/README.md>

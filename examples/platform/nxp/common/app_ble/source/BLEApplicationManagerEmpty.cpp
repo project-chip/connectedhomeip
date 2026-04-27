@@ -37,3 +37,8 @@ void BLEApplicationManager::EnableMultipleConnections(intptr_t arg)
 {
     /*Empty implementation. Intentionally left blank */
 }
+
+void BLEApplicationManager::FactoryReset(void)
+{
+    /*Empty implementation. Intentionally left blank */
+}

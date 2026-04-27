@@ -48,9 +48,9 @@ namespace Internal {
 
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 namespace {
-System::LayerSocketsLoop & SystemLayerSocketsLoop()
+System::LayerSelectLoop & SystemLayerSelectLoop()
 {
-    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+    return static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer());
 }
 } // anonymous namespace
 #endif
@@ -135,7 +135,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThr
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
-    // Let System::LayerSocketsLoop.PrepareEvents() handle timers.
+    // Let System::LayerSelectLoop.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -170,7 +170,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDev
 #else
     mChipEventQueue.Push(*event);
 
-    SystemLayerSocketsLoop().Signal(); // Trigger wake select on CHIP thread
+    SystemLayerSelectLoop().Signal(); // Trigger wake select on CHIP thread
     return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
@@ -214,20 +214,20 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 
     Impl()->LockChipStack();
 
-    SystemLayerSocketsLoop().EventLoopBegins();
+    SystemLayerSelectLoop().EventLoopBegins();
     do
     {
-        SystemLayerSocketsLoop().PrepareEvents();
+        SystemLayerSelectLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        SystemLayerSocketsLoop().WaitForEvents();
+        SystemLayerSelectLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        SystemLayerSocketsLoop().HandleEvents();
+        SystemLayerSelectLoop().HandleEvents();
 
         ProcessDeviceEvents();
     } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
-    SystemLayerSocketsLoop().EventLoopEnds();
+    SystemLayerSelectLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 
@@ -352,7 +352,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         // System::Layer.
         //
         Impl()->LockChipStack();
-        SystemLayerSocketsLoop().Signal();
+        SystemLayerSelectLoop().Signal();
         Impl()->UnlockChipStack();
 
         pthread_mutex_lock(&mStateLock);

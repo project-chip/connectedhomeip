@@ -16,7 +16,15 @@
  */
 #pragma once
 
+#include <access/Privilege.h>
+#include <app/ConcreteClusterPath.h>
+#include <app/data-model/Nullable.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/CHIPError.h>
+
+#include <optional>
+#include <type_traits>
+#include <utility>
 
 namespace chip {
 namespace app {
@@ -25,23 +33,38 @@ namespace app {
 /// to make it easier to implement spec-compliant classes.
 ///
 /// In particular it does:
+///   - handles a SINGLE cluster path that is set at construction time
 ///   - maintains a data version and provides `IncreaseDataVersion`. Ensures this
 ///     version is spec-compliant initialized (with a random value)
 ///   - Provides default implementations for most virtual methods EXCEPT:
 ///       - ReadAttribute (since that one needs to handle featuremap and revision)
-///       - GetClusterId (since every implementation is for different clusters)
-///
 ///
 class DefaultServerCluster : public ServerClusterInterface
 {
 public:
-    DefaultServerCluster();
+    DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
+
+    constexpr DefaultServerCluster(ConcreteClusterPath && path) :
+        mPath(std::move(path)),
+        mDataVersion(0) // data version will be initialized in startup, however constexpr requires initialization
+    {}
+
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
 
-    [[nodiscard]] DataVersion GetDataVersion() const override { return mDataVersion; }
-    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override;
+    /// Startup allows only a single initialization per cluster and will
+    /// fail with CHIP_ERROR_ALREADY_INITIALIZED if the object has already
+    /// been initialized.
+    ///
+    /// Call Shutdown to de-initialize the object.
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType) override;
+
+    [[nodiscard]] Span<const ConcreteClusterPath> GetPaths() const override { return { &mPath, 1 }; }
+
+    [[nodiscard]] DataVersion GetDataVersion(const ConcreteClusterPath &) const override { return mDataVersion; }
+    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override;
 
     /// Default implementation errors out with an unsupported write on every attribute.
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -51,7 +74,14 @@ public:
     /// is required.
     ///
     /// Default implementation just returns the global attributes required by the API contract.
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    /// Must only be implemented if event readability is relevant
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override
+    {
+        eventInfo.readPrivilege = Access::Privilege::kView;
+        return CHIP_NO_ERROR;
+    }
 
     ///////////////////////////////////// Command Support /////////////////////////////////////////////////////////
 
@@ -66,15 +96,65 @@ public:
     ///
     /// Default implementation is a NOOP (no list items generated)
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     /// Must only be implemented if commands that return values are supported by the cluster.
     ///
     /// Default implementation is a NOOP (no list items generated)
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
+    /// Returns all global attributes that the spec defines in `7.13 Global Elements / Table 93: Global Attributes`
+    static Span<const DataModel::AttributeEntry> GlobalAttributes();
 
 protected:
+    const ConcreteClusterPath mPath;
+    ServerClusterContext * mContext = nullptr;
+
+    bool IsStarted() const { return mContext != nullptr; }
+
     void IncreaseDataVersion() { mDataVersion++; }
+
+    /// Marks that a specific attribute has changed value
+    ///
+    /// This increases cluster data version and if a cluster context is available it will
+    /// notify that the attribute has changed.
+    void NotifyAttributeChanged(AttributeId attributeId);
+
+    /// Apply the very common pattern of:
+    ///   - if a variable value needs changing, update and NotifyAttributeChanged
+    ///
+    /// Returns true if the value has been updated to a new value.
+    template <typename T, typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+    bool SetAttributeValue(T & dest, const U & value, AttributeId attributeId)
+    {
+        VerifyOrReturnValue(dest != value, false);
+        dest = value;
+        NotifyAttributeChanged(attributeId);
+        return true;
+    }
+
+    template <typename T>
+    bool SetAttributeValue(DataModel::Nullable<T> & dest, decltype(DataModel::NullNullable), AttributeId attributeId)
+    {
+        VerifyOrReturnValue(!dest.IsNull(), false);
+        dest.SetNull();
+        NotifyAttributeChanged(attributeId);
+        return true;
+    }
+
+    template <typename T, typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+    bool SetAttributeValue(DataModel::Nullable<T> & dest, const U & value, AttributeId attributeId)
+    {
+        VerifyOrReturnValue(dest != static_cast<T>(value), false);
+        dest.SetNonNull(value);
+        NotifyAttributeChanged(attributeId);
+        return true;
+    }
+
+    /// Marks that a specific attribute has changed value, if `status` is success.
+    ///
+    /// Will return `status`
+    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status);
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

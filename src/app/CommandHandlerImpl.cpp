@@ -21,7 +21,6 @@
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/util/MatterCallbacks.h>
@@ -35,6 +34,7 @@
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <protocols/secure_channel/Constants.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
@@ -71,8 +71,15 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
 
         const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
         auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
-
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+        // On some platforms we can get more available length in the packet than what we requested.
+        // It is vital that we only use up to commandBufferMaxSize for the entire packet and
+        // nothing more.
+        uint32_t reservedSize = 0;
+        if (commandPacket->AvailableDataLength() > commandBufferMaxSize)
+        {
+            reservedSize = static_cast<uint32_t>(commandPacket->AvailableDataLength() - commandBufferMaxSize);
+        }
 
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeResponseBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
@@ -81,6 +88,10 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
         {
             ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
         }
+
+        // Reserving space for MIC at the end.
+        ReturnErrorOnFailure(
+            mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
         // It was never implemented in the SDK, and there are no command responses that expect a
@@ -135,7 +146,30 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
 
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+
+    auto context = TryGetExchangeContextWhenAsync();
+    // If we have no exchange or it has no session, we won't be able to send a
+    // response anyway, so it doesn't matter how we encode it, but we have unit
+    // tests that have a kinda-broken CommandHandler with no session... just use
+    // kUndefinedFabricIndex in those cases.
+    //
+    // Note that just calling GetAccessingFabricIndex() here is not OK, because
+    // we may have gone async already and our exchange/session may be gone, so
+    // that would crash.  Which is one of the reasons GetAccessingFabricIndex()
+    // is not allowed to be called once we have gone async.
+    FabricIndex accessingFabricIndex;
+    if (context && context->HasSessionHandle())
+    {
+        accessingFabricIndex = context->GetSessionHandle()->GetFabricIndex();
+    }
+    else
+    {
+        accessingFabricIndex = kUndefinedFabricIndex;
+    }
+
+    DataModel::FabricAwareTLVWriter responseWriter(*writer, accessingFabricIndex);
+
+    ReturnErrorOnFailure(aEncodable.EncodeTo(responseWriter, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
@@ -227,7 +261,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     reader.Init(std::move(payload));
     VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
     VerifyOrDie(mpResponder);
     if (mpResponder->GetGroupId().HasValue())
@@ -393,10 +427,8 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        DataModel::InvokeRequest request;
+        DataModel::InvokeRequest request(concretePath, subjectDescriptor);
 
-        request.path              = concretePath;
-        request.subjectDescriptor = &subjectDescriptor;
         request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
         Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
@@ -494,13 +526,20 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                       mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
+        // Groupcast Testing
+        auto & testing = Groupcast::GetTesting();
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
+        {
+            testing.SetGroupID(groupId);
+            testing.SetEndpointID(mapping.endpoint_id);
+            testing.SetClusterID(clusterId);
+            testing.SetElementID(static_cast<uint32_t>(commandId));
+        }
 
         {
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            DataModel::InvokeRequest request;
+            DataModel::InvokeRequest request(concretePath, subjectDescriptor);
 
-            request.path              = concretePath;
-            request.subjectDescriptor = &subjectDescriptor;
             request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
@@ -578,14 +617,13 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
             context = "no additional context";
         }
 
-        if (status.HasClusterSpecificCode())
+        if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
         {
             ChipLogError(DataManagement,
                          "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
                          " ClusterSpecificCode=%u (%s)",
                          path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()),
-                         context);
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(*clusterStatus), context);
         }
         else
         {
@@ -882,7 +920,13 @@ void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommand
 
 Messaging::ExchangeContext * CommandHandlerImpl::GetExchangeContext() const
 {
-    VerifyOrDie(mpResponder);
+    VerifyOrReturnValue((mpResponder != nullptr) && !mGoneAsync, nullptr);
+    return mpResponder->GetExchangeContext();
+}
+
+Messaging::ExchangeContext * CommandHandlerImpl::TryGetExchangeContextWhenAsync() const
+{
+    VerifyOrReturnValue(mpResponder, nullptr);
     return mpResponder->GetExchangeContext();
 }
 
@@ -943,7 +987,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, DataManagement,
                        "TH Failure: Failed 'invokeRequestMessage.Init(reader)'");
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
 
     VerifyOrDieWithMsg(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, DataManagement,

@@ -14,6 +14,8 @@ WORKDIR /app
 RUN apt-cache policy
 
 # TODO: Use multi stage build for smaller image size.
+# leaseweb seems to be more stable, update it here
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://mirror.us.leaseweb.net/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   avahi-daemon \
@@ -26,6 +28,7 @@ RUN apt-get update \
   libavahi-client3 \
   libcairo2-dev \
   libdbus-1-dev \
+  libevent-dev \
   libgif-dev \
   libgirepository1.0-dev \
   libglib2.0-dev \

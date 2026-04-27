@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,10 +22,12 @@
 
 #pragma once
 
+#include <inet/EndPointBasis.h>
 #include <inet/InetError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ObjectLifeCycle.h>
 #include <lib/support/Pool.h>
+#include <lib/support/ReferenceCountedPtr.h>
 #include <platform/LockTracker.h>
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
@@ -34,6 +36,9 @@
 
 namespace chip {
 namespace Inet {
+
+template <typename EndPointType>
+class EndPointDeletor;
 
 /**
  * Template providing traits for EndPoint types used by EndPointManager.
@@ -45,6 +50,16 @@ namespace Inet {
 template <class EndPointType>
 struct EndPointProperties;
 
+template <class EndPointType>
+class EndPointHandle : public ReferenceCountedPtr<EndPointType>
+{
+public:
+    using ReferenceCountedPtr<EndPointType>::ReferenceCountedPtr;
+
+    // For printing
+    inline operator const void *() const { return this->mRefCounted; }
+};
+
 /**
  * Manage creating, deletion, and iteration of Inet::EndPoint types.
  */
@@ -52,8 +67,9 @@ template <class EndPointType>
 class EndPointManager
 {
 public:
-    using EndPoint        = EndPointType;
-    using EndPointVisitor = Loop (*)(EndPoint *);
+    using EndPoint            = EndPointType;
+    using TypedEndPointHandle = EndPointHandle<EndPoint>;
+    using EndPointVisitor     = Loop (*)(const TypedEndPointHandle &);
 
     EndPointManager() {}
     virtual ~EndPointManager() { VerifyOrDie(mLayerState.Destroy()); }
@@ -77,13 +93,13 @@ public:
 
     System::Layer & SystemLayer() const { return *mSystemLayer; }
 
-    CHIP_ERROR NewEndPoint(EndPoint ** retEndPoint)
+    CHIP_ERROR NewEndPoint(TypedEndPointHandle & retEndPoint)
     {
         assertChipStackLockedByCurrentThread();
         VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-        *retEndPoint = CreateEndPoint();
-        if (*retEndPoint == nullptr)
+        retEndPoint = std::move(CreateEndPoint());
+        if (retEndPoint.IsNull())
         {
             ChipLogError(Inet, "%s endpoint pool FULL", EndPointProperties<EndPointType>::kName);
             return CHIP_ERROR_ENDPOINT_POOL_FULL;
@@ -93,15 +109,23 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
+
+protected:
+    friend class EndPointDeletor<EndPointType>;
+    friend class EndPointHandle<EndPointType>;
+    friend class EndPointBasis<EndPointType>;
+    friend EndPointType;
+
+    virtual TypedEndPointHandle CreateEndPoint() = 0;
+
+    virtual void ReleaseEndPoint(EndPoint * endPoint) = 0;
+
     void DeleteEndPoint(EndPoint * endPoint)
     {
         SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::kSystemStatsKey);
         ReleaseEndPoint(endPoint);
     }
-
-    virtual EndPoint * CreateEndPoint()                         = 0;
-    virtual void ReleaseEndPoint(EndPoint * endPoint)           = 0;
-    virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
 
 private:
     ObjectLifeCycle mLayerState;
@@ -112,20 +136,25 @@ template <typename EndPointImpl>
 class EndPointManagerImplPool : public EndPointManager<typename EndPointImpl::EndPoint>
 {
 public:
-    using Manager  = EndPointManager<typename EndPointImpl::EndPoint>;
-    using EndPoint = typename EndPointImpl::EndPoint;
+    using Manager             = EndPointManager<typename EndPointImpl::EndPoint>;
+    using EndPoint            = typename EndPointImpl::EndPoint;
+    using TypedEndPointHandle = typename Manager::TypedEndPointHandle;
 
     EndPointManagerImplPool()           = default;
     ~EndPointManagerImplPool() override = default;
 
-    EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
-    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+    TypedEndPointHandle CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
     Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
     {
-        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop { return visitor(endPoint); });
+        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop {
+            TypedEndPointHandle handle(endPoint);
+            return visitor(handle);
+        });
     }
 
 private:
+    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+
     ObjectPool<EndPointImpl, EndPointProperties<EndPoint>::kNumEndPoints> sEndPointPool;
 };
 

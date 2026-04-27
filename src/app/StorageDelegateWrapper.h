@@ -28,7 +28,7 @@ namespace app {
 class StorageDelegateWrapper
 {
 public:
-    StorageDelegateWrapper() = default;
+    constexpr StorageDelegateWrapper(){};
 
     // Passed-in storage must outlive this object.
     CHIP_ERROR Init(PersistentStorageDelegate * storage)
@@ -40,9 +40,10 @@ public:
 
     CHIP_ERROR WriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
     CHIP_ERROR ReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
+    CHIP_ERROR DeleteKey(const StorageKeyName & aKey);
 
 private:
-    PersistentStorageDelegate * mStorage;
+    PersistentStorageDelegate * mStorage = nullptr;
 };
 
 } // namespace app

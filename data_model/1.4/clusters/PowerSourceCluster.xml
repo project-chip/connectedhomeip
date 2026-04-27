@@ -555,7 +555,9 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="Status" type="PowerSourceStatusEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="Order" type="uint8">
       <access read="true" readPrivilege="view"/>
@@ -566,7 +568,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="60"/>
+      <constraint>
+        <maxLength value="60"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="WiredAssessedInputVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -588,7 +592,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="WIRED"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="WiredAssessedCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -623,7 +629,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="BatVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -638,7 +646,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <constraint type="max" value="200"/>
+      <constraint>
+        <max value="200"/>
+      </constraint>
     </attribute>
     <attribute id="0x000D" name="BatTimeRemaining" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -652,7 +662,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BAT"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000F" name="BatReplacementNeeded" type="bool">
       <access read="true" readPrivilege="view"/>
@@ -679,7 +691,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
     <attribute id="0x0013" name="BatReplacementDescription" type="string">
       <access read="true" readPrivilege="view"/>
@@ -687,7 +701,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="REPLC"/>
       </mandatoryConform>
-      <constraint type="maxLength" value="60"/>
+      <constraint>
+        <maxLength value="60"/>
+      </constraint>
     </attribute>
     <attribute id="0x0014" name="BatCommonDesignation" type="BatCommonDesignationEnum">
       <access read="true" readPrivilege="view"/>
@@ -695,7 +711,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0015" name="BatANSIDesignation" type="string">
       <access read="true" readPrivilege="view"/>
@@ -703,7 +721,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="maxLength" value="20"/>
+      <constraint>
+        <maxLength value="20"/>
+      </constraint>
     </attribute>
     <attribute id="0x0016" name="BatIECDesignation" type="string">
       <access read="true" readPrivilege="view"/>
@@ -711,7 +731,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="maxLength" value="20"/>
+      <constraint>
+        <maxLength value="20"/>
+      </constraint>
     </attribute>
     <attribute id="0x0017" name="BatApprovedChemistry" type="BatApprovedChemistryEnum">
       <access read="true" readPrivilege="view"/>
@@ -719,7 +741,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0018" name="BatCapacity" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -743,7 +767,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="RECHG"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x001B" name="BatTimeToFullCharge" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -771,7 +797,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
-      <constraint type="maxCount" value="16"/>
+      <constraint>
+        <maxCount value="16"/>
+      </constraint>
     </attribute>
     <attribute id="0x001F" name="EndpointList" type="list">
       <entry type="endpoint-no"/>
@@ -788,12 +816,16 @@ Davis, CA 95616, USA
       <field id="0" name="Current" type="list" default="empty">
         <entry type="WiredFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
       <field id="1" name="Previous" type="list" default="empty">
         <entry type="WiredFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
     </event>
     <event id="0x01" name="BatFaultChange" priority="info">
@@ -804,12 +836,16 @@ Davis, CA 95616, USA
       <field id="0" name="Current" type="list" default="empty">
         <entry type="BatFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
       <field id="1" name="Previous" type="list" default="empty">
         <entry type="BatFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
     </event>
     <event id="0x02" name="BatChargeFaultChange" priority="info">
@@ -820,12 +856,16 @@ Davis, CA 95616, USA
       <field id="0" name="Current" type="list" default="empty">
         <entry type="BatChargeFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="16"/>
+        <constraint>
+          <maxCount value="16"/>
+        </constraint>
       </field>
       <field id="1" name="Previous" type="list" default="empty">
         <entry type="BatChargeFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="16"/>
+        <constraint>
+          <maxCount value="16"/>
+        </constraint>
       </field>
     </event>
   </events>

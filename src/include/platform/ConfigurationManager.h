@@ -103,6 +103,7 @@ public:
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                           = 0;
     virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                = 0;
     virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                          = 0;
+    virtual CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVer)                = 0;
     virtual CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) = 0;
     virtual CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
@@ -117,6 +118,7 @@ public:
     virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
     virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
+    virtual CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVer)            = 0;
     virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
     virtual CHIP_ERROR StoreRegulatoryLocation(uint8_t location)                       = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
@@ -189,7 +191,7 @@ protected:
 };
 
 /**
- * Returns a reference to a ConfigurationManager object.
+ * Returns a reference to a ConfigurationManager singleton object.
  *
  * Applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
@@ -197,7 +199,7 @@ protected:
 ConfigurationManager & ConfigurationMgr();
 
 /**
- * Returns the platform-specific implementation of the ConfigurationManager object.
+ * Returns the platform-specific implementation of the ConfigurationManager singleton object.
  *
  * Applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the selected platform.

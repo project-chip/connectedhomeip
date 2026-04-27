@@ -27,7 +27,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -88,6 +88,15 @@ public:
                                                Crypto::Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                FabricIndex fabricIndex, VendorId vendorId);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    CHIP_ERROR OpenJointCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
+                                            Crypto::Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
+                                            FabricIndex fabricIndex, VendorId vendorId);
+
+    // Tracks whether joint commissioning mode is ongoing
+    bool IsJCM() const;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     void CloseCommissioningWindow();
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum CommissioningWindowStatusForCluster() const;
@@ -121,11 +130,22 @@ public:
     // commissioning window timeout.
     void OverrideMinCommissioningTimeout(System::Clock::Seconds32 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
 
+    Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
+
+    /**
+     * Expire the fail-safe if there is an active PASE session, since this indicates that the fail-safe is for the commissioning
+     * happening over the PASE session, and not for some unrelated non-commissioning activity.
+     */
+    void ExpireFailSafeIfHeldByOpenPASESession();
+
 private:
     //////////// SessionDelegate Implementation ///////////////
     void OnSessionReleased() override;
 
     void SetBLE(bool ble) { mIsBLE = ble; }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void SetWiFiPAF(bool paf) { mIsWiFiPAF = paf; }
+#endif
 
     CHIP_ERROR SetTemporaryDiscriminator(uint16_t discriminator);
 
@@ -190,6 +210,18 @@ private:
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    bool mIsWiFiPAF = false;
+    // Both 0 and kUndefinedWiFiPafSessionId are invalid publish-id.
+    // Use 0 as the default value so that the PAF definition does not need to be included.
+    uint32_t mPublishId = 0;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Boolean that tracks whether we are currently in a Joint Commissioning Mode.
+    bool mJCM = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     PASESession mPairingSession;
 

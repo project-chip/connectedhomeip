@@ -147,18 +147,24 @@ Davis, CA 95616, USA
     <struct name="MessageResponseOptionStruct">
       <field id="0" name="MessageResponseID" type="uint32">
         <mandatoryConform/>
-        <constraint type="min" value="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="1" name="Label" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </struct>
     <struct name="MessageStruct">
       <field id="0" name="MessageID" type="message-id">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
         <access fabricSensitive="true"/>
@@ -181,7 +187,9 @@ Davis, CA 95616, USA
       <field id="5" name="MessageText" type="string">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="6" name="Responses" type="list" default="empty">
         <entry type="MessageResponseOptionStruct"/>
@@ -189,7 +197,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
-        <constraint type="maxCount" value="4"/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -199,13 +209,17 @@ Davis, CA 95616, USA
       <entry type="MessageStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="ActiveMessageIDs" type="list" default="empty">
       <entry type="message-id"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -214,7 +228,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
         <mandatoryConform/>
@@ -232,14 +248,18 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="MessageText" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="6" name="Responses" type="list" default="empty">
         <entry type="MessageResponseOptionStruct"/>
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
-        <constraint type="maxCount" value="4"/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="CancelMessagesRequest" direction="commandToServer" response="Y">
@@ -248,7 +268,9 @@ Davis, CA 95616, USA
       <field id="0" name="MessageIDs" type="list">
         <entry type="message-id"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
     </command>
   </commands>
@@ -258,7 +280,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
     </event>
     <event id="0x01" name="MessagePresented" priority="info">
@@ -266,7 +290,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
     </event>
     <event id="0x02" name="MessageComplete" priority="info">
@@ -274,7 +300,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="MessageID" type="message-id">
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="ResponseID" type="uint32" default="null">
         <quality nullable="true"/>
@@ -287,7 +315,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="RPLY"/>
         </mandatoryConform>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="3" name="FutureMessagesPreference" type="FutureMessagePreferenceEnum" default="null">
         <quality nullable="true"/>

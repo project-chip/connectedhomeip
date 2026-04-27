@@ -153,8 +153,8 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(!gDishwasherModeDelegate && !gDishwasherModeInstance);
 
     gDishwasherModeDelegate = std::make_unique<DishwasherModeDelegate>();
-    gDishwasherModeInstance = std::make_unique<ModeBase::Instance>(gDishwasherModeDelegate.get(), endpointId, DishwasherMode::Id,
-                                                                   chip::to_underlying(Feature::kOnOff));
-    gDishwasherModeInstance->Init();
+    gDishwasherModeInstance =
+        std::make_unique<ModeBase::Instance>(gDishwasherModeDelegate.get(), endpointId, DishwasherMode::Id, 0);
+    TEMPORARY_RETURN_IGNORED gDishwasherModeInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER

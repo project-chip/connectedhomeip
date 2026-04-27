@@ -33,10 +33,10 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Commi
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
     // Stop active discovery.
-    mActiveDeviceCommissioner->StopCommissionableDiscovery();
+    TEMPORARY_RETURN_IGNORED mActiveDeviceCommissioner->StopCommissionableDiscovery();
 
     // Cancel discovery timer.
-    chip::DeviceLayer::SystemLayer().CancelTimer(OnDiscoveredTimeout, this);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().CancelTimer(OnDiscoveredTimeout, this);
 
     // Stop Mdns discovery.
     mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);

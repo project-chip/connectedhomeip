@@ -33,6 +33,7 @@ chip_test_suite("tests") {
     "TestFlatAllocatedQName.cpp",
     "TestHeapQName.cpp",
     "TestQName.cpp",
+    "TestQNameString.cpp",
     "TestRecordWriter.cpp",
   ]
 

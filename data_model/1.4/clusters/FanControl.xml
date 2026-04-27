@@ -199,12 +199,16 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="100"/>
+      <constraint>
+        <max value="100"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="PercentCurrent" type="percent" default="desc">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="100"/>
+      <constraint>
+        <max value="100"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="SpeedMax" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -212,7 +216,12 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="between" from="1" to="100"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="100"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="SpeedSetting" type="uint8" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -220,8 +229,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="max">
-        <value attribute="SpeedMax"/>
+      <constraint>
+        <max>
+          <attribute name="SpeedMax"/>
+        </max>
       </constraint>
     </attribute>
     <attribute id="0x0006" name="SpeedCurrent" type="uint8" default="desc">
@@ -230,8 +241,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="max">
-        <value attribute="SpeedMax"/>
+      <constraint>
+        <max>
+          <attribute name="SpeedMax"/>
+        </max>
       </constraint>
     </attribute>
     <attribute id="0x0007" name="RockSupport" type="RockBitmap" default="0">
@@ -240,7 +253,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="RCK"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="RockSetting" type="RockBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -248,7 +263,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="RCK"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0009" name="WindSupport" type="WindBitmap" default="0">
       <access read="true" readPrivilege="view"/>
@@ -256,7 +273,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="WND"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -264,7 +283,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="WND"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -272,7 +293,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="DIR"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>

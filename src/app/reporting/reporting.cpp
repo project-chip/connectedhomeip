@@ -19,7 +19,6 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/Provider.h>
-#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/LockTracker.h>
 
@@ -35,7 +34,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
     VerifyOrReturn(provider != nullptr);
 
-    provider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint, clusterId, attributeId));
+    provider->NotifyAttributeChanged({ endpoint, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
@@ -47,10 +46,10 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
     VerifyOrReturn(provider != nullptr);
 
-    provider->Temporary_ReportAttributeChanged(AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
+    provider->NotifyAttributeChanged(aPath, DataModel::AttributeChangeType::kReportable);
 }
 
-void MatterReportingAttributeChangeCallback(EndpointId endpoint)
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, DataModel::EndpointChangeType type)
 {
     // Attribute writes have asserted this already, but this assert should catch
     // applications notifying about changes from their end.
@@ -58,6 +57,5 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
 
     DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
     VerifyOrReturn(provider != nullptr);
-
-    provider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
+    provider->NotifyEndpointChanged(endpoint, type);
 }

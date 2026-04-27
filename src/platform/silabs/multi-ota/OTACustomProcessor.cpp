@@ -16,48 +16,21 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTACustomProcessor.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#if SL_WIFI
-#include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif // SL_WIFI
-
-extern "C" {
-#include "btl_interface.h"
-#include "sl_core.h"
-}
-
-/// No error, operation OK
-#define SL_BOOTLOADER_OK 0L
-
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 // Define static memebers
 uint8_t OTACustomProcessor::mSlotId                                                  = 0;
 uint32_t OTACustomProcessor::mWriteOffset                                            = 0;
 uint16_t OTACustomProcessor::writeBufOffset                                          = 0;
 uint8_t OTACustomProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
-
-CHIP_ERROR OTACustomProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTACustomProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mDescriptorProcessed = false;
-
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR OTACustomProcessor::ProcessInternal(ByteSpan & block)
 {
@@ -92,4 +65,7 @@ CHIP_ERROR OTACustomProcessor::FinalizeAction()
     return CHIP_NO_ERROR;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

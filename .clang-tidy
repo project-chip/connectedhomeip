@@ -46,6 +46,7 @@ Checks: >
   -clang-analyzer-security.insecureAPI.rand,
   -clang-analyzer-security.insecureAPI.strcpy,
   -clang-analyzer-unix.Malloc,
+  -clang-analyzer-webkit.NoUncountedMemberChecker,
   -clang-diagnostic-implicit-int-conversion,
   -clang-diagnostic-missing-template-arg-list-after-template-kw
 WarningsAsErrors: '*'

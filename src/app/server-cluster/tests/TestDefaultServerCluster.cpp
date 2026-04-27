@@ -18,25 +18,30 @@
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/data-model-provider/MetadataList.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/ServerClusterContext.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <cstdlib>
-#include <optional>
+#include <utility>
 
 using namespace chip;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
@@ -44,9 +49,7 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ClusterId id) : mClusterId(id) {}
-
-    ClusterId GetClusterId() const override { return mClusterId; }
+    constexpr FakeDefaultServerCluster(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -61,34 +64,44 @@ public:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    void TestIncreaseDataVersion() { IncreaseDataVersion(); }
-
-private:
-    ClusterId mClusterId;
+    // Mark some methods public for the purpose of testing
+    using DefaultServerCluster::IncreaseDataVersion;
+    using DefaultServerCluster::NotifyAttributeChanged;
+    using DefaultServerCluster::NotifyAttributeChangedIfSuccess;
+    using DefaultServerCluster::SetAttributeValue;
 };
 
 } // namespace
 
 TEST(TestDefaultServerCluster, TestDataVersion)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
-    DataVersion v1 = cluster.GetDataVersion();
-    cluster.TestIncreaseDataVersion();
-    ASSERT_EQ(cluster.GetDataVersion(), v1 + 1);
+    DataVersion v1 = cluster.GetDataVersion({ 1, 2 });
+    cluster.IncreaseDataVersion();
+    ASSERT_EQ(cluster.GetDataVersion({ 1, 2 }), v1 + 1);
 }
 
 TEST(TestDefaultServerCluster, TestFlagsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
-    ASSERT_EQ(cluster.GetClusterFlags().Raw(), 0u);
+    FakeDefaultServerCluster cluster({ 1, 2 });
+    ASSERT_EQ(cluster.GetClusterFlags({ 1, 2 }).Raw(), 0u);
+}
+
+TEST(TestDefaultServerCluster, ListWriteNotification)
+{
+    FakeDefaultServerCluster cluster({ 1, 2 });
+
+    // this does not test anything really, except we get 100% coverage and we see that we do not crash
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin, 1);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure, 1);
 }
 
 TEST(TestDefaultServerCluster, AttributesDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
-    DataModel::ListBuilder<AttributeEntry> attributes;
+    ReadOnlyBufferBuilder<AttributeEntry> attributes;
 
     ASSERT_EQ(cluster.Attributes({ 1, 1 }, attributes), CHIP_NO_ERROR);
 
@@ -97,37 +110,48 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     // 5 global attributes are currently supported. Ensure they are returned.
     ASSERT_EQ(data.size(), 5u);
 
-    ASSERT_EQ(data[0].attributeId, Globals::Attributes::ClusterRevision::Id);
-    ASSERT_EQ(data[1].attributeId, Globals::Attributes::FeatureMap::Id);
-    ASSERT_EQ(data[2].attributeId, Globals::Attributes::AttributeList::Id);
+    ASSERT_EQ(data[0].attributeId, Globals::Attributes::FeatureMap::Id);
+    ASSERT_EQ(data[1].attributeId, Globals::Attributes::ClusterRevision::Id);
+    ASSERT_EQ(data[2].attributeId, Globals::Attributes::GeneratedCommandList::Id);
     ASSERT_EQ(data[3].attributeId, Globals::Attributes::AcceptedCommandList::Id);
-    ASSERT_EQ(data[4].attributeId, Globals::Attributes::GeneratedCommandList::Id);
+    ASSERT_EQ(data[4].attributeId, Globals::Attributes::AttributeList::Id);
 
     // first 2 are normal, the rest are list
     for (size_t i = 0; i < 5; i++)
     {
-        ASSERT_EQ(data[i].flags.Has(AttributeQualityFlags::kListAttribute), (i >= 2));
-        ASSERT_EQ(data[i].readPrivilege, Access::Privilege::kView);
-        ASSERT_FALSE(data[i].writePrivilege.has_value());
+        ASSERT_EQ(data[i].HasFlags(AttributeQualityFlags::kListAttribute), (i >= 2));
+        ASSERT_EQ(data[i].GetReadPrivilege(), Access::Privilege::kView);
+        ASSERT_FALSE(data[i].GetWritePrivilege().has_value());
     }
+}
+
+TEST(TestDefaultServerCluster, ListWriteIsANoop)
+{
+    FakeDefaultServerCluster cluster({ 1, 2 });
+
+    // this is really for coverage, we are not calling anything useful
+    cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
+                                           DataModel::ListWriteOperation::kListWriteBegin, 1);
+    cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
+                                           DataModel::ListWriteOperation::kListWriteSuccess, 1);
 }
 
 TEST(TestDefaultServerCluster, CommandsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
-    DataModel::ListBuilder<AcceptedCommandEntry> acceptedCommands;
+    ReadOnlyBufferBuilder<AcceptedCommandEntry> acceptedCommands;
     ASSERT_EQ(cluster.AcceptedCommands({ 1, 1 }, acceptedCommands), CHIP_NO_ERROR);
     ASSERT_TRUE(acceptedCommands.TakeBuffer().empty());
 
-    DataModel::ListBuilder<CommandId> generatedCommands;
+    ReadOnlyBufferBuilder<CommandId> generatedCommands;
     ASSERT_EQ(cluster.GeneratedCommands({ 1, 1 }, generatedCommands), CHIP_NO_ERROR);
     ASSERT_TRUE(generatedCommands.TakeBuffer().empty());
 }
 
 TEST(TestDefaultServerCluster, WriteAttributeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     WriteOperation test(0 /* endpoint */, 1 /* cluster */, 1234 /* attribute */);
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -140,13 +164,150 @@ TEST(TestDefaultServerCluster, WriteAttributeDefault)
 
 TEST(TestDefaultServerCluster, InvokeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     TLV::TLVReader tlvReader;
-    InvokeRequest request;
-
-    request.path = { 0 /* endpoint */, 1 /* cluster */, 1234 /* command */ };
+    InvokeRequest request({ 0 /* endpoint */, 1 /* cluster */, 1234 /* command */ }, chip::Testing::kAdminSubjectDescriptor);
 
     ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr /* command handler, assumed unused here */),
               Status::UnsupportedCommand);
+}
+
+TEST(TestDefaultServerCluster, NotifyAttributeChanged)
+{
+    constexpr ClusterId kEndpointId = 321;
+    constexpr ClusterId kClusterId  = 1122;
+    FakeDefaultServerCluster cluster({ kEndpointId, kClusterId });
+
+    // When no ServerClusterContext is set, only the data version should change.
+    DataVersion oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+
+    cluster.NotifyAttributeChanged(123);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+
+    // Create a ServerClusterContext and verify that attribute change notifications are processed.
+    TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    cluster.NotifyAttributeChanged(234);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 234));
+}
+
+TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
+{
+    constexpr ClusterId kEndpointId = 321;
+    constexpr ClusterId kClusterId  = 1122;
+    FakeDefaultServerCluster cluster({ kEndpointId, kClusterId });
+
+    // When no ServerClusterContext is set, only the data version should change.
+    DataVersion oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(123, Status::Success), Status::Success);
+    DataVersion newVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    ASSERT_NE(newVersion, oldVersion);
+
+    oldVersion = newVersion;
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(123, Status::Failure), Status::Failure);
+    newVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    ASSERT_EQ(newVersion, oldVersion);
+
+    // Create a ServerClusterContext and verify that attribute change notifications are processed.
+    TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(234, Status::Success), Status::Success);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 234));
+
+    // now test a failure - nothing should be marked dirty
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    context.ChangeListener().DirtyList().clear();
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(345, Status::Failure), Status::Failure);
+    ASSERT_EQ(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+}
+
+TEST(TestDefaultServerCluster, SetAttributeValueNullable)
+{
+    constexpr EndpointId kEndpointId = 321;
+    constexpr ClusterId kClusterId   = 1122;
+    FakeDefaultServerCluster cluster({ kEndpointId, kClusterId });
+
+    TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint32_t> attr;
+
+    // Initial state: null
+    ASSERT_TRUE(attr.IsNull());
+
+    // Set to null when already null -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, DataModel::NullNullable, 1));
+    ASSERT_TRUE(attr.IsNull());
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // Set to value -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, 123u, 1));
+    ASSERT_FALSE(attr.IsNull());
+    ASSERT_EQ(attr.Value(), 123u);
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 1));
+    context.ChangeListener().DirtyList().clear();
+
+    // Set to same value -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, 123u, 1));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // Set to different value -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, 456u, 1));
+    ASSERT_EQ(attr.Value(), 456u);
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Set to null -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, DataModel::NullNullable, 1));
+    ASSERT_TRUE(attr.IsNull());
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Test setting with another Nullable object
+    DataModel::Nullable<uint32_t> otherAttr;
+
+    // Initial state: null
+    ASSERT_TRUE(otherAttr.IsNull());
+
+    // Set attr to a value first so it's not null
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, 789u, 1));
+    context.ChangeListener().DirtyList().clear();
+
+    // Set with null Nullable -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, otherAttr, 1));
+    ASSERT_TRUE(attr.IsNull());
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Set with same null Nullable -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, otherAttr, 1));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // Set otherAttr to a value
+    otherAttr.SetNonNull(999u);
+
+    // Set with non-null Nullable -> should return true, changed
+    ASSERT_TRUE(cluster.SetAttributeValue(attr, otherAttr, 1));
+    ASSERT_FALSE(attr.IsNull());
+    ASSERT_EQ(attr.Value(), 999u);
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    context.ChangeListener().DirtyList().clear();
+
+    // Set with same non-null Nullable -> should return false, no change
+    ASSERT_FALSE(cluster.SetAttributeValue(attr, otherAttr, 1));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
 }

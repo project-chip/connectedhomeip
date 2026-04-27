@@ -262,7 +262,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
                 ChipLogError(Zcl, "ApplicationLauncher target app not found");
                 LauncherResponseType response;
                 response.status = StatusEnum::kAppNotAvailable;
-                responder.Success(response);
+                TEMPORARY_RETURN_IGNORED responder.Success(response);
                 return true;
             }
 
@@ -297,7 +297,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
             ChipLogProgress(Zcl, "ApplicationLauncher target app not found");
             LauncherResponseType response;
             response.status = StatusEnum::kAppNotAvailable;
-            responder.Success(response);
+            TEMPORARY_RETURN_IGNORED responder.Success(response);
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -356,7 +356,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
                 response.status = StatusEnum::kAppNotAvailable;
-                responder.Success(response);
+                TEMPORARY_RETURN_IGNORED responder.Success(response);
                 return true;
             }
 
@@ -445,7 +445,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
                 response.status = StatusEnum::kAppNotAvailable;
-                responder.Success(response);
+                TEMPORARY_RETURN_IGNORED responder.Success(response);
                 return true;
             }
 
@@ -496,4 +496,9 @@ exit:
 void MatterApplicationLauncherPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gApplicationLauncherAttrAccess);
+}
+
+void MatterApplicationLauncherPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gApplicationLauncherAttrAccess);
 }

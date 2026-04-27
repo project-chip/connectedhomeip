@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_TESTABLE
 @interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
 @property (nonatomic, nullable) NSNumber * dataVersion;
+@property (nonatomic, nullable) NSNumber * pendingDataVersion; // for holding new data version during a report, and not encoded
 @property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
 
 - (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;

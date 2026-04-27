@@ -70,6 +70,14 @@ config DFU_MULTI_IMAGE_PACKAGE_NET
 	default y
 
 endif # SOC_SERIES_NRF53X
+
+if BOARD_NRF54L15DK
+
+config PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+	default y
+
+endif # BOARD_NRF54L15DK
+
 endif # BOOTLOADER_MCUBOOT
 
 #### Enable generating factory data

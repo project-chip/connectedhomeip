@@ -16,6 +16,3 @@ declare_args() {
   nxp_crypto_impl = ""
   nxp_crypto_mw_root = ""
 }
-
-assert(nxp_crypto_impl != "", "nxp_crypto_impl should be defined")
-assert(nxp_crypto_mw_root != "", "nxp_crypto_mw_root should be defined")

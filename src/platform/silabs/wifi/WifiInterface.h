@@ -16,11 +16,16 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <platform/NetworkCommissioning.h>
+
 #include <array>
 #include <cmsis_os2.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Span.h>
+#include <platform/silabs/wifi/WifiStateProvider.h>
+#include <platform/silabs/wifi/icd/PowerSaveInterface.h>
 #include <platform/silabs/wifi/wfx_msgs.h>
 #include <sl_cmsis_os2_common.h>
 #include <sl_status.h>
@@ -33,46 +38,12 @@
 #endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
 /* Updated constants */
-
-constexpr size_t kWifiMacAddressLength = 6;
+constexpr size_t kWiFiMacAddressLength = 6;
 
 /* Defines to update */
-
-// TODO: Not sure why the pass key max length differs for the 917 SoC & NCP
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-// MAX PASSKEY LENGTH including NULL character
-#define WFX_MAX_PASSKEY_LENGTH (SL_WIFI_MAX_PSK_LENGTH)
-#else
-// MAX PASSKEY LENGTH including NULL character
-#define WFX_MAX_PASSKEY_LENGTH (64)
-#endif // (SLI_SI91X_MCU_INTERFACE  | EXP_BOARD)
-
-// MAX SSID LENGTH excluding NULL character
-#define WFX_MAX_SSID_LENGTH (32)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-/* Note that these are same as RSI_security */
-typedef enum
-{
-    WFX_SEC_UNSPECIFIED    = 0,
-    WFX_SEC_NONE           = 1,
-    WFX_SEC_WEP            = 2,
-    WFX_SEC_WPA            = 3,
-    WFX_SEC_WPA2           = 4,
-    WFX_SEC_WPA3           = 5,
-    WFX_SEC_WPA_WPA2_MIXED = 6,
-} wfx_sec_t;
-
-typedef struct wfx_wifi_scan_result
-{
-    uint8_t ssid[WFX_MAX_SSID_LENGTH]; // excludes null-character
-    size_t ssid_length;
-    wfx_sec_t security;
-    uint8_t bssid[kWifiMacAddressLength];
-    uint8_t chan;
-    int16_t rssi; /* I suspect this is in dBm - so signed */
-} wfx_wifi_scan_result_t;
-using ScanCallback = void (*)(wfx_wifi_scan_result_t *);
+using ScanCallback = void (*)(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse *);
 
 typedef struct wfx_wifi_scan_ext
 {
@@ -85,7 +56,7 @@ typedef struct wfx_wifi_scan_ext
     uint32_t overrun_count;
 } wfx_wifi_scan_ext_t;
 
-#ifdef RS911X_WIFI
+#ifdef SL_MATTER_SIWX_WIFI_ENABLE
 /*
  * This Sh%t is here to support WFXUtils - and the Matter stuff that uses it
  * We took it from the SDK (for WF200)
@@ -107,7 +78,7 @@ namespace Silabs {
  * @brief Public Interface for the Wi-Fi platform APIs
  *
  */
-class WifiInterface
+class WifiInterface : public WifiStateProvider, public PowerSaveInterface
 {
 public:
     enum class WifiEvent : uint8_t
@@ -145,41 +116,46 @@ public:
         kWPACouterMeasures = 5, // WPA contermeasures triggered a disconnection
     };
 
-    // TODO: Figure out if we need this structure. We have different strcutures for the same use
-    struct WifiCredentials
+    struct WiFiCredentials
     {
-        WifiCredentials() { Clear(); }
+        WiFiCredentials() { Clear(); }
 
-        uint8_t ssid[WFX_MAX_SSID_LENGTH]       = { 0 };
-        size_t ssidLength                       = 0;
-        uint8_t passkey[WFX_MAX_PASSKEY_LENGTH] = { 0 };
-        size_t passkeyLength                    = 0;
-        wfx_sec_t security                      = WFX_SEC_UNSPECIFIED;
+        uint8_t ssid[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength] = { 0 };
+        size_t ssidLen                                                = 0;
 
-        WifiCredentials & operator=(const WifiCredentials & other)
+        uint8_t key[chip::DeviceLayer::Internal::kMaxWiFiKeyLength] = { 0 };
+        size_t keyLen                                               = 0;
+
+        chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
+
+        WiFiCredentials & operator=(const WiFiCredentials & other)
         {
             if (this != &other)
             {
-                memcpy(ssid, other.ssid, WFX_MAX_SSID_LENGTH);
-                ssidLength = other.ssidLength;
-                memcpy(passkey, other.passkey, WFX_MAX_PASSKEY_LENGTH);
-                passkeyLength = other.passkeyLength;
-                security      = other.security;
+                memcpy(ssid, other.ssid, chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+                ssidLen = other.ssidLen;
+
+                memcpy(key, other.key, chip::DeviceLayer::Internal::kMaxWiFiKeyLength);
+                keyLen = other.keyLen;
+
+                security = other.security;
             }
             return *this;
         }
 
         void Clear()
         {
-            memset(ssid, 0, WFX_MAX_SSID_LENGTH);
-            ssidLength = 0;
-            memset(passkey, 0, WFX_MAX_PASSKEY_LENGTH);
-            passkeyLength = 0;
-            security      = WFX_SEC_UNSPECIFIED;
+            memset(ssid, 0, chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+            ssidLen = 0;
+
+            memset(key, 0, chip::DeviceLayer::Internal::kMaxWiFiKeyLength);
+            keyLen = 0;
+
+            security.ClearAll();
         }
     };
 
-    using MacAddress = std::array<uint8_t, kWifiMacAddressLength>;
+    using MacAddress = std::array<uint8_t, kWiFiMacAddressLength>;
 
     virtual ~WifiInterface() = default;
 
@@ -248,50 +224,24 @@ public:
     virtual void ConfigureStationMode() = 0;
 
     /**
-     * @brief Returns the state of the Wi-Fi connection
-     *
-     * @return true, if the Wi-Fi device is connected to an AP
-     *         false, otherwise
-     */
-    virtual bool IsStationConnected() = 0;
-
-    /**
-     * @brief Returns the state of the Wi-Fi Station configuration of the Wi-Fi device
-     *
-     * @return true, if the Wi-Fi Station mode is enabled
-     *         false, otherwise
-     */
-    virtual bool IsStationModeEnabled() = 0;
-
-    /**
-     * @brief Returns the state of the Wi-Fi station initialization
-     *
-     * @return true, if the initialization was successful
-     *         false, otherwise
-     */
-    virtual bool IsStationReady() = 0;
-
-    /**
      * @brief Triggers the device to disconnect from the connected Wi-Fi network
      *
      * @note The disconnection is not immediate. It can take a certain amount of time for the device to be in a disconnected state
      * once the function is called. When the function returns, the device might not have yet disconnected from the Wi-Fi network.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR, disconnection request was succesfully triggered
-     *         otherwise, CHIP_ERROR_INTERNAL
+     * The implementation may only enqueue a disconnect (e.g. post an event); there is no synchronous success/failure to report.
      */
-    virtual CHIP_ERROR TriggerDisconnection() = 0;
+    virtual void TriggerDisconnection() = 0;
 
     /**
      * @brief Gets the connected access point information.
-     *        See @wfx_wifi_scan_result_t for the information that is returned by the function.
+     *        See @NetworkCommissioning::WiFiScanResponse for the information that is returned by the function.
      *
      * @param[out] info AP information
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, device has succesfully pulled all the AP information
      *                    CHIP_ERROR_INTERNAL, otherwise. If the function returns an error, the data in ap cannot be used.
      */
-    virtual CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) = 0;
+    virtual CHIP_ERROR GetAccessPointInfo(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse & info) = 0;
 
     /**
      * @brief Gets the connected access point extended information.
@@ -326,8 +276,9 @@ public:
      *       The function will overwrite any existing Wi-Fi credentials.
      *
      * @param[in] credentials
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if ssidLength is 0 or exceeds max SSID length
      */
-    virtual void SetWifiCredentials(const WifiCredentials & credentials) = 0;
+    virtual CHIP_ERROR SetWifiCredentials(const WiFiCredentials & credentials) = 0;
 
     /**
      * @brief Returns the configured Wi-Fi credentials
@@ -337,23 +288,15 @@ public:
      * @return CHIP_ERROR CHIP_ERROR_INCORRECT_STATE, if the device does not have any set credentials
      *                    CHIP_NO_ERROR, otherwise
      */
-    virtual CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials) = 0;
+    virtual CHIP_ERROR GetWifiCredentials(WiFiCredentials & credentials) = 0;
 
     /**
-     * @brief Returns the state of the Wi-Fi network provisionning
-     *        Does the device has Wi-Fi credentials or not
-     *
-     * @return true, the device has Wi-Fi credentials
-     *         false, otherwise
-     */
-    virtual bool IsWifiProvisioned() = 0;
-
-    /**
-     * @brief Triggers a connection attempt the Access Point who's crendetials match the ones store with the SetWifiCredentials API.
+     * @brief Triggers a connection attempt the Access Point who's credentials match the ones store with the SetWifiCredentials API.
      *        The function triggers an async connection attempt. The upper layers are notified trought a platform event if the
      *        connection attempt was successful or not.
      *
      *        The returned error code only indicates if the connection attempt was triggered or not.
+     *        On retry after failure, the implementation may use quick join (no scan) when channel/BSSID are known.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, the connection attempt was succesfully triggered
      *                    CHIP_ERROR_INCORRECT_STATE, the Wi-Fi station does not have any Wi-Fi credentials
@@ -362,53 +305,29 @@ public:
      */
     virtual CHIP_ERROR ConnectToAccessPoint(void) = 0;
 
-/* Function to update */
-
-// TODO: Harmonize the Power Save function inputs for all platforms
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-    virtual CHIP_ERROR ConfigurePowerSave(rsi_power_save_profile_mode_t sl_si91x_ble_state,
-                                          sl_si91x_performance_profile_t sl_si91x_wifi_state, uint32_t listenInterval) = 0;
-#else
-    virtual CHIP_ERROR ConfigurePowerSave() = 0;
-#endif /* (SLI_SI91X_MCU_INTERFACE | EXP_BOARD) */
-
-    /**
-     * @brief Configures the broadcast filter.
-     *
-     * @param[in] enableBroadcastFilter Boolean to enable or disable the broadcast filter.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR, the counters were succesfully reset to 0.
-     *                    CHIP_ERROR_INTERNAL, if there was an error when configuring the broadcast filter
-     */
-    virtual CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter) = 0;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-    /**
-     * @brief Returns IP assignment status
-     *
-
-     * @return true, Wi-Fi station has an IPv4 address
-     *         false, otherwise
-     */
-    virtual bool HasAnIPv4Address() = 0;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
-    /**
-     * @brief Returns IP assignment status
-     *
-
-     * @return true, Wi-Fi station has an IPv6 address
-     *         false, otherwise
-     */
-    virtual bool HasAnIPv6Address() = 0;
-
     /**
      * @brief Cancels the on-going network scan operation.
      *        If one isn't in-progress, function doesn't do anything
      */
     virtual void CancelScanNetworks() = 0;
+
+    /**
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
+     *
+     *  The default implementation returns the 2.4 GHz band support.
+     *
+     *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
+     */
+    virtual uint32_t GetSupportedWiFiBandsMask() const
+    {
+        // Default to 2.4G support only
+        return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
+    }
+
+    /**
+     * @brief Function resets reconnection attempt interval back to the minimum value
+     */
+    void ResetConnectionRetryInterval();
 
 protected:
     /**
@@ -420,6 +339,12 @@ protected:
     void NotifyIPv6Change(bool gotIPv6Addr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    /**
+     * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+     *
+     * @param[in] ip New IPv4 address
+     */
+    void GotIPv4Address(uint32_t ip);
     /**
      * @brief Function notifies the PlatformManager that an IPv4 event occured on the WiFi interface.
      *
@@ -482,10 +407,8 @@ typedef struct wfx_rsi_s
 {
     chip::BitFlags<chip::DeviceLayer::Silabs::WifiInterface::WifiState> dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
-    chip::DeviceLayer::Silabs::WifiInterface::WifiCredentials credentials;
+    chip::DeviceLayer::Silabs::WifiInterface::WiFiCredentials credentials;
     ScanCallback scan_cb;
-    uint8_t * scan_ssid; /* Which one are we scanning for */
-    size_t scan_ssid_length;
 #ifdef SL_WFX_CONFIG_SOFTAP
     chip::DeviceLayer::Silabs::WifiInterface::MacAddress softap_mac;
 #endif

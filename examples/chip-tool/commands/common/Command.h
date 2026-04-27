@@ -279,6 +279,11 @@ public:
     const chip::Optional<char *> & GetStorageDirectory() const { return mStorageDirectory; }
 
 protected:
+    // Utility method to create a ByteSpan from a (mutable) character string we
+    // have, which handles the hex: and str: prefixes as needed.  Returns false
+    // on failure (e.g. invalid hex encoding).
+    static bool OctetStringFromCharString(char * argValue, chip::ByteSpan * value);
+
     // mStorageDirectory lives here so we can just set it in RunAsInteractive.
     chip::Optional<char *> mStorageDirectory;
 

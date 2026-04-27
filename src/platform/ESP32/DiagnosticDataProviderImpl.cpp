@@ -28,6 +28,10 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/DiagnosticDataProviderImpl.h>
 #include <platform/ESP32/ESP32Utils.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <platform/KeyValueStoreManager.h>
+#endif
 
 #include "esp_event.h"
 #include "esp_heap_caps_init.h"
@@ -156,25 +160,61 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    uint64_t upTime = 0;
-
-    if (GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalHours = 0;
-        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
+    return ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
+    if (mBootReason.has_value())
+    {
+        ChipLogDetail(DeviceLayer, "Boot Reason (cached):%u", to_underlying(mBootReason.value()));
+        bootReason = mBootReason.value();
+        return CHIP_NO_ERROR;
+    }
+
     bootReason = BootReasonType::kUnspecified;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    // ESP-IDF provides no dedicated reset reason for OTA-triggered reboots.
+    // Detect a post-OTA boot by reading the OTA requestor's persisted update state from KVS.
+    // The OTA requestor stores kApplying before rebooting and clears it after NotifyUpdateApplied(),
+    // so no manual cleanup is needed here.
+    using OTAUpdateStateEnum = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+
+    // KeyValueStoreMgr() is the underlying store used by the OTA requestor's
+    // PersistentStorageDelegate on ESP32 (via KvsPersistentStorageDelegate), so reading
+    // these keys directly is equivalent to what DefaultOTARequestorStorage does.
+    auto & keyMgr = PersistedStorage::KeyValueStoreMgr();
+
+    size_t bytesRead = 0;
+    OTAUpdateStateEnum otaState;
+    auto otaStateKeyName     = DefaultStorageKeyAllocator::OTACurrentUpdateState();
+    const char * otaStateKey = otaStateKeyName.KeyName();
+
+    CHIP_ERROR err = keyMgr.Get(otaStateKey, &otaState, sizeof(otaState), &bytesRead);
+
+    if (err == CHIP_NO_ERROR && bytesRead == sizeof(otaState) && otaState == OTAUpdateStateEnum::kApplying)
+    {
+        bytesRead                        = 0;
+        uint32_t currentVersion          = 0;
+        uint32_t targetVersion           = 0;
+        auto otaTargetVersionKeyName     = DefaultStorageKeyAllocator::OTATargetVersion();
+        const char * otaTargetVersionKey = otaTargetVersionKeyName.KeyName();
+
+        CHIP_ERROR currentVersionGetErr = ConfigurationMgr().GetSoftwareVersion(currentVersion);
+        CHIP_ERROR targetVersionGetErr  = keyMgr.Get(otaTargetVersionKey, &targetVersion, sizeof(targetVersion), &bytesRead);
+
+        if (currentVersionGetErr == CHIP_NO_ERROR && targetVersionGetErr == CHIP_NO_ERROR && bytesRead == sizeof(targetVersion) &&
+            currentVersion == targetVersion)
+        {
+            bootReason  = BootReasonType::kSoftwareUpdateCompleted;
+            mBootReason = bootReason;
+            ChipLogDetail(DeviceLayer, "After OTA Upgrade Boot Reason:%u", to_underlying(bootReason));
+            return CHIP_NO_ERROR;
+        }
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
     uint8_t reason;
     reason = static_cast<uint8_t>(esp_reset_reason());
     if (reason == ESP_RST_UNKNOWN)
@@ -198,12 +238,15 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
         bootReason = BootReasonType::kSoftwareWatchdogReset;
         /* Reboot can be due to hardware or software watchdog*/
     }
+    mBootReason = bootReason;
+    ChipLogDetail(DeviceLayer, "from API Boot Reason:%u", to_underlying(bootReason));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    esp_netif_t * netif     = esp_netif_next(NULL);
+    // TODO: safely iterate over netifs
+    esp_netif_t * netif     = esp_netif_next_unsafe(NULL);
     NetworkInterface * head = NULL;
     uint8_t ipv6_addr_count = 0;
     esp_ip6_addr_t ip6_addr[LWIP_IPV6_NUM_ADDRESSES];
@@ -213,11 +256,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     }
     else
     {
-        for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next(ifa))
+        for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next_unsafe(ifa))
         {
             NetworkInterface * ifp = new NetworkInterface();
-            esp_netif_ip_info_t ipv4_info;
-            uint8_t addressSize = 0;
+            uint8_t addressSize    = 0;
             Platform::CopyString(ifp->Name, esp_netif_get_ifkey(ifa));
             ifp->name          = CharSpan::fromCharString(ifp->Name);
             ifp->isOperational = true;
@@ -249,6 +291,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");
             }
 #ifndef CONFIG_DISABLE_IPV4
+            esp_netif_ip_info_t ipv4_info;
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
             {
                 memcpy(ifp->Ipv4AddressesBuffer[0], &(ipv4_info.ip.addr), kMaxIPv4AddrSize);

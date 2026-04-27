@@ -5,11 +5,11 @@ plugins {
 apply from: "../../../../third_party/android_deps/android_deps.gradle"
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -23,8 +23,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -37,6 +37,9 @@ android {
                     '../app/src/main/java/com/google/chip/chiptool'
             ]
         }
+    }
+    packagingOptions {
+        jniLibs.useLegacyPackaging = true
     }
 }
 

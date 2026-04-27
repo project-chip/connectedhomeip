@@ -134,12 +134,30 @@ def dump_table(header_path: Path, descriptor: ErrorDescriptor):
 
 def main():
     descriptors = {
-        "src/lib/core/CHIPError.h": ErrorDescriptor(section="SDK Core", code_range=0x000, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP(_CORE)?_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
-        "src/inet/InetError.h": ErrorDescriptor(section="SDK Inet Layer", code_range=0x100, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_INET_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
-        "src/include/platform/CHIPDeviceError.h": ErrorDescriptor(section="SDK Device Layer", code_range=0x200, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_DEVICE_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
-        "src/lib/asn1/ASN1Error.h": ErrorDescriptor(section="ASN1 Layer", code_range=0x300, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_ASN1_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
-        "src/ble/BleError.h": ErrorDescriptor(section="BLE Layer", code_range=0x400, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_BLE_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
-        "src/protocols/interaction_model/StatusCodeList.h": ErrorDescriptor(section="IM Global errors", code_range=0x500, macro_regex=r"^CHIP_IM_STATUS_CODE[(][A-Za-z0-9_]+\s*,\s*(?P<name>[A-Z0-9_]+)\s*,\s*(?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
+        "src/lib/core/CHIPError.h": ErrorDescriptor(
+            section="SDK Core",
+            code_range=0x000,
+            macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP(_CORE)?_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)( CHIP_ERROR_SOURCE_LOCATION)?[)]"),
+        "src/inet/InetError.h": ErrorDescriptor(
+            section="SDK Inet Layer",
+            code_range=0x100,
+            macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_INET_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
+        "src/include/platform/CHIPDeviceError.h": ErrorDescriptor(
+            section="SDK Device Layer",
+            code_range=0x200,
+            macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_DEVICE_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
+        "src/lib/asn1/ASN1Error.h": ErrorDescriptor(
+            section="ASN1 Layer",
+            code_range=0x300,
+            macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_ASN1_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
+        "src/ble/BleError.h": ErrorDescriptor(
+            section="BLE Layer",
+            code_range=0x400,
+            macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_BLE_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
+        "src/protocols/interaction_model/StatusCodeList.h": ErrorDescriptor(
+            section="IM Global errors",
+            code_range=0x500,
+            macro_regex=r"^CHIP_IM_STATUS_CODE[(][A-Za-z0-9_]+\s*,\s*(?P<name>[A-Z0-9_]+)\s*,\s*(?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
     }
 
     print("# Matter SDK `CHIP_ERROR` enums values")

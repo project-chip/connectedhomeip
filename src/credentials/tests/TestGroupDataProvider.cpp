@@ -29,6 +29,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/KeyValueStoreManager.h>
 
 using namespace chip::Credentials;
@@ -109,6 +110,7 @@ static const GroupInfo kGroupInfo3_2(kGroup2, "Group-3.2");
 static const GroupInfo kGroupInfo3_3(kGroup3, "Group-3.3");
 static const GroupInfo kGroupInfo3_4(kGroup4, "Group-3.4");
 static const GroupInfo kGroupInfo3_5(kGroup4, "Group-3.5");
+static const GroupInfo kGroupInfo3_6(kGroup4, "Group-3.5");
 
 static const GroupKey kGroup1Keyset0(kGroup1, kKeysetId0);
 static const GroupKey kGroup1Keyset1(kGroup1, kKeysetId1);
@@ -150,13 +152,13 @@ public:
     void OnGroupAdded(chip::FabricIndex fabric, const GroupInfo & new_group) override
     {
         fabric_index = fabric;
-        latest       = new_group;
+        latest.Copy(new_group);
         added_count++;
     }
     void OnGroupRemoved(chip::FabricIndex fabric, const GroupInfo & old_group) override
     {
         fabric_index = fabric;
-        latest       = old_group;
+        latest.Copy(old_group);
         removed_count++;
     }
 };
@@ -164,8 +166,8 @@ static TestListener sListener;
 
 void ResetProvider(GroupDataProvider * provider)
 {
-    provider->RemoveFabric(kFabric1);
-    provider->RemoveFabric(kFabric2);
+    EXPECT_SUCCESS(provider->RemoveFabric(kFabric1).NoErrorIf(CHIP_ERROR_NOT_FOUND));
+    EXPECT_SUCCESS(provider->RemoveFabric(kFabric2).NoErrorIf(CHIP_ERROR_NOT_FOUND));
 }
 
 bool CompareKeySets(const KeySet & retrievedKeySet, const KeySet & keyset2)
@@ -296,12 +298,12 @@ TEST_F(TestGroupDataProvider, TestGroupInfo)
     // Out-of-order
     EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_1));
 
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric1, 0, kGroupInfo1_1), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric1, 1, kGroupInfo1_2), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_3), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric2, 0, kGroupInfo2_1), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric2, 1, kGroupInfo2_2), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric2, 2, kGroupInfo2_3), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric1, 0, kGroupInfo1_1));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric1, 1, kGroupInfo1_2));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_3));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric2, 0, kGroupInfo2_1));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric2, 1, kGroupInfo2_2));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric2, 2, kGroupInfo2_3));
 
     // Duplicated
     EXPECT_EQ(CHIP_ERROR_DUPLICATE_KEY_ID, provider->SetGroupInfoAt(kFabric1, 3, kGroupInfo1_1));
@@ -331,8 +333,8 @@ TEST_F(TestGroupDataProvider, TestGroupInfo)
 
     // Remove Groups
 
-    EXPECT_EQ(provider->RemoveGroupInfo(kFabric1, kGroup3), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->RemoveGroupInfoAt(kFabric2, 0), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(provider->RemoveGroupInfo(kFabric1, kGroup3));
+    EXPECT_SUCCESS(provider->RemoveGroupInfoAt(kFabric2, 0));
     EXPECT_EQ(sListener.latest, kGroupInfo2_1);
     EXPECT_EQ(sListener.added_count, 6u);
     EXPECT_EQ(sListener.removed_count, 2u);
@@ -663,6 +665,13 @@ TEST_F(TestGroupDataProvider, TestGroupKeys)
     EXPECT_EQ(provider->GetGroupKeyAt(kFabric2, 0, pair), CHIP_NO_ERROR);
     EXPECT_EQ(pair, kGroup2Keyset0);
 
+    // Override first
+    EXPECT_EQ(provider->SetGroupKey(kFabric1, kGroup1, kKeysetId3), CHIP_NO_ERROR);
+    // Get First
+    KeysetId keyset_id = 0;
+    EXPECT_EQ(provider->GetGroupKey(kFabric1, kGroup1, keyset_id), CHIP_NO_ERROR);
+    EXPECT_EQ(keyset_id, kKeysetId3);
+
     // Remove Groups (remaining entries shift up)
 
     EXPECT_EQ(provider->RemoveGroupKeyAt(kFabric1, 2), CHIP_NO_ERROR);
@@ -674,7 +683,7 @@ TEST_F(TestGroupDataProvider, TestGroupKeys)
     EXPECT_EQ(provider->GetGroupKeyAt(kFabric1, 1, pair), CHIP_NO_ERROR);
     EXPECT_EQ(pair, kGroup1Keyset1);
     EXPECT_EQ(provider->GetGroupKeyAt(kFabric1, 0, pair), CHIP_NO_ERROR);
-    EXPECT_EQ(pair, kGroup1Keyset0);
+    EXPECT_EQ(pair, kGroup1Keyset3);
 
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, provider->GetGroupKeyAt(kFabric2, 3, pair));
     EXPECT_EQ(provider->GetGroupKeyAt(kFabric2, 2, pair), CHIP_NO_ERROR);
@@ -686,7 +695,7 @@ TEST_F(TestGroupDataProvider, TestGroupKeys)
 
     // Overwrite, (group_id, keyset_id) must be unique
 
-    EXPECT_EQ(CHIP_ERROR_DUPLICATE_KEY_ID, provider->SetGroupKeyAt(kFabric1, 2, kGroup1Keyset0));
+    EXPECT_EQ(CHIP_ERROR_DUPLICATE_KEY_ID, provider->SetGroupKeyAt(kFabric1, 2, kGroup1Keyset3));
     EXPECT_EQ(provider->SetGroupKeyAt(kFabric1, 2, kGroup3Keyset0), CHIP_NO_ERROR);
     EXPECT_EQ(CHIP_ERROR_DUPLICATE_KEY_ID, provider->SetGroupKeyAt(kFabric2, 0, kGroup2Keyset2));
     EXPECT_EQ(provider->SetGroupKeyAt(kFabric2, 0, kGroup3Keyset1), CHIP_NO_ERROR);

@@ -21,9 +21,10 @@ import traceback
 from dataclasses import dataclass
 
 import click
-from matter_yamltests.errors import TestStepError, TestStepKeyError
-from matter_yamltests.hooks import TestParserHooks, TestRunnerHooks, WebSocketRunnerHooks
-from matter_yamltests.parser import TestStep
+
+from matter.yamltests.errors import TestStepError, TestStepKeyError
+from matter.yamltests.hooks import TestParserHooks, TestRunnerHooks, WebSocketRunnerHooks
+from matter.yamltests.parser import TestStep
 
 
 def _strikethrough(str):
@@ -176,7 +177,7 @@ class TestRunnerLogger(TestRunnerHooks):
         else:
             state = _SUCCESS
 
-        if self.__use_test_harness_log_format and (state == _SUCCESS or state == _WARNING):
+        if self.__use_test_harness_log_format and (state in (_SUCCESS, _WARNING)):
             print(self.__strings.test_harness_test_stop_success.format(filename=self.__filename))
 
         successes = click.style(self.__successes, bold=True)
@@ -317,9 +318,9 @@ class TestRunnerLogger(TestRunnerHooks):
     def __prepare_data_for_printing(self, data):
         if isinstance(data, bytes):
             return data.decode('unicode_escape')
-        elif isinstance(data, list):
+        if isinstance(data, list):
             return [self.__prepare_data_for_printing(entry) for entry in data]
-        elif isinstance(data, dict):
+        if isinstance(data, dict):
             result = {}
             for key, value in data.items():
                 result[key] = self.__prepare_data_for_printing(value)

@@ -102,5 +102,14 @@ void emberAfOvenModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gOvenModeDelegate == nullptr && gOvenModeInstance == nullptr);
     gOvenModeDelegate = new OvenMode::OvenModeDelegate;
     gOvenModeInstance = new ModeBase::Instance(gOvenModeDelegate, 0x1, OvenMode::Id, 0x0);
-    gOvenModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gOvenModeInstance->Init();
+}
+
+void emberAfOvenModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gOvenModeInstance)
+    {
+        gOvenModeInstance->Shutdown();
+    }
+    OvenMode::Shutdown();
 }

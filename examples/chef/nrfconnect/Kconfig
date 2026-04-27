@@ -15,6 +15,19 @@
 #
 mainmenu "Matter nRF Connect Chef Example Application"
 
+# Sample configuration used for Thread networking
+if NET_L2_OPENTHREAD
+
+choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
+	default OPENTHREAD_NORDIC_LIBRARY_MTD
+endchoice
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_MTD
+endchoice
+
+endif # NET_L2_OPENTHREAD
+
 config CHEF_DEVICE_TYPE
 	string "Chef app device type"
 	default ""

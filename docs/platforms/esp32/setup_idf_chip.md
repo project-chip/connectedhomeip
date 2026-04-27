@@ -13,25 +13,25 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-linux-users)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-macos-users)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.5.1/esp32/get-started/linux-macos-setup.html#for-linux-users)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.5.1/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
-### Get ESP-IDF v5.3
+### Get ESP-IDF v5.5.1
 
--   Clone ESP-IDF [v5.3
-    release](https://github.com/espressif/esp-idf/releases/tag/v5.3
+-   Clone ESP-IDF [v5.5.1
+    release](https://github.com/espressif/esp-idf/releases/tag/v5.5.1
 
     ```
-    git clone -b v5.3 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
+    git clone -b v5.5.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
     cd esp-idf
     ./install.sh
     ```
 
--   To update an existing esp-idf toolchain to v5.3:
+-   To update an existing esp-idf toolchain to v5.5.1:
 
     ```
     cd path/to/esp-idf
-    git fetch --depth 1 origin v5.3
+    git fetch --depth 1 origin v5.5.1
     git reset --hard FETCH_HEAD
     git submodule update --depth 1 --recursive --init
 
@@ -54,7 +54,7 @@ care of downloading GN, ninja, and setting up a Python environment with
 libraries used to build and test.
 
 ```
-source scripts/bootstrap.sh
+source scripts/bootstrap.sh -p all,esp32
 ```
 
 Whenever Matter environment is out of date, it can be updated by running above
@@ -70,6 +70,20 @@ below:
 # Please make sure to run this command in the Matter Python environment
 python3 -m pip install esptool
 ```
+
+## Using ESP-IDF v6.0 (beta)
+
+ESP-IDF v6.0 requires additional Python dependencies to be installed in the
+Matter environment. Run the following after bootstrapping:
+
+```
+# Please make sure to run these commands in the Matter Python environment
+pip install -U cryptography==45.0.4
+pip install esp-idf-kconfig==3.6.0
+```
+
+> **Note:** Only examples without display support have been verified with
+> ESP-IDF v6.0. Tested on ESP32-C3-Devkit
 
 ---
 

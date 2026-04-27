@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@
 #include <zephyr/net/openthread.h>
 
 #include <openthread/thread.h>
-#include <platform/Zephyr/BLEManagerImpl.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -40,7 +39,7 @@ class ThreadStackManager;
 class ThreadStackManagerImpl;
 
 /**
- * Concrete implementation of the ThreadStackManager singleton object for nRF Connect platforms.
+ * Concrete implementation of the ThreadStackManager singleton object for Zephyr platforms.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
                                      public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>
@@ -77,6 +76,10 @@ protected:
 
     void _ProcessThreadActivity() {}
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+#endif
+
     //} // namespace Internal
 
 private:
@@ -109,7 +112,7 @@ inline ThreadStackManager & ThreadStackMgr(void)
  * Returns the platform-specific implementation of the ThreadStackManager singleton object.
  *
  * chip applications can use this to gain access to features of the ThreadStackManager
- * that are specific to nRF Connect platforms.
+ * that are specific to Zephyr platforms.
  */
 inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 {

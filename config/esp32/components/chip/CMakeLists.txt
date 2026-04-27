@@ -35,9 +35,9 @@ set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update co
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-        set(is_debug TRUE)
-    else()
         set(is_debug FALSE)
+    else()
+        set(is_debug TRUE)
     endif()
 endif()
 
@@ -77,6 +77,21 @@ chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
+
+# Use PSA Crypto backend for esp-idf v6.0 and onwards
+# esp-idf v6.0 and onwards migrated to mbedTLS 4.x where PSA is the crypto backend primary interface
+if (IDF_VERSION_MAJOR GREATER_EQUAL 6)
+    chip_gn_arg_append("chip_crypto"                    "\"psa\"")
+    # keep using older mbedTLS APIs for spake2p, PSA driver for PSA_ALG_SPAKE2P_MATTER is not yet available in mbedtls v4.x
+    chip_gn_arg_append("chip_crypto_spake2p"            "\"mbedtls\"")
+    chip_gn_arg_bool("chip_crypto_psa_aead_single_part" "true")
+endif()
+
+# If ccache was enabled by IDF and the ccache executable was found,
+# use it as the command launcher for GN to speed up subsequent builds.
+if (CCACHE_ENABLE AND CCACHE_FOUND)
+    chip_gn_arg_append("pw_command_launcher" "\"${CCACHE_FOUND}\"")
+endif()
 
 if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
     chip_gn_arg_bool("enable_im_pretty_print" "true")
@@ -121,6 +136,12 @@ if(CONFIG_DISABLE_IPV4)
     endif()
 endif()
 
+if(CONFIG_ENABLE_TCP_TRANSPORT)
+    chip_gn_arg_append("chip_inet_config_enable_tcp_endpoint" "true")
+else()
+    chip_gn_arg_append("chip_inet_config_enable_tcp_endpoint" "false")
+endif()
+
 if(CONFIG_DISABLE_READ_CLIENT)
     chip_gn_arg_append("chip_enable_read_client"             "false")
 endif()
@@ -135,7 +156,15 @@ if(CONFIG_ENABLE_ICD_SERVER)
         chip_gn_arg_append("chip_icd_report_on_active_mode"               "true")
     endif()
     if(CONFIG_ENABLE_ICD_LIT)
-        chip_gn_arg_append("chip_enable_icd_lit"               "true")
+        chip_gn_arg_append("chip_enable_icd_lit"                        "true")
+        chip_gn_arg_append("chip_enable_icd_checkin"                    "true")
+        chip_gn_arg_append("chip_enable_icd_user_active_mode_trigger"   "true")
+        if (CONFIG_ENABLE_ICD_DSLS)
+            chip_gn_arg_append("chip_enable_icd_dsls"           "true")
+        else()
+            chip_gn_arg_append("chip_enable_icd_dsls"           "false")
+        endif()
+    else()
         if(CONFIG_ENABLE_ICD_CIP)
             chip_gn_arg_append("chip_enable_icd_checkin"               "true")
         else()
@@ -147,6 +176,19 @@ if(CONFIG_ENABLE_ICD_SERVER)
             chip_gn_arg_append("chip_enable_icd_user_active_mode_trigger"               "false")
         endif()
     endif()
+    if (CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT)
+        chip_gn_arg_append("chip_enable_icd_checkin_on_report_timeout"  "true")
+    else()
+        chip_gn_arg_append("chip_enable_icd_checkin_on_report_timeout"  "false")
+    endif()
+endif()
+
+if(CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"internal\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"external\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_DEFAULT)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"default\"")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)
@@ -163,10 +205,6 @@ endif()
 
 if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
-endif()
-
-if (CONFIG_IM_PRETTY_PRINT)
-    chip_gn_arg_bool("enable_im_pretty_print"	"true")
 endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)
@@ -216,12 +254,12 @@ if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
 endif()
 
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
-    chip_gn_arg_append("chip_enable_openthread"                 "true")
+    chip_gn_arg_append("chip_enable_thread"                     "true")
     if (CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER)
         chip_gn_arg_append("chip_device_config_thread_network_endpoint_id" ${CONFIG_THREAD_NETWORK_ENDPOINT_ID})
     endif()
 else()
-    chip_gn_arg_append("chip_enable_openthread"                 "false")
+    chip_gn_arg_append("chip_enable_thread"                     "false")
 endif()
 
 if (CONFIG_OPENTHREAD_FTD)
@@ -238,6 +276,10 @@ endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
+endif()
+
+if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
+    chip_gn_arg_append("chip_enable_access_restrictions"                 "true")
 endif()
 
 if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
@@ -289,21 +331,17 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  chip_gn_arg_bool("matter_enable_tracing_support"  "true")
-  chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
-endif()
-
-if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
-     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
+    chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+    chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostics:esp32_diagnostic_tracing\"")
 endif()
 
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-   target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
 
 if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
@@ -312,6 +350,10 @@ endif()
 
 if (CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS)
     chip_gn_arg_append("icd_max_notification_subscribers" ${CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS})
+endif()
+
+if (CONFIG_CHIP_ENABLE_GROUPCAST)
+chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -337,8 +379,8 @@ endif()
 
 set(args_gn "${CMAKE_CURRENT_BINARY_DIR}/args.gn")
 add_custom_command(OUTPUT "${args_gn}"
-                   COMMAND ${python} 
-                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py 
+                   COMMAND ${python}
+                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py
                            "${CMAKE_BINARY_DIR}"
                            "${idf_path}"
                            "${CMAKE_CURRENT_LIST_DIR}/chip.c"
@@ -363,13 +405,18 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
+if (CONFIG_BUILD_CHIP_TESTS)
+    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPWTestsWrapper.a")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
 endif()
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
+if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
 endif()
+
 
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are
@@ -436,6 +483,10 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND matter_requires espressif__esp_secure_cert_mgr)
 endif()
 
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+    list(APPEND matter_requires espressif__esp_encrypted_img)
+endif()
+
 add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
                      REQUIRES ${matter_requires})
 
@@ -456,10 +507,19 @@ endif()
 
 # Build Matter OTA image
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
-        OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
-    )
-    # Adding dependecy as app target so that this runs after images are ready
-    add_dependencies(chip-ota-image app)
+    if (CONFIG_OPENTHREAD_BORDER_ROUTER AND CONFIG_AUTO_UPDATE_RCP)
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/ota_with_rcp_image
+            OUTPUT_FILE ${BUILD_DIR}/ota_with_rcp_image-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image gen_ota_image)
+    else()
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
+            OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image app)
+    endif()
 endif()

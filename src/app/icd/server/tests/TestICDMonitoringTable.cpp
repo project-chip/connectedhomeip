@@ -25,6 +25,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #if CHIP_CRYPTO_PSA
 #include <crypto/CHIPCryptoPALPSA.h>
@@ -85,9 +86,7 @@ struct TestICDMonitoringTable : public ::testing::Test
         EXPECT_GE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::ICDKeyRangeStart));
         EXPECT_LE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::Maximum));
 #else
-        EXPECT_EQ(memcmp(saved.As<Crypto::Symmetric128BitsKeyByteArray>(), loaded.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                         sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-                  0);
+        EXPECT_TRUE(saved.OpaqueBytes().data_equal(loaded.OpaqueBytes()));
 #endif
     }
 };
@@ -221,7 +220,7 @@ TEST_F(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(2, loading.Limit());
 
     // Remove first entry
-    saving.Remove(0);
+    EXPECT_SUCCESS(saving.Remove(0));
 
     ICDMonitoringEntry entry4(&keystore);
     entry4.checkInNodeID    = kClientNodeId13;

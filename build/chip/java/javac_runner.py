@@ -88,8 +88,7 @@ def ComputeClasspath(build_config_json):
     unique_jars = build_config_json['deps_info']['deps_jars']
     if sys.platform == 'win32':
         return ";".join(unique_jars)
-    else:
-        return ":".join(unique_jars)
+    return ":".join(unique_jars)
 
 
 def main():

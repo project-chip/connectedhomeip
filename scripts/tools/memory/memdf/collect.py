@@ -283,9 +283,9 @@ def postprocess_collected(config: Config, dfs: DFs) -> None:
                     config, dfs[c.name], column)
 
     for df in dfs.values():
-        if demangle := set((c for c in df.columns if c.endswith('symbol'))):
+        if demangle := {c for c in df.columns if c.endswith('symbol')}:
             df.attrs['demangle'] = demangle
-        if hexify := set((c for c in df.columns if c.endswith('address'))):
+        if hexify := {c for c in df.columns if c.endswith('address')}:
             df.attrs['hexify'] = hexify
 
 

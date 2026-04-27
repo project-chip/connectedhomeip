@@ -1,0 +1,84 @@
+# CHIP NXP Unit Tests Application
+
+## How to build NXP matter unit tests application
+
+1. Make sure to follow shared build instructions from
+   [MATTER NXP Examples Guide for FreeRTOS platforms](../../../docs/platforms/nxp/nxp_examples_freertos_platforms.md#set-up-the-build-environment)
+
+2. Run west build command:
+   `west build -d <folder> -b <board> src/test_driver/nxp/`
+
+## How to update the list of executed tests
+
+To modify the list of executed tests, please update the test_components.txt file
+with adding/removing test component library names.
+
+Available Matter test component libraries:
+
+```
+libPlatformTests
+libBleLayerTests
+libFormatTests
+libPWTestsWrapper
+libVerhoeffTest
+libSupportTests
+libCoreTests
+libAddressResolveTests
+libASN1Tests
+libMdnsFakePlatformTests
+libMdnsTests
+libMinimalMdnsCoreTests
+libMinimalMdnsRecordsTests
+libMinimalMdnsRespondersTests
+libTestShell
+libUserDirectedCommissioningTests
+libBDXTests
+libSecureChannelTests
+libInteractionModelTests
+libTestDACRevocationDelegate
+libCertTestVectors
+libCredentialsTest
+libIncludePlatformTests
+libChipCryptoTests
+libInetTestHelpers
+libInetLayerTests
+libTracingTests
+libNetworkTestHelpers
+libRawTransportTests
+libTransportLayerTests
+libRetransmitTests
+libSRPTests
+libSystemLayerTests
+libSetupPayloadTests
+libCodeDrivenDataModelProviderTests
+libEndpointTests
+libCodegenDataModelProviderTests
+libCHIPForTestController
+libControllerTests
+libControllerDataModelTests
+libMessagingTestHelpers
+libMessagingLayerTests
+libEnergyTest
+libTestPushAVStreamTransport
+libTestNetworkCommissioningCluster
+libTestAdministratorCommissioningCluster
+libTestWebRTCTransportRequestorCluster
+libTestBooleanStateCluster
+libTestSoilMeasurementCluster
+libTestSoftwareDiangosticsCluster
+libTestOtaProviderCluster
+libTestBasicInformationCluster
+libTestGroupKeyManagementCluster
+libTestGeneralDiangosticsCluster
+libTestEthernetDiagnosticsCluster
+libTestWiFiNetworkDiagnosticsCluster
+libAppTestHelpers
+libAppTests
+libICDServerTests
+libAppClusterBuildingBlockTests
+libIMInterfaceTests
+libServerClusterInterfaceTests
+libAppDataModelTests
+libCHIPTest
+libServerClusterShimTests
+```

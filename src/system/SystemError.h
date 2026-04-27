@@ -35,24 +35,29 @@
 #include <lib/core/CHIPError.h>
 #include <system/SystemConfig.h>
 
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+#include <source_location>
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/err.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #ifdef __cplusplus
 
-#if CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code, __FILE__, __LINE__)
-#else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code)
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code CHIP_ERROR_SOURCE_LOCATION)
 
 namespace chip {
 namespace System {
 
 namespace Internal {
-extern CHIP_ERROR MapErrorPOSIX(int code);
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+extern CHIP_ERROR MapErrorPOSIX(int code, std::source_location location);
+#elif CHIP_CONFIG_ERROR_SOURCE
 extern CHIP_ERROR MapErrorPOSIX(int code, const char * file, unsigned int line);
+#else
+extern CHIP_ERROR MapErrorPOSIX(int code);
+#endif
 } // namespace Internal
 
 extern const char * DescribeErrorPOSIX(CHIP_ERROR code);

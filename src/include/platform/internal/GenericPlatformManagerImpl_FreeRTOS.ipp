@@ -244,7 +244,11 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
         while (eventReceived == pdTRUE)
         {
             Impl()->DispatchEvent(&event);
-            eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
+            {
+                // Unlock the CHIP stack, to prevent the Matter task from remaining locked for too long
+                StackUnlock unlock;
+                eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
+            }
         }
     }
 }
@@ -269,8 +273,13 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
     GenericPlatformManagerImpl_FreeRTOS<ImplClass> * platformManager =
         static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg);
     platformManager->Impl()->RunEventLoop();
+    ChipLogDetail(DeviceLayer, "CHIP event task stopped");
+
+    // Notify any waiting tasks that we're about to exit
+    TaskHandle_t currentTask = xTaskGetCurrentTaskHandle();
+    xTaskNotifyGive(currentTask);
+
     vTaskDelete(NULL);
-    platformManager->mEventLoopTask = NULL;
 }
 
 template <class ImplClass>
@@ -410,6 +419,19 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
+    // If event loop task exists, wait for it to exit
+    if (mEventLoopTask != NULL)
+    {
+        // Wait for notification from the event loop task with a timeout
+        const TickType_t xMaxBlockTime = pdMS_TO_TICKS(2000); // 2 second timeout
+        if (ulTaskNotifyTake(pdTRUE, xMaxBlockTime) == 0)
+        {
+            ChipLogError(DeviceLayer, "Event loop task failed to exit within timeout");
+        }
+
+        mEventLoopTask = NULL;
+    }
+
     if (mChipEventQueue)
     {
         vQueueDelete(mChipEventQueue);
@@ -422,8 +444,11 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
         mBackgroundEventQueue = NULL;
     }
 #endif
-    vSemaphoreDelete(mChipStackLock);
-    mChipStackLock = NULL;
+    if (mChipStackLock)
+    {
+        vSemaphoreDelete(mChipStackLock);
+        mChipStackLock = NULL;
+    }
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
@@ -431,6 +456,12 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopEventLoopTask(void)
 {
     mShouldRunEventLoop.store(false);
+    // Post a no-op event to wake up the event loop if it's blocked on queue receive
+    ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
+    if (mChipEventQueue != NULL)
+    {
+        xQueueSend(mChipEventQueue, &noop, 0);
+    }
     return CHIP_NO_ERROR;
 }
 

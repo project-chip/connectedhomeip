@@ -24,7 +24,7 @@
  */
 
 #include <controller/CHIPCommissionableNodeController.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <inet/IPAddress.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -74,6 +74,7 @@ pychip_CommissionableNodeController_DiscoverCommissioners(chip::Controller::Comm
 void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
     chip::Controller::CommissionableNodeController * commissionableNodeCtrl)
 {
+#if CHIP_PROGRESS_LOGGING
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
     {
         const chip::Dnssd::CommissionNodeData * dnsSdInfo = commissionableNodeCtrl->GetDiscoveredCommissioner(i);
@@ -81,8 +82,17 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
         {
             continue;
         }
-        char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
+        char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
+        const char * rotatingIdStr;
+        if (Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId)) ==
+            CHIP_NO_ERROR)
+        {
+            rotatingIdStr = rotatingId;
+        }
+        else
+        {
+            rotatingIdStr = "<invalid bytes>";
+        }
 
         ChipLogProgress(Discovery, "Commissioner %d", i);
         ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->instanceName);
@@ -94,7 +104,7 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
         ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissioningMode);
         ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->deviceType);
         ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->deviceName);
-        ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
+        ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingIdStr);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
 
@@ -133,4 +143,5 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
             ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
         }
     }
+#endif
 }

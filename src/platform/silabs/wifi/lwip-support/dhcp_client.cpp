@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include "lwip/opt.h"
+
 #if LWIP_IPV4 && LWIP_DHCP
 
 #include <stdio.h>
@@ -29,20 +31,6 @@
 
 #define MAX_DHCP_TRIES (4)
 #define NETIF_IPV4_ADDRESS(X, Y) (((X) >> (8 * Y)) & 0xFF)
-
-/* Station IP address */
-uint8_t sta_ip_addr0      = STA_IP_ADDR0_DEFAULT;
-uint8_t sta_ip_addr1      = STA_IP_ADDR1_DEFAULT;
-uint8_t sta_ip_addr2      = STA_IP_ADDR2_DEFAULT;
-uint8_t sta_ip_addr3      = STA_IP_ADDR3_DEFAULT;
-uint8_t sta_netmask_addr0 = STA_NETMASK_ADDR0_DEFAULT;
-uint8_t sta_netmask_addr1 = STA_NETMASK_ADDR1_DEFAULT;
-uint8_t sta_netmask_addr2 = STA_NETMASK_ADDR2_DEFAULT;
-uint8_t sta_netmask_addr3 = STA_NETMASK_ADDR3_DEFAULT;
-uint8_t sta_gw_addr0      = STA_GW_ADDR0_DEFAULT;
-uint8_t sta_gw_addr1      = STA_GW_ADDR1_DEFAULT;
-uint8_t sta_gw_addr2      = STA_GW_ADDR2_DEFAULT;
-uint8_t sta_gw_addr3      = STA_GW_ADDR3_DEFAULT;
 
 /// Current DHCP state machine state.
 static volatile uint8_t dhcp_state = DHCP_OFF;
@@ -77,9 +65,6 @@ void dhcpclient_set_link_state(int link_up)
 uint8_t dhcpclient_poll(void * arg)
 {
     struct netif * netif = (struct netif *) arg;
-    ip_addr_t ipaddr;
-    ip_addr_t netmask;
-    ip_addr_t gw;
     struct dhcp * dhcp;
 
     switch (dhcp_state)
@@ -110,13 +95,6 @@ uint8_t dhcpclient_poll(void * arg)
                 ChipLogProgress(DeviceLayer, "*ERR*DHCP: Failed");
                 /* Stop DHCP */
                 dhcp_stop(netif);
-
-                /* TODO - I am not sure that this is best */
-                /* Static address used */
-                IP_ADDR4(&ipaddr, sta_ip_addr0, sta_ip_addr1, sta_ip_addr2, sta_ip_addr3);
-                IP_ADDR4(&netmask, sta_netmask_addr0, sta_netmask_addr1, sta_netmask_addr2, sta_netmask_addr3);
-                IP_ADDR4(&gw, sta_gw_addr0, sta_gw_addr1, sta_gw_addr2, sta_gw_addr3);
-                netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
             }
         }
         break;

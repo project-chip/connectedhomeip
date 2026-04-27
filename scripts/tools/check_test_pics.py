@@ -38,8 +38,8 @@ def main():
     pics_yaml = sys.argv[2]
 
     with open(value_defs, "r") as stream:
-        defined_values = set(map(lambda item: re.sub(
-            value_regexp, "", item.rstrip()), stream.readlines()))
+        defined_values = {re.sub(
+            value_regexp, "", item.rstrip()) for item in stream.readlines()}
         # Remove Comments w/ # and empty lines
         for elem in list(defined_values):
             if elem.startswith('#') or (elem == ""):
@@ -52,7 +52,7 @@ def main():
             print(e)
             return 1
 
-        possible_values = set(map(lambda item: item["id"], yaml_data["PICS"]))
+        possible_values = {item["id"] for item in yaml_data["PICS"]}
 
     if defined_values != possible_values:
         for value in sorted(possible_values - defined_values):

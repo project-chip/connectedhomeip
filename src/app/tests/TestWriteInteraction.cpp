@@ -55,7 +55,7 @@ chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kM
 namespace chip {
 namespace app {
 
-using namespace chip::Test;
+using namespace chip::Testing;
 
 const MockNodeConfig & TestMockNodeConfig()
 {
@@ -122,7 +122,7 @@ const MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-class TestWriteInteraction : public chip::Test::AppContext
+class TestWriteInteraction : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
@@ -141,11 +141,11 @@ public:
         ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
 
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)
@@ -154,6 +154,12 @@ public:
         }
         AppContext::TearDown();
     }
+
+    enum class EncodingMethod
+    {
+        Standard,      // Encoding using WriteClient::EncodeAttribute()
+        PreencodedTLV, // Encoding using WriteClient::PutPreencodedAttribute()
+    };
 
     void TestWriteClient();
     void TestWriteClientGroup();
@@ -164,7 +170,7 @@ public:
     void TestWriteInvalidMessage3();
     void TestWriteInvalidMessage4();
 
-    static void AddAttributeDataIB(WriteClient & aWriteClient);
+    static void AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
@@ -186,7 +192,6 @@ private:
         System::PacketBufferTLVReader reader;
         reader.Init(std::move(payload));
         ReturnErrorOnFailure(response.Init(reader));
-        StatusIB status;
         ReturnErrorOnFailure(response.GetStatus(mLastStatus));
         return CHIP_NO_ERROR;
     }
@@ -230,15 +235,43 @@ public:
     CHIP_ERROR mError = CHIP_NO_ERROR;
 };
 
-void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient)
+void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding = EncodingMethod::Standard)
 {
     AttributePathParams attributePathParams;
     bool attributeValue              = true;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+    attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
-    EXPECT_EQ(aWriteClient.EncodeAttribute(attributePathParams, attributeValue), CHIP_NO_ERROR);
+    switch (encoding)
+    {
+    case EncodingMethod::Standard:
+
+        EXPECT_EQ(aWriteClient.EncodeAttribute(attributePathParams, attributeValue), CHIP_NO_ERROR);
+        break;
+
+    case EncodingMethod::PreencodedTLV:
+
+        // Encode AttributeData into TLV
+        uint8_t buffer[5];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+        TLV::TLVType outerContainer;
+
+        EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer));
+        EXPECT_EQ(CHIP_NO_ERROR, writer.PutBoolean(TLV::ContextTag(1), attributeValue));
+        EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(outerContainer));
+
+        // Put Preencoded Data into AttributeDataIB
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        EXPECT_SUCCESS(reader.Next());
+        EXPECT_EQ(aWriteClient.PutPreencodedAttribute(ConcreteDataAttributePath(attributePathParams.mEndpointId,
+                                                                                attributePathParams.mClusterId,
+                                                                                attributePathParams.mAttributeId),
+                                                      reader),
+                  CHIP_NO_ERROR);
+    }
 }
 
 void TestWriteInteraction::AddAttributeStatus(WriteHandler & aWriteHandler)
@@ -287,12 +320,12 @@ void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::Pack
         EXPECT_EQ(pWriter->EndContainer(dummyType), CHIP_NO_ERROR);
     }
 
-    attributeDataIBBuilder.EndOfAttributeDataIB();
+    EXPECT_SUCCESS(attributeDataIBBuilder.EndOfAttributeDataIB());
     EXPECT_EQ(attributeDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeDataIBsBuilder.EndOfAttributeDataIBs();
+    EXPECT_SUCCESS(attributeDataIBsBuilder.EndOfAttributeDataIBs());
     EXPECT_EQ(attributeDataIBsBuilder.GetError(), CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequestMessage();
+    EXPECT_SUCCESS(writeRequestBuilder.EndOfWriteRequestMessage());
     EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -327,12 +360,12 @@ void TestWriteInteraction::GenerateWriteResponse(System::PacketBufferHandle & aP
     statusIBBuilder.EncodeStatusIB(statusIB);
     EXPECT_EQ(statusIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeStatusIBBuilder.EndOfAttributeStatusIB();
+    EXPECT_SUCCESS(attributeStatusIBBuilder.EndOfAttributeStatusIB());
     EXPECT_EQ(attributeStatusIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeStatusesBuilder.EndOfAttributeStatuses();
+    EXPECT_SUCCESS(attributeStatusesBuilder.EndOfAttributeStatuses());
     EXPECT_EQ(attributeStatusesBuilder.GetError(), CHIP_NO_ERROR);
-    writeResponseBuilder.EndOfWriteResponseMessage();
+    EXPECT_SUCCESS(writeResponseBuilder.EndOfWriteResponseMessage());
     EXPECT_EQ(writeResponseBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -341,44 +374,49 @@ void TestWriteInteraction::GenerateWriteResponse(System::PacketBufferHandle & aP
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClient)
 {
 
-    TestWriteClientCallback callback;
-    app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+    for (EncodingMethod encoding : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    AddAttributeDataIB(writeClient);
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        AddAttributeDataIB(writeClient, encoding);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+        DrainAndServiceIO();
 
-    GenerateWriteResponse(buf);
+        GenerateWriteResponse(buf);
 
-    EXPECT_EQ(writeClient.ProcessWriteResponseMessage(std::move(buf)), CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.ProcessWriteResponseMessage(std::move(buf)), CHIP_NO_ERROR);
 
-    writeClient.Close();
+        writeClient.Close();
 
-    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
-    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+        Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    }
 }
 
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
 {
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
-    TestWriteClientCallback callback;
-    app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        AddAttributeDataIB(writeClient, encodingMethod);
 
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    AddAttributeDataIB(writeClient);
+        SessionHandle groupSession = GetSessionBobToFriends();
+        EXPECT_TRUE(groupSession->IsGroupSession());
 
-    SessionHandle groupSession = GetSessionBobToFriends();
-    EXPECT_TRUE(groupSession->IsGroupSession());
+        EXPECT_EQ(writeClient.SendWriteRequest(groupSession), CHIP_NO_ERROR);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(groupSession), CHIP_NO_ERROR);
+        DrainAndServiceIO();
 
-    DrainAndServiceIO();
-
-    // The WriteClient should be shutdown once we SendWriteRequest for group.
-    EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
+        // The WriteClient should be shutdown once we SendWriteRequest for group.
+        EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
+    }
 }
 
 TEST_F(TestWriteInteraction, TestWriteHandler)
@@ -395,8 +433,8 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
-                              chip::app::InteractionModelEngine::GetInstance());
+            EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                             chip::app::InteractionModelEngine::GetInstance()));
 
             GenerateWriteRequest(messageIsTimed, buf);
 
@@ -424,65 +462,95 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
 TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
 {
 
-    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
-    // Shouldn't have anything in the retransmit table when starting the test.
-    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
-
-    TestWriteClientCallback callback;
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
-
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
-
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-
-    AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
-
-    const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
-    static const char charSpanData[] = "a simple test string";
-
-    app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
-    dataTx.a = 12;
-    dataTx.b = true;
-    dataTx.d = chip::ByteSpan(byteSpanData);
-    // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
-    dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
-
-    EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx), CHIP_NO_ERROR);
-
-    EXPECT_EQ(callback.mOnSuccessCalled, 0);
-
-    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
-
-    DrainAndServiceIO();
-
-    EXPECT_EQ(callback.mOnSuccessCalled, 1);
-
+    for (EncodingMethod encoding : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
-        app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataRx;
-        TLV::TLVReader reader;
-        reader.Init(chip::Test::attributeDataTLV, chip::Test::attributeDataTLVLen);
-        reader.Next();
-        EXPECT_EQ(CHIP_NO_ERROR, DataModel::Decode(reader, dataRx));
-        EXPECT_EQ(dataRx.a, dataTx.a);
-        EXPECT_EQ(dataRx.b, dataTx.b);
-        EXPECT_TRUE(dataRx.d.data_equal(dataTx.d));
-        // Equals to dataRx.e.size() == dataTx.e.size() && memncmp(dataRx.e.data(), dataTx.e.data(), dataTx.e.size()) == 0
-        EXPECT_TRUE(dataRx.e.data_equal(dataTx.e));
+        Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+        // Shouldn't have anything in the retransmit table when starting the test.
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+        TestWriteClientCallback callback;
+        auto * engine = chip::app::InteractionModelEngine::GetInstance();
+        EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
+                  CHIP_NO_ERROR);
+
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+        AttributePathParams attributePathParams;
+        attributePathParams.mEndpointId  = kTestEndpointId;
+        attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+        attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
+        static const char charSpanData[] = "a simple test string";
+
+        app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
+        dataTx.a = 12;
+        dataTx.b = true;
+        dataTx.d = chip::ByteSpan(byteSpanData);
+        // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
+        dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
+
+        if (encoding == EncodingMethod::Standard)
+        {
+            EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx), CHIP_NO_ERROR);
+        }
+        else if (encoding == EncodingMethod::PreencodedTLV)
+        {
+            // Encode AttributeData into TLV
+            uint8_t buffer[50];
+            TLV::TLVWriter writer;
+            writer.Init(buffer, sizeof(buffer));
+            TLV::TLVType outerContainer;
+
+            EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), dataTx.a));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.PutBoolean(TLV::ContextTag(1), dataTx.b));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(3), dataTx.d));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(4), dataTx.e));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(outerContainer));
+
+            // Put Preencoded Data into AttributeDataIB
+            TLV::TLVReader dataTxTLV;
+            dataTxTLV.Init(buffer, writer.GetLengthWritten());
+            EXPECT_SUCCESS(dataTxTLV.Next());
+            ConcreteDataAttributePath path = ConcreteDataAttributePath(
+                attributePathParams.mEndpointId, attributePathParams.mClusterId, attributePathParams.mAttributeId);
+            EXPECT_EQ(writeClient.PutPreencodedAttribute(path, dataTxTLV), CHIP_NO_ERROR);
+        }
+
+        EXPECT_EQ(callback.mOnSuccessCalled, 0);
+
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+        DrainAndServiceIO();
+
+        EXPECT_EQ(callback.mOnSuccessCalled, 1);
+
+        {
+            app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataRx;
+            TLV::TLVReader reader;
+            reader.Init(chip::Testing::attributeDataTLV, chip::Testing::attributeDataTLVLen);
+            EXPECT_SUCCESS(reader.Next());
+            EXPECT_EQ(CHIP_NO_ERROR, DataModel::Decode(reader, dataRx));
+            EXPECT_EQ(dataRx.a, dataTx.a);
+            EXPECT_EQ(dataRx.b, dataTx.b);
+            EXPECT_TRUE(dataRx.d.data_equal(dataTx.d));
+            // Equals to dataRx.e.size() == dataTx.e.size() && memncmp(dataRx.e.data(), dataTx.e.data(), dataTx.e.size()) == 0
+            EXPECT_TRUE(dataRx.e.data_equal(dataTx.e));
+        }
+
+        EXPECT_EQ(callback.mOnSuccessCalled, 1);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 1);
+
+        // By now we should have closed all exchanges and sent all pending acks, so
+        // there should be no queued-up things in the retransmit table.
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+        engine->Shutdown();
     }
-
-    EXPECT_EQ(callback.mOnSuccessCalled, 1);
-    EXPECT_EQ(callback.mOnErrorCalled, 0);
-    EXPECT_EQ(callback.mOnDoneCalled, 1);
-
-    // By now we should have closed all exchanges and sent all pending acks, so
-    // there should be no queued-up things in the retransmit table.
-    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
-
-    engine->Shutdown();
 }
 
 TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
@@ -501,13 +569,14 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+    attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
     DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
 
     Optional<DataVersion> version(kAcceptedDataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx, version), CHIP_NO_ERROR);
 
@@ -545,16 +614,18 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+    attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
 
     app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTxValue;
     dataTxValue.a = 12;
     dataTxValue.b = true;
     DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
     dataTx.SetNonNull(dataTxValue);
-    Optional<DataVersion> version(chip::Test::kRejectedDataVersion);
+    Optional<DataVersion> version(chip::Testing::kRejectedDataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
+    static_assert(kAcceptedDataVersion != kRejectedDataVersion);
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx, version), CHIP_NO_ERROR);
 
@@ -578,36 +649,39 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
 
 TEST_F(TestWriteInteraction, TestWriteRoundtrip)
 {
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
+    {
+        Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+        // Shouldn't have anything in the retransmit table when starting the test.
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
-    // Shouldn't have anything in the retransmit table when starting the test.
-    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+        TestWriteClientCallback callback;
+        auto * engine = chip::app::InteractionModelEngine::GetInstance();
+        EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
+                  CHIP_NO_ERROR);
 
-    TestWriteClientCallback callback;
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        AddAttributeDataIB(writeClient, encodingMethod);
 
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    AddAttributeDataIB(writeClient);
+        EXPECT_EQ(callback.mOnSuccessCalled, 0);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 0);
 
-    EXPECT_EQ(callback.mOnSuccessCalled, 0);
-    EXPECT_EQ(callback.mOnErrorCalled, 0);
-    EXPECT_EQ(callback.mOnDoneCalled, 0);
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        DrainAndServiceIO();
 
-    DrainAndServiceIO();
+        EXPECT_EQ(callback.mOnSuccessCalled, 1);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 1);
+        // By now we should have closed all exchanges and sent all pending acks, so
+        // there should be no queued-up things in the retransmit table.
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    EXPECT_EQ(callback.mOnSuccessCalled, 1);
-    EXPECT_EQ(callback.mOnErrorCalled, 0);
-    EXPECT_EQ(callback.mOnDoneCalled, 1);
-    // By now we should have closed all exchanges and sent all pending acks, so
-    // there should be no queued-up things in the retransmit table.
-    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
-
-    engine->Shutdown();
+        engine->Shutdown();
+    }
 }
 
 // This test creates a chunked write request, we drop the second write chunk message, then write handler receives unknown
@@ -627,13 +701,17 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    // Reserve all except the last 128 bytes, so that we make sure to chunk.
+    // Reserve all except the last 60 bytes, so that we make sure to chunk. it was empirically determined that with a list of 10
+    // ByteSpan items, we will be able to fit 5/6 list items into the initial ReplaceAll list; thus triggering chunking.
     app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
 
-    ByteSpan list[5];
+    constexpr uint8_t kTestListLength = 10;
+    ByteSpan list[kTestListLength];
 
-    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
     GetLoopback().mSentMessageCount                 = 0;
     GetLoopback().mNumMessagesToDrop                = 1;
@@ -651,7 +729,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     writer.Init(std::move(msgBuf));
 
     ReportDataMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
@@ -664,7 +742,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     rm->ClearRetransTable(writeHandler->mExchangeCtx.Get());
     GetLoopback().mSentMessageCount  = 0;
     GetLoopback().mNumMessagesToDrop = 0;
-    writeHandler->OnMessageReceived(writeHandler->mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
+    EXPECT_EQ(writeHandler->OnMessageReceived(writeHandler->mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
+              CHIP_ERROR_INVALID_MESSAGE_TYPE);
     DrainAndServiceIO();
 
     EXPECT_EQ(writeCallback.mLastErrorReason.mStatus, Protocols::InteractionModel::Status::InvalidAction);
@@ -672,8 +751,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // This test is to create Chunked write requests, we drop the message since the 3rd message, then remove fabrics for client and
@@ -692,13 +771,17 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    // Reserve all except the last 128 bytes, so that we make sure to chunk.
+    // Reserve all except the last 60 bytes, so that we make sure to chunk. it was empirically determined that with a list of 10
+    // ByteSpan items, we will be able to fit 5/6 list items into the initial ReplaceAll list; thus triggering chunking.
     app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
 
-    ByteSpan list[5];
+    constexpr uint8_t kTestListLength = 10;
+    ByteSpan list[kTestListLength];
 
-    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
     GetLoopback().mDroppedMessageCount              = 0;
     GetLoopback().mSentMessageCount                 = 0;
@@ -711,14 +794,14 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
     EXPECT_EQ(GetLoopback().mSentMessageCount, 3u);
     EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
-    GetFabricTable().Delete(GetAliceFabricIndex());
+    EXPECT_SUCCESS(GetFabricTable().Delete(GetAliceFabricIndex()));
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateAliceFabric();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateAliceFabric());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 #endif
@@ -765,8 +848,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveEmptyWriteReque
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives an unexpected message type, sends a status response to that.
@@ -805,7 +888,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     ReportDataMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -836,8 +919,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives a malformed write response message, sends a Status Report.
@@ -876,7 +959,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     WriteResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -906,8 +989,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives a malformed status response message.
@@ -946,7 +1029,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -977,8 +1060,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives a busy status response message.
@@ -1017,7 +1100,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     response.Status(Protocols::InteractionModel::Status::Busy);
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
@@ -1049,8 +1132,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 } // namespace app

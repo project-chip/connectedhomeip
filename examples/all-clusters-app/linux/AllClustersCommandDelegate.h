@@ -102,6 +102,11 @@ private:
     void OnAirQualityChange(uint32_t aEnum);
 
     /**
+     * Should be called when it is necessary to change the measured moisture value.
+     */
+    void OnSoilMoistureChange(chip::EndpointId endpointId, chip::app::DataModel::Nullable<chip::Percent> soilMoisture);
+
+    /**
      * Should be called when it is necessary to change the operational state as a manual operation.
      */
     void OnOperationalStateChange(std::string device, std::string operation, Json::Value param);
@@ -117,10 +122,24 @@ private:
     void OnOvenOperationalStateChange(std::string device, std::string operation, Json::Value param);
 
     /**
+     * Should be called when it is necessary to change one or some attributes.
+     */
+    void OnMeterIdentificationHandler(const Json::Value & param);
+
+    /**
      * Should be called when it is necessary to change the Occupancy attribute.
      */
     void HandleSetOccupancyChange(chip::EndpointId endpointId, uint8_t occupancyValue);
-    static void OccupancyPresentTimerHandler(chip::System::Layer * systemLayer, void * appState);
+
+    /**
+     * Should be called when it is necessary to change the BooleanState cluster StateValue attribute.
+     */
+    void OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState);
+
+    /**
+     * Should be called when it is necessary to trigger or clear a sensor fault on the BooleanStateConfiguration cluster.
+     */
+    void OnBooleanStateSensorFaultHandler(chip::EndpointId endpointId, uint16_t sensorFault);
 };
 
 class AllClustersCommandDelegate : public NamedPipeCommandDelegate

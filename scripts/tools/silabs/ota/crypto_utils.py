@@ -46,6 +46,8 @@ import copy
 import logging
 import struct
 
+logger = logging.getLogger(__name__)
+
 shifts = [[[0, 0], [1, 3], [2, 2], [3, 1]],
           [[0, 0], [1, 5], [2, 4], [3, 3]],
           [[0, 0], [1, 7], [3, 5], [4, 4]]]
@@ -380,10 +382,11 @@ class rijndael:
 
 def encryptFlashData(nonce, key, data, imageLen):
     encyptedBlock = ''
-    if (imageLen % 16) != 0:
-        for x in range(16 - (imageLen % 16)):
-            data = data + bytes([255])
-        imageLen = len(data)
+    block_size = 16
+    # pad using PKCS#7 padding
+    pad_len = block_size - (imageLen % block_size)
+    data = data + bytes([pad_len] * pad_len)
+    imageLen = len(data)
 
     r = rijndael(key, block_size=16)
 
@@ -435,12 +438,11 @@ def aParsePassKeyString(sPassKey):
             else:
                 lstu32Passkey[i] = int(lstStrPassKey[i], 10)
 
-    logging.info(f"\t-key: {lstu32Passkey[0]}, {lstu32Passkey[1]}, {lstu32Passkey[2]}, {lstu32Passkey[3]}")
-    abEncryptKey = struct.pack(">LLLL", lstu32Passkey[0],
-                               lstu32Passkey[1],
-                               lstu32Passkey[2],
-                               lstu32Passkey[3])
-    return abEncryptKey
+    logger.info("\t-key: 0x%08X, 0x%08X, 0x%08X, 0x%08X", *lstu32Passkey[0:4])
+    return struct.pack(">LLLL", lstu32Passkey[0],
+                       lstu32Passkey[1],
+                       lstu32Passkey[2],
+                       lstu32Passkey[3])
 
 
 def aParseNonce(sNonceValue):
@@ -460,7 +462,7 @@ def aParseNonce(sNonceValue):
             else:
                 lstu32Nonce[i] = int(lstStrNonce[i], 10)
 
-    logging.info(f"Nonce : {lstu32Nonce[0]}, {lstu32Nonce[1]}, {lstu32Nonce[2]}, {lstu32Nonce[3]}")
+    logger.info("Nonce : 0x%08X, 0x%08X, 0x%08X, 0x%08X", *lstu32Nonce[0:4])
 
     return lstu32Nonce
 
@@ -478,10 +480,10 @@ def encryptData(sSrcData, sPassKey, aPassIv):
         ',' + "0x" + sIvString[16:24] + ',' + "0x" + sIvString[24:32]
     aNonce = aParseNonce(sPassString)
 
-    logging.info("Started Encrypting with key[{}] ......".format(sPassKey))
+    logger.info("Started Encrypting with key[%s] ......", sPassKey)
 
     encryptedData = encryptFlashData(aNonce, aPassKey, sSrcData, len(sSrcData))
 
-    logging.info("Done")
+    logger.info("Done")
 
     return encryptedData

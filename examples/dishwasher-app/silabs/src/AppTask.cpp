@@ -60,21 +60,10 @@ static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHa
 static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
 #endif
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Dishwasher-App");
-#endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
 
     PlatformMgr().LockChipStack();
     err = DeviceEnergyManager::Instance().Init();
@@ -98,8 +87,10 @@ CHIP_ERROR AppTask::Init()
     // Register DEM & Electrical Sensor Test Event Trigger
     if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
     {
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sEnergyReportingTestEventTriggerHandler);
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(
+            &sEnergyReportingTestEventTriggerHandler);
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(
+            &sDeviceEnergyManagementTestEventTriggerHandler);
     }
 #endif
 
@@ -203,7 +194,7 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
     }
     else if (action == OperationalStateEnum::kStopped)
     {
-        SILABS_LOG("Stoping dishwasher");
+        SILABS_LOG("Stopping dishwasher");
     }
     else if (action == OperationalStateEnum::kPaused)
     {

@@ -100,10 +100,11 @@ class GeneratorTest:
                 # test.outputs contain:
                 #    - file_name
                 #    - golden_path
-                expected_files = set([o.file_name for o in test.outputs])
-                actual_files = set([
-                    name[len(output_directory)+1:] for name in glob.glob(f"{output_directory}/**/*", recursive=True)
-                ])
+                expected_files = {o.file_name for o in test.outputs}
+                actual_files = {
+                    name[len(output_directory)+1:]
+                    for name in glob.glob(f"{output_directory}/**/*", recursive=True)
+                }
 
                 checker.assertEqual(
                     expected_files, actual_files, msg="Expected and actual generated file list MUST be identical.")
@@ -147,7 +148,7 @@ def build_tests(yaml_data, context: ProgramArguments) -> List[GeneratorTest]:
 
 class TestGenerators(unittest.TestCase):
     def test_generators(self):
-        with open(os.path.join(TESTS_DIR, "available_tests.yaml"), 'rt') as stream:
+        with open(os.path.join(TESTS_DIR, "available_tests.yaml")) as stream:
             yaml_data = yaml.safe_load(stream)
 
         global PROGRAM_ARGUMENTS

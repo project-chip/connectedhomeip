@@ -44,15 +44,26 @@ void ShutdownMetricsCollection();
 + (instancetype)sharedInstance;
 
 /**
- * @brief This method creates a snapshot of the metrics collected until the current point in time
- * and returns an object with the stats.
+ * @brief This method creates a snapshot of the metrics for commissioning collected until the current
+ *        point in time and returns an object with the stats.
  *
  * @param [in] resetCollection Boolean that specifies whether or not to clear the stats collected after
  *                             creating the snapshot.
  *
  * @return MTRMetric object representing the metric data.
  */
-- (MTRMetrics *)metricSnapshot:(BOOL)resetCollection;
+- (MTRMetrics *)metricSnapshotForCommissioning:(BOOL)resetCollection;
+
+/**
+ * @brief This method creates a snapshot of the metrics for a category (other than for commissioning)
+ *        that were collected until the current point in time and returns an object with those stats.
+ *
+ * @param [in] removeMetrics Boolean that specifies whether to clear the stats for the category after
+ *                           creating the snapshot.
+ *
+ * @return MTRMetric object representing the metric data.
+ */
+- (MTRMetrics *)metricSnapshotForCategory:(NSString *)category removeMetrics:(BOOL)removeMetrics;
 
 /**
  * @brief This method clears any metrics collected.
