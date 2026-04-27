@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
+#include <clusters/FanControl/Enums.h>
 #include <devices/Types.h>
 #include <devices/fan/FanDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <clusters/FanControl/Enums.h>
 
 using namespace chip::app::Clusters;
 using chip::BitMask;
@@ -72,8 +72,7 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     FanControlCluster::Config fanConfig(endpoint, &mFanDelegate);
     fanConfig.WithSpeedMax(10)
         .WithStep()
-        .WithWindSupport(BitMask<FanControl::WindBitmap>(FanControl::WindBitmap::kSleepWind,
-                                                        FanControl::WindBitmap::kNaturalWind))
+        .WithWindSupport(BitMask<FanControl::WindBitmap>(FanControl::WindBitmap::kSleepWind, FanControl::WindBitmap::kNaturalWind))
         .WithRockSupport(BitMask<FanControl::RockBitmap>(FanControl::RockBitmap::kRockLeftRight))
         .WithAirflowDirection();
     mFanControlCluster.Create(fanConfig);
