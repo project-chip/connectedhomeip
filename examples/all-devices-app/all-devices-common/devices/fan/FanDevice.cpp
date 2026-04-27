@@ -18,8 +18,10 @@
 #include <devices/Types.h>
 #include <devices/fan/FanDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <clusters/FanControl/Enums.h>
 
 using namespace chip::app::Clusters;
+using chip::BitMask;
 
 namespace chip {
 namespace app {
@@ -68,7 +70,12 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 
     // Fan
     FanControlCluster::Config fanConfig(endpoint, &mFanDelegate);
-    fanConfig.WithSpeedMax(10).WithStep();
+    fanConfig.WithSpeedMax(10)
+        .WithStep()
+        .WithWindSupport(BitMask<FanControl::WindBitmap>(FanControl::WindBitmap::kSleepWind,
+                                                        FanControl::WindBitmap::kNaturalWind))
+        .WithRockSupport(BitMask<FanControl::RockBitmap>(FanControl::RockBitmap::kRockLeftRight))
+        .WithAirflowDirection();
     mFanControlCluster.Create(fanConfig);
     ReturnErrorOnFailure(provider.AddCluster(mFanControlCluster.Registration()));
 
