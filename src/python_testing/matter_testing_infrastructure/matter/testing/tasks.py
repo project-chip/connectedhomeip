@@ -167,11 +167,12 @@ class Subprocess(threading.Thread):
         self.event_started.wait()
 
         if expected_output is not None:
-            if not self.event.wait(timeout) and self.p is not None:
+            if not self.event.wait(timeout):
                 # Terminate the process, so the Python interpreter will not
                 # hang on the join call in our thread entry point in case of
                 # Python process termination (not-caught exception).
-                self.p.terminate()
+                if self.p is not None:
+                    self.p.terminate()
                 raise TimeoutError("Expected output '%r' not found within %s seconds" % (expected_output, timeout))
             self.expected_output = None
 
