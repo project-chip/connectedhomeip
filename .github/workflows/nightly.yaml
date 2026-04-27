@@ -404,7 +404,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -412,22 +412,8 @@ jobs:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-msan
 
-            - name: Restore MSAN sysroot cache
-              id: msan-sysroot-cache
-              if: github.event.inputs.force_msan_sysroot_rebuild != 'true'
-              uses: actions/cache@v5
-              with:
-                  path: ~/.cache/matter/msan_sysroot
-                  key: msan-sysroot-${{ hashFiles('scripts/build/build_msan_sysroot.sh', 'build/config/compiler/msan_ignorelist.txt') }}
-
-            - name: Build MSAN sysroot (cache miss or forced)
-              if: steps.msan-sysroot-cache.outputs.cache-hit != 'true' || github.event.inputs.force_msan_sysroot_rebuild == 'true'
-              run: ./scripts/run_in_build_env.sh "scripts/build/build_msan_sysroot.sh${{ github.event.inputs.force_msan_sysroot_rebuild == 'true' && ' --force' || '' }}"
-
-            # Sanity check: validate the sysroot before compiling. Catches the case where the cache restored
-            # but the stamp's hash disagrees with the current script/ignorelist.
-            - name: Verify MSAN sysroot
-              run: ./scripts/run_in_build_env.sh "scripts/build/build_msan_sysroot.sh --check"
+            - name: Build MSAN sysroot
+              run: ./scripts/run_in_build_env.sh "scripts/build/build_msan_sysroot.sh"
 
             - name: Build and Run MSAN unit tests
               run: >-
