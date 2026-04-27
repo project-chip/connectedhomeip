@@ -64,7 +64,7 @@ public:
         uint16_t sessionId, chip::Optional<chip::ByteSpan> message, uint8_t responseTimeout,
         app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) override;
 
-    Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId) override;
+    Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex) override;
 
     Protocols::InteractionModel::Status ProxyBackgroundScanStartRequest(
         chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,

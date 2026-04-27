@@ -113,7 +113,7 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyMessage
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyDisconnectRequest(uint16_t sessionId)
+Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex)
 {
     return Protocols::InteractionModel::Status::Success;
 }

@@ -254,10 +254,10 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
     // SessionId=0xFFFF means cancel any ongoing ProxyConnectRequest, not disconnect a session.
     if (commandData.sessionId == kCancelPendingConnectSessionId)
     {
-        return mDelegate.CancelPendingConnect();
+        return mDelegate.CancelPendingConnect(request.subjectDescriptor.fabricIndex);
     }
 
-    auto delegateStatus = mDelegate.ProxyDisconnectRequest(commandData.sessionId);
+    auto delegateStatus = mDelegate.ProxyDisconnectRequest(commandData.sessionId, request.subjectDescriptor.fabricIndex);
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
 
     // Transition cluster state back to disconnected now that the session is gone.

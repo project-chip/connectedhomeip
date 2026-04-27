@@ -552,7 +552,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateFailure
     // Subclass that rejects all disconnect requests.
     struct FailDisconnectDelegate : public CommissioningProxyMockDelegate
     {
-        Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t) override
+        Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t, chip::FabricIndex) override
         {
             return Protocols::InteractionModel::Status::Failure;
         }
@@ -584,12 +584,14 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_S
 {
     struct PendingConnectDelegate : public CommissioningProxyMockDelegate
     {
-        Protocols::InteractionModel::Status CancelPendingConnect() override
+        Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex fabricIndex) override
         {
-            cancelCalled = true;
+            cancelCalled      = true;
+            lastFabricIndex   = fabricIndex;
             return Protocols::InteractionModel::Status::Success;
         }
-        bool cancelCalled = false;
+        bool cancelCalled             = false;
+        chip::FabricIndex lastFabricIndex = chip::kUndefinedFabricIndex;
     } mockDelegate;
 
     TestServerClusterContext context;
@@ -600,10 +602,12 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_S
 
     ClusterTester tester(cluster);
 
+    tester.SetFabricIndex(2);
     Commands::ProxyDisconnectRequest::Type cmd;
     cmd.sessionId = 0xFFFF;
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_TRUE(mockDelegate.cancelCalled);
+    EXPECT_EQ(mockDelegate.lastFabricIndex, 2);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -628,6 +632,46 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_A
     auto code = result.GetStatusCode();
     ASSERT_TRUE(code.has_value());
     EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// SessionId=0xFFFF from the wrong fabric SHALL return NotFound (fabric isolation).
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_WrongFabric)
+{
+    struct FabricCheckDelegate : public CommissioningProxyMockDelegate
+    {
+        Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex fabricIndex) override
+        {
+            // Simulate a pending connect owned by fabric 1; reject any other fabric.
+            if (fabricIndex != 1)
+                return Protocols::InteractionModel::Status::NotFound;
+            return Protocols::InteractionModel::Status::Success;
+        }
+    } mockDelegate;
+
+    TestServerClusterContext context;
+    BitMask<Feature> features(Feature::kWiFiNetworkInterface);
+    CommissioningProxyCluster cluster(
+        CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    Commands::ProxyDisconnectRequest::Type cmd;
+    cmd.sessionId = 0xFFFF;
+
+    // Fabric 2 tries to cancel fabric 1's pending connect — SHALL be rejected.
+    tester.SetFabricIndex(2);
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    auto code = result.GetStatusCode();
+    ASSERT_TRUE(code.has_value());
+    EXPECT_EQ(code->GetStatus(), Protocols::InteractionModel::Status::NotFound);
+
+    // Fabric 1 (the owner) cancels its own pending connect — SHALL succeed.
+    tester.SetFabricIndex(1);
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

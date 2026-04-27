@@ -123,7 +123,7 @@ public:
      * @return Success if the session was found and cleaned up; NotFound if unknown.
      */
     virtual Protocols::InteractionModel::Status
-    ProxyDisconnectRequest(uint16_t sessionId) { return Protocols::InteractionModel::Status::UnsupportedCommand; }
+    ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex) { return Protocols::InteractionModel::Status::UnsupportedCommand; }
 
     /**
      * @brief Cancel any in-progress ProxyConnectRequest.
@@ -137,7 +137,7 @@ public:
      *         InvalidInState if no connect is pending (connection already completed).
      */
     virtual Protocols::InteractionModel::Status
-    CancelPendingConnect() { return Protocols::InteractionModel::Status::InvalidInState; }
+    CancelPendingConnect(chip::FabricIndex fabricIndex) { return Protocols::InteractionModel::Status::InvalidInState; }
 
     /**
      * @brief Start a continuous background scan for commissionable devices.

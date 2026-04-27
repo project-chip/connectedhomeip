@@ -56,6 +56,7 @@ constexpr uint8_t kMaxProxySessions = 1;
 struct ProxySessionInfo
 {
     chip::WiFiPAF::WiFiPAFSession pafSession; // includes peer_addr, discriminator, etc.
+    chip::FabricIndex fabricIndex = chip::kUndefinedFabricIndex;
 };
 
 // Session map: sessionId → ProxySessionInfo
@@ -108,6 +109,7 @@ struct ProxyConnectCtx
     uint32_t subscribeId; // NAN subscribe_id from wpa_supplicant, stored after WiFiPAFSubscribe
     // Back-pointer so OnPafConnectSuccess can transition the cluster state.
     chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * cluster = nullptr;
+    chip::FabricIndex fabricIndex = chip::kUndefinedFabricIndex;
 };
 
 // Owning pointer to the in-flight ProxyConnectRequest context.
@@ -342,7 +344,8 @@ static void OnPafConnectSuccess(void * context)
 
     uint16_t sessionId = AllocSessionId();
     ProxySessionInfo info{};
-    info.pafSession = *pPafInfo;
+    info.pafSession   = *pPafInfo;
+    info.fabricIndex  = ctx->fabricIndex;
     sProxySessions[sessionId] = std::move(info);
 
     ChipLogProgress(AppServer, "ProxyConnectRequest: WiFiPAF connected, proxy session %u (disc %u peer_id %u)",
@@ -396,6 +399,21 @@ static void OnPafConnectError(void * context, CHIP_ERROR err)
     if (rmErr != CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "OnPafConnectError: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+    }
+
+    // RmPafSession cancels whichever subscribe_id is stored in the session.
+    // If a stale NAN subscription hijacked the connection, the session's
+    // subscribe_id was overwritten to the stale one and our actual
+    // subscribe_id (ctx->subscribeId) was never cancelled.  Cancel it
+    // explicitly so it doesn't become the next stale subscription.
+    if (ctx->subscribeId != 0)
+    {
+        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx->subscribeId);
+        if (cancelErr != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(AppServer, "OnPafConnectError: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT,
+                          ctx->subscribeId, cancelErr.Format());
+        }
     }
 
     if (cmd != nullptr)
@@ -790,7 +808,13 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     // Keep the IM invoke alive until the PAF connect succeeds or fails.
     // Pass mServer so OnPafConnectSuccess can update the cluster state.
     uint16_t effectiveTimeout = timeout > 0 ? timeout : kProxyConnectDefaultTimeoutSecs;
-    auto * ctx = new ProxyConnectCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, discriminator, 0, mServer };
+    auto * ctx         = new ProxyConnectCtx{};
+    ctx->handle        = chip::app::CommandHandler::Handle(commandObj);
+    ctx->path          = request.path;
+    ctx->discriminator = discriminator;
+    ctx->subscribeId   = 0;
+    ctx->cluster       = mServer;
+    ctx->fabricIndex   = request.subjectDescriptor.fabricIndex;
     sPendingConnectCtx = ctx;
 
     if (auto * exchange = commandObj->GetExchangeContext())
@@ -916,6 +940,14 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         return chip::Protocols::InteractionModel::Status::NotFound;
     }
 
+    // Fabric isolation: reject if the requesting fabric does not own this session.
+    if (request.subjectDescriptor.fabricIndex != it->second.fabricIndex)
+    {
+        ChipLogProgress(AppServer, "ProxyMessageRequest: sessionId %u owned by fabric %u, rejected fabric %u",
+                        sessionId, it->second.fabricIndex, request.subjectDescriptor.fabricIndex);
+        return chip::Protocols::InteractionModel::Status::NotFound;
+    }
+
     // Per spec §10.168: reject if another ProxyMessageRequest for this session
     // is still outstanding.  However, if the exchange for the previous request
     // has already timed out (handle.Get() == nullptr), clean it up rather than
@@ -1013,14 +1045,22 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 }
 
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyDisconnectRequest(
-    uint16_t sessionId)
+    uint16_t sessionId, chip::FabricIndex fabricIndex)
 {
-    ChipLogProgress(AppServer, "ProxyDisconnectRequest: sessionId=%u", sessionId);
+    ChipLogProgress(AppServer, "ProxyDisconnectRequest: sessionId=%u fabric=%u", sessionId, fabricIndex);
 
     auto it = sProxySessions.find(sessionId);
     if (it == sProxySessions.end())
     {
         ChipLogError(AppServer, "ProxyDisconnectRequest: unknown sessionId %u", sessionId);
+        return chip::Protocols::InteractionModel::Status::NotFound;
+    }
+
+    // Fabric isolation: reject if the requesting fabric does not own this session.
+    if (fabricIndex != it->second.fabricIndex)
+    {
+        ChipLogProgress(AppServer, "ProxyDisconnectRequest: sessionId %u owned by fabric %u, rejected fabric %u",
+                        sessionId, it->second.fabricIndex, fabricIndex);
         return chip::Protocols::InteractionModel::Status::NotFound;
     }
 
@@ -1077,12 +1117,20 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::CancelPendingConnect()
+Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::CancelPendingConnect(chip::FabricIndex fabricIndex)
 {
     if (sPendingConnectCtx == nullptr)
     {
         ChipLogProgress(AppServer, "CancelPendingConnect: no pending connect");
         return chip::Protocols::InteractionModel::Status::InvalidInState;
+    }
+
+    // Fabric isolation: only the owning fabric may cancel its own pending connect.
+    if (fabricIndex != sPendingConnectCtx->fabricIndex)
+    {
+        ChipLogProgress(AppServer, "CancelPendingConnect: pending connect owned by fabric %u, rejected fabric %u",
+                        sPendingConnectCtx->fabricIndex, fabricIndex);
+        return chip::Protocols::InteractionModel::Status::NotFound;
     }
 
     auto * ctx = sPendingConnectCtx;
