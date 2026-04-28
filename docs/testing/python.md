@@ -1010,7 +1010,9 @@ async def test_TC_OPCREDS_3_8(self):
 ```
 
 ## Wildcard subscription read verification
-This verification is enabled by default for tests that do not explicitly disable it.
+
+This verification is enabled by default for tests that do not explicitly disable
+it.
 
 ### Overview
 
@@ -1022,10 +1024,10 @@ The framework maintains a subscription-backed attribute cache and, when enabled,
 read helpers compare direct read responses against cached subscription values to
 help detect missing reports, stale values, or reporting inconsistencies.
 
-The comparison path is implemented in
-`matter_testing.py` (`verify_attribute_subscription_value`,
-`read_single_attribute_check_success`, and related helpers), while subscription
-client handling lives in `event_attribute_reporting.py`.
+The comparison path is implemented in `matter_testing.py`
+(`verify_attribute_subscription_value`, `read_single_attribute_check_success`,
+and related helpers), while subscription client handling lives in
+`event_attribute_reporting.py`.
 
 ### Architecture
 
@@ -1042,8 +1044,8 @@ down the background subscription.
 
 The wildcard subscribe uses:
 
-- `keepSubscriptions=False`
-- `autoResubscribe=False`
+-   `keepSubscriptions=False`
+-   `autoResubscribe=False`
 
 `keepSubscriptions=False` avoids leaving stale server-side subscriptions behind
 if setup is retried.
@@ -1068,33 +1070,38 @@ subscription coverage needs to remain active through that step.
 
 Attributes marked in the data model XML with:
 
-- **Changes Omitted (C)**
-- **Quieter Reporting (Q)**
+-   **Changes Omitted (C)**
+-   **Quieter Reporting (Q)**
 
 are excluded from wildcard subscription verification, since these attributes are
 not expected to behave like ordinary report-driven attributes.
 
-A small transitional allowlist
-(`_CQ_EXPECTED_BUT_NOT_YET_MARKED` in `matter_testing.py`) can treat additional
-attributes as C until XML/spec metadata catches up.
+A small transitional allowlist (`_CQ_EXPECTED_BUT_NOT_YET_MARKED` in
+`matter_testing.py`) can treat additional attributes as C until XML/spec
+metadata catches up.
 
 Each temporary entry should cite a tracking issue and be removed once the data
 model is corrected and regenerated.
 
 ### Disabling the wildcard subscription or verification
-**Disable the background subscription entirely** 
-(no cache, no ACL append for the subscription controller):
-- Per test class: `disable_wildcard_subscription = True`
-- Per run / harness: `--no-wildcard-subscription` (`matter_test_config.no_wildcard_subscription`)
+
+**Disable the background subscription entirely** (no cache, no ACL append for
+the subscription controller):
+
+-   Per test class: `disable_wildcard_subscription = True`
+-   Per run / harness: `--no-wildcard-subscription`
+    (`matter_test_config.no_wildcard_subscription`)
 
 **Keep the subscription but skip comparing reads to the cache:**
-- Per test class: `default_verify_wildcard_subscription = False`
-- Single read: pass `verify_wildcard_subscription=False` to the read helper, otherwise this defaults to True.
+
+-   Per test class: `default_verify_wildcard_subscription = False`
+-   Single read: pass `verify_wildcard_subscription=False` to the read helper,
+    otherwise this defaults to True.
 
 ### Known limitations
 
-This framework has exposed cases where some attributes are effectively
-polled on read in the SDK rather than updated through a reporting path.
+This framework has exposed cases where some attributes are effectively polled on
+read in the SDK rather than updated through a reporting path.
 
 Such attributes may appear in the subscription priming read but later disagree
 with a direct read, producing mismatches that are not DUT subscription failures.
@@ -1109,6 +1116,6 @@ across controllers operating on different fabrics (for example, fabric-scoped
 attributes such as CurrentFabricIndex can legitimately differ across fabrics and
 should not be treated as subscription failures).
 
-Direct reads may also occasionally overtake in-flight subscription reports during
-attribute transitions, which can create transient mismatches that are framework
-timing artifacts rather than missing DUT reports.
+Direct reads may also occasionally overtake in-flight subscription reports
+during attribute transitions, which can create transient mismatches that are
+framework timing artifacts rather than missing DUT reports.
