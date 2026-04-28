@@ -28,7 +28,7 @@ namespace CommissioningProxy {
 
 namespace {
 
-constexpr uint8_t kDefaultScanMaxTimeSeconds   = 5;
+constexpr uint8_t kDefaultScanMaxTimeSeconds   = 10;
 constexpr uint16_t kDefaultCacheTimeoutSeconds = 30;
 constexpr uint8_t kMaxCachedResults            = 10;
 

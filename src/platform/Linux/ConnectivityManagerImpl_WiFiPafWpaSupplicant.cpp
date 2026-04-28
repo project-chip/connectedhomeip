@@ -735,8 +735,8 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
         uint32_t expected = (mBgScanCb != nullptr) ? mBgScanSubscribeId : mActiveScanSubscribeId;
         if (expected == 0 || subscribe_id != expected)
         {
-            ChipLogDetail(DeviceLayer, "ScanDiscoveryResult: ignoring stale subscribe_id=%u (expected=%u)",
-                          subscribe_id, expected);
+            ChipLogProgress(DeviceLayer, "ScanDiscoveryResult: ignoring stale subscribe_id=%u (expected=%u)",
+                            subscribe_id, expected);
             return;
         }
     }
@@ -952,19 +952,27 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
     TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 
+    // Hold the mutex while collecting and clearing mNanScanPeers so that a
+    // ScanDiscoveryResult running concurrently on the GLib/D-Bus thread cannot
+    // write to the set at the same time.  Moving mActiveScanSubscribeId = 0
+    // inside the lock ensures any ScanDiscoveryResult that acquires the lock
+    // after us sees expected == 0 and correctly discards the late event.
     std::vector<NanPeerInfo> results;
-    results.reserve(mNanScanPeers.size());
-    for (auto & p : mNanScanPeers)
-        results.push_back(p);
-    mNanScanPeers.clear();
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        results.reserve(mNanScanPeers.size());
+        for (auto & p : mNanScanPeers)
+            results.push_back(p);
+        mNanScanPeers.clear();
+        mActiveScanSubscribeId = 0;
+        mScanFreq              = 0;
+    }
 
     if (mScanCb != nullptr)
         mScanCb(mScanCbContext, results);
 
-    mScanCb                = nullptr;
-    mScanCbContext         = nullptr;
-    mActiveScanSubscribeId = 0;
-    mScanFreq              = 0;
+    mScanCb        = nullptr;
+    mScanCbContext = nullptr;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)
