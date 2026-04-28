@@ -73,17 +73,17 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
+CustomerAppTask & appInstance()
+{
+    return CustomerAppTask::GetAppTask();
+}
+
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 RGBLEDWidget sLightLED;
 #else
 LEDWidget sLightLED;
 #endif
 
-// ---------------------------------------------------------------------------
-// Lighting state. Lives here (TU-local) instead of on AppTask because the
-// helpers below are not part of the override surface and AppTask is a
-// singleton (CustomerAppTask::sAppTask).
-// ---------------------------------------------------------------------------
 AppTask::State_t sLightState = AppTask::kState_OffCompleted;
 osTimerId_t sLightTimer      = nullptr;
 bool sOffEffectArmed         = false;
@@ -96,17 +96,7 @@ uint16_t sCurrentY         = 0;
 uint16_t sCurrentCTMireds  = 250;
 #endif
 
-// ---------------------------------------------------------------------------
-// Internal helpers (no override surface). Kept as TU-local free functions so
-// they cannot be overridden by Derived classes; bodies access the state above
-// directly.
-// ---------------------------------------------------------------------------
-
-// Forward-declare the event handler so PostLightActionRequest can take its address.
 void LightActionEventHandler(AppEvent * aEvent);
-
-// Forward-declare so OnLightActionCompleted (defined further below) can pass
-// this pointer to PlatformMgr().ScheduleWork.
 void UpdateClusterState(intptr_t context);
 
 void StartLightTimer(uint32_t aTimeoutMs)
@@ -154,7 +144,7 @@ void LightActionEventHandler(AppEvent * aEvent)
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = (CustomerAppTask::GetAppTask().IsLightOn()) ? AppTask::OFF_ACTION : AppTask::ON_ACTION;
+        action = (appInstance().IsLightOn()) ? AppTask::OFF_ACTION : AppTask::ON_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
     else
@@ -164,7 +154,7 @@ void LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = CustomerAppTask::GetAppTask().InitiateAction(actor, action, &value);
+        initiated = appInstance().InitiateAction(actor, action, &value);
 
         if (!initiated)
         {
@@ -182,7 +172,7 @@ void PostLightControlActionRequest(int32_t aActor, AppTask::Action_t aAction, RG
     light_event.LightControlEvent.Action = aAction;
     light_event.LightControlEvent.Value  = *aValue;
     light_event.Handler                  = &CustomerAppTask::LightControlEventHandler;
-    CustomerAppTask::GetAppTask().PostEvent(&light_event);
+    appInstance().PostEvent(&light_event);
 }
 #endif
 
@@ -199,7 +189,7 @@ void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 
     int32_t actor = AppEvent::kEventType_Timer;
     uint8_t value = 0;
-    CustomerAppTask::GetAppTask().InitiateAction(actor, AppTask::OFF_ACTION, &value);
+    appInstance().InitiateAction(actor, AppTask::OFF_ACTION, &value);
 }
 
 void ActuatorMovementTimerEventHandler(AppEvent * /* aEvent */)
@@ -219,7 +209,7 @@ void ActuatorMovementTimerEventHandler(AppEvent * /* aEvent */)
 
     if (actionCompleted != AppTask::INVALID_ACTION)
     {
-        CustomerAppTask::GetAppTask().OnLightActionCompleted(actionCompleted);
+        appInstance().OnLightActionCompleted(actionCompleted);
     }
 }
 
@@ -232,17 +222,14 @@ OnOffEffect gEffect = {
 
 } // namespace
 
-// ---------------------------------------------------------------------------
-// AppTask member definitions (overridable APIs). Singleton provided by
-// CustomerAppTask.cpp (AppTask::GetAppTask() returns CustomerAppTask::GetAppTask()).
-// ---------------------------------------------------------------------------
+
 
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
 
-    err = CustomerAppTask::GetAppTask().InitLight();
+    err = appInstance().InitLight();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("InitLight() failed");
@@ -417,12 +404,12 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     if (button == APP_LIGHT_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = &LightActionEventHandler;
-        CustomerAppTask::GetAppTask().PostEvent(&button_event);
+        appInstance().PostEvent(&button_event);
     }
     else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
-        CustomerAppTask::GetAppTask().PostEvent(&button_event);
+        appInstance().PostEvent(&button_event);
     }
 }
 
@@ -464,7 +451,6 @@ void AppTask::OnLightActionCompleted(AppTask::Action_t aAction)
 
     if (mSyncClusterToButtonAction)
     {
-        // UpdateClusterState is a TU-local helper (no CRTP override); pass it directly to ScheduleWork.
         TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
                                                                                reinterpret_cast<intptr_t>(nullptr));
         mSyncClusterToButtonAction = false;
@@ -504,7 +490,7 @@ bool AppTask::InitiateAction(int32_t aActor, AppTask::Action_t aAction, uint8_t 
 
     if (action_initiated)
     {
-        CustomerAppTask::GetAppTask().OnLightActionInitiated(aAction, aActor, aValue);
+        appInstance().OnLightActionInitiated(aAction, aActor, aValue);
     }
 
     return action_initiated;
@@ -524,7 +510,7 @@ void AppTask::LightTimerEventHandler(void * /* timerCbArg */)
     {
         event.Handler = &ActuatorMovementTimerEventHandler;
     }
-    CustomerAppTask::GetAppTask().PostEvent(&event);
+    appInstance().PostEvent(&event);
 }
 
 void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
@@ -638,15 +624,18 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
     case OnOff::Id:
         if (attributeId == OnOff::Attributes::OnOff::Id && value != nullptr && size == sizeof(uint8_t))
         {
-            CustomerAppTask::GetAppTask().InitiateAction(AppEvent::kEventType_Light,
-                                                         *value ? AppTask::ON_ACTION : AppTask::OFF_ACTION, value);
+#ifdef SL_MATTER_ENABLE_AWS
+            ChipLogProgress(Zcl, "sending light state update");
+            MatterAwsSendMsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));    
+#endif // SL_MATTER_ENABLE_AWS
+            appInstance().InitiateAction(AppEvent::kEventType_Light, *value ? AppTask::ON_ACTION : AppTask::OFF_ACTION, value);
         }
         break;
 
     case LevelControl::Id:
         if (attributeId == LevelControl::Attributes::CurrentLevel::Id && value != nullptr && size == sizeof(uint8_t))
         {
-            CustomerAppTask::GetAppTask().InitiateAction(AppEvent::kEventType_Light, AppTask::LEVEL_ACTION, value);
+            appInstance().InitiateAction(AppEvent::kEventType_Light, AppTask::LEVEL_ACTION, value);
         }
         break;
 
@@ -661,7 +650,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
-            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_XY, attributeId,
+            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_XY, attributeId,
                                                                   value);
             break;
 
@@ -672,7 +661,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
-            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV,
+            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV,
                                                                   attributeId, value);
             break;
 
@@ -682,7 +671,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
-            CustomerAppTask::GetAppTask().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_CT, attributeId,
+            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_CT, attributeId,
                                                                   value);
             break;
 
