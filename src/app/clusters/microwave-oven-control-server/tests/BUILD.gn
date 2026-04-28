@@ -1,4 +1,4 @@
-# Copyright (c) 2025-2026 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,22 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("microwave-oven-control-server") {
-  sources = [
-    "AppDelegate.h",
-    "IntegrationDelegate.h",
-    "MicrowaveOvenControlCluster.cpp",
-    "MicrowaveOvenControlCluster.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestMicrowaveOvenControlCluster"
+
+  test_sources = [ "TestMicrowaveOvenControlCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/mode-base-server",
-    "${chip_root}/src/app/clusters/operational-state-server",
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/zzz_generated/app-common/clusters/MicrowaveOvenControl",
+    "${chip_root}/src/app/clusters/microwave-oven-control-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/support",
   ]
 }
