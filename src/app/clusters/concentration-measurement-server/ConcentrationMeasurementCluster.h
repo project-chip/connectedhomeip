@@ -22,7 +22,36 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/CarbonDioxideConcentrationMeasurement/Metadata.h>
+#include <clusters/CarbonMonoxideConcentrationMeasurement/Metadata.h>
+#include <clusters/FormaldehydeConcentrationMeasurement/Metadata.h>
+#include <clusters/NitrogenDioxideConcentrationMeasurement/Metadata.h>
+#include <clusters/OzoneConcentrationMeasurement/Metadata.h>
+#include <clusters/Pm10ConcentrationMeasurement/Metadata.h>
+#include <clusters/Pm1ConcentrationMeasurement/Metadata.h>
+#include <clusters/Pm25ConcentrationMeasurement/Metadata.h>
+#include <clusters/RadonConcentrationMeasurement/Metadata.h>
+#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
 #include <lib/support/BitFlags.h>
+
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::FormaldehydeConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::OzoneConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::Pm10ConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::Pm1ConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::Pm25ConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::RadonConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::kRevision);
 
 namespace chip {
 namespace app {
@@ -75,9 +104,10 @@ public:
 
 private:
     static constexpr uint32_t kWindowMaxSeconds = 604800;
-    static constexpr uint16_t kClusterRevision  = 3;
+    static constexpr uint16_t kClusterRevision =
+        static_cast<uint16_t>(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision);
 
-    BitFlags<Feature> mFeatures;
+    const BitFlags<Feature> mFeatures;
 
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;

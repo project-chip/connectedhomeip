@@ -101,7 +101,10 @@ public:
     // remote Matter clients can't use these setters and write attributes.
     // The access boundary is enforced by not implementing WriteAttribute()
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
-    CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v) { return mCluster.SetMeasuredValue(v); }
+    CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v)
+    {
+        return mCluster.SetMeasuredValue(v);
+    }
 
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> v)
