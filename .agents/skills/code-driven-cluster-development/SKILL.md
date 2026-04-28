@@ -1,10 +1,10 @@
 ---
 name: code-driven-cluster-development
 description: >
-    Guidelines for implementing Matter server clusters using the
-    DefaultServerCluster base class (code-driven approach). Use this skill when
-    working in src/app/clusters/ — writing a new cluster, adding features to an
-    existing one, or reviewing any change in that directory.
+    Guidelines for implementing or migrating Matter server clusters (code that
+    resides in `src/app/clusters`) using the DefaultServerCluster base class
+    (code-driven data model approach), as opposed to the legacy ZAP/Ember
+    codegen approach.
 ---
 
 # Code-Driven Cluster Development
@@ -13,10 +13,11 @@ description: >
 
 A _code-driven_ cluster is a `ServerClusterInterface` implementation that lives
 in `src/app/clusters/<cluster-folder>/` and extends `DefaultServerCluster`. It
-stores its own attribute state in C++ member variables instead of the legacy
-Ember RAM store. The framework calls methods like `ReadAttribute` directly;
-ZAP-generated accessors (`emberAfReadAttribute`) must not be used inside the
-cluster class.
+stores its own attribute state in C++ member variables instead of relying on the
+Ember attribute RAM store. The framework calls the cluster's virtual methods
+(`ReadAttribute`, `WriteAttribute`, `InvokeCommand`, …) directly; ZAP-generated
+attribute accessors (`emberAfReadAttribute` etc.) must not be used inside the
+cluster class itself.
 
 Note that the `<cluster-folder>` naming is not standardized, but often starts
 with the cluster name. It is a mapping defined in
@@ -33,10 +34,11 @@ A common pattern for code-driven cluster directory layout is:
 src/app/clusters/<cluster-name>-server/
 ├── <ClusterName>Cluster.h             # Core class (extends DefaultServerCluster)
 ├── <ClusterName>Cluster.cpp           # Core class implementation
-├── CodegenIntegration.h               # Bridge declarations (ZAP ↔ Cluster)
-├── CodegenIntegration.cpp             # ZAP callbacks + FindClusterOnEndpoint()
-├── BUILD.gn                           # Core files (no codegen dependencies)
-├── app_config_dependent_sources.gni   # Codegen-dependent files
+├── CodegenIntegration.h               # App-specific Bridge: ZAP ↔ code-driven cluster
+├── CodegenIntegration.cpp             # App-specific ZAP callbacks + FindClusterOnEndpoint()
+├── BUILD.gn                           # Core files (does NOT include CodegenIntegration)
+├── app_config_dependent_sources.cmake # Application code-generation dependencies
+├── app_config_dependent_sources.gni   # Application code-generation dependencies
 └── tests/
     ├── BUILD.gn
     └── Test<ClusterName>Cluster.cpp
@@ -151,10 +153,8 @@ Key points:
     indicate a logic bug at call site, not a recoverable runtime error).
 -   Expose application-facing setters/getters; keep attribute storage in
     `protected` or `private` members.
--   **No Redundant Members**: Do not store `mIsRegistered` or `mContext`. These
-    are handled by the base class.
 
-### Implementation Pattern
+### Implementation (`<ClusterName>Cluster.cpp`)
 
 **When to call the base class**: You MUST call the base class from `Startup()`
 and `Shutdown()`. Do NOT call the base class from `ReadAttribute`,
@@ -185,9 +185,9 @@ DataModel::ActionReturnStatus FooCluster::ReadAttribute(
 ```
 
 -   **Return `Protocols::InteractionModel::Status::UnsupportedAttribute`
-    directly in the `default` case.**
--   **No Delegation**: Do not call `DefaultServerCluster::ReadAttribute` — it
-    has no base behavior for read operations.
+    directly in the `default` case. Do not call
+    `DefaultServerCluster::ReadAttribute` — it has no base behavior for read
+    operations.**
 -   The framework pre-filters requests so `ReadAttribute` is only called for
     paths that are in the `Attributes()` list; returning `UnsupportedAttribute`
     for anything unrecognised is the correct and consistent pattern.
@@ -290,11 +290,9 @@ DataModel::ActionReturnStatus FooCluster::WriteAttribute(
 }
 ```
 
--   **No Delegation**: Return `UnsupportedAttribute` directly in the `default`
-    case. Do not delegate to `DefaultServerCluster::WriteAttribute` — there is
-    no base-class behavior for write operations.
--   **No Double-Notify**: If a setter (e.g., `SetAttributeValue`) already
-    notifies, don't wrap it in `NotifyAttributeChangedIfSuccess`.
+Return `Protocols::InteractionModel::Status::UnsupportedAttribute` directly in
+the `default` case. Do not delegate to `DefaultServerCluster::WriteAttribute` —
+there is no base-class behavior for write operations.
 
 #### Commands
 
@@ -403,27 +401,124 @@ Override `EventInfo` only when non-default read privileges are needed.
 
 ## CodegenIntegration Layer
 
-This is the **only** place where Ember/ZAP APIs (`Accessors::Get/Set`) are
-allowed. Typical pattern:
+`CodegenIntegration.h/cpp` (or equivalent files in the `codegen/` subdirectory)
+is the **only** place where Ember/ZAP APIs are allowed. Its responsibilities
+are:
 
-1. Allocate the cluster instance via `LazyRegisteredServerCluster<FooCluster>`.
-2. Read ZAP attribute store defaults and construct `Config` structs. The
-   delegate is used only during init/lookup/shutdown, so it is safe — and
-   preferred — to allocate it **on the stack**.
+1. Declare a file-scope array of `LazyRegisteredServerCluster<FooCluster>`
+   instances (never heap-allocate).
+2. Read ZAP attribute store defaults and construct `Config` structs.
 3. Register/unregister clusters via `CodegenClusterIntegration::RegisterServer`.
 4. Implement `FindClusterOnEndpoint()` and optional convenience setters.
+5. Provide empty stubs for legacy plugin callbacks.
+
+### Typical pattern
 
 ```cpp
-void MatterFooPluginServerInitCallback()
+// CodegenIntegration.cpp
+
+#include <app/clusters/<name>-server/CodegenIntegration.h>
+#include <app/clusters/<name>-server/FooCluster.h>
+#include <app/static-cluster-config/Foo.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+namespace {
+
+constexpr size_t kFixedCount = Foo::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kMaxCount   = kFixedCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<FooCluster> gServers[kMaxCount];
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    // IntegrationDelegate is only used during lookups — stack allocation is fine.
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId,
+                                                   unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits,
+                                                   uint32_t featureMap) override
+    {
+        FooCluster::Config config;
+        config.optionalAttributes = FooCluster::OptionalAttributeSet(optionalAttributeBits);
+        // Read defaults from Ember store. Tolerate failure (use neutral defaults).
+        if (Foo::Attributes::SomeAttr::Get(endpointId, &config.someAttr)
+            != Protocols::InteractionModel::Status::Success)
+        {
+             config.someAttr = kSomeDefaultAttrValue;
+        }
+        gServers[clusterInstanceIndex].Create(endpointId, config);
+        return gServers[clusterInstanceIndex].Registration();
+    }
+    ServerClusterInterface * FindRegistration(unsigned index) override
+    {
+        VerifyOrReturnValue(gServers[index].IsConstructed(), nullptr);
+        return &gServers[index].Cluster();
+    }
+    void ReleaseRegistration(unsigned index) override { gServers[index].Destroy(); }
+};
+
+} // namespace
+
+void MatterFooClusterInitCallback(EndpointId endpointId)
+{
+    // Note: integration delegate is only used for lookups and it is OK
+    //       for it to live on the stack. Typical pattern is to have
+    //       this on the stack for all init/lookup/shutdown.
     IntegrationDelegate delegate;
-    LazyRegisteredServerCluster<FooCluster> * cluster = /* allocate */;
-    CodegenClusterIntegration::RegisterServer(*cluster, delegate);
+    CodegenClusterIntegration::RegisterServer(
+        { .endpointId = endpointId, .clusterId = Foo::Id,
+          .fixedClusterInstanceCount = kFixedCount,
+          .maxClusterInstanceCount   = kMaxCount,
+          .fetchFeatureMap           = false,
+          .fetchOptionalAttributes   = true },
+        delegate);
 }
+
+void MatterFooClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    IntegrationDelegate delegate;
+    CodegenClusterIntegration::UnregisterServer(
+        { .endpointId = endpointId, .clusterId = Foo::Id,
+          .fixedClusterInstanceCount = kFixedCount,
+          .maxClusterInstanceCount   = kMaxCount },
+        delegate, shutdownType);
+}
+
+namespace chip::app::Clusters::Foo {
+
+FooCluster * FindClusterOnEndpoint(EndpointId endpointId)
+{
+    IntegrationDelegate delegate;
+    return static_cast<FooCluster *>(
+        CodegenClusterIntegration::FindClusterOnEndpoint(
+            { .endpointId = endpointId, .clusterId = Foo::Id,
+              .fixedClusterInstanceCount = kFixedCount,
+              .maxClusterInstanceCount   = kMaxCount },
+            delegate));
+}
+
+// Optional convenience helper (common pattern):
+CHIP_ERROR SetSomeValue(EndpointId endpointId, int16_t value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    return cluster->SetSomeValue(value);
+}
+
+} // namespace chip::app::Clusters::Foo
 ```
 
-See `src/data-model-providers/codegen/ClusterIntegration.h` for the full API.
+**Key rules for `CodegenIntegration`:**
+
+-   Always check return status / tolerate failure when reading Ember attribute
+    defaults; use a safe fallback (null, zero, or a neutral default).
+-   When both min/maxMeasuredValue are read from ZAP and form an invalid range
+    (e.g., both 0 in a new ZAP config), treat both as null rather than crashing.
+-   Do not add empty `MatterFooPluginServerInitCallback` / `ShutdownCallback`
+    stubs unless they were generated by ZAP — only stubs that ZAP declares.
+-   Pointer return values from singleton accessors (e.g.,
+    `Server::GetInstance().GetCASESessionManager()`) must be null-checked before
+    use via `VerifyOrDie` or `VerifyOrReturnError`.
 
 ### Direct registration (no ZAP integration)
 
@@ -436,49 +531,97 @@ CodegenDataModelProvider::Instance().Registry().Register(gCluster.Registration()
 
 ---
 
-## Unit Testing with ClusterTester
+## Unit Tests
 
-The `ClusterTester` helper class (in
-`src/app/server-cluster/testing/ClusterTester.h`) is mandatory for testing. It
-abstracts TLV handling, memory management for views, and fabric context. See
-`src/app/server-cluster/testing/` for full documentation and examples.
+Tests live in `tests/Test<ClusterName>Cluster.cpp` and use the Pigweed/GTest
+framework.
 
-### Capabilities & Patterns
+### Standard structure
 
--   **Direct Testing**: Instantiate the cluster class directly using
-    `TestServerClusterContext`.
--   **Automatic TLV**: Use `tester.ReadAttribute(Id, outValue)`,
-    `tester.WriteAttribute(Id, inValue)`, and `tester.Invoke(requestStruct)`.
--   **Side Effects**: Verify events via `tester.GetNextGeneratedEvent()` and
-    dirty markings via `tester.GetDirtyList()`.
--   **Fabric Scoping**: Use `tester.SetFabricIndex(idx)` to simulate actions
-    from specific fabrics.
--   **Coverage**:
-    -   Every feature combination in `Attributes()` and `AcceptedCommands()`.
-    -   Boundary cases (min, max, null sentinel rejection).
-    -   Dirty markings (reporting) for every state change.
--   **No `sleep` in tests**: Unit tests must never call `sleep()` or rely on
-    real-time delays. If the cluster has time-dependent behavior, use a mock
-    clock. Test-plan steps that say "wait X seconds" should advance the mock
-    clock, not sleep.
+```cpp
+#include <pw_unit_test/framework.h>
+#include <app/clusters/<name>-server/FooCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+
+namespace {
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::Testing;
+
+// Subclass to expose protected methods for testing
+class TestableFooCluster : public FooCluster
+{
+public:
+    using FooCluster::FooCluster;
+    using FooCluster::SomeProtectedMethod;
+};
+
+struct TestFooCluster : public ::testing::Test
+{
+    static void SetUpTestSuite()   { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    TestServerClusterContext testContext;
+};
+
+} // namespace
+
+TEST_F(TestFooCluster, AttributeList)
+{
+    FooCluster cluster(kRootEndpointId);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attrs;
+    ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, Foo::Id), attrs),
+              CHIP_NO_ERROR);
+    // verify expected attribute set ...
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestFooCluster, ReadAttributes)
+{
+    FooCluster cluster(kRootEndpointId);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Read mandatory attributes
+    uint16_t revision{};
+    ASSERT_EQ(tester.ReadAttribute(Foo::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+```
+
+### Test coverage checklist
+
+-   [ ] Mandatory attributes are readable after construction.
+-   [ ] Optional attributes appear in `Attributes()` only when enabled.
+-   [ ] Setter returns `CHIP_NO_ERROR` for valid values.
+-   [ ] Setter returns `CHIP_IM_GLOBAL_STATUS(ConstraintError)` for out-of-range
+        values (including boundary values).
+-   [ ] For nullable numeric attributes: verify that the reserved null sentinel
+        (e.g. `0xFFFF` for `uint16`) is rejected when written via the data
+        model.
+-   [ ] `Startup` / `Shutdown` cycle works correctly.
+-   [ ] Protected setters are exposed via a `Testable*` subclass when needed.
+-   [ ] No `sleep()` calls — time-dependent behavior uses a mock clock instead.
 
 ---
 
-## Ensuring Spec Compliance
+## Ember / ZAP Rules
 
-Tests must prove the cluster adheres to the Matter Specification and Test Plans.
+| Location                     | Ember / ZAP APIs allowed?               |
+| ---------------------------- | --------------------------------------- |
+| `<ClusterName>Cluster.h/cpp` | **No** — never                          |
+| `CodegenIntegration.h/cpp`   | **Yes** — exclusively here              |
+| Tests                        | **No** — use `TestServerClusterContext` |
 
-### Consult the Source of Truth
-
-Use the `matter-specification-access` skill to obtain and read the latest
-specification and test plans.
-
--   **Validate Semantics**: Ensure `ReadAttribute` and `WriteAttribute` handle
-    constraints exactly as defined in the spec.
--   **Mirror Test Plans**: Use the `.adoc` test plans (e.g.,
-    `src/cluster/<name>.adoc` in `chip-test-plans` repo) as the blueprint for
-    your unit tests. If a test plan requires a specific error (e.g.,
-    `ConstraintError`), the unit test must assert it.
+Forbidden in cluster core code: `EmberAfStatus`, `emberAfContainsServer`,
+`emberAfReadAttribute`, `emberAfWriteAttribute`, ZAP-generated accessor
+functions (`Foo::Attributes::Bar::Get/Set`).
 
 ---
 
@@ -503,9 +646,8 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
 
 1. **Unlisted headers** — every `.h` file must appear in a build file.
 2. **Ember APIs in cluster core** — move them to `CodegenIntegration.cpp`.
-3. **Missing null checks on pointer-returning singletons** — e.g.
-   `Server::GetInstance().GetCASESessionManager()` may return null; check with
-   `VerifyOrDie` or `VerifyOrReturnError` before use.
+3. **Missing `VerifyOrDie` / null checks on singleton pointers** — e.g.
+   `Server::GetInstance().GetCASESessionManager()` may return null.
 4. **Invalid ZAP defaults not handled gracefully** — e.g. if `min` > `max` in
    ZAP, the cluster should handle this safely (e.g. by nulling the range) rather
    than crashing.
@@ -583,9 +725,15 @@ Study these clusters to understand specific implementation patterns:
 
 ## References
 
--   **Base Class**: `src/app/server-cluster/DefaultServerCluster.h`
--   **Testing**: `src/app/server-cluster/testing/`
--   **Integration Helper**:
+-   Base class: `src/app/server-cluster/DefaultServerCluster.h`
+-   Interface: `src/app/server-cluster/ServerClusterInterface.h`
+-   Testing helpers: `src/app/server-cluster/testing/`
+-   Build integration helper:
     `src/data-model-providers/codegen/ClusterIntegration.h`
--   **Migration Guide**: `docs/guides/migrating_ember_cluster_to_code_driven.md`
--   **Writing New Clusters**: `docs/guides/writing_clusters.md`
+-   Example simple cluster: `src/app/clusters/air-quality-server/`
+-   Example cluster with commands: `src/app/clusters/on-off-server/`
+-   Example cluster with delegate: `src/app/clusters/actions-server/`
+-   Example cluster with config struct:
+    `src/app/clusters/flow-measurement-server/`
+-   Migration guide: `docs/guides/migrating_ember_cluster_to_code_driven.md`
+-   Writing new clusters: `docs/guides/writing_clusters.md`
