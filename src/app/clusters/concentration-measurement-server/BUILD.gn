@@ -18,7 +18,6 @@ source_set("concentration-measurement-server") {
   sources = [
     "ConcentrationMeasurementCluster.cpp",
     "ConcentrationMeasurementCluster.h",
-    "ConcentrationMeasurementDelegate.h",
     "concentration-measurement-cluster-objects.h",
   ]
 

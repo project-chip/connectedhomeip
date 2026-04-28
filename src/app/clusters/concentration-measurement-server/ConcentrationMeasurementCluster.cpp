@@ -17,7 +17,6 @@
  */
 
 #include "ConcentrationMeasurementCluster.h"
-#include "ConcentrationMeasurementDelegate.h"
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/core/CHIPError.h>
@@ -32,9 +31,12 @@ namespace Clusters {
 namespace ConcentrationMeasurement {
 
 ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId,
-                                                                 BitFlags<Feature> features, Delegate & delegate) :
+                                                                 BitFlags<Feature> features, MeasurementMediumEnum medium,
+                                                                 MeasurementUnitEnum unit, DataModel::Nullable<float> minMeasured,
+                                                                 DataModel::Nullable<float> maxMeasured, float uncertainty) :
     DefaultServerCluster({ endpointId, clusterId }),
-    mFeatures(features), mDelegate(delegate)
+    mFeatures(features), mMedium(medium), mUnit(unit), mMinMeasuredValue(minMeasured), mMaxMeasuredValue(maxMeasured),
+    mUncertainty(uncertainty)
 {
     bool validCluster = false;
     for (ClusterId id : AliasedClusters)
@@ -50,8 +52,6 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
     {
         mFeatures.Set(Feature::kLevelIndication);
     }
-
-    // Peak and Average require Numeric
     if (mFeatures.HasAny(Feature::kPeakMeasurement, Feature::kAverageMeasurement))
     {
         mFeatures.Set(Feature::kNumericMeasurement);
@@ -60,19 +60,13 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
 
 ConcentrationMeasurementCluster::~ConcentrationMeasurementCluster() {}
 
-CHIP_ERROR ConcentrationMeasurementCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
-    return mDelegate.Init();
-}
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
     case MeasurementMedium::Id:
-        return encoder.Encode(mDelegate.GetMeasurementMedium());
+        return encoder.Encode(mMedium);
 
     case Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);
@@ -81,39 +75,40 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(con
         return encoder.Encode(kClusterRevision);
 
     case MeasuredValue::Id:
-        return encoder.Encode(mDelegate.GetMeasuredValue());
+        return encoder.Encode(mMeasuredValue);
 
     case MinMeasuredValue::Id:
-        return encoder.Encode(mDelegate.GetMinMeasuredValue());
+        return encoder.Encode(mMinMeasuredValue);
 
     case MaxMeasuredValue::Id:
-        return encoder.Encode(mDelegate.GetMaxMeasuredValue());
+        return encoder.Encode(mMaxMeasuredValue);
 
     case Uncertainty::Id:
-        return encoder.Encode(mDelegate.GetUncertainty());
+        return encoder.Encode(mUncertainty);
 
     case MeasurementUnit::Id:
-        return encoder.Encode(mDelegate.GetMeasurementUnit());
+        return encoder.Encode(mUnit);
 
     case PeakMeasuredValue::Id:
-        return encoder.Encode(mDelegate.GetPeakMeasuredValue());
+        return encoder.Encode(mPeakMeasuredValue);
 
     case PeakMeasuredValueWindow::Id:
-        return encoder.Encode(mDelegate.GetPeakMeasuredValueWindow());
+        return encoder.Encode(mPeakMeasuredValueWindow);
 
     case AverageMeasuredValue::Id:
-        return encoder.Encode(mDelegate.GetAverageMeasuredValue());
+        return encoder.Encode(mAverageMeasuredValue);
 
     case AverageMeasuredValueWindow::Id:
-        return encoder.Encode(mDelegate.GetAverageMeasuredValueWindow());
+        return encoder.Encode(mAverageMeasuredValueWindow);
 
     case LevelValue::Id:
-        return encoder.Encode(mDelegate.GetLevelValue());
+        return encoder.Encode(mLevelValue);
 
     default:
         return Status::UnsupportedAttribute;
     }
 }
+
 CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath & path,
                                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -161,25 +156,62 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
 CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    auto min = mDelegate.GetMinMeasuredValue();
-    auto max = mDelegate.GetMaxMeasuredValue();
     if (!value.IsNull())
     {
-        if (!min.IsNull() && value.Value() < min.Value())
+        if (!mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        if (!max.IsNull() && value.Value() > max.Value())
+        if (!mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
-
-    if (mDelegate.GetMeasuredValue() != value)
+    if (mMeasuredValue != value)
     {
-        mDelegate.SetMeasuredValue(value);
+        mMeasuredValue = value;
         NotifyAttributeChanged(MeasuredValue::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetMinMeasuredValue(DataModel::Nullable<float> value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (!value.IsNull() && !mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    if (mMinMeasuredValue != value)
+    {
+        mMinMeasuredValue = value;
+        NotifyAttributeChanged(MinMeasuredValue::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetMaxMeasuredValue(DataModel::Nullable<float> value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (!value.IsNull() && !mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    if (mMaxMeasuredValue != value)
+    {
+        mMaxMeasuredValue = value;
+        NotifyAttributeChanged(MaxMeasuredValue::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetUncertainty(float value)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (mUncertainty != value)
+    {
+        mUncertainty = value;
+        NotifyAttributeChanged(Uncertainty::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -187,24 +219,20 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable
 CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    auto min = mDelegate.GetMinMeasuredValue();
-    auto max = mDelegate.GetMaxMeasuredValue();
     if (!value.IsNull())
     {
-        if (!min.IsNull() && value.Value() < min.Value())
+        if (!mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        if (!max.IsNull() && value.Value() > max.Value())
+        if (!mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
-
-    if (mDelegate.GetPeakMeasuredValue() != value)
+    if (mPeakMeasuredValue != value)
     {
-        mDelegate.SetPeakMeasuredValue(value);
+        mPeakMeasuredValue = value;
         NotifyAttributeChanged(PeakMeasuredValue::Id);
     }
     return CHIP_NO_ERROR;
@@ -214,9 +242,9 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValueWindow(uint32_t 
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (mDelegate.GetPeakMeasuredValueWindow() != value)
+    if (mPeakMeasuredValueWindow != value)
     {
-        mDelegate.SetPeakMeasuredValueWindow(value);
+        mPeakMeasuredValueWindow = value;
         NotifyAttributeChanged(PeakMeasuredValueWindow::Id);
     }
     return CHIP_NO_ERROR;
@@ -225,24 +253,20 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValueWindow(uint32_t 
 CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    auto min = mDelegate.GetMinMeasuredValue();
-    auto max = mDelegate.GetMaxMeasuredValue();
     if (!value.IsNull())
     {
-        if (!min.IsNull() && value.Value() < min.Value())
+        if (!mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        if (!max.IsNull() && value.Value() > max.Value())
+        if (!mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
-
-    if (mDelegate.GetAverageMeasuredValue() != value)
+    if (mAverageMeasuredValue != value)
     {
-        mDelegate.SetAverageMeasuredValue(value);
+        mAverageMeasuredValue = value;
         NotifyAttributeChanged(AverageMeasuredValue::Id);
     }
     return CHIP_NO_ERROR;
@@ -252,9 +276,9 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValueWindow(uint32
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (mDelegate.GetAverageMeasuredValueWindow() != value)
+    if (mAverageMeasuredValueWindow != value)
     {
-        mDelegate.SetAverageMeasuredValueWindow(value);
+        mAverageMeasuredValueWindow = value;
         NotifyAttributeChanged(AverageMeasuredValueWindow::Id);
     }
     return CHIP_NO_ERROR;
@@ -272,9 +296,9 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetLevelValue(LevelValueEnum value)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
-    if (mDelegate.GetLevelValue() != value)
+    if (mLevelValue != value)
     {
-        mDelegate.SetLevelValue(value);
+        mLevelValue = value;
         NotifyAttributeChanged(LevelValue::Id);
     }
     return CHIP_NO_ERROR;

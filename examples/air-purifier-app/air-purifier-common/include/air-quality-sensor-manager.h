@@ -16,15 +16,12 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/air-quality-server/CodegenIntegration.h>
 #include <app/clusters/air-quality-server/air-quality-server.h>
-#include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
-#include <app/clusters/concentration-measurement-server/ConcentrationMeasurementDelegate.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
+
+#pragma once
 
 namespace chip {
 namespace app {
@@ -35,107 +32,57 @@ class AirQualitySensorManager
 public:
     AirQualitySensorManager(EndpointId aEndpointId) :
         mEndpointId(aEndpointId),
-        mAirQualityInstance(mEndpointId,
-                            BitMask<AirQuality::Feature>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
-                                                         AirQuality::Feature::kVeryPoor, AirQuality::Feature::kExtremelyPoor)),
-        // Delegates — fixed sensor hardware (kAir, kPpm)
-        mCarbonDioxideDelegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm, chip::app::DataModel::MakeNullable(0.0f),
-                               chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mCarbonMonoxideDelegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                ConcentrationMeasurement::MeasurementUnitEnum::kPpm, chip::app::DataModel::MakeNullable(0.0f),
-                                chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mNitrogenDioxideDelegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                 ConcentrationMeasurement::MeasurementUnitEnum::kPpm, chip::app::DataModel::MakeNullable(0.0f),
-                                 chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mPm1Delegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                     chip::app::DataModel::MakeNullable(0.0f), chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mPm10Delegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                      chip::app::DataModel::MakeNullable(0.0f), chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mPm25Delegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                      chip::app::DataModel::MakeNullable(0.0f), chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mRadonDelegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                       chip::app::DataModel::MakeNullable(0.0f), chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mTotalVolatileOrganicCompoundsDelegate(
-            ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-            chip::app::DataModel::MakeNullable(0.0f), chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mOzoneDelegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                       chip::app::DataModel::MakeNullable(0.0f), chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        mFormaldehydeDelegate(ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                              ConcentrationMeasurement::MeasurementUnitEnum::kPpm, chip::app::DataModel::MakeNullable(0.0f),
-                              chip::app::DataModel::MakeNullable(1000.0f), 0.0f),
-        // Clusters
-        mCarbonDioxideConcentrationMeasurementInstance(mEndpointId, CarbonDioxideConcentrationMeasurement::Id, kAllFeatures,
-                                                       mCarbonDioxideDelegate),
-        mCarbonMonoxideConcentrationMeasurementInstance(mEndpointId, CarbonMonoxideConcentrationMeasurement::Id, kAllFeatures,
-                                                        mCarbonMonoxideDelegate),
-        mNitrogenDioxideConcentrationMeasurementInstance(mEndpointId, NitrogenDioxideConcentrationMeasurement::Id, kAllFeatures,
-                                                         mNitrogenDioxideDelegate),
-        mPm1ConcentrationMeasurementInstance(mEndpointId, Pm1ConcentrationMeasurement::Id, kAllFeatures, mPm1Delegate),
-        mPm10ConcentrationMeasurementInstance(mEndpointId, Pm10ConcentrationMeasurement::Id, kAllFeatures, mPm10Delegate),
-        mPm25ConcentrationMeasurementInstance(mEndpointId, Pm25ConcentrationMeasurement::Id, kAllFeatures, mPm25Delegate),
-        mRadonConcentrationMeasurementInstance(mEndpointId, RadonConcentrationMeasurement::Id, kAllFeatures, mRadonDelegate),
-        mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance(mEndpointId,
-                                                                       TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
-                                                                       kAllFeatures, mTotalVolatileOrganicCompoundsDelegate),
-        mOzoneConcentrationMeasurementInstance(mEndpointId, OzoneConcentrationMeasurement::Id, kAllFeatures, mOzoneDelegate),
-        mFormaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id, kAllFeatures,
-                                                      mFormaldehydeDelegate),
-        // Registrations
-        mCarbonDioxideRegistration(mCarbonDioxideConcentrationMeasurementInstance),
-        mCarbonMonoxideRegistration(mCarbonMonoxideConcentrationMeasurementInstance),
-        mNitrogenDioxideRegistration(mNitrogenDioxideConcentrationMeasurementInstance),
-        mPm1Registration(mPm1ConcentrationMeasurementInstance), mPm10Registration(mPm10ConcentrationMeasurementInstance),
-        mPm25Registration(mPm25ConcentrationMeasurementInstance), mRadonRegistration(mRadonConcentrationMeasurementInstance),
-        mTotalVolatileOrganicCompoundsRegistration(mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance),
-        mOzoneRegistration(mOzoneConcentrationMeasurementInstance),
-        mFormaldehydeRegistration(mFormaldehydeConcentrationMeasurementInstance)
-    {}
-
-    static constexpr BitFlags<ConcentrationMeasurement::Feature> kAllFeatures{
-        ConcentrationMeasurement::Feature::kNumericMeasurement, ConcentrationMeasurement::Feature::kLevelIndication,
-        ConcentrationMeasurement::Feature::kMediumLevel,        ConcentrationMeasurement::Feature::kCriticalLevel,
-        ConcentrationMeasurement::Feature::kPeakMeasurement,    ConcentrationMeasurement::Feature::kAverageMeasurement,
-    };
+        airQualityInstance(mEndpointId,
+                           BitMask<AirQuality::Feature, uint32_t>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
+                                                                  AirQuality::Feature::kVeryPoor,
+                                                                  AirQuality::Feature::kExtremelyPoor)),
+        carbonDioxideConcentrationMeasurementInstance(mEndpointId, CarbonDioxideConcentrationMeasurement::Id,
+                                                      ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                      ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        carbonMonoxideConcentrationMeasurementInstance(mEndpointId, CarbonMonoxideConcentrationMeasurement::Id,
+                                                       ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                       ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        nitrogenDioxideConcentrationMeasurementInstance(mEndpointId, NitrogenDioxideConcentrationMeasurement::Id,
+                                                        ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                        ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        pm1ConcentrationMeasurementInstance(mEndpointId, Pm1ConcentrationMeasurement::Id,
+                                            ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                            ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        pm10ConcentrationMeasurementInstance(mEndpointId, Pm10ConcentrationMeasurement::Id,
+                                             ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                             ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        pm25ConcentrationMeasurementInstance(mEndpointId, Pm25ConcentrationMeasurement::Id,
+                                             ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                             ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        radonConcentrationMeasurementInstance(mEndpointId, RadonConcentrationMeasurement::Id,
+                                              ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                              ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        totalVolatileOrganicCompoundsConcentrationMeasurementInstance(
+            mEndpointId, TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+            ConcentrationMeasurement::MeasurementMediumEnum::kAir, ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        ozoneConcentrationMeasurementInstance(mEndpointId, OzoneConcentrationMeasurement::Id,
+                                              ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                              ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
+        formaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id,
+                                                     ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                                                     ConcentrationMeasurement::MeasurementUnitEnum::kPpm){};
 
     void Init();
+
+private:
     EndpointId mEndpointId;
-    AirQuality::Instance mAirQualityInstance;
-
-    // Delegates declared before clusters — clusters hold a Delegate reference
-    ConcentrationMeasurement::DefaultDelegate mCarbonDioxideDelegate;
-    ConcentrationMeasurement::DefaultDelegate mCarbonMonoxideDelegate;
-    ConcentrationMeasurement::DefaultDelegate mNitrogenDioxideDelegate;
-    ConcentrationMeasurement::DefaultDelegate mPm1Delegate;
-    ConcentrationMeasurement::DefaultDelegate mPm10Delegate;
-    ConcentrationMeasurement::DefaultDelegate mPm25Delegate;
-    ConcentrationMeasurement::DefaultDelegate mRadonDelegate;
-    ConcentrationMeasurement::DefaultDelegate mTotalVolatileOrganicCompoundsDelegate;
-    ConcentrationMeasurement::DefaultDelegate mOzoneDelegate;
-    ConcentrationMeasurement::DefaultDelegate mFormaldehydeDelegate;
-
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mCarbonDioxideConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mCarbonMonoxideConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mNitrogenDioxideConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mPm1ConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mPm10ConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mPm25ConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mRadonConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mTotalVolatileOrganicCompoundsConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mOzoneConcentrationMeasurementInstance;
-    ConcentrationMeasurement::ConcentrationMeasurementCluster mFormaldehydeConcentrationMeasurementInstance;
-
-    // Registrations declared after clusters — hold a pointer to the cluster
-    chip::app::ServerClusterRegistration mCarbonDioxideRegistration;
-    chip::app::ServerClusterRegistration mCarbonMonoxideRegistration;
-    chip::app::ServerClusterRegistration mNitrogenDioxideRegistration;
-    chip::app::ServerClusterRegistration mPm1Registration;
-    chip::app::ServerClusterRegistration mPm10Registration;
-    chip::app::ServerClusterRegistration mPm25Registration;
-    chip::app::ServerClusterRegistration mRadonRegistration;
-    chip::app::ServerClusterRegistration mTotalVolatileOrganicCompoundsRegistration;
-    chip::app::ServerClusterRegistration mOzoneRegistration;
-    chip::app::ServerClusterRegistration mFormaldehydeRegistration;
+    AirQuality::Instance airQualityInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> carbonDioxideConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> carbonMonoxideConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> nitrogenDioxideConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> pm1ConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> pm10ConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> pm25ConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> radonConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true>
+        totalVolatileOrganicCompoundsConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> ozoneConcentrationMeasurementInstance;
+    ConcentrationMeasurement::Instance<true, true, true, true, true, true> formaldehydeConcentrationMeasurementInstance;
 };
 
 } // namespace Clusters

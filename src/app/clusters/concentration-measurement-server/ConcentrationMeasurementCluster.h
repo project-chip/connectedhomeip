@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "ConcentrationMeasurementDelegate.h"
 #include "concentration-measurement-cluster-objects.h"
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
@@ -31,72 +30,44 @@ namespace Clusters {
 namespace ConcentrationMeasurement {
 
 /**
- * ConcentrationMeasurementCluster mplementation serves for ALL 10 aliased Concentration Measurement clusters:
- *   CarbonDioxideConcentrationMeasurement, CarbonMonoxideConcentrationMeasurement,
- *   NitrogenDioxideConcentrationMeasurement, OzoneConcentrationMeasurement,
- *   PM2_5ConcentrationMeasurement, PM1ConcentrationMeasurement,
- *   PM10ConcentrationMeasurement, RadonConcentrationMeasurement,
- *   TotalVolatileOrganicCompoundsConcentrationMeasurement,
- *   FormaldehydeConcentrationMeasurement
- *
- * They  share an identical attribute structure. Only difference is the
- * ClusterId, which is passed to the constructor.
- *
- * This cluster stores NO attribute data. Every Read request is forwarded
- * to the Delegate, which provides values on demand.
+ * Single implementation for all 10 aliased Concentration Measurement clusters.
+ * The cluster owns all attribute storage. Push readings via Set*().
  */
 class ConcentrationMeasurementCluster : public DefaultServerCluster
 {
 public:
     /**
-     * @param endpointId  Endpoint this cluster lives on. Must match ZAP configuration.
-     * @param clusterId   Which aliased cluster ID to use (e.g. CarbonDioxideConcentrationMeasurement::Id).
-     *                    Pass a different ID per pollutant — the attribute structure is identical.
-     * @param features    Bitmask of optional feature groups this instance supports.
-     *                    Example: BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement)
-     *                    This value is also returned as the FeatureMap attribute.
-     * @param delegate    Application-supplied delegate. Must outlive this cluster instance.
+     * @param endpointId   Endpoint this cluster lives on.
+     * @param clusterId    Aliased cluster ID (e.g. CarbonDioxideConcentrationMeasurement::Id).
+     * @param features     Feature flags enabled for this instance.
+     * @param medium       Measurement medium — fixed at construction.
+     * @param unit         Measurement unit — fixed at construction.
+     * @param minMeasured  Sensor minimum range — fixed at construction. Defaults to 0.
+     * @param maxMeasured  Sensor maximum range — fixed at construction. Defaults to null (unset).
+     * @param uncertainty  Sensor uncertainty — fixed at construction. Defaults to 0.
      */
-    ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId, BitFlags<Feature> features, Delegate & delegate);
+    ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId, BitFlags<Feature> features,
+                                    MeasurementMediumEnum medium, MeasurementUnitEnum unit,
+                                    DataModel::Nullable<float> minMeasured = DataModel::MakeNullable(0.0f),
+                                    DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>(),
+                                    float uncertainty                      = 0.0f);
 
     ~ConcentrationMeasurementCluster() override;
 
-    /**
-     * Called once by the framework when the cluster is registered (via ServerClusterRegistration).
-     * Calls DefaultServerCluster::Startup() +  delegate.Init().
-     */
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-
-    /**
-     * Fills 'builder' with the AttributeEntry IDs this instance exposes.
-     * Called by the DataModel layer to enumerate supported attributes.
-     *
-     * Always appended: MeasurementMedium, FeatureMap, ClusterRevision.
-     * Feature-conditional:
-     *   kNumericMeasurement → MeasuredValue, MinMeasuredValue, MaxMeasuredValue,
-     *                         Uncertainty, MeasurementUnit
-     *   kPeakMeasurement    → PeakMeasuredValue, PeakMeasuredValueWindow
-     *   kAverageMeasurement → AverageMeasuredValue, AverageMeasuredValueWindow
-     *   kLevelIndication    → LevelValue
-     */
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    /**
-     * Reads an attribute value and encodes it into 'encoder'.
-     * Returns UnsupportedAttribute for any attribute whose feature flag is not set.
-     * All values are forwarded to the corresponding Delegate getter — this cluster
-     * stores no data of its own.
-     */
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
-    /** Returns true if the given feature flag was set at construction. */
     bool HasFeature(Feature f) const { return mFeatures.Has(f); }
 
-    // ── Setters for measured (dynamic) attributes — write through to the delegate and notify subscribers.
-    // Fixed attributes (Min/MaxMeasuredValue, Uncertainty, MeasurementUnit, MeasurementMedium) are read
-    // directly from the delegate and have no cluster-level setters.
+    // Push a new sensor reading into the cluster. Validates range, stores, and
+    // notifies subscribers. Returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the
+    // relevant feature flag was not set at construction.
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> value);
+    CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> value);
+    CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<float> value);
+    CHIP_ERROR SetUncertainty(float value);
     CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> value);
     CHIP_ERROR SetPeakMeasuredValueWindow(uint32_t value);
     CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> value);
@@ -104,14 +75,25 @@ public:
     CHIP_ERROR SetLevelValue(LevelValueEnum value);
 
 private:
-    // Per-spec maximum window for PeakMeasuredValueWindow / AverageMeasuredValueWindow: 7 days
     static constexpr uint32_t kWindowMaxSeconds = 604800;
-
-    // Cluster revision per Matter spec
-    static constexpr uint16_t kClusterRevision = 3;
+    static constexpr uint16_t kClusterRevision  = 3;
 
     BitFlags<Feature> mFeatures;
-    Delegate & mDelegate;
+
+    // Fixed sensor characteristics — set at construction, never change.
+    MeasurementMediumEnum      mMedium;
+    MeasurementUnitEnum        mUnit;
+    DataModel::Nullable<float> mMinMeasuredValue;
+    DataModel::Nullable<float> mMaxMeasuredValue;
+    float                      mUncertainty;
+
+    // Dynamic attributes — updated via Set*().
+    DataModel::Nullable<float> mMeasuredValue;
+    DataModel::Nullable<float> mPeakMeasuredValue;
+    uint32_t                   mPeakMeasuredValueWindow    = 0;
+    DataModel::Nullable<float> mAverageMeasuredValue;
+    uint32_t                   mAverageMeasuredValueWindow = 0;
+    LevelValueEnum             mLevelValue                 = LevelValueEnum::kUnknown;
 };
 
 } // namespace ConcentrationMeasurement
