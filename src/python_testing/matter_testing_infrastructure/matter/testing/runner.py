@@ -482,7 +482,18 @@ def run_tests_no_exit(
                 )
                 if commissionee is not None:
                     stored_global_wildcard = event_loop.run_until_complete(
-                        asyncio.wait_for(default_controller.Read(node_id, [...]), timeout=60)
+                        asyncio.wait_for(
+                            default_controller.Read(
+                                node_id,
+                                [
+                                    (Clusters.Descriptor),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                                ],
+                            ),
+                            timeout=60,
+                        )
                     )
                     test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                 else:
@@ -498,7 +509,18 @@ def run_tests_no_exit(
                     )
                     if commissionee is not None:
                         stored_global_wildcard = event_loop.run_until_complete(
-                            asyncio.wait_for(default_controller.Read(node_id, [...]), timeout=60)
+                            asyncio.wait_for(
+                                default_controller.Read(
+                                    node_id,
+                                    [
+                                        (Clusters.Descriptor),
+                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                                    ],
+                                ),
+                                timeout=60,
+                            )
                         )
                         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                 except Exception:
@@ -508,7 +530,18 @@ def run_tests_no_exit(
                 # Path 3: CASE (already commissioned, no setup code)
                 try:
                     stored_global_wildcard = event_loop.run_until_complete(
-                        asyncio.wait_for(default_controller.Read(node_id, [...]), timeout=60)
+                        asyncio.wait_for(
+                            default_controller.Read(
+                                node_id,
+                                [
+                                    (Clusters.Descriptor),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                                    Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                                ],
+                            ),
+                            timeout=60,
+                        )
                     )
                     test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                 except Exception:
