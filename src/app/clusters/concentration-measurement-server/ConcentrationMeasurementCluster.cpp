@@ -75,33 +75,43 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(con
         return encoder.Encode(kClusterRevision);
 
     case MeasuredValue::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mMeasuredValue);
 
     case MinMeasuredValue::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mMinMeasuredValue);
 
     case MaxMeasuredValue::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mMaxMeasuredValue);
 
     case Uncertainty::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mUncertainty);
 
     case MeasurementUnit::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mUnit);
 
     case PeakMeasuredValue::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mPeakMeasuredValue);
 
     case PeakMeasuredValueWindow::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mPeakMeasuredValueWindow);
 
     case AverageMeasuredValue::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mAverageMeasuredValue);
 
     case AverageMeasuredValueWindow::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), Status::UnsupportedAttribute);
         return encoder.Encode(mAverageMeasuredValueWindow);
 
     case LevelValue::Id:
+        VerifyOrReturnError(mFeatures.Has(Feature::kLevelIndication), Status::UnsupportedAttribute);
         return encoder.Encode(mLevelValue);
 
     default:
@@ -112,8 +122,16 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(con
 CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath & path,
                                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // 1 mandatory + 5 numeric + 2 peak + 2 average + 1 level + 10 globals
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(21));
+    uint8_t count = 11; // 10 globals + MeasurementMedium
+    if (mFeatures.Has(Feature::kNumericMeasurement))
+        count += 5;
+    if (mFeatures.Has(Feature::kPeakMeasurement))
+        count += 2;
+    if (mFeatures.Has(Feature::kAverageMeasurement))
+        count += 2;
+    if (mFeatures.Has(Feature::kLevelIndication))
+        count += 1;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(count));
 
     ReturnErrorOnFailure(DefaultServerCluster::Attributes(path, builder));
 
