@@ -117,12 +117,6 @@ void FanDevice::Unregister(CodeDrivenDataModelProvider & provider)
     }
 }
 
-Clusters::OnOffCluster & FanDevice::OnOffCluster()
-{
-    VerifyOrDie(mOnOffCluster.IsConstructed());
-    return mOnOffCluster.Cluster();
-}
-
 Clusters::FanControlCluster & FanDevice::FanControlCluster()
 {
     VerifyOrDie(mFanControlCluster.IsConstructed());
