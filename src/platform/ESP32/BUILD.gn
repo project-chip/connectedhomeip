@@ -34,6 +34,11 @@ declare_args() {
   chip_use_esp32_ecdsa_peripheral = false
   chip_enable_route_hook = false
   chip_memory_alloc_mode = "default"
+
+  # Enable multi-image OTA. When true the MultiImageOTAProcessor and
+  # AppImageProcessor replace the standard single-image OTAImageProcessorImpl.
+  # Requires chip_enable_ota_requestor = true.
+  chip_enable_multi_ota_requestor = false
 }
 
 defines = [
@@ -93,10 +98,21 @@ static_library("ESP32") {
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-    ]
+    if (chip_enable_multi_ota_requestor) {
+      sources += [
+        "multi-ota/AppImageProcessor.cpp",
+        "multi-ota/AppImageProcessor.h",
+        "multi-ota/MultiImageHeader.h",
+        "multi-ota/MultiImageOTAProcessorImpl.cpp",
+        "multi-ota/MultiImageOTAProcessorImpl.h",
+        "multi-ota/SubImageProcessor.h",
+      ]
+    } else {
+      sources += [
+        "OTAImageProcessorImpl.cpp",
+        "OTAImageProcessorImpl.h",
+      ]
+    }
     deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
