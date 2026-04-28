@@ -167,12 +167,12 @@ std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::Invoke
     case Commands::SetCookingParameters::Id: {
         Commands::SetCookingParameters::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetCookingParameters(handler, request.path, data);
+        return HandleSetCookingParameters(request.path, data);
     }
     case Commands::AddMoreTime::Id: {
         Commands::AddMoreTime::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleAddMoreTime(handler, request.path, data);
+        return HandleAddMoreTime(data);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
@@ -193,7 +193,7 @@ CHIP_ERROR MicrowaveOvenControlCluster::AcceptedCommands(const ConcreteClusterPa
 }
 
 std::optional<DataModel::ActionReturnStatus>
-MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+MicrowaveOvenControlCluster::HandleSetCookingParameters(const ConcreteCommandPath & commandPath,
                                                         const Commands::SetCookingParameters::DecodableType & commandData)
 {
     Status status            = Status::Success;
@@ -228,10 +228,6 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
     uint32_t reqCookTimeSec = cookTimeSec.ValueOr(kDefaultCookTimeSec);
     VerifyOrReturnError(IsCookTimeSecondsInRange(reqCookTimeSec, mAppDelegate.GetMaxCookTimeSec()), Status::ConstraintError,
                         ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
-
-    VerifyOrReturnError(
-        cookMode.HasValue() || cookTimeSec.HasValue() || powerSetting.HasValue(), Status::InvalidCommand,
-        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing"));
 
     if (mFeature.Has(Feature::kPowerAsNumber))
     {
@@ -317,8 +313,7 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(CommandHandler * command
 }
 
 std::optional<DataModel::ActionReturnStatus>
-MicrowaveOvenControlCluster::HandleAddMoreTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                               const Commands::AddMoreTime::DecodableType & commandData)
+MicrowaveOvenControlCluster::HandleAddMoreTime(const Commands::AddMoreTime::DecodableType & commandData)
 {
     uint8_t opState = mIntegrationDelegate.GetCurrentOperationalState();
     VerifyOrReturnError(opState != to_underlying(OperationalState::OperationalStateEnum::kError), Status::InvalidInState);

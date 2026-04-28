@@ -80,7 +80,7 @@ private:
      * If the operational state is not in 'Stopped', returns the Interaction Model status code of INVALID_IN_STATE.
      */
     std::optional<DataModel::ActionReturnStatus>
-    HandleSetCookingParameters(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    HandleSetCookingParameters(const ConcreteCommandPath & commandPath,
                                const MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData);
 
     /**
@@ -90,8 +90,7 @@ private:
      * If the operational state is in 'Error', returns the Interaction Model status code of INVALID_IN_STATE.
      */
     std::optional<DataModel::ActionReturnStatus>
-    HandleAddMoreTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                      const MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
+    HandleAddMoreTime(const MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
 };
 
 } // namespace chip::app::Clusters

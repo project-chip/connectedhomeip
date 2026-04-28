@@ -111,8 +111,7 @@ public:
 
 private:
     Delegate * mDelegate{};
-    EndpointId mEndpointId{};
-    ClusterId mClusterId{};
+    ConcreteClusterPath mClusterPath{};
     BitMask<MicrowaveOvenControl::Feature> mFeature{};
     CodegenIntegrationDelegate mIntegrationDelegate;
     MicrowaveOvenControlCluster::OptionalAttributeSet mOptionalAttributeSet{};

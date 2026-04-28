@@ -32,8 +32,7 @@ using namespace Commands;
 
 CodegenIntegrationDelegate::CodegenIntegrationDelegate(Clusters::OperationalState::Instance & aOpStateInstance,
                                                        Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mOpStateInstance(aOpStateInstance),
-    mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
+    mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {}
 
 uint8_t CodegenIntegrationDelegate::GetCurrentOperationalState() const
@@ -57,7 +56,9 @@ bool CodegenIntegrationDelegate::IsSupportedOperationalStateCommand(EndpointId e
 
     CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
 
-    TEMPORARY_RETURN_IGNORED model.AcceptedCommands(ConcreteClusterPath(endpointId, OperationalState::Id), acceptedCommandsList);
+    VerifyOrReturnValue(model.AcceptedCommands(ConcreteClusterPath(endpointId, OperationalState::Id), acceptedCommandsList) ==
+                            CHIP_NO_ERROR,
+                        false);
     auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 
     return std::find_if(acceptedCommands.begin(), acceptedCommands.end(),
@@ -67,10 +68,11 @@ bool CodegenIntegrationDelegate::IsSupportedOperationalStateCommand(EndpointId e
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<Feature> aFeature,
                    OperationalState::Instance & aOpStateInstance, ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature),
+    mDelegate(aDelegate), mClusterPath(aEndpointId, aClusterId), mFeature(aFeature),
     mIntegrationDelegate(aOpStateInstance, aMicrowaveOvenModeInstance)
-{}
+{
+    VerifyOrDie(aClusterId == MicrowaveOvenControl::Id);
+}
 
 Instance::~Instance()
 {
@@ -85,9 +87,9 @@ Instance::~Instance()
 CHIP_ERROR Instance::Init()
 {
     // Check if the cluster has been selected in zap
-    VerifyOrReturnError(
-        emberAfContainsServer(mEndpointId, mClusterId), CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId)));
+    VerifyOrReturnError(emberAfContainsServer(mClusterPath.mEndpointId, mClusterPath.mClusterId), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.",
+                                     long(mClusterPath.mClusterId)));
 
     // Exactly one of the PowerAsNumber and PowerInWatts features must be supported, per spec.
     VerifyOrReturnError(
@@ -104,12 +106,12 @@ CHIP_ERROR Instance::Init()
         !mFeature.Has(Feature::kPowerNumberLimits) || mFeature.Has(Feature::kPowerAsNumber), CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(Zcl, "Microwave Oven Control: feature bits error, PowerNumberLimits feature requires PowerAsNumber"));
 
-    if (emberAfContainsAttribute(mEndpointId, mClusterId, WattRating::Id))
+    if (emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, WattRating::Id))
     {
         mOptionalAttributeSet.Set<WattRating::Id>();
     }
 
-    const EmberAfCluster * cluster = emberAfFindServerCluster(mEndpointId, mClusterId);
+    const EmberAfCluster * cluster = emberAfFindServerCluster(mClusterPath.mEndpointId, mClusterPath.mClusterId);
     VerifyOrReturnValue(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
     bool supportsAddMoreTime = false;
@@ -132,7 +134,7 @@ CHIP_ERROR Instance::Init()
                                                 .supportsAddMoreTime  = supportsAddMoreTime,
                                                 .integrationDelegate  = mIntegrationDelegate,
                                                 .appDelegate          = *mDelegate };
-    mCluster.Create(mEndpointId, config);
+    mCluster.Create(mClusterPath.mEndpointId, config);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 
