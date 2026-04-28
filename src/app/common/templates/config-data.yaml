@@ -32,7 +32,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Energy EVSE Mode
     - Joint Fabric Administrator
     - Laundry Washer Mode
-    - Microwave Oven Control
     - Network Commissioning
     - Network Identity Management
     - Operational State
@@ -141,6 +140,7 @@ CodeDrivenClusters:
     - Identify
     - Illuminance Measurement
     - Localization Configuration
+    - Microwave Oven Control
     - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor

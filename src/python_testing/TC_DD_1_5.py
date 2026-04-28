@@ -92,7 +92,8 @@ class TC_DD_1_5(MatterBaseTest):
         self.step("2b")
         monitoring_task = asyncio.create_task(reader.activate_tag_monitoring())
         user_input_task = asyncio.create_task(self.wait_for_user_input_async(
-            "Press enter when steps 2a and 2b are done", ""
+            "Unpack the DUT from its packaging, activate the NFC tag (if required by the DUT),"
+            " and bring the TH NFC reader close to the DUT's NFC tag. Press Enter when you are done.", ""
         ))
         await user_input_task
 

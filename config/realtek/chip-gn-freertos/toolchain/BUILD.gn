@@ -18,20 +18,20 @@ import("//build_overrides/chip.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
 declare_args() {
-  bee_ar = ""
-  bee_cc = ""
-  bee_cxx = ""
-  bee_cpu = ""
+  rtk_ar = ""
+  rtk_cc = ""
+  rtk_cxx = ""
+  rtk_cpu = ""
 }
 
-gcc_toolchain("bee") {
-  ar = bee_ar
-  cc = bee_cc
-  cxx = bee_cxx
+gcc_toolchain("rtkFreeRTOS") {
+  ar = rtk_ar
+  cc = rtk_cc
+  cxx = rtk_cxx
 
   toolchain_args = {
     current_os = "freertos"
-    current_cpu = bee_cpu
+    current_cpu = rtk_cpu
     is_clang = false
     import("${chip_root}/src/platform/realtek/freertos/args.gni")
   }
