@@ -864,8 +864,8 @@ void PairingCommand::OnProxyDeviceConnected(void * context,
     request.address.SetNull();
     request.transport.Set(CapabilitiesBitmap::kWiFiPAF);
     request.discriminator = self->mDiscriminator.value_or(0);
-    request.vendorId      = chip::VendorId::Common;
-    request.productId     = 0;
+    request.vendorID      = chip::VendorId::Common;
+    request.productID     = 0;
     request.timeout       = self->mProxyConnectTimeout;
 
     chip::app::CommandPathParams pathParams(
