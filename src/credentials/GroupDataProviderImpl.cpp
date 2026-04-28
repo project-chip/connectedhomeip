@@ -1652,8 +1652,8 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
                                             const KeySet & in_keyset)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(in_keyset.num_keys_used <= KeySet::kEpochKeysMax, CHIP_ERROR_INVALID_ARGUMENT);
-
+    VerifyOrReturnError(in_keyset.num_keys_used >= 1 && in_keyset.num_keys_used <= KeySet::kEpochKeysMax,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     FabricData fabric(fabric_index);
     KeySetData keyset;
 
