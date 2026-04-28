@@ -861,8 +861,11 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _populate_wildcard(self) -> None:
         """ Populates self.stored_global_wildcard if not already filled. """
         if self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [
+                (Clusters.Descriptor,),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
 
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
@@ -1023,7 +1026,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
+            self, cluster: type[ClusterObjects.Cluster], attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "",
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
@@ -1659,15 +1662,3 @@ def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescrip
 def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
     """Returns the cluster object for a given command object."""
     return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
-
-
-async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
-    """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [
-        (Clusters.Descriptor,),  # single-element tuple needs trailing comma
-        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
-    ])
-    return [e for e in wildcard.attributes
-            if accept_function(wildcard, e)]

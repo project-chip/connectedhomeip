@@ -277,7 +277,7 @@ def generate_mobly_test_config(matter_test_config: "MatterTestConfig") -> TestRu
     # freestanding without relying
     test_run_config.testbed_name = "MatterTest"
 
-    log_path = matter_test_config.logs_path
+    log_path: Path | str = matter_test_config.logs_path
     log_path = TestingDefaults.LOG_PATH if log_path is None else log_path
     if ENV_MOBLY_LOGPATH in os.environ:
         log_path = os.environ[ENV_MOBLY_LOGPATH]
