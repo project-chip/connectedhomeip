@@ -704,6 +704,11 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
     for bitmasks, nullable sentinels (e.g., `0xFFFE`, `0xFF`), and range
     boundaries that are naturally expressed in hex (e.g., `0x3FFF`, `0x7FFF`).
     Do not mechanically convert hex to decimal just to avoid hex.
+17. **Redundant validity checks in `ReadAttribute` / `WriteAttribute` /
+    `InvokeCommand`** — Do not add checks to verify that the incoming path is
+    valid before dispatching. The API contract guarantees that these methods are
+    only called for paths that appear in `Attributes()` / `AcceptedCommands()`;
+    adding redundant guards wastes flash.
 
 ---
 
