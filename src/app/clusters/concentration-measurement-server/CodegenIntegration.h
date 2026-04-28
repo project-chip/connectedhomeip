@@ -99,8 +99,8 @@ public:
     ServerClusterRegistration & Registration() { return mRegistration; }
 
     // Set*() methods are needed to push sensor readings by the device-app hooks.
-    // remote Matter clients can't use these setters and write attributes. 
-    // The access boundary is enforced by not implementing WriteAttribute()   
+    // remote Matter clients can't use these setters and write attributes.
+    // The access boundary is enforced by not implementing WriteAttribute()
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v)
     {
         return mCluster.SetMeasuredValue(v);
