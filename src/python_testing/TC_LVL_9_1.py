@@ -36,6 +36,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
 
@@ -195,6 +196,8 @@ class TC_LVL_9_1(MatterBaseTest):
 
         self.step("5a")
         await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
+        # delay between recall scene and attribute read
+        await asyncio.sleep(1)
 
         self.step("5b")
         current_level = await self.read_single_attribute_check_success(cluster, attributes.CurrentLevel)
@@ -202,7 +205,8 @@ class TC_LVL_9_1(MatterBaseTest):
 
         self.step("6a")
         await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x01))
-
+        # delay between recall scene and attribute read
+        await asyncio.sleep(1)
         self.step("6b")
         current_level = await self.read_single_attribute_check_success(cluster, attributes.CurrentLevel)
         asserts.assert_equal(current_level, min_level, "CurrentLevel should equal MinLevel after RecallScene 0x01")

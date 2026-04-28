@@ -408,7 +408,8 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("6b")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
-
+            # delay between recall scene and attribute read
+            await asyncio.sleep(1)
         self.step("6c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             CurrentSaturation = await self.read_single_attribute_check_success(cluster, attributes.CurrentSaturation)
@@ -445,7 +446,8 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("7b")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x03))
-
+            # delay between recall scene and attribute read
+            await asyncio.sleep(1)
         self.step("7c")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.CurrentX), (self.matter_test_config.endpoint, attributes.CurrentY)])
@@ -485,7 +487,8 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("8b")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x04))
-
+            # delay between recall scene and attribute read
+            await asyncio.sleep(1)
         self.step("8c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             ColorTemperatureMireds = await self.read_single_attribute_check_success(cluster, attributes.ColorTemperatureMireds)
@@ -523,7 +526,8 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("9b")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x05))
-
+            # delay between recall scene and attribute read
+            await asyncio.sleep(1)
         self.step("9c")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.EnhancedCurrentHue), (self.matter_test_config.endpoint, attributes.CurrentSaturation)])
@@ -564,7 +568,8 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("10b")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x06))
-
+            # delay between recall scene and attribute read
+            await asyncio.sleep(1)
         self.step("10c")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             ColorLoopActive = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopActive)
