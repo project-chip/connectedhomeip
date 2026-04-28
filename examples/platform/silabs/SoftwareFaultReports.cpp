@@ -186,14 +186,16 @@ extern "C" __attribute__((used, naked)) void LogFault_Handler(void)
                      : [dbg] "h"(reinterpret_cast<void (*)(uint32_t *)>(debugHardfault))
                      : "r0", "memory", "cc");
 }
-alignas(4) static const uint32_t kFaultMagicHard __attribute__((used)) = 0x48415244; // 'HARD'
-alignas(4) static const uint32_t kFaultMagicMpu __attribute__((used)) = 0x4D505546; // 'MPUF'
-alignas(4) static const uint32_t kFaultMagicBus __attribute__((used)) = 0x42555346; // 'BUSF'
+alignas(4) static const uint32_t kFaultMagicHard __attribute__((used))  = 0x48415244; // 'HARD'
+alignas(4) static const uint32_t kFaultMagicMpu __attribute__((used))   = 0x4D505546; // 'MPUF'
+alignas(4) static const uint32_t kFaultMagicBus __attribute__((used))   = 0x42555346; // 'BUSF'
 alignas(4) static const uint32_t kFaultMagicUsage __attribute__((used)) = 0x55534654; // 'USFT'
 #if (__CORTEX_M >= 23U)
 alignas(4) static const uint32_t kFaultMagicSecure __attribute__((used)) = 0x53434654; // 'SCFT'
 #endif
 alignas(4) static const uint32_t kFaultMagicDbg __attribute__((used)) = 0x44424D4E; // 'DBMN'
+alignas(4) static const uint32_t kFaultMagicWdog __attribute__((used)) = 0x57444F47; // 'WDOG'
+
 #ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 extern "C" __attribute__((used, naked)) void HardFault_Handler(void)
 {
