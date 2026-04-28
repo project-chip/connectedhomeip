@@ -222,8 +222,6 @@ OnOffEffect gEffect = {
 
 } // namespace
 
-
-
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -650,8 +648,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
-            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_XY, attributeId,
-                                                                  value);
+            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_XY, attributeId, value);
             break;
 
         case ColorControl::Attributes::CurrentHue::Id:
@@ -661,8 +658,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
-            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV,
-                                                                  attributeId, value);
+            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_HSV, attributeId, value);
             break;
 
         case ColorControl::Attributes::ColorTemperatureMireds::Id:
@@ -671,8 +667,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
                 ChipLogError(Zcl, "Wrong length for ColorControl value: %" PRIu16, size);
                 return;
             }
-            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_CT, attributeId,
-                                                                  value);
+            appInstance().InitiateLightCtrlAction(AppEvent::kEventType_Light, AppTask::COLOR_ACTION_CT, attributeId, value);
             break;
 
         default:
