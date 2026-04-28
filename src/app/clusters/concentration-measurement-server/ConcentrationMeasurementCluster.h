@@ -74,12 +74,10 @@ public:
     CHIP_ERROR SetLevelValue(LevelValueEnum value);
 
 private:
-
-
     static constexpr uint32_t kWindowMaxSeconds = 604800;
     static constexpr uint16_t kClusterRevision  = 3;
 
-     BitFlags<Feature> mFeatures;
+    BitFlags<Feature> mFeatures;
 
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;

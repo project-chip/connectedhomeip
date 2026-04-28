@@ -73,7 +73,6 @@ public:
         mRegistration(mCluster)
     {}
 
-
     ~Instance()
     {
         if (mRegistered)
@@ -101,10 +100,7 @@ public:
     // Set*() methods are needed to push sensor readings by the device-app hooks.
     // remote Matter clients can't use these setters and write attributes.
     // The access boundary is enforced by not implementing WriteAttribute()
-    CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v)
-    {
-        return mCluster.SetMeasuredValue(v);
-    }
+    CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v) { return mCluster.SetMeasuredValue(v); }
 
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> v)
@@ -177,7 +173,6 @@ private:
     ConcentrationMeasurementCluster mCluster;
     ServerClusterRegistration mRegistration;
 };
-
 
 template <bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
 Instance<true, false, false, false, PeakMeasurementEnabled, AverageMeasurementEnabled>
