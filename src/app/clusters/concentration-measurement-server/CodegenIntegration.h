@@ -68,8 +68,7 @@ public:
     // Constructor for clusters with kNumericMeasurement.
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium,
              MeasurementUnitEnum aMeasurementUnit) :
-        mCluster(aEndpointId, aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit),
-        mRegistration(mCluster)
+        mCluster(aEndpointId, aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit), mRegistration(mCluster)
     {}
 
     /**
@@ -106,7 +105,6 @@ public:
         return mCluster.SetUncertainty(v);
     }
 
-    // ── Peak measurement ──────────────────────────────────────────────────
     template <bool En = PeakMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> v)
     {
@@ -119,7 +117,6 @@ public:
         return mCluster.SetPeakMeasuredValueWindow(v);
     }
 
-    // ── Average measurement ───────────────────────────────────────────────
     template <bool En = AverageMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> v)
     {
@@ -132,7 +129,6 @@ public:
         return mCluster.SetAverageMeasuredValueWindow(v);
     }
 
-    // ── Level indication ──────────────────────────────────────────────────
     template <bool En = LevelIndicationEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetLevelValue(LevelValueEnum v)
     {
@@ -162,6 +158,68 @@ private:
     ServerClusterRegistration mRegistration;
 };
 
+/**
+ * A factory function to create a new instance of a Concentration Measurement Cluster with only the NumericMeasurement feature
+ * enabled.
+ *
+ * @tparam PeakMeasurementEnabled Whether the PeakMeasurement feature is enabled.
+ * @tparam AverageMeasurementEnabled Whether the AverageMeasurement feature is enabled.
+ * @param endpoint Endpoint that the cluster is on.
+ * @param clusterId Cluster that the cluster is on.
+ * @param aMeasurementMedium The measurement medium.
+ * @param aMeasurementUnit The measurement unit.
+ * @return A new instance of Concentration Measurement Cluster.
+ */
+template <bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
+Instance<true, false, false, false, PeakMeasurementEnabled, AverageMeasurementEnabled>
+CreateNumericMeasurementConcentrationCluster(EndpointId endpoint, ClusterId clusterId, MeasurementMediumEnum aMeasurementMedium,
+                                             MeasurementUnitEnum aMeasurementUnit)
+{
+    return Instance<true, false, false, false, PeakMeasurementEnabled, AverageMeasurementEnabled>(
+        endpoint, clusterId, aMeasurementMedium, aMeasurementUnit);
+}
+
+/**
+ * A factory function to create a new instance of a Concentration Measurement Cluster with only the Level Indication feature
+ * enabled.
+ *
+ * @tparam MediumLevelEnabled Whether the MediumLevel feature is enabled.
+ * @tparam CriticalLevelEnabled Whether the CriticalLevel feature is enabled.
+ * @param endpoint Endpoint that the cluster is on.
+ * @param clusterId Cluster that the cluster is on.
+ * @param aMeasurementMedium The measurement medium.
+ * @return A new instance of Concentration Measurement Cluster.
+ */
+template <bool MediumLevelEnabled, bool CriticalLevelEnabled>
+Instance<false, true, MediumLevelEnabled, CriticalLevelEnabled, false, false>
+CreateLevelIndicationConcentrationCluster(EndpointId endpoint, ClusterId clusterId, MeasurementMediumEnum aMeasurementMedium)
+{
+    return Instance<false, true, MediumLevelEnabled, CriticalLevelEnabled, false, false>(endpoint, clusterId, aMeasurementMedium);
+}
+
+/**
+ * A factory function to create a new instance of a Concentration Measurement Cluster with both the NumericMeasurement and Level
+ * Indication features enabled.
+ *
+ * @tparam MediumLevelEnabled Whether the MediumLevel feature is enabled.
+ * @tparam CriticalLevelEnabled Whether the CriticalLevel feature is enabled.
+ * @tparam PeakMeasurementEnabled Whether the PeakMeasurement feature is enabled.
+ * @tparam AverageMeasurementEnabled Whether the AverageMeasurement feature is enabled.
+ * @param endpoint Endpoint that the cluster is on.
+ * @param clusterId Cluster that the cluster is on.
+ * @param aMeasurementMedium The measurement medium.
+ * @param aMeasurementUnit The measurement unit.
+ * @return A new instance of Concentration Measurement Cluster.
+ */
+template <bool MediumLevelEnabled, bool CriticalLevelEnabled, bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
+Instance<true, true, MediumLevelEnabled, CriticalLevelEnabled, PeakMeasurementEnabled, AverageMeasurementEnabled>
+CreateNumericMeasurementAndLevelIndicationConcentrationCluster(EndpointId endpoint, ClusterId clusterId,
+                                                               MeasurementMediumEnum aMeasurementMedium,
+                                                               MeasurementUnitEnum aMeasurementUnit)
+{
+    return Instance<true, true, MediumLevelEnabled, CriticalLevelEnabled, PeakMeasurementEnabled, AverageMeasurementEnabled>(
+        endpoint, clusterId, aMeasurementMedium, aMeasurementUnit);
+}
 } // namespace ConcentrationMeasurement
 } // namespace Clusters
 } // namespace app
