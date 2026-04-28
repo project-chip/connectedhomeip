@@ -18,27 +18,33 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/clusters/microwave-oven-control-server/Delegate.h>
+#include <app/clusters/microwave-oven-control-server/IntegrationDelegate.h>
+#include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace MicrowaveOvenControl {
+namespace chip::app::Clusters::MicrowaveOvenControl {
 
-constexpr uint32_t kDefaultCookTimeSec = 30u;
-constexpr uint32_t kMinCookTimeSec     = 1u;
-constexpr uint8_t kDefaultMinPowerNum  = 10u;
-constexpr uint8_t kDefaultMaxPowerNum  = 100u;
-constexpr uint8_t kDefaultPowerStepNum = 10u;
+class CodegenIntegrationDelegate : public IntegrationDelegate
+{
+public:
+    CodegenIntegrationDelegate(Clusters::OperationalState::Instance & aOpStateInstance,
+                               Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance);
+    virtual ~CodegenIntegrationDelegate() = default;
 
-class Delegate;
+    virtual uint8_t GetCurrentOperationalState() const override;
+    virtual CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const override;
+    virtual bool IsSupportedMode(uint8_t mode) const override;
+    virtual bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const override;
 
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface
+private:
+    Clusters::OperationalState::Instance & mOpStateInstance;
+    Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+};
+
+class Instance
 {
 public:
     /**
@@ -51,81 +57,67 @@ public:
      * @param aFeature The bitmask value that identifies which features are supported by this instance.
      * @param aOpStateInstance The reference of Operational State Instance.
      * @param aMicrowaveOvenModeInstance The reference of Microwave Oven Mode Instance.
-     * Note: a MicrowaveOvenControl instance must relies on an Operational State instance and a Microwave Oven Mode instance.
-     * Caller must ensure those 2 instances are live and initialized before initializing MicorwaveOvenControl instance.
+     * Note: a MicrowaveOvenControl instance must rely on an Operational State instance and a Microwave Oven Mode instance.
+     * Caller must ensure those 2 instances are live and initialized before initializing Microwave Oven Control instance.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<MicrowaveOvenControl::Feature> aFeature,
              Clusters::OperationalState::Instance & aOpStateInstance, Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance);
 
-    ~Instance() override;
+    /**
+     * @brief Destroys a Microwave Oven Control cluster instance. The Deinit() function needs to be called for this instance
+     * to be unregistered and stopped from being called by the interaction model.
+     */
+    ~Instance();
 
     /**
      * @brief Initialise the Microwave Oven Control server instance.
      * This function must be called after defining an Instance class object.
      * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
-     * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
+     * registration fails, else returns CHIP_NO_ERROR.
      * This method also checks if the feature setting is valid, if invalid it will returns CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR Init();
 
-    bool HasFeature(MicrowaveOvenControl::Feature feature) const;
+    /**
+     * @brief Uninitialise the Microwave Oven Control server instance.
+     * @return Returns an error if the CommandHandler unregistration fails, else returns CHIP_NO_ERROR.
+     */
+    CHIP_ERROR Deinit();
 
+    /**
+     * @brief Get the count of supported watt levels.
+     * @return The count of supported watt levels.
+     */
     uint8_t GetCountOfSupportedWattLevels() const;
 
+    /**
+     * @brief Get the cook time in seconds.
+     * @return The cook time in seconds.
+     */
     uint32_t GetCookTimeSec() const;
 
+    /**
+     * @brief Set the cook time in seconds.
+     * @param cookTimeSec The cook time in seconds.
+     */
     void SetCookTimeSec(uint32_t cookTimeSec);
 
+    /**
+     * @brief Check if the feature is supported by this instance.
+     * @param feature The feature to check.
+     * @return True if the feature is supported, false otherwise.
+     */
+    bool HasFeature(MicrowaveOvenControl::Feature feature) const { return mFeature.Has(feature); }
+
 private:
-    Delegate * mDelegate;
-    EndpointId mEndpointId;
-    ClusterId mClusterId;
-    BitMask<MicrowaveOvenControl::Feature> mFeature;
-    Clusters::OperationalState::Instance & mOpStateInstance;
-    Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
+    Delegate * mDelegate{};
+    ConcreteClusterPath mClusterPath{};
+    BitMask<MicrowaveOvenControl::Feature> mFeature{};
+    CodegenIntegrationDelegate mIntegrationDelegate;
+    MicrowaveOvenControlCluster::OptionalAttributeSet mOptionalAttributeSet{};
 
-    uint32_t mCookTimeSec        = kDefaultCookTimeSec;
-    uint8_t mSupportedWattLevels = 0;
-
-    /**
-     * IM-level implementation of read
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * @brief Inherited from CommandHandlerInterface
-     */
-    void InvokeCommand(HandlerContext & ctx) override;
-
-    /**
-     * @brief Handle Command: SetCookingParameters.
-     * @param ctx Returns the Interaction Model status code which was user determined in the business logic.
-     * If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
-     * If the operational state is not in 'Stopped', returns the Interaction Model status code of INVALID_IN_STATE.
-     */
-    void HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req);
-
-    /**
-     * @brief Handle Command: AddMoreTime.
-     * @param ctx Returns the Interaction Model status code which was user determined in the business logic.
-     * If the cook time value is out of range, returns the Interaction Model status code of CONSTRAINT_ERROR.
-     * If the operational state is in 'Error', returns the Interaction Model status code of INVALID_IN_STATE.
-     */
-    void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
+    // The Code Driven MicrowaveOvenControl instance (lazy-initialized)
+    chip::app::LazyRegisteredServerCluster<MicrowaveOvenControlCluster> mCluster;
 };
 
-/**
- *  @brief Check if the given cook time is in range.
- */
-bool IsCookTimeSecondsInRange(uint32_t cookTimeSec, uint32_t maxCookTimeSec);
-
-/**
- *  @brief Check if the given cooking power is in range.
- */
-bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNum, uint8_t maxCookPowerNum);
-
-} // namespace MicrowaveOvenControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::MicrowaveOvenControl
