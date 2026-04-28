@@ -401,25 +401,34 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
     }
 }
 
+bool FanControlCluster::IsFanModeSupportedBySequence(FanModeEnum value) const
+{
+    if (value == FanModeEnum::kLow &&
+        (mFanModeSequence == FanModeSequenceEnum::kOffHighAuto || mFanModeSequence == FanModeSequenceEnum::kOffHigh))
+    {
+        return false;
+    }
+    if (value == FanModeEnum::kMedium &&
+        !(mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
+    {
+        return false;
+    }
+    if (value == FanModeEnum::kAuto && !SupportsAuto())
+    {
+        return false;
+    }
+    return true;
+}
+
 DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value, bool syncOnOffDelegate)
 {
     if (EnsureKnownEnumValue(value) == FanModeEnum::kUnknownEnumValue)
     {
         return Status::ConstraintError;
     }
-    if (value == FanModeEnum::kLow &&
-        (mFanModeSequence == FanModeSequenceEnum::kOffHighAuto || mFanModeSequence == FanModeSequenceEnum::kOffHigh))
+    if (!IsFanModeSupportedBySequence(value))
     {
-        return Status::InvalidInState;
-    }
-    if (value == FanModeEnum::kMedium &&
-        !(mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
-    {
-        return Status::InvalidInState;
-    }
-    if (value == FanModeEnum::kAuto && !SupportsAuto())
-    {
-        return Status::InvalidInState;
+        return Status::ConstraintError;
     }
 
     FanModeEnum newMode = value;
@@ -430,9 +439,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value, b
     }
     else if (value == FanModeEnum::kSmart)
     {
-        if (SupportsAuto() &&
-            (mFanModeSequence == FanModeSequenceEnum::kOffLowHighAuto ||
-             mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
+        if (SupportsAuto())
         {
             newMode = FanModeEnum::kAuto;
         }
@@ -482,9 +489,10 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value, b
 
 DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
 {
+    // Spec: if the client writes null, the attribute value SHALL NOT change (successful no-op).
     if (value.IsNull())
     {
-        return Status::InvalidInState;
+        return Status::Success;
     }
 
     if (value.Value() > 100)
@@ -509,9 +517,10 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
 
 DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
 {
+    // Spec: if the client writes null, the attribute value SHALL NOT change (successful no-op).
     if (value.IsNull())
     {
-        return Status::InvalidInState;
+        return Status::Success;
     }
 
     if (value.Value() > mSpeedMax)

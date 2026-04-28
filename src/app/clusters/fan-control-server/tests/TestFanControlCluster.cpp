@@ -359,6 +359,61 @@ TEST_F(TestFanControlCluster, WritePercentSetting)
     EXPECT_EQ(readBack.Value(), 50);
 }
 
+TEST_F(TestFanControlCluster, WritePercentSettingNull_SucceedsWithoutChangingValue)
+{
+    ClusterTester tester(cluster);
+
+    DataModel::Nullable<chip::Percent> percentSetting;
+    percentSetting.SetNonNull(50);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
+
+    DataModel::Nullable<chip::Percent> nullWrite(DataModel::NullNullable);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, nullWrite), CHIP_NO_ERROR);
+
+    DataModel::Nullable<chip::Percent> readBack;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::PercentSetting::Id, readBack), CHIP_NO_ERROR);
+    ASSERT_FALSE(readBack.IsNull());
+    EXPECT_EQ(readBack.Value(), 50);
+}
+
+TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, WritePercentSettingNull_WhenAlreadyNull_Succeeds)
+{
+    ClusterTester tester(cluster);
+    cluster.SetOnOffState(true);
+
+    DataModel::Nullable<chip::Percent> percentSetting;
+    percentSetting.SetNonNull(50);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kAuto), CHIP_NO_ERROR);
+
+    DataModel::Nullable<chip::Percent> readPercent;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::PercentSetting::Id, readPercent), CHIP_NO_ERROR);
+    EXPECT_TRUE(readPercent.IsNull());
+
+    DataModel::Nullable<chip::Percent> nullWrite(DataModel::NullNullable);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, nullWrite), CHIP_NO_ERROR);
+
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::PercentSetting::Id, readPercent), CHIP_NO_ERROR);
+    EXPECT_TRUE(readPercent.IsNull());
+}
+
+TEST_F(TestFanControlClusterWithMultiSpeed, WriteSpeedSettingNull_SucceedsWithoutChangingValue)
+{
+    ClusterTester tester(cluster);
+
+    DataModel::Nullable<uint8_t> speedSetting;
+    speedSetting.SetNonNull(5);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, speedSetting), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> nullWrite(DataModel::NullNullable);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, nullWrite), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> readBack;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::SpeedSetting::Id, readBack), CHIP_NO_ERROR);
+    ASSERT_FALSE(readBack.IsNull());
+    EXPECT_EQ(readBack.Value(), 5);
+}
+
 TEST_F(TestFanControlCluster, StepCommandUnsupportedWithoutFeature)
 {
     ClusterTester tester(cluster);
@@ -542,20 +597,31 @@ TEST_F(TestFanControlCluster, FanModeSmart_MapsToHigh_WhenAutoNotSupported)
     EXPECT_EQ(fanMode, FanModeEnum::kHigh);
 }
 
-TEST_F(TestFanControlClusterOffHigh, FanModeLow_ReturnsInvalidInState)
+TEST_F(TestFanControlClusterOffHighAuto, FanModeSmart_MapsToAuto)
+{
+    ClusterTester tester(cluster);
+
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kSmart), CHIP_NO_ERROR);
+
+    FanModeEnum fanMode;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
+    EXPECT_EQ(fanMode, FanModeEnum::kAuto);
+}
+
+TEST_F(TestFanControlClusterOffHigh, FanModeLow_ReturnsConstraintError)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kLow);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
-TEST_F(TestFanControlClusterOffHigh, FanModeMedium_ReturnsInvalidInState)
+TEST_F(TestFanControlClusterOffHigh, FanModeMedium_ReturnsConstraintError)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kMedium);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestFanControlClusterOffHighAuto, FanModeAuto_Succeeds)
@@ -569,20 +635,20 @@ TEST_F(TestFanControlClusterOffHighAuto, FanModeAuto_Succeeds)
     EXPECT_EQ(fanMode, FanModeEnum::kAuto);
 }
 
-TEST_F(TestFanControlCluster, FanModeAuto_ReturnsInvalidInState_WhenAutoNotSupported)
+TEST_F(TestFanControlCluster, FanModeAuto_ReturnsConstraintError_WhenAutoNotSupported)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kAuto);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
-TEST_F(TestFanControlCluster, FanModeMedium_ReturnsInvalidInState)
+TEST_F(TestFanControlCluster, FanModeMedium_ReturnsConstraintError)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kMedium);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestFanControlClusterOffLowMedHigh, FanModeLowAndMedium_Succeed)

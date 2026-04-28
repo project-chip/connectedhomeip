@@ -150,6 +150,8 @@ public:
     void SetDelegate(FanControl::Delegate * delegate);
 
 private:
+    bool IsFanModeSupportedBySequence(FanControl::FanModeEnum value) const;
+
     bool SupportsMultiSpeed() const { return mOptionalAttributes.IsSet(FanControl::Attributes::SpeedMax::Id); }
     bool SupportsAuto() const
     {
