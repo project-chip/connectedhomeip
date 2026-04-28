@@ -838,6 +838,8 @@ public:
         mDeviceAttestationVerifier = deviceAttestationVerifier;
     }
 
+    void SetFailOnPasscodeMismatch(bool enable) { mSetUpCodePairer.SetFailOnPasscodeMismatch(enable); }
+
     Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() const { return mDeviceAttestationVerifier; }
 
     const CommissioningParameters & GetCommissioningParameters() { return mDefaultCommissioner->GetCommissioningParameters(); }

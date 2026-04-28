@@ -129,6 +129,10 @@ public:
     // whichever node we're pairing if kUndefinedNodeId is passed.
     bool StopPairing(NodeId remoteId = kUndefinedNodeId);
 
+    // When enabled, a SecurePairingFailed status (passcode mismatch) immediately
+    // aborts pairing without waiting for discovery to complete or timeout.
+    void SetFailOnPasscodeMismatch(bool enable) { mFailOnPasscodeMismatch = enable; }
+
 private:
     // DevicePairingDelegate implementation.
     void OnStatusUpdate(DevicePairingDelegate::Status status) override;
@@ -274,6 +278,9 @@ private:
 
     // mLastPASEError is the error from the last OnPairingComplete call we got.
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
+
+    // When true, SecurePairingFailed is never suppressed regardless of discovery state
+    bool mFailOnPasscodeMismatch = false;
 };
 
 } // namespace Controller
