@@ -81,19 +81,19 @@ private:
     BitFlags<Feature> mFeatures;
 
     // Fixed sensor characteristics — set at construction, never change.
-    MeasurementMediumEnum      mMedium;
-    MeasurementUnitEnum        mUnit;
+    MeasurementMediumEnum mMedium;
+    MeasurementUnitEnum mUnit;
     DataModel::Nullable<float> mMinMeasuredValue;
     DataModel::Nullable<float> mMaxMeasuredValue;
-    float                      mUncertainty;
+    float mUncertainty;
 
     // Dynamic attributes — updated via Set*().
     DataModel::Nullable<float> mMeasuredValue;
     DataModel::Nullable<float> mPeakMeasuredValue;
-    uint32_t                   mPeakMeasuredValueWindow    = 0;
+    uint32_t mPeakMeasuredValueWindow = 0;
     DataModel::Nullable<float> mAverageMeasuredValue;
-    uint32_t                   mAverageMeasuredValueWindow = 0;
-    LevelValueEnum             mLevelValue                 = LevelValueEnum::kUnknown;
+    uint32_t mAverageMeasuredValueWindow = 0;
+    LevelValueEnum mLevelValue           = LevelValueEnum::kUnknown;
 };
 
 } // namespace ConcentrationMeasurement

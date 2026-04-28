@@ -51,10 +51,8 @@ class Instance
 {
     static_assert(NumericMeasurementEnabled || LevelIndicationEnabled,
                   "At least one of NumericMeasurement or LevelIndication must be enabled");
-    static_assert(!MediumLevelEnabled || LevelIndicationEnabled,
-                  "MediumLevelEnabled requires LevelIndicationEnabled");
-    static_assert(!CriticalLevelEnabled || LevelIndicationEnabled,
-                  "CriticalLevelEnabled requires LevelIndicationEnabled");
+    static_assert(!MediumLevelEnabled || LevelIndicationEnabled, "MediumLevelEnabled requires LevelIndicationEnabled");
+    static_assert(!CriticalLevelEnabled || LevelIndicationEnabled, "CriticalLevelEnabled requires LevelIndicationEnabled");
     static_assert(!PeakMeasurementEnabled || NumericMeasurementEnabled,
                   "PeakMeasurementEnabled requires NumericMeasurementEnabled");
     static_assert(!AverageMeasurementEnabled || NumericMeasurementEnabled,
@@ -161,7 +159,7 @@ private:
     }
 
     ConcentrationMeasurementCluster mCluster;
-    ServerClusterRegistration        mRegistration;
+    ServerClusterRegistration mRegistration;
 };
 
 } // namespace ConcentrationMeasurement

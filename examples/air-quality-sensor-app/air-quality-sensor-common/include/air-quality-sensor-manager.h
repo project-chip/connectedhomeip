@@ -69,8 +69,7 @@ public:
 private:
     static constexpr ConcentrationMeasurement::MeasurementMediumEnum kMedium =
         ConcentrationMeasurement::MeasurementMediumEnum::kAir;
-    static constexpr ConcentrationMeasurement::MeasurementUnitEnum kUnit =
-        ConcentrationMeasurement::MeasurementUnitEnum::kPpm;
+    static constexpr ConcentrationMeasurement::MeasurementUnitEnum kUnit = ConcentrationMeasurement::MeasurementUnitEnum::kPpm;
     static constexpr chip::BitFlags<ConcentrationMeasurement::Feature> kAllFeatures{
         ConcentrationMeasurement::Feature::kNumericMeasurement, ConcentrationMeasurement::Feature::kLevelIndication,
         ConcentrationMeasurement::Feature::kMediumLevel,        ConcentrationMeasurement::Feature::kCriticalLevel,
@@ -83,20 +82,16 @@ private:
                             BitMask<AirQuality::Feature>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
                                                          AirQuality::Feature::kVeryPoor, AirQuality::Feature::kExtremelyPoor)),
         mCarbonDioxideConcentrationMeasurementInstance(mEndpointId, CarbonDioxideConcentrationMeasurement::Id, kAllFeatures,
-                                                       kMedium, kUnit,
-                                                       chip::app::DataModel::MakeNullable(0.0f),
+                                                       kMedium, kUnit, chip::app::DataModel::MakeNullable(0.0f),
                                                        chip::app::DataModel::MakeNullable(1000.0f)),
         mCarbonMonoxideConcentrationMeasurementInstance(mEndpointId, CarbonMonoxideConcentrationMeasurement::Id, kAllFeatures,
-                                                        kMedium, kUnit,
-                                                        chip::app::DataModel::MakeNullable(0.0f),
+                                                        kMedium, kUnit, chip::app::DataModel::MakeNullable(0.0f),
                                                         chip::app::DataModel::MakeNullable(1000.0f)),
         mNitrogenDioxideConcentrationMeasurementInstance(mEndpointId, NitrogenDioxideConcentrationMeasurement::Id, kAllFeatures,
-                                                         kMedium, kUnit,
-                                                         chip::app::DataModel::MakeNullable(0.0f),
+                                                         kMedium, kUnit, chip::app::DataModel::MakeNullable(0.0f),
                                                          chip::app::DataModel::MakeNullable(1000.0f)),
         mPm1ConcentrationMeasurementInstance(mEndpointId, Pm1ConcentrationMeasurement::Id, kAllFeatures, kMedium, kUnit,
-                                             chip::app::DataModel::MakeNullable(0.0f),
-                                             chip::app::DataModel::MakeNullable(1000.0f)),
+                                             chip::app::DataModel::MakeNullable(0.0f), chip::app::DataModel::MakeNullable(1000.0f)),
         mPm10ConcentrationMeasurementInstance(mEndpointId, Pm10ConcentrationMeasurement::Id, kAllFeatures, kMedium, kUnit,
                                               chip::app::DataModel::MakeNullable(0.0f),
                                               chip::app::DataModel::MakeNullable(1000.0f)),
