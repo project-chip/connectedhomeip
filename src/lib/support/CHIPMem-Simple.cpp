@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#include <lib/support/VerificationMacrosNoLogging.h>
+#include <lib/support/AssertBase.h>
 #include <system/SystemMutex.h>
 
 namespace chip {

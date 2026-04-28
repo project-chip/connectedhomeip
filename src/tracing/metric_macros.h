@@ -276,7 +276,7 @@
  *
  */
 #define SuccessOrExitWithMetric(kMetricKey, error)                                                                                 \
-    nlEXPECT(::chip::Tracing::ErrorHandling::LogMetricIfError((kMetricKey), (error)), exit)
+    VerifyOrExit(::chip::Tracing::ErrorHandling::LogMetricIfError((kMetricKey), (error)), {})
 
 /**
  *  @def VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)
