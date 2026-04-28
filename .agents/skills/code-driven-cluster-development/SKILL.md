@@ -18,21 +18,28 @@ Ember RAM store. The framework calls methods like `ReadAttribute` directly;
 ZAP-generated accessors (`emberAfReadAttribute`) must not be used inside the
 cluster class.
 
+Note that the `<cluster-folder>` naming is not standardized, but often starts
+with the cluster name. It is a mapping defined in
+`src/app/zap_cluster_list.json` and it is often (but not always)
+`<cluster-name>-server`.
+
 ---
 
 ## Directory / File Layout
 
+A common pattern for code-driven cluster directory layout is:
+
 ```
-src/app/clusters/<name>-server/
-├── <Name>Cluster.h             # Core class (extends DefaultServerCluster)
-├── <Name>Cluster.cpp           # Core class implementation
-├── CodegenIntegration.h        # Bridge declarations (ZAP ↔ Cluster)
-├── CodegenIntegration.cpp      # ZAP callbacks + FindClusterOnEndpoint()
-├── BUILD.gn                    # Core files (no codegen dependencies)
+src/app/clusters/<cluster-name>-server/
+├── <ClusterName>Cluster.h             # Core class (extends DefaultServerCluster)
+├── <ClusterName>Cluster.cpp           # Core class implementation
+├── CodegenIntegration.h               # Bridge declarations (ZAP ↔ Cluster)
+├── CodegenIntegration.cpp             # ZAP callbacks + FindClusterOnEndpoint()
+├── BUILD.gn                           # Core files (no codegen dependencies)
 ├── app_config_dependent_sources.gni   # Codegen-dependent files
 └── tests/
     ├── BUILD.gn
-    └── Test<Name>Cluster.cpp
+    └── Test<ClusterName>Cluster.cpp
 ```
 
 _Alternative: Legacy-Preserving Layout_ Some clusters (e.g., `on-off-server`)
@@ -67,14 +74,85 @@ subdirectory while placing the new code-driven implementation in the root.
 
 ## Core Cluster Class
 
-### Header Pattern
+### Header (`<ClusterName>Cluster.h`)
 
--   **Nested `Config`**: Use a nested `Config` struct for constructor arguments.
--   **Builders**: Use `WithXxx()` methods for optional attributes to ensure
-    flags and values are set together.
--   **No `Init()`**: Use `Startup()` and `Shutdown()`.
--   **No Redundant Members**: Do not store `EndpointId`, `mIsRegistered`, or
-    `mContext`. These are handled by the base class.
+```cpp
+#pragma once
+
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/<ClusterName>/Attributes.h>
+#include <clusters/<ClusterName>/Metadata.h>
+
+namespace chip::app::Clusters {
+
+class FooCluster : public DefaultServerCluster
+{
+public:
+    // Optional attributes are tracked as a compile-time bitset.
+    using OptionalAttributeSet = app::OptionalAttributeSet<
+        Foo::Attributes::SomeOptional::Id,
+        Foo::Attributes::AnotherOptional::Id>;
+
+    // Use a Config/StartupConfiguration class (or struct for simple cases) for
+    // constructor arguments that may be optional or have defaults. Use a class
+    // with private members and builder-style .WithXxx() setters to prevent
+    // misconfiguration in non-trivial cases.
+    class Config
+    {
+    public:
+        Config & WithMinValue(DataModel::Nullable<int16_t> min) { mMinValue = min; return *this; }
+        Config & WithMaxValue(DataModel::Nullable<int16_t> max) { mMaxValue = max; return *this; }
+        Config & WithOptionalAttributes(OptionalAttributeSet attrs) { mOptionalAttributes = attrs; return *this; }
+
+    private:
+        friend class FooCluster;
+        DataModel::Nullable<int16_t> mMinValue{};
+        DataModel::Nullable<int16_t> mMaxValue{};
+        OptionalAttributeSet mOptionalAttributes{};
+    };
+
+    FooCluster(EndpointId endpointId, const Config & config = {});
+
+    // --- ServerClusterInterface overrides ---
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
+                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    // Application-facing API
+    CHIP_ERROR SetMeasuredValue(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetMeasuredValue() const { return mMeasuredValue; }
+
+protected:
+    const BitFlags<Foo::Feature> mFeatureMap;
+    OptionalAttributeSet mOptionalAttributeSet;
+    DataModel::Nullable<int16_t> mMeasuredValue{};
+    // ... other member variables
+};
+
+} // namespace chip::app::Clusters
+```
+
+Key points:
+
+-   Inherit from `DefaultServerCluster`. Pass `{ endpointId, ClusterId }` to the
+    base constructor.
+-   Declare `OptionalAttributeSet` as a `using` alias so callers can refer to it
+    via `FooCluster::OptionalAttributeSet`.
+-   **Use a `Config` type:** For constructor arguments that may be optional or
+    have defaults. Prefer a `class` with private members and builder-style
+    `.WithXxx()` setters in non-trivial cases, and use a `struct` only for
+    simple passive configuration bundles.
+-   **Store Separate Variables:** Extract fields from the `Config` object into
+    separate member variables in the cluster class. This allows marking
+    immutable fields as `const` and prevents accidental runtime modification.
+-   Validate constructor arguments with `VerifyOrDie` (programming errors that
+    indicate a logic bug at call site, not a recoverable runtime error).
+-   Expose application-facing setters/getters; keep attribute storage in
+    `protected` or `private` members.
+-   **No Redundant Members**: Do not store `mIsRegistered` or `mContext`. These
+    are handled by the base class.
 
 ### Implementation Pattern
 
@@ -86,25 +164,42 @@ methods; return `UnsupportedAttribute` / `UnsupportedCommand` directly in the
 
 #### `ReadAttribute`
 
--   **Exhaustive**: Handle `ClusterRevision`, `FeatureMap`, and all attributes
-    in one `switch`.
--   **No Delegation**: Return `UnsupportedAttribute` directly in the `default`
-    case. Do not call `DefaultServerCluster::ReadAttribute` — it has no base
-    behavior.
--   **No pre-switch path checks**: The framework only calls `ReadAttribute` for
-    paths in the `Attributes()` list; pre-switch validity checks add code size
-    and are redundant.
--   **No feature-flag checks inside switch cases**: If optional attributes are
-    already conditionally included in `Attributes()`, do not re-check their
-    feature flags inside the switch — the framework has already pre-filtered.
+```cpp
+DataModel::ActionReturnStatus FooCluster::ReadAttribute(
+    const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+{
+    using namespace Foo::Attributes;
+    switch (request.path.mAttributeId)
+    {
+    case ClusterRevision::Id:
+        return encoder.Encode(Foo::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(static_cast<uint32_t>(mFeatureMap.Raw()));
+    case MeasuredValue::Id:
+        return encoder.Encode(mMeasuredValue);
+    // ... other attributes
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+```
 
-#### `WriteAttribute`
-
--   **No Delegation**: Return `UnsupportedAttribute` directly in the `default`
-    case. Do not call `DefaultServerCluster::WriteAttribute` — there is no base
-    behavior.
--   **No Double-Notify**: If a setter (e.g., `SetAttributeValue`) already
-    notifies, don't wrap it in `NotifyAttributeChangedIfSuccess`.
+-   **Return `Protocols::InteractionModel::Status::UnsupportedAttribute`
+    directly in the `default` case.**
+-   **No Delegation**: Do not call `DefaultServerCluster::ReadAttribute` — it
+    has no base behavior for read operations.
+-   The framework pre-filters requests so `ReadAttribute` is only called for
+    paths that are in the `Attributes()` list; returning `UnsupportedAttribute`
+    for anything unrecognised is the correct and consistent pattern.
+-   Always encode/handle `ClusterRevision` and `FeatureMap` explicitly.
+-   **Do not add path-validity checks** before the switch — they add code size
+    and are redundant because the framework guarantees the path exists.
+-   **Do not add feature-flag checks inside the switch cases** for optional
+    attributes if those attributes are already conditionally included in the
+    `Attributes()` list. The framework pre-filters requests based on the
+    supported attributes list.
+-   Do not add returning `UnsupportedAttribute` inside attribute switch
+    handling. Existent path checks ensure those code lines would never be used.
 
 #### `Attributes`
 
@@ -195,9 +290,11 @@ DataModel::ActionReturnStatus FooCluster::WriteAttribute(
 }
 ```
 
-Return `Protocols::InteractionModel::Status::UnsupportedAttribute` directly in
-the `default` case. Do not delegate to `DefaultServerCluster::WriteAttribute` —
-there is no base-class behavior for write operations.
+-   **No Delegation**: Return `UnsupportedAttribute` directly in the `default`
+    case. Do not delegate to `DefaultServerCluster::WriteAttribute` — there is
+    no base-class behavior for write operations.
+-   **No Double-Notify**: If a setter (e.g., `SetAttributeValue`) already
+    notifies, don't wrap it in `NotifyAttributeChangedIfSuccess`.
 
 #### Commands
 
@@ -309,12 +406,12 @@ Override `EventInfo` only when non-default read privileges are needed.
 This is the **only** place where Ember/ZAP APIs (`Accessors::Get/Set`) are
 allowed. Typical pattern:
 
-1. Allocate the cluster via `LazyRegisteredServerCluster`.
-2. Read ZAP defaults in an `IntegrationDelegate` to populate the `Config`. The
+1. Allocate the cluster instance via `LazyRegisteredServerCluster<FooCluster>`.
+2. Read ZAP attribute store defaults and construct `Config` structs. The
    delegate is used only during init/lookup/shutdown, so it is safe — and
    preferred — to allocate it **on the stack**.
-3. Register with the data model via `CodegenClusterIntegration::RegisterServer`.
-4. Provide `FindClusterOnEndpoint()` for application access.
+3. Register/unregister clusters via `CodegenClusterIntegration::RegisterServer`.
+4. Implement `FindClusterOnEndpoint()` and optional convenience setters.
 
 ```cpp
 void MatterFooPluginServerInitCallback()
@@ -327,6 +424,15 @@ void MatterFooPluginServerInitCallback()
 ```
 
 See `src/data-model-providers/codegen/ClusterIntegration.h` for the full API.
+
+### Direct registration (no ZAP integration)
+
+For code-driven-only applications that never use ZAP:
+
+```cpp
+RegisteredServerCluster<FooCluster> gCluster(endpointId, config);
+CodegenDataModelProvider::Instance().Registry().Register(gCluster.Registration());
+```
 
 ---
 
@@ -481,3 +587,5 @@ Study these clusters to understand specific implementation patterns:
 -   **Testing**: `src/app/server-cluster/testing/`
 -   **Integration Helper**:
     `src/data-model-providers/codegen/ClusterIntegration.h`
+-   **Migration Guide**: `docs/guides/migrating_ember_cluster_to_code_driven.md`
+-   **Writing New Clusters**: `docs/guides/writing_clusters.md`
