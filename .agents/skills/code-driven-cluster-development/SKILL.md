@@ -162,6 +162,11 @@ and `Shutdown()`. Do NOT call the base class from `ReadAttribute`,
 methods; return `UnsupportedAttribute` / `UnsupportedCommand` directly in the
 `default` case instead.
 
+**Only override `Startup`/`Shutdown` when custom code is needed** (e.g. reading
+persisted state on startup, registering a timer on startup and cancelling it on
+shutdown). If your override would only call the base, omit it entirely — a
+`Startup` that just calls `DefaultServerCluster::Startup` is dead weight.
+
 #### `ReadAttribute`
 
 ```cpp
