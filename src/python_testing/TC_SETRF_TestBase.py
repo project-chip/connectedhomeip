@@ -377,6 +377,11 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if struct.predicted is not None:
             matter_asserts.assert_valid_bool(struct.predicted, 'Predicted must has bool type.')
 
+        # checks ExternalID field must be string with max length equals 36
+        if struct.externalID is not None:
+            matter_asserts.assert_is_string(struct.externalID, "ExternalID must be a string")
+            asserts.assert_less_equal(len(struct.externalID), 36, "ExternalID must have length at most 36!")
+
     async def checkTariffInformationStruct(self,
                                            endpoint: int = None,
                                            cluster: Clusters.CommodityTariff = None,
