@@ -1081,26 +1081,15 @@ attributes as C until XML/spec metadata catches up.
 Each temporary entry should cite a tracking issue and be removed once the data
 model is corrected and regenerated.
 
-### Disabling verification
+### Disabling the wildcard subscription or verification
+**Disable the background subscription entirely** 
+(no cache, no ACL append for the subscription controller):
+- Per test class: `disable_wildcard_subscription = True`
+- Per run / harness: `--no-wildcard-subscription` (`matter_test_config.no_wildcard_subscription`)
 
-Wildcard subscription verification can be disabled at multiple levels:
-
-**Per test class**
-
-```python
-default_verify_wildcard_subscription = False
-```
-
-**Per read helper call**
-
-```python
-verify_wildcard_subscription=False
-```
-
-**Disable starting the background subscription entirely**
-
-Use `no_wildcard_subscription` in `matter_test_config.py`
-(wired through the test runner CLI).
+**Keep the subscription but skip comparing reads to the cache:**
+- Per test class: `default_verify_wildcard_subscription = False`
+- Single read: pass `verify_wildcard_subscription=False` to the read helper, otherwise this defaults to True.
 
 ### Known limitations
 
