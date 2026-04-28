@@ -313,7 +313,7 @@
  *                          assertion fails.
  */
 #define VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)                                                                   \
-    nlEXPECT_ACTION(aCondition, exit, MATTER_LOG_METRIC((kMetricKey), (anAction)))
+    VerifyOrExit(aCondition, MATTER_LOG_METRIC((kMetricKey), (anAction)))
 
 /**
  *  @def ExitNowWithMetric(kMetricKey, ...)
