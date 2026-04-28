@@ -27,12 +27,11 @@ namespace chip::app::Clusters {
 class PressureMeasurementCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet = app::OptionalAttributeSet<PressureMeasurement::Attributes::Tolerance::Id,
-                                                           PressureMeasurement::Attributes::ScaledValue::Id,
-                                                           PressureMeasurement::Attributes::MinScaledValue::Id,
-                                                           PressureMeasurement::Attributes::MaxScaledValue::Id,
-                                                           PressureMeasurement::Attributes::ScaledTolerance::Id,
-                                                           PressureMeasurement::Attributes::Scale::Id>;
+    using OptionalAttributeSet =
+        app::OptionalAttributeSet<PressureMeasurement::Attributes::Tolerance::Id, PressureMeasurement::Attributes::ScaledValue::Id,
+                                  PressureMeasurement::Attributes::MinScaledValue::Id,
+                                  PressureMeasurement::Attributes::MaxScaledValue::Id,
+                                  PressureMeasurement::Attributes::ScaledTolerance::Id, PressureMeasurement::Attributes::Scale::Id>;
 
     struct Config
     {
@@ -46,7 +45,7 @@ public:
         }
 
         Config & WithExtendedFeature(DataModel::Nullable<int16_t> minScaledValue, DataModel::Nullable<int16_t> maxScaledValue,
-                              int8_t scale)
+                                     int8_t scale)
         {
             mFeatureMap.Set(PressureMeasurement::Feature::kExtended);
             mMinScaledValue = minScaledValue;
@@ -70,7 +69,7 @@ public:
         DataModel::Nullable<int16_t> maxMeasuredValue;
         OptionalAttributeSet mOptionalAttributeSet;
         BitMask<PressureMeasurement::Feature> mFeatureMap;
-        uint16_t mTolerance      = 0;
+        uint16_t mTolerance = 0;
         DataModel::Nullable<int16_t> mMinScaledValue;
         DataModel::Nullable<int16_t> mMaxScaledValue;
         uint16_t mScaledTolerance = 0;
@@ -94,8 +93,7 @@ public:
     DataModel::Nullable<int16_t> GetScaledValue() const { return mScaledValue; }
 
 protected:
-    CHIP_ERROR SetMeasuredValueRange(DataModel::Nullable<int16_t> minMeasuredValue,
-                                     DataModel::Nullable<int16_t> maxMeasuredValue);
+    CHIP_ERROR SetMeasuredValueRange(DataModel::Nullable<int16_t> minMeasuredValue, DataModel::Nullable<int16_t> maxMeasuredValue);
 
 private:
     const OptionalAttributeSet mOptionalAttributeSet;

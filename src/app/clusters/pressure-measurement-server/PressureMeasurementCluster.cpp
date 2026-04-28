@@ -38,9 +38,7 @@ bool IsMeasuredValueInRange(int16_t value, const DataModel::Nullable<int16_t> & 
 
 } // namespace
 
-PressureMeasurementCluster::PressureMeasurementCluster(EndpointId endpointId) :
-    PressureMeasurementCluster(endpointId, Config{})
-{}
+PressureMeasurementCluster::PressureMeasurementCluster(EndpointId endpointId) : PressureMeasurementCluster(endpointId, Config{}) {}
 
 PressureMeasurementCluster::PressureMeasurementCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, PressureMeasurement::Id }), mOptionalAttributeSet(config.mOptionalAttributeSet),
@@ -122,12 +120,12 @@ DataModel::ActionReturnStatus PressureMeasurementCluster::ReadAttribute(const Da
 }
 
 CHIP_ERROR PressureMeasurementCluster::Attributes(const ConcreteClusterPath & path,
-                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 
     const DataModel::AttributeEntry optionalAttributes[] = {
-        Tolerance::kMetadataEntry,      ScaledValue::kMetadataEntry,    MinScaledValue::kMetadataEntry,
+        Tolerance::kMetadataEntry,      ScaledValue::kMetadataEntry,     MinScaledValue::kMetadataEntry,
         MaxScaledValue::kMetadataEntry, ScaledTolerance::kMetadataEntry, Scale::kMetadataEntry,
     };
 
@@ -161,7 +159,7 @@ CHIP_ERROR PressureMeasurementCluster::SetScaledValue(DataModel::Nullable<int16_
 }
 
 CHIP_ERROR PressureMeasurementCluster::SetMeasuredValueRange(DataModel::Nullable<int16_t> minMeasuredValue,
-                                                              DataModel::Nullable<int16_t> maxMeasuredValue)
+                                                             DataModel::Nullable<int16_t> maxMeasuredValue)
 {
     if (!minMeasuredValue.IsNull())
     {
