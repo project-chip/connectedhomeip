@@ -21,6 +21,8 @@
 #include "ConcentrationMeasurementCluster.h"
 #include "concentration-measurement-cluster-objects.h"
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CodeUtils.h>
 #include <type_traits>
 
 namespace chip {
@@ -33,9 +35,8 @@ namespace ConcentrationMeasurement {
  * original template-based API.
  *
  * Migration notes:
- *  - Replace Init() with registry.Register(instance.Registration()) in your
- *    ApplicationInit() or equivalent.
- *  - Init() is kept as a no-op so existing call sites compile without changes.
+ *  - Init() registers with CodegenDataModelProvider for backward compatibility.
+ *  - Prefer explicit registry.Register(instance.Registration()) in new code.
  *  - All Set*() methods forward directly to the underlying cluster.
  *
  * @tparam NumericMeasurementEnabled  Enables MeasuredValue, Min/Max, Uncertainty, Unit.
@@ -72,17 +73,34 @@ public:
         mRegistration(mCluster)
     {}
 
-    /**
-     * No-op: registration is now done via registry.Register(Registration()).
-     * Kept so existing Init() call sites compile unchanged.
-     */
-    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
-    /** Pass to CodegenDataModelProvider::Instance().Registry().Register(). */
+    ~Instance()
+    {
+        if (mRegistered)
+        {
+            LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster));
+        }
+    }
+
+    /**
+     * Registers this cluster with the CodegenDataModelProvider registry.
+     * Kept for backward compatibility with existing emberAfXxx Init callback sites.
+     */
+    CHIP_ERROR Init()
+    {
+        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mRegistration);
+        if (err == CHIP_NO_ERROR)
+        {
+            mRegistered = true;
+        }
+        return err;
+    }
+
     ServerClusterRegistration & Registration() { return mRegistration; }
 
-    // ── Numeric measurement ───────────────────────────────────────────────
-    template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
+    // Set*() methods are needed to push sensor readings by the device-app hooks.
+    // remote Matter clients can't use these setters and write attributes. 
+    // The access boundary is enforced by not implementing WriteAttribute()   
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v)
     {
         return mCluster.SetMeasuredValue(v);
@@ -155,22 +173,12 @@ private:
         return f;
     }
 
+    bool mRegistered = false;
     ConcentrationMeasurementCluster mCluster;
     ServerClusterRegistration mRegistration;
 };
 
-/**
- * A factory function to create a new instance of a Concentration Measurement Cluster with only the NumericMeasurement feature
- * enabled.
- *
- * @tparam PeakMeasurementEnabled Whether the PeakMeasurement feature is enabled.
- * @tparam AverageMeasurementEnabled Whether the AverageMeasurement feature is enabled.
- * @param endpoint Endpoint that the cluster is on.
- * @param clusterId Cluster that the cluster is on.
- * @param aMeasurementMedium The measurement medium.
- * @param aMeasurementUnit The measurement unit.
- * @return A new instance of Concentration Measurement Cluster.
- */
+
 template <bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
 Instance<true, false, false, false, PeakMeasurementEnabled, AverageMeasurementEnabled>
 CreateNumericMeasurementConcentrationCluster(EndpointId endpoint, ClusterId clusterId, MeasurementMediumEnum aMeasurementMedium,
@@ -180,17 +188,6 @@ CreateNumericMeasurementConcentrationCluster(EndpointId endpoint, ClusterId clus
         endpoint, clusterId, aMeasurementMedium, aMeasurementUnit);
 }
 
-/**
- * A factory function to create a new instance of a Concentration Measurement Cluster with only the Level Indication feature
- * enabled.
- *
- * @tparam MediumLevelEnabled Whether the MediumLevel feature is enabled.
- * @tparam CriticalLevelEnabled Whether the CriticalLevel feature is enabled.
- * @param endpoint Endpoint that the cluster is on.
- * @param clusterId Cluster that the cluster is on.
- * @param aMeasurementMedium The measurement medium.
- * @return A new instance of Concentration Measurement Cluster.
- */
 template <bool MediumLevelEnabled, bool CriticalLevelEnabled>
 Instance<false, true, MediumLevelEnabled, CriticalLevelEnabled, false, false>
 CreateLevelIndicationConcentrationCluster(EndpointId endpoint, ClusterId clusterId, MeasurementMediumEnum aMeasurementMedium)
@@ -198,20 +195,6 @@ CreateLevelIndicationConcentrationCluster(EndpointId endpoint, ClusterId cluster
     return Instance<false, true, MediumLevelEnabled, CriticalLevelEnabled, false, false>(endpoint, clusterId, aMeasurementMedium);
 }
 
-/**
- * A factory function to create a new instance of a Concentration Measurement Cluster with both the NumericMeasurement and Level
- * Indication features enabled.
- *
- * @tparam MediumLevelEnabled Whether the MediumLevel feature is enabled.
- * @tparam CriticalLevelEnabled Whether the CriticalLevel feature is enabled.
- * @tparam PeakMeasurementEnabled Whether the PeakMeasurement feature is enabled.
- * @tparam AverageMeasurementEnabled Whether the AverageMeasurement feature is enabled.
- * @param endpoint Endpoint that the cluster is on.
- * @param clusterId Cluster that the cluster is on.
- * @param aMeasurementMedium The measurement medium.
- * @param aMeasurementUnit The measurement unit.
- * @return A new instance of Concentration Measurement Cluster.
- */
 template <bool MediumLevelEnabled, bool CriticalLevelEnabled, bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
 Instance<true, true, MediumLevelEnabled, CriticalLevelEnabled, PeakMeasurementEnabled, AverageMeasurementEnabled>
 CreateNumericMeasurementAndLevelIndicationConcentrationCluster(EndpointId endpoint, ClusterId clusterId,

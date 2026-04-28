@@ -61,9 +61,8 @@ public:
 
     bool HasFeature(Feature f) const { return mFeatures.Has(f); }
 
-    // Push a new sensor reading into the cluster. Validates range, stores, and
-    // notifies subscribers. Returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the
-    // relevant feature flag was not set at construction.
+    // Push a new sensor reading. Validates range, stores, and notifies subscribers.
+    // Returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the relevant feature flag was not set at construction.
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> value);
     CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> value);
     CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<float> value);
@@ -75,19 +74,19 @@ public:
     CHIP_ERROR SetLevelValue(LevelValueEnum value);
 
 private:
+
+
     static constexpr uint32_t kWindowMaxSeconds = 604800;
     static constexpr uint16_t kClusterRevision  = 3;
 
-    BitFlags<Feature> mFeatures;
+     BitFlags<Feature> mFeatures;
 
-    // Fixed sensor characteristics — set at construction, never change.
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;
     DataModel::Nullable<float> mMinMeasuredValue;
     DataModel::Nullable<float> mMaxMeasuredValue;
     float mUncertainty;
 
-    // Dynamic attributes — updated via Set*().
     DataModel::Nullable<float> mMeasuredValue;
     DataModel::Nullable<float> mPeakMeasuredValue;
     uint32_t mPeakMeasuredValueWindow = 0;
