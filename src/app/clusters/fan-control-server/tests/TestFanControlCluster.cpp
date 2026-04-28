@@ -359,7 +359,7 @@ TEST_F(TestFanControlCluster, WritePercentSetting)
     EXPECT_EQ(readBack.Value(), 50);
 }
 
-TEST_F(TestFanControlCluster, WritePercentSettingNull_SucceedsWithoutChangingValue)
+TEST_F(TestFanControlCluster, WritePercentSettingNull_ReturnsInvalidInState_WhenNotInAuto)
 {
     ClusterTester tester(cluster);
 
@@ -368,7 +368,8 @@ TEST_F(TestFanControlCluster, WritePercentSettingNull_SucceedsWithoutChangingVal
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
 
     DataModel::Nullable<chip::Percent> nullWrite(DataModel::NullNullable);
-    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, nullWrite), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, nullWrite),
+              Protocols::InteractionModel::Status::InvalidInState);
 
     DataModel::Nullable<chip::Percent> readBack;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::PercentSetting::Id, readBack), CHIP_NO_ERROR);
@@ -397,7 +398,7 @@ TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, WritePercentSettingNull_WhenA
     EXPECT_TRUE(readPercent.IsNull());
 }
 
-TEST_F(TestFanControlClusterWithMultiSpeed, WriteSpeedSettingNull_SucceedsWithoutChangingValue)
+TEST_F(TestFanControlClusterWithMultiSpeed, WriteSpeedSettingNull_ReturnsInvalidInState_WhenNotInAuto)
 {
     ClusterTester tester(cluster);
 
@@ -406,7 +407,8 @@ TEST_F(TestFanControlClusterWithMultiSpeed, WriteSpeedSettingNull_SucceedsWithou
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, speedSetting), CHIP_NO_ERROR);
 
     DataModel::Nullable<uint8_t> nullWrite(DataModel::NullNullable);
-    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, nullWrite), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, nullWrite),
+              Protocols::InteractionModel::Status::InvalidInState);
 
     DataModel::Nullable<uint8_t> readBack;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::SpeedSetting::Id, readBack), CHIP_NO_ERROR);

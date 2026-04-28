@@ -489,9 +489,12 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value, b
 
 DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
 {
-    // Spec: if the client writes null, the attribute value SHALL NOT change (successful no-op).
     if (value.IsNull())
     {
+        if (mFanMode != FanModeEnum::kAuto)
+        {
+            return Status::InvalidInState;
+        }
         return Status::Success;
     }
 
@@ -517,9 +520,13 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
 
 DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
 {
-    // Spec: if the client writes null, the attribute value SHALL NOT change (successful no-op).
     if (value.IsNull())
     {
+        // Null is only valid in Auto mode (same rule as PercentSetting; see TestFanControl.yaml).
+        if (mFanMode != FanModeEnum::kAuto)
+        {
+            return Status::InvalidInState;
+        }
         return Status::Success;
     }
 
