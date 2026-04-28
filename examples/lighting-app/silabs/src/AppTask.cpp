@@ -626,7 +626,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
         {
 #ifdef SL_MATTER_ENABLE_AWS
             ChipLogProgress(Zcl, "sending light state update");
-            MatterAwsSendMsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));    
+            MatterAwsSendMsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
 #endif // SL_MATTER_ENABLE_AWS
             appInstance().InitiateAction(AppEvent::kEventType_Light, *value ? AppTask::ON_ACTION : AppTask::OFF_ACTION, value);
         }
