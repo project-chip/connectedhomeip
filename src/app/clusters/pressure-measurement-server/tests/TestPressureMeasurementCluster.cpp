@@ -371,9 +371,17 @@ TEST_F(TestPressureMeasurementCluster, ScaledValueEXT)
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 1u);
 
-    // Read scaled attributes
+    // Read all scaled attributes
     DataModel::Nullable<int16_t> scaledValue{};
     ASSERT_EQ(tester.ReadAttribute(ScaledValue::Id, scaledValue), CHIP_NO_ERROR);
+
+    DataModel::Nullable<int16_t> minScaledValue{};
+    ASSERT_EQ(tester.ReadAttribute(MinScaledValue::Id, minScaledValue), CHIP_NO_ERROR);
+    EXPECT_EQ(minScaledValue.Value(), -100);
+
+    DataModel::Nullable<int16_t> maxScaledValue{};
+    ASSERT_EQ(tester.ReadAttribute(MaxScaledValue::Id, maxScaledValue), CHIP_NO_ERROR);
+    EXPECT_EQ(maxScaledValue.Value(), 10000);
 
     int8_t scale{};
     ASSERT_EQ(tester.ReadAttribute(Scale::Id, scale), CHIP_NO_ERROR);
@@ -411,6 +419,11 @@ TEST_F(TestPressureMeasurementCluster, FeatureMapWithoutEXT)
     uint32_t featureMap{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 0u);
+
+    // SetScaledValue without EXT feature should fail
+    DataModel::Nullable<int16_t> sv;
+    sv.SetNonNull(100);
+    EXPECT_EQ(cluster.SetScaledValue(sv), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
