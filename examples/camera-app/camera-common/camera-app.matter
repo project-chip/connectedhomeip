@@ -341,7 +341,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  nullable TestGlobalEnum myEnum = 2;
+  optional nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -356,8 +356,8 @@ fabric_scoped struct WebRTCSessionStruct {
   node_id peerNodeID = 1;
   endpoint_no peerEndpointID = 2;
   StreamUsageEnum streamUsage = 3;
-  optional nullable int16u videoStreamID = 4;
-  optional nullable int16u audioStreamID = 5;
+  nullable int16u videoStreamID = 4;
+  nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
   optional int16u videoStreams[] = 7;
   optional int16u audioStreams[] = 8;
