@@ -39,67 +39,67 @@ public:
     using Action_t = AppTask::Action_t;
 
     // optional override: AppInitImpl()
-    CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInit); }
+    CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
     // optional override: InitLightImpl()
-    CHIP_ERROR InitLight() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLight); }
+    CHIP_ERROR InitLight() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLightImpl); }
 
     // optional override: InitiateActionImpl()
     bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
     {
-        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitiateAction, aActor, aAction, aValue);
+        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitiateActionImpl, aActor, aAction, aValue);
     }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     // optional override: InitiateLightCtrlActionImpl()
     bool InitiateLightCtrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
     {
-        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitiateLightCtrlAction, aActor, aAction, aAttributeId, value);
+        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitiateLightCtrlActionImpl, aActor, aAction, aAttributeId, value);
     }
 #endif
 
     // optional override: OnTriggerOffWithEffectImpl()
     static void OnTriggerOffWithEffect(OnOffEffect * effect)
     {
-        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffect, effect);
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffectImpl, effect);
     }
 
     // optional override: ButtonEventHandlerImpl()
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
-        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandler, button, btnAction);
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
     // optional override: DMPostAttributeChangeCallbackImpl()
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
-        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMPostAttributeChangeCallback, attributePath, type, size, value);
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMPostAttributeChangeCallbackImpl, attributePath, type, size, value);
     }
 
     // optional override: OnLightActionInitiatedImpl()
     void OnLightActionInitiated(Action_t aAction, int32_t aActor, uint8_t * aValue)
     {
-        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, OnLightActionInitiated, aAction, aActor, aValue);
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, OnLightActionInitiatedImpl, aAction, aActor, aValue);
     }
 
     // optional override: OnLightActionCompletedImpl()
     void OnLightActionCompleted(Action_t aAction)
     {
-        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, OnLightActionCompleted, aAction);
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, OnLightActionCompletedImpl, aAction);
     }
 
     // optional override: LightTimerEventHandlerImpl()
     static void LightTimerEventHandler(void * timerCbArg)
     {
-        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightTimerEventHandler, timerCbArg);
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightTimerEventHandlerImpl, timerCbArg);
     }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     // optional override: LightControlEventHandlerImpl()
     static void LightControlEventHandler(AppEvent * aEvent)
     {
-        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightControlEventHandler, aEvent);
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightControlEventHandlerImpl, aEvent);
     }
 #endif
 
