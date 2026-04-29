@@ -643,7 +643,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    {
         // If there is no secure session, means commissioning has been continued after the unpowered phase was completed
         // In such case, move on setup the CASE session over operational network
         if (!mCommissioneeDeviceProxy->GetSecureSession().HasValue())
@@ -652,15 +651,18 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
 
         // If the transport is NFC, move to unpowered phase complete to end the first phase of commissioning
-        auto transportType =
-            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
-        return (transportType == Transport::Type::kNfc && mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
-            ? CommissioningStage::kUnpoweredPhaseComplete
-            : CommissioningStage::kFindOperationalForStayActive;
-    }
-#else
-        return CommissioningStage::kFindOperationalForStayActive;
+        if (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
+                Transport::Type::kNfc &&
+            mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
+        {
+            return CommissioningStage::kUnpoweredInitialPhaseComplete;
+        }
 #endif
+        return CommissioningStage::kPoweredInitialPhaseComplete;
+    case CommissioningStage::kUnpoweredInitialPhaseComplete:
+        return CommissioningStage::kCleanup; // End commissioning (phase 1)
+    case CommissioningStage::kPoweredInitialPhaseComplete:
+        return CommissioningStage::kFindOperationalForStayActive;
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
         if (!mWroteNetworkConfig)
         {
@@ -685,8 +687,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
-    case CommissioningStage::kUnpoweredPhaseComplete:
-        return CommissioningStage::kCleanup; // End commissioning (phase 1)
 
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
