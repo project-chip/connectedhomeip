@@ -130,7 +130,7 @@ def modify_thread_tlv(dataset: bytes, tlv_type: int, modifier_fn) -> bytes:
 
 class TC_CNET_4_24_2(MatterBaseTest):
     """
-    [TC-CNET-4.25] [Thread] Network Commissioning Success After Connection Failures [DUT-Server]
+    [TC-CNET-4.24.2] [Thread] Network Commissioning Success After Connection Failures [DUT-Server]
     CASE session variant — for already commissioned devices.
 
     This test uses an existing CASE session over the operational network and verifies
