@@ -141,7 +141,7 @@ class TC_CNET_4_24_2(MatterBaseTest):
     re-establishing CASE after each network transition.
 
     Usage:
-        python src/python_testing/TC_CNET_4_24.py \
+        python src/python_testing/TC_CNET_4_24_2.py \
             --thread-dataset-hex <dataset_hex>
     """
 
