@@ -76,7 +76,6 @@ ThermostatCluster * ClusterForEndpoint(EndpointId endpointId)
     return cluster;
 }
 
-
 Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     ThermostatCluster * cluster = ClusterForEndpoint(endpoint);
