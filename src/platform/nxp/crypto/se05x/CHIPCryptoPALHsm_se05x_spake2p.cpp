@@ -332,6 +332,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
     {
         state = CHIP_SPAKE2P_STATE::INIT;
     }
+    usingSE05x = true;
 
     return error;
 }
@@ -364,7 +365,18 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
 
     ChipLogProgress(Crypto, "SE05x: HSM - BeginVerifier");
 
-#if !ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+#if ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+    uint8_t zero_w0[32] = { 0 };
+
+    // If w0in contains any non-zero bytes, it means the verifiers are calculated on host using
+    // pass-code generated for enhanced commissioning. So we use the host spake2p implementation.
+    if (w0in_len != sizeof(zero_w0) || memcmp(w0in, zero_w0, sizeof(zero_w0)) != 0)
+    {
+        ChipLogProgress(Crypto, "SE05x: Verifiers are on host. Using software SPAKE2+");
+        usingSE05x = false;
+        return Spake2p::BeginVerifier(my_identity, my_identity_len, peer_identity, peer_identity_len, w0in, w0in_len, Lin, Lin_len);
+    }
+#else
     ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
     ReturnErrorOnFailure(FEWrite(w0, w0in_mod, w0in_mod_len));
 #endif
@@ -482,23 +494,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundOne(const uint8_t * pab
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::STARTED, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(*out_len >= point_size, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_SE05X_SPAKE_VERIFIER
-    const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
-#else
-    constexpr bool sw_rollback_verifier = false;
-#endif
-
-#if !ENABLE_SE05X_SPAKE_PROVER
-    const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
-#else
-    constexpr bool sw_rollback_prover   = false;
-#endif
-
-    if (sw_rollback_verifier || sw_rollback_prover)
+    // Use software if HSM was not selected during Begin
+    if (!usingSE05x)
     {
         return Spake2p::ComputeRoundOne(pab, pab_len, out, out_len);
     }
 
+    // Use HSM implementation
     CHIP_ERROR error = Spake2p_ComputeRoundOne_HSM(&hsm_pake_context, role, pab, pab_len, out, out_len);
     if (CHIP_NO_ERROR == error)
     {
@@ -513,23 +515,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R1, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(in_len == point_size, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_SE05X_SPAKE_VERIFIER
-    const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
-#else
-    constexpr bool sw_rollback_verifier = false;
-#endif
-
-#if !ENABLE_SE05X_SPAKE_PROVER
-    const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
-#else
-    constexpr bool sw_rollback_prover   = false;
-#endif
-
-    if (sw_rollback_verifier || sw_rollback_prover)
+    // Use software if HSM was not selected during Begin
+    if (!usingSE05x)
     {
         return Spake2p::ComputeRoundTwo(in, in_len, out, out_len);
     }
 
+    // Use HSM implementation
     uint8_t pKeyKe[16] = {
         0,
     };
@@ -548,22 +540,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R2, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_SE05X_SPAKE_VERIFIER
-    const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
-#else
-    constexpr bool sw_rollback_verifier = false;
-#endif
-
-#if !ENABLE_SE05X_SPAKE_PROVER
-    const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
-#else
-    constexpr bool sw_rollback_prover   = false;
-#endif
-
-    if (sw_rollback_verifier || sw_rollback_prover)
+    // Use software if HSM was not selected during Begin
+    if (!usingSE05x)
     {
         return Spake2p::KeyConfirm(in, in_len);
     }
+
+    // Use HSM implementation
     const CHIP_ERROR error = Spake2p_KeyConfirm_HSM(&hsm_pake_context, role, in, in_len);
     if (CHIP_NO_ERROR == error)
     {
