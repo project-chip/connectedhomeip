@@ -157,8 +157,7 @@ void LightActionEventHandler(AppEvent * aEvent)
     GetLCD().WriteDemoUI(sLightOn);
 #endif
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
-                                                                           static_cast<intptr_t>(sLightOn));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, static_cast<intptr_t>(sLightOn));
 }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
@@ -201,8 +200,7 @@ void LightControlEventHandler(AppEvent * aEvent)
 bool InitiateLightCtrlAction(int32_t aActor, ColorAction_t aAction, uint32_t aAttributeId, uint8_t * value)
 {
     bool action_initiated = false;
-    VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT,
-                        action_initiated);
+    VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT, action_initiated);
 
     RGBLEDWidget::ColorData_t colorData;
     switch (aAction)
@@ -466,7 +464,7 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
 void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                             uint8_t * value)
 {
-    ClusterId clusterId   = attributePath.mClusterId;
+    ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
