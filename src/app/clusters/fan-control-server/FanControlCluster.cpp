@@ -572,6 +572,20 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
     return Status::Success;
 }
 
+bool FanControlCluster::SetPercentCurrent(chip::Percent value)
+{
+    return SetAttributeValue(mPercentCurrent, value, PercentCurrent::Id);
+}
+
+bool FanControlCluster::SetSpeedCurrent(uint8_t value)
+{
+    if (!SupportsMultiSpeed())
+    {
+        return false;
+    }
+    return SetAttributeValue(mSpeedCurrent, value, SpeedCurrent::Id);
+}
+
 void FanControlCluster::StoreFanModePersistence()
 {
     VerifyOrReturn(mContext != nullptr);
