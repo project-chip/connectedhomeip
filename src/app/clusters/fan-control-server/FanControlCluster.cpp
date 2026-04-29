@@ -428,7 +428,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value, b
     }
     if (!IsFanModeSupportedBySequence(value))
     {
-        return Status::ConstraintError;
+        return Status::InvalidInState;
     }
 
     FanModeEnum newMode = value;
