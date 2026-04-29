@@ -20,15 +20,21 @@ import datetime
 import enum
 import json
 import logging
+import threading
 import time
-from collections.abc import Callable, Iterable
-from dataclasses import asdict, dataclass, field
+from collections import defaultdict
+from collections.abc import Callable, Iterable, Mapping
+from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
-from typing import Any
+from types import TracebackType
+from typing import Any, ClassVar, TypeAlias
 
 from chiptest.log_config import LogConfig
+from chiptest.work_queue import CancellableQueue, EndOfQueue
 
 log = logging.getLogger(__name__)
+
+ExceptionInfoT: TypeAlias = BaseException | str | None
 
 
 class TestStatus(enum.StrEnum):
@@ -63,7 +69,7 @@ class TestResult:
     iteration: int
     status: TestStatus
     duration_seconds: float
-    exception: BaseException | str | None = None
+    exception: ExceptionInfoT = None
 
     @property
     def name_decorated(self) -> str:
@@ -125,7 +131,7 @@ class RunStats:
     failed: int = field(default=0, init=False)
     cancelled: int = field(default=0, init=False)
     mean_duration: float = field(default=0.0, init=False)
-    exception_first: BaseException | str | None = field(default=None, init=False)
+    exception_first: ExceptionInfoT = field(default=None, init=False)
 
     @property
     def pass_rate(self) -> float:
@@ -166,11 +172,26 @@ class RunStats:
 
 @dataclass
 class RunSummary(RunStats):
-    """Summary of a test run, including results of all iterations and aggregated statistics (both global and per-test)."""
+    """
+    Summary of a test run, including results of all iterations and aggregated statistics (both global and per-test).
+
+    If operated in multithreaded environment, it should be used as a context manager to ensure thread safety when recording results.
+    """
     iterations: int
+    tests_per_iteration: int
     run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
+    exceptions: defaultdict[int, dict[str, ExceptionInfoT]] = field(default_factory=lambda: defaultdict(dict), init=False)
+
+    def __post_init__(self):
+        self._lock = threading.Lock()
+
+    def __enter__(self):
+        return self._lock.__enter__()
+
+    def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
+        return self._lock.__exit__(exc_type, exc_val, exc_tb)
 
     def record(self, result: TestResult) -> None:
         """Record a test result."""
@@ -184,15 +205,30 @@ class RunSummary(RunStats):
             self.test_stats[result.name] = RunStats()
         self.test_stats[result.name].record(result)
 
+        # Record exception per iteration.
+        self.exceptions[result.iteration][result.name] = result.exception
+
+    @property
+    def expected_test_count(self) -> int:
+        """Total number of tests expected to be run across all iterations."""
+        return self.iterations * self.tests_per_iteration
+
+    @property
+    def current_iteration(self) -> int:
+        """Estimate the current iteration based on the number of recorded results."""
+        return len(self.exceptions)
+
     def write_json(self, path: Path) -> None:
         """Write the test run summary to a JSON file."""
         def encode(obj: Any) -> Any:
             """JSON encoder for non-serializable objects.
 
-            We cannot use json.dumps(default) for all cases, as it doesn't touch floats.
+            We cannot use json.dumps(default) for all cases, as it doesn't touch floats, and `asdict` doesn't work for defaultdict.
             """
-            if isinstance(obj, dict):
-                return {key: encode(value) for key, value in obj.items()}
+            if is_dataclass(obj):
+                return {f.name: encode(getattr(obj, f.name)) for f in fields(obj)}
+            if isinstance(obj, Mapping):
+                return {encode(key): encode(value) for key, value in obj.items()}
             if isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
                 return [encode(item) for item in obj]
             if isinstance(obj, datetime.datetime):
@@ -202,14 +238,14 @@ class RunSummary(RunStats):
             return obj
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(encode(asdict(self)), indent=2, default=repr))
+        path.write_text(json.dumps(encode(self), indent=2, default=repr))
         log.info("Test run summary written to %s", path)
 
     @classmethod
     def from_json(cls, path: Path) -> RunSummary:
         """Read the test run summary from a JSON file."""
         raw = json.loads(path.read_text())
-        ret = RunSummary(iterations=raw.get("iterations", 1))
+        ret = RunSummary(iterations=raw.get("iterations", 1), tests_per_iteration=raw.get("tests_per_iteration", 0))
 
         # Recover a timestamp.
         timestamp = raw.get("run_timestamp", "unknown")
@@ -349,3 +385,87 @@ class RunSummary(RunStats):
 
         # Final vertical padding.
         print()
+
+
+class ResultError(Exception):
+    """Exception raised when processing results."""
+
+
+ResultQueueT: TypeAlias = CancellableQueue[TestResult]
+
+
+@dataclass(eq=False)
+class ResultProcessingThread(threading.Thread):
+    """Thread that processes test results from the result queue, keeps track of test run summary and prints it at the end."""
+
+    summary: RunSummary
+    expected_failures: int
+    keep_going: bool
+    summary_file: Path | None
+
+    THREAD_TERMINATE_TIMEOUT_S: ClassVar[float] = 5.0
+
+    def __post_init__(self) -> None:
+        super().__init__(name="Results")
+
+        self.result_queue: ResultQueueT = CancellableQueue()
+        self.exception: BaseException | None = None
+
+    def run(self) -> None:
+        try:
+            log.debug("Starting result processing thread")
+            while True:
+                self._process_result(self.result_queue.get())
+        except EndOfQueue:
+            log.debug("No more results to process, finishing result processing thread")
+        except BaseException as e:
+            self.exception = e
+        finally:
+            log.debug("Result processing thread finished")
+
+    def _process_result(self, result: TestResult) -> None:
+        iteration = result.iteration
+        with self.summary:
+            self.summary.record(result)
+
+            # Check for keep going on failure.
+            if result.exception is not None and not isinstance(result.exception, KeyboardInterrupt) and not self.keep_going:
+                raise ResultError("Test failed and --keep-going flag is not set.")
+
+            # Check if all results for the iteration are in.
+            if len(self.summary.exceptions[iteration]) < self.summary.tests_per_iteration:
+                return
+
+            log.debug("All results for iteration %i are in, checking failure count", iteration)
+            observed_failures = sum(exc is not None and not isinstance(exc, KeyboardInterrupt)
+                                    for exc in self.summary.exceptions[iteration].values())
+            if observed_failures != self.expected_failures:
+                raise ResultError(
+                    f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}")
+
+    def terminate(self) -> None:
+        """Terminate the result processing thread."""
+        try:
+            # Close the result queue to unblock the thread if it's waiting for results.
+            self.result_queue.close()
+
+            if self.ident is not None:
+                self.join(self.THREAD_TERMINATE_TIMEOUT_S)
+                if self.is_alive():
+                    raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
+        except Exception as e:
+            # Try to forcefully cancel the result queue to unblock the thread.
+            self.result_queue.cancel()
+
+            # Wait for the thread to finish processing results if it had been started.
+            if self.ident is not None:
+                self.join(self.THREAD_TERMINATE_TIMEOUT_S)
+                if self.is_alive():
+                    raise RuntimeError(
+                        "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
+        finally:
+            # We don't take the lock to ensure there is no deadlock in case of the thread being stuck on acquiring the lock. This
+            # may lead to incomplete or corrupted summary, but it's better than hanging indefinitely.
+            self.summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+            if self.summary_file is not None:
+                self.summary.write_json(self.summary_file)

@@ -4537,6 +4537,19 @@ static id _Nullable DecodeEventPayloadForThermostatUserInterfaceConfigurationClu
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForHumidistatCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Humidistat;
+    switch (aEventId) {
+    default: {
+        // Not a known Humidistat event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForColorControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ColorControl;
@@ -4905,6 +4918,144 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
     }
     default: {
         // Not a known AmbientContextSensing event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ProximityRanging;
+    switch (aEventId) {
+    case Events::RangingResult::Id: {
+        Events::RangingResult::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRProximityRangingClusterRangingResultEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.sessionID];
+            value.sessionID = memberValue;
+        } while (0);
+        do {
+            MTRProximityRangingClusterRangingMeasurementDataStruct * _Nonnull memberValue;
+            memberValue = [MTRProximityRangingClusterRangingMeasurementDataStruct new];
+            if (cppValue.rangingResultData.wiFiDevIK.HasValue()) {
+                memberValue.wiFiDevIK = AsData(cppValue.rangingResultData.wiFiDevIK.Value());
+            } else {
+                memberValue.wiFiDevIK = nil;
+            }
+            if (cppValue.rangingResultData.BLEDeviceID.HasValue()) {
+                memberValue.bleDeviceID = [NSNumber numberWithUnsignedLongLong:cppValue.rangingResultData.BLEDeviceID.Value()];
+            } else {
+                memberValue.bleDeviceID = nil;
+            }
+            if (cppValue.rangingResultData.BLTDevIK.HasValue()) {
+                memberValue.bltDevIK = AsData(cppValue.rangingResultData.BLTDevIK.Value());
+            } else {
+                memberValue.bltDevIK = nil;
+            }
+            if (cppValue.rangingResultData.timeOfMeasurement.HasValue()) {
+                memberValue.timeOfMeasurement = [NSNumber numberWithUnsignedInt:cppValue.rangingResultData.timeOfMeasurement.Value()];
+            } else {
+                memberValue.timeOfMeasurement = nil;
+            }
+            if (cppValue.rangingResultData.timeOfMeasurementOffset.HasValue()) {
+                memberValue.timeOfMeasurementOffset = [NSNumber numberWithUnsignedInt:cppValue.rangingResultData.timeOfMeasurementOffset.Value()];
+            } else {
+                memberValue.timeOfMeasurementOffset = nil;
+            }
+            if (cppValue.rangingResultData.distance.IsNull()) {
+                memberValue.distance = nil;
+            } else {
+                memberValue.distance = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.distance.Value()];
+            }
+            if (cppValue.rangingResultData.errorMargin.HasValue()) {
+                memberValue.errorMargin = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.errorMargin.Value()];
+            } else {
+                memberValue.errorMargin = nil;
+            }
+            if (cppValue.rangingResultData.rdr.HasValue()) {
+                memberValue.rdr = [MTRProximityRangingClusterRDRStruct new];
+                memberValue.rdr.azimuth = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.rdr.Value().azimuth];
+                memberValue.rdr.elevation = [NSNumber numberWithShort:cppValue.rangingResultData.rdr.Value().elevation];
+                memberValue.rdr.azimuthAccuracy = [NSNumber numberWithUnsignedChar:cppValue.rangingResultData.rdr.Value().azimuthAccuracy];
+                memberValue.rdr.elevationAccuracy = [NSNumber numberWithUnsignedChar:cppValue.rangingResultData.rdr.Value().elevationAccuracy];
+                memberValue.rdr.reference = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.rangingResultData.rdr.Value().reference)];
+            } else {
+                memberValue.rdr = nil;
+            }
+            if (cppValue.rangingResultData.detectedAttackLevel.HasValue()) {
+                memberValue.detectedAttackLevel = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.rangingResultData.detectedAttackLevel.Value())];
+            } else {
+                memberValue.detectedAttackLevel = nil;
+            }
+            if (cppValue.rangingResultData.rssi.HasValue()) {
+                if (cppValue.rangingResultData.rssi.Value().IsNull()) {
+                    memberValue.rssi = nil;
+                } else {
+                    memberValue.rssi = [NSNumber numberWithChar:cppValue.rangingResultData.rssi.Value().Value()];
+                }
+            } else {
+                memberValue.rssi = nil;
+            }
+            if (cppValue.rangingResultData.txPower.HasValue()) {
+                if (cppValue.rangingResultData.txPower.Value().IsNull()) {
+                    memberValue.txPower = nil;
+                } else {
+                    memberValue.txPower = [NSNumber numberWithChar:cppValue.rangingResultData.txPower.Value().Value()];
+                }
+            } else {
+                memberValue.txPower = nil;
+            }
+            value.rangingResultData = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::RangingSessionStatus::Id: {
+        Events::RangingSessionStatus::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRProximityRangingClusterRangingSessionStatusEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.sessionID];
+            value.sessionID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.status)];
+            value.status = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known ProximityRanging event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForNetworkIdentityManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aEventId) {
+    default: {
+        // Not a known NetworkIdentityManagement event.
         break;
     }
     }
@@ -6120,6 +6271,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ThermostatUserInterfaceConfiguration::Id: {
         return DecodeEventPayloadForThermostatUserInterfaceConfigurationCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::Humidistat::Id: {
+        return DecodeEventPayloadForHumidistatCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::ColorControl::Id: {
         return DecodeEventPayloadForColorControlCluster(aPath.mEventId, aReader, aError);
     }
@@ -6179,6 +6333,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::AmbientContextSensing::Id: {
         return DecodeEventPayloadForAmbientContextSensingCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ProximityRanging::Id: {
+        return DecodeEventPayloadForProximityRangingCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return DecodeEventPayloadForNetworkIdentityManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeEventPayloadForWiFiNetworkManagementCluster(aPath.mEventId, aReader, aError);

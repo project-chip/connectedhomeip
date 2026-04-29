@@ -20,6 +20,5 @@
 
 // Note: This file exists for backwards compatibility only.
 // New code should directly use ZoneManagementCluster.h instead.
-// Implemented in PR #43423
 
 #include <app/clusters/zone-management-server/CodegenIntegration.h>

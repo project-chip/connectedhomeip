@@ -80,6 +80,7 @@ exclude:
     - "examples/chef/zzz_generated/**/*"
     - "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/*" # zap-generated files
     - "integrations/cloudbuild/*.yaml" # uglier long command line content
+    - "integrations/compute_engine/*.sh" # shellharden breaks for loops over command outputs
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
     - "scripts/tagging/tag_new_release.sh" # shellharden breaks parameter passing
     - "src/darwin/Framework/CHIP/zap-generated/*" # already clang-formatted by our zap tooling

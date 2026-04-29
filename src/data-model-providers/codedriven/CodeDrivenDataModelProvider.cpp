@@ -244,16 +244,6 @@ CHIP_ERROR CodeDrivenDataModelProvider::EndpointUniqueID(EndpointId endpointId, 
 }
 #endif
 
-void CodeDrivenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
-{
-    if (!mInteractionModelContext)
-    {
-        ChipLogError(DataManagement, "Temporary_ReportAttributeChanged called before provider has been started.");
-        return;
-    }
-    mInteractionModelContext->dataModelChangeListener.MarkDirty(path);
-}
-
 CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistration & registration)
 {
     VerifyOrReturnError(registration.endpointEntry.id != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);

@@ -2924,15 +2924,15 @@ endpoint 6 {
   }
 
   server cluster FlowMeasurement {
-    ram      attribute measuredValue default = 0xA;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x1;
     ram      attribute maxMeasuredValue default = 0xFFF;
     ram      attribute tolerance default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 7 {
@@ -2966,15 +2966,15 @@ endpoint 7 {
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue default = 0x11d0;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x1;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute tolerance default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 8 {

@@ -81,7 +81,13 @@ ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
 
 ActionsServer::~ActionsServer()
 {
-    Shutdown();
+    if (mRegistered)
+    {
+        // Shutdown() was not called before destruction. Call it now to avoid
+        // leaving a dangling pointer in the data model provider registry.
+        ChipLogError(AppServer, "ActionsServer destroyed without Shutdown() being called; shutting down now.");
+        Shutdown();
+    }
     --sInstanceCount;
 }
 
@@ -100,11 +106,11 @@ void ActionsServer::Shutdown()
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(DeviceEnergyManagement::Id), err.Format());
+        [[maybe_unused]] const ConcreteClusterPath path = mCluster.Cluster().GetPaths()[0];
+        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, path.mEndpointId,
+                     ChipLogValueMEI(path.mClusterId), err.Format());
     }
 }
-
 void ActionsServer::ActionListModified(EndpointId aEndpoint)
 {
     VerifyOrReturn(aEndpoint == mCluster.Cluster().GetPaths()[0].mEndpointId);

@@ -77,16 +77,6 @@ not_automated:
       reason: Shared code for TC_SETRF, not a standalone test
     - name: TC_SUTestBase.py
       reason: Shared code for TC_SU, not a standalone test
-    - name: TC_SU_2_2.py
-      reason: Test takes around 10 minutes, skipped in CI. Works on CI if added.
-    - name: TC_SU_2_5.py
-      reason:
-          Test is skipped as it takes around 25 minutes to complete. Works on CI
-          if added.
-    - name: TC_SU_2_7.py
-      reason:
-          Test is skipped as it takes around 15 minutes to complete. Works on CI
-          if added.
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -174,12 +164,6 @@ not_automated:
           onboarding data security requirements)
     - name: TC_GC_common.py
       reason: Shared code for TC_GC, not a standalone test.
-    - name: TC_GC_2_2.py
-      reason:
-          Test fails in REPL Tests - Linux CI environment because report
-          chunking is not enabled.
-    - name: TC_GC_2_7.py
-      reason: Does not currently pass.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
@@ -187,12 +171,10 @@ not_automated:
 slow_tests:
     - { name: mobile-device-test.py, duration: 3 minutes }
     - { name: TC_AccessChecker.py, duration: 15 minutes }
-    - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
     - { name: TC_CADMIN_1_3_4.py, duration: 4 minutes }
     - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
     - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
     - { name: TC_CADMIN_1_9.py, duration: 40 seconds }
-    - { name: TC_CC_2_2.py, duration: 1.5 minutes }
     - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }
     - { name: TC_DEM_2_10.py, duration: 40 seconds }
     - { name: TC_DeviceBasicComposition.py, duration: 9 minutes }
@@ -200,7 +182,6 @@ slow_tests:
     - { name: TC_DRLK_2_3.py, duration: 30 seconds }
     - { name: TC_EEVSE_2_6.py, duration: 30 seconds }
     - { name: TC_FAN_3_1.py, duration: 15 seconds }
-    - { name: TC_JFADMIN_1_4.py, duration: 5 minutes }
     - { name: TC_MCORE_FS_1_4.py, duration: 20 seconds }
     - { name: TC_OPSTATE_2_5.py, duration: 1.25 minutes }
     - { name: TC_OPSTATE_2_6.py, duration: 35 seconds }
@@ -219,3 +200,6 @@ nightly:
     - { name: TC_SU_2_2.py, duration: 10 minutes }
     - { name: TC_SU_2_5.py, duration: 20 minutes }
     - { name: TC_SU_2_7.py, duration: 25 minutes }
+    - { name: TC_CC_2_2.py, duration: 2.5 minutes }
+    - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }
+    - { name: TC_JFADMIN_1_4.py, duration: 5 minutes }
