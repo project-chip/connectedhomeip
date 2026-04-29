@@ -23,7 +23,7 @@ runs:
   using: "composite"
   steps:
     - name: Configure ccache
-      uses: pyTooling/Actions/with-post-step@v0.4.5
+      uses: pyTooling/Actions/with-post-step@cc576ce25a588e4fd623f3a4ea528f397141e931 # v0.4.5
       with:
         main: |
           mkdir -p .ccache
@@ -63,7 +63,7 @@ runs:
     - name: Restore ccache
       if: ${{ inputs.disable != 'true' }}
       id: ccache-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
       with:
         path: .ccache
         key: ${{ env.CCACHE_KEY }}
