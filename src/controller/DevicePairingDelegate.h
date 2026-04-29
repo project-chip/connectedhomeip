@@ -237,6 +237,18 @@ public:
      * @param[in] endpoint the endpoint that hosts the Network Commissioning cluster the credentials are needed for.
      */
     virtual CHIP_ERROR ThreadCredentialsNeeded(EndpointId endpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief
+     *   Called when the initial stage of commissioning is completed.
+     *
+     * @param[in] peerId an identifier for the commissioning process.  This is the actual
+     *                   NodeID of the node, combined with the compressed fabric ID for
+     *                   the fabric doing the commissioning.
+     * @param[in] transportType the transport type of the commissioning channel used for the initial phase of commissioning.
+     * @param[in] isUnpowered true if the device was unpowered during the initial phase of commissioning, false otherwise     *
+     */
+    virtual void OnInitialStageComplete(PeerId peerId, Transport::Type transportType, bool isUnpowered) {}
 };
 
 } // namespace Controller

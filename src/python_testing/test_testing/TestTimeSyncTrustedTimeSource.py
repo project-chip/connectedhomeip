@@ -28,11 +28,11 @@ from matter.testing.runner import default_matter_test_main
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
-kConfigureUTCTime = 6
-kConfigureTimeZone = 7
-kConfigureDSTOffset = 8
-kConfigureDefaultNTP = 9
-kConfigureTrustedTimeSource = 19
+kConfigureUTCTime = 5
+kConfigureTimeZone = 6
+kConfigureDSTOffset = 7
+kConfigureDefaultNTP = 8
+kConfigureTrustedTimeSource = 20
 
 # NOTE: all of these tests require a specific app setup. Please see TestTimeSyncTrustedTimeSourceRunner.py
 
