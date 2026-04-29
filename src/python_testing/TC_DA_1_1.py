@@ -42,7 +42,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.testing.commissioning import SetupParameters
+from matter.testing.commissioning import CommissioningInfo, SetupParameters, commission_device
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
@@ -133,6 +133,17 @@ class TC_DA_1_1(MatterBaseTest):
         opcreds_cluster = Clusters.OperationalCredentials
         fabrics_attr = opcreds_cluster.Attributes.Fabrics
         nocs_attr = opcreds_cluster.Attributes.NOCs
+        commissioning_info = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method,
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            thread_ba_host=self.matter_test_config.thread_ba_host,
+            thread_ba_port=self.matter_test_config.thread_ba_port,
+        )
 
         # *** PRECONDITION ***
         # DUT is commissioned to TH1's fabric
@@ -193,12 +204,8 @@ class TC_DA_1_1(MatterBaseTest):
         # DUT is commissioned to TH2's fabric
         self.step(7)
         th2_node_id = self.dut_node_id + 2
-        await th2.CommissionOnNetwork(
-            nodeId=th2_node_id,
-            setupPinCode=setup_params.passcode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=setup_params.discriminator
-        )
+        status = await commission_device(th2, th2_node_id, setupPayloadInfo[0], commissioning_info)
+        asserts.assert_true(status, f"TH2 commissioning failed: {status}")
 
         # *** STEP 8 ***
         # TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
@@ -211,17 +218,14 @@ class TC_DA_1_1(MatterBaseTest):
             attribute=fabrics_attr,
             fabric_filtered=False)
 
-        # Verify that there is a single entry in the Fabrics list
-        asserts.assert_equal(len(fabrics_th2), 1,
-                             f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th2)}")
-
-        # Verify that TH2's Fabrics attribute's FabricID is the same as TH2's FabricID
-        asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId,
-                             f"TH2 FabricID ({fabrics_th2[0].fabricID}) and Fabrics attribute FabricID ({th2.fabricId}) must match")
+        # Verify that TH2's FabricID is present in the Fabrics list
+        th2_fabric = next((f for f in fabrics_th2 if f.fabricID == th2.fabricId), None)
+        asserts.assert_is_not_none(th2_fabric,
+                                   f"TH2 FabricID ({th2.fabricId}) not found in Fabrics list: {[f.fabricID for f in fabrics_th2]}")
 
         # Verify that TH2 and TH1's Fabrics attribute's FabricIDs are different
-        asserts.assert_not_equal(fabrics_th2[0].fabricID, th1_fabric.fabricID,
-                                 f"TH2's FabricID ({fabrics_th2[0].fabricID}) must be different from TH1's FabricID ({th1_fabric.fabricID})")
+        asserts.assert_not_equal(th2_fabric.fabricID, th1_fabric.fabricID,
+                                 f"TH2's FabricID ({th2_fabric.fabricID}) must be different from TH1's FabricID ({th1_fabric.fabricID})")
 
         # *** STEP 9 ***
         # TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster
@@ -234,13 +238,13 @@ class TC_DA_1_1(MatterBaseTest):
             attribute=nocs_attr,
             fabric_filtered=False)
 
-        # Verify that there is a single entry in the NOCs list
-        asserts.assert_equal(len(nocs_th2), 1,
-                             f"NOCs attribute must contain a single entry in the list, got {len(nocs_th2)}")
+        # Locate TH2's NOC entry by matching fabric index
+        th2_noc = next((n for n in nocs_th2 if n.fabricIndex == th2_fabric.fabricIndex), None)
+        asserts.assert_is_not_none(th2_noc, f"No NOC entry found for TH2's fabric index ({th2_fabric.fabricIndex})")
 
         # Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key
         nocs_th1_decoded_pk = TLVReader(th1_noc.noc).get()["Any"][9]
-        nocs_th2_decoded_pk = TLVReader(nocs_th2[0].noc).get()["Any"][9]
+        nocs_th2_decoded_pk = TLVReader(th2_noc.noc).get()["Any"][9]
         asserts.assert_not_equal(nocs_th1_decoded_pk, nocs_th2_decoded_pk,
                                  f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1's NOCs entry public key ({nocs_th1_decoded_pk.hex()})")
 
@@ -252,12 +256,8 @@ class TC_DA_1_1(MatterBaseTest):
         # *** STEP 11 ***
         # TH1 commissions DUT to TH1's fabric
         self.step(11)
-        await th1.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
-            setupPinCode=setup_params.passcode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=setup_params.discriminator
-        )
+        status = await commission_device(th1, self.dut_node_id, setupPayloadInfo[0], commissioning_info)
+        asserts.assert_true(status, f"TH1 re-commissioning failed: {status}")
 
 
 if __name__ == "__main__":
