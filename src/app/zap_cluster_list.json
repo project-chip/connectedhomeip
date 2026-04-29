@@ -81,6 +81,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "NETWORK_IDENTITY_MANAGEMENT_CLUSTER": [],
         "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
@@ -153,6 +154,7 @@
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "WIFI_NETWORK_MANAGEMENT_CLUSTER": [],
         "ZONE_MANAGEMENT_CLUSTER": []
     },
     "ServerDirectories": {
@@ -266,6 +268,9 @@
         "MESSAGES_CLUSTER": ["messages-server"],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
+        "NETWORK_IDENTITY_MANAGEMENT_CLUSTER": [
+            "network-identity-management-server"
+        ],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

@@ -24,7 +24,6 @@ CommandHandlerInterfaceOnlyClusters:
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
     - Camera AV Settings User Level Management
-    - Closure Dimension
     - Commodity Price
     - Commodity Tariff
     - Device Energy Management Mode
@@ -33,8 +32,8 @@ CommandHandlerInterfaceOnlyClusters:
     - Energy EVSE Mode
     - Joint Fabric Administrator
     - Laundry Washer Mode
-    - Microwave Oven Control
     - Network Commissioning
+    - Network Identity Management
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
@@ -121,6 +120,7 @@ CodeDrivenClusters:
     - Camera AV Stream Management
     - Chime
     - Closure Control
+    - Closure Dimension
     - Commissioner Control
     - Descriptor
     - Device Energy Management
@@ -140,7 +140,10 @@ CodeDrivenClusters:
     - Identify
     - Illuminance Measurement
     - Localization Configuration
+    - Microwave Oven Control
+    - Network Identity Management
     - OTA Software Update Provider
+    - OTA Software Update Requestor
     - Occupancy Sensing
     - Operational Credentials
     - Power Topology
