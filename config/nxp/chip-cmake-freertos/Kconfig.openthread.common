@@ -16,8 +16,16 @@
 
 # Define NET_L2_OPENTHREAD config for FreeRTOS compatibility with Zephyr (already defined in Zephyr module)
 # to enable shared code and Kconfig across both platforms.
+
+config OPENTHREAD
+	bool
+	help
+	  Internal: mirrors NET_L2_OPENTHREAD so CHIP GN receives chip_enable_thread and loads OpenThread
+	  declare_args (see config/common/cmake/chip_gn_kconfig_defaults.cmake).
+
 config NET_L2_OPENTHREAD
 	bool "Enable Thread support"
+	select OPENTHREAD
 	help
 	  Enable OT support.
 
