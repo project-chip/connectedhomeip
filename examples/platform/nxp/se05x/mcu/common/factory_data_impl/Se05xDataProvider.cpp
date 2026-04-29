@@ -34,6 +34,9 @@ using namespace chip::DeviceLayer::PersistedStorage;
 namespace chip {
 namespace DeviceLayer {
 
+static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
+    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
+
 static Se05xDataProviderImpl sInstance;
 
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
@@ -66,6 +69,7 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(uint8_t * buf, uint16_t b
         size_t buflen = sizeof(cert);
 
         err = se05x_get_certificate(kSpake2p_Pwd_Salt_Bin_File_id, cert, &buflen);
+        se05x_close_session();
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         certLen = buflen;
@@ -129,6 +133,27 @@ CHIP_ERROR Se05xDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
 CHIP_ERROR Se05xDataProviderImpl::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
     iterationCount = SE05X_SPAKE_VERIFIER_TP_ITER_CNT;
+    return CHIP_NO_ERROR;
+}
+
+/*
+ * The function will set the verifiers to zero (The trust provisioned verifiers from SE05x are used).
+ * In the SE05x spake implementation, the values of verifiers (zeros and non-zero) are used to decide if
+ * SE05x or host to be used for spake.
+ */
+CHIP_ERROR Se05xDataProviderImpl::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
+{
+    char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
+    uint16_t verifierB64Len                                   = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kVerifierId, (uint8_t *) &verifierB64[0], sizeof(verifierB64), verifierB64Len));
+
+    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
+    VerifyOrReturnError(verifierLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(verifierLen <= verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    // Set verifier buffer to zero - the actual verifier remains in SE05x secure element
+    memset(verifierBuf.data(), 0, verifierLen);
+    verifierBuf.reduce_size(verifierLen);
+
     return CHIP_NO_ERROR;
 }
 #endif
