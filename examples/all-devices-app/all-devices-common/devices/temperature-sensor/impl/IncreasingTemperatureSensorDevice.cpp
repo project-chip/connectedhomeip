@@ -25,7 +25,8 @@ namespace chip {
 namespace app {
 
 namespace {
-constexpr System::Clock::Seconds16 kIncreaseMoistureIntervalSec = System::Clock::Seconds16(10);
+
+constexpr System::Clock::Seconds16 kIncreaseTemperatureIntervalSec = System::Clock::Seconds16(10);
 
 const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
     .minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-10)),
@@ -48,8 +49,8 @@ CHIP_ERROR IncreasingTemperatureSensorDevice::Register(EndpointId endpoint, Code
                                                        EndpointId parentId)
 {
     ReturnErrorOnFailure(TemperatureSensorDevice::Register(endpoint, provider, parentId));
-    // Kick off the timer loop to increase moisture every few seconds
-    return mTimerDelegate.StartTimer(this, kIncreaseMoistureIntervalSec);
+    // Kick off the timer loop to increase temperature every few seconds
+    return mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec);
 }
 
 void IncreasingTemperatureSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
@@ -77,7 +78,7 @@ void IncreasingTemperatureSensorDevice::TimerFired()
     ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", mTemperatureMeasuredValue.Value());
     LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(mTemperatureMeasuredValue));
 
-    VerifyOrDie(mTimerDelegate.StartTimer(this, kIncreaseMoistureIntervalSec) == CHIP_NO_ERROR);
+    LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec));
 }
 
 } // namespace app
