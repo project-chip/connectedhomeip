@@ -19,25 +19,11 @@
 
 #pragma once
 
-/**********************************************************
- * Includes
- *********************************************************/
-
-#include "AppEvent.h"
 #include "BaseApplication.h"
-
-#include <lib/core/CHIPError.h>
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-#include "RGBLEDWidget.h"
-#endif
 
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-
-/**********************************************************
- * AppTask Declaration
- *********************************************************/
+#include <lib/core/CHIPError.h>
 
 class AppTask : public BaseApplication
 {
@@ -56,46 +42,13 @@ public:
 
     CHIP_ERROR StartAppTask();
 
-    enum Action_t
-    {
-        ON_ACTION = 0,
-        OFF_ACTION,
-        LEVEL_ACTION,
-        COLOR_ACTION_HSV,
-        COLOR_ACTION_CT,
-        COLOR_ACTION_XY,
-
-        INVALID_ACTION
-    };
-
-    enum State_t
-    {
-        kState_OffInitiated = 0,
-        kState_OffCompleted,
-        kState_OnInitiated,
-        kState_OnCompleted,
-    };
-
     /**
      * @brief Event handler when a button is pressed.
      *
-     * @param button      APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
-     * @param btnAction   SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
+     * @param button    APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
+     * @param btnAction SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-
-    CHIP_ERROR InitLight();
-
-    /**
-     * @brief Returns true when the light is currently in the On-completed state.
-     */
-    bool IsLightOn() const;
-
-    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    bool InitiateLightCtrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value);
-#endif
 
     static void OnTriggerOffWithEffect(OnOffEffect * effect);
 
@@ -104,13 +57,5 @@ public:
 
 protected:
     CHIP_ERROR AppInit() override;
-
-    void OnLightActionInitiated(Action_t aAction, int32_t aActor, uint8_t * aValue);
-    void OnLightActionCompleted(Action_t aAction);
-
-    static void LightTimerEventHandler(void * timerCbArg);
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    static void LightControlEventHandler(AppEvent * aEvent);
-#endif
+    CHIP_ERROR InitLight();
 };
