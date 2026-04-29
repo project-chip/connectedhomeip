@@ -1,12 +1,12 @@
 # Documentation links
 
--   [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
--   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
--   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
--   [CI REPL Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/ci_tests/)
--   [Nightly Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/nightly/)
+- [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
+- [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
+- [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
+- [CI REPL Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/ci_tests/)
+- [Nightly Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/nightly/)
 
-# Matter
+# Matterr
 
 [![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/build.yaml)
 
