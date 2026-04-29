@@ -50,6 +50,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+
 class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
 
     def desc_TC_WebRTCP_2_1(self) -> str:

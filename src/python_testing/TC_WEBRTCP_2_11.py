@@ -129,8 +129,8 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_audio_stream(audioStreamID)
         await self.validate_allocated_video_stream(videoStreamID)
 
-        #videoStreamID = await self.allocate_video_stream(endpoint)
-        #audioStreamID = await self.allocate_audio_stream(endpoint)
+        # videoStreamID = await self.allocate_video_stream(endpoint)
+        # audioStreamID = await self.allocate_audio_stream(endpoint)
 
         self.step(2)
         # Send SolicitOffer command with valid parameters, expecting deferred response
