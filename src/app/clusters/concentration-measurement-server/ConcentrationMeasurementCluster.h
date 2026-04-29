@@ -107,7 +107,7 @@ private:
     static constexpr uint16_t kClusterRevision =
         static_cast<uint16_t>(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision);
 
-    const BitFlags<Feature> mFeatures;
+    BitFlags<Feature> mFeatures;
 
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;
