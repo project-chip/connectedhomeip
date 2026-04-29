@@ -27,11 +27,8 @@ namespace chip::app::Clusters {
 class PressureMeasurementCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet =
-        app::OptionalAttributeSet<PressureMeasurement::Attributes::Tolerance::Id, PressureMeasurement::Attributes::ScaledValue::Id,
-                                  PressureMeasurement::Attributes::MinScaledValue::Id,
-                                  PressureMeasurement::Attributes::MaxScaledValue::Id,
-                                  PressureMeasurement::Attributes::ScaledTolerance::Id, PressureMeasurement::Attributes::Scale::Id>;
+    using OptionalAttributeSet = app::OptionalAttributeSet<PressureMeasurement::Attributes::Tolerance::Id,
+                                                           PressureMeasurement::Attributes::ScaledTolerance::Id>;
 
     struct Config
     {
@@ -51,10 +48,6 @@ public:
             mMinScaledValue = minScaledValue;
             mMaxScaledValue = maxScaledValue;
             mScale          = scale;
-            mOptionalAttributeSet.template Set<PressureMeasurement::Attributes::ScaledValue::Id>();
-            mOptionalAttributeSet.template Set<PressureMeasurement::Attributes::MinScaledValue::Id>();
-            mOptionalAttributeSet.template Set<PressureMeasurement::Attributes::MaxScaledValue::Id>();
-            mOptionalAttributeSet.template Set<PressureMeasurement::Attributes::Scale::Id>();
             return *this;
         }
 
@@ -65,15 +58,17 @@ public:
             return *this;
         }
 
+        BitMask<PressureMeasurement::Feature> mFeatureMap;
+        OptionalAttributeSet mOptionalAttributeSet;
+
         DataModel::Nullable<int16_t> minMeasuredValue;
         DataModel::Nullable<int16_t> maxMeasuredValue;
-        OptionalAttributeSet mOptionalAttributeSet;
-        BitMask<PressureMeasurement::Feature> mFeatureMap;
         uint16_t mTolerance = 0;
+
         DataModel::Nullable<int16_t> mMinScaledValue;
         DataModel::Nullable<int16_t> mMaxScaledValue;
-        uint16_t mScaledTolerance = 0;
         int8_t mScale             = 0;
+        uint16_t mScaledTolerance = 0;
     };
 
     explicit PressureMeasurementCluster(EndpointId endpointId);
@@ -92,21 +87,18 @@ public:
     CHIP_ERROR SetScaledValue(DataModel::Nullable<int16_t> scaledValue);
     DataModel::Nullable<int16_t> GetScaledValue() const { return mScaledValue; }
 
-protected:
-    CHIP_ERROR SetMeasuredValueRange(DataModel::Nullable<int16_t> minMeasuredValue, DataModel::Nullable<int16_t> maxMeasuredValue);
-
 private:
     const OptionalAttributeSet mOptionalAttributeSet;
     const BitMask<PressureMeasurement::Feature> mFeatureMap;
     DataModel::Nullable<int16_t> mMeasuredValue{};
-    DataModel::Nullable<int16_t> mMinMeasuredValue{};
-    DataModel::Nullable<int16_t> mMaxMeasuredValue{};
-    uint16_t mTolerance{};
+    const DataModel::Nullable<int16_t> mMinMeasuredValue;
+    const DataModel::Nullable<int16_t> mMaxMeasuredValue;
+    const uint16_t mTolerance;
     DataModel::Nullable<int16_t> mScaledValue{};
-    DataModel::Nullable<int16_t> mMinScaledValue{};
-    DataModel::Nullable<int16_t> mMaxScaledValue{};
-    uint16_t mScaledTolerance{};
-    int8_t mScale{};
+    const DataModel::Nullable<int16_t> mMinScaledValue;
+    const DataModel::Nullable<int16_t> mMaxScaledValue;
+    const uint16_t mScaledTolerance;
+    const int8_t mScale;
 };
 
 } // namespace chip::app::Clusters

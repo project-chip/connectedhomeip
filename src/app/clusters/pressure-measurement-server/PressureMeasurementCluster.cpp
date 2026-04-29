@@ -22,10 +22,14 @@ namespace chip::app::Clusters {
 
 using namespace PressureMeasurement::Attributes;
 
-// Spec bounds for pressure measurement (int16s)
+// Spec bounds for constructor validation
 constexpr int16_t kMinMeasuredValueMax = 32766;
-constexpr int16_t kMaxMeasuredValueMin = -32766;
-constexpr uint16_t kMaxTolerance       = 2048;
+constexpr int16_t kMaxMeasuredValueMax = 32767;
+constexpr uint16_t kToleranceMax       = 2048;
+constexpr int16_t kMinScaledValueMax   = 32766;
+constexpr int16_t kMaxScaledValueMax   = 32767;
+constexpr uint16_t kScaledToleranceMax = 2048;
+constexpr int8_t kScaleMin             = -127;
 
 namespace {
 
@@ -42,49 +46,53 @@ PressureMeasurementCluster::PressureMeasurementCluster(EndpointId endpointId) : 
 
 PressureMeasurementCluster::PressureMeasurementCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, PressureMeasurement::Id }), mOptionalAttributeSet(config.mOptionalAttributeSet),
-    mFeatureMap(config.mFeatureMap)
+    mFeatureMap(config.mFeatureMap), mMinMeasuredValue(config.minMeasuredValue), mMaxMeasuredValue(config.maxMeasuredValue),
+    mTolerance(config.mTolerance), mMinScaledValue(config.mMinScaledValue), mMaxScaledValue(config.mMaxScaledValue),
+    mScaledTolerance(config.mScaledTolerance), mScale(config.mScale)
 {
-    // Validate measured value range
-    if (!config.minMeasuredValue.IsNull())
+    // Validate measured value range per spec constraints
+    if (!mMinMeasuredValue.IsNull())
     {
-        VerifyOrDie(config.minMeasuredValue.Value() <= kMinMeasuredValueMax);
+        VerifyOrDie(mMinMeasuredValue.Value() <= kMinMeasuredValueMax);
+    }
 
-        if (!config.maxMeasuredValue.IsNull())
+    if (!mMaxMeasuredValue.IsNull())
+    {
+        VerifyOrDie(mMaxMeasuredValue.Value() <= kMaxMeasuredValueMax);
+
+        if (!mMinMeasuredValue.IsNull())
         {
-            VerifyOrDie(config.maxMeasuredValue.Value() >= config.minMeasuredValue.Value() + 1);
+            VerifyOrDie(mMaxMeasuredValue.Value() >= mMinMeasuredValue.Value() + 1);
         }
     }
 
-    if (!config.maxMeasuredValue.IsNull())
-    {
-        VerifyOrDie(config.maxMeasuredValue.Value() >= kMaxMeasuredValueMin);
-    }
+    VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || mTolerance <= kToleranceMax);
 
-    VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || config.mTolerance <= kMaxTolerance);
-
-    // Validate EXT feature: if any EXT attribute is present, the Extended feature must be enabled
-    if (mOptionalAttributeSet.IsSet(ScaledValue::Id) || mOptionalAttributeSet.IsSet(MinScaledValue::Id) ||
-        mOptionalAttributeSet.IsSet(MaxScaledValue::Id) || mOptionalAttributeSet.IsSet(Scale::Id) ||
-        mOptionalAttributeSet.IsSet(ScaledTolerance::Id))
-    {
-        VerifyOrDieWithMsg(mFeatureMap.Has(PressureMeasurement::Feature::kExtended), AppServer,
-                           "Scaled attributes require the Extended feature.");
-    }
-
-    VerifyOrDie(!mOptionalAttributeSet.IsSet(ScaledTolerance::Id) || config.mScaledTolerance <= kMaxTolerance);
+    // Validate EXT feature
+    VerifyOrDieWithMsg(!mOptionalAttributeSet.IsSet(ScaledTolerance::Id) ||
+                           mFeatureMap.Has(PressureMeasurement::Feature::kExtended),
+                       AppServer, "ScaledTolerance requires the Extended feature. Use WithExtendedFeature() in Config.");
 
     if (mFeatureMap.Has(PressureMeasurement::Feature::kExtended))
     {
-        VerifyOrDie(config.mScale >= -127);
-    }
+        VerifyOrDie(mScale >= kScaleMin);
+        VerifyOrDie(!mOptionalAttributeSet.IsSet(ScaledTolerance::Id) || mScaledTolerance <= kScaledToleranceMax);
 
-    mMinMeasuredValue = config.minMeasuredValue;
-    mMaxMeasuredValue = config.maxMeasuredValue;
-    mTolerance        = config.mTolerance;
-    mMinScaledValue   = config.mMinScaledValue;
-    mMaxScaledValue   = config.mMaxScaledValue;
-    mScaledTolerance  = config.mScaledTolerance;
-    mScale            = config.mScale;
+        if (!mMinScaledValue.IsNull())
+        {
+            VerifyOrDie(mMinScaledValue.Value() <= kMinScaledValueMax);
+        }
+
+        if (!mMaxScaledValue.IsNull())
+        {
+            VerifyOrDie(mMaxScaledValue.Value() <= kMaxScaledValueMax);
+
+            if (!mMinScaledValue.IsNull())
+            {
+                VerifyOrDie(mMaxScaledValue.Value() >= mMinScaledValue.Value() + 1);
+            }
+        }
+    }
 }
 
 DataModel::ActionReturnStatus PressureMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -95,7 +103,7 @@ DataModel::ActionReturnStatus PressureMeasurementCluster::ReadAttribute(const Da
     case ClusterRevision::Id:
         return encoder.Encode(PressureMeasurement::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(mFeatureMap.Raw());
+        return encoder.Encode(mFeatureMap);
     case MeasuredValue::Id:
         return encoder.Encode(mMeasuredValue);
     case MinMeasuredValue::Id:
@@ -124,12 +132,18 @@ CHIP_ERROR PressureMeasurementCluster::Attributes(const ConcreteClusterPath & pa
 {
     AttributeListBuilder listBuilder(builder);
 
-    const DataModel::AttributeEntry optionalAttributes[] = {
-        Tolerance::kMetadataEntry,      ScaledValue::kMetadataEntry,     MinScaledValue::kMetadataEntry,
-        MaxScaledValue::kMetadataEntry, ScaledTolerance::kMetadataEntry, Scale::kMetadataEntry,
+    const bool hasExt = mFeatureMap.Has(PressureMeasurement::Feature::kExtended);
+
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mOptionalAttributeSet.IsSet(Tolerance::Id), Tolerance::kMetadataEntry },
+        { hasExt, ScaledValue::kMetadataEntry },
+        { hasExt, MinScaledValue::kMetadataEntry },
+        { hasExt, MaxScaledValue::kMetadataEntry },
+        { hasExt, Scale::kMetadataEntry },
+        { hasExt && mOptionalAttributeSet.IsSet(ScaledTolerance::Id), ScaledTolerance::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), mOptionalAttributeSet);
+    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
 CHIP_ERROR PressureMeasurementCluster::SetMeasuredValue(DataModel::Nullable<int16_t> measuredValue)
@@ -155,29 +169,6 @@ CHIP_ERROR PressureMeasurementCluster::SetScaledValue(DataModel::Nullable<int16_
     }
 
     SetAttributeValue(mScaledValue, scaledValue, ScaledValue::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PressureMeasurementCluster::SetMeasuredValueRange(DataModel::Nullable<int16_t> minMeasuredValue,
-                                                             DataModel::Nullable<int16_t> maxMeasuredValue)
-{
-    if (!minMeasuredValue.IsNull())
-    {
-        VerifyOrReturnError(minMeasuredValue.Value() <= kMinMeasuredValueMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-        if (!maxMeasuredValue.IsNull())
-        {
-            VerifyOrReturnError(maxMeasuredValue.Value() >= minMeasuredValue.Value() + 1, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        }
-    }
-
-    if (!maxMeasuredValue.IsNull())
-    {
-        VerifyOrReturnError(maxMeasuredValue.Value() >= kMaxMeasuredValueMin, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    }
-
-    SetAttributeValue(mMinMeasuredValue, minMeasuredValue, MinMeasuredValue::Id);
-    SetAttributeValue(mMaxMeasuredValue, maxMeasuredValue, MaxMeasuredValue::Id);
     return CHIP_NO_ERROR;
 }
 

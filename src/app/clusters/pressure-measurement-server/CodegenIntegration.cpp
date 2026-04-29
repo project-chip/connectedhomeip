@@ -74,8 +74,9 @@ public:
             config.WithTolerance(tolerance);
         }
 
-        // EXT feature: check if ScaledValue attribute is present (implies Extended feature)
-        if (optionalAttributeSet.IsSet(ScaledValue::Id))
+        // EXT feature: ScaledValue, MinScaledValue, MaxScaledValue, Scale are mandated by Extended feature
+        BitFlags<PressureMeasurement::Feature> features(featureMap);
+        if (features.Has(PressureMeasurement::Feature::kExtended))
         {
             DataModel::Nullable<int16_t> minScaledValue;
             DataModel::Nullable<int16_t> maxScaledValue;
@@ -120,7 +121,7 @@ void MatterPressureMeasurementClusterInitCallback(EndpointId endpointId)
             .clusterId                 = PressureMeasurement::Id,
             .fixedClusterInstanceCount = kPressureMeasurementFixedClusterCount,
             .maxClusterInstanceCount   = kPressureMeasurementMaxClusterCount,
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);

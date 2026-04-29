@@ -31,14 +31,6 @@ using namespace chip::app::Clusters::PressureMeasurement;
 using namespace chip::app::Clusters::PressureMeasurement::Attributes;
 using namespace chip::Testing;
 
-// Exposes protected SetMeasuredValueRange for testing
-class TestablePressureMeasurementCluster : public PressureMeasurementCluster
-{
-public:
-    using PressureMeasurementCluster::PressureMeasurementCluster;
-    using PressureMeasurementCluster::SetMeasuredValueRange;
-};
-
 struct TestPressureMeasurementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -70,43 +62,6 @@ void TestMandatoryAttributes(ClusterTester & tester)
 
 } // namespace
 
-TEST_F(TestPressureMeasurementCluster, AttributeTest)
-{
-    {
-        PressureMeasurementCluster cluster(kRootEndpointId);
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, PressureMeasurement::Id), attributes), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    {
-        const DataModel::AttributeEntry optionalAttributes[] = { Tolerance::kMetadataEntry };
-        PressureMeasurementCluster::Config config;
-        config.WithTolerance(100);
-        PressureMeasurementCluster cluster(kRootEndpointId, config);
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, PressureMeasurement::Id), attributes), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), config.mOptionalAttributeSet),
-                  CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-}
-
 TEST_F(TestPressureMeasurementCluster, ReadAttributeTest)
 {
     {
@@ -114,7 +69,6 @@ TEST_F(TestPressureMeasurementCluster, ReadAttributeTest)
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
-
         TestMandatoryAttributes(tester);
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -127,7 +81,6 @@ TEST_F(TestPressureMeasurementCluster, ReadAttributeTest)
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
-
         TestMandatoryAttributes(tester);
 
         uint16_t tolerance{};
@@ -210,30 +163,12 @@ TEST_F(TestPressureMeasurementCluster, ConstructorVariants)
     }
 }
 
-TEST_F(TestPressureMeasurementCluster, InvalidRangeDefaultsToNull)
-{
-    // min == max == 0 is invalid (max must be >= min + 1).
-    TestablePressureMeasurementCluster cluster(kRootEndpointId);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-    DataModel::Nullable<int16_t> min;
-    DataModel::Nullable<int16_t> max;
-    min.SetNonNull(0);
-    max.SetNonNull(0);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    EXPECT_TRUE(cluster.GetMinMeasuredValue().IsNull());
-    EXPECT_TRUE(cluster.GetMaxMeasuredValue().IsNull());
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
 TEST_F(TestPressureMeasurementCluster, MeasuredValue)
 {
     PressureMeasurementCluster::Config config;
     config.minMeasuredValue.SetNonNull(-10);
     config.maxMeasuredValue.SetNonNull(10);
-    TestablePressureMeasurementCluster cluster(kRootEndpointId, config);
+    PressureMeasurementCluster cluster(kRootEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     DataModel::Nullable<int16_t> measuredValue{};
@@ -266,90 +201,26 @@ TEST_F(TestPressureMeasurementCluster, MeasuredValue)
     EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetMeasuredValue().IsNull());
 
-    // Null range — any value accepted
-    DataModel::Nullable<int16_t> nullMin, nullMax;
-    nullMin.SetNull();
-    nullMax.SetNull();
-    EXPECT_EQ(cluster.SetMeasuredValueRange(nullMin, nullMax), CHIP_NO_ERROR);
-
-    measuredValue.SetNonNull(-32766);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-
-    measuredValue.SetNonNull(32766);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-
-    // Only min set
-    DataModel::Nullable<int16_t> minOnly, maxNull;
-    minOnly.SetNonNull(100);
-    maxNull.SetNull();
-    EXPECT_EQ(cluster.SetMeasuredValueRange(minOnly, maxNull), CHIP_NO_ERROR);
-
-    measuredValue.SetNonNull(99);
+    // -32768 is outside configured range (-10 to 10) — rejected
+    measuredValue.SetNonNull(-32768);
     EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    measuredValue.SetNonNull(32766);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-
-    // Only max set
-    DataModel::Nullable<int16_t> minNull, maxOnly;
-    minNull.SetNull();
-    maxOnly.SetNonNull(200);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(minNull, maxOnly), CHIP_NO_ERROR);
-
-    measuredValue.SetNonNull(201);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    measuredValue.SetNonNull(-32766);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestPressureMeasurementCluster, MeasuredValueRange)
+TEST_F(TestPressureMeasurementCluster, MeasuredValueNullRange)
 {
-    TestablePressureMeasurementCluster cluster(kRootEndpointId);
+    // Both min and max null — any valid value accepted
+    PressureMeasurementCluster cluster(kRootEndpointId);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-    DataModel::Nullable<int16_t> min, max;
+    DataModel::Nullable<int16_t> measuredValue{};
 
-    // Valid range
-    min.SetNonNull(-100);
-    max.SetNonNull(100);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.GetMinMeasuredValue().Value(), -100);
-    EXPECT_EQ(cluster.GetMaxMeasuredValue().Value(), 100);
+    measuredValue.SetNonNull(-32767);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
 
-    // Max spec bounds
-    min.SetNonNull(32766);
-    max.SetNonNull(32767);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_NO_ERROR);
-
-    // min exceeds max allowed (32766)
-    min.SetNonNull(32767);
-    max.SetNonNull(32767);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    // min == max (must be min + 1)
-    min.SetNonNull(100);
-    max.SetNonNull(100);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    // Both null
-    min.SetNull();
-    max.SetNull();
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_NO_ERROR);
-    EXPECT_TRUE(cluster.GetMinMeasuredValue().IsNull());
-    EXPECT_TRUE(cluster.GetMaxMeasuredValue().IsNull());
-
-    // Only min set
-    min.SetNonNull(-500);
-    max.SetNull();
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_NO_ERROR);
-
-    // Only max set
-    min.SetNull();
-    max.SetNonNull(500);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(min, max), CHIP_NO_ERROR);
+    measuredValue.SetNonNull(32767);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -405,6 +276,30 @@ TEST_F(TestPressureMeasurementCluster, ScaledValueEXT)
     sv.SetNull();
     EXPECT_EQ(cluster.SetScaledValue(sv), CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetScaledValue().IsNull());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPressureMeasurementCluster, ScaledToleranceBeforeExtendedFeature)
+{
+    // WithScaledTolerance before WithExtendedFeature — order should not matter
+    PressureMeasurementCluster::Config config;
+    config.minMeasuredValue.SetNonNull(30);
+    config.maxMeasuredValue.SetNonNull(10000);
+    config.WithScaledTolerance(50);
+    config.WithExtendedFeature(DataModel::Nullable<int16_t>(-100), DataModel::Nullable<int16_t>(10000), -1);
+    PressureMeasurementCluster cluster(kRootEndpointId, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 1u);
+
+    uint16_t scaledTolerance{};
+    ASSERT_EQ(tester.ReadAttribute(ScaledTolerance::Id, scaledTolerance), CHIP_NO_ERROR);
+    EXPECT_EQ(scaledTolerance, 50);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
