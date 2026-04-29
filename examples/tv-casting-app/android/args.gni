@@ -24,7 +24,8 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-chip_build_libshell = true
+import(
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
 
 chip_enable_additional_data_advertising = true
 
@@ -36,12 +37,49 @@ chip_max_discovered_ip_addresses = 20
 
 enable_rtti = true
 
-# Build Configuration: Fast Development Mode
-optimize_for_size = false  # -O2 (speed) vs -Os (size) - faster compilation
-symbol_level =
-    0  # -g0 (no debug symbols) - fastest compilation, no stack traces
+if (optimize_apk_size) {
+  # Size-optimized build: smaller APK, fewer debug features
+  # NOTE: The following flags are declared in declare_args() blocks
+  # elsewhere and MUST be passed as explicit GN build args from
+  # android.py to override their defaults.  Setting them here in
+  # args.gni has NO EFFECT because this file is evaluated inside
+  # default_args (before args.gn values are applied), so the
+  # if (optimize_apk_size) conditional sees the default value of
+  # false and the entire block is skipped.
+  #
+  # Flags passed from android.py for size-optimized builds:
+  #   optimize_apk_size = true          (this flag itself)
+  #   is_debug = false
+  #   matter_enable_tracing_support = false
+  #   use_static_libcxx = true
+  #   chip_tlv_decoder_attribute_source_override  (tv-casting-app only)
+  #   chip_tlv_decoder_event_source_override     (tv-casting-app only)
+  #   chip_cluster_objects_source_override        (tv-casting-app only)
+  #
+  # The assignments below are kept for documentation and for any
+  # build path that evaluates args.gni AFTER args.gn (e.g. a manual
+  # gn gen with optimize_apk_size=true in args.gn directly).
+  chip_build_libshell = false
+  optimize_for_size = true  # -Os (size) instead of -O2 (speed)
+  symbol_level = 0  # -g0: no debug symbols
 
-#is_debug = false            # Release mode: faster execution, removes safety checks
+  # Slim TLV decoders covering only the 18 casting clusters.  These
+  # replace the full zap-generated decoders (~200+ clusters) at build
+  # time, keeping ChipClusters.java read/subscribe APIs functional
+  # while reducing binary size.
+  chip_tlv_decoder_attribute_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-CHIPAttributeTLVValueDecoder.cpp"
+  chip_tlv_decoder_event_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-CHIPEventTLVValueDecoder.cpp"
+
+  # Compile only the ~36 casting-relevant clusters instead of the full
+  # generated cluster-objects.cpp (~200+ clusters).  This is the same
+  # slim file already used by Linux and Darwin builds.
+  chip_cluster_objects_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
+} else {
+  # Default development build: full debug features, fast compilation
+  chip_build_libshell = true
+  optimize_for_size = false  # -O2 (speed) - faster compilation
+  symbol_level = 0  # -g0 (no debug symbols) - fastest compilation
+}
 
 # Symbol Level Options:
 # 0 = No debug symbols (-g0): Fastest build, smallest binary, no crash stack traces
@@ -53,5 +91,5 @@ symbol_level =
 # false = Release mode: Removes assert() checks, bounds checking, extra logging
 # true = Debug mode: Keeps all safety checks, slower execution but catches bugs
 # Default: true (if not specified, GN defaults to debug mode)
-
-# For Release Builds: Use optimize_for_size=true, symbol_level=1
+# Note: In size-optimized builds, is_debug=false is set by android.py as a
+# GN build arg to properly override the declare_args() default.

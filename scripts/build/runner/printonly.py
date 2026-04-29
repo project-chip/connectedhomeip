@@ -29,12 +29,13 @@ class PrintOnlyRunner:
             "# Commands will be run in CHIP project root.\n")
         self.output_file.write('cd "%s"\n\n' % self.root)
 
-    def Run(self, cmd, title=None, dedup=False):
-        if title:
+    def Run(self, cmd, title=None, dedup=False, quiet=False):
+        if title and not quiet:
             self.output_file.write("# " + title + "\n")
 
         if dedup & self.deduplicator.is_duplicate(cmd):
-            self.output_file.write("# DUPLICATE COMMAND SKIPPED\n")
+            if not quiet:
+                self.output_file.write("# DUPLICATE COMMAND SKIPPED\n")
             return
 
         self.output_file.write(

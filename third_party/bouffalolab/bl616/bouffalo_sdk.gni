@@ -19,9 +19,8 @@ import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
   # Location of the bl616 SDK.
-  bouffalo_sdk_root = "${chip_root}/third_party/bouffalolab/bouffalo_sdk"
+  bouffalo_sdk_root = "${chip_root}/third_party/bouffalolab/repo_bouffalo_sdk"
 
-  enable_lwip_pbuf_ram = false
   enable_debug_coredump = false
   coredump_binary_id = 0
   bouffalo_sdk_coredump_version = 1
@@ -63,6 +62,7 @@ template("bouffalo_sdk") {
       "-fstrict-volatile-bitfields",
       "-fshort-enums",
       "-Wno-unused-but-set-variable",
+      "-Wno-sign-compare",
     ]
 
     cflags = [
@@ -72,10 +72,6 @@ template("bouffalo_sdk") {
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
-    }
-
-    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
-      defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
     }
   }
 
@@ -106,11 +102,13 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/drivers/soc/bl616/std/startup/vector.S",
     ]
 
+    cflags_c = [ "-Wno-sign-compare" ]
+
     configs += [
-      ":${sdk_target_name}_config_freertos",
       ":${sdk_target_name}_config_std_drv",
       ":${sdk_target_name}_config_lhal",
       ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
     ]
 
     public_configs = [
@@ -136,7 +134,6 @@ template("bouffalo_sdk") {
   source_set("${sdk_target_name}_std_drv") {
     defines = [
       "ARCH_RISCV",
-      "BFLB_USE_HAL_DRIVER",
       "BFLB_USE_ROM_DRIVER",
     ]
 
@@ -174,14 +171,12 @@ template("bouffalo_sdk") {
     ]
 
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_startup",
       ":${sdk_target_name}_config_lhal",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_std_drv",
-      ":${sdk_target_name}_config",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_std_drv" ]
   }
 
   config("${sdk_target_name}_config_lhal") {
@@ -203,10 +198,7 @@ template("bouffalo_sdk") {
       "CONFIG_IRQ_NUM=80",
     ]
 
-    include_dirs = [
-      #bl616 lhal
-      "${bouffalo_sdk_root}/drivers/lhal/include",
-    ]
+    include_dirs = [ "${bouffalo_sdk_root}/drivers/lhal/include" ]
 
     sources = [
       "${bouffalo_sdk_root}/drivers/lhal/config/bl616/device_table.c",
@@ -249,28 +241,16 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/drivers/lhal/src/flash/bflb_xip_sflash.c",
     ]
 
-    libs = [ "${bouffalo_sdk_root}/drivers/lhal/src/pka/libpka.a" ]
+    libs = [ "${bouffalo_sdk_root}/drivers/lhal/src/pka/libpka_bl616.a" ]
 
-    cflags_c = [
-      "-Wno-shadow",
-      "-Wno-sign-compare",
-      "-Wno-implicit-fallthrough",
-      "-Wno-format",
-      "-Wno-format-nonliteral",
-      "-Wno-format-security",
-      "-Wno-unused-function",
-    ]
+    cflags_c = [ "-Wno-shadow" ]
 
     configs += [
-      ":${sdk_target_name}_config_startup",
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_std_drv",
-      ":${sdk_target_name}_config_freertos",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_lhal",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_lhal" ]
   }
 
   config("${sdk_target_name}_config_sys") {
@@ -288,7 +268,6 @@ template("bouffalo_sdk") {
     ]
 
     cflags_c = [
-      "-Wno-sign-compare",
       "-Wno-shadow",
       "-Wno-format",
       "-Wno-format-nonliteral",
@@ -296,13 +275,11 @@ template("bouffalo_sdk") {
     ]
 
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_std_drv",
       ":${sdk_target_name}_config_lhal",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_sys",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_sys" ]
   }
 
   config("${sdk_target_name}_config_board") {
@@ -310,38 +287,64 @@ template("bouffalo_sdk") {
   }
 
   source_set("${sdk_target_name}_board") {
-    defines = [
-      "CONFIG_MBEDTLS",
-      "CONFIG_BFLOG",
-      "BL616",
-    ]
+    defines = [ "CONFIG_MBEDTLS" ]
 
     include_dirs = [ "${bouffalo_sdk_root}/bsp/board/bl616dk" ]
 
     sources = [
       "${bouffalo_sdk_root}/bsp/board/bl616dk/board.c",
+      "${bouffalo_sdk_root}/bsp/board/bl616dk/board_flash_psram.c",
+      "${bouffalo_sdk_root}/bsp/board/bl616dk/board_gpio.c",
       "${bouffalo_sdk_root}/bsp/board/bl616dk/board_rf.c",
       "${bouffalo_sdk_root}/bsp/board/bl616dk/fw_header.c",
     ]
 
     cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-type-limits",
       "-Wno-shadow",
-      "-Wno-enum-conversion",
       "-Wno-format",
       "-Wno-format-nonliteral",
       "-Wno-format-security",
     ]
 
     configs += [
-      ":${sdk_target_name}_config_startup",
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_std_drv",
-      ":${sdk_target_name}_config_lhal",
-      ":${sdk_target_name}_config_freertos",
-      ":${sdk_target_name}_config_mm",
       ":${sdk_target_name}_config_rf",
+      ":${sdk_target_name}_config_lhal",
+      ":${sdk_target_name}_config_mm",
     ]
 
     public_configs = [ ":${sdk_target_name}_config_board" ]
+  }
+
+  config("${sdk_target_name}_config_eth_phy") {
+    include_dirs = [
+      "${bouffalo_sdk_root}/bsp/common/eth_phy",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/lwip_netif_emac",
+    ]
+  }
+
+  source_set("${sdk_target_name}_eth_phy") {
+    sources = [
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/ephy_general.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/ephy_lan8720.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/eth_phy.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/eth_phy_port.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/lwip_netif_emac/lwip_netif_emac.c",
+    ]
+
+    configs += [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_std_drv",
+      ":${sdk_target_name}_config_lhal",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_lwip",
+      ":${sdk_target_name}_config_freertos",
+    ]
+
+    public_configs = [ ":${sdk_target_name}_config_eth_phy" ]
   }
 
   config("${sdk_target_name}_config_shell") {
@@ -358,20 +361,15 @@ template("bouffalo_sdk") {
 
     cflags_c = [
       "-Wno-shadow",
-      "-Wno-enum-conversion",
       "-Wno-format-security",
-      "-Wno-format-truncation",
       "-Wno-format-nonliteral",
-      "-Wno-sign-compare",
     ]
 
     configs += [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_lhal",
       ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_config_board",
       ":${sdk_target_name}_config_freertos",
-      ":${sdk_target_name}_config_mm",
     ]
     public_configs = [ ":${sdk_target_name}_config_shell" ]
   }
@@ -386,8 +384,6 @@ template("bouffalo_sdk") {
   }
 
   source_set("${sdk_target_name}_rf") {
-    defines = [ "RFPARAM_BL616" ]
-
     include_dirs = [ "${bouffalo_sdk_root}/drivers/rfparam/Inc" ]
 
     sources = [
@@ -397,20 +393,15 @@ template("bouffalo_sdk") {
 
     libs = [ "${bouffalo_sdk_root}/drivers/soc/bl616/phyrf/lib-gcc_10.2.0-toolchain_V2.6.1/libbl616_phyrf.a" ]
 
-    cflags_c = [
-      "-Wno-shadow",
-      "-Wno-sign-compare",
-    ]
+    cflags_c = [ "-Wno-shadow" ]
 
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_std_drv",
       ":${sdk_target_name}_config_lhal",
       ":${sdk_target_name}_config_utils",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_rf",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_rf" ]
   }
 
   source_set("${sdk_target_name}_libc") {
@@ -472,31 +463,27 @@ template("bouffalo_sdk") {
     ]
 
     cflags = [
-      "-fno-builtin",
-      "-Wno-sign-compare",
-      "-Wno-implicit-fallthrough",
+      "-Wno-nonnull-compare",
       "-Wno-builtin-declaration-mismatch",
+      "-Wno-implicit-fallthrough",
+      "-Wno-format",
+      "-Wno-format-truncation",
     ]
     configs += [
       ":${sdk_target_name}_config_mm",
       ":${sdk_target_name}_config_lhal",
+      ":${sdk_target_name}_config_utils",
     ]
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 
   config("${sdk_target_name}_config_freertos") {
-    defines = [
-      "CONFIG_FREERTOS",
-      "configSTACK_ALLOCATION_FROM_SEPARATE_HEAP=1",
-    ]
+    defines = [ "CONFIG_FREERTOS" ]
 
     include_dirs = [
       "${bouffalo_sdk_root}/components/os/freertos/include",
       "${bouffalo_sdk_root}/components/os/freertos/portable/GCC/RISC-V/common",
       "${bouffalo_sdk_root}/components/os/freertos/portable/GCC/RISC-V/common/chip_specific_extensions/RV32I_CLINT_no_extensions",
-
-      #"${bouffalo_sdk_root}/components/os/freertos/posix/include",
-      "${chip_root}/examples/platform/bouffalolab/bl616",
     ]
   }
 
@@ -504,12 +491,9 @@ template("bouffalo_sdk") {
     defines = [
       "portasmHANDLE_INTERRUPT=interrupt_entry",
       "default_interrupt_handler=freertos_risc_v_trap_handler",
-
-      #"CONFIG_POSIX",
     ]
 
     include_dirs = [
-      #memory heap
       "${bouffalo_sdk_root}/components/os/freertos/include",
       "${bouffalo_sdk_root}/components/os/freertos/portable/GCC/RISC-V/common",
       "${bouffalo_sdk_root}/components/os/freertos/portable/GCC/RISC-V/common/chip_specific_extensions/RV32I_CLINT_no_extensions",
@@ -528,87 +512,38 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/os/freertos/timers.c",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_freertos",
-    ]
-  }
-
-  config("${sdk_target_name}_config_mm") {
-    include_dirs = [
-      "${bouffalo_sdk_root}/components/mm",
-      "${bouffalo_sdk_root}/components/mm/tlsf",
-    ]
-  }
-
-  source_set("${sdk_target_name}_mm") {
-    defines = [
-      "configSTACK_ALLOCATION_FROM_SEPARATE_HEAP=1",
-      "CONFIG_TLSF",
-    ]
-
-    include_dirs = [
-      #memory heap
-      "${bouffalo_sdk_root}/components/mm",
-      "${bouffalo_sdk_root}/components/mm/tlsf",
-    ]
-
-    sources = [
-      "${bouffalo_sdk_root}/components/mm/mem.c",
-      "${bouffalo_sdk_root}/components/mm/tlsf/bflb_tlsf.c",
-      "${bouffalo_sdk_root}/components/mm/tlsf/tlsf.c",
-    ]
-
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-format",
-      "-Wno-format-nonliteral",
-      "-Wno-format-security",
-    ]
-
     configs += [
-      ":${sdk_target_name}_config_lhal",
-      ":${sdk_target_name}_config_freertos",
-    ]
-
-    public_configs = [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_mm",
     ]
+
+    public_configs = [ ":${sdk_target_name}_config_freertos" ]
   }
 
-  config("${sdk_target_name}_config_easyflash4") {
-    include_dirs = [ "${bouffalo_sdk_root}/components/easyflash4/inc" ]
+  config("${sdk_target_name}_config_mm") {
+    include_dirs = [ "${bouffalo_sdk_root}/components/mm" ]
   }
 
-  source_set("${sdk_target_name}_easyflash4") {
-    defines = [
-      "CONFIG_EASYFLASH4",
-      "BL616",
-      "EF_ENV_CACHE_TABLE_SIZE=100",
-    ]
+  source_set("${sdk_target_name}_mm") {
+    defines = [ "CONFIG_TLSF" ]
 
-    include_dirs = [ "${bouffalo_sdk_root}/components/easyflash4/inc" ]
+    include_dirs = [ "${bouffalo_sdk_root}/components/mm/tlsf" ]
 
     sources = [
-      "${bouffalo_sdk_root}/components/easyflash4/src/easyflash.c",
-      "${bouffalo_sdk_root}/components/easyflash4/src/easyflash_cli.c",
-      "${bouffalo_sdk_root}/components/easyflash4/src/ef_env.c",
-      "${bouffalo_sdk_root}/components/easyflash4/src/ef_env_legacy.c",
-      "${bouffalo_sdk_root}/components/easyflash4/src/ef_env_legacy_wl.c",
-      "${bouffalo_sdk_root}/components/easyflash4/src/ef_port.c",
-      "${bouffalo_sdk_root}/components/easyflash4/src/ef_utils.c",
+      "${bouffalo_sdk_root}/components/mm/mm.c",
+      "${bouffalo_sdk_root}/components/mm/mm_debug.c",
+      "${bouffalo_sdk_root}/components/mm/tlsf/tlsf.c",
+      "${bouffalo_sdk_root}/components/mm/tlsf/tlsf_allocator.c",
     ]
 
-    cflags_c = [ "-Wno-sign-compare" ]
-
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_lhal",
       ":${sdk_target_name}_config_freertos",
       ":${sdk_target_name}_config_utils",
     ]
 
-    public_configs = [ ":${sdk_target_name}_config_easyflash4" ]
+    public_configs = [ ":${sdk_target_name}_config_mm" ]
   }
 
   config("${sdk_target_name}_config_littlefs") {
@@ -621,11 +556,6 @@ template("bouffalo_sdk") {
   }
 
   source_set("${sdk_target_name}_littlefs") {
-    defines = [
-      "CONFIG_LITTLEFS",
-      "CONFIG_FREERTOS",
-    ]
-
     include_dirs = [
       "${bouffalo_sdk_root}/components/fs/littlefs/littlefs",
       "${bouffalo_sdk_root}/components/fs/littlefs/port",
@@ -639,67 +569,57 @@ template("bouffalo_sdk") {
     ]
 
     cflags_c = [
-      "-Wno-sign-compare",
+      "-Wno-shadow",
       "-Wno-format",
       "-Wno-format-nonliteral",
       "-Wno-format-security",
-      "-Wno-shadow",
     ]
 
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_lhal",
-      ":${sdk_target_name}_config_freertos",
       ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_littlefs",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_littlefs" ]
   }
 
   config("${sdk_target_name}_config_utils") {
     include_dirs = [
-      "${bouffalo_sdk_root}/components/utils/log",
-      "${bouffalo_sdk_root}/components/utils/log/bflog",
+      "${bouffalo_sdk_root}/components/utils/async_event",
       "${bouffalo_sdk_root}/components/utils/bflb_mtd/include",
       "${bouffalo_sdk_root}/components/utils/bflb_ota",
       "${bouffalo_sdk_root}/components/utils/coredump",
       "${bouffalo_sdk_root}/components/utils/partition",
       "${bouffalo_sdk_root}/components/utils/getopt",
+      "${bouffalo_sdk_root}/components/utils/log",
+      "${bouffalo_sdk_root}/components/utils/log/bflb_log",
+      "${bouffalo_sdk_root}/components/utils/list",
       "${bouffalo_sdk_root}/components/utils/ring_buffer",
       "${bouffalo_sdk_root}/components/utils/math/include",
-      "${bouffalo_sdk_root}/components/utils/list",
     ]
 
-    defines = [
-      "CONFIG_LOG_LEVEL=0",
-      "CONFIG_BFLOG",
-      "CONFIG_BFLOG_DEBUG",
-    ]
+    defines = [ "CONFIG_LOG_LEVEL=0" ]
   }
 
   source_set("${sdk_target_name}_utils") {
-    defines = [
-      "CONFIG_LOG_LEVEL=0",
-      "CONFIG_BFLOG",
-      "CONFIG_BFLOG_DEBUG",
-    ]
-
+    defines = []
     if (defined(invoker.enable_debug_coredump) &&
         invoker.enable_debug_coredump) {
       defines += [ "CONFIG_COREDUMP" ]
     }
 
     sources = [
+      "${bouffalo_sdk_root}/components/utils/async_event/async_event.c",
+      "${bouffalo_sdk_root}/components/utils/async_event/rtos_al.c",
       "${bouffalo_sdk_root}/components/utils/bflb_mtd/bflb_boot2.c",
       "${bouffalo_sdk_root}/components/utils/bflb_mtd/bflb_mtd.c",
       "${bouffalo_sdk_root}/components/utils/bflb_ota/bflb_ota.c",
       "${bouffalo_sdk_root}/components/utils/bflb_ota/utils_sha256.c",
       "${bouffalo_sdk_root}/components/utils/getopt/utils_getopt.c",
-      "${bouffalo_sdk_root}/components/utils/log/bflog/bflog.c",
+      "${bouffalo_sdk_root}/components/utils/log/bflb_log/bflb_log.c",
       "${bouffalo_sdk_root}/components/utils/log/log.c",
-      "${bouffalo_sdk_root}/components/utils/log/log_freertos.c",
       "${bouffalo_sdk_root}/components/utils/math/src/utils_base64.c",
       "${bouffalo_sdk_root}/components/utils/math/src/utils_crc.c",
       "${bouffalo_sdk_root}/components/utils/math/src/utils_hex.c",
@@ -725,26 +645,21 @@ template("bouffalo_sdk") {
     }
 
     cflags_c = [
-      "-Wno-sign-compare",
       "-Wno-type-limits",
-      "-Wno-stringop-truncation",
       "-Wno-format",
       "-Wno-format-nonliteral",
       "-Wno-format-security",
-      "-Wno-implicit-function-declaration",
     ]
 
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_startup",
       ":${sdk_target_name}_config_std_drv",
       ":${sdk_target_name}_config_lhal",
       ":${sdk_target_name}_config_freertos",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_utils",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_utils" ]
   }
 
   config("${sdk_target_name}_config_mbedtls") {
@@ -758,8 +673,6 @@ template("bouffalo_sdk") {
   }
 
   source_set("${sdk_target_name}_mbedtls") {
-    defines = [ "CONFIG_FREERTOS" ]
-
     include_dirs =
         [ "${bouffalo_sdk_root}/components/crypto/mbedtls/mbedtls/library" ]
 
@@ -868,24 +781,19 @@ template("bouffalo_sdk") {
     ]
 
     cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-implicit-function-declaration",
       "-Wno-format",
       "-Wno-format-security",
       "-Wno-format-nonliteral",
     ]
 
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_lhal",
       ":${sdk_target_name}_config_freertos",
-      ":${sdk_target_name}_config_mm",
       ":${sdk_target_name}_config_lwip",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_mbedtls",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_mbedtls" ]
   }
 
   config("${sdk_target_name}_config_lwip") {
@@ -900,16 +808,6 @@ template("bouffalo_sdk") {
 
     include_dirs +=
         [ "${bouffalo_sdk_root}/components/net/lwip/lwip/src/apps/dhcpd" ]
-
-    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
-      include_dirs += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip" ]
-    }
-
-    defines = [
-      "CONFIG_LWIP",
-      "CONFIG_MAC_TXQ_DEPTH=8",
-      "CONFIG_MAC_RXQ_DEPTH=8",
-    ]
   }
 
   source_set("${sdk_target_name}_lwip") {
@@ -947,6 +845,7 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/ipv6/ip6_frag.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/ipv6/mld6.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/ipv6/nd6.c",
+      "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/mem.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/memp.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/netif.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/pbuf.c",
@@ -961,67 +860,74 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/netif/ethernet.c",
     ]
 
-    if (defined(invoker.enable_lwip_pbuf_ram) && invoker.enable_lwip_pbuf_ram) {
-      sources += [ "${bouffalolab_iot_sdk_build_root}/patches/lwip/mem.c" ]
-    } else {
-      sources +=
-          [ "${bouffalo_sdk_root}/components/net/lwip/lwip/src/core/mem.c" ]
-    }
-
     sources += [
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/apps/dhcpd/dhcp_server_raw.c",
       "${bouffalo_sdk_root}/components/net/lwip/lwip/src/apps/lwiperf/lwiperf.c",
     ]
 
     cflags_c = [
-      "-Wno-sign-compare",
       "-Wno-format",
       "-Wno-format-nonliteral",
       "-Wno-format-security",
-      "-Wno-unused-variable",
     ]
 
     configs += [
-      ":${sdk_target_name}_config_std_drv",
-      ":${sdk_target_name}_config_lhal",
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_freertos",
-      ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_config_mm",
       ":${sdk_target_name}_config_wifi",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_lwip",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_lwip" ]
   }
 
   config("${sdk_target_name}_config_wifi") {
     defines = [
-      "CFG_VIF_MAX=2",
-      "CFG_STA_MAX=4",
-      "CFG_UMAC",
+      "__FILENAME__=__FILE__",
+      "CFG_IPV6",
+    ]
+    defines += [ "CONFIG_MACSW_SELECT_INCLUDE=\"macsw_default_config.h\"" ]
+    defines += [
+      "BOUFFALO_SDK",
+      "PLATFORM_PRIVDE_ERRNO",
+    ]
+    defines += [
+      "CONFIG_MACSW_LWIP",
+      "CONFIG_USE_MBEDTLS",
+      "CONFIG_NO_STDOUT_DEBUG",
     ]
 
     include_dirs = [
-      "${bouffalo_sdk_root}/components/wireless/wifi6/include",
-      "${bouffalo_sdk_root}/components/wireless/wifi6/bl6_os_adapter/include",
+      "${bouffalo_sdk_root}/components/wireless/macsw/inc",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/fhost/include",
       "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter/include",
     ]
   }
 
   source_set("${sdk_target_name}_wifi") {
-    defines = [ "CFG_IPV6" ]
-    libs = [ "${bouffalo_sdk_root}/components/wireless/wifi6/lib/libwifi6.a" ]
-
-    include_dirs =
-        [ "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter" ]
+    libs = [
+      "${bouffalo_sdk_root}/components/wireless/macsw/lib/libmacsw_bl616_default.a",
+      "${bouffalo_sdk_root}/components/wireless/macsw/lib/libmacsw_config_bl616_default.a",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/fhost/lib/libfhost_bl616_default.a",
+    ]
 
     sources = [
-      "${bouffalo_sdk_root}/components/wireless/wifi6/bl6_os_adapter/src/platform_bouffalo_sdk.c",
-      "${bouffalo_sdk_root}/components/wireless/wifi6/bl6_os_adapter/src/rtos_al.c",
+      "${bouffalo_sdk_root}/components/wireless/macsw_plat.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/fhost_config/fhost_config_buffer.c",
+    ]
+
+    defines = [ "BOUFFALO_SDK" ]
+    include_dirs = [
+      "${bouffalo_sdk_root}/components/wireless/wifi6/macsw_os_adapter/include",
+    ]
+    sources += [
+      "${bouffalo_sdk_root}/components/wireless/wifi6/macsw_os_adapter/src/platform_bouffalo_sdk.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/macsw_os_adapter/src/rtos_al.c",
+    ]
+
+    include_dirs +=
+        [ "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter" ]
+    sources += [
       "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter/cli_al.c",
-      "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter/mat.c",
       "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter/net_al.c",
       "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter/net_al_ext.c",
       "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter/pbuf_custom_ref.c",
@@ -1029,53 +935,201 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/wireless/wifi6/wifi6_lwip_adapter/wifi_pkt_hooks.c",
     ]
 
+    include_dirs += [
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/l2_packet",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/rsn_supp",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/drivers",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_peer",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eapol_supp",
+    ]
+    sources += [
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ap_config.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ap_drv_ops.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ap_list.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ap_mlme.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/authsrv.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/beacon.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/bss_load.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ctrl_iface_ap.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/dfs.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/drv_callbacks.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/eap_user_db.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/hostapd.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/hw_features.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ieee802_11.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ieee802_11_auth.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ieee802_11_he.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ieee802_11_ht.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ieee802_11_shared.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ieee802_11_vht.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/ieee802_1x.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/mbo_ap.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/neighbor_db.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/pmksa_cache_auth.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/rrm.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/sta_info.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/tkip_countermeasures.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/utils.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/wmm.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/wnm_ap.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/wpa_auth.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/wpa_auth_glue.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/wpa_auth_ie.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/ap/wps_hostapd.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/common/dragonfly.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/common/hw_features_common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/common/ieee802_11_common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/common/sae.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/common/wpa_common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/drivers/driver_common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/drivers/driver_macsw.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/drivers/drivers.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_common/eap_common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_common/eap_wsc_common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_peer/eap.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_peer/eap_methods.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_peer/eap_wsc.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_server/eap_server.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_server/eap_server_identity.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eap_server/eap_server_methods.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eapol_auth/eapol_auth_sm.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/l2_packet/l2_packet_macsw.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/rsn_supp/pmksa_cache.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/rsn_supp/preauth.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/rsn_supp/wpa.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/rsn_supp/wpa_ie.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/tls/bignum.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/base64.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/bitfield.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/crc32.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/eloop_rtos.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/ip_addr.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/os_macsw.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/uuid.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/wpa_debug.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/utils/wpabuf.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/aes-omac1.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/aes-unwrap.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/aes-wrap.c",
+
+      #"${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/crypto_openssl.c",
+      #"${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/crypto_libtomcrypt.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/crypto_internal-modexp.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/crypto_mbedtls.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/crypto_mbedtls_misc.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/dh_group5.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/dh_groups.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/random.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/rc4.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/sha1-pbkdf2.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/sha1-prf.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/sha256-kdf.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/sha256-prf.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/tls_none.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps_attr_build.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps_attr_parse.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps_attr_process.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps_common.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps_dev_attr.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps_enrollee.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wps/wps_registrar.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/ap.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/bss.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/bssid_ignore.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/config.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/config_none.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/ctrl_iface.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/ctrl_iface_macsw.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/eap_register.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/events.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/main_macsw.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/mbo.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/notify.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/op_classes.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/robust_av.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/rrm.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/scan.c",
+
+      #"${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/crypto_openssl.c",
+      #"${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/src/wpa_crypto/crypto_libtomcrypt.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/sme.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/wmm_ac.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/wnm_sta.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/wpa_supplicant.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/wpas_glue.c",
+      "${bouffalo_sdk_root}/components/wireless/wifi6/wpa_supplicant/wpa_supplicant/wps_supplicant.c",
+    ]
+
     cflags_c = [
       "-Wno-error",
-      "-Wno-sign-compare",
-      "-Wno-int-conversion",
-      "-Wno-shadow",
-      "-Wno-incompatible-pointer-types",
-      "-Wno-implicit-function-declaration",
+      "-Wno-misleading-indentation",
       "-Wno-format",
       "-Wno-format-nonliteral",
-      "-Wno-discarded-qualifiers",
       "-Wno-format-security",
+      "-Wno-incompatible-pointer-types",
+      "-Wno-implicit-function-declaration",
+      "-Wno-shadow",
+      "-Wno-int-conversion",
+      "-Wno-discarded-qualifiers",
+      "-Wno-implicit-fallthrough",
     ]
 
     configs += [
-      ":${sdk_target_name}_config_std_drv",
-      ":${sdk_target_name}_config_lhal",
-      ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_config_shell",
-      ":${sdk_target_name}_config_freertos",
-      ":${sdk_target_name}_config_lwip",
-    ]
-    public_configs = [
       ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_wifi",
+      ":${sdk_target_name}_config_std_drv",
+      ":${sdk_target_name}_config_rf",
+      ":${sdk_target_name}_config_lhal",
+      ":${sdk_target_name}_config_sys",
+      ":${sdk_target_name}_config_lwip",
+      ":${sdk_target_name}_config_mbedtls",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_mm",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_shell",
     ]
+
+    public_configs = [ ":${sdk_target_name}_config_wifi" ]
   }
 
   config("${sdk_target_name}_config_ble") {
     defines = [
+      "CONFIG_FREERTOS",
+      "CONFIG_BLE_ENABLE",
       "BFLB_BLE",
-      "CONFIG_BT_CONN=1",
+      "CONFIG_BLE",
+      "CONFIG_BL_SDK",
+      "CONFIG_CON=1",
+      "CONFIG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BT_PERIPHERAL",
+      "CONFIG_BT_BROADCASTER",
 
-      "CONFIG_SET_TX_PWR",
-      "CFG_CON=1",
-      "CFG_BLE",
-      "CFG_SLEEP",
-      "CFG_BT_RESET",
-      "CONFIG_BT_PERIPHERAL=1",
-      "CFG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BLE_PDS",
+      "CONFIG_HW_SEC_ENG_DISABLE",
+      "CONFIG_EM_HEAP_DISABLE",
+      "CONFIG_BT_CONN",
+      "CONFIG_BT_HCI_VS_EVT_USER",
+      "CONFIG_BT_ASSERT",
+
+      "CONFIG_BT_GATT_DIS_PNP",
+      "CONFIG_BT_GATT_DIS_SERIAL_NUMBER",
+      "CONFIG_BT_GATT_DIS_FW_REV",
+      "CONFIG_BT_GATT_DIS_HW_REV",
+      "CONFIG_BT_GATT_DIS_SW_REV",
       "CONFIG_BT_GATT_DYNAMIC_DB",
       "CONFIG_BT_GATT_SERVICE_CHANGED",
-      "CONFIG_BT_SETTINGS_CCC_LAZY_LOADING",
       "CONFIG_BT_KEYS_OVERWRITE_OLDEST",
-      "CONFIG_BT_GAP_PERIPHERAL_PREF_PARAMS",
+      "CONFIG_BT_KEYS_SAVE_AGING_COUNTER_ON_PAIRING",
       "CONFIG_BT_BONDABLE",
-      "CONFIG_BT_ASSERT",
-      "CFG_BLE_STACK_DBG_PRINT",
+
+      "CONFIG_BT_SETTINGS_USE_PRINTK",
     ]
 
     include_dirs = [
@@ -1093,22 +1147,6 @@ template("bouffalo_sdk") {
   }
 
   source_set("${sdk_target_name}_ble") {
-    defines = [
-      "CONFIG_BT_L2CAP_DYNAMIC_CHANNEL",
-      "CONFIG_BT_GATT_CLIENT",
-      "CONFIG_BT_CONN=1",
-      "CONFIG_BT_GATT_DIS_PNP",
-      "CONFIG_BT_GATT_DIS_SERIAL_NUMBER",
-      "CONFIG_BT_GATT_DIS_FW_REV",
-      "CONFIG_BT_GATT_DIS_HW_REV",
-      "CONFIG_BT_GATT_DIS_SW_REV",
-      "CONFIG_BT_ECC",
-      "CONFIG_BT_KEYS_SAVE_AGING_COUNTER_ON_PAIRING",
-      "CONFIG_BT_HCI_VS_EVT_USER",
-      "CONFIG_BT_SETTINGS_USE_PRINTK",
-      "CONFIG_BLE_MULTI_ADV",
-    ]
-
     libs = [ "${bouffalo_sdk_root}/components/wireless/bluetooth/btblecontroller/lib/libbtblecontroller_bl616_ble1m0s1bredr0.a" ]
 
     include_dirs = [
@@ -1126,14 +1164,15 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/common/dec.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/common/log.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/common/poll.c",
+      "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/common/rpa.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/common/work_q.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/hci_onchip/hci_driver.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/att.c",
-      "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/bl_host_assist.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/conn.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/crypto.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/gatt.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/hci_core.c",
+      "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/keys.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/l2cap.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/multi_adv.c",
       "${bouffalo_sdk_root}/components/wireless/bluetooth/blestack/src/host/settings.c",
@@ -1142,13 +1181,9 @@ template("bouffalo_sdk") {
     ]
 
     cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-implicit-function-declaration",
-      "-Wno-format",
-      "-Wno-format-nonliteral",
-      "-Wno-format-security",
-      "-Wno-discarded-qualifiers",
       "-Wno-misleading-indentation",
+      "-Wno-type-limits",
+      "-Wno-implicit-function-declaration",
     ]
 
     configs += [
@@ -1156,10 +1191,7 @@ template("bouffalo_sdk") {
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_ble",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_ble" ]
   }
 
   config("${sdk_target_name}_config_openthread_port") {
@@ -1176,6 +1208,7 @@ template("bouffalo_sdk") {
       "CONFIG_BL_SDK",
       "CHIP_HDR=<bl616.h>",
       "CHIP_GLB_HDR=<bl616_glb.h>",
+      "CHIP_SYS_HDR=<bl616_sys.h>",
       "MAC_ADDRESS_MAX_NUM=3",
     ]
 
@@ -1185,37 +1218,31 @@ template("bouffalo_sdk") {
     ]
 
     sources = [
-      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_alarm_bl616.c",
+      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_alarm.c",
+      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_frame.c",
+      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_linkmetric.c",
       "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_radio.c",
       "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_radio_bflb.c",
       "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_sys_bflb.c",
     ]
 
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
-        invoker.bouffalo_sdk_component_easyflash_enabled) {
-      sources += [ "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_settings_easyflash.c" ]
-    } else {
-      sources += [ "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_settings_littlefs.c" ]
-    }
+    sources += [ "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_settings_littlefs.c" ]
 
-    libs = [
-      "${bouffalo_sdk_root}/components/wireless/lmac154/lmac154/lib/liblmac154.a",
-      "${bouffalo_sdk_root}/components/wireless/thread/openthread_utils/lib/libopenthread_utils.a",
-    ]
+    libs = [ "${bouffalo_sdk_root}/components/wireless/lmac154/lmac154/lib/liblmac154_bl616.a" ]
 
-    cflags_c = [ "-Wno-sign-compare" ]
-
-    configs += [ ":${sdk_target_name}_config_freertos" ]
-    public_configs = [
+    configs += [
       ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_config_mm",
       ":${sdk_target_name}_config_std_drv",
       ":${sdk_target_name}_config_lhal",
-      ":${sdk_target_name}_config_shell",
+      ":${sdk_target_name}_config_sys",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_mm",
       ":${sdk_target_name}_config_littlefs",
-      ":${sdk_target_name}_config_openthread_port",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_shell",
     ]
+
+    public_configs = [ ":${sdk_target_name}_config_openthread_port" ]
 
     public_deps = [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -1259,13 +1286,7 @@ template("bouffalo_sdk") {
       ":${sdk_target_name}_sys",
       ":${sdk_target_name}_utils",
     ]
-
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
-        invoker.bouffalo_sdk_component_easyflash_enabled) {
-      public_deps += [ ":${sdk_target_name}_easyflash4" ]
-    } else {
-      public_deps += [ ":${sdk_target_name}_littlefs" ]
-    }
+    public_deps += [ ":${sdk_target_name}_littlefs" ]
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       public_deps += [ ":${sdk_target_name}_wifi" ]
@@ -1273,6 +1294,10 @@ template("bouffalo_sdk") {
     } else if (defined(invoker.chip_enable_thread) &&
                invoker.chip_enable_thread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
+    } else if (defined(invoker.chip_enable_ethernet) &&
+               invoker.chip_enable_ethernet) {
+      public_deps += [ ":${sdk_target_name}_eth_phy" ]
+      public_deps += [ ":${sdk_target_name}_lwip" ]
     }
 
     if (defined(invoker.chip_config_network_layer_ble) &&

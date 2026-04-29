@@ -16,10 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/UnitLocalization/Metadata.h>
@@ -36,22 +34,19 @@ CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    uint8_t storedTempUnit = 0;
-
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), storedTempUnit);
-    if (err == CHIP_NO_ERROR)
+    AttributePersistence attrPersistence{ context.attributeStorage };
+    const TempUnitEnum defaultTempUnit = mTemperatureUnit;
+    if (attrPersistence.LoadNativeEndianValue<TempUnitEnum>(
+            ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), mTemperatureUnit, defaultTempUnit))
     {
-        mTemperatureUnit = static_cast<TempUnitEnum>(storedTempUnit);
-        ChipLogDetail(Zcl, "UnitLocalization ep0 Loaded TemperatureUnit: %u", storedTempUnit);
+        ChipLogDetail(Zcl, "UnitLocalization ep0 Loaded TemperatureUnit: %u", to_underlying(mTemperatureUnit));
     }
     else
     {
         ChipLogDetail(Zcl, "UnitLocalization ep0 set default TemperatureUnit: %u", to_underlying(mTemperatureUnit));
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
@@ -105,6 +100,8 @@ DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataM
 
 CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
 {
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     bool isValid       = false;
     const auto & units = GetSupportedTemperatureUnits();
     for (auto const & unit : units)
@@ -119,8 +116,9 @@ CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
 
     VerifyOrReturnError(SetAttributeValue(mTemperatureUnit, newTempUnit, TemperatureUnit::Id), CHIP_NO_ERROR);
 
-    return GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit));
+    return mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id),
+        { reinterpret_cast<const uint8_t *>(&mTemperatureUnit), sizeof(mTemperatureUnit) });
 }
 
 CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,

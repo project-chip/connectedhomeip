@@ -93,11 +93,9 @@ class Cyw30739Builder(GnBuilder):
         self._output_dir = value
 
     def GnBuildArgs(self):
-        args = []
-
+        args = super().GnBuildArgs()
         if self.release:
             args.append('is_debug=false')
-
         return args
 
     def build_outputs(self):

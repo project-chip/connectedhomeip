@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/TLVWriter.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributeValueDecoder.h>
@@ -886,4 +887,198 @@ TEST(TestAttributePersistence, TestWriteOnDifferentValueNullableEnum)
         ASSERT_EQ(loadedValue.Value(), CalendarTypeEnum::kCoptic);
     }
 }
+
+// A fake encodable TLV structure, for testing purposes only.
+struct TestTLVStruct
+{
+    uint32_t a = 0;
+    bool b     = false;
+
+    bool operator==(const TestTLVStruct & other) const { return a == other.a && b == other.b; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+    {
+        TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), a));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), b));
+        return writer.EndContainer(outer);
+    }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader)
+    {
+        TLV::TLVType outer;
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        // Format of structure during Encode is known, so we force ordering.
+        ReturnErrorOnFailure(reader.Next());
+        VerifyOrReturnError(reader.GetTag() == TLV::ContextTag(1), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(reader.Get(a));
+
+        ReturnErrorOnFailure(reader.Next());
+        VerifyOrReturnError(reader.GetTag() == TLV::ContextTag(2), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(reader.Get(b));
+        VerifyOrReturnError(reader.Next() == CHIP_ERROR_END_OF_TLV, CHIP_ERROR_INVALID_ARGUMENT);
+
+        return reader.ExitContainer(outer);
+    }
+};
+
+TEST(TestAttributePersistence, TestStoreAndLoadTLV)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath kPath(1, 2, 3);
+    const ConcreteAttributePath kOtherInvalidPath(1, 2, 4);
+    constexpr size_t kBufferSize = 128;
+
+    TestTLVStruct valueToStore{ .a = 12345, .b = true };
+    TestTLVStruct valueToStore2{ .a = 67890, .b = false };
+
+    // Test StoreTLV with external buffer
+    {
+        uint8_t buffer[kBufferSize];
+        MutableByteSpan span(buffer);
+        EXPECT_EQ(persistence.StoreTLV(kPath, valueToStore, span), CHIP_NO_ERROR);
+    }
+
+    // Test LoadTLV with external buffer
+    {
+        uint8_t buffer[kBufferSize];
+        MutableByteSpan span(buffer);
+        TestTLVStruct loadedValue;
+        EXPECT_EQ(persistence.LoadTLV(kPath, loadedValue, span), CHIP_NO_ERROR);
+        EXPECT_EQ(loadedValue, valueToStore);
+    }
+
+    // Test LoadTLV from wrong path
+    {
+        uint8_t buffer[kBufferSize];
+        MutableByteSpan span(buffer);
+        TestTLVStruct loadedValue;
+        EXPECT_NE(persistence.LoadTLV(kOtherInvalidPath, loadedValue, span), CHIP_NO_ERROR);
+    }
+
+    // Test StoreTLV with stack allocation (convenience overload)
+    {
+        EXPECT_EQ(persistence.StoreTLV<kBufferSize>(kPath, valueToStore2), CHIP_NO_ERROR);
+    }
+
+    // Test StoreTLV with too small buffer
+    {
+        uint8_t buffer[4]; // Too small for TestTLVStruct
+        MutableByteSpan span(buffer);
+        EXPECT_EQ(persistence.StoreTLV(kPath, valueToStore, span), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+}
+
+TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+    const ConcreteAttributePath path(1, 2, 3);
+
+    // Helper to write raw bytes to storage
+    auto writeRaw = [&](const ByteSpan & data) {
+        return storageDelegate.SyncSetKeyValue(
+            DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(), data.data(),
+            static_cast<uint16_t>(data.size()));
+    };
+
+    // 1. Not a structure (Just an integer)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail because it expects a Structure
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_WRONG_TLV_TYPE);
+    }
+
+    // 2. Empty Structure
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail because it expects an element inside
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_END_OF_TLV);
+    }
+
+    // 3. Structure with Wrong Element Tag (Context Tag 2 instead of 1)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail on tag check
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // 4. Structure with Extra Element
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 200), CHIP_NO_ERROR); // Extra
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail on VerifyEndOfContainer inside container
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    }
+
+    // 5. Trailing Data after Structure
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), (uint32_t) 200), CHIP_NO_ERROR); // Trailing
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail on VerifyEndOfContainer outside container
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    }
+}
+
 } // namespace

@@ -36,9 +36,13 @@ template("gdbus_library") {
   }
 
   config("${library_name}_compile_config") {
-    # dbus code generation may generate some code detected as unreacheable
-    # by recent enough clang
-    cflags = [ "-Wno-unreachable-code" ]
+    # clang-specific supressions that are detected by recent enough clang:
+    #  - Unreachable code is generated
+    #  - Unused global variables (e.g. 'variable 'bluez_object_proxy_parent_class' set but not used')
+    cflags = [
+      "-Wno-unreachable-code",
+      "-Wno-unused-but-set-global",
+    ]
   }
 
   dbus_sources = []
@@ -64,31 +68,25 @@ template("gdbus_library") {
     ]
 
     args = [
-      "--input",
-      "{{source}}",
-      "--output_c",
+      "--output-c",
       rebase_path(source_file, root_build_dir),
-      "--output_h",
+      "--output-h",
       rebase_path(header_file, root_build_dir),
     ]
 
     if (defined(invoker.c_namespace)) {
-      args += [
-        "--c-namespace",
-        invoker.c_namespace,
-      ]
+      args += [ "--c-namespace=" + invoker.c_namespace ]
     }
 
     if (defined(invoker.interface_prefix)) {
-      args += [
-        "--interface-prefix",
-        invoker.interface_prefix,
-      ]
+      args += [ "--interface-prefix=" + invoker.interface_prefix ]
     }
 
     if (invoker.c_generate_object_manager) {
       args += [ "--c-generate-object-manager" ]
     }
+
+    args += [ "{{source}}" ]
   }
 
   static_library(library_name) {

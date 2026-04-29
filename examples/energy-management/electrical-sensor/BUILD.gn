@@ -21,8 +21,8 @@ config("config") {
 
 static_library("electrical-sensor") {
   sources = [
-    "${chip_root}/examples/energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management/electrical-sensor/src/PowerTopologyDelegate.cpp",
+    "${chip_root}/examples/energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management/electrical-sensor/src/PowerTopologyDelegateImpl.cpp",
   ]
 
   public_configs = [ ":config" ]

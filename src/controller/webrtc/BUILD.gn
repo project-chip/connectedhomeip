@@ -49,12 +49,4 @@ static_library("chip_webrtc") {
     "${chip_root}/src/platform",
     "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
-
-  libs = [
-    "ssl",
-    "crypto",
-  ]
-
-  # suppress known `libdatachannel` int conversion issues
-  cflags = [ "-Wno-implicit-int-conversion" ]
 }

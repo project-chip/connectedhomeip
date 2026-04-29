@@ -282,6 +282,11 @@ void PlatformManagerImpl::_Shutdown()
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
     if (mGLibMainLoop != nullptr)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+        // The wpa_supplicant GLib objects must be released while the GLib main loop is still running. Release them here, before
+        // quitting the loop, otherwise they leak when ConnectivityManager is destructed.
+        ConnectivityMgrImpl().StopWiFiManagement();
+#endif
         g_main_loop_quit(mGLibMainLoop);
         g_thread_join(mGLibMainLoopThread);
         g_main_loop_unref(mGLibMainLoop);

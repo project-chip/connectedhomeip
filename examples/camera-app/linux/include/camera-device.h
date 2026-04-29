@@ -54,7 +54,8 @@ static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
 static constexpr uint16_t k60fpsVideoFrameRate       = 60;
-static constexpr uint16_t kMinVideoFrameRate         = 30;
+static constexpr uint16_t k30fpsVideoFrameRate       = 30;
+static constexpr uint16_t kMinVideoFrameRate         = 15;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
 static constexpr uint32_t kKeyFrameIntervalMsec      = 4000;    // 4 sec; recommendation from Spec
@@ -103,6 +104,7 @@ public:
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
 
     void Init();
+    void Shutdown();
 
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
@@ -312,7 +314,7 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
-    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneId);
+    void HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds);
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
@@ -365,7 +367,7 @@ private:
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 1920, 1080 };
-    uint16_t mCurrentVideoFrameRate                                       = kMinVideoFrameRate;
+    uint16_t mCurrentVideoFrameRate                                       = k30fpsVideoFrameRate;
     bool mHDREnabled                                                      = false;
     bool mSpeakerMuted                                                    = false;
     bool mMicrophoneMuted                                                 = false;
