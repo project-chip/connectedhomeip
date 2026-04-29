@@ -288,7 +288,7 @@ class TC_CNET_4_24_2(MatterBaseTest):
         return "[TC_CNET_4_24] [Thread] Network Commissioning Success After Connection Failures [DUT-Server] [CASE]"
 
     @async_test_body
-    async def test_TC_CNET_4_24(self):
+    async def test_TC_CNET_4_24_2(self):
         endpoint = ROOT_ENDPOINT_ID
 
         correct_thread_dataset = self.matter_test_config.thread_operational_dataset
