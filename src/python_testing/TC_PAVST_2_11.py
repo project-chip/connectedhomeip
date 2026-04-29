@@ -77,9 +77,8 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
-    @async_test_body
-    async def teardown_test(self):
-        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+    def teardown_test(self):
+        self.event_loop.run_until_complete(self.postcondition_remove_tls_endpoint(self.tlsEndpointId))
         super().teardown_test()
 
     def steps_TC_PAVST_2_11(self) -> list[TestStep]:

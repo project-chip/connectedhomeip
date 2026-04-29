@@ -119,8 +119,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             ),
         ]
 
-    @async_test_body
-    async def teardown_test(self):
+    def teardown_test(self):
         # Clear provider KVS after test to avoid interference with subsequent tests
         self.clear_kvs()
         super().teardown_test()

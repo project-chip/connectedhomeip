@@ -193,8 +193,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                      "Verify that the DUT does not start transferring the software image.")
         ]
 
-    @async_test_body
-    async def teardown_test(self):
+    def teardown_test(self):
         # Clear provider KVS (self.KVS_PATH) after test to avoid interference with subsequent tests
         self.clear_kvs(kvs_path_prefix=self.KVS_PATH)
         self.terminate_provider()

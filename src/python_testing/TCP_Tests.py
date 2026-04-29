@@ -45,11 +45,13 @@ class TCP_Tests(MatterBaseTest):
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
         await self.send_single_cmd(cmd=cmd, endpoint=0, payloadCapability=payloadCapability)
 
-    @async_test_body
-    async def teardown_test(self):
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
-        await self.send_single_cmd(cmd=cmd, endpoint=0,
-                                   payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+    def teardown_test(self):
+        async def _cleanup():
+            cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+            await self.send_single_cmd(cmd=cmd, endpoint=0,
+                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        self.event_loop.run_until_complete(_cleanup())
+        super().teardown_test()
 
     def pics_TC_SC_8_1(self):
         return ['MCORE.SC.TCP']
