@@ -113,8 +113,7 @@ void LoggingFanDevice::SyncOnOffFromFanDriveState(const FanControl::FanDriveStat
         // Product choice: fan drive state implies powering the device off.
         LogErrorOnFailure(onOff.SetOnOff(false));
     }
-    else if (!onOff.GetOnOff() && supportsMultiSpeed && !newState.speedSetting.IsNull() &&
-             newState.speedSetting.Value() != 0)
+    else if (!onOff.GetOnOff() && supportsMultiSpeed && !newState.speedSetting.IsNull() && newState.speedSetting.Value() != 0)
     {
         // Product choice: fan speed command implies powering the device on.
         LogErrorOnFailure(onOff.SetOnOff(true));
