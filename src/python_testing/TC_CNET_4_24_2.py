@@ -284,7 +284,7 @@ class TC_CNET_4_24_2(MatterBaseTest):
                      "Verify the device is connected to the correct network"),
         ]
 
-    def desc_TC_CNET_4_24(self):
+    def desc_TC_CNET_4_24_2(self):
         return "[TC_CNET_4_24] [Thread] Network Commissioning Success After Connection Failures [DUT-Server] [CASE]"
 
     @async_test_body
