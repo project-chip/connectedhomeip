@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: restyled-io/actions/setup@v4
+      - uses: restyled-io/actions/setup@30f44939e2f6dcdf9e4d547c367ed35c154c5253 # v4
 
       - id: restyler
-        uses: restyled-io/actions/run@v4
+        uses: restyled-io/actions/run@30f44939e2f6dcdf9e4d547c367ed35c154c5253 # v4
 
       - name: Save restyle patch
         if: ${{ steps.restyler.outputs.git-patch }}
@@ -29,7 +29,7 @@ jobs:
 
       - id: upload
         if: ${{ steps.restyler.outputs.git-patch }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: pr-${{ github.event.pull_request.number }}-restyled
           path: /tmp/pr-${{ github.event.pull_request.number }}-restyled.patch

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(chip-gn)
 
-set(chip_dir "${bee_matter_root}")
+set(chip_dir "${matter_root}")
 set(chip_dir_output "${matter_output_path}/chip")
 set(chip_c_flags "")
 set(chip_cpp_flags "")
@@ -66,7 +66,7 @@ list(
     APPEND CHIP_INC
 
 	${inc_path}
-    ${CHIP_ROOT}/config/realtek/bee
+    ${CHIP_ROOT}/config/realtek/chip-gn-freertos
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/src
@@ -117,16 +117,24 @@ foreach(tmp IN LISTS GLOBAL_CXX_FLAGS)
 endforeach()
 string(APPEND chip_cpp_flags "${chip_c_flags}")
 
-set(import_str "import(\"//config/realtek/bee/args.gni\")\n" )
+set(import_str "import(\"//config/realtek/chip-gn-freertos/args.gni\")\n" )
 
 string(APPEND CHIP_GN_ARGS "${import_str}")
 
+# Set arm_platform_config based on RT_PLATFORM
+if(RT_PLATFORM STREQUAL "rtl87x2g")
+  set(arm_gni_path "//config/realtek/chip-gn-freertos/rtl87x2g/arm.gni")
+else()
+  message(FATAL_ERROR "RT_PLATFORM is not set or set to an unsupported value: '${RT_PLATFORM}'")
+endif()
+string(APPEND CHIP_GN_ARGS "arm_platform_config = \"${arm_gni_path}\"\n")
+
 string(APPEND CHIP_GN_ARGS "target_cflags_c = [${chip_c_flags}]\n")
 string(APPEND CHIP_GN_ARGS "target_cflags_cc = [${chip_cpp_flags}]\n")
-string(APPEND CHIP_GN_ARGS "bee_ar = \"arm-none-eabi-ar\"\n")
-string(APPEND CHIP_GN_ARGS "bee_cc = \"arm-none-eabi-gcc\"\n")
-string(APPEND CHIP_GN_ARGS "bee_cxx = \"arm-none-eabi-c++\"\n")
-string(APPEND CHIP_GN_ARGS "bee_cpu = \"arm\"\n")
+string(APPEND CHIP_GN_ARGS "rtk_ar = \"arm-none-eabi-ar\"\n")
+string(APPEND CHIP_GN_ARGS "rtk_cc = \"arm-none-eabi-gcc\"\n")
+string(APPEND CHIP_GN_ARGS "rtk_cxx = \"arm-none-eabi-c++\"\n")
+string(APPEND CHIP_GN_ARGS "rtk_cpu = \"arm\"\n")
 string(APPEND CHIP_GN_ARGS "chip_enable_thread = true\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
 string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = false\n")
@@ -216,13 +224,13 @@ ExternalProject_Add(
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
     CONFIGURE_COMMAND       gn
                             --root=${CHIP_ROOT}
-                            --root-target=${CHIP_ROOT}/config/realtek/bee
-                            --dotfile=${CHIP_ROOT}/config/realtek/bee/.gn
+                            --root-target=${CHIP_ROOT}/config/realtek/chip-gn-freertos
+                            --dotfile=${CHIP_ROOT}/config/realtek/chip-gn-freertos/.gn
                             gen
                             --check
                             --fail-on-unused-args
                             "${CHIP_OUTPUT}"
-    BUILD_COMMAND           ninja -C "${CHIP_OUTPUT}" bee
+    BUILD_COMMAND           ninja -C "${CHIP_OUTPUT}" rtk
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        -lCHIP -lPwRpc
     CONFIGURE_ALWAYS        TRUE
