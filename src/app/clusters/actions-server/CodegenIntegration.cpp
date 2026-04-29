@@ -104,7 +104,7 @@ void ActionsServer::Shutdown()
     VerifyOrReturn(mRegistered);
     mRegistered    = false;
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
-    if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_FOUND)
     {
         [[maybe_unused]] const ConcreteClusterPath path = mCluster.Cluster().GetPaths()[0];
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, path.mEndpointId,
@@ -138,7 +138,7 @@ CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, Attribut
 // directly (not through these callbacks) and register it with the codegen data model
 // provider via Init(). This is consistent with the code-driven cluster pattern where the
 // application owns the cluster lifecycle rather than the ZAP-generated scaffolding.
-void MatterActionsClusterInitCallback(EndpointId endpointId) {}
-void MatterActionsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType type) {}
-void MatterActionsPluginServerInitCallback() {}
-void MatterActionsPluginServerShutdownCallback() {}
+void __attribute__((weak)) MatterActionsClusterInitCallback(EndpointId endpointId) {}
+void __attribute__((weak)) MatterActionsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType type) {}
+void __attribute__((weak)) MatterActionsPluginServerInitCallback() {}
+void __attribute__((weak)) MatterActionsPluginServerShutdownCallback() {}

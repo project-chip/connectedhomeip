@@ -506,6 +506,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint, MatterClu
         {
             MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId, shutdownType);
         }
+        emberAfClusterShutdownCallback(definedEndpoint->endpoint, cluster->clusterId);
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
         if (f != nullptr)
         {

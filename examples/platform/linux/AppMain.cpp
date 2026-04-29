@@ -1102,6 +1102,15 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     shellThread.join();
 #endif
 
+    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
+    {
+        EndpointId endpoint = emberAfEndpointFromIndex(i);
+        if (endpoint != kInvalidEndpointId)
+        {
+            emberAfEndpointEnableDisable(endpoint, false);
+        }
+    }
+
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
