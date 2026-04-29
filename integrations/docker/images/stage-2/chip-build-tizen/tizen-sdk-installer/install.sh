@@ -165,8 +165,8 @@ function unrpm_globs() {
 # globs. In a situation where multiple zip files matching the same glob are
 # present, for example:
 # $ ls -l cache/tizen-9.0-core-add-ons_*_ubuntu-64.zip
-# -rw-rw-r-- 1 m.grela m.grela 461718 Nov  4  2024 cache/tizen-9.0-core-add-ons_0.0.341_ubuntu-64.zip
-# -rw-rw-r-- 1 m.grela m.grela 461722 Apr 16 01:45 cache/tizen-9.0-core-add-ons_0.0.358_ubuntu-64.zip
+# -rw-rw-r-- 1 ubuntu ubuntu 461718 Nov  4  2024 cache/tizen-9.0-core-add-ons_0.0.341_ubuntu-64.zip
+# -rw-rw-r-- 1 ubuntu ubuntu 461722 Apr 16 01:45 cache/tizen-9.0-core-add-ons_0.0.358_ubuntu-64.zip
 #
 # the function attempts to find the most recent version of a particular zip file.
 #
@@ -488,9 +488,9 @@ fi
 # when for example capi-network-thread-*.armv7l.rpm matches both
 # binary and devel RPM files. For example:
 # ls -l cache/capi-network-thread-*.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 55133 Oct 30  2024 cache/capi-network-thread-0.9.0-2.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 17377 Oct 30  2024 cache/capi-network-thread-devel-0.9.0-2.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 25965 Oct 30  2024 cache/capi-network-thread-test-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 ubuntu ubuntu 55133 Oct 30  2024 cache/capi-network-thread-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 ubuntu ubuntu 17377 Oct 30  2024 cache/capi-network-thread-devel-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 ubuntu ubuntu 25965 Oct 30  2024 cache/capi-network-thread-test-0.9.0-2.armv7l.rpm
 
 TIZEN_SDK_BASE_RPMS=(
     'iniparser-[0-9]*'
