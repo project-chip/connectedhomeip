@@ -128,7 +128,7 @@ def modify_thread_tlv(dataset: bytes, tlv_type: int, modifier_fn) -> bytes:
     raise ValueError(f"TLV type 0x{tlv_type:02x} not found in dataset")
 
 
-class TC_CNET_4_24(MatterBaseTest):
+class TC_CNET_4_24_2(MatterBaseTest):
     """
     [TC-CNET-4.25] [Thread] Network Commissioning Success After Connection Failures [DUT-Server]
     CASE session variant — for already commissioned devices.
