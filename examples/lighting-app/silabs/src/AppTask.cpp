@@ -129,7 +129,7 @@ void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
     sLightLED.Set(false);
 }
 
-void LightTimerEventHandler(void * /* timerCbArg */)
+[[maybe_unused]] void LightTimerEventHandler(void * /* timerCbArg */)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
@@ -154,7 +154,7 @@ void LightActionEventHandler(AppEvent * aEvent)
     }
 
 #ifdef DISPLAY_ENABLED
-    GetLCD().WriteDemoUI(sLightOn);
+    BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
 
     TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, static_cast<intptr_t>(sLightOn));
