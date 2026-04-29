@@ -76,6 +76,19 @@ ThermostatCluster * ClusterForEndpoint(EndpointId endpointId)
     return cluster;
 }
 
+
+Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    ThermostatCluster * cluster = ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return Status::Failure;
+    }
+    cluster->SetDelegate(delegate);
+    return Status::Success;
+}
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
