@@ -314,12 +314,8 @@ def setupArgumentsParser():
                         help="Don't do any generation, just log what targets would be generated (default: False)")
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
-
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.add_argument('--no-rerun-in-env', action='store_false', dest='rerun_in_env')
-    parser.set_defaults(parallel=True, rerun_in_env=True)
-
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--rerun-in-env', action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args()
 
     # Convert a list of target_types (as strings)

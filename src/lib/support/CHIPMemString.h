@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 namespace chip {

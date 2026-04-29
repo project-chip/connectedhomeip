@@ -62,28 +62,123 @@ Names vary, however to be consistent with most of the existing code use:
 -   `cluster-name-server` for the cluster directory name
 -   `ClusterNameSnakeCluster.h/cpp` for the `ServerClusterInterface`
     implementation
--   `ClusterNameSnakeLogic.h/cpp` for the `Logic` implementation if applicable
 
-### Recommended Modular Layout
+### Recommended Implementation Pattern
 
-For better testability and maintainability, we recommend splitting the
-implementation into logical components. The
-[Software Diagnostics](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/software-diagnostics-server)
-cluster is a good example of this pattern.
+For optimal flash and RAM usage on resource-constrained devices, we strongly
+recommend a **combined implementation** pattern. You should avoid splitting the
+implementation into separate logic and translation layers, as this introduces
+unnecessary overhead.
 
--   **`ClusterLogic`:**
-    -   A type-safe class containing the core business logic of the cluster.
-    -   Manages all attribute storage.
-    -   Should be thoroughly unit-tested.
--   **`ClusterImplementation`:**
-    -   Implements the `ServerClusterInterface` (often by deriving from
-        `DefaultServerCluster`).
-    -   Acts as a translation layer between the data model (encoders/decoders)
-        and the `ClusterLogic`.
+-   **Combined Implementation (Recommended):**
+
+    -   The cluster's logic, data storage, and `ServerClusterInterface`
+        implementation are all contained within a single class (often by
+        deriving from `DefaultServerCluster`).
+    -   This minimizes boilerplate and virtual function translation layers,
+        resulting in a significantly smaller flash footprint.
+    -   **Example:** The
+        [Basic Information](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/basic-information)
+        cluster is a good example of a combined implementation.
+
+-   **Modular Implementation / `ClusterLogic` (Not Recommended):**
+
+    -   Historically, some clusters separated core business logic into a
+        type-safe `ClusterLogic` class, with a `ClusterImplementation` class
+        acting as a translation layer.
+    -   While this isolated the logic for testing, it adds noticeable flash and
+        RAM overhead and is **discouraged** for new clusters.
+    -   **Example:** The
+        [Administrator Commissioning](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/administrator-commissioning-server)
+        cluster demonstrates this legacy modular implementation.
+
 -   **`ClusterDriver` (or `Delegate`):**
     -   An optional interface providing callbacks to the application for cluster
         interactions. We recommend the term `Driver` to avoid confusion with the
         overloaded term `Delegate`.
+
+#### Cluster Initialization and Configuration (Builder Pattern)
+
+To ensure that a cluster is initialized correctly and that feature flags remain
+in sync with their mandatory attributes or parameters, all new code-driven
+clusters should use a **builder-style Config** pattern. This pattern prevents
+common errors where a feature is enabled but its mandatory parameters are
+missing.
+
+**Reference Example:** The
+[Level Control Cluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/level-control/LevelControlCluster.h)
+is the primary reference for this implementation pattern.
+
+**Pattern Principles:**
+
+-   **Nested Config Struct/Class:** Define a `Config` struct or class within the
+    main cluster class to hold all startup state. Use a `class` with private
+    members for non-trivial configurations to prevent direct manipulation of
+    members and enforce the use of builder methods. A `struct` with public
+    members is acceptable for very simple configurations without complex rules.
+-   **Fluent Builder API:** Provide `With<Feature>(...)` methods that return a
+    reference to the `Config` object to allow for chained configuration calls.
+-   **Atomic Configuration:** Methods must handle both the `FeatureMap` bit
+    setting and the initialization of any associated attributes to prevent
+    invalid states.
+-   **Encapsulated Logic:** This approach encapsulates the cluster's complex
+    conformance logic directly into the configuration API, making it much harder
+    for application developers to create an invalid configuration.
+-   **External Endpoint ID:** The `EndpointId` should be passed to the cluster
+    constructor directly, not stored in the `Config` object. This allows the
+    same `Config` instance to be reused across multiple cluster instances on
+    different endpoints.
+-   **Separate Member Variables:** Extract configuration values from the
+    `Config` object into separate member variables within the cluster class,
+    rather than storing the `Config` object itself. This allows making immutable
+    configuration values `const` (enhancing safety) and reduces coupling.
+
+**Example Implementation (from LevelControlCluster):**
+
+```cpp
+class LevelControlCluster : public DefaultServerCluster ...
+{
+public:
+    class Config
+    {
+    public:
+        Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) :
+            mDelegate(delegate), mTimerDelegate(timerDelegate), mFeatureMap(0) {}
+
+        // Automatically sets the Lighting feature and sets required attribute values
+        Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
+        {
+            mFeatureMap.Set(LevelControl::Feature::kLighting);
+            WithMinLevel(1);   // Spec mandates MinLevel=1 for Lighting feature
+            WithMaxLevel(254); // Spec mandates MaxLevel=254 for Lighting feature
+            mStartUpCurrentLevel = startUpCurrentLevel;
+            return *this;
+        }
+
+        Config & WithMinLevel(uint8_t minLevel)
+        {
+            // ... implementation
+            return *this;
+        }
+
+        Config & WithMaxLevel(uint8_t maxLevel)
+        {
+            // ... implementation
+            return *this;
+        }
+
+    private:
+        friend class LevelControlCluster;
+        LevelControlDelegate & mDelegate;
+        TimerDelegate & mTimerDelegate;
+        BitMask<LevelControl::Feature> mFeatureMap;
+        DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
+        // ... other members
+    };
+
+    LevelControlCluster(EndpointId endpoint, const Config & config);
+};
+```
 
 ### Design Principles
 
@@ -128,43 +223,6 @@ writes or commands), use a delegate (or driver) interface that acts as a
 -   **Avoid Redundant Notifications:** Ensure that no-op operations (e.g.,
     writing the same value that is already present) are handled early and do not
     trigger delegate callbacks or change notifications.
-
-### Choosing the Right Implementation Pattern
-
-When implementing a cluster, you have two primary architectural choices: a
-**combined implementation** and a **modular implementation**. The best choice
-depends on the cluster's complexity and the constraints of the target device,
-particularly flash and RAM usage.
-
--   **Combined Implementation (Logic and Data in One Class):**
-
-    -   **Description:** In this pattern, the cluster's logic, data storage, and
-        `ServerClusterInterface` implementation are all contained within a
-        single class.
-    -   **Pros:** Simpler to write and can result in a smaller flash footprint,
-        making it ideal for simple clusters or resource-constrained devices.
-    -   **Cons:** Can be harder to test and maintain as the cluster's complexity
-        grows.
-    -   **Example:** The
-        [Basic Information](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/basic-information)
-        cluster is a good example of a combined implementation.
-
--   **Modular Implementation (Logic Separated from Data Model):**
-    -   **Description:** This pattern separates the core business logic into a
-        `ClusterLogic` class, while the `ClusterImplementation` class handles
-        the translation between the data model and the logic.
-    -   **Pros:** Promotes better testability, as the `ClusterLogic` can be
-        unit-tested in isolation. It is also more maintainable for complex
-        clusters.
-    -   **Cons:** May use slightly more flash and RAM due to the additional
-        class and virtual function calls.
-    -   **Example:** The
-        [Software Diagnostics](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/software-diagnostics-server)
-        cluster demonstrates a modular implementation.
-
-**Recommendation:** Start with a combined implementation for simpler clusters.
-If the cluster's logic is complex or if you need to maximize testability, choose
-the modular approach.
 
 ### BUILD file layout
 
@@ -325,17 +383,46 @@ attribute's value changes.
         VerifyOrReturnValue(mValue != newValue, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ```
 
--   **OnClusterAttributeChanged Pattern:** Each cluster should implement a
-    centralized helper method (e.g., `OnClusterAttributeChanged(AttributeId)`)
-    that combines both network and application notifications.
-    -   Call `NotifyAttributeChanged()` to notify network subscribers.
-    -   Call delegate callbacks to notify the application layer of the _actual_
-        change.
-    -   Invoke this method only when a value has truly changed.
-    -   **Example:** See
-        [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
-        which declares `OnClusterAttributeChanged(AttributeId)` as a private
-        helper.
+-   **Per-Attribute Change Callbacks:** As a concrete realization of the
+    [Delegate/Driver Pattern for Validation](#delegate-driver-pattern-for-validation),
+    each mutable attribute should have a corresponding
+    `On<AttributeName>Changed` callback in the delegate interface. These are
+    _pre-write_ hooks invoked after spec-level validation and the no-op guard,
+    but _before_ the value is committed. The callback must always receive the
+    **proposed new value**, not the current (stale) value. Returning `true`
+    accepts the change; returning `false` vetoes it. The cluster must then fail
+    the operation with `Protocols::InteractionModel::Status::Failure` (for APIs
+    returning `Status`) or `CHIP_ERROR_INCORRECT_STATE` (for APIs returning
+    `CHIP_ERROR`). Default implementations should return `true` so applications
+    only override the callbacks they need.
+
+    **Example:** The
+    [Boolean State Configuration delegate](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h)
+    declares:
+
+    ```cpp
+    virtual bool OnCurrentSensitivityLevelChanged(uint8_t newValue) { return true; }
+    virtual bool OnAlarmsActiveChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsSuppressedChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsEnabledChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnSensorFaultChanged(chip::BitMask<SensorFaultBitmap> newValue) { return true; }
+    ```
+
+    And the cluster invokes them in the standard order—validate, guard no-op,
+    call delegate, then commit and notify:
+
+    ```cpp
+    VerifyOrReturnError(level < mSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(mCurrentSensitivityLevel != level, CHIP_NO_ERROR);
+
+    if (mDelegate != nullptr)
+    {
+        VerifyOrReturnError(mDelegate->OnCurrentSensitivityLevelChanged(level), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    mCurrentSensitivityLevel = level;
+    NotifyAttributeChanged(CurrentSensitivityLevel::Id);
+    ```
 
 #### Persistent Storage
 
@@ -389,11 +476,25 @@ specification.
 
 ### Unit Testing
 
--   Unit tests should reside in `src/app/clusters/<cluster-name>/tests/`.
--   At a minimum, `ClusterLogic` should be fully tested, including its behavior
-    with different feature configurations.
--   `ClusterImplementation` can also be unit-tested if its logic is complex.
-    Otherwise, integration tests should provide sufficient coverage.
+Unit tests should reside in `src/app/clusters/<cluster-name>/tests/`.
+
+Use the `chip::Testing::ClusterTester` utility to write your unit tests. This
+modern API removes the need to manually mock encoders, handlers, or raw TLV
+buffers. More on
+[ClusterTester Helper Class Guide](../cluster_and_device_type_dev/cluster_tester.md).
+
+-   **Test Setup:** Create a mock delegate to inject fake data into your cluster
+    instance.
+-   **Menu Verification:** Ensure `Attributes()` and `AcceptedCommands()` return
+    the correct metadata, or `ClusterTester` will reject your reads/invocations.
+-   **Reads:** Test `ReadAttribute` via `tester.ReadAttribute()` and verify data
+    matches your mock.
+-   **Commands:** Test commands via `tester.Invoke()` and ensure specific
+    `Protocols::InteractionModel::Status` codes are returned accurately based on
+    delegate responses.
+-   **Reporting:** Verify reporting logic by reading `tester.GetDirtyList()` to
+    ensure state changes properly mark attributes as dirty, while No-Op writes
+    do not.
 
 ---
 
@@ -431,14 +532,14 @@ implementation.
    the `CodeDrivenClusters` array in
    `src/app/common/templates/config-data.yaml`.
 6. **Update ZAP Configuration:** To prevent the Ember framework from allocating
-   memory for your cluster's attributes (which are now managed by your
-   `ClusterLogic`), you must:
+   memory for your cluster's attributes, you must:
     - In `src/app/zap-templates/zcl/zcl.json` and
       `zcl-with-test-extensions.json`, add all non-list attributes of your
       cluster to `attributeAccessInterfaceAttributes`. This marks them as
       externally handled.
-7. Once `config-data.yaml` and `zcl.json/zcl-with-test-extensions.json` are
-   updated, run the ZAP regeneration command, like
+7. **Regenerate ZAP:** Once `config-data.yaml` and
+   `zcl.json/zcl-with-test-extensions.json` are updated, run the ZAP
+   regeneration command, like
 
     ```bash
     ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'

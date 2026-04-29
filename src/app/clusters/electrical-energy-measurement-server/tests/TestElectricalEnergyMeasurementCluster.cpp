@@ -39,6 +39,21 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
+const Structs::MeasurementAccuracyRangeStruct::Type kTestAccuracyRanges[] = {
+    { .rangeMin   = 0,
+      .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+      .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
+};
+
+const Structs::MeasurementAccuracyStruct::Type kTestAccuracy = {
+    .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 1'000'000'000'000'000,
+    .accuracyRanges   = DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type>(kTestAccuracyRanges)
+};
+
 struct TestElectricalEnergyMeasurementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -59,6 +74,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
             .optionalAttributes = static_cast<ElectricalEnergyMeasurement::OptionalAttributes>(0),
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -78,6 +94,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -105,6 +122,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -129,6 +147,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -178,6 +197,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
             .optionalAttributes = static_cast<ElectricalEnergyMeasurement::OptionalAttributes>(0),
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -209,6 +229,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
             .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .accuracyStruct     = kTestAccuracy,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -261,6 +282,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
         .endpointId         = kTestEndpointId,
         .featureFlags       = allFeatures,
         .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+        .accuracyStruct     = kTestAccuracy,
     });
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -316,6 +338,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
         .endpointId         = kTestEndpointId,
         .featureFlags       = allFeatures,
         .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+        .accuracyStruct     = kTestAccuracy,
     });
 
     EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);

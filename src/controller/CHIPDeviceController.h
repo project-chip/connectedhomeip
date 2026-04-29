@@ -82,6 +82,12 @@
 
 namespace chip {
 
+namespace Testing {
+
+class DeviceCommissionerTestAccess;
+
+} // namespace Testing
+
 namespace Controller {
 
 inline constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
@@ -480,6 +486,8 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #endif
                                       public SessionEstablishmentDelegate
 {
+    friend class chip::Testing::DeviceCommissionerTestAccess;
+
 public:
     DeviceCommissioner();
     ~DeviceCommissioner() override {}

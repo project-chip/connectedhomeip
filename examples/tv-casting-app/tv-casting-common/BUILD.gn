@@ -14,19 +14,38 @@
 
 import("//build_overrides/chip.gni")
 
+import(
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 config("config") {
   include_dirs = [
     ".",
-    "${chip_root}/examples/chip-tool",
-    "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/zzz_generated/tv-casting-app",
     "${chip_root}/src/lib",
   ]
 
+  # chip-tool headers are only needed when legacy sources are compiled.
+  if (!optimize_apk_size) {
+    include_dirs += [
+      "${chip_root}/examples/chip-tool",
+      "${chip_root}/zzz_generated/chip-tool",
+    ]
+  }
+
   cflags = [ "-Wconversion" ]
+
+  # Enable per-function and per-data sections so the linker's --gc-sections
+  # can discard unreferenced code/data from the final .so.
+  if (optimize_apk_size) {
+    cflags += [
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-fvisibility=hidden",
+      "-flto=thin",
+    ]
+  }
 
   defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=0" ]
 }
@@ -34,66 +53,77 @@ config("config") {
 chip_data_model("tv-casting-common") {
   zap_file = "tv-casting-app.zap"
 
-  sources = [
-    "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
-    "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
-    "${chip_root}/examples/chip-tool/commands/common/CHIPCommand.h",
-    "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
-    "${chip_root}/examples/chip-tool/commands/common/Command.h",
-    "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
-    "${chip_root}/examples/chip-tool/commands/common/Commands.h",
-    "${chip_root}/examples/chip-tool/commands/common/CredentialIssuerCommands.h",
-    "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
-    "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.cpp",
-    "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.h",
-    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
-    "${chip_root}/src/controller/ExamplePersistentStorage.h",
-    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
-    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
-    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/EntryToText.cpp",
-    "clusters/content-app-observer/ContentAppObserver.cpp",
-    "clusters/content-app-observer/ContentAppObserver.h",
-    "commands/clusters/ModelCommand.cpp",
-    "commands/common/CHIPCommand.cpp",
-    "include/AppParams.h",
-    "include/ApplicationBasic.h",
-    "include/ApplicationLauncher.h",
-    "include/CastingServer.h",
-    "include/Channel.h",
-    "include/ContentLauncher.h",
-    "include/ConversionUtils.h",
-    "include/KeypadInput.h",
-    "include/LevelControl.h",
-    "include/MediaBase.h",
-    "include/MediaCommandBase.h",
-    "include/MediaPlayback.h",
-    "include/MediaReadBase.h",
-    "include/MediaSubscriptionBase.h",
-    "include/Messages.h",
-    "include/OnOff.h",
-    "include/PersistenceManager.h",
-    "include/TargetEndpointInfo.h",
-    "include/TargetNavigator.h",
-    "include/TargetVideoPlayerInfo.h",
-    "include/WakeOnLan.h",
-    "src/AppParams.cpp",
-    "src/ApplicationLauncher.cpp",
-    "src/CastingServer.cpp",
-    "src/Channel.cpp",
-    "src/ContentLauncher.cpp",
-    "src/ConversionUtils.cpp",
-    "src/KeypadInput.cpp",
-    "src/LevelControl.cpp",
-    "src/MediaPlayback.cpp",
-    "src/Messages.cpp",
-    "src/OnOff.cpp",
-    "src/PersistenceManager.cpp",
-    "src/TargetEndpointInfo.cpp",
-    "src/TargetNavigator.cpp",
-    "src/TargetVideoPlayerInfo.cpp",
-    "src/WakeOnLan.cpp",
-    "src/ZCLCallbacks.cpp",
-  ]
+  # Legacy chip-tool sources: needed for the deprecated casting API path.
+  # The simplified API (core/, support/) does not reference these, so they
+  # can be excluded in size-optimized builds to save significant .so space.
+  if (!optimize_apk_size) {
+    sources = [
+      "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
+      "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
+      "${chip_root}/examples/chip-tool/commands/common/CHIPCommand.h",
+      "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
+      "${chip_root}/examples/chip-tool/commands/common/Command.h",
+      "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
+      "${chip_root}/examples/chip-tool/commands/common/Commands.h",
+      "${chip_root}/examples/chip-tool/commands/common/CredentialIssuerCommands.h",
+      "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
+      "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.cpp",
+      "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.h",
+      "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+      "${chip_root}/src/controller/ExamplePersistentStorage.h",
+      "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+      "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
+      "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/EntryToText.cpp",
+      "clusters/content-app-observer/ContentAppObserver.cpp",
+      "clusters/content-app-observer/ContentAppObserver.h",
+      "commands/clusters/ModelCommand.cpp",
+      "commands/common/CHIPCommand.cpp",
+      "include/AppParams.h",
+      "include/ApplicationBasic.h",
+      "include/ApplicationLauncher.h",
+      "include/CastingServer.h",
+      "include/Channel.h",
+      "include/ContentLauncher.h",
+      "include/ConversionUtils.h",
+      "include/KeypadInput.h",
+      "include/LevelControl.h",
+      "include/MediaBase.h",
+      "include/MediaCommandBase.h",
+      "include/MediaPlayback.h",
+      "include/MediaReadBase.h",
+      "include/MediaSubscriptionBase.h",
+      "include/Messages.h",
+      "include/OnOff.h",
+      "include/PersistenceManager.h",
+      "include/TargetEndpointInfo.h",
+      "include/TargetNavigator.h",
+      "include/TargetVideoPlayerInfo.h",
+      "include/WakeOnLan.h",
+      "src/AppParams.cpp",
+      "src/ApplicationLauncher.cpp",
+      "src/CastingServer.cpp",
+      "src/Channel.cpp",
+      "src/ContentLauncher.cpp",
+      "src/ConversionUtils.cpp",
+      "src/KeypadInput.cpp",
+      "src/LevelControl.cpp",
+      "src/MediaPlayback.cpp",
+      "src/Messages.cpp",
+      "src/OnOff.cpp",
+      "src/PersistenceManager.cpp",
+      "src/TargetEndpointInfo.cpp",
+      "src/TargetNavigator.cpp",
+      "src/TargetVideoPlayerInfo.cpp",
+      "src/WakeOnLan.cpp",
+      "src/ZCLCallbacks.cpp",
+    ]
+  } else {
+    sources = [
+      "clusters/content-app-observer/ContentAppObserver.cpp",
+      "clusters/content-app-observer/ContentAppObserver.h",
+      "src/ZCLCallbacks.cpp",
+    ]
+  }
 
   # Add simplified casting API files here
   sources += [
@@ -124,16 +154,24 @@ chip_data_model("tv-casting-common") {
   ]
 
   deps = [
-    "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
-    "${chip_root}/src/app/tests/suites/commands/interaction_model",
-    "${chip_root}/src/lib/support/jsontlv",
-    "${chip_root}/src/tracing",
-    "${chip_root}/src/tracing/json",
     "${chip_root}/third_party/inipp",
-    "${chip_root}/third_party/jsoncpp",
   ]
+
+  # These deps are pulled from chip-tool but not directly used by
+  # tv-casting-common source files. Keep them in normal builds for
+  # compatibility; drop them in size-optimized builds to reduce .so size.
+  if (!optimize_apk_size) {
+    deps += [
+      "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/app/tests/suites/commands/interaction_model",
+      "${chip_root}/src/lib/support/jsontlv",
+      "${chip_root}/src/tracing",
+      "${chip_root}/src/tracing/json",
+      "${chip_root}/third_party/jsoncpp",
+    ]
+  }
 
   public_deps = [
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",

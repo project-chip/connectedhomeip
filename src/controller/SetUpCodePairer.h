@@ -50,6 +50,13 @@
 #include <vector>
 
 namespace chip {
+
+namespace Testing {
+
+class SetUpCodePairerTestAccess;
+
+} // namespace Testing
+
 namespace Controller {
 
 class DeviceCommissioner;
@@ -98,6 +105,8 @@ class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
                                    public Nfc::NFCReaderTransportDelegate
 #endif
 {
+    friend class chip::Testing::SetUpCodePairerTestAccess;
+
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
     virtual ~SetUpCodePairer() {}
@@ -179,6 +188,12 @@ private:
     // True if we are still waiting on discovery to possibly produce new
     // RendezvousParameters in the future.
     bool DiscoveryInProgress() const;
+
+    // If there is nothing left to try (no PASE in progress, no queued discovered
+    // parameters, no discovery in progress), notify the commissioner that pairing
+    // has failed.  err is used as the failure error only if no PASE attempt has
+    // produced an error yet.
+    void StopPairingIfTransportsExhausted(CHIP_ERROR err);
 
     // Not an enum class because we use this for indexing into arrays.
     enum TransportTypes

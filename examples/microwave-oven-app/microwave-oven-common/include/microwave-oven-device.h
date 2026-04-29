@@ -255,12 +255,10 @@ private:
     ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kDefrost) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = kModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Defrost"),
-                                                 .mode     = kModeDefrost,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = kModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Defrost"_span, .mode = kModeDefrost, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
     };
 
     // Operational States

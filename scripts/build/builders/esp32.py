@@ -20,6 +20,8 @@ from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
 
 class Esp32Board(Enum):
     DevKitC = auto()
@@ -240,7 +242,7 @@ class Esp32Builder(Builder):
 
         # pre-requisite
         self._Execute(
-            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_ENABLE_ESP_INSIGHTS_TRACE=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
 
         cmake_flags = []
 
@@ -261,7 +263,7 @@ class Esp32Builder(Builder):
         self._IdfEnvExecute(cmd)
 
     def _build(self):
-        logging.info('Compiling Esp32 at %s', self.output_dir)
+        log.info('Compiling Esp32 at %s', self.output_dir)
 
         # Unfortunately sdkconfig is sticky and needs reset on every build
         self._Execute(

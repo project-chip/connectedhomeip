@@ -40,6 +40,15 @@
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
+#if !defined(CONFIG_ZEPHYR_VERSION_3_3)
+#include <zephyr/random/random.h>
+// Implementation for Zephyr Bluetooth host.
+int bt_rand(void * buf, size_t len)
+{
+    return sys_csrand_get(buf, len);
+}
+#endif
+
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer::Internal;
 

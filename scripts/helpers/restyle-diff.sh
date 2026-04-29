@@ -21,10 +21,25 @@
 #  you've written is kosher to CI
 #
 # Usage:
-#  restyle-diff.sh [-d] [ref]
+#  restyle-diff.sh [-d] [-p] [-c] [-u] [-h] [ref]
 #
 # if unspecified, ref defaults to upstream/master (or master)
 # -d enables debug logging for Restyle CLI
+# -p pull restyler Docker images before running (default: skip pull, reuse cached images)
+# -c explicitly pass --commit to restyle CLI to generate commits per tool
+# -u automatically push resulting commits using 'git push'
+# -h show this help message
+
+show_help() {
+    echo "Usage: restyle-diff.sh [-d] [-p] [-c] [-u] [-h] [ref]"
+    echo
+    echo "  [ref]  Base reference for restyle (defaults to upstream/master or master)"
+    echo "  -d     Enable debug logging for Restyle CLI"
+    echo "  -p     Pull restyler Docker images before running"
+    echo "  -c     Explicitly pass --commit to restyle CLI to generate commits per tool"
+    echo "  -u     Automatically push resulting commits using 'git push'"
+    echo "  -h     Show this help message"
+}
 #
 
 here=${0%/*}
@@ -39,8 +54,12 @@ cd "$CHIP_ROOT"
 restyle-paths() {
     [[ $# -eq 0 ]] && return 0
 
-    echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
-    restyle --config-file=.restyled.yaml "$@"
+    if [[ "$PULL" == "True" ]]; then
+        echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
+    else
+        echo "[restyle-diff.sh] Please wait, Restyling files (using cached images; pass -p to pull updates)"
+    fi
+    restyle --config-file=.restyled.yaml "${COMMIT_FLAG:+"$COMMIT_FLAG"}" "$@"
 
     # warn if restyle left any files owned by root (which means older restyle-CLI is being used)
     root_owned=$(find "$@" -maxdepth 0 -user 0 2>/dev/null || true)
@@ -57,8 +76,30 @@ restyle-paths() {
 
 }
 
+version_lt() {
+    local v1="$1" v2="$2"
+    local num1 num2 i=0
+    while :; do
+        num1="${v1%%.*}" v1="${v1#"$num1"}" v1="${v1#.}"
+        num2="${v2%%.*}" v2="${v2#"$num2"}" v2="${v2#.}"
+        num1=${num1:-0} num2=${num2:-0}
+        if [ "$num1" -lt "$num2" ] 2>/dev/null; then return 0; fi
+        if [ "$num1" -gt "$num2" ] 2>/dev/null; then return 1; fi
+        if [ -z "$v1" ] && [ -z "$v2" ]; then return 1; fi
+    done
+}
+
 ensure_restyle_installed() {
     if command -v restyle >/dev/null 2>&1; then
+        local version
+        version=$(restyle --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0.0")
+        if version_lt "$version" "0.8.1.0"; then
+            echo "[restyle-diff.sh] WARNING: restyle version $version is older than the version 0.8.1.0 which is faster and most stable"
+            echo "[restyle-diff.sh] Please UPGRADE to a newer restyle CLI by running"
+            echo "[restyle-diff.sh] 1. rm -f \"\$(command -v restyle)\""
+            echo "[restyle-diff.sh] 2. re-run this script without using sudo (it will automatically download latest restyle-CLI version)."
+            exit 1
+        fi
         return 0
     fi
 
@@ -93,11 +134,35 @@ ensure_restyle_installed() {
 
 # This was added to be able to use xargs to call the function restyle-paths
 export -f restyle-paths
+
+# Default to skipping image pulls; image tags in .restyled.yaml are pinned, so cached images stay correct until the .restyled.yaml
+# config bumps a tag. When that happens, Restyle CLI's `docker run --pull never` fails with a "No such image" error;
+# if you see that error, re-run this script with -p to fetch the new image.
+export PULL=False
+export PUSH=False
+export COMMIT_FLAG=""
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d)
             export DEBUG=True
             shift
+            ;;
+        -p)
+            export PULL=True
+            shift
+            ;;
+        -c)
+            export COMMIT_FLAG="--commit"
+            shift
+            ;;
+        -u)
+            export PUSH=True
+            shift
+            ;;
+        -h | --help)
+            show_help
+            exit 0
             ;;
         *)
             ref="$1"
@@ -116,3 +181,8 @@ paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
 ensure_restyle_installed
 
 echo "$paths" | xargs -n "$MAX_ARGS" "$BASH" -c 'restyle-paths "$@"' -
+
+if [[ "$PUSH" == "True" ]]; then
+    echo "[restyle-diff.sh] Pushing changes..."
+    git push
+fi

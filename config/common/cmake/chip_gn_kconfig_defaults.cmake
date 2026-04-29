@@ -41,6 +41,7 @@ matter_add_gn_arg_bool("chip_enable_icd_dsls" CONFIG_CHIP_ICD_DSLS_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
 matter_add_gn_arg_bool("chip_enable_read_client" CONFIG_CHIP_ENABLE_READ_CLIENT)
+matter_add_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
 
 # Allows to set chip_stack_lock_tracking level
 # Required in case default value needs to be set to "none" for optimization
@@ -94,4 +95,8 @@ endif()
 if(CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
     matter_add_gn_arg_bool("chip_use_transitional_device_instance_info_provider" FALSE)
+endif()
+
+if (CONFIG_CHIP_BUILD_TESTS)
+    matter_add_gn_arg_bool("chip_with_nlfaultinjection" CONFIG_CHIP_BUILD_NL_FAULT_INJECTION)
 endif()

@@ -245,6 +245,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/glib/platform/middleware/glib/dmd",
       "${efr32_sdk_root}/bluetooth_common/inc ",
       "${efr32_sdk_root}/bluetooth_le_host/inc",
+      "${efr32_sdk_root}/bluetooth_le_host/config",
       "${efr32_sdk_root}/bluetooth_le_controller/inc",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/graphics",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/memory_manager",
@@ -334,7 +335,7 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${efr32_sdk_root}/bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a ",
+        "${efr32_sdk_root}/bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a",
         "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
       ]
 
@@ -349,7 +350,10 @@ template("efr32_sdk") {
         defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
       }
 
-      defines += [ "MGM24" ]
+      defines += [
+        "MGM24",
+        "_SILICON_LABS_MODULE=1",
+      ]
     } else if (silabs_family == "efr32mg26") {
       _include_dirs += [
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/EFR32MG26/Include",
@@ -542,22 +546,7 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {
-      defines += [
-        "SL_OT_ENABLE=1",
-
-        #TODO: Remove these defines once sl_openthread_rtos_config is included in sl_ot_rtos_adaptation.c
-        "SL_OPENTHREAD_RTOS_STACK_TASK_PRIORITY=24",
-        "SL_OPENTHREAD_RTOS_APP_TASK_PRIORITY=23",
-        "SL_OPENTHREAD_RTOS_CLI_TASK_PRIORITY=16",
-        "SL_OPENTHREAD_STACK_TASK_MEM_SIZE=4608",
-        "SL_OPENTHREAD_APP_TASK_MEM_SIZE=4608",
-        "SL_OPENTHREAD_CLI_TASK_MEM_SIZE=2048",
-        "SL_OPENTHREAD_RTOS_CLI_TASK_PRIORITY=16",
-        "SL_OPENTHREAD_OS_CLI_TASK_SIZE=2048",
-        "SL_OPENTHREAD_ENABLE_APP_TASK=0",
-        "SL_OPENTHREAD_ENABLE_CLI_TASK=0",
-        "SL_OPENTHREAD_ENABLE_SERIAL_TASK=0",
-      ]
+      defines += [ "SL_OT_ENABLE=1" ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -905,6 +894,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/bluetooth_le_host/src/sl_bt_stack_init.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_advertiser_config.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_connection_config.c",
+        "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_dynamic_gattdb_config.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_hci_event_table.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_host_adaptation.c",
       ]
@@ -1018,6 +1008,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/EFR32MG24/Source/system_efr32mg24.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/clocks/sl_device_clock_efr32xg24.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg24.c",
+        "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_curves_efr32.c",
       ]
     } else if (silabs_family == "mgm24") {
       sources += [
@@ -1033,6 +1024,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/EFR32MG26/Source/system_efr32mg26.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/clocks/sl_device_clock_efr32xg26.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg26.c",
+        "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_curves_efr32.c",
       ]
     }
 
@@ -1049,7 +1041,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/service/mpu/src/sl_mpu_s2.c",
         "${efr32_sdk_root}/platform_core/platform/service/power_manager/src/sleep_loop/sl_power_manager_hal_s2.c",
         "${efr32_sdk_root}/platform_core/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
-        "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_curves_efr32.c",
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_rssi/sl_rail_util_rssi.c",
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_sequencer/sl_rail_util_sequencer.c",
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",

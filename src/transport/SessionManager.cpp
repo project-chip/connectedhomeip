@@ -48,6 +48,7 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TracingStructs.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 
@@ -1166,7 +1167,16 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter.Release();
-
+    // Groupcast Testing
+    auto & testing = chip::Groupcast::GetTesting();
+    if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+    {
+        testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+        if (!decrypted)
+        {
+            testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+        }
+    }
     if (!decrypted)
     {
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");
@@ -1328,17 +1338,26 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
 {
     // Mark the corresponding secure sessions for eviction
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
+        if (session->GetTCPConnection() == conn)
         {
-            SessionHandle handle(*session);
-            // Notify the SessionConnection delegate of the connection
-            // closure.
-            if (mConnDelegate != nullptr)
+            bool isActive = session->IsActiveSession();
+
+            if (isActive)
             {
-                mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                // Notify the SessionConnection delegate of the connection
+                // closure before session eviction detaches holders and
+                // releases exchanges.
+                if (mConnDelegate != nullptr)
+                {
+                    SessionHandle handle(*session);
+                    mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                }
             }
 
-            // Mark session for eviction.
+            // Explicitly release the TCP connection handle to ensure the transport resource is reclaimed immediately.
+            session->ReleaseTCPConnection();
+
+            // Mark session for eviction regardless of its current state (Active, Defunct, or Establishing).
             session->MarkForEviction();
         }
 

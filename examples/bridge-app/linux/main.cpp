@@ -33,6 +33,7 @@
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
@@ -71,8 +72,6 @@ namespace {
 NamedPipeCommands sChipNamedPipeCommands;
 BridgeCommandDelegate sBridgeCommandDelegate;
 
-const int kNodeLabelSize = 32;
-const int kUniqueIdSize  = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 const int kDescriptorAttributeArraySize = 254;
 
@@ -133,17 +132,6 @@ DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDe
 #endif
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Bridged Device Basic Information cluster attributes
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize,
-                          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)),         /* NodeLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0), /* Reachable */
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::UniqueID::Id, CHAR_STRING, kUniqueIdSize, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id, INT32U, 4,
-                              0), /* Configuration Version */
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* feature map */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
-
 // Declare Cluster List for Bridged Light endpoint
 // TODO: It's not clear whether it would be better to get the command lists from
 // the ZAP config on our last fixed endpoint instead.
@@ -160,8 +148,7 @@ constexpr CommandId onOffIncomingCommands[] = {
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
 DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, ZAP_CLUSTER_MASK(SERVER), onOffIncomingCommands, nullptr),
     DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr,
-                            nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
@@ -217,7 +204,6 @@ DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MeasuredValue::Id,
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedTempSensorClusters)
 DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
@@ -245,7 +231,6 @@ DECLARE_DYNAMIC_ATTRIBUTE(PowerSource::Attributes::BatChargeLevel::Id, ENUM8, 1,
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedComposedDeviceClusters)
 DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(PowerSource::Id, powerSourceAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
@@ -260,8 +245,6 @@ DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensor
 // =================================================================================
 
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 #define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
@@ -306,6 +289,17 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                     {
                         dev->GenerateUniqueId();
                     }
+                    // NOTE: log only for now: this generally has no reason for failing and if it fails,
+                    //       cluster registration fails, however the rest of the device shows up.
+                    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(
+                        dev->CreateBridgedDeviceInfo(gCurrentEndpointId,
+                                                     {
+                                                         .reachable = true,
+                                                         .nodeLabel = dev->GetName(),
+                                                     },
+                                                     {
+                                                         .uniqueId = dev->GetUniqueId(),
+                                                     })));
 
                     return index;
                 }
@@ -336,6 +330,9 @@ int RemoveDeviceEndpoint(Device * dev)
         {
             // Todo: Update this to schedule the work rather than use this lock
             DeviceLayer::StackLock lock;
+
+            gDevices[index]->Unregister();
+
             // Silence complaints about unused ep when progress logging
             // disabled.
             [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
@@ -413,26 +410,8 @@ void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attr
 }
 } // anonymous namespace
 
-void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
-{
-    if (itemChangedMask & Device::kChanged_Reachable)
-    {
-        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::Reachable::Id);
-    }
-
-    if (itemChangedMask & Device::kChanged_Name)
-    {
-        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::NodeLabel::Id);
-    }
-}
-
 void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t itemChangedMask)
 {
-    if (itemChangedMask & (DeviceOnOff::kChanged_Reachable | DeviceOnOff::kChanged_Name | DeviceOnOff::kChanged_Location))
-    {
-        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
-    }
-
     if (itemChangedMask & DeviceOnOff::kChanged_OnOff)
     {
         ScheduleReportingCallback(dev, OnOff::Id, OnOff::Attributes::OnOff::Id);
@@ -442,11 +421,6 @@ void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t it
 void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSource::Changed_t itemChangedMask)
 {
     using namespace app::Clusters;
-    if (itemChangedMask &
-        (DevicePowerSource::kChanged_Reachable | DevicePowerSource::kChanged_Name | DevicePowerSource::kChanged_Location))
-    {
-        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
-    }
 
     if (itemChangedMask & DevicePowerSource::kChanged_BatLevel)
     {
@@ -465,59 +439,10 @@ void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSo
 
 void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask)
 {
-    if (itemChangedMask &
-        (DeviceTempSensor::kChanged_Reachable | DeviceTempSensor::kChanged_Name | DeviceTempSensor::kChanged_Location))
-    {
-        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
-    }
     if (itemChangedMask & DeviceTempSensor::kChanged_MeasurementValue)
     {
         ScheduleReportingCallback(dev, TemperatureMeasurement::Id, TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
-}
-
-Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId,
-                                                                          uint8_t * buffer, uint16_t maxReadLength)
-{
-    using namespace BridgedDeviceBasicInformation::Attributes;
-
-    ChipLogProgress(DeviceLayer, "HandleReadBridgedDeviceBasicAttribute: attrId=%d, maxReadLength=%d", attributeId, maxReadLength);
-
-    if ((attributeId == Reachable::Id) && (maxReadLength == 1))
-    {
-        *buffer = dev->IsReachable() ? 1 : 0;
-    }
-    else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
-    {
-        MutableByteSpan zclNameSpan(buffer, maxReadLength);
-        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclNameSpan, dev->GetName());
-    }
-    else if ((attributeId == UniqueID::Id) && (maxReadLength == 32))
-    {
-        MutableByteSpan zclUniqueIdSpan(buffer, maxReadLength);
-        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
-    }
-    else if ((attributeId == ConfigurationVersion::Id) && (maxReadLength == 4))
-    {
-        uint32_t configVersion = dev->GetConfigurationVersion();
-        memcpy(buffer, &configVersion, sizeof(configVersion));
-    }
-    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
-    {
-        uint16_t rev = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
-        memcpy(buffer, &rev, sizeof(rev));
-    }
-    else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
-    {
-        uint32_t featureMap = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
-        memcpy(buffer, &featureMap, sizeof(featureMap));
-    }
-    else
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status HandleReadOnOffAttribute(DeviceOnOff * dev, chip::AttributeId attributeId, uint8_t * buffer,
@@ -561,30 +486,6 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(DeviceOnOff * dev,
     {
         return Protocols::InteractionModel::Status::Failure;
     }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
-Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Device * dev, AttributeId attributeId, uint8_t * buffer)
-{
-    ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=" ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-
-    if (attributeId != BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
-    }
-
-    CharSpan nameSpan = CharSpan::fromZclString(buffer);
-
-    if (nameSpan.size() > kNodeLabelSize)
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-
-    std::string name(nameSpan.data(), nameSpan.size());
-    dev->SetName(name.c_str());
-
-    HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
     return Protocols::InteractionModel::Status::Success;
 }
@@ -639,11 +540,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     {
         Device * dev = gDevices[endpointIndex];
 
-        if (clusterId == BridgedDeviceBasicInformation::Id)
-        {
-            ret = HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
-        }
-        else if (clusterId == OnOff::Id)
+        if (clusterId == OnOff::Id)
         {
             ret = HandleReadOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer, maxReadLength);
         }
@@ -725,25 +622,16 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
-    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
+    VerifyOrReturnValue(endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT, Protocols::InteractionModel::Status::Failure);
+    Device * dev = gDevices[endpointIndex];
+    VerifyOrReturnValue(dev && dev->IsReachable(), Protocols::InteractionModel::Status::Failure);
 
-    // ChipLogProgress(DeviceLayer, "emberAfExternalAttributeWriteCallback: ep=%d", endpoint);
-
-    if (endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    if (clusterId == OnOff::Id)
     {
-        Device * dev = gDevices[endpointIndex];
-
-        if ((dev->IsReachable()) && (clusterId == OnOff::Id))
-        {
-            ret = HandleWriteOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer);
-        }
-        else if ((dev->IsReachable()) && (clusterId == BridgedDeviceBasicInformation::Id))
-        {
-            ret = HandleWriteBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer);
-        }
+        return HandleWriteOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer);
     }
 
-    return ret;
+    return Protocols::InteractionModel::Status::Failure;
 }
 
 void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint16_t actionID, uint32_t invokeID, bool hasInvokeID)
@@ -932,8 +820,7 @@ void * bridge_polling_thread(void * context)
             if (ch == 'w')
             {
                 // TC-BRBINFO-3.2 step 3
-                uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
-                Light1.SetConfigurationVersion(configVersion);
+                Light1.IncreaseConfigurationVersion();
             }
             continue;
         }
@@ -1144,8 +1031,7 @@ void BridgeAppCommandHandler::HandleCommand(intptr_t context)
 
     if (name == "SimulateConfigurationVersionChange")
     {
-        uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
-        Light1.SetConfigurationVersion(configVersion);
+        Light1.IncreaseConfigurationVersion();
     }
     else
     {
