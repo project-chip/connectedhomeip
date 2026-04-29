@@ -50,6 +50,7 @@ public:
 
     // Accessors for subclasses/implementations to interact with clusters
     Clusters::FanControlCluster & FanControlCluster();
+    Clusters::OnOffCluster & OnOffCluster();
 
 private:
     class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider

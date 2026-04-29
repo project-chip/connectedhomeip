@@ -16,12 +16,40 @@
  */
 
 #include <devices/fan/impl/LoggingFanDevice.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip {
 namespace app {
+
+namespace {
+
+bool DesiredOnOffFromFanDriveState(const FanControl::FanDriveState & newState, bool supportsMultiSpeed)
+{
+    if (newState.mode == FanControl::FanModeEnum::kOff)
+    {
+        return false;
+    }
+
+    // Example product rule: multi-speed fan at 0 implies device off at the application level.
+    if (supportsMultiSpeed && !newState.speedSetting.IsNull() && newState.speedSetting.Value() == 0)
+    {
+        return false;
+    }
+
+    // Outside Auto, percent 0 implies off.
+    if (newState.mode != FanControl::FanModeEnum::kAuto && !newState.percentSetting.IsNull() &&
+        newState.percentSetting.Value() == 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace
 
 LoggingFanDevice::LoggingFanDevice(const Context & context) : FanDevice(*this, *this, context) {}
 
@@ -74,6 +102,18 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
     return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed)).GetStatusCode().GetStatus();
 }
 
+void LoggingFanDevice::SyncOnOffFromFanDriveState(const FanControl::FanDriveState & newState)
+{
+    const bool supportsMultiSpeed = FanControlCluster().GetFeatureMap().Has(FanControl::Feature::kMultiSpeed);
+    const bool desiredOn          = DesiredOnOffFromFanDriveState(newState, supportsMultiSpeed);
+
+    Clusters::OnOffCluster & onOff = OnOffCluster();
+    if (onOff.GetOnOff() != desiredOn)
+    {
+        LogErrorOnFailure(onOff.SetOnOff(desiredOn));
+    }
+}
+
 void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
     const unsigned mode             = static_cast<unsigned>(to_underlying(newState.mode));
@@ -114,6 +154,8 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
             "speedCurrent=%u",
             mode, percentCurrent, speedCurrent);
     }
+
+    SyncOnOffFromFanDriveState(newState);
 }
 
 void LoggingFanDevice::OnRockSettingChanged(BitMask<FanControl::RockBitmap> newValue)
