@@ -66,16 +66,16 @@ def with_annotated_exception(fn: Callable[Concatenate[S, P], R]) -> Callable[Con
 class ProcessConfig:
     """Process configuration template."""
 
-    DEFAULT_START_TIMEOUT: ClassVar[float] = 4.0
-    DEFAULT_STOP_TIMEOUT: ClassVar[float] = 4.0
-    DEFAULT_TERMINATION_TIMEOUT: ClassVar[float] = 2.0
+    DEFAULT_START_TIMEOUT_SEC: ClassVar[float] = 4.0
+    DEFAULT_STOP_TIMEOUT_SEC: ClassVar[float] = 4.0
+    DEFAULT_TERMINATION_TIMEOUT_SEC: ClassVar[float] = 2.0
 
     id: int = 0
     name: str = "Process{id}"
     log_config: LogConfig = dataclasses.field(default_factory=LogConfig)
-    start_timeout: float = DEFAULT_START_TIMEOUT
-    stop_timeout: float = DEFAULT_STOP_TIMEOUT
-    termination_timeout: float = DEFAULT_TERMINATION_TIMEOUT
+    start_timeout_sec: float = DEFAULT_START_TIMEOUT_SEC
+    stop_timeout_sec: float = DEFAULT_STOP_TIMEOUT_SEC
+    termination_timeout_sec: float = DEFAULT_TERMINATION_TIMEOUT_SEC
 
     def with_formatted_name(self) -> Self:
         """Format the name using the id and process hierarchy. Return a new instance with the formatted name."""
@@ -245,7 +245,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
 
         try:
             if not self.state.wait_for(lambda phase, _: phase not in (ProcessPhase.NOT_STARTED, ProcessPhase.UNINITIALIZED),
-                                       self._config.start_timeout):
+                                       self._config.start_timeout_sec):
                 raise TimeoutError("Timeout when waiting for initialization")
 
             with self.state:
@@ -296,23 +296,23 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
                 return
 
             # Wait for the external work queue to be cancelled by its owner, which should signal the process to gracefully stop.
-            if self.has_stopped(self._config.stop_timeout):
+            if self.has_stopped(self._config.stop_timeout_sec):
                 return
 
             log.debug("Sending interrupt signal to process %s", self.name)
             if self._proc.pid is not None:
                 os.kill(self._proc.pid, signal.SIGINT)  # TODO Python 3.14: self._proc.interrupt()
-            if self.has_stopped(self._config.stop_timeout):
+            if self.has_stopped(self._config.stop_timeout_sec):
                 return
 
             log.warning("Timeout when waiting for process %s to stop. Sending terminate signal", self.name)
             self._proc.terminate()
-            if self.has_stopped(self._config.termination_timeout):
+            if self.has_stopped(self._config.termination_timeout_sec):
                 return
 
             log.warning("Timeout when waiting for process %s to terminate. Sending kill signal", self.name)
             self._proc.kill()
-            if self.has_stopped(self._config.termination_timeout):
+            if self.has_stopped(self._config.termination_timeout_sec):
                 return
 
             raise TimeoutError(f"Failed to terminate the process {self.name}. May become a zombie")

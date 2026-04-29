@@ -111,7 +111,7 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
 
         if hasattr(self, '_server_thread_manager'):
             log.debug("Waiting for XMLRPC Server thread to stop")
-            self._server_thread_manager.join(timeout=self._config.stop_timeout)
+            self._server_thread_manager.join(timeout=self._config.stop_timeout_sec)
             if self._server_thread_manager.is_alive():
                 log.error("XMLRPC Server thread failed to stop")
             log.debug("XMLRPC Server thread stopped")
@@ -161,7 +161,7 @@ class XmlRpcServerProcessManager(threading.Thread):
         super().start()
 
         try:
-            if not self._init_done.wait(timeout=self._proc_config.start_timeout):
+            if not self._init_done.wait(timeout=self._proc_config.start_timeout_sec):
                 raise TimeoutError("Failed to start within timeout")
 
             if self._exception is not None:
@@ -183,7 +183,7 @@ class XmlRpcServerProcessManager(threading.Thread):
             self._rsp_queue.cancel()
 
             # Stopping the queues should result in the subprocess exiting, and in turn the manager thread.
-            self.join(timeout=self._proc_config.stop_timeout)
+            self.join(timeout=self._proc_config.stop_timeout_sec)
 
             # Propagate the exception risen in the thread.
             if raise_on_proc_error and self._exception is not None:
