@@ -19,9 +19,11 @@ The first commit introducing this work is `70089581bd`.
     -   [Linux Platform Delegate](#linux-platform-delegate)
     -   [ProxyTransport](#proxytransport)
     -   [WiFi-PAF Subsystem](#wifi-paf-subsystem)
+    -   [Linux Platform](#linux-platform)
     -   [Controller / chip-tool](#controller--chip-tool)
     -   [AutoCommissioner](#autocommissioner)
     -   [Generated / ZAP Artefacts](#generated--zap-artefacts)
+-   [Python Certification Tests](#python-certification-tests)
 -   [Cross-Compiling for Raspberry Pi](#cross-compiling-for-raspberry-pi)
 
 <hr>
@@ -119,23 +121,23 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 | File | Change |
 | ---- | ------ |
-| `CommissioningProxyCluster.cpp` | New: full code-driven cluster implementation — attribute R/W, command dispatch, async nullopt pattern, `HandleProxyBackGroundScanStartRequest` / `HandleProxyBackGroundScanStopRequest` handlers, `MaxCachedResults` / `NumCachedResults` / `CacheTimeout` / `CachedResults` attribute reads, `MarkCachedResultsDirty()` |
+| `CommissioningProxyCluster.cpp` | New: full code-driven cluster implementation — attribute R/W, command dispatch, async nullopt pattern, `HandleProxyBackGroundScanStartRequest` / `HandleProxyBackGroundScanStopRequest` handlers, `MaxCachedResults` / `NumCachedResults` / `CacheTimeout` / `CachedResults` / `WiFiBand` / `MaxSessions` attribute reads, `MarkCachedResultsDirty()`; WiFiBand and MaxSessions delegate validation in scan/connect handlers |
 | `CommissioningProxyCluster.h` | New: `CommissioningProxyCluster` class and `Config` struct |
-| `CommissioningProxyDelegate.h` | New: abstract `Delegate` interface with `ProxyConnectRequest`, `ProxyDisconnectRequest`, `ProxyMessageRequest`, `ProxyScanRequest`, `ProxyBackgroundScanStartRequest`, `ProxyBackgroundScanStopRequest`, cache attribute accessors, and `EncodeCachedResults()` |
+| `CommissioningProxyDelegate.h` | New: abstract `Delegate` interface with `ProxyConnectRequest`, `ProxyDisconnectRequest`, `ProxyMessageRequest`, `ProxyScanRequest`, `ProxyBackgroundScanStartRequest`, `ProxyBackgroundScanStopRequest`, `CancelPendingConnect`, cache attribute accessors, `GetMaxSessions()`, `GetSupportedWiFiBands()`, and `EncodeCachedResults()` |
 | `CodegenIntegration.h/.cpp` | New: thin compatibility shim for ZAP-based apps |
 | `CommissioningProxyTestEventTriggerHandler.h` | New: test-event trigger handler stub |
 | `BUILD.gn` / `*.cmake` / `*.gni` | Updated: build rules to include the new cluster source files |
-| `tests/` | New: unit tests for the cluster (mock delegate, backwards-compatibility tests) |
+| `tests/` | New: `TestCommissioningProxyCluster.cpp` (session management, fabric isolation, MaxSessions, scan, timeout), `TestCommissioningProxyClusterBackwardsCompatibility.cpp`, `CommissioningProxyMockDelegate.cpp/.h` |
 | `README.md` | New: cluster server documentation |
 
 ### Linux Platform Delegate (`examples/commissioning-proxy-app/linux/`)
 
 | File | Change |
 | ---- | ------ |
-| `CommissioningProxyCommandDelegate.cpp` | Replaced: full PAF delegate implementation — session tracking, `ProxyWiFiPAFDelegate`, async connect/message/disconnect flow, `OnProxyConnectTimeout` (cancels NAN subscribe, returns `Status::Timeout`), `ProxyBackgroundScanStartRequest` / `ProxyBackgroundScanStopRequest` (multi-fabric `sBgScanFabrics` map, per-fabric lifetime timer, NAN discovery cache, band encoding) |
+| `CommissioningProxyCommandDelegate.cpp` | Replaced: full PAF delegate implementation — session tracking, `ProxyWiFiPAFDelegate`, async connect/message/disconnect flow, `OnProxyConnectTimeout` (cancels NAN subscribe, returns `Status::Timeout`), `ProxyBackgroundScanStartRequest` / `ProxyBackgroundScanStopRequest` (multi-fabric `sBgScanFabrics` map, per-fabric lifetime timer, NAN discovery cache, band encoding), `ProxyScanRequest` (async `WiFiPAFScan`, Busy guard), MaxSessions enforcement, fabric isolation (NOT_FOUND on cross-fabric access) |
 | `CommissioningProxyCommandDelegate.h` | Removed: replaced by `commissioning-proxy-delegate-impl.h` |
 | `CPAppCommandDelegate.cpp/.h` | New: named-pipe command handler for the proxy app |
-| `main.cpp` | Updated: registers `CommissioningProxyCluster` via `CodegenDataModelProvider`; cancels the proxy's own NAN publish on commissioning complete via `CancelWiFiPAFPublish()` / `OnChipDeviceEvent()` |
+| `main.cpp` | Updated: registers `CommissioningProxyCluster` via `CodegenDataModelProvider`; cancels the proxy's own NAN publish on commissioning complete via `CancelWiFiPAFPublish()` / `OnChipDeviceEvent()`; derives `WiFiBand` attribute value from `--wifipaf freq_list=` and passes to `MyCPDelegate::SetSupportedWiFiBands()` |
 | `args.gni` | Updated: enables TCP endpoint (`chip_inet_config_enable_tcp_endpoint`) |
 | `BUILD.gn` | Updated: adds `ProxyTransport` and cluster server as build dependencies |
 | `include/CHIPProjectAppConfig.h` | Updated: project-level CHIP config overrides |
@@ -144,7 +146,7 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 | File | Change |
 | ---- | ------ |
-| `include/commissioning-proxy-delegate-impl.h` | New: `MyCPDelegate` class declaration |
+| `include/commissioning-proxy-delegate-impl.h` | New: `MyCPDelegate` class declaration — includes `SetSupportedWiFiBands()`, `GetSupportedWiFiBands()`, `GetMaxSessions()`, and private `mSupportedWiFiBands` field |
 | `src/commissioning-proxy-delegate-impl.cpp` | New: `MyCPDelegate` attribute getter/setter implementations |
 | `commissioning-proxy.matter` / `.zap` | Updated: cluster descriptor (ZAP source of truth for code generation) |
 | `BUILD.gn` | Updated: adds delegate implementation sources |
@@ -189,8 +191,8 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 | File | Change |
 | ---- | ------ |
-| `ConnectivityManagerImpl.cpp` | `ScanDiscoveryResult()` and PAF scanning helpers; debug logging in `_WiFiPAFShutdown`; `WiFiPAFDisconnectPublishReceiveHandler()` tears down the GLib `nanreceive` handler; `WiFiPAFStartBackgroundScan()` / `WiFiPAFStopBackgroundScan()` for background NAN scanning; `GetPendingConnectSubscribeId()` accessor; `PostNetworkConnect()` calls `ScheduleCancelPublishersOnTxIdle()` to defer NAN publisher teardown until PAFTP tx-idle |
-| `ConnectivityManagerImpl.h` | Declares `WiFiPAFDisconnectPublishReceiveHandler()`, `BgScanDiscoveryCallback` typedef, `WiFiPAFStartBackgroundScan()`, `WiFiPAFStopBackgroundScan()`, `GetPendingConnectSubscribeId()`; `mScanFreq` field |
+| `ConnectivityManagerImpl.cpp` | `ScanDiscoveryResult()` and PAF scanning helpers; debug logging in `_WiFiPAFShutdown`; `WiFiPAFDisconnectPublishReceiveHandler()` tears down the GLib `nanreceive` handler; `WiFiPAFStartBackgroundScan()` / `WiFiPAFStopBackgroundScan()` for background NAN scanning; `WiFiPAFScan()` for foreground one-shot scanning (TTL = scanMaxTime); `GetPendingConnectSubscribeId()` accessor; `PostNetworkConnect()` calls `ScheduleCancelPublishersOnTxIdle()` to defer NAN publisher teardown until PAFTP tx-idle |
+| `ConnectivityManagerImpl.h` | Declares `WiFiPAFDisconnectPublishReceiveHandler()`, `BgScanDiscoveryCallback` typedef, `WiFiPAFStartBackgroundScan()`, `WiFiPAFStopBackgroundScan()`, `WiFiPAFScan()`, `PafScanResultsCallback` typedef, `GetPendingConnectSubscribeId()`; `mScanFreq` field; `NanPeerInfo` struct extended with `band`, `vid`, `pid` fields |
 
 <hr>
 
@@ -253,9 +255,12 @@ Defines the pure-virtual `Delegate` interface.  Key methods:
 | `ProxyScanRequest()` | Initiate a NAN scan; must call `commandObj->AddResponse()` asynchronously |
 | `ProxyBackgroundScanStartRequest()` | Start a continuous background NAN scan; results cached and served as a cluster attribute |
 | `ProxyBackgroundScanStopRequest()` | Stop the background scan for the requesting fabric/node; silently ignores calls from a non-matching fabric/node |
+| `CancelPendingConnect()` | Cancel any in-progress `ProxyConnectRequest` (used for SessionId `0xFFFF`); enforces fabric isolation |
 | `GetScanMaxTime()` / `SetScanMaxTime()` | Attribute accessors |
 | `GetMaxCachedResults()` / `GetNumCachedResults()` | Read-only cache size/count attribute accessors |
 | `GetCacheTimeout()` / `SetCacheTimeout()` | Cache expiry timeout attribute accessors |
+| `GetMaxSessions()` | Returns the maximum number of simultaneous proxy sessions supported; used by the cluster server for both the `MaxSessions` attribute read and `RESOURCE_EXHAUSTED` enforcement |
+| `GetSupportedWiFiBands()` | Returns the `WiFiBandBitmap` of bands supported by the hardware; used for the `WiFiBand` attribute read and to validate WiFiBands fields in scan and connect requests |
 | `EncodeCachedResults()` | Encodes the `CachedResults` list attribute into a TLV `AttributeValueEncoder` |
 
 ---
@@ -343,6 +348,32 @@ The subscribe ID is captured into `ProxyConnectCtx::subscribeId` after
 `sBgScanFabrics`; cancels its lifetime timer; stops the hardware scan if the map
 is now empty.  Silently succeeds if the fabric key is not found (per spec).
 
+**`ProxyScanRequest`** (foreground one-shot scan): calls
+`WiFiPAFScan(scanMaxTime, OnPafScanDone, ctx)` where `scanMaxTime` is the value
+of the proxy's `ScanMaxTime` attribute.  The subscribe TTL passed to
+wpa\_supplicant equals `scanMaxTime` so the NAN subscribe expires naturally at
+the right time.  A boolean guard `sScanInProgress` returns `Status::Busy` if a
+foreground scan is already running.  The `CommandHandler::Handle` is kept live
+until `OnPafScanDone` fires (called from the platform layer on completion or
+timeout), at which point `ProxyScanResponse` is built from the accumulated
+`NanPeerInfo` results and returned.
+
+**Fabric isolation**: each `ProxyConnectRequest` stores
+`request.subjectDescriptor.fabricIndex` into both `ProxyConnectCtx::fabricIndex`
+and (on success) `ProxySessionInfo::fabricIndex`.  Subsequent commands enforce
+this ownership:
+
+-   `ProxyMessageRequest` — returns `NOT_FOUND` if
+    `request.subjectDescriptor.fabricIndex != session.fabricIndex`.
+-   `ProxyDisconnectRequest` — returns `NOT_FOUND` on fabric mismatch.
+-   `CancelPendingConnect` (SessionId `0xFFFF`) — returns `NOT_FOUND` if the
+    requesting fabric does not match `sPendingConnectCtx->fabricIndex`.
+
+**MaxSessions enforcement**: at the start of `HandleProxyConnectRequest`, if
+`sProxySessions.size() >= GetMaxSessions()` (currently `kMaxProxySessions = 1`)
+the command returns `Status::ResourceExhausted` without touching the transport
+layer.
+
 #### `main.cpp`
 
 **Proxy NAN publish self-cancel**: after `ApplicationInit()`, if the
@@ -356,6 +387,14 @@ not yet on a fabric, an `OnChipDeviceEvent` handler is registered to call
 itself as a NAN publisher serves no purpose and can confuse a subscribing
 `_WiFiPAFSubscribe` call (which would register a second `nanreceive` handler on
 top of the first, delivering PAF packets twice).
+
+**WiFiBand attribute derivation**: after `ApplicationInit()`, `main.cpp` parses
+the `freq_list=` value from `LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds`
+(supplied via `--wifipaf freq_list=...`), maps each frequency to a band
+(2412–2484 MHz → `k2g4`, 5035–5980 MHz → `k5g`), and calls
+`gMyCPDelegate.SetSupportedWiFiBands(bands)`.  The resulting bitmask is served
+as the `WiFiBand` attribute and used to validate `WiFiBands` fields in
+`ProxyScanRequest` and `ProxyConnectRequest`.
 
 ---
 
@@ -464,6 +503,27 @@ recent `_WiFiPAFSubscribe` call that has not yet transitioned to an active
 session.  Used by `HandleProxyConnectRequest` to capture the ID for timeout
 cleanup.
 
+**`WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbCtx)`**:
+performs a foreground one-shot NAN discovery scan.  Issues a NAN subscribe with
+TTL = `scanMaxTime` seconds, accumulates results in `mNanScanPeers` (a
+`std::set<NanPeerInfo>` deduplicated by MAC + discriminator), and starts a
+`scanMaxTime`-second timer (`FinishWiFiPAFScan`) that cancels the subscribe and
+delivers all collected results to `cb` when it fires.  Setting the subscribe TTL
+equal to `scanMaxTime` ensures wpa\_supplicant's own expiry and the CHIP-side
+timer are aligned, preventing stale subscribe IDs from returning zero results on
+subsequent scans.
+
+**`NanPeerInfo` struct** extended fields:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `band` | `uint16_t` | `WiFiBandBitmap` value derived from the scan frequency (0 = unknown) |
+| `vid`  | `uint16_t` | Vendor ID parsed from the NAN SSI advertisement |
+| `pid`  | `uint16_t` | Product ID parsed from the NAN SSI advertisement |
+
+These fields populate `ScanResultStruct::vendorID`, `::productID`, and
+`::wiFiBand` in the `CachedResults` attribute and `ProxyScanResponse`.
+
 **`mScanFreq`** (private field): the frequency (MHz) reported by
 wpa_supplicant for the most recent NAN discovery event.  Set under
 `mWpaSupplicantMutex` on the GLib thread; read in `ScanDiscoveryResult()` to
@@ -548,157 +608,33 @@ the ZAP code generator.
 
 <hr>
 
+## Python Certification Tests
+
+Python Matter certification tests for the Commissioning Proxy cluster are in
+`src/python_testing/`.  Each test uses `MatterBaseTest` and runs against a live
+DUT (commissioning-proxy-app) over the network.
+
+| Test file | Description |
+| --------- | ----------- |
+| `TC_COMPRO_2_1.py` | Attributes with DUT as Server — reads and validates all mandatory/optional cluster attributes |
+| `TC_COMPRO_2_2.py` | Proxy Scan feature — `ProxyScanRequest` returns at least one result for a nearby commissionable device |
+| `TC_COMPRO_2_3.py` | Proxy Background Scan feature — start/stop/cache lifecycle and `CachedResults` attribute reporting |
+| `TC_COMPRO_2_4.py` | Proxy Connect, Message and Disconnect — full end-to-end commissioning via proxy |
+| `TC_COMPRO_2_5.py` | Writable Attributes — `ScanMaxTime` and `CacheTimeout` write/read-back |
+| `TC_COMPRO_2_6.py` | Error Handling — verifies `INVALID_TRANSPORT_TYPE`, `RESOURCE_EXHAUSTED`, `NOT_FOUND`, `BUSY` status codes |
+| `TC_COMPRO_2_7.py` | Multi-Session Support — `MaxSessions` attribute reflects implementation limit; second `ProxyConnectRequest` returns `RESOURCE_EXHAUSTED` when sessions are full |
+| `TC_COMPRO_2_8.py` | Fabric Isolation — commissions a second in-process fabric (TH2) and verifies that cross-fabric `ProxyMessageRequest`, `ProxyDisconnectRequest`, and `CancelPendingConnect` return `NOT_FOUND` |
+| `TC_COMPRO_2_9.py` | Device Type Requirements — verifies the device type descriptor and mandatory cluster list on the endpoint |
+
+Tests that require a physical End Device (2.2, 2.3, 2.4, 2.6, 2.7, 2.8) are run
+with the `networked` mode argument, which SSH-resets the ED RPi before each
+iteration.
+
+<hr>
+
 ## Cross-Compiling for Raspberry Pi
 
-Raspberry Pi 4/5 runs a 64-bit Linux kernel (`aarch64`). Builds are done
-inside a Docker container that carries the CHIP cross-compilation toolchain
-and an Ubuntu 24.04 arm64 sysroot.  A named Docker volume caches the Pigweed
-bootstrap environment so subsequent builds skip re-bootstrapping.
-
-### 1. Create the Docker image (one time)
-
-Create a file named `Dockerfile.chip-cross-aarch64` with the following
-content and build the image:
-
-```dockerfile
-FROM ghcr.io/project-chip/chip-build-crosscompile:latest
-
-# Enable arm64 packages
-RUN dpkg --add-architecture arm64 \
- && apt-get update
-
-# Native build tools
-RUN apt-get install -y --no-install-recommends \
-    git cmake ninja-build pkg-config curl unzip \
-    python3 python3-venv python3-dev python3-pip \
-    default-jre
-
-# Cross toolchain
-RUN apt-get install -y --no-install-recommends \
-    gcc-aarch64-linux-gnu \
-    g++-aarch64-linux-gnu \
-    libc6-dev-arm64-cross \
-    linux-libc-dev-arm64-cross
-
-# arm64 system libraries
-RUN apt-get install -y --no-install-recommends \
-    libssl-dev:arm64 \
-    libdbus-1-dev:arm64 \
-    libglib2.0-dev:arm64 \
-    libavahi-client-dev:arm64 \
-    libgirepository1.0-dev:arm64 \
-    libcairo2-dev:arm64 \
-    libreadline-dev:arm64 \
- && rm -rf /var/lib/apt/lists/*
-```
-
-```
-$ docker build -t chip-cross-aarch64 -f Dockerfile.chip-cross-aarch64 .
-```
-
-The base image `chip-build-crosscompile` already contains Clang, GN, ninja,
-and an Ubuntu 24.04 arm64 sysroot at `/opt/ubuntu-24.04-aarch64-sysroot`.
-
-### 2. Create the Pigweed environment volume (one time)
-
-A Docker volume persists the Pigweed bootstrap across builds so you do not
-re-download it every time:
-
-```
-$ ENV_VOL="chip-pw-env-$(id -u)"
-$ docker volume inspect "$ENV_VOL" >/dev/null 2>&1 || docker volume create "$ENV_VOL"
-
-# Fix ownership so the build can run as your UID/GID
-$ docker run --rm \
-    -v "$ENV_VOL:/pw_env" \
-    chip-cross-aarch64 \
-    bash -lc "mkdir -p /pw_env && chown -R $(id -u):$(id -g) /pw_env"
-```
-
-### 3. Build the commissioning proxy app
-
-```
-$ REPO="$HOME/Work/morse/connectedhomeip"   # adjust to your repo path
-$ ENV_VOL="chip-pw-env-$(id -u)"
-
-$ docker run --rm -t \
-    --user "$(id -u):$(id -g)" \
-    -v "$REPO:/workdir/connectedhomeip" \
-    -v "$ENV_VOL:/pw_env" \
-    -w /workdir/connectedhomeip \
-    chip-cross-aarch64 \
-    bash -lc '
-      set -eo pipefail
-      git config --global --add safe.directory /workdir/connectedhomeip
-      git config --global --add safe.directory /workdir/connectedhomeip/third_party/pigweed/repo
-      export PW_PROJECT_ROOT=/workdir/connectedhomeip
-      export PW_ENVIRONMENT_ROOT=/pw_env
-      source scripts/bootstrap.sh
-      cd examples/commissioning-proxy-app/linux
-      gn gen out/rpi-arm64 --args='"'"'import("//with_pw_rpc.gni") target_os="linux" target_cpu="arm64" is_debug=true is_clang=true sysroot="/opt/ubuntu-24.04-aarch64-sysroot" system_libdir="lib/aarch64-linux-gnu"'"'"'
-      ninja -C out/rpi-arm64
-    '
-```
-
-Output binary:
-
-```
-examples/commissioning-proxy-app/linux/out/rpi-arm64/chip-commissioning-proxy-app
-```
-
-### 4. Build chip-tool (arm64)
-
-```
-$ REPO="$HOME/Work/morse/connectedhomeip"
-$ ENV_VOL="chip-pw-env-$(id -u)"
-
-$ docker run --rm -t \
-    --user "$(id -u):$(id -g)" \
-    -v "$REPO:/workdir/connectedhomeip" \
-    -v "$ENV_VOL:/pw_env" \
-    -w /workdir/connectedhomeip \
-    chip-cross-aarch64 \
-    bash -lc '
-      set -eo pipefail
-      git config --global --add safe.directory /workdir/connectedhomeip
-      git config --global --add safe.directory /workdir/connectedhomeip/third_party/pigweed/repo
-      export PW_PROJECT_ROOT=/workdir/connectedhomeip
-      export PW_ENVIRONMENT_ROOT=/pw_env
-      source scripts/bootstrap.sh
-      cd examples/chip-tool
-      gn gen out/rpi-arm64 --args='"'"'target_os="linux" target_cpu="arm64" is_debug=true is_clang=true sysroot="/opt/ubuntu-24.04-aarch64-sysroot" system_libdir="lib/aarch64-linux-gnu"'"'"'
-      ninja -C out/rpi-arm64
-    '
-```
-
-Output binary:
-
-```
-examples/chip-tool/out/rpi-arm64/chip-tool
-```
-
-### 5. Transfer and run on the Raspberry Pi
-
-```
-$ scp examples/commissioning-proxy-app/linux/out/rpi-arm64/chip-commissioning-proxy-app \
-      pi@raspberrypi.local:~/
-$ scp examples/chip-tool/out/rpi-arm64/chip-tool \
-      pi@raspberrypi.local:~/
-
-# On the Raspberry Pi:
-$ sudo ./chip-commissioning-proxy-app --wifi --allow-large-payload
-```
-
-### Notes
-
--   The Raspberry Pi must have Wi-Fi Aware (NAN) hardware and a kernel with NAN
-    support (`iw dev` should list NAN support under `Supported interface modes`).
-    Most Raspberry Pi 4/5 firmware builds do not enable NAN by default;
-    confirm with your BSP vendor.
--   `--allow-large-payload` is required so that chip-tool can connect to the
-    proxy app over TCP (needed for oversized commissioning payloads).
--   The `chip-pw-env-<uid>` volume survives container restarts. Delete it
-    (`docker volume rm "chip-pw-env-$(id -u)"`) only if you need a clean
-    bootstrap (e.g. after a Pigweed toolchain update).
--   To disable RPC support, replace `import("//with_pw_rpc.gni") ` with an
-    empty string in the `gn gen --args` for the proxy app.
+For Docker-based cross-compilation of all three binaries (commissioning-proxy-app,
+chip-tool, and chip-lighting-app) and full RPi deployment instructions, see
+`../CP_getting_started.md §4–5`.  That document also covers the wpa\_supplicant
+NAN patch required on the proxy RPi and hardware prerequisites.

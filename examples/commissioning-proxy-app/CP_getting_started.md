@@ -644,6 +644,9 @@ The proxy supports scan and background NAN scanning so that commissioners
 can discover nearby devices. Background scan results are cached and can
 be subscribed to as needed.
 
+For a concise command reference (syntax, argument tables, bitmaps) see
+`linux/README.md §Foreground Scanning` and `§Background Scanning`.
+
 ### 8.1 Run a foreground scan
 
 Annotated form (for reference):
@@ -707,6 +710,8 @@ Copy-paste form:
 <hr>
 
 ## 9. Commissioning the End Device Through the Commissioning Proxy
+
+For a concise command reference see `linux/README.md §Commissioning a Device via the Proxy`.
 
 With the Commissioning Proxy on the Fabric and the end device running, issue the `pairing proxy`
 command from the **TH RPi**:

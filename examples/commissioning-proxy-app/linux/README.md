@@ -15,12 +15,20 @@ how to commission a device through it using chip-tool.
     -   [Commandline arguments](#commandline-arguments)
     -   [Running the Commissioning Proxy](#running-the-commissioning-proxy)
     -   [Commissioning a Device via the Proxy](#commissioning-a-device-via-the-proxy)
+    -   [Foreground Scanning](#foreground-scanning)
     -   [Background Scanning](#background-scanning)
+    -   [Fabric Isolation](#fabric-isolation)
     -   [Device Tracing](#device-tracing)
 
 <hr>
 
 ## Building
+
+**For Raspberry Pi (hardware testing):** see `../CP_getting_started.md` for the
+full cross-compilation and deployment workflow, including Docker image setup,
+wpa\_supplicant patching, and deploying all three binaries to the RPi.
+
+**For local x86 development:**
 
 -   Install tool chain
 
@@ -46,6 +54,21 @@ how to commission a device through it using chip-tool.
 
     Enables WiFi management feature. Required for Wi-Fi PAF commissioning.
 
+-   `--wifipaf freq_list=<freq_1>,<freq_2>,...`
+
+    Enables Wi-Fi PAF via wpa\_supplicant and sets the NAN operating frequencies
+    in MHz.  At least one frequency must be supplied.  The proxy derives the
+    `WiFiBand` attribute value from this list at startup (2412–2484 MHz → 2.4 GHz,
+    5035–5980 MHz → 5 GHz).
+
+    Example — 2.4 GHz channel 6 only:
+
+          --wifipaf freq_list=2437
+
+    Example — 2.4 GHz channel 6 and 5 GHz channel 149:
+
+          --wifipaf freq_list=2437,5745
+
 -   `--discriminator <value>`
 
     Set the discriminator used to identify this proxy node during commissioning.
@@ -58,11 +81,6 @@ how to commission a device through it using chip-tool.
 
     Path of a named pipe used to send commands to the running app. Optional.
 
--   `--allow-large-payload`
-
-    Enable TCP transport for large payload support (recommended when chip-tool
-    connects over TCP).
-
 ## Running the Commissioning Proxy
 
 The proxy app must first be commissioned onto the fabric before it can proxy
@@ -70,7 +88,7 @@ commissioning for other devices. Start the proxy app on a node that has Wi-Fi
 Aware (NAN) capability:
 
 ```
-$ ./out/debug/chip-commissioning-proxy-app --wifi --allow-large-payload
+$ ./out/debug/chip-commissioning-proxy-app --wifi --wifipaf freq_list=2437
 ```
 
 Then commission the proxy node itself using chip-tool (one time):
@@ -99,7 +117,7 @@ between chip-tool and the device.
 ### Command syntax
 
 ```
-$ ./chip-tool pairing proxy <node-id> <ssid> <password> <setup-pin-code> <discriminator> <proxy-node-id> [--proxy-connect-timeout <seconds>]
+$ ./chip-tool pairing proxy <node-id> <ssid> <password> <setup-pin-code> <discriminator> <proxy-node-id> [<proxy-connect-timeout>]
 ```
 
 | Argument                  | Description                                                        |
@@ -110,7 +128,7 @@ $ ./chip-tool pairing proxy <node-id> <ssid> <password> <setup-pin-code> <discri
 | `setup-pin-code`          | Commissionee's PASE setup PIN code                                 |
 | `discriminator`           | Commissionee's discriminator                                       |
 | `proxy-node-id`           | Node ID of the already-commissioned commissioning proxy            |
-| `--proxy-connect-timeout` | Timeout in seconds for `ProxyConnectRequest` (default: 30 s)       |
+| `proxy-connect-timeout`   | Timeout in seconds for `ProxyConnectRequest` (default: 30 s)       |
 
 ### Example
 
@@ -121,27 +139,46 @@ $ ./chip-tool pairing proxy 1999 "MyNetwork" "MyPassword" 20202021 3840 0x7ce
 This commissions device node 1999 via the proxy at node 0x7ce onto the Wi-Fi
 network "MyNetwork".
 
-### Network topology
+For a step-by-step walkthrough including what happens at each stage, see
+`../CP_getting_started.md §9`.  For the full packet-flow diagram and
+implementation detail, see `IMPLEMENTATION_README.md §Architecture Overview`.
+
+## Foreground Scanning
+
+For annotated and copy-paste command forms see `../CP_getting_started.md §8.1`.
+
+The proxy can perform a one-shot foreground NAN scan for commissionable devices
+and return results immediately via `ProxyScanResponse`.
 
 ```
-chip-tool  <-- TCP/IP -->  Commissioning Proxy App  <-- Wi-Fi PAF (NAN) -->  Commissionee
+$ ./chip-tool commissioningproxy proxy-scan-request \
+    <Transport> <proxy-node-id> <endpoint-id> \
+    --allow-large-payload true \
+    --WiFiBands <bands> \
+    --timeout <seconds>
 ```
 
-1.  chip-tool establishes a CASE session to the commissioning proxy.
-2.  chip-tool sends `ProxyConnectRequest` — the proxy opens a PAF session to
-    the Commissionee.  If the PAF session is not established within the connect
-    timeout, the proxy cancels the NAN subscribe and returns `Status::Timeout`.
-3.  chip-tool sends PASE and commissioning messages via `ProxyMessageRequest`
-    — the proxy forwards each message over PAF and returns the response.
-4.  When the Commissionee connects to Wi-Fi, the proxy defers NAN publisher
-    teardown until the PAFTP send queue is drained and all outstanding fragment
-    acks have been received, then cancels the NAN publisher sessions.  This
-    releases the radio for IPv6 DAD and mDNS, reducing post-WiFi-join mDNS
-    latency from ~35 s to ~3 s.
-5.  Upon commissioning completion, chip-tool sends `ProxyDisconnectRequest` to
-    tear down the PAF session.
+| Argument          | Description                                                                |
+| ----------------- | -------------------------------------------------------------------------- |
+| `Transport`       | Transport bitmap: `2` = BLE, `8` = WiFiPAF                                |
+| `proxy-node-id`   | Node ID of the proxy                                                       |
+| `endpoint-id`     | Endpoint hosting the CommissioningProxy cluster (typically `1`)            |
+| `--allow-large-payload true` | Required — forces TCP for this command (spec `L` quality)     |
+| `--WiFiBands`     | Wi-Fi band bitmap: `1` = 2.4 GHz, `4` = 5 GHz, `5` = both                |
+| `--timeout`       | How long (seconds) chip-tool waits for the response                        |
+
+The scan runs for the duration configured by the proxy's `ScanMaxTime` attribute.
+Results are returned inline in the `ProxyScanResponse`.
+
+### Example — foreground WiFiPAF scan on both bands
+
+```
+$ ./chip-tool commissioningproxy proxy-scan-request 8 0x7ce 1 --allow-large-payload true --WiFiBands 5 --timeout 20
+```
 
 ## Background Scanning
+
+For annotated and copy-paste command forms see `../CP_getting_started.md §8.2–8.4`.
 
 The proxy supports continuous background NAN scanning so that commissioners can
 discover nearby devices before initiating a `ProxyConnectRequest`.  The feature
@@ -150,44 +187,56 @@ is exposed as cluster commands on the `CommissioningProxy` cluster (endpoint 1).
 ### Starting a background scan
 
 ```
-$ ./chip-tool commissioning-proxy proxy-back-ground-scan-start-request \
+$ ./chip-tool commissioningproxy proxy-back-ground-scan-start-request \
     <Transport> <Timeout> <WiFiBands> \
     <proxy-node-id> <endpoint-id>
 ```
 
-| Argument      | Description                                                                   |
-| ------------- | ----------------------------------------------------------------------------- |
-| `Transport`   | Transport bitmap (e.g. `1` for WiFiPAF)                                       |
-| `Timeout`     | Scan lifetime in seconds; `0` for no expiry                                   |
-| `WiFiBands`   | Wi-Fi band bitmap (e.g. `1` for 2.4 GHz, `2` for 5 GHz, `3` for both)        |
-| `proxy-node-id` | Node ID of the proxy                                                        |
-| `endpoint-id` | Endpoint hosting the CommissioningProxy cluster (typically `1`)               |
+| Argument        | Description                                                                   |
+| --------------- | ----------------------------------------------------------------------------- |
+| `Transport`     | Transport bitmap: `2` = BLE, `8` = WiFiPAF                                   |
+| `Timeout`       | Scan lifetime in seconds; `0` for no expiry                                   |
+| `WiFiBands`     | Wi-Fi band bitmap: `1` = 2.4 GHz, `4` = 5 GHz, `5` = both                   |
+| `proxy-node-id` | Node ID of the proxy                                                          |
+| `endpoint-id`   | Endpoint hosting the CommissioningProxy cluster (typically `1`)               |
 
 The proxy starts a NAN subscribe immediately and caches discovered devices in
 the `CachedResults` attribute.  Results are pushed to subscribers via attribute
 reporting.  Multiple fabrics may each call start independently; the hardware
 scan runs as long as at least one fabric has an active request.
 
+### Example — background WiFiPAF scan on both bands, no expiry
+
+```
+$ ./chip-tool commissioningproxy proxy-back-ground-scan-start-request 8 0 5 0x7ce 1
+```
+
 ### Stopping a background scan
 
 ```
-$ ./chip-tool commissioning-proxy proxy-back-ground-scan-stop-request \
+$ ./chip-tool commissioningproxy proxy-back-ground-scan-stop-request \
     <Transport> <WiFiBands> \
     <proxy-node-id> <endpoint-id>
 ```
 
-The hardware scan stops once no fabrics remain active.  If the requesting
-`fabric-index` / `node-id` pair does not match the original requester the
-command is silently ignored (per spec §10.5.7.7).
+The hardware scan stops once no fabrics remain active.
 
 ### Reading cached results
 
 ```
-$ ./chip-tool commissioning-proxy read cached-results <proxy-node-id> <endpoint-id>
+$ ./chip-tool commissioningproxy read cached-results <proxy-node-id> <endpoint-id>
 ```
 
 Returns the list of discovered commissionee peer descriptors (address, band,
 discriminator) currently held in the proxy's cache.
+
+## Fabric Isolation
+
+Each proxy session is bound to the fabric that created it via
+`ProxyConnectRequest`.  Attempts by a different fabric to send
+`ProxyMessageRequest`, `ProxyDisconnectRequest`, or a
+`CancelPendingConnect` (SessionId `0xFFFF`) for a session owned by another
+fabric are rejected with `Status::NotFound`.
 
 ## Device Tracing
 
