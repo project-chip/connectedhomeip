@@ -17,11 +17,16 @@
 
 #include "AppTask.h"
 
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 int main()
 {

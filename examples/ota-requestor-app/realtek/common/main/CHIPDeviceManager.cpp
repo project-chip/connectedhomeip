@@ -28,6 +28,7 @@
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <core/ErrorStr.h>
 #include <dac_provider/CommonDACProvider.h>
 #include <platform/realtek/freertos/FactoryDataProvider.h>
@@ -147,4 +148,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         cb->PostAttributeChangeCallback(path.mEndpointId, path.mClusterId, path.mAttributeId, type, size, value);
     }
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

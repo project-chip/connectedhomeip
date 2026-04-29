@@ -31,7 +31,13 @@
 #include "commands/session-management/Commands.h"
 #include "commands/storage/Commands.h"
 
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <zap-generated/cluster/Commands.h>
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 // ================================================================================
 // Main Code

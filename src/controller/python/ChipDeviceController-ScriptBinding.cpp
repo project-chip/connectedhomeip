@@ -42,6 +42,7 @@
 
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
@@ -1162,4 +1163,10 @@ PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFun
 void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback)
 {
     chip::MainLoopWork::ExecuteInMainLoop([callback]() { sCheckInDelegate.SetOnCheckInCompleteCallback(callback); });
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Dummy implementation to satisfy linker for Python library.
 }

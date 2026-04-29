@@ -20,10 +20,16 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/KeyValueStoreManager.h>
 
 extern const char TAG[] = "persistent-storage";
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 extern "C" void app_main()
 {

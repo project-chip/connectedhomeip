@@ -32,6 +32,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Dnssd.h>
 #include <lib/core/DataModelTypes.h>
@@ -390,6 +391,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
                                         value);
     }
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }
 
 /** @brief OnOff Cluster Init

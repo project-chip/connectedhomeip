@@ -16,9 +16,11 @@
  *    limitations under the License.
  */
 
+#include <app/ConcreteAttributePath.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -71,6 +73,10 @@ using namespace chip::app;
 using namespace chip::DeviceLayer;
 using namespace chip::Credentials;
 using chip::DeviceLayer::Internal::ESP32Config;
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 static const char TAG[] = "all-devices-app";
 

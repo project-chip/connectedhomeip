@@ -102,3 +102,9 @@ TEST_F(TestDeviceEnergyManagementClusterBackwardsCompatibility, TestInstanceLife
 }
 
 } // namespace
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Dummy implementation for tests
+}

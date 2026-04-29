@@ -137,6 +137,7 @@ void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
     LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }
 
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <examples/all-clusters-app/all-clusters-common/include/laundry-dryer-controls-delegate-impl.h>
 #include <src/app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 using namespace chip::app::Clusters::LaundryDryerControls;
@@ -216,4 +217,10 @@ extern "C" void app_main()
 bool lowPowerClusterSleep()
 {
     return true;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

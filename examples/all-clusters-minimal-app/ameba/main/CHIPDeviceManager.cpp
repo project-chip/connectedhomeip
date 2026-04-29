@@ -27,6 +27,7 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/util/basic-types.h>
 #include <core/ErrorStr.h>
 #include <support/CHIPMem.h>
@@ -87,4 +88,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         cb->PostAttributeChangeCallback(path.mEndpointId, path.mClusterId, path.mAttributeId, type, size, value);
     }
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

@@ -256,3 +256,66 @@ To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
+
+### `MatterCodegenPostAttributeChangeCallback`
+
+Applications using `CodegenDataModelProvider` must now implement the
+`MatterCodegenPostAttributeChangeCallback` callback. This callback is invoked
+after any attribute value changes in the data model (both for Ember and
+code-driven clusters).
+
+It was introduced because `MatterPostAttributeChangeCallback` is not called for
+code-driven clusters (as they bypass Ember). The new callback ensures that
+applications can react to all attribute changes regardless of cluster type.
+
+**Relationship with `MatterPostAttributeChangeCallback`:** For Ember-based
+clusters, **both** callbacks are fired. To avoid processing the same attribute
+change twice, applications should migrate their attribute-change logic from
+`MatterPostAttributeChangeCallback` into
+`MatterCodegenPostAttributeChangeCallback` and provide an empty stub for the
+former:
+
+```cpp
+// Migrate logic here — called for ALL attribute changes (Ember and code-driven).
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Handle attribute change ...
+}
+
+// Keep as empty stub to avoid duplicate processing for Ember clusters.
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                       uint8_t type, uint16_t size, uint8_t * value)
+{
+}
+```
+
+If your application does not need to react to attribute changes at all, you can
+provide dummy implementations of both functions.
+
+This is a non-weak symbol to ensure developers are aware of the change and
+explicitly handle it.
+
+### Legacy `Matter*ClusterServerAttributeChangedCallback`
+
+Legacy cluster-specific post-attribute change callbacks like
+`MatterWindowCoveringClusterServerAttributeChangedCallback` or
+`MatterClosureControlClusterServerAttributeChangedCallback` may still be called
+for Ember-based clusters, but they are not called for code-driven clusters.
+
+To support code-driven cluster compatibility, applications relying on these
+callbacks should consider migrating their logic to
+`MatterCodegenPostAttributeChangeCallback`.
+
+Example:
+
+```cpp
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    if (path.mClusterId == app::Clusters::WindowCovering::Id)
+    {
+        // Handle Window Covering attribute change ...
+    }
+}
+```

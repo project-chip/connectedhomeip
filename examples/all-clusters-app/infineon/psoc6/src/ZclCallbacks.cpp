@@ -28,6 +28,7 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/util/af-types.h>
 
 using namespace ::chip;
@@ -65,6 +66,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         break;
     }
 }
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
+}
+
 /** @brief OnOff Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the

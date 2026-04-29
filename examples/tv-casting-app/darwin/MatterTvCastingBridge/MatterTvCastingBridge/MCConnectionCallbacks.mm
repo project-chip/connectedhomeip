@@ -1,3 +1,4 @@
+#include <app/data-model-provider/AttributeChangeListener.h>
 /**
  *
  *    Copyright (c) 2024 Project CHIP Authors
@@ -31,3 +32,9 @@
 }
 
 @end
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+    chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
+}

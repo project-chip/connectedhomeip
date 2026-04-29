@@ -32,6 +32,10 @@ uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 
 using namespace ::chip::DeviceLayer;
 
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
+
 #if FSL_OSA_MAIN_FUNC_ENABLE
 extern "C" void main_task(void const * argument)
 {

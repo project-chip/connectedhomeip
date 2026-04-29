@@ -239,3 +239,9 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 }
 
 } // namespace
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Dummy implementation for tests
+}

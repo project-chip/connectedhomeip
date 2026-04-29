@@ -48,6 +48,7 @@
 #include "Device.h"
 #include "include/main.h"
 #include "main.h"
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/server/Server.h>
 
 #include <cassert>
@@ -1054,4 +1055,10 @@ void BridgeCommandDelegate::OnEventCommandReceived(const char * json)
 
     TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(BridgeAppCommandHandler::HandleCommand,
                                                                            reinterpret_cast<intptr_t>(handler));
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for bridge-app on linux.
 }

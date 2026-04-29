@@ -31,6 +31,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters::WindowCovering;
@@ -53,12 +54,12 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
     }
 }
 
-/* Forwards all attributes changes */
-void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
 {
-    if (attributePath.mEndpointId == WindowCovering::Endpoint())
+    if (path.mClusterId == app::Clusters::WindowCovering::Id && path.mEndpointId == WindowCovering::Endpoint())
     {
-        switch (attributePath.mAttributeId)
+        switch (path.mAttributeId)
         {
         case Attributes::TargetPositionLiftPercent100ths::Id:
             WindowCovering::Instance().StartMove(WindowCovering::MoveType::LIFT);
@@ -73,11 +74,14 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
             WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::TILT);
             break;
         default:
-            WindowCovering::Instance().SchedulePostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+            WindowCovering::Instance().SchedulePostAttributeChange(path.mEndpointId, path.mAttributeId);
             break;
         };
     }
 }
+
+/* Forwards all attributes changes */
+void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {

@@ -46,6 +46,7 @@
 #endif
 
 #include <OTAConfig.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 #define WIFI_DEV_NAME "MediaTek-OTA-Requestor"
 
@@ -302,4 +303,10 @@ int main(void)
         ;
 
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

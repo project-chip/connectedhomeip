@@ -33,7 +33,14 @@
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
+
 extern const char TAG[] = "chip-pigweed-app";
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 namespace {
 using std::byte;

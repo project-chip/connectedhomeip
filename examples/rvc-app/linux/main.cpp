@@ -19,6 +19,7 @@
 #include "RvcAppCommandDelegate.h"
 #include "rvc-device.h"
 #include <AppMain.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 #include <string>
 
@@ -69,4 +70,10 @@ int main(int argc, char * argv[])
 
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

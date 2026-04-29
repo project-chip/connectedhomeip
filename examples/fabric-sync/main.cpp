@@ -19,6 +19,7 @@
 #include <CommissionerMain.h>
 #include <admin/FabricAdmin.h>
 #include <admin/PairingManager.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <bridge/Bridge.h>
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -116,4 +117,10 @@ int main(int argc, char * argv[])
     ChipLinuxAppMainLoop();
 
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for fabric-sync-app on linux.
 }

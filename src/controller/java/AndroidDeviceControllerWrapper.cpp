@@ -1178,3 +1178,9 @@ void AndroidDeviceControllerWrapper::StopDnssd()
 {
     chip::app::DnssdServer::Instance().StopServer();
 }
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Android controller doesn't need to react to attribute changes currently.
+}

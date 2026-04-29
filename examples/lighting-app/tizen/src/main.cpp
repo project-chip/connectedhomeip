@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
 
 #include <LedManager.h>
@@ -118,6 +119,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     default:
         ChipLogDetail(NotSpecified, "Not handled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
     }
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }
 
 void emberAfColorControlClusterInitCallback(EndpointId endpoint)

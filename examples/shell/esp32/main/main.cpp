@@ -18,12 +18,18 @@
 #include "nvs_flash.h"
 
 #include <ChipShellCollection.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using chip::Shell::Engine;
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 static void chip_shell_task(void * args)
 {

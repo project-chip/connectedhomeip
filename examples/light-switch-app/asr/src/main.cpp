@@ -21,6 +21,7 @@
 #include "init_asrPlatform.h"
 #include <AppTask.h>
 #include <FreeRTOS.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -54,6 +55,9 @@ void appError(CHIP_ERROR error)
 // ================================================================================
 // Main Code
 // ================================================================================
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 int main(void)
 {
     init_asrPlatform();

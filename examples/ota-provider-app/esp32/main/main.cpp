@@ -31,6 +31,7 @@
 
 #include <OTAProviderCommands.h>
 #include <app/clusters/ota-provider/CodegenIntegration.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
 #include <shell_extension/launch.h>
@@ -284,4 +285,10 @@ extern "C" void app_main()
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

@@ -23,6 +23,8 @@
 
 #include "FreeRTOS.h"
 #include <AppTask.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -31,6 +33,10 @@ uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 #endif
 
 using namespace ::chip::DeviceLayer;
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 int main(int argc, char * argv[])
 {

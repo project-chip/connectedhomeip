@@ -19,7 +19,9 @@
 #include <platform/PlatformManager.h>
 
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -118,4 +120,10 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

@@ -19,6 +19,7 @@
 #include "AppMain.h"
 #include "lit-icd-common/Identify.h"
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 #include "system/SystemClock.h"
 
@@ -49,4 +50,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                                        uint8_t * value)
 {
     // TODO: Watch ICDM Cluster changes
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
+    // TODO: Watch ICDM Cluster changes for code-driven clusters if needed.
 }

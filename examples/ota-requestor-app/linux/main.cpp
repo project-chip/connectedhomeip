@@ -17,12 +17,14 @@
  */
 
 #include "AppMain.h"
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
 
 #include <optional>
@@ -359,4 +361,10 @@ int main(int argc, char * argv[])
         ChipLogError(SoftwareUpdate, "The OTA image is invalid");
     }
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

@@ -35,6 +35,7 @@
 #include "support/CHIPMem.h"
 
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -156,4 +157,10 @@ extern "C" void app_main()
 extern "C" void otSysProcessDrivers(otInstance * aInstance)
 {
     (void) aInstance;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

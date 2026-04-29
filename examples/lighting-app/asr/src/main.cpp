@@ -35,6 +35,7 @@
 
 #include "AppConfig.h"
 #include "init_asrPlatform.h"
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/server/Server.h>
 
 using namespace ::chip;
@@ -70,6 +71,9 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 // Main Code
 // ================================================================================
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 int main(void)
 {
     init_asrPlatform();

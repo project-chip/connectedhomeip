@@ -2,6 +2,7 @@
 #include "FakeAttributeAccess.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -426,6 +427,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                                                WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id);
     }
 #endif
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }
 
 /** @brief OnOff Cluster Init

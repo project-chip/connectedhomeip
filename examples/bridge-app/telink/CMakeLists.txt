@@ -39,6 +39,7 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/Device.cpp
+               src/ZclCallbacks.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp

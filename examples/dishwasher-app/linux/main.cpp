@@ -17,6 +17,7 @@
  */
 #include "operational-state-delegate-impl.h"
 #include <AppMain.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -38,4 +39,10 @@ int main(int argc, char * argv[])
 
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

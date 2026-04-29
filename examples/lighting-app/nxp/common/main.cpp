@@ -18,6 +18,11 @@
 
 #include "AppTask.h"
 #include "FreeRTOS.h"
+#include <app/data-model-provider/AttributeChangeListener.h>
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{}
 
 #if configAPPLICATION_ALLOCATED_HEAP
 uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];

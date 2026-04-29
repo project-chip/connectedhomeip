@@ -32,6 +32,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters::WindowCovering;
@@ -50,8 +51,14 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
     }
 }
 
-/* Forwards all attributes changes */
-void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
 {
-    WindowManager::Instance().PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+    if (path.mClusterId == app::Clusters::WindowCovering::Id)
+    {
+        WindowManager::Instance().PostAttributeChange(path.mEndpointId, path.mAttributeId);
+    }
 }
+
+/* Forwards all attributes changes */
+void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}

@@ -3016,3 +3016,36 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     EXPECT_TRUE(span2.data_equal("shortUniqueId"_span));
 }
 #endif
+
+namespace {
+
+bool gMatterCodegenPostAttributeChangeCalled = false;
+chip::app::ConcreteAttributePath gLastChangedPath;
+
+} // namespace
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    gMatterCodegenPostAttributeChangeCalled = true;
+    gLastChangedPath                        = path;
+}
+
+namespace {
+
+TEST_F(TestCodegenModelViaMocks, CodegenPostAttributeChange)
+{
+    chip::app::CodegenDataModelProvider & provider = chip::app::CodegenDataModelProvider::Instance();
+
+    gMatterCodegenPostAttributeChangeCalled = false;
+    chip::app::ConcreteAttributePath path(1, 2, 3);
+
+    provider.NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
+
+    EXPECT_TRUE(gMatterCodegenPostAttributeChangeCalled);
+    EXPECT_EQ(gLastChangedPath.mEndpointId, path.mEndpointId);
+    EXPECT_EQ(gLastChangedPath.mClusterId, path.mClusterId);
+    EXPECT_EQ(gLastChangedPath.mAttributeId, path.mAttributeId);
+}
+
+} // namespace

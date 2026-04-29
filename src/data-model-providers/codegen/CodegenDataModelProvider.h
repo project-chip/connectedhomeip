@@ -28,6 +28,27 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+/// Callback invoked after an attribute value has been changed in the data model.
+/// This is called for ALL attribute changes when using CodegenDataModelProvider.
+/// Applications must implement this function.
+///
+/// This is intended as replacement for MatterPostAttributeChangeCallback and
+/// ServerClusterPostAttributeChangeCallback (or Matter*ClusterServerAttributeChangedCallback) calls:
+///   - All attribute change notifications will be received on this callback.
+///   - `value` is not received and has to be read. This is because the method for reading the attribute
+///     value is changing when clusters are moved to code-driven.
+///
+/// Migration Recommendations:
+///   - For code-driven clusters:
+///       - Include `<app/clusters/CLUSTER_NAME-server/CodegenIntegration.h>`
+///       - Use `FindClusterOnEndpoint` to access the cluster instance and fetch values.
+///   - For Ember clusters:
+///       - Use `Accessors.h` getters to get the current value of an attribute.
+///       - Note: When the cluster is moved to code-driven, these accessors will be removed
+///         and will need replacement with `FindClusterOnEndpoint`.
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type);
+
 namespace chip {
 namespace app {
 
@@ -43,6 +64,7 @@ namespace app {
 /// Given that this relies on global data at link time, there generally can be
 /// only one CodegenDataModelProvider per application. Per-cluster CodegenIntegration
 /// functions access the global singleton instance via `CodegenDataModelProvider::Instance()`.
+
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
@@ -97,6 +119,15 @@ protected:
     virtual void InitDataModelForTesting();
 
 private:
+    class AttributeChangeHandler : public DataModel::AttributeChangeListener
+    {
+    public:
+        void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override
+        {
+            ::MatterCodegenPostAttributeChangeCallback(path, type);
+        }
+    } mAttributeChangeHandler;
+
     // Context is available after startup and cleared in shutdown.
     // This has a value for as long as we assume the context is valid.
     std::optional<DataModel::InteractionModelContext> mContext;

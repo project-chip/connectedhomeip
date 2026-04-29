@@ -55,3 +55,9 @@ Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, 
     memset(dataPtr, 0, readLength);
     return Status::Success;
 }
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Dummy implementation for tests using mock codegen data model
+}

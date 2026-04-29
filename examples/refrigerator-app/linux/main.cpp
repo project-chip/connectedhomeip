@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <AppMain.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -71,4 +72,10 @@ int main(int argc, char * argv[])
 
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

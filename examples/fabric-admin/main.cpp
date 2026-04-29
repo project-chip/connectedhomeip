@@ -16,6 +16,7 @@
  *
  */
 
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/common/Commands.h>
 #include <commands/fabric-sync/Commands.h>
@@ -69,4 +70,10 @@ int main(int argc, char * argv[])
     ApplicationInit();
 
     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

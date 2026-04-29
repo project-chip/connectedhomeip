@@ -410,3 +410,9 @@ TEST_F(TestServerCommandDispatch, TestDataResponseHandlerOverride2)
 }
 
 } // namespace
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Dummy implementation for tests
+}

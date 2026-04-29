@@ -16,8 +16,10 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-table.h>
 #include <app/util/generic-callbacks.h>
@@ -100,6 +102,14 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         MatterDescriptorClusterShutdownCallback(endpoint, shutdownType);
         break;
     }
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+    chip::app::DataModel::AttributeChangeType type)
+{
+    // as opposed to MatterPostAttributeChangeCallback, this method is not
+    // weak-linked so an implementation is required. However there is nothing to do here
+    // so it is just declared currently.
 }
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,

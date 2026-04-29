@@ -25,6 +25,7 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/util/basic-types.h>
 #include <core/ErrorStr.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -176,4 +177,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

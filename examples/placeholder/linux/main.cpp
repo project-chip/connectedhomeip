@@ -20,6 +20,7 @@
 #include "AppOptions.h"
 #include "InteractiveServer.h"
 
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/util/MatterCallbacks.h>
 
 namespace {
@@ -75,4 +76,10 @@ int main(int argc, char * argv[])
     ChipLinuxAppMainLoop();
 
     return 0;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for simulated-app1/app2 on linux.
 }

@@ -127,6 +127,7 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
+    UnregisterAttributeChangeListener(mAttributeChangeHandler);
     mContext.reset();
     mRegistry.ClearContext();
     return DataModel::Provider::Shutdown();
@@ -139,6 +140,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
 
     mContext.emplace(context);
+    RegisterAttributeChangeListener(mAttributeChangeHandler);
 
     // Ember NVM requires have a data model provider. attempt to create one if one is not available
     //

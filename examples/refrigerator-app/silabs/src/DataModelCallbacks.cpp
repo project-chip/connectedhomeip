@@ -25,6 +25,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/temperature-control-server/CodegenIntegration.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #ifdef SL_MATTER_ENABLE_AWS
@@ -43,24 +45,39 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     switch (clusterId)
     {
-    case app::Clusters::Identify::Id:
-        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-        break;
     case app::Clusters::RefrigeratorAlarm::Id:
         RefrigeratorMgr().RefAlarmAttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
 #ifdef SL_MATTER_ENABLE_AWS
         matterAws::control::AttributeHandler(attributePath.mEndpointId, attributeId);
 #endif // SL_MATTER_ENABLE_AWS
         break;
-    case app::Clusters::TemperatureControl::Id:
-        RefrigeratorMgr().TempCtrlAttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
-#ifdef SL_MATTER_ENABLE_AWS
-        matterAws::control::AttributeHandler(attributePath.mEndpointId, attributeId);
-#endif // SL_MATTER_ENABLE_AWS
-        break;
     default:
         break;
+    }
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    if (path.mClusterId == app::Clusters::Identify::Id)
+    {
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " changed", ChipLogValueMEI(path.mAttributeId));
+    }
+    else if (path.mClusterId == app::Clusters::TemperatureControl::Id)
+    {
+        auto * cluster = TemperatureControl::FindClusterOnEndpoint(path.mEndpointId);
+        if (cluster != nullptr)
+        {
+            if (path.mAttributeId == app::Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Id)
+            {
+                int16_t setpoint = cluster->GetTemperatureSetpoint();
+                RefrigeratorMgr().TempCtrlAttributeChangeHandler(path.mEndpointId, path.mAttributeId,
+                                                                 reinterpret_cast<uint8_t *>(&setpoint), sizeof(setpoint));
+            }
+#ifdef SL_MATTER_ENABLE_AWS
+            matterAws::control::AttributeHandler(path.mEndpointId, path.mAttributeId);
+#endif // SL_MATTER_ENABLE_AWS
+        }
     }
 }
 

@@ -29,6 +29,7 @@
 
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
@@ -110,4 +111,10 @@ void AppDeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpoi
 
 exit:
     return;
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }

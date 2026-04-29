@@ -26,6 +26,7 @@
 
 #include <DeviceCallbacks.h>
 #include <IcdUatButton.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
@@ -135,4 +136,10 @@ extern "C" void app_main()
     sButton.SetUatButtonPressCallback(UatButtonHandler);
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+}
+
+void MatterCodegenPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path,
+                                              chip::app::DataModel::AttributeChangeType type)
+{
+    // Stub for now, logic remains in MatterPostAttributeChangeCallback for Ember clusters.
 }
