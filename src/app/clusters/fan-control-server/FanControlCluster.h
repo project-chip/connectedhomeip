@@ -139,6 +139,9 @@ public:
     DataModel::ActionReturnStatus SetWindSetting(BitMask<FanControl::WindBitmap> value);
     DataModel::ActionReturnStatus SetAirflowDirection(FanControl::AirflowDirectionEnum value);
 
+    bool SetPercentCurrent(chip::Percent value);
+    bool SetSpeedCurrent(uint8_t value);
+
     void SetDelegate(FanControl::Delegate * delegate);
 
 private:

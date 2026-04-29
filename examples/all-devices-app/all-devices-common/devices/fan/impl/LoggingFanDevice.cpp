@@ -156,6 +156,30 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
     }
 
     SyncOnOffFromFanDriveState(newState);
+
+    auto & cluster = FanControlCluster();
+    if (OnOffCluster().GetOnOff())
+    {
+        if (newState.mode == FanControl::FanModeEnum::kOff)
+        {
+            cluster.SetPercentCurrent(chip::Percent{ 0 });
+            if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+            {
+                cluster.SetSpeedCurrent(0);
+            }
+        }
+        else
+        {
+            if (!newState.percentSetting.IsNull())
+            {
+                cluster.SetPercentCurrent(newState.percentSetting.Value());
+            }
+            if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed) && !newState.speedSetting.IsNull())
+            {
+                cluster.SetSpeedCurrent(newState.speedSetting.Value());
+            }
+        }
+    }
 }
 
 void LoggingFanDevice::OnRockSettingChanged(BitMask<FanControl::RockBitmap> newValue)
@@ -184,6 +208,34 @@ void LoggingFanDevice::OnOffStartup(bool on)
 void LoggingFanDevice::OnOnOffChanged(bool on)
 {
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffChanged() -> %s", on ? "ON" : "OFF");
+
+    auto & cluster = FanControlCluster();
+
+    if (!on)
+    {
+        cluster.SetPercentCurrent(chip::Percent{ 0 });
+        if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+        {
+            cluster.SetSpeedCurrent(0);
+        }
+    }
+    else
+    {
+        const auto percentSetting = cluster.GetPercentSetting();
+        if (!percentSetting.IsNull())
+        {
+            cluster.SetPercentCurrent(percentSetting.Value());
+        }
+
+        if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+        {
+            const auto speedSetting = cluster.GetSpeedSetting();
+            if (!speedSetting.IsNull())
+            {
+                cluster.SetSpeedCurrent(speedSetting.Value());
+            }
+        }
+    }
 }
 
 } // namespace app
