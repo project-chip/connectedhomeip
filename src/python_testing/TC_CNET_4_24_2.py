@@ -230,7 +230,7 @@ class TC_CNET_4_24_2(MatterBaseTest):
     def default_timeout(self) -> int:
         return TIMEOUT
 
-    def steps_TC_CNET_4_24(self):
+    def steps_TC_CNET_4_24_2(self):
         return [
             TestStep(0,
                      "TH verifies CASE session with the already-commissioned DUT\n"
