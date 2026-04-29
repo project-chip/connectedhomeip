@@ -6,7 +6,7 @@
 - [CI REPL Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/ci_tests/)
 - [Nightly Tests Dashboard](https://project-chip.github.io/connectedhomeip/allure-report/nightly/)
 
-# Matterr
+# Matter SDK
 
 [![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/build.yaml)
 
