@@ -48,7 +48,7 @@ class TestMatterDeviceGraph(MatterBaseTest):
         # The topology has descriptors on every endpoint, but doesn't include any server or client clusters
         # Let's add some.
         # We can just add two of the same on every endpoint
-        for e in endpoints.keys():
+        for e in endpoints:
             endpoints[e][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList] = [
                 Clusters.ColorControl.id, Clusters.OnOff.id]
             endpoints[e][Clusters.Descriptor][Clusters.Descriptor.Attributes.ClientList] = [Clusters.Identify.id]
