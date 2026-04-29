@@ -20,7 +20,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::app::Clusters;
-// using namespace chip::app::Clusters::TemperatureMeasurement;
 
 namespace chip {
 namespace app {

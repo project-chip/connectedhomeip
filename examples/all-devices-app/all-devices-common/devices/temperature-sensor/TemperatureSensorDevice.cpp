@@ -19,8 +19,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
-// using namespace chip::app::Clusters::TemperatureMeasurement;
-// using namespace chip::app::Clusters::TemperatureMeasurement::Attributes;
 
 namespace chip {
 namespace app {
