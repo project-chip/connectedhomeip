@@ -28,8 +28,8 @@ namespace app {
  * interfaces and logs messages when fan actions occur (On/Off callbacks, step, fan drive state,
  * rock/wind, airflow direction).
  *
- * Product policy (example): when Fan Control drive state implies the fan is running, the On/Off
- * cluster is set on; when FanMode is off, SpeedSetting is 0 (multi-speed), or PercentSetting is 0
+ * Product policy (example): when On/Off is off and SpeedSetting becomes non-zero (multi-speed),
+ * On/Off is set on; when FanMode is off, SpeedSetting is 0 (multi-speed), or PercentSetting is 0
  * outside Auto, On/Off is set off. Real products can replace this mapping.
  */
 class LoggingFanDevice : public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate, public FanDevice

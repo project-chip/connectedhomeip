@@ -108,9 +108,16 @@ void LoggingFanDevice::SyncOnOffFromFanDriveState(const FanControl::FanDriveStat
     const bool desiredOn          = DesiredOnOffFromFanDriveState(newState, supportsMultiSpeed);
 
     Clusters::OnOffCluster & onOff = OnOffCluster();
-    if (onOff.GetOnOff() != desiredOn)
+    if (!desiredOn && onOff.GetOnOff())
     {
-        LogErrorOnFailure(onOff.SetOnOff(desiredOn));
+        // Product choice: fan drive state implies powering the device off.
+        LogErrorOnFailure(onOff.SetOnOff(false));
+    }
+    else if (!onOff.GetOnOff() && supportsMultiSpeed && !newState.speedSetting.IsNull() &&
+             newState.speedSetting.Value() != 0)
+    {
+        // Product choice: fan speed command implies powering the device on.
+        LogErrorOnFailure(onOff.SetOnOff(true));
     }
 }
 
@@ -178,6 +185,14 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
             {
                 cluster.SetSpeedCurrent(newState.speedSetting.Value());
             }
+        }
+    }
+    else
+    {
+        cluster.SetPercentCurrent(chip::Percent{ 0 });
+        if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+        {
+            cluster.SetSpeedCurrent(0);
         }
     }
 }
