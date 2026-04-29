@@ -39,6 +39,7 @@ aef
 AES
 AFL
 AIDL
+aliased
 algs
 alloc
 allocator
@@ -129,6 +130,7 @@ backend
 backends
 backticks
 backtrace
+backwards
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
@@ -163,6 +165,7 @@ bluetoothd
 bluez
 Bonjour
 BOOL
+boolean
 booleans
 BooleanState
 bootable
@@ -193,6 +196,8 @@ bz
 bzip
 CACACACA
 cacerts
+callsite
+callsites
 CAfile
 cancelled
 capacitive
@@ -412,6 +417,7 @@ dereference
 dereferencing
 desc
 descheduled
+destructor
 detokenization
 detokenizer
 dev
@@ -587,6 +593,7 @@ FDDE
 fddead
 fde
 fdx
+featuremap
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -609,6 +616,7 @@ forkpty
 FormaldehydeConcentrationMeasurement
 formatter
 formatters
+forwarding
 FOTA
 framerate
 FreeRTOS
@@ -756,6 +764,9 @@ Infineon
 ini
 init
 InitArgs
+initialize
+initializer
+initializers
 inlined
 inlining
 InputLoop
@@ -1187,6 +1198,7 @@ PowerConfiguration
 PowerProfile
 PowerSource
 PowerSourceConfiguration
+ppm
 pre
 PrebuiltDataModelDirectory
 preprocessor
@@ -1274,7 +1286,10 @@ recurse
 refrigeratoralarm
 regen
 registerAttributeAccessOverride
+registration
 RegisterCommandHandler
+registry
+registrations
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1447,6 +1462,7 @@ subcommand
 subcommands
 subdirectories
 subdirectory
+subflag
 subfolder
 submodule
 submodules
@@ -1603,6 +1619,7 @@ unittest
 unpair
 unprovisioned
 unreferenced
+unregister
 unregistration
 Unsecure
 Unselect
