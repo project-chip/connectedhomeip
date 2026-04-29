@@ -165,6 +165,8 @@ private:
 
 ThermostatCluster * ClusterForEndpoint(EndpointId endpointId);
 
+Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
