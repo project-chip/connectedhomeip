@@ -61,10 +61,10 @@ void ApplicationInit()
 
 ### 3. Update attribute values from firmware
 
-Call `Set*()` on the cluster whenever the physical sensor produces a new reading.
-The cluster validates bounds, stores the value, and notifies subscribers automatically.
-These methods are for **device firmware only** — remote Matter clients have no
-write access to these attributes.
+Call `Set*()` on the cluster whenever the physical sensor produces a new
+reading. The cluster validates bounds, stores the value, and notifies
+subscribers automatically. These methods are for **device firmware only** —
+remote Matter clients have no write access to these attributes.
 
 ```cpp
 gCO2Cluster.SetMeasuredValue(chip::app::DataModel::MakeNullable(412.5f));
@@ -78,8 +78,8 @@ gCO2Cluster.SetAverageMeasuredValueWindow(86400);
 ```
 
 `Set*()` returns `CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE` for any attribute whose
-feature flag was not set at construction, and `CHIP_IM_GLOBAL_STATUS(ConstraintError)`
-for out-of-range values.
+feature flag was not set at construction, and
+`CHIP_IM_GLOBAL_STATUS(ConstraintError)` for out-of-range values.
 
 ## Feature Flags
 
@@ -92,8 +92,7 @@ for out-of-range values.
 | `kMediumLevel`        | sub-flag of `kLevelIndication`, no extra attributes                                       |
 | `kCriticalLevel`      | sub-flag of `kLevelIndication`, no extra attributes                                       |
 
-`MeasurementMedium`, `FeatureMap`, and `ClusterRevision` are always present.
-See
+`MeasurementMedium`, `FeatureMap`, and `ClusterRevision` are always present. See
 [examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h](../../../../examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h)
 and the corresponding `.cpp` for a full working example.
 
@@ -124,9 +123,9 @@ This preserves the original `Init()`-based ZAP callback pattern; no call-site
 changes are needed.
 
 **`Set*()` methods** — each method is guarded by `std::enable_if_t` on the
-matching boolean template parameter, so calling e.g. `SetPeakMeasuredValue()`
-on an instance where `PeakMeasurementEnabled = false` is a **compile-time
-error**, not a runtime one. Internally they forward to the corresponding
+matching boolean template parameter, so calling e.g. `SetPeakMeasuredValue()` on
+an instance where `PeakMeasurementEnabled = false` is a **compile-time error**,
+not a runtime one. Internally they forward to the corresponding
 `ConcentrationMeasurementCluster::Set*()`.
 
 **`Registration()`** — returns the `ServerClusterRegistration` directly, so new
@@ -187,9 +186,8 @@ This pattern still compiles and works unchanged. `Init()` calls
 
 ## Migrating from the Template-Based API
 
-
-1. Replace the `Instance<...>` declaration with `ConcentrationMeasurementCluster`
-   and a `ServerClusterRegistration`.
+1. Replace the `Instance<...>` declaration with
+   `ConcentrationMeasurementCluster` and a `ServerClusterRegistration`.
 2. Build the feature set with `BitFlags<Feature>` instead of template booleans.
 3. Move fixed sensor characteristics (`medium`, `unit`, `minMeasured`,
    `maxMeasured`, `uncertainty`) from `SetMin/MaxMeasuredValue()` calls into the
