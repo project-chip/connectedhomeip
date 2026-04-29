@@ -119,7 +119,7 @@ void CancelLightTimer()
 
 void UpdateClusterState(intptr_t /* context */)
 {
-    uint8_t newValue = AppTask::GetAppTask().IsLightOn();
+    uint8_t newValue = appInstance().IsLightOn();
 
     Protocols::InteractionModel::Status status = OnOffServer::Instance().setOnOffValue(LIGHT_ENDPOINT, newValue, false);
 
