@@ -172,17 +172,17 @@ class SetupParameters:
 
 @dataclass
 class TestCleanupConfig:
-    disarm_failsafes: bool = True
-    reset_acls_to_default: bool = True
-    close_commissioning_windows: bool = True
-    remove_extra_fabrics: bool = True
-    purge_scenes: bool = True
-    purge_groups: bool = True
-    purge_group_memberships: bool = True
-    purge_doorlock: bool = True
-    purge_tls_endpoints: bool = True
-    unregister_icd_clients: bool = True
-    shutdown_extra_controllers: bool = True
+    disarm_failsafes: bool = True              # sends ArmFailSafe(expiryLengthSeconds=0) on GeneralCommissioning
+    reset_acls_to_default: bool = True         # restores ACL on endpoint 0 to the state captured before the test ran
+    close_commissioning_windows: bool = True   # sends RevokeCommissioning on AdministratorCommissioning
+    remove_extra_fabrics: bool = True          # removes all fabrics on the DUT except TH1's via RemoveFabric
+    purge_scenes: bool = True                  # calls RemoveAllScenes per group on every ScenesManagement endpoint
+    purge_groups: bool = True                  # removes all non-IPK group key sets and clears GroupKeyMap
+    purge_group_memberships: bool = True       # calls RemoveAllGroups on every Groups endpoint
+    purge_doorlock: bool = True                # clears all DoorLock credentials and users
+    purge_tls_endpoints: bool = True           # removes all provisioned endpoints via TlsClientManagement
+    unregister_icd_clients: bool = True        # unregisters all entries from IcdManagement.RegisteredClients
+    shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -281,36 +281,39 @@ class MatterBaseTest(base_test.BaseTestClass):
         Wildcard attributes are pre-fetched once so all cluster-presence checks within
         a single cleanup pass share the same read.
         """
+        dut_reachable = True
         try:
             await self._populate_wildcard()
         except Exception as e:
-            LOGGER.warning(f"[CLN] could not populate wildcard, cluster-specific cleanup will be skipped: {e}")
+            LOGGER.warning(f"[CLN] could not populate wildcard, DUT is unreachable — skipping all DUT cleanup: {e}")
+            dut_reachable = False
 
-        # DUT cleanup (run first as controller must still be alive to send commands)
-        # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
-        #   group to still exist on the DUT, so group memberships cannot be cleared first.
-        if self.cleanup_config.disarm_failsafes:
-            await self._disarm_failsafes()
-        if self.cleanup_config.reset_acls_to_default:
-            await self._reset_acls_to_default()
-        if self.cleanup_config.close_commissioning_windows:
-            await self._close_commissioning_windows()
-        if self.cleanup_config.remove_extra_fabrics:
-            await self._remove_extra_fabrics()
-        if self.cleanup_config.purge_scenes:
-            await self._purge_scenes()
-        if self.cleanup_config.purge_groups:
-            await self._purge_groups()
-        if self.cleanup_config.purge_group_memberships:
-            await self._purge_group_memberships()
-        if self.cleanup_config.purge_doorlock:
-            await self._purge_doorlock()
-        if self.cleanup_config.purge_tls_endpoints:
-            await self._purge_tls_endpoints()
-        if self.cleanup_config.unregister_icd_clients:
-            await self._unregister_icd_clients()
+        if dut_reachable:
+            # DUT cleanup (run first as controller must still be alive to send commands)
+            # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
+            #   group to still exist on the DUT, so group memberships cannot be cleared first.
+            if self.cleanup_config.disarm_failsafes:
+                await self._disarm_failsafes()
+            if self.cleanup_config.reset_acls_to_default:
+                await self._reset_acls_to_default()
+            if self.cleanup_config.close_commissioning_windows:
+                await self._close_commissioning_windows()
+            if self.cleanup_config.remove_extra_fabrics:
+                await self._remove_extra_fabrics()
+            if self.cleanup_config.purge_scenes:
+                await self._purge_scenes()
+            if self.cleanup_config.purge_groups:
+                await self._purge_groups()
+            if self.cleanup_config.purge_group_memberships:
+                await self._purge_group_memberships()
+            if self.cleanup_config.purge_doorlock:
+                await self._purge_doorlock()
+            if self.cleanup_config.purge_tls_endpoints:
+                await self._purge_tls_endpoints()
+            if self.cleanup_config.unregister_icd_clients:
+                await self._unregister_icd_clients()
 
-        # Controller cleanup
+        # Controller cleanup (runs regardless — no DUT connection needed)
         if self.cleanup_config.shutdown_extra_controllers:
             self._shutdown_extra_controllers()
 
