@@ -80,6 +80,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+
 class TC_ACE_1_6(MatterBaseTest):
 
     def desc_TC_ACE_1_6(self) -> str:
@@ -431,6 +432,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 11g: Verify GroupcastTesting event is emitted the same as in step 11a (AccessAllowed: true)
             self.step("11g")
+
             def previous_event_filter(data) -> bool:
                 return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey
 
