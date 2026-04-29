@@ -69,11 +69,10 @@ class TC_DA_1_1(MatterBaseTest):
         """Execute the test steps."""
         return [
             TestStep("precondition", "DUT is commissioned to TH1's fabric", is_commissioning=True),
-            TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1", """
-                     - Verify that there is a single entry in the NOCs list"""),
-            TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster and saves the returned list as fabrics_th1", """
-                     - Verify that there is a single entry in the Fabrics list
-                     - Verify that the FabricID for that entry matches the FabricID for TH1"""),
+            TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1"),
+            TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
+                     - Verify that TH1's fabric is present in the list
+                     - Locate TH1's NOC entry by matching fabric index"""),
             TestStep(3, "Factory reset DUT", "Perform the necessary actions to put the DUT into a commissionable state"),
             TestStep(4, "TH2 opens a PASE session with the DUT"),
             TestStep(5, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
@@ -81,14 +80,13 @@ class TC_DA_1_1(MatterBaseTest):
             TestStep(6, "TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to the DUT to clear the fail-safe timer and close the PASE session"),
             TestStep(7, "DUT is commissioned to TH2's fabric"),
             TestStep(8, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
-                     - Verify that there is a single entry in the Fabrics list
-                     - Verify that TH2's Fabrics attribute's FabricID is the same as TH2's FabricID
+                     - Verify that TH2's FabricID is present in the Fabrics list
                      - Verify that TH2 and TH1's Fabrics attribute's FabricIDs are different"""),
             TestStep(9, "TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster", """
-                     - Verify that there is a single entry in the NOCs list
+                     - Locate TH2's NOC entry by matching fabric index
                      - Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key"""),
             TestStep(10, "Factory reset DUT", "Perform the necessary actions to put the DUT into a commissionable state"),
-            TestStep(11, "DUT is commissioned to TH1's fabric")
+            TestStep(11, "TH1 commissions DUT to TH1's fabric")
         ]
 
     def get_new_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
