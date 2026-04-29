@@ -439,8 +439,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Duplicate events could occur from step 11d, as this is an event emitted from a point where the message cannot
             # be decrypted (because of no group keys being present). Without the message being decrypted, logic to filter out
-            # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases 
-            # (i.e. when testing over multiple networks). This safely filters through potential duplicate events from the 
+            # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases
+            # (i.e. when testing over multiple networks). This safely filters through potential duplicate events from the
             # previous steps.
             event_data = event_sub.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
