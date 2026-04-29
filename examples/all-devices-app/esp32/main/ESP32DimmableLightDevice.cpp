@@ -118,6 +118,11 @@ void ESP32DimmableLightDevice::StartBlinkTimer()
     if (mBlinkTimer == nullptr)
     {
         mBlinkTimer = xTimerCreate("LedBlink", pdMS_TO_TICKS(50), pdTRUE, this, BlinkTimerCallback);
+        if (mBlinkTimer == nullptr)
+        {
+            ChipLogError(DeviceLayer, "ESP32DimmableLightDevice: Failed to create blink timer");
+            return;
+        }
     }
     xTimerStart(mBlinkTimer, 0);
 }

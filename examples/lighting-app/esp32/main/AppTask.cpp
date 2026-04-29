@@ -112,8 +112,6 @@ CHIP_ERROR AppTask::Init()
 
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
-
-    ScreenManager::AddVLED(TFT_YELLOW);
 #endif
 
     return err;
