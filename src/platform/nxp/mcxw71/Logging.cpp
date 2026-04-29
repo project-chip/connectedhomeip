@@ -10,6 +10,7 @@
 #include <src/lib/support/CodeUtils.h>
 
 #include "fsl_debug_console.h"
+#include <cstdio>
 #include <cstring>
 
 #ifdef CONFIG_ENABLE_PW_RPC
