@@ -96,10 +96,10 @@ from cryptography.x509.oid import NameOID
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import _has_attribute, _has_cluster, async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
-from matter.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 

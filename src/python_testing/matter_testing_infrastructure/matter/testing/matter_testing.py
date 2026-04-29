@@ -47,10 +47,10 @@ import matter.CertificateAuthority
 
 from mobly import asserts, base_test, signals
 
-import matter.clusters as Clusters
-import matter.logging
 import matter.CertificateAuthority
+import matter.clusters as Clusters
 import matter.FabricAdmin
+import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
