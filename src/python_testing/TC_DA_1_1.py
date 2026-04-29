@@ -160,7 +160,8 @@ class TC_DA_1_1(MatterBaseTest):
 
         # Verify that TH1's fabric is present in the list (device may have pre-existing fabrics)
         th1_fabric = next((f for f in fabrics_th1 if f.fabricID == th1.fabricId), None)
-        asserts.assert_is_not_none(th1_fabric, f"TH1 FabricID ({th1.fabricId}) not found in Fabrics list: {[f.fabricID for f in fabrics_th1]}")
+        asserts.assert_is_not_none(
+            th1_fabric, f"TH1 FabricID ({th1.fabricId}) not found in Fabrics list: {[f.fabricID for f in fabrics_th1]}")
 
         # Locate TH1's NOC entry by matching fabric index
         th1_noc = next((n for n in nocs_th1 if n.fabricIndex == th1_fabric.fabricIndex), None)
