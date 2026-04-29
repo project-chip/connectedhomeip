@@ -66,26 +66,12 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
         }
     }
 
-    if (newSpeed > 0)
-    {
-        cluster.SetOnOffState(true);
-    }
-    else
-    {
-        cluster.SetOnOffState(false);
-    }
-
     if (newSpeed != currentSpeed)
     {
         ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from %u to %u", currentSpeed, newSpeed);
     }
 
     return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed)).GetStatusCode().GetStatus();
-}
-
-void LoggingFanDevice::OnFanStateChanged(bool isOn)
-{
-    ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnFanStateChanged() -> %s", isOn ? "ON" : "OFF");
 }
 
 void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
@@ -151,13 +137,11 @@ void LoggingFanDevice::OnAirflowDirectionChanged(FanControl::AirflowDirectionEnu
 void LoggingFanDevice::OnOffStartup(bool on)
 {
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffStartup() -> %s", on ? "ON" : "OFF");
-    FanControlCluster().SetOnOffState(on);
 }
 
 void LoggingFanDevice::OnOnOffChanged(bool on)
 {
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffChanged() -> %s", on ? "ON" : "OFF");
-    FanControlCluster().SetOnOffState(on);
 }
 
 } // namespace app

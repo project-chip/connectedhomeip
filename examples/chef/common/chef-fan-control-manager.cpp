@@ -24,7 +24,6 @@
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
-#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <lib/support/CodeUtils.h>
@@ -48,9 +47,10 @@ public:
     void Init();
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
-    void OnFanStateChanged(bool isOn) override;
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
+    Protocols::InteractionModel::Status OnCommand(EndpointId endpointId);
+    Protocols::InteractionModel::Status OffCommand(EndpointId endpointId);
 
 private:
     uint8_t mPercentCurrent = 0;
@@ -83,12 +83,6 @@ private:
 };
 
 static std::unique_ptr<ChefFanControlManager> mFanControlManager;
-
-void ChefFanControlManager::OnFanStateChanged(bool isOn)
-{
-    ChipLogProgress(NotSpecified, "ChefFanControlManager::OnFanStateChanged: %d", isOn);
-    OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
-}
 
 Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
 {
@@ -369,13 +363,67 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
     mFanControlManager->Init();
 }
 
+Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId endpointId)
+{
+    ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
+
+    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(fc != nullptr, Status::UnsupportedEndpoint);
+
+    if (fc->GetFanMode() == FanModeEnum::kOff)
+    {
+        return fc->SetFanMode(FanModeEnum::kHigh).GetStatusCode().GetStatus();
+    }
+
+    if (fc->GetFeatureMap().Has(Feature::kMultiSpeed))
+    {
+        DataModel::Nullable<uint8_t> speedSetting = fc->GetSpeedSetting();
+        if (!speedSetting.IsNull() && speedSetting.Value() != 0)
+        {
+            Status status = fc->SetSpeedSetting(speedSetting).GetStatusCode().GetStatus();
+            if (status != Status::Success)
+            {
+                ChipLogError(DeviceLayer, "ChefFanControlManager::OnCommand SetSpeedSetting failed: %d", to_underlying(status));
+                return status;
+            }
+        }
+    }
+
+    DataModel::Nullable<Percent> percentSetting = fc->GetPercentSetting();
+    if (!percentSetting.IsNull() && percentSetting.Value() != 0)
+    {
+        Status status = fc->SetPercentSetting(percentSetting).GetStatusCode().GetStatus();
+        if (status != Status::Success)
+        {
+            ChipLogError(DeviceLayer, "ChefFanControlManager::OnCommand SetPercentSetting failed: %d", to_underlying(status));
+            return status;
+        }
+    }
+
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId endpointId)
+{
+    ChipLogProgress(DeviceLayer, "ChefFanControlManager::OffCommand");
+
+    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(fc != nullptr, Status::UnsupportedEndpoint);
+
+    if (fc->GetFanMode() == FanModeEnum::kOff)
+    {
+        return Status::Success;
+    }
+
+    return fc->SetFanMode(FanModeEnum::kOff).GetStatusCode().GetStatus();
+}
+
 void HandleOnOffAttributeChangeForFan(EndpointId endpointId, bool value)
 {
-    FanControlCluster * fanCluster = FanControl::FindClusterOnEndpoint(endpointId);
-    if (fanCluster != nullptr)
-    {
-        fanCluster->SetOnOffState(value);
-    }
+    if (value)
+        mFanControlManager->OnCommand(endpointId);
+    else
+        mFanControlManager->OffCommand(endpointId);
 }
 
 void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

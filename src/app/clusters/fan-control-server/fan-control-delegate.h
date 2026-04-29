@@ -60,13 +60,6 @@ public:
 
     virtual void OnPersistenceRestored() {}
 
-    /**
-     * @brief Called when the fan transitions between on and off states.
-     *        Implementations should update the OnOff cluster attribute accordingly.
-     *        This is separate from OnFanDriveStateChanged to make the OnOff sync responsibility explicit.
-     */
-    virtual void OnFanStateChanged(bool isOn) {}
-
     virtual void OnFanDriveStateChanged(const FanDriveState & newState) {}
     virtual void OnRockSettingChanged(BitMask<RockBitmap> newValue) {}
     virtual void OnWindSettingChanged(BitMask<WindBitmap> newValue) {}

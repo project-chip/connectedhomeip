@@ -75,7 +75,6 @@ class NotifyingFanControlDelegate : public FanControl::Delegate
 {
 public:
     int mFanDriveStateNotifyCount = 0;
-    int mFanStateChangedCount     = 0;
     int mRockSettingNotifyCount   = 0;
 
     NotifyingFanControlDelegate(EndpointId endpoint) : Delegate(endpoint) {}
@@ -86,7 +85,6 @@ public:
     }
 
     void OnFanDriveStateChanged(const FanDriveState &) override { mFanDriveStateNotifyCount++; }
-    void OnFanStateChanged(bool) override { mFanStateChangedCount++; }
     void OnRockSettingChanged(BitMask<RockBitmap> newValue) override
     {
         (void) newValue;
@@ -380,7 +378,6 @@ TEST_F(TestFanControlCluster, WritePercentSettingNull_ReturnsInvalidInState_When
 TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, WritePercentSettingNull_WhenAlreadyNull_Succeeds)
 {
     ClusterTester tester(cluster);
-    cluster.SetOnOffState(true);
 
     DataModel::Nullable<chip::Percent> percentSetting;
     percentSetting.SetNonNull(50);
@@ -468,9 +465,6 @@ TEST_F(TestFanControlClusterWithMultiSpeed, FanModeOff_ZeroesPercentSettingAndSp
 TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, FanModeAuto_NullsPercentSettingAndSpeedSetting)
 {
     ClusterTester tester(cluster);
-
-    // OnOff must be on for Current attributes to track the setting values.
-    cluster.SetOnOffState(true);
 
     DataModel::Nullable<chip::Percent> percentSetting;
     percentSetting.SetNonNull(50);
@@ -762,7 +756,6 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSettingToZero_NotifiesFanDri
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
-    cluster.SetOnOffState(true);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kHigh), CHIP_NO_ERROR);
 
     DataModel::Nullable<chip::Percent> percentSetting;
@@ -770,11 +763,9 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSettingToZero_NotifiesFanDri
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
 
     delegate.mFanDriveStateNotifyCount = 0;
-    delegate.mFanStateChangedCount     = 0;
     percentSetting.SetNonNull(0);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
-    EXPECT_EQ(delegate.mFanStateChangedCount, 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -789,7 +780,6 @@ TEST_F(TestFanControlDelegateCallbacks, WriteSpeedSettingToZero_NotifiesFanDrive
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
-    cluster.SetOnOffState(true);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kHigh), CHIP_NO_ERROR);
 
     DataModel::Nullable<chip::Percent> percentSetting;
@@ -797,12 +787,10 @@ TEST_F(TestFanControlDelegateCallbacks, WriteSpeedSettingToZero_NotifiesFanDrive
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
 
     delegate.mFanDriveStateNotifyCount = 0;
-    delegate.mFanStateChangedCount     = 0;
     DataModel::Nullable<uint8_t> speedSetting;
     speedSetting.SetNonNull(0);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, speedSetting), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
-    EXPECT_EQ(delegate.mFanStateChangedCount, 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

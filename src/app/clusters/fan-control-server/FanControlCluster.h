@@ -132,20 +132,12 @@ public:
     FanControl::AirflowDirectionEnum GetAirflowDirection() const { return mAirflowDirection; }
 
     // Setters
-    DataModel::ActionReturnStatus SetFanMode(FanControl::FanModeEnum value, bool syncOnOffDelegate = true);
+    DataModel::ActionReturnStatus SetFanMode(FanControl::FanModeEnum value);
     DataModel::ActionReturnStatus SetPercentSetting(DataModel::Nullable<chip::Percent> value);
     DataModel::ActionReturnStatus SetSpeedSetting(DataModel::Nullable<uint8_t> value);
     DataModel::ActionReturnStatus SetRockSetting(BitMask<FanControl::RockBitmap> value);
     DataModel::ActionReturnStatus SetWindSetting(BitMask<FanControl::WindBitmap> value);
     DataModel::ActionReturnStatus SetAirflowDirection(FanControl::AirflowDirectionEnum value);
-
-    /**
-     * @brief Synchronizes the FanControl cluster with the OnOff cluster state.
-     * The application must call this method whenever the OnOff cluster state changes.
-     * When turned off, this sets PercentCurrent and SpeedCurrent to 0.
-     * When turned on, it restores them based on the current settings.
-     */
-    void SetOnOffState(bool on);
 
     void SetDelegate(FanControl::Delegate * delegate);
 
@@ -171,8 +163,7 @@ private:
     // Mandatory attribute side effects when FanMode becomes kLow, kMedium, or kHigh.
     // PercentSetting is set to 33%, 66%, or 100% respectively; when MultiSpeed is supported,
     // SpeedSetting is set to 1, the rounded midpoint of 1..SpeedMax, or SpeedMax.
-    // PercentCurrent and SpeedCurrent are updated to match only while On/Off is on (fan energized);
-    // otherwise only the *Setting attributes change.
+    // PercentCurrent and SpeedCurrent are updated to match the derived settings.
     void ApplyFanModeLowSideEffects();
     void ApplyFanModeMediumSideEffects();
     void ApplyFanModeHighSideEffects();
@@ -195,7 +186,6 @@ private:
     BitMask<FanControl::WindBitmap> mWindSetting;
     FanControl::AirflowDirectionEnum mAirflowDirection = FanControl::AirflowDirectionEnum::kForward;
 
-    bool mIsOnOffOn = false;
     uint8_t mSpeedMax;
     BitMask<FanControl::RockBitmap> mRockSupport;
     BitMask<FanControl::WindBitmap> mWindSupport;

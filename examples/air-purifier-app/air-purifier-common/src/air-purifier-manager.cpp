@@ -157,13 +157,6 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     return fc->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 
-void AirPurifierManager::OnFanStateChanged(bool isOn)
-{
-    ChipLogProgress(NotSpecified, "AirPurifierManager::OnFanStateChanged: %d", isOn);
-    OnOff::Attributes::OnOff::Set(mEndpointId, isOn);
-    mOnOffClusterOn = isOn;
-}
-
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
     switch (attributeId)
@@ -213,12 +206,6 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         return;
     }
     bool on = static_cast<bool>(*value);
-
-    FanControlCluster * fanCluster = FanControl::FindClusterOnEndpoint(mEndpointId);
-    if (fanCluster != nullptr)
-    {
-        fanCluster->SetOnOffState(on);
-    }
 
     mOnOffClusterOn = on;
 }

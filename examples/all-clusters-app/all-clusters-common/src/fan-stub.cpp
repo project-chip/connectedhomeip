@@ -47,7 +47,6 @@ public:
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
-    void OnFanStateChanged(bool isOn) override;
 
 private:
     CHIP_ERROR ReadPercentCurrent(AttributeValueEncoder & aEncoder);
@@ -89,12 +88,6 @@ CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
     }
 
     return aEncoder.Encode(ret);
-}
-
-void FanControlManager::OnFanStateChanged(bool isOn)
-{
-    ChipLogProgress(NotSpecified, "FanControlManager::OnFanStateChanged: %d", isOn);
-    OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
 }
 
 Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)

@@ -25,9 +25,8 @@ namespace app {
  * @brief An implementation of a Fan Device.
  *
  * This class serves as a simple example. It implements the OnOffDelegate and FanControlDelegate
- * interfaces and logs messages when fan actions occur (On/Off, step, fan drive state, rock/wind,
- * airflow direction).
- * It also participates in the FanDevice wiring between the OnOff and FanControl clusters.
+ * interfaces and logs messages when fan actions occur (On/Off callbacks, step, fan drive state,
+ * rock/wind, airflow direction).
  */
 class LoggingFanDevice : public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate, public FanDevice
 {
@@ -40,7 +39,6 @@ public:
     Protocols::InteractionModel::Status HandleStep(Clusters::FanControl::StepDirectionEnum aDirection, bool aWrap,
                                                    bool aLowestOff) override;
 
-    void OnFanStateChanged(bool isOn) override;
     void OnFanDriveStateChanged(const Clusters::FanControl::FanDriveState & newState) override;
     void OnRockSettingChanged(BitMask<Clusters::FanControl::RockBitmap> newValue) override;
     void OnWindSettingChanged(BitMask<Clusters::FanControl::WindBitmap> newValue) override;

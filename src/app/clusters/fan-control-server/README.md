@@ -45,11 +45,6 @@ public:
     {
         // React to fan state changes (mode, speed, etc.)
     }
-
-    void OnFanStateChanged(bool isOn) override
-    {
-        // Optional: Sync with OnOff cluster
-    }
 };
 ```
 
