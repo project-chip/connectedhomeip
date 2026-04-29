@@ -634,12 +634,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] ICD Management cluster not present, skipping ICD client cleanup")
             return
 
-        # Read the RegisteredClients attribute
-        registered_clients = await self.read_single_attribute_check_success(
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.RegisteredClients,
-            endpoint=0
-        )
+        registered_clients = self.stored_global_wildcard.attributes.get(0, {}).get(
+            Clusters.IcdManagement, {}).get(Clusters.IcdManagement.Attributes.RegisteredClients)
 
         if not registered_clients:
             LOGGER.info("[CLN] no ICD clients registered, skipping")
