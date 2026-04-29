@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2025 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -176,7 +176,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -620,18 +620,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
-        """Retrieves test steps from a 'steps_*' function, using a cache."""
-        steps_name = f'steps_{test.removeprefix("test_")}'
+        """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
+
+        Checks for an explicit steps_* method first. If none exists, falls back to
+        extracting steps from self.step() calls in the test method's source code.
+
+        Returns None if no steps are defined by either mechanism.
+        """
         if test in self.cached_steps:
             return self.cached_steps[test]
 
-        try:
-            fn = getattr(self, steps_name)
-            steps = fn()
-            self.cached_steps[test] = steps
-            return fn()
-        except AttributeError:
-            return None
+        steps = None
+        if steps_method := getattr(self, 'steps_' + test.removeprefix('test_'), None):
+            steps = steps_method()
+        else:
+            test_method = getattr(self, test)
+            from matter.testing.step_extractor import extract_steps_from_method
+            steps = extract_steps_from_method(test_method) or None
+
+        self.cached_steps[test] = steps
+        return steps
 
     def get_restart_flag_file(self) -> Optional[str]:
         if self.matter_test_config.restart_flag_file is None:
@@ -651,27 +659,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> Optional[list[str]]:
-        """Retrieve PICS list from a 'pics_*' function if it exists.
+        """Retrieve PICS list from a 'pics_*' function or @pics decorator.
+
+        The pics_* method takes precedence over the @pics decorator.
 
         Args:
             test: Name of the test to get PICS for.
 
         Returns:
-            List of PICS strings if pics function exists, None otherwise.
+            List of PICS strings if pics function or decorator exists, None otherwise.
         """
-        steps_name = f'pics_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, steps_name)
-            return fn()
-        except AttributeError:
-            return None
+        if pics_method := getattr(self, 'pics_' + test.removeprefix('test_'), None):
+            return pics_method()
+        test_method = getattr(self, test)
+        return getattr(test_method, '_pics', None)  # set by @pics
 
     def get_test_desc(self, test: str) -> str:
         ''' Returns a description of this test
 
-            Test description is defined in the function called desc_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            desc_TC_TEST_1_1.
+            Test description is defined in the function called desc_<functionname>,
+            or as a docstring on the test method itself.
+            The desc_* method takes precedence if both are defined.
 
             Format:
             <Test plan reference> [<test plan number>] <test plan name>
@@ -679,12 +687,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = f'desc_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, desc_name)
-            return fn()
-        except AttributeError:
-            return test
+        if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
+            return desc_method()
+        test_method = getattr(self, test)
+        if doc := test_method.__doc__:
+            return doc.strip()
+        return test
 
     #
     # Matter Test API - Step Management & Execution
@@ -692,17 +700,30 @@ class MatterBaseTest(base_test.BaseTestClass):
     # These methods are used to mark test progress for the test harness and logs, to help with test
     # debugging, issue creation and log analysis by the test labs.
 
-    def step(self, step: typing.Union[int, str]):
+    def step(self, step: typing.Union[int, str], description: str = "", *,
+             is_commissioning: bool = False, expectation: str = ""):
         """Execute a test step and manage step progression.
 
         Validates step order, prints step information, and notifies runner hooks.
 
         Args:
             step: The step number or identifier to execute.
+            description: Step description for inline step definitions.
+                Should always be provided (not empty) when any keyword arguments
+                (is_commissioning, expectation) are passed.
+            is_commissioning: Mark this step as the commissioning step (keyword-only).
+            expectation: Expected outcome for test plan generation (keyword-only).
+
+            All arguments to step() must be constants for automatic extraction of
+            the test step list to work. If dynamic step() parameters are required
+            an explicit `steps_` method must be defined.
 
         Raises:
             AssertionError: If steps are called out of order or step doesn't exist.
         """
+        # description, is_commissioning, and expectation are not used at runtime.
+        # They exist so the AST step extractor can read them from source code to
+        # build the step list without needing a separate steps_* method.
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
