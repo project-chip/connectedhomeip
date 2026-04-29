@@ -39,6 +39,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
+
 class TC_TMP_2_1(MatterBaseTest):
     def desc_TC_TMP_2_1(self) -> str:
         return "[TC-TMP-2.1] Attributes with Server as DUT"
