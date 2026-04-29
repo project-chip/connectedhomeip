@@ -326,7 +326,7 @@ class TC_CNET_4_24(MatterBaseTest):
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=300, breadcrumb=0))
         asserts.assert_equal(arm_failsafe_response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
                              f"Fail-safe arming failed: {arm_failsafe_response.errorCode}")
-        logger.info(f" --- Fail-safe armed successfully (300 seconds)")
+        logger.info(" --- Fail-safe armed successfully (300 seconds)")
 
         # Step 1: Remove all configured networks
         self.step(1)
