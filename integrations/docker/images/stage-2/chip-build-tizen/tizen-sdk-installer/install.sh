@@ -165,8 +165,8 @@ function unrpm_globs() {
 # globs. In a situation where multiple zip files matching the same glob are
 # present, for example:
 # $ ls -l cache/tizen-9.0-core-add-ons_*_ubuntu-64.zip
-# -rw-rw-r-- 1 m.grela m.grela 461718 Nov  4  2024 cache/tizen-9.0-core-add-ons_0.0.341_ubuntu-64.zip
-# -rw-rw-r-- 1 m.grela m.grela 461722 Apr 16 01:45 cache/tizen-9.0-core-add-ons_0.0.358_ubuntu-64.zip
+# -rw-rw-r-- 1 tizen users 461718 Nov  4  2024 cache/tizen-9.0-core-add-ons_0.0.341_ubuntu-64.zip
+# -rw-rw-r-- 1 tizen users 461722 Apr 16 01:45 cache/tizen-9.0-core-add-ons_0.0.358_ubuntu-64.zip
 #
 # the function attempts to find the most recent version of a particular zip file.
 #
@@ -246,17 +246,20 @@ function download_tizen_sdk_arm() {
     info "Downloading Tizen ARM toolchain and sysroot ..."
     local url
 
-    # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     download "$url" "${TIZEN_STUDIO_SDK_ARM_ZIPS[@]}"
 
-    # Base packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
     download "$url" "${TIZEN_SDK_ARM_BASE_RPMS[@]}"
 
-    # Unified packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
     download "$url" "${TIZEN_SDK_ARM_UNIFIED_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM_BASE_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM_UNIFIED_RPMS[@]}"
 }
 
 # Function for installing Tizen SDK (armv7l).
@@ -270,6 +273,8 @@ function install_tizen_sdk_arm() {
     info "Installing Tizen ARM sysroot..."
     unrpm_globs "$sysroot" TIZEN_SDK_ARM_BASE_RPMS
     unrpm_globs "$sysroot" TIZEN_SDK_ARM_UNIFIED_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM_BASE_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM_UNIFIED_RPMS
 
     fixup_symlinks "$sysroot"/usr/{lib,lib64}
 
@@ -281,17 +286,20 @@ function download_tizen_sdk_arm64() {
     info "Downloading Tizen ARM64 toolchain and sysroot ..."
     local url
 
-    # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     download "$url" "${TIZEN_STUDIO_SDK_ARM64_ZIPS[@]}"
 
-    # Base packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
     download "$url" "${TIZEN_SDK_ARM64_BASE_RPMS[@]}"
 
-    # Unified packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
     download "$url" "${TIZEN_SDK_ARM64_UNIFIED_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM64_BASE_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM64_UNIFIED_RPMS[@]}"
 }
 
 # Function for installing Tizen SDK (arm64).
@@ -305,6 +313,8 @@ function install_tizen_sdk_arm64() {
     info "Installing Tizen ARM64 sysroot..."
     unrpm_globs "$sysroot" TIZEN_SDK_ARM64_BASE_RPMS
     unrpm_globs "$sysroot" TIZEN_SDK_ARM64_UNIFIED_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM64_BASE_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM64_UNIFIED_RPMS
 
     fixup_symlinks "$sysroot"/usr/{lib,lib64}
 
@@ -488,9 +498,9 @@ fi
 # when for example capi-network-thread-*.armv7l.rpm matches both
 # binary and devel RPM files. For example:
 # ls -l cache/capi-network-thread-*.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 55133 Oct 30  2024 cache/capi-network-thread-0.9.0-2.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 17377 Oct 30  2024 cache/capi-network-thread-devel-0.9.0-2.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 25965 Oct 30  2024 cache/capi-network-thread-test-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 tizen users 55133 Oct 30  2024 cache/capi-network-thread-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 tizen users 17377 Oct 30  2024 cache/capi-network-thread-devel-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 tizen users 25965 Oct 30  2024 cache/capi-network-thread-test-0.9.0-2.armv7l.rpm
 
 TIZEN_SDK_BASE_RPMS=(
     'iniparser-[0-9]*'
@@ -563,6 +573,10 @@ TIZEN_SDK_UNIFIED_RPMS=(
     'vconf-internal-keys-devel-*'
 )
 
+# RPMs with recent bug fixes required for Matter SDK.
+TIZEN_SDK_SNAPSHOTS_BASE_RPMS=()
+TIZEN_SDK_SNAPSHOTS_UNIFIED_RPMS=()
+
 # Handle differences in Tizen SDK versions. For example, since
 # Tizen 10.0 the PCRE2 library is provided by the BASE repository.
 if awk "BEGIN {exit !($TIZEN_VERSION >= 10.0)}"; then
@@ -576,6 +590,9 @@ if awk "BEGIN {exit !($TIZEN_VERSION >= 10.0)}"; then
         'libcynara-creds-self-[0-9]*'
         'libcynara-uid-[0-9]*'
     )
+    TIZEN_SDK_SNAPSHOTS_UNIFIED_RPMS+=(
+        'libnsd-dns-sd-[0-9]*'
+    )
 else
     TIZEN_SDK_UNIFIED_RPMS+=('pcre2-devel-[0-9]*')
 fi
@@ -588,6 +605,16 @@ done
 for rpm in "${TIZEN_SDK_UNIFIED_RPMS[@]}"; do
     TIZEN_SDK_ARM_UNIFIED_RPMS+=("$rpm.armv7l.rpm")
     TIZEN_SDK_ARM64_UNIFIED_RPMS+=("$rpm.aarch64.rpm")
+done
+
+for rpm in "${TIZEN_SDK_SNAPSHOTS_BASE_RPMS[@]}"; do
+    TIZEN_SDK_SNAPSHOTS_ARM_BASE_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_SNAPSHOTS_ARM64_BASE_RPMS+=("$rpm.aarch64.rpm")
+done
+
+for rpm in "${TIZEN_SDK_SNAPSHOTS_UNIFIED_RPMS[@]}"; do
+    TIZEN_SDK_SNAPSHOTS_ARM_UNIFIED_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_SNAPSHOTS_ARM64_UNIFIED_RPMS+=("$rpm.aarch64.rpm")
 done
 
 # ------------------------------------------------------------------------------
