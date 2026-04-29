@@ -144,21 +144,18 @@ class TC_DA_1_1(MatterBaseTest):
         self.step(1)
         nocs_th1 = await self.read_nocs(th1)
 
-        # Verify that there is a single entry in the NOCs list
-        asserts.assert_true(len(nocs_th1) == 1, f"NOCs attribute must contain a single entry in the list, got {len(nocs_th1)}")
-
         # *** STEP 2 ***
         # TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
         self.step(2)
         fabrics_th1 = await self.read_fabrics(th1)
 
-        # Verify that there is a single entry in the Fabrics list
-        asserts.assert_true(len(fabrics_th1) == 1,
-                            f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th1)}")
+        # Verify that TH1's fabric is present in the list (device may have pre-existing fabrics)
+        th1_fabric = next((f for f in fabrics_th1 if f.fabricID == th1.fabricId), None)
+        asserts.assert_is_not_none(th1_fabric, f"TH1 FabricID ({th1.fabricId}) not found in Fabrics list: {[f.fabricID for f in fabrics_th1]}")
 
-        # Verify that the FabricID for that entry matches the FabricID for TH1
-        asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId,
-                             f"TH1 FabricID ({fabrics_th1[0].fabricID}) and Fabrics attribute FabricID ({th1.fabricId}) must match")
+        # Locate TH1's NOC entry by matching fabric index
+        th1_noc = next((n for n in nocs_th1 if n.fabricIndex == th1_fabric.fabricIndex), None)
+        asserts.assert_is_not_none(th1_noc, f"No NOC entry found for TH1's fabric index ({th1_fabric.fabricIndex})")
 
         # *** STEP 3 ***
         # Factory reset DUT
@@ -182,8 +179,8 @@ class TC_DA_1_1(MatterBaseTest):
 
         # Verify that TH1's FabricID is not present in TH2's Fabrics list
         fabrics_th2_ids_pase = [f.fabricID for f in fabrics_th2_pase[0][opcreds_cluster][fabrics_attr]]
-        asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_th2_ids_pase,
-                              f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids_pase}")
+        asserts.assert_not_in(th1_fabric.fabricID, fabrics_th2_ids_pase,
+                              f"TH1's FabricID ({th1_fabric.fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids_pase}")
 
         # *** STEP 6 ***
         # TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to
@@ -223,8 +220,8 @@ class TC_DA_1_1(MatterBaseTest):
                              f"TH2 FabricID ({fabrics_th2[0].fabricID}) and Fabrics attribute FabricID ({th2.fabricId}) must match")
 
         # Verify that TH2 and TH1's Fabrics attribute's FabricIDs are different
-        asserts.assert_not_equal(fabrics_th2[0].fabricID, fabrics_th1[0].fabricID,
-                                 f"TH2's FabricID ({fabrics_th2[0].fabricID}) must be different from TH1's FabricID ({fabrics_th1[0].fabricID})")
+        asserts.assert_not_equal(fabrics_th2[0].fabricID, th1_fabric.fabricID,
+                                 f"TH2's FabricID ({fabrics_th2[0].fabricID}) must be different from TH1's FabricID ({th1_fabric.fabricID})")
 
         # *** STEP 9 ***
         # TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster
@@ -242,7 +239,7 @@ class TC_DA_1_1(MatterBaseTest):
                              f"NOCs attribute must contain a single entry in the list, got {len(nocs_th2)}")
 
         # Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key
-        nocs_th1_decoded_pk = TLVReader(nocs_th1[0].noc).get()["Any"][9]
+        nocs_th1_decoded_pk = TLVReader(th1_noc.noc).get()["Any"][9]
         nocs_th2_decoded_pk = TLVReader(nocs_th2[0].noc).get()["Any"][9]
         asserts.assert_not_equal(nocs_th1_decoded_pk, nocs_th2_decoded_pk,
                                  f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1's NOCs entry public key ({nocs_th1_decoded_pk.hex()})")
