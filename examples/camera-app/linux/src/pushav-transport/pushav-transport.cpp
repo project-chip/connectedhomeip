@@ -388,7 +388,7 @@ bool PushAVTransport::HandleTriggerDetected()
     // Use the current motion detected duration which represents when this recording session will end
     mBlindStartTime = mClipInfo.mActivationTime + std::chrono::seconds(mClipInfo.mMotionDetectedDurationS);
 
-    if (mRecorder.get() == nullptr)
+    if (mRecorder.get() == nullptr && mTransportStatus == TransportStatusEnum::kActive)
     {
         InitializeRecorder();
     }
@@ -487,11 +487,11 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneIds count: [%zu], Sensitivity: [%d]",
                     (uint16_t) activationReason, zoneIds.size(), sensitivity);
 
-    if (mTransportStatus == TransportStatusEnum::kInactive)
-    {
-        ChipLogProgress(Camera, "PushAVTransport trigger ignored- transport status is Inactive");
-        return;
-    }
+    // if (mTransportStatus == TransportStatusEnum::kInactive)
+    // {
+    //     ChipLogProgress(Camera, "PushAVTransport trigger ignored- transport status is Inactive");
+    //     return;
+    // }
 
     // Handle edge case where zoneIds is empty
     if (zoneIds.empty())
