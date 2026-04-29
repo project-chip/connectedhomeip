@@ -18,12 +18,13 @@
 import os
 import sys
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_device_types
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_device_types
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+    os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 try:
     import matter_device_graph
@@ -34,7 +35,7 @@ except ModuleNotFoundError:
 try:
     import TestMatterTestingSupport
 except ModuleNotFoundError:
-    sys.path.append(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing'))
+    sys.path.append(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing', 'test_testing'))
     import TestMatterTestingSupport
 
 
@@ -51,6 +52,10 @@ class TestMatterDeviceGraph(MatterBaseTest):
             endpoints[e][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList] = [
                 Clusters.ColorControl.id, Clusters.OnOff.id]
             endpoints[e][Clusters.Descriptor][Clusters.Descriptor.Attributes.ClientList] = [Clusters.Identify.id]
+        
+        # Add the vendor name and product name
+        endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorName] = "TestVendor"
+        endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductName] = "TestProduct"
 
         # Run the script to ensure it doesn't throw any errors
         xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
