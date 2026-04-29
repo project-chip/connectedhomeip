@@ -89,6 +89,32 @@ struct ProxyMsgCtx
 // Map sessionId → pending ProxyMessageRequest context (at most one per session).
 static std::map<uint16_t, ProxyMsgCtx *> sPendingProxyMsgCtx;
 
+// Fired when the proxy's responseTimeout deadline elapses before the ED replies.
+// Returns FAILURE to the commissioner immediately rather than waiting for the
+// PAFTP ack-recv timer (PAFTP_ACK_TIMEOUT_MS), which can outlast the
+// commissioner's interactionTimeoutMs when the ED keeps sending ACKs.
+static void ProxyMessageResponseTimeoutCallback(chip::System::Layer *, void * appState)
+{
+    uint16_t sessionId = static_cast<uint16_t>(reinterpret_cast<uintptr_t>(appState));
+    auto it            = sPendingProxyMsgCtx.find(sessionId);
+    if (it == sPendingProxyMsgCtx.end())
+        return; // Already resolved (ED replied or session closed).
+    ProxyMsgCtx * ctx = it->second;
+    sPendingProxyMsgCtx.erase(it);
+    ChipLogProgress(AppServer, "ProxyMessageRequest: responseTimeout expired for session %u", sessionId);
+    chip::app::CommandHandler * cmd = ctx->handle.Get();
+    if (cmd != nullptr)
+        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
+    delete ctx;
+}
+
+static void CancelProxyMessageResponseTimer(uint16_t sessionId)
+{
+    chip::DeviceLayer::SystemLayer().CancelTimer(
+        ProxyMessageResponseTimeoutCallback,
+        reinterpret_cast<void *>(static_cast<uintptr_t>(sessionId)));
+}
+
 // True while a ProxyScanRequest is in progress; used to return Busy for concurrent requests.
 static bool sScanInProgress = false;
 
@@ -139,6 +165,7 @@ static void OnProxyWiFiPAFMessageReceived(uint16_t sessionId, const uint8_t * da
 
     ProxyMsgCtx * ctx = it->second;
     sPendingProxyMsgCtx.erase(it);
+    CancelProxyMessageResponseTimer(sessionId);
 
     chip::app::CommandHandler * cmd = ctx->handle.Get();
     if (cmd == nullptr)
@@ -220,6 +247,7 @@ public:
                 {
                     ProxyMsgCtx * ctx = pendingIt->second;
                     sPendingProxyMsgCtx.erase(pendingIt);
+                    CancelProxyMessageResponseTimer(sid);
                     chip::app::CommandHandler * cmd = ctx->handle.Get();
                     ChipLogError(AppServer,
                                  "WiFiPAFCloseSession: PAF session closed with pending ProxyMessageRequest "
@@ -964,6 +992,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         // Previous request timed out without a commissionee reply; clean up so
         // this session is not permanently stuck.
         ChipLogProgress(AppServer, "ProxyMessageRequest: cleaning up expired pending ctx for session %u", sessionId);
+        CancelProxyMessageResponseTimer(sessionId);
         delete existing;
         sPendingProxyMsgCtx.erase(pendingIt);
     }
@@ -1039,8 +1068,22 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
+    // Start a hard deadline timer.  If the ED does not reply within
+    // responseTimeout seconds, ProxyMessageResponseTimeoutCallback fires and
+    // returns Failure to the commissioner.  This ensures the commissioner
+    // always gets a timely response even when PAFTP_ACK_TIMEOUT_MS is longer
+    // than the commissioner's interactionTimeoutMs (e.g. PAFTP_ACK_TIMEOUT_MS
+    // is 30 s to cover WiFi join, but the commissioner may only wait 35 s).
+    CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Seconds16(responseTimeout),
+        ProxyMessageResponseTimeoutCallback,
+        reinterpret_cast<void *>(static_cast<uintptr_t>(sessionId)));
+    if (timerErr != CHIP_NO_ERROR)
+        ChipLogError(AppServer, "ProxyMessageRequest: failed to start response timer: %" CHIP_ERROR_FORMAT,
+                     timerErr.Format());
+
     // Response will be sent asynchronously via OnProxyWiFiPAFMessageReceived()
-    // when the commissionee's reply arrives.
+    // when the commissionee's reply arrives, or by the timer above if it does not.
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
@@ -1076,6 +1119,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     auto pendingIt = sPendingProxyMsgCtx.find(sessionId);
     if (pendingIt != sPendingProxyMsgCtx.end())
     {
+        CancelProxyMessageResponseTimer(sessionId);
         delete pendingIt->second;
         sPendingProxyMsgCtx.erase(pendingIt);
     }
