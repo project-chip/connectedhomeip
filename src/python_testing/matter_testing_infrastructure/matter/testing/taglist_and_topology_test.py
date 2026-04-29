@@ -228,7 +228,7 @@ def build_tree_for_graph(endpoints: dict[int, Any]) -> tuple[TreeDict, list[Prob
     for p in problem_endpoints:
         location = ClusterPathLocation(endpoint_id=p, cluster_id=Clusters.Descriptor.id)
         problems.append(ProblemNotice(test_name="Tree graph", location=location,
-                        severify=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {p}"))
+                        severity=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {p}"))
 
     roots = find_tree_roots(tree_endpoints, endpoints)
     all_endpoints: TreeDict = {}
@@ -259,7 +259,7 @@ def build_tree_for_graph(endpoints: dict[int, Any]) -> tuple[TreeDict, list[Prob
         if endpoints[s][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
             location = ClusterPathLocation(endpoint_id=p, cluster_id=Clusters.Descriptor.id)
             problems.append(ProblemNotice(test_name="Tree graph", location=location,
-                            severify=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {s}"))
+                            severity=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {s}"))
         all_endpoints[s] = EndpointTree(endpoint=s, children=[], is_tree_root=True)
 
     if problems:
