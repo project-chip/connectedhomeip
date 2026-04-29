@@ -52,7 +52,7 @@ class TestMatterDeviceGraph(MatterBaseTest):
             endpoints[e][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList] = [
                 Clusters.ColorControl.id, Clusters.OnOff.id]
             endpoints[e][Clusters.Descriptor][Clusters.Descriptor.Attributes.ClientList] = [Clusters.Identify.id]
-        
+
         # Add the vendor name and product name
         endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorName] = "TestVendor"
         endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductName] = "TestProduct"
