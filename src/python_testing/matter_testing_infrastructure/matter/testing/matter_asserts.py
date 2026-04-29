@@ -375,7 +375,7 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
 # Commissioning-related assertions
 
 async def assert_is_commissioned_to_any_fabric(
-    dev_ctrl,
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
     description: str = "Device",
     pase_params: Optional[PaseParams] = None
