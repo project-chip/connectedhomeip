@@ -82,10 +82,10 @@ Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Dele
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::Failure;
     }
     cluster->SetDelegate(delegate);
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace Thermostat
