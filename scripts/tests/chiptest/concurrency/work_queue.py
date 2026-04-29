@@ -24,7 +24,7 @@ class Waitable(Protocol):
     def wait(self, timeout: float | None = None) -> bool: ...
 
 
-def wait_for_mp_managed(waitable: Waitable, timeout: float | None = None, polling_interval: float = 0.1) -> bool:
+def wait_for_mp_managed(waitable: Waitable, timeout_sec: float | None = None, polling_interval_sec: float = 0.1) -> bool:
     """
     Wait for a resource managed by multiprocessing.Manager.
 
@@ -32,8 +32,8 @@ def wait_for_mp_managed(waitable: Waitable, timeout: float | None = None, pollin
     as the manager process explicitly ignores SIGINT.
     """
     # Blocking wait with no timeout. Cancellable only with a KeyboardInterrupt.
-    if timeout is None:
-        while not waitable.wait(polling_interval):
+    if timeout_sec is None:
+        while not waitable.wait(polling_interval_sec):
             pass
         return True
 
@@ -41,13 +41,13 @@ def wait_for_mp_managed(waitable: Waitable, timeout: float | None = None, pollin
     # implementation of the waitable. For Conditions (and Events which use Conditions for `wait()`), this checks the state and
     # returns immediately. The default Condition implementation checks if `timeout > 0`: if so, it acquires the underlying lock
     # with a timeout (blocking). Otherwise, it acquires the lock without blocking, without checking for negative timeout values.
-    if timeout <= 0:
-        return waitable.wait(timeout)
+    if timeout_sec <= 0:
+        return waitable.wait(timeout_sec)
 
     # Countdown wait with polling, so that we can catch KeyboardInterrupt.
-    end = time.monotonic() + timeout
-    while (time_left := end - time.monotonic()) > 0:
-        if waitable.wait(min(polling_interval, time_left)):
+    end = time.monotonic() + timeout_sec
+    while (time_left_sec := end - time.monotonic()) > 0:
+        if waitable.wait(min(polling_interval_sec, time_left_sec)):
             return True
 
     return False
