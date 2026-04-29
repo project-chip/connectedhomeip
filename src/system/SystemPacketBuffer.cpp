@@ -35,13 +35,13 @@
 #include <system/SystemMutex.h>
 #include <system/SystemStats.h>
 
-#include <stdint.h>
-
 #include <limits.h>
 #include <limits>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -733,7 +733,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
             chip::Platform::MemoryFree(aPacket);
 #endif
-            aPacket       = lNextPacket;
+            aPacket = lNextPacket;
         }
         else
         {
