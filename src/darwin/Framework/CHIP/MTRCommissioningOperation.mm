@@ -297,6 +297,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     commissioningComplete:(NSError * _Nullable)error
                    nodeID:(NSNumber * _Nullable)nodeID
                   metrics:(MTRMetrics *)metrics
+                  context:(NSDictionary<NSString *, id> *)context
 {
     if (error) {
         [self _dispatchCommissioningError:error forCommissioningID:nodeID withMetrics:metrics];
@@ -319,7 +320,9 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     [strongController commissioningDone:self];
 
     dispatch_async(_delegateQueue, ^{
-        if ([strongDelegate respondsToSelector:@selector(commissioning:succeededForNodeID:metrics:)]) {
+        if ([strongDelegate respondsToSelector:@selector(commissioning:succeededForNodeID:metrics:context:)]) {
+            [strongDelegate commissioning:self succeededForNodeID:nodeID metrics:metrics context:context];
+        } else if ([strongDelegate respondsToSelector:@selector(commissioning:succeededForNodeID:metrics:)]) {
             [strongDelegate commissioning:self succeededForNodeID:nodeID metrics:metrics];
         }
     });
