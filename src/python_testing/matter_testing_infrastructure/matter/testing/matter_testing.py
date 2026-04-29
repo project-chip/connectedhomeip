@@ -192,15 +192,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-<<<<<<< test-teardown-dut-th-cleanup
-        self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
         self.cleanup_config = TestCleanupConfig()
         self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
         self._original_acl = None
-=======
-        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
->>>>>>> master
 
     #
     # Mobly Test Controller Methods (Framework Interface)
