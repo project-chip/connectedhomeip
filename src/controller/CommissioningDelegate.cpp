@@ -115,6 +115,12 @@ const char * StageToString(CommissioningStage stage)
     case kThreadNetworkEnable:
         return "ThreadNetworkEnable";
 
+    case kPoweredInitialPhaseComplete:
+        return "PoweredInitialPhaseComplete";
+
+    case kUnpoweredInitialPhaseComplete:
+        return "UnpoweredInitialPhaseComplete";
+
     case kEvictPreviousCaseSessions:
         return "EvictPreviousCaseSessions";
 
@@ -261,6 +267,12 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
 
     case kThreadNetworkEnable:
         return "core_commissioning_stage_thread_network_enable";
+
+    case kPoweredInitialPhaseComplete:
+        return "core_commissioning_stage_powered_initial_phase";
+
+    case kUnpoweredInitialPhaseComplete:
+        return "core_commissioning_stage_unpowered_initial_phase";
 
     case kEvictPreviousCaseSessions:
         return "core_commissioning_stage_evict_previous_case_sessions";

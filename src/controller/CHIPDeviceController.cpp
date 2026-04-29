@@ -4529,6 +4529,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
+    case CommissioningStage::kUnpoweredInitialPhaseComplete:
+        FALLTHROUGH;
+    case CommissioningStage::kPoweredInitialPhaseComplete:
+        CommissioningInitialStageComplete(proxy);
+        return;
     case CommissioningStage::kFindOperationalForStayActive:
     case CommissioningStage::kFindOperationalForCommissioningComplete: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
@@ -4629,10 +4634,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kUnpoweredPhaseComplete:
-        ChipLogProgress(Controller, "Completed unpowered commissioning phase, marking commissioning as complete");
-        CommissioningStageComplete(CHIP_NO_ERROR);
-        break;
     case CommissioningStage::kCleanup:
         CleanupCommissioning(proxy, proxy->GetDeviceId(), params.GetCompletionStatus());
         break;
@@ -4713,6 +4714,36 @@ bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeDa
         return false;
     }
     return true;
+}
+
+static bool IsInitialPhaseComplete(const CommissioningStage step, bool & isUnpowered)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    if (step == CommissioningStage::kUnpoweredInitialPhaseComplete)
+    {
+        isUnpowered = true;
+        return true;
+    }
+#else
+    VerifyOrDie(step != CommissioningStage::kUnpoweredInitialPhaseComplete);
+#endif
+    isUnpowered = false;
+    return step == CommissioningStage::kPoweredInitialPhaseComplete;
+}
+
+void DeviceCommissioner::CommissioningInitialStageComplete(DeviceProxy * proxy)
+{
+    bool isUnpowered;
+    VerifyOrDie(IsInitialPhaseComplete(mCommissioningStage, isUnpowered));
+
+    ChipLogProgress(Controller, "Completed initial phase of commissioning");
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnInitialStageComplete(
+            PeerId(GetCompressedFabricId(), proxy->GetDeviceId()),
+            proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType(), isUnpowered);
+    }
+    CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
 } // namespace Controller
