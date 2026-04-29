@@ -29,7 +29,7 @@ TemperatureSensorDevice::TemperatureSensorDevice(TimerDelegate & timerDelegate,
     mTimerDelegate(timerDelegate), mTempConfig(tempConfig)
 {}
 
-CHIP_ERROR TemperatureSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR TemperatureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 

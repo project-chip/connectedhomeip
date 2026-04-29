@@ -17,8 +17,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device temperature-sensor
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -38,7 +38,6 @@ from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-
 
 class TC_TMP_2_1(MatterBaseTest):
     def desc_TC_TMP_2_1(self) -> str:

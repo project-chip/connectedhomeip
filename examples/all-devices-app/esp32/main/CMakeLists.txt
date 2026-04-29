@@ -55,7 +55,7 @@ set(SRC_DIRS_LIST
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl"   
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl"
 )
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}

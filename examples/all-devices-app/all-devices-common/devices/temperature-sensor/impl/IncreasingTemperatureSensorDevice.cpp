@@ -17,7 +17,6 @@
 #include "IncreasingTemperatureSensorDevice.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::app::Clusters;
 
@@ -29,8 +28,8 @@ namespace {
 constexpr System::Clock::Seconds16 kIncreaseTemperatureIntervalSec = System::Clock::Seconds16(10);
 
 const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-10)),
-    .maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(50)),
+    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-10),
+    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(50),
     .tolerance        = 0,
 };
 
