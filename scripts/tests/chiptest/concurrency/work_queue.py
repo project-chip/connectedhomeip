@@ -37,7 +37,10 @@ def wait_for_mp_managed(waitable: Waitable, timeout: float | None = None, pollin
             pass
         return True
 
-    # Special case for non-positive timeout, to avoid waiting at all and return immediately.
+    # Special case for non-positive timeout, to return immediately without waiting. Behavior depends on the underlying
+    # implementation of the waitable. For Conditions (and Events which use Conditions for `wait()`), this checks the state and
+    # returns immediately. The default Condition implementation checks if `timeout > 0`: if so, it acquires the underlying lock
+    # with a timeout (blocking). Otherwise, it acquires the lock without blocking, without checking for negative timeout values.
     if timeout <= 0:
         return waitable.wait(timeout)
 
