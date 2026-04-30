@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,26 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Options from standalone-chip.mk that differ from configure defaults. These
-# options are used from examples/.
-
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-
-import("//build/chip/tests.gni")
-
-declare_args() {
-  chip_build_pw_rpc_lib = false
-}
-
-group("bee") {
-  deps = [ "//src/lib" ]
-
-  if (chip_build_pw_rpc_lib) {
-    deps += [ "//config/realtek/bee/lib/pw_rpc" ]
-  }
-
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
-  }
-}
+# This is the equivalent to app_config_dependent_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+)

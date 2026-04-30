@@ -17,14 +17,30 @@
 
 #include <inet/InetInterface.h>
 
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
+#include <version.h>
+#else
+#include <zephyr/version.h>
+#endif
+
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+struct net_in6_addr;
+#else
 struct in6_addr;
+#endif
 struct net_if;
 
 namespace chip {
 namespace DeviceLayer {
 namespace InetUtils {
 
-in6_addr ToZephyrAddr(const Inet::IPAddress & address);
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+using ZephyrIn6Addr = ::net_in6_addr;
+#else
+using ZephyrIn6Addr = ::in6_addr;
+#endif
+
+ZephyrIn6Addr ToZephyrAddr(const Inet::IPAddress & address);
 net_if * GetInterface(Inet::InterfaceId ifaceId = Inet::InterfaceId::Null());
 net_if * GetWiFiInterface();
 
