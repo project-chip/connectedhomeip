@@ -338,9 +338,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             # Track the controller's CA so it can be removed from
             # persistent storage after controller shutdown
-            ca = controller.fabricAdmin.certificateAuthority
-            if ca not in self._extra_cas:
-                self._extra_cas.append(ca)
+            fa = controller.fabricAdmin
+            if fa is not None:
+                ca = fa.certificateAuthority
+                if ca not in self._extra_cas:
+                    self._extra_cas.append(ca)
 
     def _shutdown_extra_controllers(self) -> None:
         """Shuts down all extra controllers created during the test run and
@@ -371,9 +373,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Sends ArmFailSafe(expiryLengthSeconds=0) to disarm any active failsafe on the DUT."""
         LOGGER.info("[CLN] sending ArmFailSafe(0) to disarm any active failsafe")
         try:
-            resp = await self.send_single_cmd(
-                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0),
-                endpoint=0
+            resp = typing.cast(
+                Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
+                await self.send_single_cmd(
+                    cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=uint(0)),
+                    endpoint=0
+                )
             )
             if resp.errorCode != Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
                 LOGGER.warning(f"[CLN] disarm failsafe returned errorCode {resp.errorCode}")
@@ -408,17 +413,20 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             # Read TH1's fabric index on the DUT via the default controller
             th1_fabric_index = await self.read_single_attribute_check_success(
-                cluster=Clusters.OperationalCredentials,
+                cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
                 attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
                 endpoint=0
             )
 
             # Read all fabrics unfiltered so we see every fabric, not just TH1's
-            fabrics = await self.read_single_attribute_check_success(
-                cluster=Clusters.OperationalCredentials,
-                attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
-                endpoint=0,
-                fabric_filtered=False
+            fabrics = typing.cast(
+                List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
+                await self.read_single_attribute_check_success(
+                    cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
+                    attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+                    endpoint=0,
+                    fabric_filtered=False
+                )
             )
         except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
             LOGGER.warning(
@@ -450,9 +458,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         LOGGER.info("[CLN] purging group key sets and key map")
         try:
-            resp = await self.send_single_cmd(
-                cmd=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
-                endpoint=0
+            resp = typing.cast(
+                Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse,
+                await self.send_single_cmd(
+                    cmd=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
+                    endpoint=0
+                )
             )
 
             # Remove all non-IPK key sets, key set 0 (IPK) cannot be removed
@@ -491,15 +502,18 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
-                                cluster=Clusters.ScenesManagement):
+                                cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
                 continue
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
-                                cluster=Clusters.Groups):
+                                cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
             try:
-                resp = await self.send_single_cmd(
-                    cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[]),
-                    endpoint=endpoint_id
+                resp = typing.cast(
+                    Clusters.Groups.Commands.GetGroupMembershipResponse,
+                    await self.send_single_cmd(
+                        cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[]),
+                        endpoint=endpoint_id
+                    )
                 )
                 group_ids = resp.groupList
                 if not group_ids:
@@ -526,7 +540,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         found_any = False
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
-                                cluster=Clusters.Groups):
+                                cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
             found_any = True
             LOGGER.info(f"[CLN] sending RemoveAllGroups on endpoint {endpoint_id}")
@@ -550,7 +564,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         found_any = False
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
-                                cluster=Clusters.DoorLock):
+                                cluster=Clusters.DoorLock):  # type: ignore[arg-type]
                 continue
             found_any = True
             LOGGER.info(f"[CLN] clearing DoorLock users and credentials on endpoint {endpoint_id}")
@@ -561,7 +575,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                     timedRequestTimeoutMs=1000
                 )
                 await self.send_single_cmd(
-                    cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=0xFFFE),
+                    cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=uint(0xFFFE)),
                     endpoint=endpoint_id,
                     timedRequestTimeoutMs=1000
                 )
@@ -585,10 +599,13 @@ class MatterBaseTest(base_test.BaseTestClass):
                 continue
             found_any = True
             try:
-                provisioned = await self.read_single_attribute_check_success(
-                    cluster=Clusters.TlsClientManagement,
-                    attribute=Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints,
-                    endpoint=endpoint_id
+                provisioned = typing.cast(
+                    List[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
+                    await self.read_single_attribute_check_success(
+                        cluster=Clusters.TlsClientManagement,  # type: ignore[arg-type]
+                        attribute=Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints,
+                        endpoint=endpoint_id
+                    )
                 )
                 if not provisioned:
                     LOGGER.info(f"[CLN] no TLS endpoints provisioned on endpoint {endpoint_id}")
@@ -630,7 +647,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
             return
         if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0,
-                              attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
+                              attribute=Clusters.IcdManagement.Attributes.RegisteredClients):  # type: ignore[arg-type]
             LOGGER.info("[CLN] ICD Management cluster not present, skipping ICD client cleanup")
             return
 
