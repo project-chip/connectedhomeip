@@ -116,7 +116,7 @@ Forwarding into `AppTask` still goes through CRTP as in
 ### Sample Implementation
 
 The following shows a minimal example `CustomerAppTask` that overrides
-`AppInitImpl()` (required) and `ButtonEventHandlerImpl()`.
+`AppInitImpl()` and `ButtonEventHandlerImpl()`.
 
 **CustomerAppTask.h**
 
