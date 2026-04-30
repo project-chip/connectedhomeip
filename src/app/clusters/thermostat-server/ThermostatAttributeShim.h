@@ -46,6 +46,7 @@ namespace LocalTemperature {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 
 } // namespace LocalTemperature
 

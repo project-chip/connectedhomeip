@@ -83,6 +83,10 @@ Status Set(EndpointId endpoint, int16_t value)
     return cluster->SetLocalTemperature(value);
 }
 
+Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty) {
+    return Set(endpoint, value);
+}
+
 } // namespace LocalTemperature
 
 namespace SystemMode {
