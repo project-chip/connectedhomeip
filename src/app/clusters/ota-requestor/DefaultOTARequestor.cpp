@@ -20,7 +20,6 @@
  * OTA Requestor logic is contained in this class.
  */
 
-#include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/ota-requestor/CodegenIntegrationInternal.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>

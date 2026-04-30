@@ -64,7 +64,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup Environment
         # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
         run: |
@@ -165,7 +165,7 @@ jobs:
              --ota-candidate-file /tmp/otaCandidateJSON \
           "
       - name: Uploading core files
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ failure() && !env.ACT }}
         with:
           name: crash-core-darwin-${{ matrix.build_variant }}
@@ -173,19 +173,19 @@ jobs:
           # Cores are big; don't hold on to them too long.
           retention-days: 5
       - name: Uploading diagnostic logs
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ failure() && !env.ACT }}
         with:
           name: crash-log-darwin-${{ matrix.build_variant }}
           path: ~/Library/Logs/DiagnosticReports/
       - name: Uploading framework build log
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ failure() && !env.ACT }}
         with:
           name: framework-build-log-darwin-${BUILD_VARIANT_FRAMEWORK_TOOL}
           path: out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
       - name: Uploading objdir for debugging
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ failure() && !env.ACT }}
         with:
           name: crash-objdir-darwin-${{ matrix.build_variant }}
