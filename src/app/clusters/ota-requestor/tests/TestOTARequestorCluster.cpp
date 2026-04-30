@@ -488,6 +488,7 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     DownloadError::DecodableType decodedEvent;
@@ -502,6 +503,7 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
