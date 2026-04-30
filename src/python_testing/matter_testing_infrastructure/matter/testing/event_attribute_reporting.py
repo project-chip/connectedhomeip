@@ -540,16 +540,23 @@ class AttributeSubscriptionHandler:
         return
 
 
-class WildcardAttributeSubscriptionHandler:
-    """
-    Callback class to handle wildcard attribute subscription reports.
+class BackgroundWildcardSubscriptionCache:
+    """Framework-internal cache backing MatterBaseTest's background wildcard subscription.
 
-    Unlike AttributeSubscriptionHandler which tracks a specific attribute, this class manages
-    subscriptions to multiple attributes using wildcard paths (e.g., all attributes in a cluster,
-    all attributes on an endpoint, or all attributes across all endpoints/clusters).
+    Test authors should not instantiate this directly.  It is created and managed by
+    ``MatterBaseTest._start_wildcard_subscription`` and consulted from
+    ``verify_attribute_subscription_value`` (which is invoked transparently by
+    ``read_single_attribute``, ``read_single_attribute_check_success``, and
+    ``read_single_attribute_all_endpoints``).  For per-attribute or per-event
+    subscriptions inside a test, use ``AttributeSubscriptionHandler`` or
+    ``EventSubscriptionHandler`` above instead.
 
-    It provides queue-based tracking of all attribute updates, allowing tests to verify that
-    specific attributes received reports after being modified.
+    The class plays two roles:
+        1. **Subscription callback** — receives every attribute report from a wildcard
+           subscription via ``__call__`` and records it.
+        2. **Latest-value cache** — exposes the most recent reported value for any
+           ``(endpoint_id, cluster_id, attribute_id)`` tuple via ``_latest_values``,
+           seeded from the priming read in ``start()``.
 
     Attributes with the Changes Omitted (C) or Quieter Reporting (Q) spec quality flags can be
     excluded by passing their (cluster_id, attribute_id) pairs as `excluded_attribute_ids`.
@@ -559,15 +566,16 @@ class WildcardAttributeSubscriptionHandler:
     Attributes:
         _subscription: The active subscription transaction object.
         _excluded_attribute_ids: Frozen set of (cluster_id, attr_id) pairs to ignore.
-        _q: Queue storing dicts of {endpoint, cluster, attribute, value} for received updates.
-        _attribute_reports: Dictionary tracking all reports by (endpoint, cluster, attribute) tuple.
+        _q: Queue of AttributeValue records for received updates.
+        _attribute_reports: Dictionary mapping (endpoint, cluster, attribute) tuples to a
+            history list of AttributeValue records.
         _latest_values: Dictionary mapping (endpoint_id, cluster_id, attr_id) -> latest value,
             seeded from the priming read and updated on every non-excluded report.
         _lock: Threading lock for thread-safe access to internal data structures.
     """
 
     def __init__(self, excluded_attribute_ids: Optional[frozenset[tuple[int, int]]] = None):
-        """Initialize the wildcard subscription handler.
+        """Initialize the background wildcard subscription cache.
 
         Parameters:
             excluded_attribute_ids: Optional frozenset of (cluster_id, attribute_id) integer
@@ -578,7 +586,7 @@ class WildcardAttributeSubscriptionHandler:
         self._subscription = None
         self._excluded_attribute_ids: frozenset[tuple[int, int]] = excluded_attribute_ids or frozenset()
         self._q: queue.Queue = queue.Queue()
-        self._attribute_reports: dict[tuple, list[Any]] = {}
+        self._attribute_reports: dict[tuple, list[AttributeValue]] = {}
         # (endpoint_id: int, cluster_id: int, attr_id: int) -> latest reported value.
         # Seeded from the priming read in start() and kept up-to-date by __call__.
         self._latest_values: dict[tuple[int, int, int], Any] = {}
@@ -607,22 +615,22 @@ class WildcardAttributeSubscriptionHandler:
         report_key = (endpoint_id, path.ClusterType, path.AttributeType)
         cache_key = (endpoint_id, path.ClusterId, path.AttributeId)
 
-        # Queue the report for sequential processing
-        self._q.put({
-            'endpoint': endpoint_id,
-            'cluster': path.ClusterType,
-            'attribute': path.AttributeType,
-            'value': data
-        })
+        # Single AttributeValue feeds both the queue (for ordered consumption) and
+        # the per-attribute history list.  Matches the AttributeValue contract used
+        # by AttributeSubscriptionHandler in this same file.
+        report = AttributeValue(
+            endpoint_id=endpoint_id,
+            attribute=path.AttributeType,
+            value=data,
+            timestamp_utc=datetime.now(timezone.utc),
+        )
 
-        # Track in history and latest-value cache with thread safety
+        self._q.put(report)
+
         with self._lock:
             if report_key not in self._attribute_reports:
                 self._attribute_reports[report_key] = []
-            self._attribute_reports[report_key].append({
-                'value': data,
-                'timestamp': datetime.now(timezone.utc)
-            })
+            self._attribute_reports[report_key].append(report)
             self._latest_values[cache_key] = data
 
     async def start(self, dev_ctrl, node_id: int, attributes: list,
@@ -686,7 +694,7 @@ class WildcardAttributeSubscriptionHandler:
         try:
             priming_data = self._subscription.GetAttributes()
         except Exception:
-            LOGGER.warning("[WildcardAttributeSubscriptionHandler] Could not read priming attribute cache")
+            LOGGER.warning("[BackgroundWildcardSubscriptionCache] Could not read priming attribute cache")
             return
 
         with self._lock:

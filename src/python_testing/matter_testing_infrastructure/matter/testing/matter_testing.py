@@ -235,7 +235,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.stored_global_wildcard = None
 
         # Populated by _start_wildcard_subscription (called from setup_test) with the
-        # WildcardAttributeSubscriptionHandler that drives subscription-cache verification.
+        # BackgroundWildcardSubscriptionCache that drives subscription-cache verification.
         # Shut down in teardown_test.
         self.wildcard_subscription_handler = None
 
@@ -391,10 +391,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         (set by the test runner before setup_class is called).
         """
         # Lazy import to break the circular dependency:
-        from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
+        from matter.testing.event_attribute_reporting import BackgroundWildcardSubscriptionCache
 
         LOGGER.info("[MatterBaseTest] Building wildcard subscription handler")
-        handler = WildcardAttributeSubscriptionHandler(
+        handler = BackgroundWildcardSubscriptionCache(
             excluded_attribute_ids=self._cq_excluded_attr_ids
         )
 
