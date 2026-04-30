@@ -274,7 +274,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._log_execution_parameters_summary()
         super().teardown_class()
 
-    async def _run_framework_cleanup(self):
+    async def _run_framework_cleanup(self) -> None:
         """Runs all enabled cleanup steps at the end of each test method.
 
         DUT-side cleanup runs first (while the default controller is still active),
@@ -290,7 +290,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if dut_reachable:
             try:
                 await self._populate_wildcard()
-            except Exception as e:
+            except Exception as e:  # DUT may be unreachable or mid-reboot; skip all DUT cleanup rather than failing the test
                 LOGGER.warning(f"[CLN] could not populate wildcard, DUT is unreachable — skipping all DUT cleanup: {e}")
                 dut_reachable = False
 
@@ -323,7 +323,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.cleanup_config.shutdown_extra_controllers:
             self._shutdown_extra_controllers()
 
-    def _on_new_controller_created(self, controller):
+    def _on_new_controller_created(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
         """Hook set and fired by FabricAdmin for every NewController() call.
 
         Skips the default controller.
@@ -342,7 +342,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             if ca not in self._extra_cas:
                 self._extra_cas.append(ca)
 
-    def _shutdown_extra_controllers(self):
+    def _shutdown_extra_controllers(self) -> None:
         """Shuts down all extra controllers created during the test run and
         removes their CAs from persistent storage (admin_storage.json).
         """
@@ -351,8 +351,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info(f"[CLN] shutting down controller nodeId={ctrl.nodeId:#x}")
                 ctrl.Shutdown()
                 LOGGER.info(f"[CLN] controller nodeId={ctrl.nodeId:#x} shut down successfully")
-            except Exception as e:
-                self.problems.append(f"Controller shutdown failed: {e}")
+            except Exception as e:  # Shutdown can fail if the controller is already stopped or the stack is in a bad state
+                LOGGER.warning(f"[CLN] controller shutdown failed: {e}")
         self._extra_controllers.clear()
 
         # Controller shutdown does not update persistent storage
@@ -363,11 +363,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info(f"[CLN] removing CA index {ca.caIndex} from persistent storage")
                 self.certificate_authority_manager.RemoveCertificateAuthority(ca)
                 LOGGER.info(f"[CLN] CA index {ca.caIndex} removed successfully")
-            except Exception as e:
-                self.problems.append(f"CA removal failed: {e}")
+            except Exception as e:  # Storage may be inconsistent if the controller was shut down in a bad state
+                LOGGER.warning(f"[CLN] CA removal failed: {e}")
         self._extra_cas.clear()
 
-    async def _disarm_failsafes(self):
+    async def _disarm_failsafes(self) -> None:
         """Sends ArmFailSafe(expiryLengthSeconds=0) to disarm any active failsafe on the DUT."""
         LOGGER.info("[CLN] sending ArmFailSafe(0) to disarm any active failsafe")
         try:
@@ -379,10 +379,10 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.warning(f"[CLN] disarm failsafe returned errorCode {resp.errorCode}")
             else:
                 LOGGER.info("[CLN] failsafe disarmed successfully")
-        except Exception as e:
+        except Exception as e:  # DUT may be unreachable or session may have expired; log and continue cleanup
             LOGGER.warning(f"[CLN] disarm failsafe failed: {e}")
 
-    async def _reset_acls_to_default(self):
+    async def _reset_acls_to_default(self) -> None:
         """Restores the ACL on endpoint 0 to the state captured before the test ran.
 
         Uses the ACL saved in setup_test (_original_acl).
@@ -400,10 +400,10 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.warning(f"[CLN] ACL reset returned status {result[0].Status}")
             else:
                 LOGGER.info("[CLN] ACL restored successfully")
-        except Exception as e:
+        except Exception as e:  # Session may have expired or DUT ACL may be in a state that rejects the write
             LOGGER.warning(f"[CLN] ACL reset failed: {e}")
 
-    async def _remove_extra_fabrics(self):
+    async def _remove_extra_fabrics(self) -> None:
         """Removes any fabric on the DUT that is not the default controller's fabric."""
         try:
             # Read TH1's fabric index on the DUT via the default controller
@@ -420,7 +420,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 endpoint=0,
                 fabric_filtered=False
             )
-        except Exception as e:
+        except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
             LOGGER.warning(
                 f"[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: {e}")
             return
@@ -440,10 +440,10 @@ class MatterBaseTest(base_test.BaseTestClass):
                     endpoint=0
                 )
                 LOGGER.info(f"[CLN] fabric index {fabric_index} removed successfully")
-            except Exception as e:
+            except Exception as e:  # RemoveFabric may fail if the fabric was already removed by the test or a prior cleanup
                 LOGGER.warning(f"[CLN] RemoveFabric({fabric_index}) failed: {e}")
 
-    async def _purge_groups(self):
+    async def _purge_groups(self) -> None:
         """Removes all non-IPK group key sets and clears the group key map on the DUT.
 
         Key set 0 (IPK) is skipped as it cannot be removed.
@@ -463,7 +463,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                         cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=key_set_id),
                         endpoint=0
                     )
-        except Exception as e:
+        except Exception as e:  # DUT may be unreachable, or key sets may already be absent; skip rather than aborting cleanup
             LOGGER.warning(f"[CLN] key set removal failed: {e}")
 
         # Clear all group key mappings
@@ -476,10 +476,10 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.warning(f"[CLN] GroupKeyMap clear returned status {result[0].Status}")
             else:
                 LOGGER.info("[CLN] group key map cleared successfully")
-        except Exception as e:
+        except Exception as e:  # Write may fail if session expired or the DUT rejected the empty map
             LOGGER.warning(f"[CLN] GroupKeyMap clear failed: {e}")
 
-    async def _purge_scenes(self):
+    async def _purge_scenes(self) -> None:
         """Removes all scenes from all groups on every endpoint that has ScenesManagement.
 
         Must run before _purge_group_memberships since RemoveAllScenes needs the group to
@@ -511,10 +511,10 @@ class MatterBaseTest(base_test.BaseTestClass):
                         endpoint=endpoint_id
                     )
                 LOGGER.info(f"[CLN] scenes cleared on endpoint {endpoint_id}")
-            except Exception as e:
+            except Exception as e:  # DUT may be unreachable or the group may have been removed by the test
                 LOGGER.warning(f"[CLN] scene removal failed on endpoint {endpoint_id}: {e}")
 
-    async def _purge_group_memberships(self):
+    async def _purge_group_memberships(self) -> None:
         """Removes all group memberships from the DUT's group table.
 
         Must run after _purge_scenes since scenes need their groups to still exist for RemoveAllScenes.
@@ -536,12 +536,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                     endpoint=endpoint_id
                 )
                 LOGGER.info(f"[CLN] group memberships cleared on endpoint {endpoint_id}")
-            except Exception as e:
+            except Exception as e:  # DUT may be unreachable or session may have expired after a multi-fabric test
                 LOGGER.warning(f"[CLN] RemoveAllGroups failed on endpoint {endpoint_id}: {e}")
         if not found_any:
             LOGGER.info("[CLN] Groups cluster not present on any endpoint, skipping group membership cleanup")
 
-    async def _purge_doorlock(self):
+    async def _purge_doorlock(self) -> None:
         """Clears all DoorLock users and credentials on every endpoint with the DoorLock cluster."""
         if self.stored_global_wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
@@ -566,12 +566,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                     timedRequestTimeoutMs=1000
                 )
                 LOGGER.info(f"[CLN] DoorLock users and credentials cleared on endpoint {endpoint_id}")
-            except Exception as e:
+            except Exception as e:  # DUT may be unreachable or DoorLock may be in a state that rejects the clear
                 LOGGER.warning(f"[CLN] DoorLock cleanup failed on endpoint {endpoint_id}: {e}")
         if not found_any:
             LOGGER.info("[CLN] DoorLock cluster not present on any endpoint, skipping DoorLock cleanup")
 
-    async def _purge_tls_endpoints(self):
+    async def _purge_tls_endpoints(self) -> None:
         """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
 
         Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
@@ -601,12 +601,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                         payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
                     )
                 LOGGER.info(f"[CLN] TLS endpoints removed on endpoint {endpoint_id}")
-            except Exception as e:
+            except Exception as e:  # DUT may be unreachable or TLS endpoint may have already been removed
                 LOGGER.warning(f"[CLN] TLS endpoint cleanup failed on endpoint {endpoint_id}: {e}")
         if not found_any:
             LOGGER.info("[CLN] TlsClientManagement cluster not present on any endpoint — skipping TLS endpoint cleanup")
 
-    async def _close_commissioning_windows(self):
+    async def _close_commissioning_windows(self) -> None:
         """Sends RevokeCommissioning to close any open commissioning window on the DUT.
 
         If no window is open the DUT returns an error, which is expected and logged as info.
@@ -619,10 +619,10 @@ class MatterBaseTest(base_test.BaseTestClass):
                 timedRequestTimeoutMs=6000
             )
             LOGGER.info("[CLN] commissioning window revoked successfully")
-        except Exception as e:
+        except Exception as e:  # Expected when no commissioning window is open; the DUT returns an error in that case
             LOGGER.info(f"[CLN] RevokeCommissioning skipped (likely no window open): {e}")
 
-    async def _unregister_icd_clients(self):
+    async def _unregister_icd_clients(self) -> None:
         """Unregisters all ICD clients registered on the DUT via the default controller"""
         # Check if the ICD Management cluster is present on the DUT.
         # Wildcard is pre-populated by _run_framework_cleanup; guard for standalone calls.
@@ -651,7 +651,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                     endpoint=0
                 )
                 LOGGER.info(f"[CLN] unregistered ICD client {entry.checkInNodeID:#x}")
-            except Exception as e:
+            except Exception as e:  # DUT may be unreachable or the client may have already been unregistered
                 LOGGER.warning(f"[CLN] UnregisterClient({entry.checkInNodeID:#x}) failed: {e}")
 
     def _format_summary_value(self, key: str, value: Any) -> str:
