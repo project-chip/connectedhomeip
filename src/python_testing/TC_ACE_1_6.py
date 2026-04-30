@@ -131,6 +131,7 @@ class TC_ACE_1_6(MatterBaseTest):
             TestStep(28, "TH resets the GroupKeyMap attribute list"),
             TestStep(29, "TH resets the key set 0x01a3"),
             TestStep(30, "TH resets the key set 0x01a1"),
+            TestStep(31, "TH writes The ACL attribute to restore full access over CASE"),
         ]
 
     @async_test_body
@@ -559,8 +560,13 @@ class TC_ACE_1_6(MatterBaseTest):
         self.step(30)
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
 
-        # TODO(#71506): A step should be added in this test to restore a wildcard ACL entry.
-
+        self.step(31)
+        acl_admin_full = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[th1_nodeid],
+            targets=NullValue)
+        await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin_full]))])
 
 if __name__ == "__main__":
     default_matter_test_main()
