@@ -97,11 +97,30 @@ _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32, c_char_p, c_char_p, PyChipError)
 
 DevicePairingDelegate_OnCommissioningStatusUpdateFunct: typing.TypeAlias = typing.Callable[
-    [int, int, PyChipError],
+    [int, int, int, PyChipError],
     None,
 ]
+# Mapping of C++ DevicePairingDelegate_OnCommissioningStatusUpdateFunct to Python:
+#
+# C++ signature:
+#   (PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR err)
+#
+# PeerId (src/lib/core/PeerId.h) contains:
+#   - NodeId
+#   - CompressedFabricId
+#
+# In the Python binding, PeerId is flattened into two uint64 values:
+#   - first c_uint64  -> NodeId
+#   - second c_uint64 -> CompressedFabricId
+#
+# The remaining parameters are mapped as:
+#   - c_uint8     -> CommissioningStage (enum)
+#   - PyChipError -> CHIP_ERROR
+#
+# So the signature below corresponds to:
+#   (nodeId, compressedFabricId, stageCompleted, err)
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
-    None, c_uint64, c_uint8, PyChipError)
+    None, c_uint64, c_uint64, c_uint8, PyChipError)
 
 DevicePairingDelegate_OnCommissioningStageStartFunct: typing.TypeAlias = typing.Callable[
     [int, bytes],
@@ -1003,6 +1022,27 @@ class ChipDeviceControllerBase():
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeId, port)
+        )
+
+    async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int) -> None:
+        '''
+        Establish a PASE session over Thread MeshCoP.
+
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists.
+        For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
+
+        Args:
+            baAddr (str): IP address of BorderAgent.
+            setupCode (str): The setup code of the device.
+            nodeId (int): The node ID of the device.
+            baPort (int): IP port of BorderAgent.
+
+        Returns:
+            None
+        '''
+        await self._establishPASESession(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop(
+                self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId)
         )
 
     async def EstablishPASESession(self, setUpCode: str, nodeId: int) -> None:
@@ -2650,6 +2690,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.argtypes = [
+                c_void_p, c_char_p, c_uint16, c_char_p, c_uint64]
+            self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]
