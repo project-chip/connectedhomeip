@@ -74,7 +74,7 @@ public:
         }
 
         WindowCoveringCluster::Config config;
-        config.mFeatures          = features;
+        config.mFeatures           = features;
         config.mOptionalAttributes = optionalAttributes;
         gServers[clusterInstanceIndex].Create(endpointId, config);
 
