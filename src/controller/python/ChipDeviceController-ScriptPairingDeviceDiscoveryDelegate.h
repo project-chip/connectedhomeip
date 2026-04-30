@@ -66,7 +66,7 @@ private:
     CommissioningParameters mParams;
     NodeId mNodeId;
     uint32_t mSetupPasscode;
-    bool mEstablishPaseOnly;
+    bool mEstablishPaseOnly = false;
 };
 
 } // namespace Controller
