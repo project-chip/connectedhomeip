@@ -17,6 +17,8 @@
 
 #include "ThermostatCluster.h"
 
+#include <app/util/attribute-table.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -33,19 +35,6 @@ namespace Attributes {
 
 namespace ControlSequenceOfOperation {
 
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value) // ControlSequenceOfOperationEnum
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->GetControlSequenceOfOperation();
-    return Status::Success;
-}
-
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
@@ -54,13 +43,29 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->SetControlSequenceOfOperation(value);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->SetControlSequenceOfOperation(value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change control sequence of operation attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE));
 }
 } // namespace ControlSequenceOfOperation
 
 namespace LocalTemperature {
 
-Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+
+Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
     if (cluster == nullptr)
@@ -68,41 +73,33 @@ Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    value = cluster->GetLocalTemperature();
-    return Status::Success;
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->SetLocalTemperature(value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change local temperature attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Status Set(EndpointId endpoint, int16_t value)
 {
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    return cluster->SetLocalTemperature(value);
+    return Set(endpoint, value, MarkAttributeDirty::kNo);
 }
 
-Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty)
-{
-    return Set(endpoint, value);
-}
 
 } // namespace LocalTemperature
 
 namespace SystemMode {
-
-Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->GetSystemMode();
-    return Status::Success;
-}
 
 Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum value)
 {
@@ -112,7 +109,22 @@ Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum 
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->SetSystemMode(value);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::SystemModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->SetSystemMode(value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change system mode attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE));
 }
 } // namespace SystemMode
 
@@ -126,7 +138,22 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->SetRunningMode(value);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->SetRunningMode(value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change thermostat running mode attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE));
 }
 
 } // namespace ThermostatRunningMode
@@ -141,22 +168,26 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->SetRunningState(value);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->SetRunningState(value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change running state attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE));
 }
 } // namespace ThermostatRunningState
 
 namespace AbsMinHeatSetpointLimit {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->mSetpoints.absoluteHeatLimits.minimum;
-    return Status::Success;
-}
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
@@ -166,22 +197,27 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->ChangeSetpointAttribute(Id, value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change absolute min heat setpoint limit attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE));
 }
 } // namespace AbsMinHeatSetpointLimit
 
 namespace AbsMaxHeatSetpointLimit {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->mSetpoints.absoluteHeatLimits.maximum;
-    return Status::Success;
-}
+
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
@@ -190,23 +226,27 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->ChangeSetpointAttribute(Id, value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change absolute max heat setpoint limit attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE));
 }
 } // namespace AbsMaxHeatSetpointLimit
 
 namespace OccupiedCoolingSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->mSetpoints.occupiedCoolingSetpoint;
-    return Status::Success;
-}
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
@@ -215,24 +255,28 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->ChangeSetpointAttribute(Id, value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change occupied cooling setpoint attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE));
 }
 
 } // namespace OccupiedCoolingSetpoint
 
 namespace OccupiedHeatingSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->mSetpoints.occupiedHeatingSetpoint;
-    return Status::Success;
-}
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
@@ -241,24 +285,28 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->ChangeSetpointAttribute(Id, value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change occupied heating setpoint attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE));
 }
 
 } // namespace OccupiedHeatingSetpoint
 
 namespace UnoccupiedCoolingSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->mSetpoints.unoccupiedCoolingSetpoint;
-    return Status::Success;
-}
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
@@ -267,24 +315,28 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->ChangeSetpointAttribute(Id, value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change unoccupied cooling setpoint attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE));
 }
 
 } // namespace UnoccupiedCoolingSetpoint
 
 namespace UnoccupiedHeatingSetpoint {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
-    }
-    *value = cluster->mSetpoints.unoccupiedHeatingSetpoint;
-    return Status::Success;
-}
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
@@ -293,7 +345,22 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Status::Failure;
     }
-    return cluster->ChangeSetpointAttribute(Id, value);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    auto status = cluster->ChangeSetpointAttribute(Id, value);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to change unoccupied heating setpoint attribute for endpoint %d", endpoint);
+        return status;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE));
 }
 
 } // namespace UnoccupiedHeatingSetpoint
@@ -308,37 +375,52 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
         return Status::Failure;
     }
     cluster->mFeatures = BitFlags<Thermostat::Feature>(value);
-    return Status::Success;
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE));
 }
 } // namespace FeatureMap
 
 // These attributes are deprecated, and only in "use" by ThermostaticRadiatorValveManager, and will be removed in the future
 namespace PICoolingDemand {
-uint8_t piCoolingDemand = 0;
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
-{
-    *value = piCoolingDemand;
-    return Status::Success;
-}
+
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 {
-    piCoolingDemand = value;
-    return Status::Success;
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
+
 } // namespace PICoolingDemand
 
 namespace PIHeatingDemand {
-uint8_t piHeatingDemand = 0;
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
-{
-    *value = piHeatingDemand;
-    return Status::Success;
-}
+
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 {
-    piHeatingDemand = value;
-    return Status::Success;
+     using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
+
 } // namespace PIHeatingDemand
 
 } // namespace Attributes
