@@ -139,9 +139,10 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         logger.info("About to write acl entries")
         await self.create_acl_entry(dev_ctrl=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
-    @async_test_body
-    async def teardown_test(self):
-        await self.clear_ota_providers(self.controller, self.requestor_node_id)
+    def teardown_test(self):
+        async def _cleanup():
+            await self.clear_ota_providers(self.controller, self.requestor_node_id)
+        self.event_loop.run_until_complete(_cleanup())
         self.terminate_provider()
         self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
         super().teardown_test()

@@ -328,6 +328,40 @@ class CertificateAuthorityManager:
 
         return ca
 
+    def RemoveCertificateAuthority(self, ca: CertificateAuthority):
+        ''' Shuts down a CertificateAuthority and removes all of its entries from persistent storage.
+
+            This removes:
+            - The CA entry from the 'caList' key in repl-config
+            - The four SDK credential keys for this CA index from sdk-config
+
+            After this call the CA object is no longer valid and should not be used.
+        '''
+        ca_index = ca.caIndex
+        ca.Shutdown()
+
+        if ca in self._activeCaList:
+            self._activeCaList.remove(ca)
+
+        # Remove from repl-config caList
+        ca_list = self._persistentStorage.GetKey('caList')
+        if ca_list and str(ca_index) in ca_list:
+            del ca_list[str(ca_index)]
+            self._persistentStorage.SetKey('caList', ca_list)
+
+        # Remove SDK credential keys for this CA index
+        _SDK_KEY_PREFIXES = [
+            'ExampleCARootCert',
+            'ExampleCAIntermediateCert',
+            'ExampleOpCredsCAKey',
+            'ExampleOpCredsICAKey',
+        ]
+
+        # Keys are written by ExampleOperationalCredentialsIssuer via PERSISTENT_KEY_OP,
+        # which formats the index as lowercase hex (PRIx64).
+        for prefix in _SDK_KEY_PREFIXES:
+            self._persistentStorage.DeleteSdkKey(f'{prefix}{ca_index:x}')
+
     def Shutdown(self):
         ''' Shuts down all active CertificateAuthority instances tracked by this manager, before shutting itself down.
 

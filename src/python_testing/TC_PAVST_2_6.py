@@ -76,9 +76,8 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
-    @async_test_body
-    async def teardown_test(self):
-        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+    def teardown_test(self):
+        self.event_loop.run_until_complete(self.postcondition_remove_tls_endpoint(self.tlsEndpointId))
         super().teardown_test()
 
     async def privacy_setting_test(self, endpoint, aConnectionID, aTransportStatus):
