@@ -357,13 +357,19 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.warning(f"[CLN] controller shutdown failed: {e}")
         self._extra_controllers.clear()
 
-        # Controller shutdown does not update persistent storage
-        # Remove each extra CA explicitly so that admin_storage.json
-        # does not accumulate stale caList entries and credential keys
+        # Shut down each CA and remove it from the manager's active list and from
+        # persistent storage (caList in admin_storage.json) directly.
+        mgr = self.certificate_authority_manager
         for ca in self._extra_cas:
             try:
-                LOGGER.info(f"[CLN] removing CA index {ca.caIndex} from persistent storage")
-                self.certificate_authority_manager.RemoveCertificateAuthority(ca)
+                LOGGER.info(f"[CLN] shutting down CA index {ca.caIndex}")
+                ca.Shutdown()
+                if ca in mgr._activeCaList:
+                    mgr._activeCaList.remove(ca)
+                ca_list = mgr._persistentStorage.GetKey('caList') or {}
+                if str(ca.caIndex) in ca_list:
+                    del ca_list[str(ca.caIndex)]
+                    mgr._persistentStorage.SetKey('caList', ca_list)
                 LOGGER.info(f"[CLN] CA index {ca.caIndex} removed successfully")
             except Exception as e:  # Storage may be inconsistent if the controller was shut down in a bad state
                 LOGGER.warning(f"[CLN] CA removal failed: {e}")
