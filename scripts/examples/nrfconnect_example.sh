@@ -35,7 +35,7 @@ fi
 set -x
 
 # Activate Zephyr environment
-[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
+[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/../.zephyrrc"
 
 # Activate Matter environment
 source "../scripts/activate.sh"
