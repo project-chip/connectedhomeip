@@ -97,6 +97,16 @@ namespace FeatureMap {
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
 }
 
+namespace PICoolingDemand {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+} // namespace PICoolingDemand
+
+namespace PIHeatingDemand {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+} // namespace PIHeatingDemand
+
 } // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters

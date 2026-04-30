@@ -311,6 +311,33 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 }
 } // namespace FeatureMap
 
+
+// These attributes are deprecated, and only in "use" by ThermostaticRadiatorValveManager, and will be removed in the future
+namespace PICoolingDemand {
+uint8_t piCoolingDemand = 0;
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value) {
+    *value = piCoolingDemand;
+    return Status::Success;
+}
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value) {
+    piCoolingDemand = value;
+    return Status::Success;
+}
+} // namespace PICoolingDemand
+
+namespace PIHeatingDemand {
+uint8_t piHeatingDemand = 0;
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value) {
+    *value = piHeatingDemand;
+    return Status::Success;
+}
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value) {
+    piHeatingDemand = value;
+    return Status::Success;
+}
+} // namespace PIHeatingDemand
+
+
 } // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters
