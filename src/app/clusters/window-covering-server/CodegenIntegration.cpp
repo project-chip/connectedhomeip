@@ -43,77 +43,111 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        WindowCovering::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         BitFlags<WindowCovering::Feature> features;
         features.SetRaw(featureMap);
 
-        // Load RAM-backed attributes with ZAP-defined defaults from generated accessors so the
-        // cluster comes up with the application-configured values instead of zero-initialized ones.
-        WindowCovering::Type type{};
-        if (Attributes::Type::Get(endpointId, &type) != Status::Success)
+        // Build OptionalAttributeSet: only set feature-dependent attributes when the feature is present.
+        WindowCovering::OptionalAttributeSet optionalAttributes;
+        app::AttributeSet emberOptionals(optionalAttributeBits);
+
+        if (features.Has(Feature::kLift) && emberOptionals.IsSet(Attributes::NumberOfActuationsLift::Id))
         {
-            type = WindowCovering::Type::kRollerShade;
+            optionalAttributes.Set<Attributes::NumberOfActuationsLift::Id>();
+        }
+        if (features.Has(Feature::kTilt) && emberOptionals.IsSet(Attributes::NumberOfActuationsTilt::Id))
+        {
+            optionalAttributes.Set<Attributes::NumberOfActuationsTilt::Id>();
+        }
+        if (features.HasAll(Feature::kLift, Feature::kPositionAwareLift) &&
+            emberOptionals.IsSet(Attributes::CurrentPositionLiftPercentage::Id))
+        {
+            optionalAttributes.Set<Attributes::CurrentPositionLiftPercentage::Id>();
+        }
+        if (features.HasAll(Feature::kTilt, Feature::kPositionAwareTilt) &&
+            emberOptionals.IsSet(Attributes::CurrentPositionTiltPercentage::Id))
+        {
+            optionalAttributes.Set<Attributes::CurrentPositionTiltPercentage::Id>();
+        }
+        if (emberOptionals.IsSet(Attributes::SafetyStatus::Id))
+        {
+            optionalAttributes.Set<Attributes::SafetyStatus::Id>();
+        }
+
+        WindowCoveringCluster::Config config;
+        config.mFeatures          = features;
+        config.mOptionalAttributes = optionalAttributes;
+        gServers[clusterInstanceIndex].Create(endpointId, config);
+
+        auto & cluster = gServers[clusterInstanceIndex].Cluster();
+
+        // Load mandatory attribute values from ZAP-defined defaults.
+        WindowCovering::Type type{};
+        if (Attributes::Type::Get(endpointId, &type) == Status::Success)
+        {
+            cluster.SetType(type);
         }
 
         chip::BitMask<WindowCovering::ConfigStatus> configStatus;
-        if (Attributes::ConfigStatus::Get(endpointId, &configStatus) != Status::Success)
+        if (Attributes::ConfigStatus::Get(endpointId, &configStatus) == Status::Success)
         {
-            configStatus.ClearAll();
+            cluster.SetConfigStatus(configStatus);
         }
 
         WindowCovering::EndProductType endProductType{};
-        if (Attributes::EndProductType::Get(endpointId, &endProductType) != Status::Success)
+        if (Attributes::EndProductType::Get(endpointId, &endProductType) == Status::Success)
         {
-            endProductType = WindowCovering::EndProductType::kRollerShade;
+            cluster.SetEndProductType(endProductType);
         }
 
         chip::BitMask<WindowCovering::Mode> mode;
-        if (Attributes::Mode::Get(endpointId, &mode) != Status::Success)
+        if (Attributes::Mode::Get(endpointId, &mode) == Status::Success)
         {
-            mode.ClearAll();
+            cluster.SetMode(mode);
         }
 
-        // OperationalStatus has no RAM backing (handled by the code-driven cluster at runtime),
-        // so it is initialized to the spec default of "stall" (all zeros).
-        chip::BitMask<WindowCovering::OperationalStatus> operationalStatus;
+        // Load feature-gated position attributes from ZAP defaults.
+        if (features.HasAll(Feature::kLift, Feature::kPositionAwareLift))
+        {
+            DataModel::Nullable<Percent100ths> percent100ths;
+            if (Attributes::CurrentPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            {
+                cluster.SetCurrentPositionLiftPercentage100ths(percent100ths);
+            }
+            if (Attributes::TargetPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            {
+                cluster.SetTargetPositionLiftPercent100ths(percent100ths);
+            }
 
-        Config config{ .type              = type,
-                       .configStatus      = configStatus,
-                       .operationalStatus = operationalStatus,
-                       .endProductType    = endProductType,
-                       .mode              = mode };
-        gServers[clusterInstanceIndex].Create(endpointId, features, optionalAttributeSet, config);
-
-        // Load ZAP-defined defaults for nullable position attributes so they don't start as null.
-        // Without this, ComputeOperationalState returns Stall (null current) and movement never starts.
-        auto & cluster = gServers[clusterInstanceIndex].Cluster();
-
-        DataModel::Nullable<Percent100ths> percent100ths;
-        if (Attributes::CurrentPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
-        {
-            cluster.SetCurrentPositionLiftPercentage100ths(percent100ths);
-        }
-        if (Attributes::CurrentPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
-        {
-            cluster.SetCurrentPositionTiltPercentage100ths(percent100ths);
-        }
-        if (Attributes::TargetPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
-        {
-            cluster.SetTargetPositionLiftPercent100ths(percent100ths);
-        }
-        if (Attributes::TargetPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
-        {
-            cluster.SetTargetPositionTiltPercent100ths(percent100ths);
+            if (optionalAttributes.IsSet(Attributes::CurrentPositionLiftPercentage::Id))
+            {
+                DataModel::Nullable<Percent> percent;
+                if (Attributes::CurrentPositionLiftPercentage::Get(endpointId, percent) == Status::Success)
+                {
+                    cluster.SetCurrentPositionLiftPercentage(percent);
+                }
+            }
         }
 
-        DataModel::Nullable<Percent> percent;
-        if (Attributes::CurrentPositionLiftPercentage::Get(endpointId, percent) == Status::Success)
+        if (features.HasAll(Feature::kTilt, Feature::kPositionAwareTilt))
         {
-            cluster.SetCurrentPositionLiftPercentage(percent);
-        }
-        if (Attributes::CurrentPositionTiltPercentage::Get(endpointId, percent) == Status::Success)
-        {
-            cluster.SetCurrentPositionTiltPercentage(percent);
+            DataModel::Nullable<Percent100ths> percent100ths;
+            if (Attributes::CurrentPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            {
+                cluster.SetCurrentPositionTiltPercentage100ths(percent100ths);
+            }
+            if (Attributes::TargetPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            {
+                cluster.SetTargetPositionTiltPercent100ths(percent100ths);
+            }
+
+            if (optionalAttributes.IsSet(Attributes::CurrentPositionTiltPercentage::Id))
+            {
+                DataModel::Nullable<Percent> percent;
+                if (Attributes::CurrentPositionTiltPercentage::Get(endpointId, percent) == Status::Success)
+                {
+                    cluster.SetCurrentPositionTiltPercentage(percent);
+                }
+            }
         }
 
         return gServers[clusterInstanceIndex].Registration();
@@ -300,28 +334,7 @@ void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(cluster != nullptr);
-    chip::BitMask<ConfigStatus> newStatus;
-
-    chip::BitMask<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
-    chip::BitMask<Mode> oldMode           = ModeGet(endpoint);
-
-    newStatus = oldStatus;
-
-    // Attribute: ConfigStatus reflects the following current mode flags
-    newStatus.Set(ConfigStatus::kOperational, !newMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
-    newStatus.Set(ConfigStatus::kLiftMovementReversed, newMode.Has(Mode::kMotorDirectionReversed));
-
-    // Verify only one mode supported at once and maintenance lock goes over calibration
-    if (newMode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
-    {
-        newMode.Clear(Mode::kCalibrationMode);
-    }
-
-    if (oldMode != newMode)
-        cluster->SetMode(newMode);
-
-    if (oldStatus != newStatus)
-        ConfigStatusSet(endpoint, newStatus);
+    cluster->SetMode(newMode);
 }
 
 chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)

@@ -85,11 +85,9 @@ Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
     return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
 }
 
-WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
-                                             OptionalAttributeSet & optionalAttributeSet, Config & config) :
+WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)),
-    mFeatureMap(features), mOptionalAttributes(optionalAttributeSet), mType(config.type), mConfigStatus(config.configStatus),
-    mOperationalStatus(config.operationalStatus), mEndProductType(config.endProductType), mMode(config.mode)
+    mFeatureMap(config.mFeatures), mOptionalAttributes(config.mOptionalAttributes)
 {}
 
 CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
@@ -248,26 +246,19 @@ void WindowCoveringCluster::SetCurrentPositionTiltPercentage100ths(NPercent100th
     }
 }
 
-void WindowCoveringCluster::UpdateConfigStatusFromMode()
-{
-    chip::BitMask<ConfigStatus> newStatus = mConfigStatus;
-    newStatus.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
-    newStatus.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
-    SetConfigStatus(newStatus);
-}
-
 void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
 {
-    // Spec: maintenance lock takes priority over calibration
     if (mode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
     {
         mode.Clear(Mode::kCalibrationMode);
     }
 
-    VerifyOrReturn(mMode != mode);
-    mMode = mode;
-    NotifyAttributeChanged(Attributes::Mode::Id);
-    UpdateConfigStatusFromMode();
+    VerifyOrReturn(SetAttributeValue(mMode, mode, Attributes::Mode::Id));
+
+    chip::BitMask<ConfigStatus> newStatus = mConfigStatus;
+    newStatus.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    newStatus.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
+    SetConfigStatus(newStatus);
 }
 
 void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)
@@ -340,15 +331,17 @@ CHIP_ERROR WindowCoveringCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { HasFeature(Feature::kLift), Attributes::NumberOfActuationsLift::kMetadataEntry },
-        { HasFeature(Feature::kTilt), Attributes::NumberOfActuationsTilt::kMetadataEntry },
-        { HasFeaturePaLift(), Attributes::CurrentPositionLiftPercentage::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::NumberOfActuationsLift::Id), Attributes::NumberOfActuationsLift::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::NumberOfActuationsTilt::Id), Attributes::NumberOfActuationsTilt::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::CurrentPositionLiftPercentage::Id),
+          Attributes::CurrentPositionLiftPercentage::kMetadataEntry },
         { HasFeaturePaLift(), Attributes::TargetPositionLiftPercent100ths::kMetadataEntry },
         { HasFeaturePaLift(), Attributes::CurrentPositionLiftPercent100ths::kMetadataEntry },
-        { HasFeaturePaTilt(), Attributes::CurrentPositionTiltPercentage::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::CurrentPositionTiltPercentage::Id),
+          Attributes::CurrentPositionTiltPercentage::kMetadataEntry },
         { HasFeaturePaTilt(), Attributes::TargetPositionTiltPercent100ths::kMetadataEntry },
         { HasFeaturePaTilt(), Attributes::CurrentPositionTiltPercent100ths::kMetadataEntry },
-        { mOptionalAttributes.IsSet(Attributes::SafetyStatus::Id), Attributes::SafetyStatus::kMetadataEntry }
+        { mOptionalAttributes.IsSet(Attributes::SafetyStatus::Id), Attributes::SafetyStatus::kMetadataEntry },
     };
     return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
 } // namespace WindowCovering
