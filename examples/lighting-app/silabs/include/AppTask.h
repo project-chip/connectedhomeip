@@ -23,7 +23,19 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/on-off-server/on-off-server.h>
+#include <cstdint>
 #include <lib/core/CHIPError.h>
+
+struct AppEvent;
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+enum ColorAction_t : uint8_t
+{
+    COLOR_ACTION_XY = 0,
+    COLOR_ACTION_HSV,
+    COLOR_ACTION_CT,
+};
+#endif
 
 class AppTask : public BaseApplication
 {
@@ -54,6 +66,14 @@ public:
 
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
+
+    static void LightActionEventHandler(AppEvent * aEvent);
+
+    static void LightTimerEventHandler(void * timerCbArg);
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    static void LightControlEventHandler(AppEvent * aEvent);
+#endif
 
 protected:
     CHIP_ERROR AppInit() override;

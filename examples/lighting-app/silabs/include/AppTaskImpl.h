@@ -48,6 +48,26 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
+    // optional override: LightActionEventHandlerImpl()
+    static void LightActionEventHandler(AppEvent * aEvent)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightActionEventHandlerImpl, aEvent);
+    }
+
+    // optional override: LightTimerEventHandlerImpl()
+    static void LightTimerEventHandler(void * timerCbArg)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightTimerEventHandlerImpl, timerCbArg);
+    }
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    // optional override: LightControlEventHandlerImpl()
+    static void LightControlEventHandler(AppEvent * aEvent)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightControlEventHandlerImpl, aEvent);
+    }
+#endif
+
     // optional override: OnTriggerOffWithEffectImpl()
     static void OnTriggerOffWithEffect(OnOffEffect * effect)
     {
@@ -70,6 +90,14 @@ private:
     CHIP_ERROR InitLightImpl() { return AppTask::InitLight(); }
 
     void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction) { AppTask::ButtonEventHandler(button, btnAction); }
+
+    void LightActionEventHandlerImpl(AppEvent * aEvent) { AppTask::LightActionEventHandler(aEvent); }
+
+    void LightTimerEventHandlerImpl(void * timerCbArg) { AppTask::LightTimerEventHandler(timerCbArg); }
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    void LightControlEventHandlerImpl(AppEvent * aEvent) { AppTask::LightControlEventHandler(aEvent); }
+#endif
 
     void OnTriggerOffWithEffectImpl(OnOffEffect * effect) { AppTask::OnTriggerOffWithEffect(effect); }
 
