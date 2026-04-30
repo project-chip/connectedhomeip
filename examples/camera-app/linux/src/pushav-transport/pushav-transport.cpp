@@ -418,7 +418,7 @@ void PushAVTransport::StartRecordingAndStreaming()
     mRecorder->Start();
     mStreaming = true;
     UpdateSendFlags();
-    if (IsStreaming() && (mTransportTriggerType != TransportTriggerTypeEnum::kCommand))
+    if (IsStreaming()) // && (mTransportTriggerType != TransportTriggerTypeEnum::kCommand))
     {
         ChipLogDetail(Camera, "Ready to stream");
         GeneratePushTransportBeginEvent();
@@ -427,8 +427,13 @@ void PushAVTransport::StartRecordingAndStreaming()
 
 void PushAVTransport::GeneratePushTransportBeginEvent()
 {
-    if (mPushAvStreamTransportServer != nullptr)
+    ChipLogProgress(
+        Camera, "GeneratePushTransportBeginEvent: connectionID=%u, triggerType=%u, mCurrentActivationByManualTrigger=%s",
+        mConnectionID, static_cast<uint16_t>(mTransportTriggerType), mCurrentActivationByManualTrigger ? "true" : "false");
+
+    if (/*mCurrentActivationByManualTrigger != true || */ mPushAvStreamTransportServer != nullptr)
     {
+        ChipLogProgress(Camera, "GeneratePushTransportBeginEvent: Calling NotifyTransportStarted for connection %u", mConnectionID);
         // mActivationReason is optional - if not set, it defaults to empty value
         mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, mTransportTriggerType, mActivationReason);
     }

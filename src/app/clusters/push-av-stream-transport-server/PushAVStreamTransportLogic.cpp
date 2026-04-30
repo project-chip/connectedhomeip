@@ -1551,6 +1551,12 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
                 // Don't include the session number if we can't get it
                 cmafSessionNumber = Optional<uint64_t>();
             }
+
+            // ChipLogProgress(Zcl, "HandleManuallyTriggerTransport: Generating PushTransportBegin event for connection %u, "
+            //                      "triggerType=kCommand, activationReason=%u",
+            //                 connectionID, to_underlying(activationReason));
+            // GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
+            //                                 containerType, cmafSessionNumber);
         }
     }
 
