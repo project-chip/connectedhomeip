@@ -209,7 +209,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 
     if (error != CHIP_NO_ERROR)
     {
-        DeviceLayer::SystemLayer().ScheduleLambda([this, error] {
+        error = DeviceLayer::SystemLayer().ScheduleLambda([this, error] {
             mDownloader->EndDownload(error);
             PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         });

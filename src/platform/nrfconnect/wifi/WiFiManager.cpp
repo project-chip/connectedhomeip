@@ -645,7 +645,7 @@ void WiFiManager::NotifyDisconnected(uint16_t reason)
 
 void WiFiManager::IPv6AddressChangeHandler(const void * data)
 {
-    const in6_addr * addr = reinterpret_cast<const in6_addr *>(data);
+    const InetUtils::ZephyrIn6Addr * addr = reinterpret_cast<const InetUtils::ZephyrIn6Addr *>(data);
 
     // Filter out link-local addresses that are not routable outside of a local network.
     if (!net_ipv6_is_ll_addr(addr))

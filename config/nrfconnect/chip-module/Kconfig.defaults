@@ -256,6 +256,9 @@ config IEEE802154_NRF5_RX_STACK_SIZE
 
 endif # NET_L2_OPENTHREAD
 
+config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
+    default n if !NET_L2_OPENTHREAD
+
 # ==============================================================================
 # OpenThread configuration
 # ==============================================================================
