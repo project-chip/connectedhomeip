@@ -25,7 +25,6 @@ from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArg
 
 
 # Mirror of the C struct PychipCaseCapturedHeaders defined in CASECapture.h.
-# Field order and types must match; field names in `_fields_` are Python-side only.
 class PyCaseCapturedHeaders(ctypes.Structure):
     _fields_ = [
         ("sessionType", ctypes.c_uint8),
