@@ -37,49 +37,34 @@ namespace Thermostat {
 namespace Attributes {
 
 namespace ControlSequenceOfOperation {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value);
 } // namespace ControlSequenceOfOperation
 
 namespace LocalTemperature {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 
 } // namespace LocalTemperature
 
 namespace AbsMinHeatSetpointLimit {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 } // namespace AbsMinHeatSetpointLimit
 
 namespace AbsMaxHeatSetpointLimit {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 } // namespace AbsMaxHeatSetpointLimit
 
 namespace OccupiedCoolingSetpoint {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-
 } // namespace OccupiedCoolingSetpoint
 
 namespace OccupiedHeatingSetpoint {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-
 } // namespace OccupiedHeatingSetpoint
 
 namespace SystemMode {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::Thermostat::SystemModeEnum * value); // SystemModeEnum
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum value);
-
 } // namespace SystemMode
 
 namespace ThermostatRunningMode {
@@ -98,12 +83,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
 }
 
 namespace PICoolingDemand {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
 } // namespace PICoolingDemand
 
 namespace PIHeatingDemand {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
 } // namespace PIHeatingDemand
 
