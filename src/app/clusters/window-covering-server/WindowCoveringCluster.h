@@ -44,11 +44,10 @@ typedef DataModel::Nullable<uint16_t> NAbsolute;
 typedef Optional<Percent> OPercent;
 typedef Optional<Percent100ths> OPercent100ths;
 
-using OptionalAttributeSet = app::OptionalAttributeSet<Attributes::NumberOfActuationsLift::Id,
-                                                        Attributes::NumberOfActuationsTilt::Id,
-                                                        Attributes::CurrentPositionLiftPercentage::Id,
-                                                        Attributes::CurrentPositionTiltPercentage::Id,
-                                                        Attributes::SafetyStatus::Id>;
+using OptionalAttributeSet =
+    app::OptionalAttributeSet<Attributes::NumberOfActuationsLift::Id, Attributes::NumberOfActuationsTilt::Id,
+                              Attributes::CurrentPositionLiftPercentage::Id, Attributes::CurrentPositionTiltPercentage::Id,
+                              Attributes::SafetyStatus::Id>;
 
 // Match directly with OperationalStatus 2 bits Fields
 enum class OperationalState : uint8_t
