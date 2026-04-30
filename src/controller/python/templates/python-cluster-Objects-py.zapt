@@ -213,6 +213,5 @@ class {{asUpperCamelCase name}}(Cluster):
             {{/zcl_event_fields}}
 
 {{/zcl_events}}
-
 {{/unless~}}
 {{/zcl_clusters}}
