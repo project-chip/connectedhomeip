@@ -15,8 +15,7 @@
 #    limitations under the License.
 #
 # TC_CNET_4_23_2.py — continuation of TC-CNET-4.23: Network Commissioning on a second
-# Wi-Fi profile over an operational (CASE) session. Maps to test plan steps 17–22;
-# this script uses harness steps 1–6. Intended to follow TC_CNET_4_23; with default
+# Wi-Fi profile over an operational (CASE) session. Maps to test plan steps 17–22. Intended to follow TC_CNET_4_23; with default
 # harness behaviour the DUT is commissioned before this test runs when
 # commissioning_method is configured.
 #
@@ -150,6 +149,8 @@ class TC_CNET_4_23_2(MatterBaseTest):
         )
         asserts.assert_true(isinstance(afs, cgen.Commands.ArmFailSafeResponse),
                             "Expected ArmFailSafeResponse in CASE phase")
+        asserts.assert_equal(afs.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"ArmFailSafe (arm) failed with errorCode={afs.errorCode}")
 
         self.step(2)
         logger.info(" --- CASE phase: AddOrUpdateWiFiNetwork with WRONG password")
@@ -216,11 +217,15 @@ class TC_CNET_4_23_2(MatterBaseTest):
         )
 
         logger.info(" --- CASE phase: disarming failsafe")
-        await self.send_single_cmd(
+        afs_disarm = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=105),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
+        asserts.assert_true(isinstance(afs_disarm, cgen.Commands.ArmFailSafeResponse),
+                            "Expected ArmFailSafeResponse when disarming fail-safe")
+        asserts.assert_equal(afs_disarm.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"ArmFailSafe (disarm) failed with errorCode={afs_disarm.errorCode}")
 
 
 if __name__ == "__main__":
