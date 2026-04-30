@@ -792,9 +792,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         # commissioning_method is None, eliminating any network overhead for them.
         # For runner-commissioned tests commissioning_method is set; for in-test
         # commissioning the flag is set by commission_devices() on success.
+        # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
+        # on the fabric — an operational read there would send CASE Sigma1 to an
+        # uncommissioned device, triggering unexpected DUT behaviour.
         dut_expected = (
-            self._dut_confirmed_available
-            or self.matter_test_config.commissioning_method is not None
+            not self.is_commissioning
+            and (
+                self._dut_confirmed_available
+                or self.matter_test_config.commissioning_method is not None
+            )
         )
         if dut_expected:
             try:
