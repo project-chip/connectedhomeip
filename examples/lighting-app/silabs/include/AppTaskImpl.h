@@ -25,10 +25,9 @@
 /**
  * @brief CRTP base for AppTask, exposing override hooks for customizable APIs.
  *
- * Each public method dispatches to `Derived::*Impl()`. All overrides are optional:
- * a default `*Impl()` exists in the private section and falls through to the base
- * `AppTask` implementation. Override `*Impl()` in Derived only for the behaviors
- * you want to customize.
+ * Each public method dispatches to `Derived::*Impl()`. Overrides are optional: default
+ * `*Impl()` implementations in the private section forward to `AppTask`. Override in
+ * Derived only for the behaviors you want to customize.
  *
  * @tparam Derived The derived class type (CRTP pattern)
  */

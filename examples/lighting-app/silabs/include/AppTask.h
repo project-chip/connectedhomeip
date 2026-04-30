@@ -78,4 +78,6 @@ public:
 protected:
     CHIP_ERROR AppInit() override;
     CHIP_ERROR InitLight();
+
+    static void UpdateOnOffClusterState(intptr_t context);
 };

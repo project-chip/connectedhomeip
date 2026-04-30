@@ -117,17 +117,6 @@ void PostLightControlColorEvent(ColorAction_t action, const RGBLEDWidget::ColorD
 }
 #endif
 
-void UpdateOnOffClusterState(intptr_t context)
-{
-    Protocols::InteractionModel::Status status =
-        OnOffServer::Instance().setOnOffValue(LIGHT_ENDPOINT, static_cast<uint8_t>(context), false);
-
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        SILABS_LOG("ERR: updating on/off %x", to_underlying(status));
-    }
-}
-
 void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 {
     sLightOn = false;
@@ -142,6 +131,17 @@ OnOffEffect gEffect = {
 };
 
 } // namespace
+
+void AppTask::UpdateOnOffClusterState(intptr_t context)
+{
+    Protocols::InteractionModel::Status status =
+        OnOffServer::Instance().setOnOffValue(LIGHT_ENDPOINT, static_cast<uint8_t>(context), false);
+
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        SILABS_LOG("ERR: updating on/off %x", to_underlying(status));
+    }
+}
 
 void AppTask::LightTimerEventHandler(void * /* timerCbArg */)
 {
