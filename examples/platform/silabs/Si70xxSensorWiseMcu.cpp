@@ -131,7 +131,7 @@ sl_status_t Init()
 
 sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
 {
-    sl_status_t status      = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
 
 #if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
     // Add PS requirement to keep the sensor awake
