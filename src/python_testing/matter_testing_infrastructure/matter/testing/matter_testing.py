@@ -217,7 +217,7 @@ class BackgroundWildcardSubscriptionCache:
                 XmlAttribute.changes_omitted / XmlAttribute.quieter_reporting flags in
                 spec_parsing to exclude C- and Q-quality attributes from subscription checks.
         """
-        self._subscription = None
+        self._subscription: Optional[Any] = None
         self._excluded_attribute_ids: frozenset[tuple[int, int]] = excluded_attribute_ids or frozenset()
         self._q: queue.Queue = queue.Queue()
         self._attribute_reports: dict[tuple, list[AttributeValue]] = {}
@@ -243,11 +243,20 @@ class BackgroundWildcardSubscriptionCache:
         if (path.ClusterId, path.AttributeId) in self._excluded_attribute_ids:
             return
 
+        # TypedAttributePath invariants (enforced in its __post_init__) guarantee that
+        # ClusterType / AttributeType / ClusterId / AttributeId are populated.  Subscription
+        # callbacks from the SDK also populate Path (and Path.EndpointId).  Asserts are for
+        # type narrowing; if any of these were ever None at runtime we would want to fail
+        # loudly rather than corrupt the cache.
+        assert path.Path is not None and path.Path.EndpointId is not None
+        assert path.AttributeType is not None
+        assert path.ClusterId is not None and path.AttributeId is not None
+
         data = transaction.GetAttribute(path)
 
         endpoint_id: int = path.Path.EndpointId
         report_key = (endpoint_id, path.ClusterType, path.AttributeType)
-        cache_key = (endpoint_id, path.ClusterId, path.AttributeId)
+        cache_key: tuple[int, int, int] = (endpoint_id, path.ClusterId, path.AttributeId)
 
         # Single AttributeValue feeds both the queue (for ordered consumption) and
         # the per-attribute history list.  Matches the AttributeValue contract used
@@ -305,6 +314,7 @@ class BackgroundWildcardSubscriptionCache:
             keepSubscriptions=keepSubscriptions,
             autoResubscribe=autoResubscribe
         )
+        assert self._subscription is not None
         self._subscription.SetAttributeUpdateCallback(self.__call__)
 
         # Seed _latest_values from the priming read.  GetAttributes() returns the
