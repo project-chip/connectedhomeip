@@ -77,6 +77,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
         self.endpoint = MatterBaseTest.get_endpoint(self)
 
         # Step 1a: Test uint16 constraint validation using ColorControl clusters MoveToColorTemperature command
+        # TODO: Follow-Up PR #https://github.com/project-chip/connectedhomeip/issues/71864 to do dynamic command testing for constraints based on available commands on endpoint being tested.
         self.step("1a")
         if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.ColorControl.Commands.MoveToColorTemperature):
             try:
@@ -90,6 +91,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
                                      f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1b: Test octstr max length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
+        # TODO: Follow-Up PR #https://github.com/project-chip/connectedhomeip/issues/71864 to do dynamic command testing for constraints based on available commands on endpoint being tested.
         self.step("1b")
         if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest):
             # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
@@ -105,6 +107,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
                                      f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1c: Test octstr min length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
+        # TODO: Follow-Up PR #https://github.com/project-chip/connectedhomeip/issues/71864 to do dynamic command testing for constraints based on available commands on endpoint being tested.
         self.step("1c")
         if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest):
             # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
