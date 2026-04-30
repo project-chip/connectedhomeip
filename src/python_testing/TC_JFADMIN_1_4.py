@@ -110,7 +110,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
     ):
         if commissioning_timeout is None:
             commissioning_timeout = self.ojcw_timeout_baseline
-        log.info(f"Setting commissioning timeout to {commissioning_timeout}ms")
+        log.info(f"Setting commissioning timeout to {commissioning_timeout}s")
         cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
             commissioningTimeout=commissioning_timeout,
             PAKEPasscodeVerifier=pake_passcode_verifier,
