@@ -328,39 +328,22 @@ class CertificateAuthorityManager:
 
         return ca
 
-    def RemoveCertificateAuthority(self, ca: CertificateAuthority):
-        ''' Shuts down a CertificateAuthority and removes all of its entries from persistent storage.
+    def new_fabric_admin(self, vendorId: int, fabricId: int):
+        """
+        Create a new certificate authority with a new fabric admin.
 
-            This removes:
-            - The CA entry from the 'caList' key in repl-config
-            - The four SDK credential keys for this CA index from sdk-config
+        This is a convenience method that creates a new CertificateAuthority
+        and initializes it with a FabricAdmin with the specified vendorId and fabricId.
 
-            After this call the CA object is no longer valid and should not be used.
-        '''
-        ca_index = ca.caIndex
-        ca.Shutdown()
+        Arguments:
+            vendorId: The vendor ID for the fabric admin
+            fabricId: The fabric ID for the fabric admin
 
-        if ca in self._activeCaList:
-            self._activeCaList.remove(ca)
-
-        # Remove from repl-config caList
-        ca_list = self._persistentStorage.GetKey('caList')
-        if ca_list and str(ca_index) in ca_list:
-            del ca_list[str(ca_index)]
-            self._persistentStorage.SetKey('caList', ca_list)
-
-        # Remove SDK credential keys for this CA index
-        _SDK_KEY_PREFIXES = [
-            'ExampleCARootCert',
-            'ExampleCAIntermediateCert',
-            'ExampleOpCredsCAKey',
-            'ExampleOpCredsICAKey',
-        ]
-
-        # Keys are written by ExampleOperationalCredentialsIssuer via PERSISTENT_KEY_OP,
-        # which formats the index as lowercase hex (PRIx64).
-        for prefix in _SDK_KEY_PREFIXES:
-            self._persistentStorage.DeleteSdkKey(f'{prefix}{ca_index:x}')
+        Returns:
+            FabricAdmin: The newly created fabric admin instance
+        """
+        new_cert_auth = self.NewCertificateAuthority()
+        return new_cert_auth.NewFabricAdmin(vendorId=vendorId, fabricId=fabricId)
 
     def Shutdown(self):
         ''' Shuts down all active CertificateAuthority instances tracked by this manager, before shutting itself down.
