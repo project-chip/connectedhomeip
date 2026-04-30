@@ -64,7 +64,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace LocalTemperature {
 
-
 Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
@@ -95,7 +94,6 @@ Status Set(EndpointId endpoint, int16_t value)
 {
     return Set(endpoint, value, MarkAttributeDirty::kNo);
 }
-
 
 } // namespace LocalTemperature
 
@@ -375,7 +373,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
         return Status::Failure;
     }
     cluster->mFeatures = BitFlags<Thermostat::Feature>(value);
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits       = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -410,7 +408,7 @@ namespace PIHeatingDemand {
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 {
-     using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
