@@ -98,8 +98,6 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
     VerifyOrReturnError(bChipDevice, false);
     chip::MutableByteSpan deviceInfoSpan(reinterpret_cast<uint8_t *>(&aDeviceInfo),
                                          sizeof(chip::Ble::ChipBLEDeviceIdentificationInfo));
-
-
     bool success = _HexToBytes(aDevice["serviceData"].asString(), deviceInfoSpan);
 
     if (!success)
