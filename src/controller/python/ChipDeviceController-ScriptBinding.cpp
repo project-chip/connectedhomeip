@@ -607,7 +607,7 @@ PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::De
                                                             const char * borderAgentIPAddrStr, uint16_t borderAgentPort)
 {
 #if CHIP_SUPPORT_THREAD_MESHCOP
-    const uint32_t kDefaultDiscoveryTimeoutMsec = 1000000;
+    const uint32_t kDefaultDiscoveryTimeoutMsec = 15 * 60 * 1000; // 15 mins
     CHIP_ERROR err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, pairingDelegate, devCtrl,
                                                           kDefaultDiscoveryTimeoutMsec);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));

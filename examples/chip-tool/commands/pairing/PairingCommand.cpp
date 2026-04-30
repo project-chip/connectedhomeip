@@ -71,6 +71,20 @@ namespace {
     return CHIP_NO_ERROR;
 }
 
+class DeviceDiscoveryDelegateRegistery
+{
+public:
+    DeviceDiscoveryDelegateRegistery() = delete;
+    DeviceDiscoveryDelegateRegistery(DeviceController & controller, DeviceDiscoveryDelegate * delegate) : mController(controller)
+    {
+        mController.RegisterDeviceDiscoveryDelegate(delegate);
+    }
+    ~DeviceDiscoveryDelegateRegistery() { mController.RegisterDeviceDiscoveryDelegate(nullptr); }
+
+private:
+    DeviceController & mController;
+};
+
 } // namespace
 
 CHIP_ERROR PairingCommand::RunCommand()
@@ -342,38 +356,26 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
         }
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     if (address.GetTransportType() == Transport::Type::kThreadMeshcop && mOnboardingPayload)
     {
         SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
+        DeviceDiscoveryDelegateRegistery registery(CurrentCommissioner(), this);
         ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
-        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
         if (mPaseOnly.ValueOr(false))
         {
-            err = CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kAll, NullOptional,
-                                                                MakeOptional(meshcopParams));
+            return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kAll, NullOptional,
+                                                                 MakeOptional(meshcopParams));
         }
-        else
-        {
-            auto commissioningParams = GetCommissioningParameters();
-            err = CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, DiscoveryType::kAll,
-                                                   NullOptional, MakeOptional(meshcopParams));
-        }
-        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
+        auto commissioningParams = GetCommissioningParameters();
+        return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, DiscoveryType::kAll,
+                                                NullOptional, MakeOptional(meshcopParams));
     }
-    else
+    if (mPaseOnly.ValueOr(false))
     {
-        if (mPaseOnly.ValueOr(false))
-        {
-            err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
-        }
-        else
-        {
-            auto commissioningParams = GetCommissioningParameters();
-            err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
-        }
+        return CurrentCommissioner().EstablishPASEConnection(remoteId, params);
     }
-    return err;
+    auto commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index)
