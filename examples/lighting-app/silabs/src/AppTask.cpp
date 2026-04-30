@@ -159,7 +159,6 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         return;
     }
 
-
     sLightOn = !sLightOn;
     sLightLED.Set(sLightOn);
 
@@ -176,7 +175,8 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateOnOffClusterState, static_cast<intptr_t>(sLightOn));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateOnOffClusterState,
+                                                                           static_cast<intptr_t>(sLightOn));
 }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
@@ -450,10 +450,10 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
             VerifyOrReturn(VerifyColorControlValueSize(size, sizeof(uint16_t)));
             {
                 RGBLEDWidget::ColorData_t colorData;
-                colorData.xy = { sCurrentX, sCurrentY };
+                colorData.xy          = { sCurrentX, sCurrentY };
                 const uint16_t newVal = *reinterpret_cast<uint16_t *>(value);
-                bool const changed =
-                    (attributeId == ColorControl::Attributes::CurrentX::Id) ? (colorData.xy.x != newVal) : (colorData.xy.y != newVal);
+                bool const changed    = (attributeId == ColorControl::Attributes::CurrentX::Id) ? (colorData.xy.x != newVal)
+                                                                                                : (colorData.xy.y != newVal);
                 if (changed)
                 {
                     if (attributeId == ColorControl::Attributes::CurrentX::Id)
@@ -475,7 +475,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
             {
                 RGBLEDWidget::ColorData_t colorData;
                 colorData.hsv = { sCurrentHue, sCurrentSaturation };
-                bool changed = false;
+                bool changed  = false;
                 if (attributeId == ColorControl::Attributes::CurrentHue::Id)
                 {
                     if (colorData.hsv.h != *value)
