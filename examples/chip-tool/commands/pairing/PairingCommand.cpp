@@ -71,15 +71,15 @@ namespace {
     return CHIP_NO_ERROR;
 }
 
-class DeviceDiscoveryDelegateRegistery
+class DeviceDiscoveryDelegateRegistry
 {
 public:
-    DeviceDiscoveryDelegateRegistery() = delete;
-    DeviceDiscoveryDelegateRegistery(DeviceController & controller, DeviceDiscoveryDelegate * delegate) : mController(controller)
+    DeviceDiscoveryDelegateRegistry() = delete;
+    DeviceDiscoveryDelegateRegistry(DeviceController & controller, DeviceDiscoveryDelegate * delegate) : mController(controller)
     {
         mController.RegisterDeviceDiscoveryDelegate(delegate);
     }
-    ~DeviceDiscoveryDelegateRegistery() { mController.RegisterDeviceDiscoveryDelegate(nullptr); }
+    ~DeviceDiscoveryDelegateRegistry() { mController.RegisterDeviceDiscoveryDelegate(nullptr); }
 
 private:
     DeviceController & mController;
@@ -359,7 +359,7 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     if (address.GetTransportType() == Transport::Type::kThreadMeshcop && mOnboardingPayload)
     {
         SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
-        DeviceDiscoveryDelegateRegistery registery(CurrentCommissioner(), this);
+        DeviceDiscoveryDelegateRegistry registry(CurrentCommissioner(), this);
         ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
         if (mPaseOnly.ValueOr(false))
         {
