@@ -127,12 +127,35 @@ public:
     }
 
     /**
-     * @brief Adds a "poison key": a key that, if read/written, implies some bad
-     *        behavior occurred.
-     *
-     * @param key - Poison key to add to the set.
+     * @brief Adds a "poison key" that causes all operations on that key to fail.
      */
-    virtual void AddPoisonKey(const std::string & key) { mPoisonKeys.insert(key); }
+    virtual void AddPoisonKey(const std::string & key) { mPoisonKeys[key] = { 0, 0 }; }
+
+    /**
+     * @brief Adds a "poison key" with separate read and write success patterns.
+     *
+     * Each pattern is a bit field that controls the sequence of outcomes for successive
+     * operations on the key. The lowest bit determines the next outcome: 1 = success,
+     * 0 = failure. After each operation the pattern is arithmetically right-shifted.
+     * (This means the highest bit repeats indefinitely once all other bits have been consumed).
+     *
+     * Examples:
+     *   0          always fail
+     *   0b1        succeed once, then fail forever
+     *   0b11       succeed twice, then fail forever
+     *   0b010      fail once, succeed once, then fail forever
+     *   -1         always succeed (effectively not poisoned for this operation type)
+     *
+     * Note: Write patterns will not advance while `SetRejectWrites(true)` is in effect.
+     *
+     * @param key          Key to poison.
+     * @param readPattern  Bit pattern for read (Get) operations.
+     * @param writePattern Bit pattern for write (Set/Delete) operations.
+     */
+    virtual void AddPoisonKey(const std::string & key, int readPattern, int writePattern)
+    {
+        mPoisonKeys[key] = { readPattern, writePattern };
+    }
 
     /**
      * Allows subsequent writes to be rejected for unit testing purposes.
@@ -210,7 +233,7 @@ protected:
         VerifyOrReturnError((buffer != nullptr) || (size == 0), CHIP_ERROR_INVALID_ARGUMENT);
 
         // Making sure poison keys are not accessed
-        if (mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
+        if (IsReadPoisoned(key))
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
@@ -239,7 +262,7 @@ protected:
     virtual CHIP_ERROR SyncSetKeyValueInternal(const char * key, const void * value, uint16_t size)
     {
         // Make sure writes are allowed and poison keys are not accessed
-        if (mRejectWrites || mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
+        if (mRejectWrites || /* has side effect */ IsWritePoisoned(key))
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
@@ -265,7 +288,7 @@ protected:
     virtual CHIP_ERROR SyncDeleteKeyValueInternal(const char * key)
     {
         // Make sure writes are allowed and poison keys are not accessed
-        if (mRejectWrites || mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
+        if (mRejectWrites || /* has side effect */ IsWritePoisoned(key))
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
@@ -277,9 +300,35 @@ protected:
     }
 
     std::map<std::string, std::vector<uint8_t>> mStorage;
-    std::set<std::string> mPoisonKeys;
+
+    struct PoisonPattern
+    {
+        int read;
+        int write;
+    };
+    std::map<std::string, PoisonPattern> mPoisonKeys;
     bool mRejectWrites         = false;
     LoggingLevel mLoggingLevel = LoggingLevel::kDisabled;
+
+    // Advances and checks the given pattern. Returns true if the operation should fail.
+    static bool TakePoison(int & pattern)
+    {
+        bool poisoned = (pattern & 1) == 0;
+        pattern >>= 1; // arithmetic right shift (sign bit repeats, so -1 stays -1)
+        return poisoned;
+    }
+
+    bool IsReadPoisoned(const char * key)
+    {
+        auto it = mPoisonKeys.find(std::string(key));
+        return it != mPoisonKeys.end() && TakePoison(it->second.read);
+    }
+
+    bool IsWritePoisoned(const char * key)
+    {
+        auto it = mPoisonKeys.find(std::string(key));
+        return it != mPoisonKeys.end() && TakePoison(it->second.write);
+    }
 };
 
 } // namespace chip
