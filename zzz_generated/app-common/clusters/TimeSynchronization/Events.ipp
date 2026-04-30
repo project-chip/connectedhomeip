@@ -51,7 +51,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace DSTTableEmpty.
+} // namespace DSTTableEmpty
 namespace DSTStatus {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -82,7 +82,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace DSTStatus.
+} // namespace DSTStatus
 namespace TimeZoneStatus {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -118,7 +118,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace TimeZoneStatus.
+} // namespace TimeZoneStatus
 namespace TimeFailure {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -140,7 +140,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace TimeFailure.
+} // namespace TimeFailure
 namespace MissingTrustedTimeSource {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -162,7 +162,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MissingTrustedTimeSource.
+} // namespace MissingTrustedTimeSource
 } // namespace Events
 } // namespace TimeSynchronization
 } // namespace Clusters

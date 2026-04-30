@@ -111,7 +111,7 @@ CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
  *
  *
  * If the vehicle ID can be retrieved (e.g. over Powerline)
- *   dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_123456789"));
+ *   dg->HwSetVehicleID("TEST_VEHICLE_123456789"_span);
  *
  *
  * If the EVSE has an RFID sensor, the RFID value read can cause an event to be sent
@@ -458,7 +458,7 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
 
     status = PowerSource::Attributes::WiredCurrentType::Set(endpointId, PowerSource::WiredCurrentTypeEnum::kAc);
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::Description::Set(endpointId, CharSpan::fromCharString("Primary Mains Power"));
+    status = PowerSource::Attributes::Description::Set(endpointId, "Primary Mains Power"_span);
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
 
     chip::EndpointId endpointArray[] = { endpointId };

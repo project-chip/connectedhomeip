@@ -329,7 +329,8 @@ public:
     CHIP_ERROR RemoveGroupKeySetEntry(uint16_t groupKeySetId);
     CHIP_ERROR UpdateGroupKeySetEntry(Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet);
 
-    CHIP_ERROR AddAdmin(Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & adminId);
+    CHIP_ERROR
+    AddAdmin(const Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & adminId);
     bool IsAdminEntryPresent(NodeId nodeId);
     CHIP_ERROR UpdateAdmin(NodeId nodeId, CharSpan friendlyName, ByteSpan icac);
     CHIP_ERROR RemoveAdmin(NodeId nodeId);

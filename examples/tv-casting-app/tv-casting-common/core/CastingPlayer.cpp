@@ -342,16 +342,26 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
 {
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
                     support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
-    VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mIdOptions.resetState();
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    mTargetCastingPlayer = weak_from_this();
+    mIdOptions.LogDetail();
+
+    // hack to re-populate mUdcClients cache on TV in order to allow cancel to pass through
+    mIdOptions.mCommissionerPasscode      = true;
+    mIdOptions.mNoPasscode                = true;
+    mIdOptions.mCancelPasscode            = false;
+    mIdOptions.mCommissionerPasscodeReady = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    err = SendUserDirectedCommissioningRequest();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::StopConnecting() hack failed with %" CHIP_ERROR_FORMAT, err.Format());
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
     mIdOptions.mCancelPasscode     = true;
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    mTargetCastingPlayer.reset();
-    CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
-
     if (!shouldSendIdentificationDeclarationMessage)
     {
         ChipLogProgress(AppServer,
@@ -601,10 +611,33 @@ void CastingPlayer::LogDetail() const
 }
 
 CastingPlayer::CastingPlayer(const CastingPlayer & other) :
-    std::enable_shared_from_this<CastingPlayer>(other), mEndpoints(other.mEndpoints), mConnectionState(other.mConnectionState),
-    mAttributes(other.mAttributes), mIdOptions(other.mIdOptions),
-    mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec), mOnCompleted(other.mOnCompleted)
-{}
+    std::enable_shared_from_this<CastingPlayer>(other), mConnectionState(other.mConnectionState), mAttributes(other.mAttributes),
+    mIdOptions(other.mIdOptions), mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec),
+    mOnCompleted(other.mOnCompleted)
+{
+    ChipLogProgress(AppServer, "CastingPlayer::CastingPlayer(copy) deep-copying %u endpoint(s) from other=%p to this=%p",
+                    static_cast<unsigned int>(other.mEndpoints.size()), static_cast<const void *>(&other),
+                    static_cast<void *>(this));
+
+    // Create new Endpoint objects instead of sharing them, so that each Endpoint's
+    // mCastingPlayer raw pointer points to *this* CastingPlayer (not `other`).
+    // Sharing Endpoint shared_ptrs would leave their mCastingPlayer pointing to `other`,
+    // which becomes a dangling pointer when `other` is destroyed (e.g. when
+    // CastingStore::ReadAll() returns a std::list<CastingPlayer> by value).
+    mEndpoints.reserve(other.mEndpoints.size());
+    for (const auto & endpoint : other.mEndpoints)
+    {
+        EndpointAttributes attrs;
+        attrs.mId             = endpoint->GetId();
+        attrs.mVendorId       = endpoint->GetVendorId();
+        attrs.mProductId      = endpoint->GetProductId();
+        attrs.mDeviceTypeList = endpoint->GetDeviceTypeList();
+
+        auto newEndpoint = std::make_shared<Endpoint>(this, attrs);
+        newEndpoint->RegisterClusters(endpoint->GetServerList());
+        mEndpoints.push_back(newEndpoint);
+    }
+}
 
 CastingPlayer & CastingPlayer::operator=(const CastingPlayer & other)
 {
@@ -712,6 +745,8 @@ void CastingPlayer::OnCommissioningSessionStarted()
 void CastingPlayer::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "CastingPlayer::OnCommissioningSessionEstablishmentError() err: %" CHIP_ERROR_FORMAT, err.Format());
+    mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+    LogErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(false));
     if (mOnCompleted != nullptr)
     {
         // err = 0x38 = CHIP_ERROR_INVALID_PASE_PARAMETER upon bad passcode

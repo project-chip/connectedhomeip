@@ -17,30 +17,29 @@
 import json
 import logging
 import os
+import shlex
 import sys
 
 import click
 import coloredlogs
-from builders.builder import BuilderOptions
+from builders.builder import BuilderOptions, BuildProfile
 from runner import PrintOnlyRunner, ShellRunner
+from runner.shell import SubcommandException
 
 import build
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+log = logging.getLogger(__name__)
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
-
-
-def CommaSeparate(items) -> str:
-    return ', '.join([x for x in items])
 
 
 def ValidateRepoPath(context, parameter, value):
@@ -84,11 +83,21 @@ def ValidateTargetNames(context, parameter, values):
     is_flag=True,
     help='Pass verbose flag to ninja.')
 @click.option(
+    '--quiet',
+    default=False,
+    is_flag=True,
+    help='Pass quiet flag to ninja.')
+@click.option(
     '--target',
     default=[],
     multiple=True,
     callback=ValidateTargetNames,
     help='Build target(s)')
+@click.option(
+    "--build-profile",
+    default=BuildProfile.DEFAULT,
+    type=click.Choice(BuildProfile, case_sensitive=False),
+    help="The build profile to use.")
 @click.option(
     '--enable-link-map-file',
     default=False,
@@ -137,23 +146,21 @@ def ValidateTargetNames(context, parameter, values):
     type=click.File("wt"),
     help='Where to write the dry run output')
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--pw-command-launcher',
+    default=None,
     help=(
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, verbose, target, enable_link_map_file, repo,
+def main(context, log_level, verbose, quiet, target, build_profile, enable_link_map_file, repo,
          out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
-         enable_flashbundle, no_log_timestamps, pw_command_launcher):
+         enable_flashbundle, log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if 'PW_PROJECT_ROOT' not in os.environ:
@@ -170,12 +177,13 @@ before running this script.
         runner = ShellRunner(root=repo)
 
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, verbose=verbose,
+        repository_path=repo, output_prefix=out_prefix, verbose=verbose, quiet=quiet,
         ninja_jobs=ninja_jobs, runner=runner
     )
 
-    requested_targets = set([t.lower() for t in target])
+    requested_targets = {t.lower() for t in target}
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
+        build_profile=build_profile,
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,
@@ -242,7 +250,11 @@ def cmd_targets(context, format, completion_prefix):
     help='Prefix of compressed archives of the generated files.')
 @click.pass_context
 def cmd_build(context, copy_artifacts_to, create_archives):
-    context.obj.Build()
+    try:
+        context.obj.Build()
+    except SubcommandException as e:
+        log.error("Command '%s' failed with error code %d", shlex.join(e.command), e.returncode)
+        sys.exit(1)
 
     if copy_artifacts_to:
         context.obj.CopyArtifactsTo(copy_artifacts_to)

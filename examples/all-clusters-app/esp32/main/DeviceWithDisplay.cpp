@@ -27,6 +27,7 @@
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 #include <string>
@@ -234,7 +235,8 @@ public:
             {
                 // update the current humidity here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
-                app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(
+                    1, app::DataModel::MakeNullable(static_cast<uint16_t>(n * 100))));
             }
             else if (name == "CoolSetpoint")
             {
@@ -725,7 +727,8 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Humidity Sensor");
     AddAttribute("Humidity", "30");
-    app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+    LogErrorOnFailure(
+        app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(1, app::DataModel::MakeNullable<uint16_t>(30 * 100)));
 
     AddDevice("Light Sensor");
     AddEndpoint("External");

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemClock.h>
 

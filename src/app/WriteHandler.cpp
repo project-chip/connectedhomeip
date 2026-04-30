@@ -40,6 +40,7 @@
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/raw/GroupcastTesting.h>
 
 #include <optional>
 
@@ -503,6 +504,15 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             }
 
             dataAttributePath.mEndpointId = mapping.endpoint_id;
+            // Groupcast Testing
+            auto & testing = Groupcast::GetTesting();
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
+            {
+                testing.SetGroupID(groupId);
+                testing.SetEndpointID(dataAttributePath.mEndpointId);
+                testing.SetClusterID(dataAttributePath.mClusterId);
+                testing.SetElementID(static_cast<uint32_t>(dataAttributePath.mAttributeId));
+            }
 
             // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
             // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report
@@ -891,10 +901,8 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     DataModel::ActionReturnStatus status = CheckWriteAllowed(aSubject, aPath);
     if (status.IsSuccess())
     {
-        DataModel::WriteAttributeRequest request;
+        DataModel::WriteAttributeRequest request(aPath, aSubject);
 
-        request.path              = aPath;
-        request.subjectDescriptor = &aSubject;
         request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
         AttributeValueDecoder decoder(aData, aSubject);

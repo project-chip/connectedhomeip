@@ -86,9 +86,7 @@ struct TestICDMonitoringTable : public ::testing::Test
         EXPECT_GE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::ICDKeyRangeStart));
         EXPECT_LE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::Maximum));
 #else
-        EXPECT_EQ(memcmp(saved.As<Crypto::Symmetric128BitsKeyByteArray>(), loaded.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                         sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-                  0);
+        EXPECT_TRUE(saved.OpaqueBytes().data_equal(loaded.OpaqueBytes()));
 #endif
     }
 };

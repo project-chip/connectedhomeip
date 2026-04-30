@@ -476,31 +476,67 @@ bool PushAVTransport::ValidateZoneAndSensitivity(
     return false;
 }
 
-void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason, int zoneId, int sensitivity)
+void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason, const std::vector<int> & zoneIds,
+                                       int sensitivity)
 {
-    ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneId: [%d], Sensitivity: [%d]",
-                    (uint16_t) activationReason, zoneId, sensitivity);
+    ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneIds count: [%zu], Sensitivity: [%d]",
+                    (uint16_t) activationReason, zoneIds.size(), sensitivity);
 
-    mCurrentActivationByManualTrigger = (zoneId == kInvalidZoneId) ? true : false;
+    // Handle edge case where zoneIds is empty
+    if (zoneIds.empty())
+    {
+        ChipLogProgress(Camera, "PushAVTransport trigger transport ignored - empty zoneIds list provided");
+        return;
+    }
+
+    // For a single motion event with multiple zones, we need to check if any zone should trigger
+    bool shouldProcessTrigger = false;
+    bool hasManualTrigger     = false;
+
+    // Check if this is a manual trigger (invalid zone ID)
+    for (int zoneId : zoneIds)
+    {
+        if (zoneId == kInvalidZoneId)
+        {
+            hasManualTrigger = true;
+            break;
+        }
+    }
+
+    mCurrentActivationByManualTrigger = hasManualTrigger;
     mActivationReason                 = chip::MakeOptional(activationReason);
 
     // Check if trigger should be processed based on transport type
-    bool shouldProcessTrigger = false;
-
     if (mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
     {
         shouldProcessTrigger = true;
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
     {
-        shouldProcessTrigger =
-            mCurrentActivationByManualTrigger || ValidateZoneAndSensitivity(mZoneSensitivityList, zoneId, sensitivity);
+        // For motion triggers, check if any zone in the list should trigger
+        if (hasManualTrigger)
+        {
+            shouldProcessTrigger = true;
+        }
+        else
+        {
+            // Check if any zone in the list passes validation
+            for (int zoneId : zoneIds)
+            {
+                if (ValidateZoneAndSensitivity(mZoneSensitivityList, zoneId, sensitivity))
+                {
+                    shouldProcessTrigger = true;
+                    break;
+                }
+            }
+        }
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
     {
         ChipLogProgress(Camera, "PushAVTransport continuous transport trigger received. No action needed");
         return;
     }
+
     // Process the trigger if conditions are met
     if (shouldProcessTrigger)
     {

@@ -37,6 +37,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "init_OTARequestor.h"
 #endif
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 using namespace ::chip;
@@ -101,8 +102,8 @@ void asr_matter_sensors(bool enable, int temp, int humi, int pressure)
         LogErrorOnFailure(
             chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, static_cast<int16_t>(temp)));
 
-        chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
-            /* endpoint ID */ 1, static_cast<int16_t>(humi));
+        LogErrorOnFailure(chip::app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(
+            /* endpoint ID */ 1, chip::app::DataModel::MakeNullable(static_cast<uint16_t>(humi))));
 
         chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::Set(
             /* endpoint ID */ 1, static_cast<int16_t>(pressure));

@@ -389,22 +389,11 @@ def run_tests_no_exit(
         bool: True if all tests passed, False otherwise
     """
 
-    # Lazy import to avoid circular dependency
-    from typing import TYPE_CHECKING
-
+    from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.matter_stack_state import MatterStackState
-    if TYPE_CHECKING:
-        from matter.testing.commissioning import CommissionDeviceTest
-    else:
-        CommissionDeviceTest = None  # Initial placeholder
 
-    # Actual runtime import
-    if CommissionDeviceTest is None:
-        from matter.testing.commissioning import CommissionDeviceTest
-
-    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
-    #       Mobly deep copies the user params before passing them to the test class and the event
-    #       loop is not serializable. So, we are setting the event loop as a test class member.
+    # Mobly deep-copies user_params, so the asyncio event loop cannot be passed
+    # through TestRunConfig. Attach it directly to the test classes instead.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 

@@ -163,15 +163,15 @@ TEST_F(TestResourceMonitoringCluster, ReadAttributeTest)
 
     auto it = replacementProductList.begin();
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_0")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_0"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_1")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_1"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_2")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_2"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_3")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_3"_span));
     ASSERT_TRUE(it.Next());
-    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_4")));
+    ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_4"_span));
 
     ASSERT_FALSE(it.Next());
 }
