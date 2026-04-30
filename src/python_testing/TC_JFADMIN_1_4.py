@@ -64,8 +64,8 @@ log = logging.getLogger(__name__)
 
 class TC_JFADMIN_1_4(MatterBaseTest):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
-    _OJCW_TIMEOUT_SPEC = 180 # Minimum timeout allowed by the spec, required by the test plan
-    _OJCW_TIMEOUT_CI = 15 # Lower than spec to keep CI fast
+    _OJCW_TIMEOUT_SPEC = 180  # Minimum timeout allowed by the spec, required by the test plan
+    _OJCW_TIMEOUT_CI = 15  # Lower than spec to keep CI fast
     # TODO: Seems like the OJCW Discriminator should be randomized, but the test plan explicitly requires this number.
     _DEFAULT_OJCW_DISCRIMINATOR = 3839
     _DEFAULT_OJCW_ITERATIONS = 2000
@@ -359,7 +359,8 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         await self.sleep_until_ojcw_expires()
         responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
-            len(responses), 0, f"DUT should have stopped advertising commissioning service with discriminator {self._DEFAULT_OJCW_DISCRIMINATOR}"
+            len(
+                responses), 0, f"DUT should have stopped advertising commissioning service with discriminator {self._DEFAULT_OJCW_DISCRIMINATOR}"
         )
 
         self.step("5")
@@ -452,7 +453,8 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         await self.sleep_until_ojcw_expires()
         responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
-            len(responses), 0, f"DUT should have stopped advertising commissioning service with discriminator {self._DEFAULT_OJCW_DISCRIMINATOR}"
+            len(
+                responses), 0, f"DUT should have stopped advertising commissioning service with discriminator {self._DEFAULT_OJCW_DISCRIMINATOR}"
         )
 
         self.step("18")
@@ -469,7 +471,8 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         await self.sleep_until_ojcw_expires()
         responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
-            len(responses), 0, f"DUT should have stopped advertising commissioning service with discriminator {self._DEFAULT_OJCW_DISCRIMINATOR}"
+            len(
+                responses), 0, f"DUT should have stopped advertising commissioning service with discriminator {self._DEFAULT_OJCW_DISCRIMINATOR}"
         )
 
 
