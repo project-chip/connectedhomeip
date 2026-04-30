@@ -20,6 +20,7 @@
 
 #include <cstring>
 
+#include <controller/python/matter/native/ChipMainLoopWork.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/TypeTraits.h>
@@ -135,16 +136,18 @@ PyChipError pychip_case_capture_set_observer(chip::Controller::DeviceCommissione
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    if (devCtrl->ExchangeMgr()->GetTestOnlyReceivedMessageObserver() != &gCaseObserver)
-    {
-        devCtrl->ExchangeMgr()->SetTestOnlyReceivedMessageObserver(&gCaseObserver);
-    }
+    chip::MainLoopWork::ExecuteInMainLoop([devCtrl] {
+        if (devCtrl->ExchangeMgr()->GetTestOnlyReceivedMessageObserver() != &gCaseObserver)
+        {
+            devCtrl->ExchangeMgr()->SetTestOnlyReceivedMessageObserver(&gCaseObserver);
+        }
+    });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_case_capture_reset(void)
 {
-    gCaseObserver.ResetSlots();
+    chip::MainLoopWork::ExecuteInMainLoop([] { gCaseObserver.ResetSlots(); });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -153,7 +156,7 @@ PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out)
     VerifyOrReturnError(out != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
     std::memset(out, 0, sizeof(*out));
-    gCaseObserver.FillSnapshot(*out);
+    chip::MainLoopWork::ExecuteInMainLoop([out] { gCaseObserver.FillSnapshot(*out); });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
