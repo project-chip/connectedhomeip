@@ -26,6 +26,7 @@
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
+#include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
@@ -149,6 +150,8 @@ private:
                         .timerDelegate     = mContext->timerDelegate,
             });
         };
+        mRegistry["soil-sensor"]        = []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); };
+        mRegistry["temperature-sensor"] = []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); };
     }
 };
 
