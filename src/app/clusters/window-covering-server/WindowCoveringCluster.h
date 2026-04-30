@@ -44,7 +44,11 @@ typedef DataModel::Nullable<uint16_t> NAbsolute;
 typedef Optional<Percent> OPercent;
 typedef Optional<Percent100ths> OPercent100ths;
 
-using OptionalAttributeSet = app::OptionalAttributeSet<Attributes::SafetyStatus::Id>;
+using OptionalAttributeSet = app::OptionalAttributeSet<Attributes::NumberOfActuationsLift::Id,
+                                                        Attributes::NumberOfActuationsTilt::Id,
+                                                        Attributes::CurrentPositionLiftPercentage::Id,
+                                                        Attributes::CurrentPositionTiltPercentage::Id,
+                                                        Attributes::SafetyStatus::Id>;
 
 // Match directly with OperationalStatus 2 bits Fields
 enum class OperationalState : uint8_t
@@ -74,20 +78,44 @@ struct AbsoluteLimits
     uint16_t closed;
 };
 
-struct Config
-{
-    Type type;
-    chip::BitMask<ConfigStatus> configStatus;
-    chip::BitMask<OperationalStatus> operationalStatus;
-    EndProductType endProductType;
-    chip::BitMask<Mode> mode;
-};
-
 class WindowCoveringCluster : public DefaultServerCluster
 {
 public:
-    WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
-                          OptionalAttributeSet & optionalAttributeSet, Config & config);
+    struct Config
+    {
+        Config & WithLift()
+        {
+            mFeatures.Set(Feature::kLift);
+            return *this;
+        }
+        Config & WithTilt()
+        {
+            mFeatures.Set(Feature::kTilt);
+            return *this;
+        }
+        Config & WithPositionAwareLift()
+        {
+            mFeatures.Set(Feature::kLift);
+            mFeatures.Set(Feature::kPositionAwareLift);
+            return *this;
+        }
+        Config & WithPositionAwareTilt()
+        {
+            mFeatures.Set(Feature::kTilt);
+            mFeatures.Set(Feature::kPositionAwareTilt);
+            return *this;
+        }
+        Config & WithAbsolutePosition()
+        {
+            mFeatures.Set(Feature::kAbsolutePosition);
+            return *this;
+        }
+
+        BitFlags<Feature> mFeatures;
+        OptionalAttributeSet mOptionalAttributes;
+    };
+
+    WindowCoveringCluster(EndpointId endpointId, const Config & config);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -214,12 +242,6 @@ public:
     Delegate * GetDelegate() const { return mDelegate; }
 
 private:
-    /**
-     * @brief Updates ConfigStatus to reflect the current Mode.
-     *        Called after mMode is committed.
-     */
-    void UpdateConfigStatusFromMode();
-
     /**
      * @brief Computes the motion lock status from the current Mode and ConfigStatus members.
      *
