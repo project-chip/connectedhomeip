@@ -70,6 +70,10 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
+    // Close WebRTC connections before CameraAppShutdown and PlatformMgr().Shutdown() to ensure WebRTC callbacks (such as
+    // WebRTCProviderManager::OnConnectionStateChanged) can still use the SystemLayer.
+    gCameraDevice.Shutdown();
+
     CameraAppShutdown();
 
     TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();

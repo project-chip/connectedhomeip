@@ -20,9 +20,9 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 namespace {
-#if defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_1_PIN)
+#if defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_3_PIN)
 bool ps_requirement_added = false;
-#endif // defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_1_PIN)
+#endif // defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_3_PIN)
 } // namespace
 
 #ifdef __cplusplus
@@ -54,7 +54,7 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
         // BTN_0 is pressed
         // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
         // control to scheduler, the PIN is unmasked in the power manager flow before going to sleep
-        status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
+        status = sl_si91x_gpio_driver_mask_set_uulp_npss_interrupt(pin_intr);
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
 }
@@ -102,9 +102,9 @@ inline void sl_si91x_btn_event_handler()
 void sl_si91x_uart_power_requirement_handler()
 {
 #ifdef ENABLE_CHIP_SHELL
-#ifdef RTE_UULP_GPIO_1_PIN
-    // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
-    if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_1_PIN))
+#ifdef RTE_UULP_GPIO_3_PIN
+    // Checking the UULP PIN 3 status to reinit the UART and not allow the device to go to sleep
+    if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_3_PIN))
     {
         if (!ps_requirement_added)
         {
@@ -120,7 +120,7 @@ void sl_si91x_uart_power_requirement_handler()
             ps_requirement_added = false;
         }
     }
-#endif // RTE_UULP_GPIO_1_PIN
+#endif // RTE_UULP_GPIO_3_PIN
 #endif // ENABLE_CHIP_SHELL
 }
 

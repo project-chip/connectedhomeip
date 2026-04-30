@@ -19,6 +19,8 @@ from enum import Enum, auto
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
 
 class TelinkLogLevel(Enum):
     DEFAULT = auto()  # default everything
@@ -213,8 +215,7 @@ class TelinkBuilder(Builder):
         return cmd
 
     def generate(self):
-        if os.path.exists(self.output_dir):
-            return
+        os.makedirs(self.output_dir, exist_ok=True)
 
         flags = []
         if self.enable_ota:
@@ -287,7 +288,7 @@ class TelinkBuilder(Builder):
                       title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling Telink at %s', self.output_dir)
+        log.info('Compiling Telink at %s', self.output_dir)
 
         cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
 

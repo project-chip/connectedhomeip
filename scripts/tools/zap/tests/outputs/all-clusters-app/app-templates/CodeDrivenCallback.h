@@ -44,9 +44,17 @@ void MatterAccessControlClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAccessControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterActionsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterActionsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterOtaSoftwareUpdateRequestorClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterLocalizationConfigurationClusterInitCallback(chip::EndpointId endpointId);
 
@@ -120,6 +128,14 @@ void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterTemperatureControlClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTemperatureControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterAirQualityClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterAirQualityClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterScenesManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterScenesManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -160,6 +176,18 @@ void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId, Mat
 void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterTemperatureMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTemperatureMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterFlowMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterFlowMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterRelativeHumidityMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterRelativeHumidityMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 

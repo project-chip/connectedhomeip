@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2025 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+from __future__ import annotations
+
 import asyncio
 import inspect
 import json
@@ -28,7 +30,7 @@ import subprocess
 import textwrap
 import time
 import typing
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from enum import IntFlag
 from typing import Any, Callable, List, Optional, Type, Union
@@ -74,6 +76,8 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
+
+_SUMMARY_MAX_HEX_CHARS = 128
 
 
 class TestError(Exception):
@@ -172,7 +176,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, list[TestStep]] = {}
+        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -237,7 +241,66 @@ class MatterBaseTest(base_test.BaseTestClass):
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
+        self._log_execution_parameters_summary()
         super().teardown_class()
+
+    def _format_summary_value(self, key: str, value: Any) -> str:
+        """Format values for end-of-test summary logs."""
+        if isinstance(value, bytes):
+            hex_value = value.hex()
+            if len(hex_value) > _SUMMARY_MAX_HEX_CHARS:
+                return f"0x{hex_value[:_SUMMARY_MAX_HEX_CHARS]}... (truncated, {len(value)} bytes)"
+            return f"0x{hex_value}"
+        if isinstance(value, list) and len(value) > 8:
+            head = ", ".join(repr(v) for v in value[:5])
+            return f"[{head}, ...] (len={len(value)})"
+        if key == "pics" and isinstance(value, dict):
+            return "Please request if needed"
+        return repr(value)
+
+    def _log_execution_parameters_summary(self):
+        """Log execution parameters at test end to aid result triage."""
+        try:
+            meta = asdict(self.matter_test_config)
+        except Exception as ex:
+            LOGGER.warning("Unable to collect execution parameter summary: %s", ex)
+            return
+
+        config_fields: dict[str, Any] = {}
+        for key, value in meta.items():
+            if key == "global_test_params":
+                continue
+            if isinstance(value, os.PathLike):
+                value = os.fspath(value)
+            if value in (None, [], {}, ""):
+                continue
+            config_fields[key] = value
+
+        named_args: dict[str, Any] = {}
+        for key, value in self.matter_test_config.global_test_params.items():
+            if key == "meta_config":
+                continue
+            if value in (None, [], {}, ""):
+                continue
+            named_args[key] = value
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY BEGIN =====")
+
+        if config_fields:
+            LOGGER.info("Config values:")
+            for key in sorted(config_fields.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, config_fields[key]))
+
+        if named_args:
+            LOGGER.info("\n\nNamed args:")
+            for key in sorted(named_args.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, named_args[key]))
+
+        if self.is_pics_sdk_ci_only:
+            test_name = self.__class__.__name__
+            LOGGER.info(f"===== PICS_SDK_CI_ONLY is enabled (True) for test '{test_name}'.")
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
 
     def _dump_device_attributes_on_failure(self):
         """
@@ -557,18 +620,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
-        """Retrieves test steps from a 'steps_*' function, using a cache."""
-        steps_name = f'steps_{test.removeprefix("test_")}'
+        """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
+
+        Checks for an explicit steps_* method first. If none exists, falls back to
+        extracting steps from self.step() calls in the test method's source code.
+
+        Returns None if no steps are defined by either mechanism.
+        """
         if test in self.cached_steps:
             return self.cached_steps[test]
 
-        try:
-            fn = getattr(self, steps_name)
-            steps = fn()
-            self.cached_steps[test] = steps
-            return fn()
-        except AttributeError:
-            return None
+        steps = None
+        if steps_method := getattr(self, 'steps_' + test.removeprefix('test_'), None):
+            steps = steps_method()
+        else:
+            test_method = getattr(self, test)
+            from matter.testing.step_extractor import extract_steps_from_method
+            steps = extract_steps_from_method(test_method) or None
+
+        self.cached_steps[test] = steps
+        return steps
 
     def get_restart_flag_file(self) -> Optional[str]:
         if self.matter_test_config.restart_flag_file is None:
@@ -588,27 +659,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> Optional[list[str]]:
-        """Retrieve PICS list from a 'pics_*' function if it exists.
+        """Retrieve PICS list from a 'pics_*' function or @pics decorator.
+
+        The pics_* method takes precedence over the @pics decorator.
 
         Args:
             test: Name of the test to get PICS for.
 
         Returns:
-            List of PICS strings if pics function exists, None otherwise.
+            List of PICS strings if pics function or decorator exists, None otherwise.
         """
-        steps_name = f'pics_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, steps_name)
-            return fn()
-        except AttributeError:
-            return None
+        if pics_method := getattr(self, 'pics_' + test.removeprefix('test_'), None):
+            return pics_method()
+        test_method = getattr(self, test)
+        return getattr(test_method, '_pics', None)  # set by @pics
 
     def get_test_desc(self, test: str) -> str:
         ''' Returns a description of this test
 
-            Test description is defined in the function called desc_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            desc_TC_TEST_1_1.
+            Test description is defined in the function called desc_<functionname>,
+            or as a docstring on the test method itself.
+            The desc_* method takes precedence if both are defined.
 
             Format:
             <Test plan reference> [<test plan number>] <test plan name>
@@ -616,12 +687,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = f'desc_{test.removeprefix("test_")}'
-        try:
-            fn = getattr(self, desc_name)
-            return fn()
-        except AttributeError:
-            return test
+        if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
+            return desc_method()
+        test_method = getattr(self, test)
+        if doc := test_method.__doc__:
+            return doc.strip()
+        return test
 
     #
     # Matter Test API - Step Management & Execution
@@ -629,17 +700,30 @@ class MatterBaseTest(base_test.BaseTestClass):
     # These methods are used to mark test progress for the test harness and logs, to help with test
     # debugging, issue creation and log analysis by the test labs.
 
-    def step(self, step: typing.Union[int, str]):
+    def step(self, step: typing.Union[int, str], description: str = "", *,
+             is_commissioning: bool = False, expectation: str = ""):
         """Execute a test step and manage step progression.
 
         Validates step order, prints step information, and notifies runner hooks.
 
         Args:
             step: The step number or identifier to execute.
+            description: Step description for inline step definitions.
+                Should always be provided (not empty) when any keyword arguments
+                (is_commissioning, expectation) are passed.
+            is_commissioning: Mark this step as the commissioning step (keyword-only).
+            expectation: Expected outcome for test plan generation (keyword-only).
+
+            All arguments to step() must be constants for automatic extraction of
+            the test step list to work. If dynamic step() parameters are required
+            an explicit `steps_` method must be defined.
 
         Raises:
             AssertionError: If steps are called out of order or step doesn't exist.
         """
+        # description, is_commissioning, and expectation are not used at runtime.
+        # They exist so the AST step extractor can read them from source code to
+        # build the step list without needing a separate steps_* method.
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
@@ -1511,15 +1595,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             try:
                 # Create the restart flag file to signal the test runner
+                # Allow for multiple reboots like SW update tests do using the "restart" mode
+                restart_text = "restart"
                 with open(restart_flag_file, "w") as f:
-                    f.write("restart")
+                    f.write(restart_text)
                 LOGGER.info("Created restart flag file to signal app reboot")
 
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-
-                # Expire sessions and re-establish connections
+                # Expire sessions before the monitor picks up the flag
                 self._expire_sessions_on_all_controllers()
-                LOGGER.info("App restart completed successfully")
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_text)
+
+                LOGGER.info("App reboot completed successfully")
 
             except Exception as e:
                 LOGGER.error(f"Failed to reboot app: {e}")
@@ -1559,16 +1646,26 @@ class MatterBaseTest(base_test.BaseTestClass):
                     f.write(restart_flag_text)
                     LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
 
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
                 LOGGER.info("%s request sent successfully", restart_flag_text.capitalize())
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_flag_text)
 
             except Exception as e:
                 err = f"Failed to {restart_flag_text}: {e}"
                 LOGGER.error(err)
                 asserts.fail(err)
+
+    async def wait_for_restart_flag_file_removal(self, restart_flag_file, restart_flag_text, timeout_sec=30.0):
+        # Wait for the monitor thread to remove the flag file
+        # The monitor deletes the flag file AFTER the restart completes, so this ensures
+        # the app has fully rebooted and is ready before we continue
+        start_time = time.time()
+        while os.path.exists(restart_flag_file):
+            if time.time() - start_time > timeout_sec:
+                asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
+            await asyncio.sleep(0.1)
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):

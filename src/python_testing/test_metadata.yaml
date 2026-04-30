@@ -13,22 +13,6 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
-    - name: TC_AVSM_2_18.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
-    - name: TC_AVSM_2_19.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
-    - name: TC_AVSM_2_20.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
-    - name: TC_AVSM_2_21.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
     - name: TC_BRBINFO_3_1.py
       reason:
           Attribute is not implemented in the bridge app. Same code as
@@ -93,12 +77,6 @@ not_automated:
       reason: Shared code for TC_SETRF, not a standalone test
     - name: TC_SUTestBase.py
       reason: Shared code for TC_SU, not a standalone test
-    - name: TC_SU_2_2.py
-      reason: Test takes around 10 minutes, skipped in CI. Works on CI if added.
-    - name: TC_SU_2_7.py
-      reason:
-          Test is skipped as it takes around 15 minutes to complete. Works on CI
-          if added.
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -184,36 +162,8 @@ not_automated:
       reason:
           No existing app corresponding to the test content (NFC-based
           onboarding data security requirements)
-    - name: TC_GCAST_common.py
-      reason: Shared code for TC_GCAST, not a standalone test.
-    - name: TC_GCAST_2_2.py
-      reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
-    - name: TC_GCAST_2_3.py
-      reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
-    - name: TC_GCAST_2_4.py
-      reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
-    - name: TC_GCAST_2_5.py
-      reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
-    - name: TC_GCAST_2_7.py
-      reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
-    - name: TC_GCAST_2_8.py
-      reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
-    - name: TC_ACL_2_10.py
-      reason:
-          Flaky, see
-          https://github.com/project-chip/connectedhomeip/issues/43056
+    - name: TC_GC_common.py
+      reason: Shared code for TC_GC, not a standalone test.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
@@ -221,12 +171,10 @@ not_automated:
 slow_tests:
     - { name: mobile-device-test.py, duration: 3 minutes }
     - { name: TC_AccessChecker.py, duration: 15 minutes }
-    - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
     - { name: TC_CADMIN_1_3_4.py, duration: 4 minutes }
     - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
     - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
     - { name: TC_CADMIN_1_9.py, duration: 40 seconds }
-    - { name: TC_CC_2_2.py, duration: 1.5 minutes }
     - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }
     - { name: TC_DEM_2_10.py, duration: 40 seconds }
     - { name: TC_DeviceBasicComposition.py, duration: 9 minutes }
@@ -234,7 +182,6 @@ slow_tests:
     - { name: TC_DRLK_2_3.py, duration: 30 seconds }
     - { name: TC_EEVSE_2_6.py, duration: 30 seconds }
     - { name: TC_FAN_3_1.py, duration: 15 seconds }
-    - { name: TC_JFPKI_2_4.py, duration: 5 minutes }
     - { name: TC_MCORE_FS_1_4.py, duration: 20 seconds }
     - { name: TC_OPSTATE_2_5.py, duration: 1.25 minutes }
     - { name: TC_OPSTATE_2_6.py, duration: 35 seconds }
@@ -247,5 +194,12 @@ slow_tests:
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
-    - { name: TC_CADMIN_1_27.py, duration: 30 seconds }
-    - { name: TC_CADMIN_1_28.py, duration: 30 seconds }
+    - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
+    - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
+nightly:
+    - { name: TC_SU_2_2.py, duration: 10 minutes }
+    - { name: TC_SU_2_5.py, duration: 20 minutes }
+    - { name: TC_SU_2_7.py, duration: 25 minutes }
+    - { name: TC_CC_2_2.py, duration: 2.5 minutes }
+    - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }
+    - { name: TC_JFADMIN_1_4.py, duration: 5 minutes }

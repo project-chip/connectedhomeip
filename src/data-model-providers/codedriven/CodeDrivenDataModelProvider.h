@@ -89,7 +89,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & out) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) override;

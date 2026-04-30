@@ -31,12 +31,14 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <zap-generated/gen_config.h>
 
-namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
+namespace {
 SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * EEMFirstInstance = nullptr;
 
 inline void RegisterLegacyEEM(SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * inst)
@@ -70,19 +72,14 @@ inline void UnregisterLegacyEEM(SingleLinkedListNode<ElectricalEnergyMeasurement
     }
 }
 
+// Default empty accuracy used at construction time; real values are set later via SetMeasurementAccuracy.
+const MeasurementAccuracyStruct::Type kDefaultAccuracy = {};
 } // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
 ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
@@ -91,6 +88,7 @@ ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(Bit
         .endpointId         = endpointId,
         .featureFlags       = aFeature,
         .optionalAttributes = aOptionalAttrs,
+        .accuracyStruct     = kDefaultAccuracy,
     })
 {
     mClusterListNode.mValue = &mCluster.Cluster();

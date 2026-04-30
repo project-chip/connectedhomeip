@@ -78,6 +78,7 @@
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groups/AttributeIds.h>
 #include <clusters/HepaFilterMonitoring/AttributeIds.h>
+#include <clusters/Humidistat/AttributeIds.h>
 #include <clusters/IcdManagement/AttributeIds.h>
 #include <clusters/Identify/AttributeIds.h>
 #include <clusters/IlluminanceMeasurement/AttributeIds.h>
@@ -98,6 +99,7 @@
 #include <clusters/MicrowaveOvenMode/AttributeIds.h>
 #include <clusters/ModeSelect/AttributeIds.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
+#include <clusters/NetworkIdentityManagement/AttributeIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OnOff/AttributeIds.h>
@@ -115,6 +117,7 @@
 #include <clusters/PowerSourceConfiguration/AttributeIds.h>
 #include <clusters/PowerTopology/AttributeIds.h>
 #include <clusters/PressureMeasurement/AttributeIds.h>
+#include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProxyConfiguration/AttributeIds.h>
 #include <clusters/ProxyDiscovery/AttributeIds.h>
 #include <clusters/ProxyValid/AttributeIds.h>

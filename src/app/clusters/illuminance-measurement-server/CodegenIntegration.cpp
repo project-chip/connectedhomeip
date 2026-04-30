@@ -47,11 +47,19 @@ public:
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
+        // Try to read the default value for these mandatory attributes but do not fail if the operation is not successful.
+        // This is because not all apps are setting a default value for them in ember.
         DataModel::Nullable<uint16_t> minMeasuredValue{};
-        VerifyOrDie(MinMeasuredValue::Get(endpointId, minMeasuredValue) == Status::Success);
+        if (MinMeasuredValue::Get(endpointId, minMeasuredValue) != Status::Success)
+        {
+            minMeasuredValue.SetNull();
+        }
 
         DataModel::Nullable<uint16_t> maxMeasuredValue{};
-        VerifyOrDie(MaxMeasuredValue::Get(endpointId, maxMeasuredValue) == Status::Success);
+        if (MaxMeasuredValue::Get(endpointId, maxMeasuredValue) != Status::Success)
+        {
+            maxMeasuredValue.SetNull();
+        }
 
         uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
@@ -132,6 +140,23 @@ IlluminanceMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId)
         integrationDelegate);
 
     return static_cast<IlluminanceMeasurementCluster *>(illuminanceMeasurement);
+}
+
+CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t> measuredValue)
+{
+    auto illuminanceMeasurement = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(illuminanceMeasurement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return illuminanceMeasurement->SetMeasuredValue(measuredValue);
+}
+
+CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<uint16_t> minMeasuredValue,
+                                 DataModel::Nullable<uint16_t> maxMeasuredValue)
+{
+    auto illuminanceMeasurement = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(illuminanceMeasurement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return illuminanceMeasurement->SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue);
 }
 
 } // namespace chip::app::Clusters::IlluminanceMeasurement

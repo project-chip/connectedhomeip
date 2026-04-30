@@ -13,11 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
+#include <access/AccessControl.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
-#include <app/clusters/groupcast/GroupcastLogic.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -35,25 +36,43 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <platform/NetworkCommissioning.h>
 
 #include <array>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <set>
 
 namespace {
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::Access;
 using namespace chip::Testing;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters::Groupcast;
+using namespace chip::System::Clock::Literals;
+using namespace chip::Protocols::InteractionModel;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
+static constexpr size_t kMaxMembershipEndpoints = app::Clusters::GroupcastCluster::kMaxMembershipEndpoints;
+
+static constexpr FabricIndex kTestFabricIndex = Testing::kTestFabricIndex;
+static constexpr NodeId kNodeIdForAdmin       = 1ULL;
+static constexpr NodeId kNodeIdForManage      = 2ULL;
+
+static constexpr SubjectDescriptor kAdminSubjectDescriptor{ .fabricIndex = kTestFabricIndex,
+                                                            .authMode    = AuthMode::kCase,
+                                                            .subject     = kNodeIdForAdmin };
+
+static constexpr SubjectDescriptor kManageSubjectDescriptor{ .fabricIndex = kTestFabricIndex,
+                                                             .authMode    = AuthMode::kCase,
+                                                             .subject     = kNodeIdForManage };
 
 template <typename DecodableListType>
 CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
@@ -68,7 +87,6 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
     return it.GetStatus();
 }
 
-chip::FabricIndex kTestFabricIndex = Testing::kTestFabricIndex;
 class CustomDataModel : public EmptyProvider
 {
 public:
@@ -98,24 +116,55 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestGroupcastCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
 
-    TestServerClusterContext mTestContext;
-    Credentials::GroupDataProviderImpl mProvider;
-    Crypto::DefaultSessionKeystore mKeystore;
-    CustomDataModel customDataModel;
-    std::unique_ptr<ServerClusterContext> clusterContext;
-    FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
-    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider }, BitFlags<Feature>{ Feature::kSender } };
-    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider },
-                                               BitFlags<Feature>{ Feature::kListener } };
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    class TestDeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+    {
+    public:
+        bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
+        {
+            (void) deviceType;
+            (void) endpoint;
+            return false;
+        }
+    };
+
+    class GroupcastTestingAccessControlDelegate : public Access::AccessControl::Delegate
+    {
+        CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                         Privilege requestPrivilege) override
+        {
+            if (subjectDescriptor.authMode != AuthMode::kCase)
+            {
+                return CHIP_ERROR_ACCESS_DENIED;
+            }
+
+            switch (subjectDescriptor.subject)
+            {
+            case kNodeIdForAdmin:
+                // Admin always has access
+                return CHIP_NO_ERROR;
+            case kNodeIdForManage: {
+                // Manage can access everything but Administer-level things
+                CHIP_ERROR err = (requestPrivilege == Access::Privilege::kAdminister) ? CHIP_ERROR_ACCESS_DENIED : CHIP_NO_ERROR;
+                return err;
+            }
+            default:
+                return CHIP_ERROR_ACCESS_DENIED;
+            }
+        }
+    };
 
     void SetUp() override
     {
         mProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
         mProvider.SetSessionKeystore(&mKeystore);
+        mProvider.SetGroupcastEnabled(true);
         ASSERT_EQ(mProvider.Init(), CHIP_NO_ERROR);
+        ASSERT_EQ(mAccessDelegate.Init(), CHIP_NO_ERROR);
+        ASSERT_EQ(mAccessControl.Init(&mAccessDelegate, mDeviceTypeResolver), CHIP_NO_ERROR);
 
         // Replace the DataModel Provider in the ServerClusterContext provided to the cluster implementation
         // with our Mock DataModel Provider so we can test endpoints validations on JoinGroup command.
@@ -130,18 +179,21 @@ struct TestGroupcastCluster : public ::testing::Test
         ASSERT_EQ(mSender.Startup(*clusterContext), CHIP_NO_ERROR);
         ASSERT_EQ(mListener.Startup(*clusterContext), CHIP_NO_ERROR);
 
-        CHIP_ERROR err = mFabricHelper.SetUpTestFabric(kTestFabricIndex);
+        CHIP_ERROR err = mFabricHelper.SetUpTestFabric(mFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_EQ(mFabricIndex, kTestFabricIndex);
         Credentials::SetGroupDataProvider(&mProvider);
     }
 
     void TearDown() override
     {
+        mAccessDelegate.Finish();
+        mAccessControl.Finish();
         mSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
         mListener.Shutdown(app::ClusterShutdownType::kClusterShutdown);
         clusterContext.reset();
         Credentials::SetGroupDataProvider(nullptr);
-        CHIP_ERROR err = mFabricHelper.TearDownTestFabric(kTestFabricIndex);
+        CHIP_ERROR err = mFabricHelper.TearDownTestFabric(mFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         mProvider.Finish();
     }
@@ -150,9 +202,29 @@ struct TestGroupcastCluster : public ::testing::Test
                       const Protocols::InteractionModel::Status expected)
     {
         ASSERT_TRUE(status.has_value());
-        EXPECT_EQ(status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  expected);
+        EXPECT_EQ(status->GetStatusCode().GetStatus(), expected);
     }
+
+    FabricIndex mFabricIndex = kTestFabricIndex;
+    TestServerClusterContext mTestContext;
+    TestPersistentStorageDelegate mStorageDelegate;
+    GroupcastTestingAccessControlDelegate mAccessDelegate;
+    TestDeviceTypeResolver mDeviceTypeResolver;
+    Access::AccessControl mAccessControl;
+    Credentials::GroupDataProviderImpl mProvider;
+    TimerDelegateMock mMockTimerDelegate;
+    Crypto::DefaultSessionKeystore mKeystore;
+    CustomDataModel customDataModel;
+    std::unique_ptr<ServerClusterContext> clusterContext;
+    FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
+    ScopedAttributeChangeListenerRegistration mScopedListenerRegistration; // RAII registration
+
+    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
+                                             BitFlags<Feature>{ Feature::kSender } };
+    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
+                                               BitFlags<Feature>{ Feature::kListener, Feature::kPerGroup } };
+
+    TestGroupcastCluster() : mScopedListenerRegistration(customDataModel, mTestContext) {}
 };
 
 TEST_F(TestGroupcastCluster, TestAttributes)
@@ -183,6 +255,53 @@ TEST_F(TestGroupcastCluster, TestAttributes)
     }
 }
 
+void ValidateMembership(const Attributes::Membership::TypeInfo::DecodableType & memberships,
+                        const Clusters::Groupcast::Structs::MembershipStruct::Type * expectedMemberships,
+                        size_t expectedMembershipsCount)
+{
+    size_t membershipCount = 0;
+    ASSERT_EQ(CountListElements(memberships, membershipCount), CHIP_NO_ERROR);
+    ASSERT_EQ(membershipCount, expectedMembershipsCount);
+
+    size_t index        = 0;
+    auto iterMembership = memberships.begin();
+    while (iterMembership.Next() && (index < expectedMembershipsCount))
+    {
+        auto membership = iterMembership.GetValue();
+        ASSERT_EQ(membership.groupID, expectedMemberships[index].groupID);
+        ASSERT_EQ(membership.keySetID, expectedMemberships[index].keySetID);
+        ASSERT_EQ(membership.mcastAddrPolicy, expectedMemberships[index].mcastAddrPolicy);
+        ASSERT_EQ(membership.hasAuxiliaryACL.HasValue(), expectedMemberships[index].hasAuxiliaryACL.HasValue());
+        if (expectedMemberships[index].hasAuxiliaryACL.HasValue())
+        {
+            ASSERT_EQ(membership.hasAuxiliaryACL, expectedMemberships[index].hasAuxiliaryACL);
+        }
+
+        ASSERT_EQ(membership.endpoints.HasValue(), expectedMemberships[index].endpoints.HasValue());
+        if (membership.endpoints.HasValue())
+        {
+            size_t endpoint_count = 0;
+            ASSERT_EQ(membership.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
+            ASSERT_EQ(endpoint_count, expectedMemberships[index].endpoints.Value().size());
+            // Build set from expected endpoints
+            std::set<EndpointId> expectedEndpoints;
+            for (size_t i = 0; i < expectedMemberships[index].endpoints.Value().size(); i++)
+            {
+                expectedEndpoints.insert(expectedMemberships[index].endpoints.Value()[i]);
+            }
+            // Check each actual endpoint is in the expected set
+            auto iterEndpoints = membership.endpoints.Value().begin();
+            while (iterEndpoints.Next())
+            {
+                auto endpoint = iterEndpoints.GetValue();
+                ASSERT_NE(expectedEndpoints.find(endpoint), expectedEndpoints.end());
+            }
+        }
+        index++;
+    }
+    ASSERT_EQ(index, membershipCount);
+}
+
 TEST_F(TestGroupcastCluster, TestAcceptedCommands)
 {
     ASSERT_TRUE(IsAcceptedCommandsListEqualTo(mListener,
@@ -191,13 +310,187 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
                                                   Commands::LeaveGroup::kMetadataEntry,
                                                   Commands::UpdateGroupKey::kMetadataEntry,
                                                   Commands::ConfigureAuxiliaryACL::kMetadataEntry,
+                                                  Commands::GroupcastTesting::kMetadataEntry,
                                               }));
+}
+
+TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs)
+{
+    GroupId kGroup1     = 0xab01;
+    KeysetId kKeyset1   = 0xabcd;
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[1] = { 1 };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    // Admin privilege, and valid arguments (including key) : JoinGroup should work.
+    {
+        Commands::JoinGroup::Type joinGroupCmd;
+        joinGroupCmd.groupID         = kGroup1;
+        joinGroupCmd.keySetID        = kKeyset1;
+        joinGroupCmd.key             = MakeOptional(ByteSpan(key));
+        joinGroupCmd.useAuxiliaryACL = NullOptional;
+        joinGroupCmd.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
+    }
+
+    // Now group1 is OK and keys OK
+
+    // Constraint on groupId >= 1 must be respected.
+    {
+        Commands::JoinGroup::Type joinGroupCmd;
+        joinGroupCmd.groupID         = 0; // Disallowed
+        joinGroupCmd.keySetID        = kKeyset1;
+        joinGroupCmd.key             = MakeOptional(ByteSpan(key));
+        joinGroupCmd.useAuxiliaryACL = NullOptional;
+        joinGroupCmd.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    }
+
+    // Constraint on keySetId >= 1 must be respected.
+    {
+        Commands::JoinGroup::Type joinGroupCmd;
+        joinGroupCmd.groupID         = kGroup1;
+        joinGroupCmd.keySetID        = 0; // Disallowed
+        joinGroupCmd.key             = MakeOptional(ByteSpan(key));
+        joinGroupCmd.useAuxiliaryACL = NullOptional;
+        joinGroupCmd.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    }
+
+    // Manage access: can't touch keys or useAuxiliary ACL
+    tester.SetSubjectDescriptor(kManageSubjectDescriptor);
+
+    // Enabling useAuxiliaryACL should fail unless subject has administer privileges.
+    {
+        Commands::JoinGroup::Type joinGroupCmd;
+        joinGroupCmd.groupID         = kGroup1;
+        joinGroupCmd.keySetID        = kKeyset1;
+        joinGroupCmd.key             = NullOptional; // <-- Not touching key
+        joinGroupCmd.useAuxiliaryACL = NullOptional; // <-- Not touching useAuxACL
+        joinGroupCmd.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
+
+        // Manage should work here
+        auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
+
+        // Touching useAuxiliaryACL, even if false should fail if present --> cannot update the field.
+        joinGroupCmd.useAuxiliaryACL = MakeOptional(false);
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedAccess);
+
+        joinGroupCmd.useAuxiliaryACL = MakeOptional(true);
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedAccess);
+
+        // Starts working after no longer touching AuxACL.
+        joinGroupCmd.key             = NullOptional; // <-- Not touching key
+        joinGroupCmd.useAuxiliaryACL = NullOptional; // <-- Not touching useAuxACL
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
+
+        // If touching key, but not useAuxiliaryACL, still not legal.
+
+        joinGroupCmd.key             = MakeOptional(ByteSpan(key)); // <-- Touching key
+        joinGroupCmd.useAuxiliaryACL = NullOptional;                // <-- Not touching useAuxACL
+        result                       = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
+        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedAccess);
+    }
+}
+
+TEST_F(TestGroupcastCluster, TestUpdateGroupKeyFailsOnBadAargs)
+{
+    GroupId kGroup1      = 0xab01;
+    KeysetId kKeyset1    = 0xabcd;
+    KeysetId kKeyset2    = 0xa123;
+    const uint8_t key1[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const uint8_t key2[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[1] = { 1 };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    Commands::JoinGroup::Type joinGroupCmd;
+    joinGroupCmd.groupID         = kGroup1;
+    joinGroupCmd.keySetID        = kKeyset1;
+    joinGroupCmd.key             = MakeOptional(ByteSpan(key1));
+    joinGroupCmd.useAuxiliaryACL = MakeOptional(false);
+    joinGroupCmd.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+    joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
+
+    // Join must work
+    auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    Commands::UpdateGroupKey::Type updateGroupKeyCmd;
+    updateGroupKeyCmd.groupID  = kGroup1;
+    updateGroupKeyCmd.keySetID = kKeyset1;
+
+    // UpdateGroupKey from Admin access should succeed (no key update).
+    result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
+    ASSERT_TRUE(result.GetStatusCode().has_value());
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
+
+    // If changing a key, should fail with Manage, succeed with Admin
+    tester.SetSubjectDescriptor(kManageSubjectDescriptor);
+
+    updateGroupKeyCmd.groupID  = kGroup1;
+    updateGroupKeyCmd.keySetID = kKeyset2;
+    updateGroupKeyCmd.key      = MakeOptional(ByteSpan(key2));
+
+    result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
+    ASSERT_TRUE(result.GetStatusCode().has_value());
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::UnsupportedAccess);
+
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+    result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
+    ASSERT_TRUE(result.GetStatusCode().has_value());
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
+
+    // Constraint on groupId >= 1 must be respected.
+    updateGroupKeyCmd.groupID  = 0;
+    updateGroupKeyCmd.keySetID = kKeyset1;
+    updateGroupKeyCmd.key      = NullOptional;
+
+    result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
+    ASSERT_TRUE(result.GetStatusCode().has_value());
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+
+    // Constraint on keySetId >= 1 must be respected.
+    updateGroupKeyCmd.groupID  = kGroup1;
+    updateGroupKeyCmd.keySetID = 0;
+    updateGroupKeyCmd.key      = NullOptional;
+
+    result = tester.Invoke(Commands::UpdateGroupKey::Id, updateGroupKeyCmd);
+    ASSERT_TRUE(result.GetStatusCode().has_value());
+    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
 }
 
 TEST_F(TestGroupcastCluster, TestReadMembership)
 {
-    static constexpr uint16_t kMaxEndpoints = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
-    static constexpr uint16_t kIntervals    = 15;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
+    static constexpr uint16_t kIntervals      = 15;
+    static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const EndpointId kEndpoints[kIntervals][kMaxEndpoints] = {
         { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },
@@ -224,6 +517,7 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
     // Join groups
     {
@@ -233,20 +527,16 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         data.key             = MakeOptional(ByteSpan(key));
         data.useAuxiliaryACL = MakeOptional(true);
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
-        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints);
 
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         data.key.ClearValue();
         for (int i = 1; i < kIntervals; i++)
         {
-            data.endpoints = chip::app::DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
+            data.endpoints = DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
             result         = tester.Invoke(Commands::JoinGroup::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         }
         // Join group 2
         data.groupID         = kGroup2;
@@ -254,11 +544,9 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
         for (int i = 0; i < 2; i++)
         {
-            data.endpoints = chip::app::DataModel::List<const EndpointId>(kEndpoints[i + 1], kMaxEndpoints);
+            data.endpoints = DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
             result         = tester.Invoke(Commands::JoinGroup::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         }
 
         // Join group 3
@@ -267,11 +555,9 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         data.key             = MakeOptional(ByteSpan(key));
         data.useAuxiliaryACL = MakeOptional(false);
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
-        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints[4], 8);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[4], 8);
         result               = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Remove keyset used by Group 2
@@ -282,51 +568,322 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 4u); // Group1 [1..255], Group1 [256..300], Group2 [1..40], Group3 [63..80]
-
-        GroupId expected_groups[]            = { kGroup1, kGroup1, kGroup2, kGroup3 };
-        GroupId expected_keysets[]           = { kKeyset1, kKeyset1, kKeyset1, kInvalidKeysetId };
-        GroupId prev_group                   = kGroup1;
-        uint16_t expected_endpoint_counts[]  = { 255, 45, 40, 8 };
-        uint16_t expected_endpoint_offsets[] = { 0, 0, 1, 4 };
-        uint16_t i = 0, j = 0;
-        auto iter = memberships.begin();
-        while (iter.Next())
+        // Build expected endpoint arrays
+        // Group1 chunk 1: first kMaxMembershipEndpoints endpoints (intervals 0-12, plus 15 from interval 13 = 255 endpoints)
+        EndpointId group1_chunk1[kMaxMembershipEndpoints];
+        for (size_t i = 0; i < kMaxMembershipEndpoints; i++)
         {
-            auto item             = iter.GetValue();
-            size_t endpoint_count = 0;
-            // Check group
-            ASSERT_EQ(item.groupID, expected_groups[i]);
-            ASSERT_EQ(item.keySetID, expected_keysets[i]);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_EQ(item.hasAuxiliaryACL.Value(), item.groupID == kGroup1);
-            ASSERT_EQ(item.mcastAddrPolicy,
-                      item.groupID == kGroup1 ? app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr
-                                              : app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
-            // Check endpoint count
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, expected_endpoint_counts[i]);
-            // Check individual endpoints
-            if (item.groupID != prev_group)
-            {
-                // Reset endpoint idex for the new group
-                j = 0;
-            }
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
-            {
-                EndpointId index       = j + static_cast<EndpointId>(expected_endpoint_offsets[i] * kMaxEndpoints);
-                EndpointId endpoint_id = iter2.GetValue();
-                EndpointId expected_id = kEndpoints[index / kMaxEndpoints][index % kMaxEndpoints];
-                ASSERT_EQ(endpoint_id, expected_id);
-                j++;
-            }
-            prev_group = item.groupID;
-            i++;
+            group1_chunk1[i] = static_cast<EndpointId>(i + 1);
         }
+
+        // Group1 chunk 2: remaining 45 endpoints (last 5 from interval 13, plus all 20 from interval 14)
+        EndpointId group1_chunk2[kTotalEndpoints - kMaxMembershipEndpoints];
+        for (size_t i = 0; i < MATTER_ARRAY_SIZE(group1_chunk2); i++)
+        {
+            group1_chunk2[i] = static_cast<EndpointId>(kMaxMembershipEndpoints + i + 1);
+        }
+
+        // Group2: 40 endpoints from intervals 1-2
+        EndpointId group2_endpoints[2 * kMaxEndpoints];
+        for (size_t i = 0; i < 2 * kMaxEndpoints; i++)
+        {
+            group2_endpoints[i] = static_cast<EndpointId>(i + 1);
+        }
+
+        // Group3: 8 endpoints from interval 4
+        EndpointId group3_endpoints[8];
+        for (size_t i = 0; i < 8; i++)
+        {
+            group3_endpoints[i] = static_cast<EndpointId>(4 * kMaxEndpoints + i + 1);
+        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(group1_chunk1, kMaxMembershipEndpoints)),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(group1_chunk2, MATTER_ARRAY_SIZE(group1_chunk2))),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID   = kGroup2,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group2_endpoints, MATTER_ARRAY_SIZE(group2_endpoints))),
+                .keySetID  = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup,
+            },
+            {
+                .groupID   = kGroup3,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group3_endpoints, MATTER_ARRAY_SIZE(group3_endpoints))),
+                .keySetID  = kInvalidKeysetId,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
+    }
+}
+
+TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    GroupId kGroup1               = 0xab01;
+    GroupId kGroup2               = 0xcd02;
+    GroupId kGroup3               = 0xef03;
+    GroupId kGroup4               = 0xff04;
+    KeysetId kKeyset              = 0xabcd;
+
+    constexpr System::Clock::Milliseconds32 kChangeTemporisation = System::Clock::Milliseconds32(251);
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::TypeInfo::DecodableType multicastAddrCount;
+    app::ConcreteAttributePath membershipAttributePath(kRootEndpointId, app::Clusters::Groupcast::Id,
+                                                       app::Clusters::Groupcast::Attributes::Membership::Id);
+    app::ConcreteAttributePath usedMcastAddrCountAttributePath(kRootEndpointId, app::Clusters::Groupcast::Id,
+                                                               app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id);
+    ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+    ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+    // Read UsedMcastAddrCount
+    ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(multicastAddrCount, 0u);
+
+    // Join groups
+    {
+        // Group 1 (IanaAddr)
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroup1;
+        data.keySetID        = kKeyset;
+        data.key             = MakeOptional(ByteSpan(key));
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints);
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 1u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 2 (PerGroup)
+        data.groupID = kGroup2;
+        data.key.ClearValue();
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        result               = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 2u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 3 (PerGroup)
+        data.groupID = kGroup3;
+        result       = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 3u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 4 (IanaAddr)
+        data.groupID         = kGroup4;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        result               = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 3u);
+        mTestContext.ChangeListener().DirtyList().clear();
+    }
+
+    // Leave groups
+    {
+        // Group 2 (PerGroup)
+        Commands::LeaveGroup::Type data;
+        data.groupID = kGroup2;
+        auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 2u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 1 (IanaAddr)
+        data.groupID = kGroup1;
+        result       = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 2u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 3 (PerGroup)
+        data.groupID = kGroup3;
+        result       = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 1u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 4 (IanaAddr)
+        data.groupID = kGroup4;
+        result       = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 0u);
+        mTestContext.ChangeListener().DirtyList().clear();
+    }
+}
+
+TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints1[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    const EndpointId kEndpoints2[] = { 101, 102 };
+    KeysetId kKeyset               = 0xabcd;
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    // Read MaxMcastAddrCount
+    app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::TypeInfo::DecodableType maxMcastAddrCount;
+    ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id, maxMcastAddrCount), CHIP_NO_ERROR);
+    ASSERT_GT(maxMcastAddrCount, 0u);
+
+    // Group
+    Commands::JoinGroup::Type data;
+    data.groupID         = 1;
+    data.keySetID        = kKeyset;
+    data.key             = MakeOptional(ByteSpan(key));
+    data.useAuxiliaryACL = MakeOptional(true);
+    data.endpoints       = DataModel::List<const EndpointId>(kEndpoints1, MATTER_ARRAY_SIZE(kEndpoints1));
+
+    // Join MaxMcastAddrCount IANA address groups
+    {
+        for (GroupId i = 0; i < maxMcastAddrCount; i++)
+        {
+            data.groupID = i + 1;
+            auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+            data.key.ClearValue();
+        }
+    }
+    // Join MaxMcastAddrCount+1
+    {
+        data.groupID = maxMcastAddrCount + 1;
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+    // Leave all groups
+    {
+        data.groupID = 0;
+        auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+    // Join MaxMcastAddrCount PerGroup address groups
+    {
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+
+        for (GroupId i = 0; i < maxMcastAddrCount; i++)
+        {
+            data.groupID = i + 1;
+            auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        }
+    }
+    // Join MaxMcastAddrCount+1
+    {
+        data.groupID = maxMcastAddrCount + 1;
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
+    }
+    // Leave all groups
+    {
+        data.groupID = 0;
+        auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+    // Join 1 IANA address plus (MaxMcastAddrCount - 1) PerGroup groups
+    {
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+
+        for (GroupId i = 0; i < maxMcastAddrCount; i++)
+        {
+            data.groupID         = i + 1;
+            data.mcastAddrPolicy = MakeOptional((0 == i) ? app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr
+                                                         : app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+            auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        }
+    }
+    // Join MaxMcastAddrCount+1
+    {
+        data.groupID         = maxMcastAddrCount + 1;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+    // Join MaxMcastAddrCount+2
+    {
+        data.groupID         = maxMcastAddrCount + 2;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
+    }
+    // Join MaxMcastAddrCount+1 (existing group)
+    {
+        data.groupID         = 2;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2));
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 }
 
@@ -334,99 +891,271 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 {
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const EndpointId kEndpoints[] = { 1 };
+    const KeysetId kKeyset        = 0xabcd;
 
     Commands::JoinGroup::Type data;
     data.groupID         = 1;
-    data.keySetID        = 0xabcd;
+    data.keySetID        = kKeyset;
     data.key             = MakeOptional(ByteSpan(key));
     data.useAuxiliaryACL = MakeOptional(true);
-    data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+    data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
 
-    // Listener
+    // Neither Listener, nor Sender
+    {
+        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl });
+        chip::Testing::ClusterTester tester(cluster);
+        tester.SetFabricIndex(kTestFabricIndex);
+        tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+    }
+
+    // Listener basic flow
     {
         chip::Testing::ClusterTester tester(mListener);
         tester.SetFabricIndex(kTestFabricIndex);
+        tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
         // Join group: New keyset and key
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Per spec 11.27.7.1.4 (JoinGroup Command/Key Field), a keyset created via JoinGroup with a Key has exactly one epoch
+        // key (num_keys_used == 1) with EpochStartTime0 = 1.
+        {
+            Credentials::GroupDataProvider::KeySet storedKeyset;
+            EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kKeyset, storedKeyset), CHIP_NO_ERROR);
+            EXPECT_EQ(storedKeyset.keyset_id, kKeyset);
+            EXPECT_EQ(storedKeyset.policy, Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst);
+            EXPECT_EQ(storedKeyset.num_keys_used, 1u);
+            EXPECT_EQ(storedKeyset.epoch_keys[0].start_time, 1u);
+        }
 
         // Join group: Existing keyset and key (invalid)
         data.groupID = 2;
         result       = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::AlreadyExists);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::AlreadyExists));
 
         // Join group: Existing keyset but no key
         data.groupID = 2;
         data.key.ClearValue();
         result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
         // Join group: Existing keyset but no key
         data.groupID = 2;
         data.key.ClearValue();
         result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
         // Join group with root endpoint: Invalid Endpoint
         const EndpointId kRootEndpoint[] = { kRootEndpointId };
         data.groupID                     = 3;
-        data.endpoints = chip::app::DataModel::List<const EndpointId>(kRootEndpoint, MATTER_ARRAY_SIZE(kRootEndpoint));
-        result         = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::UnsupportedEndpoint);
+        data.endpoints                   = DataModel::List<const EndpointId>(kRootEndpoint, MATTER_ARRAY_SIZE(kRootEndpoint));
+        result                           = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::UnsupportedEndpoint));
 
         // Join group with an invalid endpoint in the data model
         const EndpointId kInvalidEndpoint[] = { 301 };
         data.groupID                        = 3;
-        data.endpoints = chip::app::DataModel::List<const EndpointId>(kInvalidEndpoint, MATTER_ARRAY_SIZE(kInvalidEndpoint));
+        data.endpoints = DataModel::List<const EndpointId>(kInvalidEndpoint, MATTER_ARRAY_SIZE(kInvalidEndpoint));
         result         = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::UnsupportedEndpoint);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::UnsupportedEndpoint));
     }
 
     // Sender
     {
         chip::Testing::ClusterTester tester(mSender);
         tester.SetFabricIndex(kTestFabricIndex);
-        data.endpoints = chip::app::DataModel::List<const EndpointId>();
+        tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+        data.endpoints = DataModel::List<const EndpointId>();
 
         // Join group: UseAuxiliaryACL can't be set
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 
         // Join group: UseAuxiliaryACL unset
         data.useAuxiliaryACL.ClearValue();
         result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Join group: ReplaceEndpoints
+        data.replaceEndpoints = MakeOptional(true);
+        result                = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+
+        data.replaceEndpoints = MakeOptional(false);
+        result                = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+
+        data.replaceEndpoints.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Join group: McastAddrPolicy kPerGroup without kPerGroup feature set
+        data.groupID         = 2;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        result               = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+
+        // Join group: McastAddrPolicy kIanaAddr without kPerGroup feature
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.key.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Join group: McastAddrPolicy absent without kPerGroup feature
+        data.groupID = 3;
+        data.mcastAddrPolicy.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
         // Join group: Non-empty endpoints
         data.groupID   = 3;
-        data.endpoints = chip::app::DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+        data.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
         result         = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     }
+}
+
+TEST_F(TestGroupcastCluster, TestReplaceEndpointsSucceedsProperly)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    GroupId kGroup1     = 0xab01;
+    KeysetId kKeyset1   = 0xabcd;
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    EndpointId initialEndpoints[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    Commands::JoinGroup::Type data;
+    data.groupID         = kGroup1;
+    data.keySetID        = kKeyset1;
+    data.key             = MakeOptional(ByteSpan(key));
+    data.useAuxiliaryACL = MakeOptional(true);
+    data.endpoints       = DataModel::List<const EndpointId>(initialEndpoints, MATTER_ARRAY_SIZE(initialEndpoints));
+
+    auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    // Read Membership
+    app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership0[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(initialEndpoints, MATTER_ARRAY_SIZE(initialEndpoints))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
+    ValidateMembership(memberships, expectedMembership0, MATTER_ARRAY_SIZE(expectedMembership0));
+
+    // Replace with 8 members
+    EndpointId replacementEndpoints[8] = { 11, 12, 13, 14, 15, 16, 17, 18 };
+    data.key.ClearValue();
+    data.replaceEndpoints = MakeOptional(true);
+    data.endpoints        = DataModel::List<const EndpointId>(replacementEndpoints, MATTER_ARRAY_SIZE(replacementEndpoints));
+
+    result = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership1[] = { {
+        .groupID   = kGroup1,
+        .endpoints = MakeOptional(DataModel::List<const EndpointId>(replacementEndpoints, MATTER_ARRAY_SIZE(replacementEndpoints))),
+        .keySetID  = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
+    ValidateMembership(memberships, expectedMembership1, MATTER_ARRAY_SIZE(expectedMembership1));
+
+    // Add 40 endpoints (requires 2 JoinGroup commands)
+    EndpointId fortyEndpoints1[20];
+    EndpointId fortyEndpoints2[20];
+    for (uint16_t i = 0; i < 20; i++)
+    {
+        fortyEndpoints1[i] = static_cast<EndpointId>(100 + i);
+        fortyEndpoints2[i] = static_cast<EndpointId>(120 + i);
+    }
+
+    data.replaceEndpoints = MakeOptional(true);
+    data.endpoints        = DataModel::List<const EndpointId>(fortyEndpoints1, MATTER_ARRAY_SIZE(fortyEndpoints1));
+    result                = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    data.replaceEndpoints = MakeOptional(false);
+    data.endpoints        = DataModel::List<const EndpointId>(fortyEndpoints2, MATTER_ARRAY_SIZE(fortyEndpoints2));
+    result                = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    EndpointId expectedForty[40];
+    for (uint16_t i = 0; i < 40; i++)
+    {
+        expectedForty[i] = static_cast<EndpointId>(100 + i);
+    }
+
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership2[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(expectedForty, MATTER_ARRAY_SIZE(expectedForty))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
+    ValidateMembership(memberships, expectedMembership2, MATTER_ARRAY_SIZE(expectedMembership2));
+
+    // JoinGroup with replace endpoints that adds only 1 endpoint
+    EndpointId oneEndpoint[1] = { 200 };
+    data.replaceEndpoints     = MakeOptional(true);
+    data.endpoints            = DataModel::List<const EndpointId>(oneEndpoint, MATTER_ARRAY_SIZE(oneEndpoint));
+    result                    = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership3[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(oneEndpoint, MATTER_ARRAY_SIZE(oneEndpoint))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
+    ValidateMembership(memberships, expectedMembership3, MATTER_ARRAY_SIZE(expectedMembership3));
+
+    // Add 40 more endpoints
+    data.replaceEndpoints = MakeOptional(false);
+    data.endpoints        = DataModel::List<const EndpointId>(fortyEndpoints1, MATTER_ARRAY_SIZE(fortyEndpoints1));
+    result                = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    data.endpoints = DataModel::List<const EndpointId>(fortyEndpoints2, MATTER_ARRAY_SIZE(fortyEndpoints2));
+    result         = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+    EndpointId expectedFortyOne[41];
+    expectedFortyOne[0] = 200;
+    for (uint16_t i = 0; i < 40; i++)
+    {
+        expectedFortyOne[i + 1] = static_cast<EndpointId>(100 + i);
+    }
+
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+    Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership4[] = { {
+        .groupID         = kGroup1,
+        .endpoints       = MakeOptional(DataModel::List<const EndpointId>(expectedFortyOne, MATTER_ARRAY_SIZE(expectedFortyOne))),
+        .keySetID        = kKeyset1,
+        .hasAuxiliaryACL = MakeOptional(true),
+        .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+    } };
+    ValidateMembership(memberships, expectedMembership4, MATTER_ARRAY_SIZE(expectedMembership4));
 }
 
 TEST_F(TestGroupcastCluster, TestLeaveGroup)
 {
-    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     static constexpr uint16_t kIntervals      = 5;
     static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
@@ -443,45 +1172,48 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     static const std::set<EndpointId> kRemoveSet1(std::begin(kLeaveEndpoints1), std::end(kLeaveEndpoints1));
     static const std::set<EndpointId> kRemoveSet2(std::begin(kLeaveEndpoints2), std::end(kLeaveEndpoints2));
 
-    GroupId kGroup1 = 0xab01;
-    GroupId kGroup2 = kGroup1 + 1;
+    GroupId kGroup1  = 0xab01;
+    GroupId kGroup2  = 0xcd02;
+    GroupId kGroup3  = 0xef03;
+    KeysetId kKeyset = 0xabcd;
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    EndpointId all_endpoints[kTotalEndpoints];
+    for (size_t i = 0; i < kTotalEndpoints; i++)
+    {
+        all_endpoints[i] = static_cast<EndpointId>(i + 1);
+    }
 
     // Join groups
     {
         // Group 1
         Commands::JoinGroup::Type data;
         data.groupID         = kGroup1;
-        data.keySetID        = 0xabcd;
+        data.keySetID        = kKeyset;
         data.key             = MakeOptional(ByteSpan(key));
         data.useAuxiliaryACL = MakeOptional(true);
-        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints);
 
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         data.key.ClearValue();
         for (int i = 1; i < kIntervals; i++)
         {
-            data.endpoints = chip::app::DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
+            data.endpoints = DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
             result         = tester.Invoke(Commands::JoinGroup::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         }
         // Group 2
         data.groupID         = kGroup2;
         data.useAuxiliaryACL = MakeOptional(false);
         for (int i = 0; i < kIntervals; i++)
         {
-            data.endpoints = chip::app::DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
+            data.endpoints = DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
             result         = tester.Invoke(Commands::JoinGroup::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         }
     }
 
@@ -490,35 +1222,25 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 2u); // Group1 [1..255], Group1 [256..300], Group2 [1..40]
-
-        GroupId group_id = kGroup1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, group_id);
-            // Check the endpoints are still in the group
-            size_t found          = 0;
-            size_t endpoint_count = 0;
-            // Check endpoint count
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, kTotalEndpoints);
-            // Check endpoints are stil in the group
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
+        // Build expected endpoint arrays - both groups have all 100 endpoints
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
-                if (kRemoveSet1.find(iter2.GetValue()) != kRemoveSet1.end())
-                {
-                    found++;
-                }
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(all_endpoints, kTotalEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(all_endpoints, kTotalEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
-            ASSERT_EQ(found, kRemoveSet1.size());
-            group_id++;
-        }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // LeaveGroup
@@ -526,13 +1248,10 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         Commands::LeaveGroup::Type data;
 
         // Update existing key (invalid)
-        data.groupID = kGroup1;
-        data.endpoints =
-            MakeOptional(chip::app::DataModel::List<const EndpointId>(kLeaveEndpoints1, MATTER_ARRAY_SIZE(kLeaveEndpoints1)));
-        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        data.groupID   = kGroup1;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kLeaveEndpoints1, MATTER_ARRAY_SIZE(kLeaveEndpoints1)));
+        auto result    = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Read Membership
@@ -540,51 +1259,48 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 2u); // Group1 [1..255], Group1 [256..300], Group2 [1..40]
-
-        GroupId group_id = kGroup1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
+        // Build expected endpoint arrays
+        // Group1: all endpoints except kLeaveEndpoints1 (100 - 8 = 92 endpoints)
+        EndpointId group1_endpoints[kTotalEndpoints - MATTER_ARRAY_SIZE(kLeaveEndpoints1)];
+        for (size_t i = 0, j = 0; (i < kTotalEndpoints) && (j < MATTER_ARRAY_SIZE(group1_endpoints)); i++)
         {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, group_id);
-            // Check the endpoints are still in the group
-            size_t found          = 0;
-            size_t endpoint_count = 0;
-            // Check endpoint count
-
-            size_t expected_count = (kGroup1 == group_id) ? kTotalEndpoints - kRemoveSet1.size() : kTotalEndpoints;
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, expected_count);
-            // Check endpoints are stil in the group
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
+            EndpointId ep = static_cast<EndpointId>(i + 1);
+            if (kRemoveSet1.find(ep) == kRemoveSet1.end())
             {
-                if (kRemoveSet1.find(iter2.GetValue()) != kRemoveSet1.end())
-                {
-                    found++;
-                }
+                group1_endpoints[j++] = ep;
             }
-            // Endpoints removed from group 1, but not from group 2
-            ASSERT_EQ(found, kGroup1 == group_id ? 0 : kRemoveSet1.size());
-            group_id++;
         }
+
+        // Group2: all endpoints (100 endpoints)
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID   = kGroup1,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group1_endpoints, MATTER_ARRAY_SIZE(group1_endpoints))),
+                .keySetID  = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(all_endpoints, kTotalEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // LeaveGroup a List of endpoints from all groups
     {
         Commands::LeaveGroup::Type data;
 
-        data.groupID = 0;
-        data.endpoints =
-            MakeOptional(chip::app::DataModel::List<const EndpointId>(kLeaveEndpoints2, MATTER_ARRAY_SIZE(kLeaveEndpoints2)));
-        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        data.groupID   = 0;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kLeaveEndpoints2, MATTER_ARRAY_SIZE(kLeaveEndpoints2)));
+        auto result    = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Read Membership
@@ -592,39 +1308,47 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 2u); // Group1 [1..255], Group1 [256..300], Group2 [1..40]
-
-        GroupId group_id = kGroup1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
+        // Build expected endpoint arrays
+        // Group1: all endpoints except kLeaveEndpoints1 and kLeaveEndpoints2 (100 - 8 - 8 = 84 endpoints)
+        EndpointId group1_endpoints[kTotalEndpoints - MATTER_ARRAY_SIZE(kLeaveEndpoints1) - MATTER_ARRAY_SIZE(kLeaveEndpoints2)];
+        for (size_t i = 0, j = 0; (i < kTotalEndpoints) && (j < MATTER_ARRAY_SIZE(group1_endpoints)); i++)
         {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, group_id);
-            // Check the endpoints are still in the group
-            size_t found          = 0;
-            size_t endpoint_count = 0;
-            // Check endpoint count
-            size_t expected_count = (kGroup1 == group_id) ? kTotalEndpoints - kRemoveSet1.size() - kRemoveSet2.size()
-                                                          : kTotalEndpoints - kRemoveSet2.size();
-
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, expected_count);
-            // Check endpoints are stil in the group
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
+            EndpointId ep = static_cast<EndpointId>(i + 1);
+            if (kRemoveSet1.find(ep) == kRemoveSet1.end() && kRemoveSet2.find(ep) == kRemoveSet2.end())
             {
-                if (kRemoveSet2.find(iter2.GetValue()) != kRemoveSet2.end())
-                {
-                    found++;
-                }
+                group1_endpoints[j++] = ep;
             }
-            // Endpoints removed from both all groups
-            ASSERT_EQ(found, static_cast<size_t>(0));
-            group_id++;
         }
+
+        // Group2: all endpoints except kLeaveEndpoints2 (100 - 8 = 92 endpoints)
+        EndpointId group2_endpoints[kTotalEndpoints - MATTER_ARRAY_SIZE(kLeaveEndpoints2)];
+        for (size_t i = 0, j = 0; (i < kTotalEndpoints) && (j < MATTER_ARRAY_SIZE(group2_endpoints)); i++)
+        {
+            EndpointId ep = static_cast<EndpointId>(i + 1);
+            if (kRemoveSet2.find(ep) == kRemoveSet2.end())
+            {
+                group2_endpoints[j++] = ep;
+            }
+        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID   = kGroup1,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group1_endpoints, MATTER_ARRAY_SIZE(group1_endpoints))),
+                .keySetID  = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID   = kGroup2,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group2_endpoints, MATTER_ARRAY_SIZE(group2_endpoints))),
+                .keySetID  = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // LeaveGroup all groups completely.
@@ -632,9 +1356,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         Commands::LeaveGroup::Type data;
         data.groupID = 0;
         auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Read Membership
@@ -642,10 +1364,148 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 0u);
+        // After leaving all groups, membership should be empty
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[0] = {};
+        ValidateMembership(memberships, expectedMembership, 0);
     }
+
+    // JoinGroup for GroupID 1 and then GroupID 2 with the same endpoint list.
+    {
+        // JoinGroup for GroupID 1
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroup1;
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints);
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+        // JoinGroup for GroupID 2
+        data.groupID = kGroup2;
+        result       = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Read Membership
+        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
+    }
+
+    // LeaveGroup for GroupID 2 without providing any endpoints
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID = kGroup2;
+        data.endpoints.ClearValue();
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Read Membership
+        Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
+            .groupID         = kGroup1,
+            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+            .keySetID        = kKeyset,
+            .hasAuxiliaryACL = MakeOptional(true),
+            .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+        } };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
+    }
+
+    // Create a Listener and Sender capable group with 1 endpoint.
+    // Remove the endpoint from the group. Verify that the group still exists for Sender.
+    app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate,
+                                                         mAccessControl },
+                                                       BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
+    ASSERT_EQ(ListenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester listenerAndSenderTester(ListenerAndSender);
+    listenerAndSenderTester.SetFabricIndex(kTestFabricIndex);
+    listenerAndSenderTester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+    {
+        // JoinGroup for GroupID 3
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroup3;
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[0], 1);
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        auto result          = listenerAndSenderTester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Read Membership
+        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(listenerAndSenderTester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup3,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], 1)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
+    }
+
+    {
+        // LeaveGroup for GroupID 3
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroup3;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], 1));
+        auto result    = listenerAndSenderTester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(listenerAndSenderTester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID   = kGroup3,
+                .endpoints = MakeOptional(
+                    DataModel::List<const chip::EndpointId>()), // Listener is supported, so an empty endpoints list is expected.
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
+    }
+    ListenerAndSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
@@ -653,49 +1513,57 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
     const uint8_t key1[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const uint8_t key2[] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf };
     const EndpointId kEndpoints[] = { 1 };
+    GroupId kGroup1               = 0xab01;
+    GroupId kGroup2               = 0xcd02;
     const KeysetId kKeyset1       = 0xabcd;
     const KeysetId kKeyset2       = 0xcafe;
+    const KeysetId kKeyset3       = 0xface;
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
     // Join groups
     {
         Commands::JoinGroup::Type data;
-        data.groupID         = 1;
+        data.groupID         = kGroup1;
         data.keySetID        = kKeyset1;
         data.key             = MakeOptional(ByteSpan(key1));
         data.useAuxiliaryACL = MakeOptional(true);
-        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
 
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
-        data.groupID  = 2;
+        data.groupID  = kGroup2;
         data.keySetID = kKeyset2;
         data.key      = MakeOptional(ByteSpan(key2));
         result        = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Read Membership
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        GroupId group_id = 1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
-        {
-            auto item            = iter.GetValue();
-            KeysetId expected_id = (1 == item.groupID) ? kKeyset1 : kKeyset2;
-            ASSERT_EQ(item.groupID, group_id);
-            ASSERT_EQ(item.keySetID, expected_id);
-            group_id++;
-        }
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = kKeyset2,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // Update
@@ -703,22 +1571,25 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
         Commands::UpdateGroupKey::Type data;
 
         // Update existing key (invalid)
-        data.groupID  = 2;
+        data.groupID  = kGroup2;
         data.keySetID = kKeyset1;
         data.key      = MakeOptional(ByteSpan(key1));
         auto result   = tester.Invoke(Commands::UpdateGroupKey::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::AlreadyExists);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::AlreadyExists));
+
+        // Update to non-existing keyset (invalid)
+        data.groupID  = kGroup2;
+        data.keySetID = kKeyset3;
+        data.key.ClearValue();
+        result = tester.Invoke(Commands::UpdateGroupKey::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 
         // Update without key (always valid)
-        data.groupID  = 2;
+        data.groupID  = kGroup2;
         data.keySetID = kKeyset1;
         data.key.ClearValue();
         result = tester.Invoke(Commands::UpdateGroupKey::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
         // Create a new key (valid, if i <= mProvider.GetMaxGroupKeysPerFabric())
         // 2 keysets already in use
@@ -727,10 +1598,9 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
         {
             data.keySetID = kKeyset2 + i;
             result        = tester.Invoke(Commands::UpdateGroupKey::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      i > mProvider.GetMaxGroupKeysPerFabric() ? Protocols::InteractionModel::Status::ResourceExhausted
-                                                               : Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(),
+                      i > mProvider.GetMaxGroupKeysPerFabric() ? ClusterStatusCode(Status::ResourceExhausted)
+                                                               : ClusterStatusCode(Status::Success));
         }
     }
 
@@ -738,16 +1608,25 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        GroupId group_id = 1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
-        {
-            auto item            = iter.GetValue();
-            KeysetId expected_id = (1 == item.groupID) ? kKeyset1 : kKeyset2 + mProvider.GetMaxGroupKeysPerFabric();
-            ASSERT_EQ(item.groupID, group_id);
-            ASSERT_EQ(item.keySetID, expected_id);
-            group_id++;
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = static_cast<KeysetId>(kKeyset2 + mProvider.GetMaxGroupKeysPerFabric()),
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 }
 
@@ -760,6 +1639,7 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
     // Join group
     {
@@ -768,42 +1648,40 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
         data.keySetID        = kKeyset;
         data.key             = MakeOptional(ByteSpan(key));
         data.useAuxiliaryACL = MakeOptional(false);
-        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
 
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Read Membership
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        auto iter = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, kGroupId);
-            ASSERT_EQ(item.keySetID, kKeyset);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_FALSE(item.hasAuxiliaryACL.Value());
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
+            .groupID         = kGroupId,
+            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+            .keySetID        = kKeyset,
+            .hasAuxiliaryACL = MakeOptional(false),
+            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+        } };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // Update Sender (false to true), invalid
     {
         chip::Testing::ClusterTester sender_tester(mSender);
         sender_tester.SetFabricIndex(kTestFabricIndex);
+        sender_tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
         Commands::ConfigureAuxiliaryACL::Type data;
         data.groupID         = kGroupId;
         data.useAuxiliaryACL = true;
 
         auto result = sender_tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     }
 
     // Update (false to true)
@@ -813,24 +1691,36 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
         data.useAuxiliaryACL = true;
 
         auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Read Membership
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        auto iter = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, kGroupId);
-            ASSERT_EQ(item.keySetID, kKeyset);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_TRUE(item.hasAuxiliaryACL.Value());
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
+            .groupID         = kGroupId,
+            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+            .keySetID        = kKeyset,
+            .hasAuxiliaryACL = MakeOptional(true),
+            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+        } };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
+    }
+
+    // Try to update for groupID 0 --> constraint error
+    {
+        tester.SetFabricIndex(kTestFabricIndex);
+        tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = 0;
+        data.useAuxiliaryACL = false;
+
+        auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     }
 
     // Update (true to false)
@@ -840,25 +1730,398 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
         data.useAuxiliaryACL = false;
 
         auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 
     // Read Membership
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        auto iter = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, kGroupId);
-            ASSERT_EQ(item.keySetID, kKeyset);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_FALSE(item.hasAuxiliaryACL.Value());
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
+            .groupID         = kGroupId,
+            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+            .keySetID        = kKeyset,
+            .hasAuxiliaryACL = MakeOptional(false),
+            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+        } };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
+}
+
+TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
+{
+    ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    // Default should be "no fabric under test"
+    FabricIndex fabricUnderTest = kUndefinedFabricIndex;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+    EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+
+    // Test invalid duration
+    {
+        Commands::GroupcastTesting::Type data;
+        data.testOperation = GroupcastTestingEnum::kEnableListenerTesting;
+        // Too small
+        data.durationSeconds = MakeOptional(static_cast<uint16_t>(9));
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+
+        // Command failed; should not have changed.
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+
+        // Too large
+        data.durationSeconds = MakeOptional(static_cast<uint16_t>(1201));
+        result               = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+
+        // Command failed; should not have changed from enabled state.
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+    }
+
+    // Enable testing (no duration)
+    {
+        Commands::GroupcastTesting::Type data;
+        data.testOperation = GroupcastTestingEnum::kEnableListenerTesting;
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
+    }
+
+    // Disable testing should clear the fabric under test
+    {
+        Commands::GroupcastTesting::Type data;
+        data.testOperation = GroupcastTestingEnum::kDisableTesting;
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+    }
+
+    // Enable Listener Testing with duration
+    {
+        const uint16_t durationSeconds = 10;
+
+        Commands::GroupcastTesting::Type data;
+        data.testOperation   = GroupcastTestingEnum::kEnableListenerTesting;
+        data.durationSeconds = MakeOptional(durationSeconds);
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
+
+        //  Testing should still be active
+        mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(durationSeconds - 1));
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
+
+        //  Testing should end after the duration
+        mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(durationSeconds + 1));
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+    }
+
+    // Enable Sender Testing with duration
+}
+
+TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1, 2 };
+    const GroupId kGroupId        = 0x1234;
+    const GroupId kGroupIdNoAux   = 0x5678;
+    const KeysetId kKeyset        = 0xabcd;
+
+    ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    auto & logOnlyEvents = mTestContext.EventsGenerator();
+
+    // 1. Test JoinGroup with useAuxiliaryACL = true -> Should generate event
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.key             = MakeOptional(ByteSpan(key));
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mClusterId, Clusters::AccessControl::Id);
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+
+        Clusters::AccessControl::Events::AuxiliaryAccessUpdated::DecodableType decodedEvent;
+        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.fabricIndex, kTestFabricIndex);
+    }
+
+    // 2. Test ConfigureAuxiliaryACL with no change -> Should NOT generate event
+    {
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = kGroupId;
+        data.useAuxiliaryACL = true;
+
+        auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 3. Test ConfigureAuxiliaryACL with change (true to false) -> Should generate event
+    {
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = kGroupId;
+        data.useAuxiliaryACL = false;
+
+        auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+
+    // 4. Test LeaveGroup with endpoints (partial remove) -> Should NOT generate event (as hasAuxiliaryACL is false)
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroupId;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints)));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // Re-join with auxiliary ACL for LeaveGroup test
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent(); // Clear the event from JoinGroup
+        ASSERT_TRUE(event.has_value());
+    }
+
+    // 5. Test LeaveGroup (whole group) -> Should generate event (as hasAuxiliaryACL is true)
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID = kGroupId;
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+
+    // 6. Test JoinGroup for a group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupIdNoAux;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(false);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 7. Test Add Endpoint to group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        const EndpointId kEndpoints2[] = { 3 };
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupIdNoAux;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(false);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 8. Test LeaveGroup (partial) for group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        const EndpointId kEndpoints2[] = { 2 };
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroupIdNoAux;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2)));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 9. Test JoinGroup with different multicast policy (no updates resulting in ACL change) -> Should NOT generate event
+    {
+        // First, ensure group exists with Aux ACL, endpoint and IANA policy
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto setupResult = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(setupResult.status, Protocols::InteractionModel::Status::Success);
+        (void) logOnlyEvents.GetNextEvent(); // Clear event from setup
+
+        // Now call JoinGroup again with same data but different multicast policy
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+}
+
+TEST_F(TestGroupcastCluster, TestMaxMembershipPerFabric)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1 };
+    const KeysetId kKeyset        = 0xabcd;
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    Commands::JoinGroup::Type data;
+    data.keySetID        = kKeyset;
+    data.useAuxiliaryACL = MakeOptional(true);
+    data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+    constexpr uint16_t kMaxPerFabric = GroupDataProviderImpl::kMaxMembershipPerFabric;
+
+    for (GroupId i = 1; i <= kMaxPerFabric; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success)) << "JoinGroup for group " << i << " should succeed";
+    }
+
+    // Per-fabric overflow
+    data.groupID = kMaxPerFabric + 1;
+    data.key.ClearValue();
+    auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
+}
+
+TEST_F(TestGroupcastCluster, TestTotalMaxMembership)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1 };
+    const KeysetId kKeyset        = 0xabcd;
+
+    constexpr uint16_t kMaxCount   = GroupDataProviderImpl::kMaxMembershipCount;
+    constexpr uint16_t kMaxPerFab  = GroupDataProviderImpl::kMaxMembershipPerFabric;
+    constexpr uint16_t kFab1Groups = kMaxPerFab - 1;
+    constexpr uint16_t kRemaining  = kMaxCount - kFab1Groups;
+    constexpr uint16_t kFab2Groups = kRemaining / 2;
+    constexpr uint16_t kFab3Groups = kRemaining - kFab2Groups;
+
+    // Set up two additional fabrics
+    FabricIndex fabricIndex2 = 2;
+    FabricIndex fabricIndex3 = 3;
+    ASSERT_EQ(mFabricHelper.AddAdditionalTestFabric(fabricIndex2), CHIP_NO_ERROR);
+    ASSERT_EQ(mFabricHelper.AddAdditionalTestFabric(fabricIndex3), CHIP_NO_ERROR);
+
+    chip::Testing::ClusterTester tester(mListener);
+    SubjectDescriptor adminSubjectDescriptor = kAdminSubjectDescriptor;
+
+    Commands::JoinGroup::Type data;
+    data.keySetID        = kKeyset;
+    data.useAuxiliaryACL = MakeOptional(true);
+    data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+    // Fabric 1: kFab1Groups (one below per-fabric limit)
+    tester.SetFabricIndex(kTestFabricIndex);
+    adminSubjectDescriptor.fabricIndex = kTestFabricIndex;
+    tester.SetSubjectDescriptor(adminSubjectDescriptor);
+
+    for (GroupId i = 1; i <= kFab1Groups; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+
+    // Fabric 2: kFab2Groups
+    tester.SetFabricIndex(fabricIndex2);
+    adminSubjectDescriptor.fabricIndex = fabricIndex2;
+    tester.SetSubjectDescriptor(adminSubjectDescriptor);
+
+    for (GroupId i = 1; i <= kFab2Groups; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+
+    // Fabric 3: kFab3Groups
+    tester.SetFabricIndex(fabricIndex3);
+    adminSubjectDescriptor.fabricIndex = fabricIndex3;
+    tester.SetSubjectDescriptor(adminSubjectDescriptor);
+
+    for (GroupId i = 1; i <= kFab3Groups; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+    }
+
+    // Node-wide total is now kMaxCount.
+    // Fabric 1 has kFab1Groups (< kMaxPerFab) so the per-fabric check passes,
+    // but the node-wide check should return ResourceExhausted.
+    tester.SetFabricIndex(kTestFabricIndex);
+    adminSubjectDescriptor.fabricIndex = kTestFabricIndex;
+    tester.SetSubjectDescriptor(adminSubjectDescriptor);
+
+    data.groupID = kFab1Groups + 1;
+    data.key.ClearValue();
+    auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
 }
 
 } // namespace

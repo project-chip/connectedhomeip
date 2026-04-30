@@ -19,6 +19,8 @@ from enum import Enum, auto
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
 
 class NrfApp(Enum):
     ALL_CLUSTERS = auto()
@@ -148,8 +150,8 @@ class NrfConnectBuilder(Builder):
             self._Execute(
                 ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
         except Exception:
-            logging.exception('Failed to validate ZEPHYR_BASE status')
-            logging.error(
+            log.exception('Failed to validate ZEPHYR_BASE status')
+            log.error(
                 'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
 
             raise Exception('ZEPHYR_BASE validation failed')
@@ -198,7 +200,7 @@ class NrfConnectBuilder(Builder):
                           title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling NrfConnect at %s', self.output_dir)
+        log.info('Compiling NrfConnect at %s', self.output_dir)
 
         cmd = self._prepare_environment()
         cmd += f'ninja -C {self.output_dir}'
@@ -216,7 +218,7 @@ class NrfConnectBuilder(Builder):
                           title='Run Tests ' + self.identifier)
 
     def _bundle(self):
-        logging.info(f'Generating flashbundle at {self.output_dir}')
+        log.info(f'Generating flashbundle at {self.output_dir}')
 
         self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)

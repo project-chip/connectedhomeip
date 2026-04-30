@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/MarkAttributeDirty.h>
 #include <app/util/attribute-metadata.h>
 #include <lib/core/DataModelTypes.h>
@@ -41,28 +40,17 @@ struct EmberAfWriteDataInput
     // The data type that dataPtr points to
     EmberAfAttributeType dataType;
 
-    // Controls when `changeListener` is called to flag an attribute dirty. It allows for things like:
-    //     kIfChanged - only if the dataPtr contains a different value than what currenty exists
+    // Controls when an attribute is marked dirty (via emberAfAttributeChanged)
+    //     kIfChanged - only if the dataPtr contains a different value than what currently exists
     //     kNo - never called
     //     kYes - always called
     chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::kIfChanged;
-
-    // Listener called when when the written data is consided changed/dirty.
-    // This being called depends on settings of `markDirty` combined with the actual contents of dataPtr
-    // vs the contents of the current attribute storage.
-    chip::app::DataModel::ProviderChangeListener * changeListener = nullptr;
 
     EmberAfWriteDataInput(uint8_t * data, EmberAfAttributeType type) : dataPtr(data), dataType(type) {}
 
     EmberAfWriteDataInput & SetMarkDirty(chip::app::MarkAttributeDirty value)
     {
         markDirty = value;
-        return *this;
-    }
-
-    EmberAfWriteDataInput & SetChangeListener(chip::app::DataModel::ProviderChangeListener * listener)
-    {
-        changeListener = listener;
         return *this;
     }
 };

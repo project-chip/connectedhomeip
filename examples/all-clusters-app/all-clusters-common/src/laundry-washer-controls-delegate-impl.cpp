@@ -23,10 +23,10 @@ using namespace chip;
 using namespace chip::app::Clusters::LaundryWasherControls;
 
 const CharSpan LaundryWasherControlDelegate::spinSpeedsNameOptions[] = {
-    CharSpan::fromCharString("Off"),
-    CharSpan::fromCharString("Low"),
-    CharSpan::fromCharString("Medium"),
-    CharSpan::fromCharString("High"),
+    "Off"_span,
+    "Low"_span,
+    "Medium"_span,
+    "High"_span,
 };
 
 const NumberOfRinsesEnum LaundryWasherControlDelegate::supportRinsesOptions[] = {

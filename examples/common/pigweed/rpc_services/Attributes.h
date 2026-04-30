@@ -181,6 +181,9 @@ public:
         case chip_rpc_AttributeData_data_string_tag:
             write_status = writer.PutString(kDataTag, data.data.data_string);
             break;
+        case chip_rpc_AttributeData_is_null_tag:
+            write_status = writer.PutNull(kDataTag);
+            break;
         default:
             return pw::Status::InvalidArgument();
         }
@@ -221,10 +224,7 @@ public:
         }
 
         Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternalDeviceAccess };
-        app::DataModel::WriteAttributeRequest write_request;
-        write_request.path = path;
-        write_request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
-        write_request.subjectDescriptor = &subjectDescriptor;
+        app::DataModel::WriteAttributeRequest write_request(path, subjectDescriptor);
 
         uint8_t raw_value_buffer[64]; // enough to hold general types
         pw::Result<TLV::TLVReader> tlvReader = ReadIntoTlv(request.data, chip::MutableByteSpan(raw_value_buffer));
@@ -263,6 +263,13 @@ public:
         // NOTE: TLV will be a full AttributeReportIB (so not purely the data)
         response.tlv_data.size = tlvBuffer.size();
         response.has_tlv_data  = true;
+
+        if (CheckTlvDataIsNull(tlvBuffer) == pw::OkStatus())
+        {
+            response.data.is_null = true;
+            response.which_data   = chip_rpc_AttributeData_is_null_tag;
+            return pw::OkStatus();
+        }
 
         switch (request.type)
         {
@@ -392,10 +399,7 @@ private:
         // TODO: this assumes a singleton data model provider
         app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
-        app::DataModel::ReadAttributeRequest request;
-        request.path = path;
-        request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
-        request.subjectDescriptor = &subjectDescriptor;
+        app::DataModel::ReadAttributeRequest request(path, subjectDescriptor);
 
         app::DataModel::ServerClusterFinder serverClusterFinder(provider);
         auto info = serverClusterFinder.Find(path);
@@ -442,8 +446,10 @@ private:
         return reader.GetString(value, N);
     }
 
-    template <typename T>
-    ::pw::Status TlvBufferGetData(ByteSpan tlvBuffer, TLV::TLVType expectedDataType, T & responseData)
+    /**
+     * Extracts data from tlvBuffer into the dataReader.
+     */
+    ::pw::Status TlvBufferGetData(ByteSpan tlvBuffer, TLV::TLVType expectedDataType, TLV::TLVReader & dataReader)
     {
         TLV::TLVReader reader;
         reader.Init(tlvBuffer);
@@ -465,11 +471,29 @@ private:
         PW_TRY(ChipErrorToPwStatus(reportParser.Init(reader)));
         app::AttributeDataIB::Parser dataParser;
         PW_TRY(ChipErrorToPwStatus(reportParser.GetAttributeData(&dataParser)));
-        TLV::TLVReader dataReader;
         PW_TRY(ChipErrorToPwStatus(dataParser.GetData(&dataReader)));
         PW_TRY(CheckTlvTagAndType(&dataReader, TLV::ContextTag(0x2), expectedDataType));
-        PW_TRY(ChipErrorToPwStatus(TlvGet(dataReader, responseData)));
 
+        return ::pw::OkStatus();
+    }
+
+    template <typename T>
+    ::pw::Status TlvBufferGetData(ByteSpan tlvBuffer, TLV::TLVType expectedDataType, T & responseData)
+    {
+        TLV::TLVReader dataReader;
+        PW_TRY(TlvBufferGetData(tlvBuffer, expectedDataType, dataReader));
+        PW_TRY(ChipErrorToPwStatus(TlvGet(dataReader, responseData)));
+        return ::pw::OkStatus();
+    }
+
+    /**
+     * Helper to check if tlvBuffer holds a Null value.
+     * Returns ::pw::OkStatus() is tlvBuffer holds a null, or an error status otherwise.
+     */
+    ::pw::Status CheckTlvDataIsNull(ByteSpan tlvBuffer)
+    {
+        TLV::TLVReader dataReader;
+        PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_Null, dataReader));
         return ::pw::OkStatus();
     }
 

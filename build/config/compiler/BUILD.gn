@@ -447,11 +447,15 @@ config("runtime_default") {
 config("sanitize_address") {
   defines = []
   cflags = [
-    "-fsanitize-coverage=inline-8bit-counters,trace-cmp",
-    "-fno-sanitize-coverage=pc-table",
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]
+  if (is_clang) {
+    cflags += [
+      "-fsanitize-coverage=inline-8bit-counters,trace-cmp",
+      "-fno-sanitize-coverage=pc-table",
+    ]
+  }
   ldflags = cflags
 
   if ((target_os == "mac" || target_os == "ios") && !is_clang) {
@@ -471,6 +475,8 @@ config("sanitize_memory") {
     "-fno-omit-frame-pointer",
   ]
   ldflags = cflags
+
+  defines = [ "CHIP_MEMORY_SANITIZER_ENABLED=1" ]
 }
 
 config("sanitize_undefined_behavior") {
@@ -478,6 +484,7 @@ config("sanitize_undefined_behavior") {
     "-fvisibility=hidden",
     "-fsanitize=undefined",
     "-fsanitize=float-divide-by-zero",
+    "-fsanitize=integer-divide-by-zero",
   ]
   if (is_clang) {
     cflags += [
