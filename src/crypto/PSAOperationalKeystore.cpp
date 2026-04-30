@@ -69,7 +69,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
 
         if (status == PSA_SUCCESS && PSA_KEY_LIFETIME_IS_VOLATILE(psa_get_key_lifetime(&attributes)))
         {
-            TEMPORARY_RETURN_IGNORED Destroy();
+            ReturnErrorOnFailure(Destroy());
         }
 
         psa_reset_key_attributes(&attributes);
@@ -170,7 +170,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     psa_key_id_t keyId              = 0;
     VerifyOrReturnError(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    TEMPORARY_RETURN_IGNORED Destroy();
+    ReturnErrorOnFailure(Destroy());
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
@@ -296,7 +296,7 @@ CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIn
 void PSAOperationalKeystore::RevertPendingKeypair()
 {
     VerifyOrReturn(HasPendingOpKeypair());
-    TEMPORARY_RETURN_IGNORED mPendingKeypair->Destroy();
+    ReturnErrorOnFailure(mPendingKeypair->Destroy());
     ReleasePendingKeypair();
 }
 

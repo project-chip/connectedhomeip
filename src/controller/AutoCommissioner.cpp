@@ -143,7 +143,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting attestation nonce to random value");
-        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce)));
     }
     mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
@@ -156,7 +156,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting CSR nonce to random value");
-        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)));
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
