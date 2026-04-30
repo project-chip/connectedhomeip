@@ -90,8 +90,8 @@ Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 }
 
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)),
-    mFeatureMap(config.mFeatures), mOptionalAttributes(config.mOptionalAttributes)
+    DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mFeatureMap(config.mFeatures),
+    mOptionalAttributes(config.mOptionalAttributes)
 {}
 
 CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
