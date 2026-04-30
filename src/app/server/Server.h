@@ -22,6 +22,7 @@
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -365,6 +366,13 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         }
 #endif
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+        if (this->groupAuxiliaryAccessControlDelegate == nullptr)
+        {
+            this->groupAuxiliaryAccessControlDelegate = &mGroupAuxiliaryAccessControlDelegate;
+        }
+#endif  // CHIP_CONFIG_ENABLE_GROUPCAST
+
         return CHIP_NO_ERROR;
     }
 
@@ -392,6 +400,13 @@ private:
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     app::DefaultICDCheckInBackOffStrategy mICDCheckInBackOffStrategy;
+#endif
+
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    // Default delegate used when the application does not provide its own. The Server's
+    // FabricTable is not reachable from here, so the delegate iterates fabric indices
+    // linearly instead of via FabricTable iteration; functionally equivalent.
+    Access::Examples::GroupAuxiliaryAccessControlDelegate mGroupAuxiliaryAccessControlDelegate{ &mGroupDataProvider };
 #endif
 };
 

@@ -37,6 +37,9 @@
 #define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
 
 namespace chip {
+
+class FabricTable;
+
 namespace Access {
 
 class AccessControl
@@ -409,6 +412,12 @@ public:
         {
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
+
+        // Optional FabricTable injection. Delegates that can take advantage of a FabricTable
+        // (e.g. to iterate only over provisioned fabric indices) may override these. The default
+        // implementation reports no FabricTable and ignores injection attempts.
+        virtual bool HasFabricTable() const { return false; }
+        virtual void SetFabricTable(chip::FabricTable *) {}
 
         // Check
         // Return CHIP_NO_ERROR if allowed, CHIP_ERROR_ACCESS_DENIED if denied,

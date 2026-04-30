@@ -38,6 +38,8 @@ public:
     {}
     ~GroupAuxiliaryAccessControlDelegate() override = default;
 
+    bool HasFabricTable() const override { return mFabricTable != nullptr; }
+    void SetFabricTable(FabricTable * fabricTable) override { mFabricTable = fabricTable; }
     // Delegate implementation
     CHIP_ERROR AuxiliaryEntries(AccessControl::EntryIterator & iterator, const FabricIndex * fabricIndex) const override;
 
