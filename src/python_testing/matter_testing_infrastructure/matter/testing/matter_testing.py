@@ -574,21 +574,12 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _purge_tls_endpoints(self):
         """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
 
-        Uses a targeted Descriptor cluster read across all endpoints to locate
-        TlsClientManagement via ServerList.
+        Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
+        TlsClientManagement via ServerList — no extra network read needed.
         """
-        try:
-            descriptor_read = await asyncio.wait_for(
-                self.default_controller.Read(self.dut_node_id, [Clusters.Descriptor]),
-                timeout=60
-            )
-        except Exception as e:
-            LOGGER.warning(f"[CLN] could not read Descriptor — skipping TLS endpoint [CLN] {e}")
-            return
-
         tls_cluster_id = Clusters.TlsClientManagement.id
         found_any = False
-        for endpoint_id, clusters in descriptor_read.attributes.items():
+        for endpoint_id, clusters in self.stored_global_wildcard.attributes.items():
             server_list = clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
             if server_list is None or tls_cluster_id not in server_list:
                 continue
