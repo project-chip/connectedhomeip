@@ -197,6 +197,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
         self._original_acl = None
+        # Set to True by commission_devices() on success; gates the per-test ACL read in
+        # setup_test so unit tests (which never commission) incur zero network overhead.
+        self._dut_confirmed_available = False
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -281,12 +284,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         Wildcard attributes are pre-fetched once so all cluster-presence checks within
         a single cleanup pass share the same read.
         """
-        dut_reachable = True
-        try:
-            await self._populate_wildcard()
-        except Exception as e:
-            LOGGER.warning(f"[CLN] could not populate wildcard, DUT is unreachable — skipping all DUT cleanup: {e}")
-            dut_reachable = False
+        # If setup_test could not read the ACL, the DUT was unreachable at test
+        # start — skip DUT cleanup to avoid a slow network discovery attempt.
+        dut_reachable = self._original_acl is not None
+        if dut_reachable:
+            try:
+                await self._populate_wildcard()
+            except Exception as e:
+                LOGGER.warning(f"[CLN] could not populate wildcard, DUT is unreachable — skipping all DUT cleanup: {e}")
+                dut_reachable = False
 
         if dut_reachable:
             # DUT cleanup (run first as controller must still be alive to send commands)
@@ -780,16 +786,27 @@ class MatterBaseTest(base_test.BaseTestClass):
             if steps is None:
                 self.step(1)
 
-        # Capture the ACL before the test runs so _reset_acls_to_default
-        # in teardown_test can restore it
-        try:
-            self._original_acl = self.event_loop.run_until_complete(self.read_single_attribute_check_success(
-                cluster=Clusters.AccessControl,
-                attribute=Clusters.AccessControl.Attributes.Acl,
-                endpoint=0
-            ))
-        except Exception:
-            self._original_acl = None
+        # Capture the ACL before the test runs so _reset_acls_to_default can restore it
+        # in teardown_test. Skip when the DUT is not known to be available: unit tests
+        # never commission a device so _dut_confirmed_available stays False, and
+        # commissioning_method is None, eliminating any network overhead for them.
+        # For runner-commissioned tests commissioning_method is set; for in-test
+        # commissioning the flag is set by commission_devices() on success.
+        dut_expected = (
+            self._dut_confirmed_available
+            or self.matter_test_config.commissioning_method is not None
+        )
+        if dut_expected:
+            try:
+                self._original_acl = self.event_loop.run_until_complete(
+                    self.read_single_attribute_check_success(
+                        cluster=Clusters.AccessControl,
+                        attribute=Clusters.AccessControl.Attributes.Acl,
+                        endpoint=0
+                    )
+                )
+            except Exception:
+                self._original_acl = None
 
     def teardown_test(self):
         """Runs DUT and controller cleanup after each individual test method.
@@ -1404,7 +1421,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        if result:
+            self._dut_confirmed_available = True
+        return result
 
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
