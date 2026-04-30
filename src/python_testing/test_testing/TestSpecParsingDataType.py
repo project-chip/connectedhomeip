@@ -31,6 +31,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 class TestSpecParsingDataType(MatterBaseTest):
+    requires_dut = False
+
     def setup_class(self):
         super().setup_class()
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)

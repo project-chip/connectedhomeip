@@ -41,6 +41,8 @@ kConfigureTrustedTimeSource = 19
 
 
 class TestCommissioningTimeSync(MatterBaseTest):
+    requires_dut = False
+
     def setup_class(self):
         self.commissioner = None
         self.commissioned = False

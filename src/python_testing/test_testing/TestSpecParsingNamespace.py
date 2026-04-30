@@ -30,6 +30,8 @@ from matter.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirect
 
 
 class TestSpecParsingNamespace(MatterBaseTest):
+    requires_dut = False
+
     def setup_class(self):
         super().setup_class()
         # Test data setup

@@ -455,6 +455,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     Wildcard subscription (see ``setup_test``):
 
+    * Set class attribute ``requires_dut = False`` for tests that do not interact with a
+      real DUT (e.g. parser/conformance unit tests under ``test_testing/``).  Such tests
+      will skip the background wildcard subscription so they don't try to subscribe to a
+      device that isn't there.  Default is ``True``.
     * Set class attribute ``disable_wildcard_subscription = True`` to skip the background
       wildcard subscription and its ACL side effects — same effect as ``--no-wildcard-subscription``.
       Prefer this for certification so the test script does not rely on extra runner flags.
@@ -462,6 +466,8 @@ class MatterBaseTest(base_test.BaseTestClass):
       each read to the subscription cache unless ``verify_wildcard_subscription=False`` is passed,
       or the class sets ``default_verify_wildcard_subscription = False``.
     """
+
+    requires_dut: bool = True
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -871,15 +877,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         self.failed = False
         if self.runner_hook and not self.is_commissioning:
-            # Start the background wildcard subscription only for real device tests or cert tests
-            # (commissioning_method is set) and unless the test has opted out via
-            # ``--no-wildcard-subscription`` or ``disable_wildcard_subscription = True`` on the
-            # test class (e.g. tests that directly manipulate the ACL or tests that count the TH entries).
-            # Unit tests in test_testing/ run without --commissioning-method, so
-            # commissioning_method is None there — skipping avoids trying to connect
-            # to a non-existent DUT (which would hang ~30 s per test and blow the CI timeout of 60mins).
-            if (not self._wildcard_subscription_disabled() and
-                    self.matter_test_config.commissioning_method is not None):
+            # Start the background wildcard subscription only for tests that interact with a
+            # real DUT (``requires_dut = True``, the default) and unless the test has opted out
+            # via ``--no-wildcard-subscription`` or ``disable_wildcard_subscription = True`` on
+            # the test class (e.g. tests that directly manipulate the ACL or tests that count
+            # the TH entries).
+            #
+            # Parser/unit tests under test_testing/ override ``requires_dut = False`` so they
+            # don't try to subscribe to a device that isn't there (which would hang ~30s per
+            # test and blow the CI timeout).  Gating on ``requires_dut`` rather than on
+            # ``--commissioning-method`` keeps this decoupled from harness CLI flags whose
+            # semantics may shift at certification time.
+            if not self._wildcard_subscription_disabled() and self.requires_dut:
                 self._start_wildcard_subscription()
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)

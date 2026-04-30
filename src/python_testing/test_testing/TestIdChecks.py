@@ -27,6 +27,8 @@ from matter.testing.runner import default_matter_test_main
 
 
 class TestIdChecks(MatterBaseTest):
+    requires_dut = False
+
     def test_device_type_ids(self):
         standard_good = [0x0000_0000, 0x0000_BFFF]
         standard_bad = [0x0000_C000]
