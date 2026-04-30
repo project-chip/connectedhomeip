@@ -115,8 +115,7 @@ public:
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
                           SetupCodePairerBehaviour connectionType              = SetupCodePairerBehaviour::kCommission,
                           DiscoveryType discoveryType                          = DiscoveryType::kAll,
-                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional,
-                          Optional<ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
+                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
 
     // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
@@ -128,7 +127,11 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #if CHIP_SUPPORT_THREAD_MESHCOP
-    void SetThreadMeshcopCommissionProxy(ThreadMeshcopCommissionProxy * proxy) { mThreadMeshcopCommissionProxy = proxy; }
+    void SetThreadMeshcopCommissionParamsAndProxy(ThreadMeshcopCommissionParameters &meshcopCommissionParams, ThreadMeshcopCommissionProxy * proxy)
+    {
+        mThreadMeshcopCommissionProxy = proxy;
+        mThreadMeshcopCommissionParams.SetValue(meshcopCommissionParams);
+    }
 #endif
 
     // Stop ongoing discovery / pairing of the specified node, or of
@@ -206,7 +209,9 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
         kNFCTransport,
 #endif
+#if CHIP_SUPPORT_THREAD_MESHCOP
         kThreadMeshcopTransport,
+#endif
         kTransportTypeCount,
     };
 
@@ -278,8 +283,8 @@ private:
     // mLastPASEError is the error from the last OnPairingComplete call we got.
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
 
-    Optional<ThreadMeshcopCommissionParameters> mThreadMeshcopCommissionParams;
 #if CHIP_SUPPORT_THREAD_MESHCOP
+    Optional<ThreadMeshcopCommissionParameters> mThreadMeshcopCommissionParams;
     ThreadMeshcopCommissionProxy * mThreadMeshcopCommissionProxy = nullptr;
 #endif
 };

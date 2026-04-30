@@ -43,8 +43,7 @@ namespace chip {
 namespace Controller {
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
-                                       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData,
-                                       Optional<ThreadMeshcopCommissionParameters> meshcopCommissioningParams)
+                                       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -88,8 +87,6 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
         NotifyCommissionableDeviceDiscovered(resolutionData.Value(), /* matchedLongDiscriminator = */ std::nullopt);
         return CHIP_NO_ERROR;
     }
-
-    mThreadMeshcopCommissionParams = meshcopCommissioningParams;
 
     ReturnErrorOnFailureWithMetric(kMetricSetupCodePairerPairDevice, Connect());
     auto errorCode =

@@ -683,13 +683,13 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
 #if CHIP_SUPPORT_THREAD_MESHCOP
     if (meshcopCommissionParams.HasValue())
     {
-        mSetUpCodePairer.SetThreadMeshcopCommissionProxy(&mThreadMeshcopCommissionProxy);
+        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
     }
 #endif
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
 
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
-                                       resolutionData, meshcopCommissionParams);
+                                       resolutionData);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
@@ -774,11 +774,11 @@ DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * 
 #if CHIP_SUPPORT_THREAD_MESHCOP
     if (meshcopCommissionParams.HasValue())
     {
-        mSetUpCodePairer.SetThreadMeshcopCommissionProxy(&mThreadMeshcopCommissionProxy);
+        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
     }
 #endif
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
-                                       resolutionData, meshcopCommissionParams);
+                                       resolutionData);
 }
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
