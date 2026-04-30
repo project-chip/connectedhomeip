@@ -27,10 +27,6 @@ namespace app {
  * This class serves as a simple example. It implements the OnOffDelegate and FanControlDelegate
  * interfaces and logs messages when fan actions occur (On/Off callbacks, step, fan drive state,
  * rock/wind, airflow direction).
- *
- * Product policy (example): when On/Off is off and SpeedSetting becomes non-zero (multi-speed),
- * On/Off is set on; when FanMode is off, SpeedSetting is 0 (multi-speed), or PercentSetting is 0
- * outside Auto, On/Off is set off. Real products can replace this mapping.
  */
 class LoggingFanDevice : public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate, public FanDevice
 {
@@ -51,9 +47,6 @@ public:
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
-
-private:
-    void SyncOnOffFromFanDriveState(const Clusters::FanControl::FanDriveState & newState);
 };
 
 } // namespace app

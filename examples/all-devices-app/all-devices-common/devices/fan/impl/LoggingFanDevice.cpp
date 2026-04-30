@@ -23,30 +23,48 @@ using namespace chip::app::Clusters;
 
 namespace chip {
 namespace app {
-
 namespace {
 
-bool DesiredOnOffFromFanDriveState(const FanControl::FanDriveState & newState, bool supportsMultiSpeed)
+bool IsFanDriveOutputActive(const FanControl::FanDriveState & state)
 {
-    if (newState.mode == FanControl::FanModeEnum::kOff)
+    using FanControl::FanModeEnum;
+    if (state.mode == FanModeEnum::kOff)
     {
         return false;
     }
+    return state.percentCurrent > 0 || state.speedCurrent > 0;
+}
 
-    // Example product rule: multi-speed fan at 0 implies device off at the application level.
-    if (supportsMultiSpeed && !newState.speedSetting.IsNull() && newState.speedSetting.Value() == 0)
+void ApplyOnOffToFan(FanControlCluster & fan, bool on)
+{
+    if (!on)
     {
-        return false;
+        fan.SetPercentCurrent(0);
+        if (fan.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+        {
+            fan.SetSpeedCurrent(0);
+        }
+        return;
     }
 
-    // Outside Auto, percent 0 implies off.
-    if (newState.mode != FanControl::FanModeEnum::kAuto && !newState.percentSetting.IsNull() &&
-        newState.percentSetting.Value() == 0)
+    if (fan.GetFanMode() == FanControl::FanModeEnum::kOff)
     {
-        return false;
+        return;
     }
 
-    return true;
+    const auto percentSetting = fan.GetPercentSetting();
+    if (!percentSetting.IsNull())
+    {
+        fan.SetPercentCurrent(percentSetting.Value());
+    }
+    if (fan.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        const auto speedSetting = fan.GetSpeedSetting();
+        if (!speedSetting.IsNull())
+        {
+            fan.SetSpeedCurrent(speedSetting.Value());
+        }
+    }
 }
 
 } // namespace
@@ -102,19 +120,6 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
     return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed)).GetStatusCode().GetStatus();
 }
 
-void LoggingFanDevice::SyncOnOffFromFanDriveState(const FanControl::FanDriveState & newState)
-{
-    const bool supportsMultiSpeed = FanControlCluster().GetFeatureMap().Has(FanControl::Feature::kMultiSpeed);
-    const bool desiredOn          = DesiredOnOffFromFanDriveState(newState, supportsMultiSpeed);
-
-    Clusters::OnOffCluster & onOff = OnOffCluster();
-    if (!desiredOn && onOff.GetOnOff())
-    {
-        // Product choice: fan drive state implies powering the device off.
-        LogErrorOnFailure(onOff.SetOnOff(false));
-    }
-}
-
 void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
     const unsigned mode             = static_cast<unsigned>(to_underlying(newState.mode));
@@ -156,39 +161,7 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
             mode, percentCurrent, speedCurrent);
     }
 
-    SyncOnOffFromFanDriveState(newState);
-
-    auto & cluster = FanControlCluster();
-    if (OnOffCluster().GetOnOff())
-    {
-        if (newState.mode == FanControl::FanModeEnum::kOff)
-        {
-            cluster.SetPercentCurrent(chip::Percent{ 0 });
-            if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-            {
-                cluster.SetSpeedCurrent(0);
-            }
-        }
-        else
-        {
-            if (!newState.percentSetting.IsNull())
-            {
-                cluster.SetPercentCurrent(newState.percentSetting.Value());
-            }
-            if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed) && !newState.speedSetting.IsNull())
-            {
-                cluster.SetSpeedCurrent(newState.speedSetting.Value());
-            }
-        }
-    }
-    else
-    {
-        cluster.SetPercentCurrent(chip::Percent{ 0 });
-        if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-        {
-            cluster.SetSpeedCurrent(0);
-        }
-    }
+    LogErrorOnFailure(OnOffCluster().SetOnOff(IsFanDriveOutputActive(newState)));
 }
 
 void LoggingFanDevice::OnRockSettingChanged(BitMask<FanControl::RockBitmap> newValue)
@@ -211,40 +184,14 @@ void LoggingFanDevice::OnAirflowDirectionChanged(FanControl::AirflowDirectionEnu
 
 void LoggingFanDevice::OnOffStartup(bool on)
 {
+    ApplyOnOffToFan(FanControlCluster(), on);
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffStartup() -> %s", on ? "ON" : "OFF");
 }
 
 void LoggingFanDevice::OnOnOffChanged(bool on)
 {
+    ApplyOnOffToFan(FanControlCluster(), on);
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffChanged() -> %s", on ? "ON" : "OFF");
-
-    auto & cluster = FanControlCluster();
-
-    if (!on)
-    {
-        cluster.SetPercentCurrent(chip::Percent{ 0 });
-        if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-        {
-            cluster.SetSpeedCurrent(0);
-        }
-    }
-    else
-    {
-        const auto percentSetting = cluster.GetPercentSetting();
-        if (!percentSetting.IsNull())
-        {
-            cluster.SetPercentCurrent(percentSetting.Value());
-        }
-
-        if (cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-        {
-            const auto speedSetting = cluster.GetSpeedSetting();
-            if (!speedSetting.IsNull())
-            {
-                cluster.SetSpeedCurrent(speedSetting.Value());
-            }
-        }
-    }
 }
 
 } // namespace app
