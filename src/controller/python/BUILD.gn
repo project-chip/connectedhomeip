@@ -72,6 +72,7 @@ shared_library("ChipDeviceCtrl") {
       "matter/bdx/bdx.cpp",
       "matter/bdx/test-bdx-transfer-server.cpp",
       "matter/bdx/test-bdx-transfer-server.h",
+      "matter/case_capture/CASECapture.cpp",
       "matter/clusters/attribute.cpp",
       "matter/clusters/command.cpp",
       "matter/commissioning/PlaceholderOperationalCredentialsIssuer.h",
@@ -226,6 +227,7 @@ matter_python_wheel_action("matter-core") {
         "matter/ble/library_handle.py",
         "matter/ble/scan_devices.py",
         "matter/ble/types.py",
+        "matter/case_capture/__init__.py",
         "matter/clusters/Attribute.py",
         "matter/clusters/Command.py",
         "matter/clusters/__init__.py",
@@ -326,6 +328,7 @@ matter_python_wheel_action("matter-core") {
     "matter.storage",
     "matter.tracing",
     "matter.fault_injection",
+    "matter.case_capture",
   ]
   if (chip_support_webrtc_python_bindings) {
     py_packages += [ "matter.webrtc" ]
