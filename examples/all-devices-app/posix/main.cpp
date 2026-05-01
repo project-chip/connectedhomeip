@@ -139,7 +139,7 @@ public:
             []() {
                 BitFlags<AppRootNode::EnabledFeatures> features;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-                features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::EnableWiFi());
+                features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::GetConfig().enableWiFi);
 #endif
                 return features;
             }())
