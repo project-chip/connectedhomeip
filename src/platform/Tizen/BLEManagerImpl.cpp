@@ -1287,8 +1287,8 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 
     /* Send StartScan Request to Scanner Class */
     strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
-    err = mDeviceScanner.StartScan(ScanFilterType::kServiceData, data);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
+    err = mDeviceScanner.StartScan(ScanFilterType::kServiceUUID, data);
+    SuccessOrExitAction(err, ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimeout, this);
     VerifyOrExit(err == CHIP_NO_ERROR, mDeviceScanner.StopScan();
