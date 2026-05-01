@@ -67,7 +67,8 @@ from typing import Dict, List, Optional, Set
 import yaml
 
 # ---------------------------------------------------------------------------
-# Allowlists – loaded from alchemy_allowlists.yaml next to this script.
+# Allowlists – loaded from
+# src/app/zap-templates/zcl/data-model/chip/alchemy_allowlists.yaml.
 #
 # MANUAL_ALLOWLIST: hand-maintained XML files that pre-date Alchemy.
 # INCOMPLETE_METADATA_ALLOWLIST: Alchemy-generated files with incomplete
