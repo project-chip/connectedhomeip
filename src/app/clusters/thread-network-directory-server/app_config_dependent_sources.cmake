@@ -19,6 +19,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/DefaultThreadNetworkDirectoryStorage.cpp"
     "${CLUSTER_DIR}/DefaultThreadNetworkDirectoryStorage.h"
     "${CLUSTER_DIR}/ThreadNetworkDirectoryStorage.h"
-    "${CLUSTER_DIR}/thread-network-directory-server.cpp"
-    "${CLUSTER_DIR}/thread-network-directory-server.h"
+    "${CLUSTER_DIR}/ThreadNetworkDirectoryCluster.cpp"
+    "${CLUSTER_DIR}/ThreadNetworkDirectoryCluster.h"
 )
