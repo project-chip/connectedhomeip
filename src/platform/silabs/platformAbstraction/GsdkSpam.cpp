@@ -303,7 +303,9 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     const sl_button_t * handle = SL_SIMPLE_BUTTON_INSTANCE(button);
     return nullptr == handle ? 0 : sl_button_get_state(handle);
 }
-
+#ifdef SL_ICD_ENABLED
+void SilabsPlatform::SleepButtonActionHandler() {}
+#endif // SL_ICD_ENABLED
 #else
 uint8_t SilabsPlatform::GetButtonState(uint8_t button)
 {
