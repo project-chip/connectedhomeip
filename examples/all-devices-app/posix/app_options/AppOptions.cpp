@@ -29,98 +29,17 @@ using namespace chip::ArgParser;
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType = 0xffd0;
-constexpr uint16_t kOptionEndpoint   = 0xffd1;
 constexpr uint16_t kOptionWiFi       = 0xffd2;
 
-std::vector<AppOptions::DeviceConfig> AppOptions::mDeviceConfigs;
+DeviceTypeParser AppOptions::sParser;
 bool AppOptions::mEnableWiFi = false;
 
-const std::vector<AppOptions::DeviceConfig> & AppOptions::GetDeviceConfigs()
+const std::vector<DeviceTypeParser::Entry> & AppOptions::GetDeviceTypeEntries()
 {
-    if (mDeviceConfigs.empty())
-    {
-        static const std::vector<DeviceConfig> kDefault = { { "contact-sensor", 1 } };
-        return kDefault;
-    }
-    return mDeviceConfigs;
+    return sParser.GetDeviceTypeEntries();
 }
 
-bool AppOptions::ParseEndpointId(const char * str, chip::EndpointId & endpoint)
-{
-    char * endptr;
-    long val = strtol(str, &endptr, 10);
 
-    if (endptr == str || *endptr != '\0' || val < 0 || val > UINT16_MAX)
-    {
-        return false;
-    }
-
-    endpoint = static_cast<chip::EndpointId>(val);
-    return true;
-}
-
-/**
- * Parses a device configuration string in the format "type" or "type:endpoint".
- *
- * Example: "speaker:2" -> type="speaker", endpoint=2
- *
- * @param value The string to parse.
- * @param config The DeviceConfig structure to populate.
- * @return true on success, false on failure (e.g. invalid format or endpoint ID).
- */
-bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
-{
-    VerifyOrReturnValue(value != nullptr, false);
-
-    // Set default values for optional fields
-    config.endpoint = 1;
-    config.parentId = chip::kInvalidEndpointId;
-
-    // Find the first colon to separate type from endpoint
-    const char * firstColon = strchr(value, ':');
-
-    // Case 1: No colon present. The entire value is treated as the device type.
-    // Example: "chime" -> type="chime", endpoint=1, parentId=invalid
-    if (firstColon == nullptr)
-    {
-        config.type = value;
-        return true;
-    }
-
-    // Extract the type (all characters before the first colon)
-    config.type.assign(value, static_cast<size_t>(firstColon - value));
-
-    // Find the second colon to separate endpoint from parent
-    const char * secondColon = strchr(firstColon + 1, ':');
-
-    // The endpoint ID starts immediately after the first colon
-    const char * endpointStart = firstColon + 1;
-
-    // If a second colon exists, the endpoint ID is between the colons.
-    // Otherwise, it extends to the end of the string.
-    size_t endpointLen = secondColon ? static_cast<size_t>(secondColon - endpointStart) : strlen(endpointStart);
-
-    // Extract and parse the endpoint ID
-    std::string endpointStr(endpointStart, endpointLen);
-    if (!ParseEndpointId(endpointStr.c_str(), config.endpoint))
-    {
-        ChipLogError(Support, "Invalid endpoint ID in device config: %s\n", value);
-        return false;
-    }
-
-    // Case 2: Two colons present (format: type:endpoint:parent)
-    // Extract and parse the parent ID after the second colon.
-    if (secondColon != nullptr)
-    {
-        if (!ParseEndpointId(secondColon + 1, config.parentId))
-        {
-            ChipLogError(Support, "Invalid parent endpoint ID in device config: %s\n", value);
-            return false;
-        }
-    }
-
-    return true;
-}
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
@@ -128,36 +47,9 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     switch (identifier)
     {
     case kOptionDeviceType: {
-        DeviceConfig config;
-        if (!ParseDeviceConfig(value, config))
+        if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;
-        }
-
-        ChipLogProgress(AppServer, "Adding device type %s on endpoint %d", config.type.c_str(), config.endpoint);
-        mDeviceConfigs.push_back(std::move(config));
-        return true;
-    }
-    case kOptionEndpoint: {
-        chip::EndpointId ep;
-        if (value == nullptr || !ParseEndpointId(value, ep))
-        {
-            ChipLogError(Support, "Invalid endpoint ID: %s\n", value ? value : "(null)");
-            return false;
-        }
-
-        if (mDeviceConfigs.empty())
-        {
-            ChipLogError(Support, "Warning: --endpoint specified before --device. Creating default 'contact-sensor'.");
-            DeviceConfig config;
-            config.type     = "contact-sensor";
-            config.endpoint = ep;
-            mDeviceConfigs.push_back(std::move(config));
-        }
-        else
-        {
-            mDeviceConfigs.back().endpoint = ep;
-            ChipLogProgress(AppServer, "Updated last device to endpoint %d", ep);
         }
         return true;
     }
@@ -177,7 +69,6 @@ OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
-        { "endpoint", kArgumentRequired, kOptionEndpoint },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
@@ -194,13 +85,9 @@ OptionSet * AppOptions::GetOptions()
         }
         result.replace(result.length() - 1, 1, ">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint'\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
-        result += "       Example: --device chime:1 --device speaker:2\n\n";
-
-        // rest of the help
-        result += "  --endpoint <endpoint-number>\n";
-        result += "       Define the endpoint for the preceding device (default 1)\n\n";
+        result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";

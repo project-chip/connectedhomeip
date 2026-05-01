@@ -34,6 +34,7 @@
 #include <app/server/Server.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <devices/device-type-parser/DeviceTypeParser.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -149,13 +150,23 @@ public:
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-        for (const auto & config : AppOptions::GetDeviceConfigs())
+        if (AppOptions::GetDeviceTypeEntries().empty())
         {
-            auto device = DeviceFactory::GetInstance().Create(config.type);
+            ChipLogProgress(AppServer, "No devices specified. Creating default contact-sensor on endpoint 1");
+            auto device = DeviceFactory::GetInstance().Create("contact-sensor");
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
-            ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", config.type.c_str(),
-                            config.endpoint, config.parentId);
-            ReturnErrorOnFailure(device->Register(config.endpoint, mDataModelProvider, config.parentId));
+            ReturnErrorOnFailure(device->Register(1, mDataModelProvider, kInvalidEndpointId));
+            mConstructedDevices.push_back(std::move(device));
+            return CHIP_NO_ERROR;
+        }
+
+        for (const auto & entry : AppOptions::GetDeviceTypeEntries())
+        {
+            auto device = DeviceFactory::GetInstance().Create(entry.type);
+            VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
+            ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
+                            entry.endpoint, entry.parentId);
+            ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
             mConstructedDevices.push_back(std::move(device));
         }
 

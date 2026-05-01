@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,19 +13,22 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/config/recommended.gni")
-import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/system/system.gni")
 
-declare_args() {
-  # Build controller (set to false for a device)
-  chip_support_commissioning_in_controller = true
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  # Build controller with webrtc python bindings
-  chip_support_webrtc_python_bindings = false
-}
+if (chip_build_tests) {
+  chip_test_suite("tests") {
+    output_name = "TestDeviceTypeParser"
 
-declare_args() {
-  # Disable Thread MeshCoP if cross-compiling because of missing libevent.
-  chip_support_thread_meshcop = false
+    test_sources = [ "TestDeviceTypeParser.cpp" ]
+
+    cflags = [ "-Wconversion" ]
+
+    public_deps = [
+      "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-type-parser",
+      "${chip_root}/src/lib/support:testing",
+      "${chip_root}/src/platform",
+    ]
+  }
 }
