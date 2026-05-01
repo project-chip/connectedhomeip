@@ -92,8 +92,9 @@ Build the application using the following command:
 ## Running the Application
 
 To run the application, specify the device type using the `--device` flag. The
-format is `type:endpoint` or `type:endpoint,parent=parentId`, where the optional `parent` option allows
-establishing parent/child endpoint relationships for logical grouping.
+format is `type:endpoint` or `type:endpoint,parent=parentId`, where the optional
+`parent` option allows establishing parent/child endpoint relationships for
+logical grouping.
 
 The application supports running multiple devices simultaneously by specifying
 the flag multiple times.

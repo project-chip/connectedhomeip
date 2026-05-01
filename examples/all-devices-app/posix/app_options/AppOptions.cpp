@@ -39,8 +39,6 @@ const std::vector<DeviceTypeParser::Entry> & AppOptions::GetDeviceTypeEntries()
     return sParser.GetDeviceTypeEntries();
 }
 
-
-
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
 {

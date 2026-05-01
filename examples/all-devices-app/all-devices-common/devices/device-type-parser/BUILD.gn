@@ -26,9 +26,7 @@ source_set("device-type-parser") {
     "DeviceTypeParser.h",
   ]
 
-  public_deps = [
-    "${chip_root}/src/lib",
-  ]
+  public_deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [
     "${chip_root}/src:includes",

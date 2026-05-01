@@ -86,15 +86,13 @@ TEST_F(TestDeviceTypeParser, AccumulateDevices)
 {
     EXPECT_EQ(mParser.ParseSingleDeviceString("chime:1"), CHIP_NO_ERROR);
     EXPECT_EQ(mParser.ParseSingleDeviceString("speaker:2,parent=1"), CHIP_NO_ERROR);
-    
+
     const auto & configs = mParser.GetDeviceTypeEntries();
     EXPECT_EQ(configs.size(), 2U);
     EXPECT_EQ(configs[0].type, "chime");
     EXPECT_EQ(configs[0].endpoint, 1);
-    
+
     EXPECT_EQ(configs[1].type, "speaker");
     EXPECT_EQ(configs[1].endpoint, 2);
     EXPECT_EQ(configs[1].parentId, 1);
 }
-
-

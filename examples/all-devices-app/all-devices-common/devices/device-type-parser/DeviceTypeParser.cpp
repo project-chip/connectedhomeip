@@ -83,9 +83,9 @@ bool DeviceTypeParser::ParseDeviceTypeEntry(const char * value, Entry & entry)
     // Parse options: "parent=parentId"
     if (comma != nullptr)
     {
-        const char * optionsStr = comma + 1;
+        const char * optionsStr   = comma + 1;
         const char * parentPrefix = "parent=";
-        const char * parentPtr = strstr(optionsStr, parentPrefix);
+        const char * parentPtr    = strstr(optionsStr, parentPrefix);
         if (parentPtr != nullptr)
         {
             const char * parentValStr = parentPtr + strlen(parentPrefix);

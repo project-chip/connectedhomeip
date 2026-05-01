@@ -34,8 +34,8 @@
 #include <app/server/Server.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-type-parser/DeviceTypeParser.h>
 #include <devices/device-factory/DeviceFactory.h>
+#include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>

@@ -33,11 +33,11 @@ public:
         chip::EndpointId parentId = chip::kInvalidEndpointId;
     };
 
-    DeviceTypeParser() = default;
+    DeviceTypeParser()  = default;
     ~DeviceTypeParser() = default;
-    
+
     // Disable copy and assignment to be safe, though not strictly necessary if only one instance is used.
-    DeviceTypeParser(const DeviceTypeParser &) = delete;
+    DeviceTypeParser(const DeviceTypeParser &)             = delete;
     DeviceTypeParser & operator=(const DeviceTypeParser &) = delete;
 
     /**
