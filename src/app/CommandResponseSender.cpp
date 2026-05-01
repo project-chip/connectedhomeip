@@ -154,6 +154,10 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     if (HasMoreToSend())
     {
         sendFlag = Messaging::SendMessageFlags::kExpectResponse;
+        // The exchange's session may have been released out from under us (for
+        // example, when a TCP connection is closed). UseSuggestedResponseTimeout
+        // requires a valid session, so guard here and propagate a normal error.
+        VerifyOrReturnError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
 

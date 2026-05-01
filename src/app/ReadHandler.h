@@ -466,6 +466,7 @@ private:
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
     friend class TestReadInteraction;
+    friend class TestSessionRelease;
     friend class chip::app::reporting::TestReportingEngine;
     friend class chip::app::reporting::TestReportScheduler;
 

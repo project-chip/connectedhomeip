@@ -287,6 +287,12 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
     VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
+        // The underlying secure session can be released out from under us (for
+        // example, when a TCP connection is closed) while this exchange is still
+        // alive. GetSessionHandle() VerifyOrDies if mSession is empty, so guard
+        // here and propagate a normal error instead of crashing. See
+        // connectedhomeip issue #43714.
+        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
@@ -313,6 +319,12 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
     if (IsPriming() || IsChunkedReport())
     {
+        // The underlying secure session can be released out from under us (for
+        // example, when a TCP connection is closed) while this exchange is still
+        // alive. GetSessionHandle() VerifyOrDies if mSession is empty, so guard
+        // here and propagate a normal error instead of crashing. See
+        // connectedhomeip issue #43714.
+        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
@@ -339,6 +351,10 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
 
+    // The exchange's session may have been released out from under us (for
+    // example, when a TCP connection is closed). UseSuggestedResponseTimeout
+    // requires a valid session, so guard here and propagate a normal error.
+    VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
     mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     CHIP_ERROR err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                responseExpected ? Messaging::SendMessageFlags::kExpectResponse
