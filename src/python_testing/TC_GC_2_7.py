@@ -281,5 +281,6 @@ class TC_GC_2_7(MatterBaseTest):
                 cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_index_2)
             )
 
+
 if __name__ == "__main__":
     default_matter_test_main()
