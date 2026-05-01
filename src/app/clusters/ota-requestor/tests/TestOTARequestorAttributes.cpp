@@ -21,7 +21,6 @@
 #include <vector>
 
 #include <app/clusters/ota-requestor/OTARequestorStorage.h>
-#include <app/common/CompatEnumNames.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
