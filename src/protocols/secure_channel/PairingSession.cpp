@@ -118,7 +118,8 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionParameters & sessionParams, TLV::TLVWriter & tlvWriter)
+CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionParameters & sessionParams,
+                                                   TLV::TLVWriter & tlvWriter)
 {
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));

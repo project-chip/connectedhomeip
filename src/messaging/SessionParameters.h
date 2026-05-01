@@ -42,8 +42,8 @@ public:
     static constexpr size_t kSizeOfSpecificationVersion     = sizeof(uint32_t);
     static constexpr size_t kSizeOfMaxPathsPerInvoke        = sizeof(uint16_t);
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    static constexpr size_t kSizeOfSupportedTransports      = sizeof(uint16_t);
-    static constexpr size_t kSizeOfMaxTCPPayloadSize        = sizeof(uint32_t);
+    static constexpr size_t kSizeOfSupportedTransports = sizeof(uint16_t);
+    static constexpr size_t kSizeOfMaxTCPPayloadSize   = sizeof(uint32_t);
 #endif
 
     static constexpr size_t kEstimatedTLVSize = TLV::EstimateStructOverhead(
@@ -65,8 +65,8 @@ public:
         kInteractionModelRevision = 5,
         kSpecificationVersion     = 6,
         kMaxPathsPerInvoke        = 7,
-        kSupportedTransports       = 8,
-        kMaxTCPPayloadSize         = 9,
+        kSupportedTransports      = 8,
+        kMaxTCPPayloadSize        = 9,
     };
 
     enum class SupportedTransport : uint16_t

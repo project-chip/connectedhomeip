@@ -631,23 +631,26 @@ TEST_F(TestCASESession, SecurePairingHandshakeTCPParamsTest)
     EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
                                                               ScopedNodeId(), NullOptional),
               CHIP_NO_ERROR);
-    EXPECT_EQ(pairingCommissioner.EstablishSession(
-                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
-                  nullptr, nullptr, &delegateCommissioner, NullOptional),
+    EXPECT_EQ(pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                   ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                   nullptr, nullptr, &delegateCommissioner, NullOptional),
               CHIP_NO_ERROR);
     ServiceEvents();
 
     EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
 
-    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(), commissionerSessionParams.GetSupportedTransports());
-    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(), commissionerSessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+              commissionerSessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              commissionerSessionParams.GetMaxTCPPayloadSize());
 
-    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(), accessorySessionParams.GetSupportedTransports());
-    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(), accessorySessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(),
+              accessorySessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              accessorySessionParams.GetMaxTCPPayloadSize());
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
 
 TEST_F(TestCASESession, ClientReceivesBusyTest)
 {
