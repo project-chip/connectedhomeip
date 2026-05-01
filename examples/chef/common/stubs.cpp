@@ -175,15 +175,15 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottomTagList[] = 
 namespace BilresaRotary {
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRotaryTagList[] = {
     { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
-    { .namespaceID = 0x67, .tag = 0x04 },
-    { .namespaceID = 0x67, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("rotary"_span)) },
+    { .namespaceID = 0x43, .tag = 0x04 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("rotary"_span)) },
 };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kButtonTagList[] = {
     { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
-    { .namespaceID = 0x67, .tag = 0x02 },
-    { .namespaceID = 0x67, .tag = 0x06 },
-    { .namespaceID = 0x67, .tag = 0x05 },
-    { .namespaceID = 0x67, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("button"_span)) },
+    { .namespaceID = 0x43, .tag = 0x02 },
+    { .namespaceID = 0x43, .tag = 0x06 },
+    { .namespaceID = 0x43, .tag = 0x05 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("button"_span)) },
 };
 } // namespace BilresaRotary
 
