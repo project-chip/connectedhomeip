@@ -2004,16 +2004,12 @@ endpoint 2 {
 
   server cluster Switch {
     emits event InitialPress;
-    emits event ShortRelease;
-    emits event MultiPressOngoing;
-    emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    ram      attribute multiPressMax default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 22;
+    ram      attribute featureMap default = 2;
     callback attribute clusterRevision;
   }
 }
