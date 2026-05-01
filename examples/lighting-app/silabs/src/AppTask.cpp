@@ -121,6 +121,9 @@ void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 {
     sLightOn = false;
     sLightLED.Set(false);
+#ifdef DISPLAY_ENABLED
+    BaseApplication::GetLCD().WriteDemoUI(false);
+#endif
 }
 
 OnOffEffect gEffect = {
@@ -423,6 +426,9 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 #endif // SL_MATTER_ENABLE_AWS
             sLightOn = (*value != 0);
             sLightLED.Set(sLightOn);
+#ifdef DISPLAY_ENABLED
+            BaseApplication::GetLCD().WriteDemoUI(sLightOn);
+#endif
             if (sLightOn && osTimerIsRunning(sLightTimer))
             {
                 if (osTimerStop(sLightTimer) == osError)
