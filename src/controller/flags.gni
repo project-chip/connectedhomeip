@@ -27,5 +27,9 @@ declare_args() {
 
 declare_args() {
   # Disable Thread MeshCoP if cross-compiling because of missing libevent.
-  chip_support_thread_meshcop = false
+  chip_support_thread_meshcop =
+      matter_enable_recommended && chip_device_platform == "linux" &&
+      !chip_system_config_use_openthread_inet_endpoints &&
+      current_cpu == host_cpu && current_os == host_os &&
+      chip_support_commissioning_in_controller
 }
