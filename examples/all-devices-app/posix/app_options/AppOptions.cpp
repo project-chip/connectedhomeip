@@ -32,6 +32,8 @@ constexpr uint16_t kOptionDeviceType    = 0xffd0;
 constexpr uint16_t kOptionWiFi          = 0xffd2;
 constexpr uint16_t kOptionKVS           = 0xffd3;
 constexpr uint16_t kOptionDiscriminator = 0xffd4;
+constexpr uint16_t kOptionVendorId      = 0xffd5;
+constexpr uint16_t kOptionProductId     = 0xffd6;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -59,6 +61,12 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     case kOptionDiscriminator:
         mConfig.discriminator.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
         return true;
+    case kOptionVendorId:
+        mConfig.vendorId.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
+        return true;
+    case kOptionProductId:
+        mConfig.productId.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
+        return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -76,6 +84,8 @@ OptionSet * AppOptions::GetOptions()
 #endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
+        { "vendor-id", kArgumentRequired, kOptionVendorId },
+        { "product-id", kArgumentRequired, kOptionProductId },
         {}, // need empty terminator
     };
 

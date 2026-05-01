@@ -35,6 +35,8 @@ public:
         bool enableWiFi = false;
         std::string kvsPath;
         chip::Optional<uint16_t> discriminator;
+        chip::Optional<uint16_t> vendorId;
+        chip::Optional<uint16_t> productId;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
