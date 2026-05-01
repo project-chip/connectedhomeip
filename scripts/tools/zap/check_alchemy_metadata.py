@@ -32,8 +32,12 @@ Expected comment block (immediately after the license header):
 Required fields
 ---------------
   Alchemy  – tool version (vX.Y.Z)
-  Git      – spec repo git-describe string, must embed a commit SHA
-             (g<7+ hex digits> suffix, e.g. g98372b049)
+  Git      – spec repo git-describe string produced by ``git describe``.
+             When HEAD is not at a tag (i.e. the value contains a
+             ``-<N>-g`` distance component), a commit SHA suffix
+             (g<7+ hex digits>, e.g. g98372b049) is required.
+             Clean tags (HEAD exactly at a tag, no distance component)
+             are accepted without a SHA suffix.
   Source   – one or more source .adoc paths
   Parameters – command-line arguments passed to Alchemy
 
@@ -151,35 +155,37 @@ def _check_hand_edits(
 ) -> List[str]:
     """Flag Alchemy-generated XML files whose content changed but whose
     metadata comment is identical to *diff_base*, indicating a hand-edit."""
+    # Build a mapping from repo-relative path string → absolute Path so we can
+    # match git diff output (which uses repo-relative paths) precisely, even
+    # when multiple directories contain files with the same basename.
     # Pass paths relative to root so git diff matches tracked repo paths
     # correctly, regardless of whether --root was supplied as an absolute path.
-    rel_paths: List[str] = []
+    rel_to_abs: Dict[str, Path] = {}
     for f in xml_files:
         try:
-            rel_paths.append(str(f.relative_to(root)))
+            rel_to_abs[str(f.relative_to(root))] = f
         except ValueError:
-            rel_paths.append(str(f))
+            rel_to_abs[str(f)] = f
 
     try:
         result = subprocess.run(
-            ["git", "diff", "--name-only", diff_base, "--"] + rel_paths,
+            ["git", "diff", "--name-only", diff_base, "--"] + list(rel_to_abs),
             capture_output=True, text=True, check=True,
             cwd=root,
         )
     except (subprocess.CalledProcessError, FileNotFoundError) as exc:
         return [f"unable to run git diff: {exc}"]
 
-    changed_names = {Path(p).name for p in result.stdout.splitlines() if p.strip()}
-    if not changed_names:
+    changed_rel_paths = {p for p in result.stdout.splitlines() if p.strip()}
+    if not changed_rel_paths:
         return []
 
     errors: List[str] = []
-    for xml_file in xml_files:
-        fname = xml_file.name
-        if fname not in changed_names:
+    for rel_str, xml_file in rel_to_abs.items():
+        if rel_str not in changed_rel_paths:
             continue
         # Skip files that are expected to be hand-maintained.
-        if fname in MANUAL_ALLOWLIST:
+        if xml_file.name in MANUAL_ALLOWLIST:
             continue
 
         try:
@@ -190,11 +196,8 @@ def _check_hand_edits(
         if new_comment is None:
             continue  # No Alchemy block — other checks handle this.
 
-        try:
-            rel = xml_file.relative_to(root)
-        except ValueError:
-            rel = xml_file
-        old_content = _get_base_content(diff_base, str(rel))
+        rel = Path(rel_str)
+        old_content = _get_base_content(diff_base, rel_str)
         if old_content is None:
             continue  # New file — no base to compare against.
 
@@ -276,9 +279,10 @@ def validate_file(filepath: Path) -> List[str]:
         git_value = spec_match.group(1)
         if not _SHA_RE.search(git_value) and _HAS_DISTANCE_RE.search(git_value):
             errors.append(
-                f"'Git:' value '{git_value}' does not contain a commit SHA\n"
-                "    Expected git-describe format: X.Y-<tag>-<N>-g<SHA>\n"
-                "    e.g. 0.9-fall2025-401-g98372b049"
+                f"'Git:' value '{git_value}' has a distance component but no commit SHA\n"
+                "    Expected git-describe format for non-tag commits: X.Y-<tag>-<N>-g<SHA>\n"
+                "    e.g. 0.9-fall2025-401-g98372b049\n"
+                "    Clean tags (no distance component) are accepted without a SHA."
             )
         if _DIRTY_RE.search(git_value):
             errors.append(
@@ -440,14 +444,20 @@ def main() -> int:
 
     if not failures:
         n_full = len(xml_files) - n_manual - n_incomplete
-        print(
-            f"OK: all {len(xml_files)} XML file(s) passed Alchemy metadata "
-            f"validation ({n_full} fully validated, {n_manual} manual-allowlist, "
+        summary = (
+            f"{len(xml_files)} XML file(s) passed Alchemy metadata validation "
+            f"({n_full} fully validated, {n_manual} manual-allowlist, "
             f"{n_incomplete} incomplete-allowlist)."
         )
         if hand_edit_errors:
+            # Metadata validation passed but hand-edits were detected
+            print(f"NOTE: {summary}")
             return 1
-        return 1 if stale_warnings else 0
+        if stale_warnings:
+            print(f"NOTE: {summary}")
+            return 1
+        print(f"OK: all {summary}")
+        return 0
 
     print("ERROR: the following XML file(s) failed Alchemy metadata validation:\n")
     for filepath in sorted(failures):
