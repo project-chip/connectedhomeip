@@ -160,9 +160,9 @@ static ExchangeContext * MakeRawExchangeWillSend(chip::Testing::AppContext & ctx
 // These do not access any private members, so plain TEST_F is fine.
 // ---------------------------------------------------------------------------
 
-// StatusResponse::Send on an exchange whose session has been released. 
-// Without the guard, this crashes inside Optional::Value() via 
-// ExchangeContext::UseSuggestedResponseTimeout. With the fix, 
+// StatusResponse::Send on an exchange whose session has been released.
+// Without the guard, this crashes inside Optional::Value() via
+// ExchangeContext::UseSuggestedResponseTimeout. With the fix,
 // StatusResponse::Send returns CHIP_ERROR_CONNECTION_ABORTED.
 TEST_F(TestSessionRelease, StatusResponseSendAfterSessionReleaseDoesNotCrash)
 {
