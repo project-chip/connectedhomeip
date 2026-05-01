@@ -36,7 +36,13 @@ bool AppOptions::mEnableWiFi = false;
 
 const std::vector<DeviceTypeParser::Entry> & AppOptions::GetDeviceTypeEntries()
 {
-    return sParser.GetDeviceTypeEntries();
+    const auto & entries = sParser.GetDeviceTypeEntries();
+    if (entries.empty())
+    {
+        static const std::vector<DeviceTypeParser::Entry> kDefault = { { "contact-sensor", 1, kInvalidEndpointId } };
+        return kDefault;
+    }
+    return entries;
 }
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,

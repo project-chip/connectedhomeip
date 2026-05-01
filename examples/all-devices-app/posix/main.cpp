@@ -150,16 +150,6 @@ public:
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-        if (AppOptions::GetDeviceTypeEntries().empty())
-        {
-            ChipLogProgress(AppServer, "No devices specified. Creating default contact-sensor on endpoint 1");
-            auto device = DeviceFactory::GetInstance().Create("contact-sensor");
-            VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
-            ReturnErrorOnFailure(device->Register(1, mDataModelProvider, kInvalidEndpointId));
-            mConstructedDevices.push_back(std::move(device));
-            return CHIP_NO_ERROR;
-        }
-
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
             auto device = DeviceFactory::GetInstance().Create(entry.type);
