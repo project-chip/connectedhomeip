@@ -56,10 +56,8 @@ OC = Clusters.OperationalCredentials
 
 # Group and subscription parameters
 GROUP_ID = 0
-# Keep the automated run short while still exercising FabricSceneInfo reports.
-SUB_MIN_S = 0
-SUB_MAX_S = 30
-SUB_REPORT_TIMEOUT_S = SUB_MAX_S + 15
+SUB_MIN_S = 100
+SUB_MAX_S = 200
 TRANSITION_TH1_MS = 20000
 TRANSITION_TH23_MS = 20  # 0x0014 for TH2/TH3 AddScene
 
@@ -74,13 +72,6 @@ def _remaining_capacity_for_fabric(fabric_scene_info: List[S.Structs.SceneInfoSt
 class TC_S_2_6(MatterBaseTest):
     """135.2.6. [TC-S-2.6] RemainingCapacity multi-fabric (DUT as Server)."""
 
-    # Multi-fabric commissioning of TH2/TH3 plus exhausting the scene table on
-    # three fabrics with subscription waits does not fit in the framework's
-    # 90 s default. Allow up to 10 minutes to cover slower CI runners.
-    @property
-    def default_timeout(self) -> int:
-        return 10 * 60
-
     def desc_TC_S_2_6(self) -> str:
         return "135.2.6. [TC-S-2.6] RemainingCapacity functionality with DUT as Server — Multi-Fabric"
 
@@ -94,7 +85,7 @@ class TC_S_2_6(MatterBaseTest):
             TestStep("2a", "Read SceneTableSize; MaxRemainingCapacity = (SceneTableSize - 1) // 2."),
             TestStep(
                 "2b",
-                "Subscribe FabricSceneInfo on TH1/TH2/TH3; verify baseline RC >= MaxRemainingCapacity per fabric.",
+                "Subscribe FabricSceneInfo on TH1/TH2/TH3 (min 100s max 200s); verify baseline RC >= MaxRemainingCapacity per fabric.",
             ),
             TestStep("3a", "TH1 AddScene group 0 scene 1 transition 20000."),
             TestStep("3b", "TH1 subscription: RemainingCapacity == TH1 baseline from 2b - 1."),
@@ -119,7 +110,7 @@ class TC_S_2_6(MatterBaseTest):
         handler: AttributeSubscriptionHandler,
         fabric_index: int,
         expected_rc: int,
-        timeout_sec: float = SUB_REPORT_TIMEOUT_S,
+        timeout_sec: float = 320.0,
     ) -> int:
         deadline = time.monotonic() + timeout_sec
         last_rc: Optional[int] = None
