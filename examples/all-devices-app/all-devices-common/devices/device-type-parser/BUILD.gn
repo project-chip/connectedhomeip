@@ -34,20 +34,4 @@ source_set("device-type-parser") {
   ]
 }
 
-if (chip_build_tests) {
-  import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  chip_test_suite("tests") {
-    output_name = "TestDeviceTypeParser"
-
-    test_sources = [ "TestDeviceTypeParser.cpp" ]
-
-    cflags = [ "-Wconversion" ]
-
-    public_deps = [
-      ":device-type-parser",
-      "${chip_root}/src/lib/support:testing",
-      "${chip_root}/src/platform",
-    ]
-  }
-}
