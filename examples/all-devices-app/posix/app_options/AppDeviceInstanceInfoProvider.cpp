@@ -24,7 +24,8 @@ namespace DeviceLayer {
 AppDeviceInstanceInfoProvider::AppDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate,
                                                              chip::Optional<uint16_t> vendorId,
                                                              chip::Optional<uint16_t> productId) :
-    mDelegate(delegate), mVendorId(vendorId), mProductId(productId)
+    mDelegate(delegate),
+    mVendorId(vendorId), mProductId(productId)
 {}
 
 CHIP_ERROR AppDeviceInstanceInfoProvider::GetVendorName(char * buf, size_t bufSize)

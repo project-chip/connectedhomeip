@@ -32,11 +32,11 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <app_options/AppDeviceInstanceInfoProvider.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
-#include <app_options/AppDeviceInstanceInfoProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -381,7 +381,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();
-    static AppDeviceInstanceInfoProvider sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);
+    static AppDeviceInstanceInfoProvider sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(),
+                                                                        config.vendorId, config.productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();
