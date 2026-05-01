@@ -36,6 +36,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
+#include <app_options/AppDeviceInstanceInfoProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -79,53 +80,6 @@ void StopSignalHandler(int /* signal */)
         SuccessOrDie(SystemLayer().ScheduleLambda([]() { VerifyOrDie(PlatformMgr().StopEventLoopTask() == CHIP_NO_ERROR); }));
     }
 }
-
-class AppDeviceInstanceInfoProvider : public DeviceLayer::DeviceInstanceInfoProvider
-{
-public:
-    AppDeviceInstanceInfoProvider(DeviceLayer::DeviceInstanceInfoProvider * delegate) : mDelegate(delegate) {}
-
-    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDelegate->GetVendorName(buf, bufSize); }
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override
-    {
-        if (AppOptions::GetConfig().vendorId.HasValue())
-        {
-            vendorId = AppOptions::GetConfig().vendorId.Value();
-            return CHIP_NO_ERROR;
-        }
-        return mDelegate->GetVendorId(vendorId);
-    }
-    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDelegate->GetProductName(buf, bufSize); }
-    CHIP_ERROR GetProductId(uint16_t & productId) override
-    {
-        if (AppOptions::GetConfig().productId.HasValue())
-        {
-            productId = AppOptions::GetConfig().productId.Value();
-            return CHIP_NO_ERROR;
-        }
-        return mDelegate->GetProductId(productId);
-    }
-    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDelegate->GetPartNumber(buf, bufSize); }
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDelegate->GetProductURL(buf, bufSize); }
-    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDelegate->GetProductLabel(buf, bufSize); }
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return mDelegate->GetSerialNumber(buf, bufSize); }
-    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override
-    {
-        return mDelegate->GetManufacturingDate(year, month, day);
-    }
-    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override { return mDelegate->GetHardwareVersion(hardwareVersion); }
-    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
-    {
-        return mDelegate->GetHardwareVersionString(buf, bufSize);
-    }
-    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
-    {
-        return mDelegate->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
-    }
-
-private:
-    DeviceLayer::DeviceInstanceInfoProvider * mDelegate;
-};
 
 class CodeDrivenDataModelDevices
 {

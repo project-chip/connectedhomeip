@@ -21,6 +21,7 @@ config("option-includes") {
 
 source_set("app-options") {
   sources = [
+    "AppDeviceInstanceInfoProvider.h",
     "AppOptions.cpp",
     "AppOptions.h",
   ]
