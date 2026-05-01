@@ -862,7 +862,8 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSig
     ReturnErrorOnFailure(tlvWriter.PutBytes(AsTlvContextTag(Sigma1Tags::kInitiatorEphPubKey), *input.initiatorEphPubKey,
                                             static_cast<uint32_t>(input.initiatorEphPubKey->Length())));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), input.initiatorSessionParams, tlvWriter));
+    ReturnErrorOnFailure(
+        EncodeSessionParameters(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), input.initiatorSessionParams, tlvWriter));
 
     if (input.sessionResumptionRequested)
     {
@@ -1149,7 +1150,8 @@ CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msgR2Res
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC), input.sigma2ResumeMIC));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionID), input.responderSessionId));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionParams), input.responderSessionParams, tlvWriter));
+    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionParams),
+                                                 input.responderSessionParams, tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msgR2Resume));
@@ -1334,7 +1336,8 @@ CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msgR2, EncodeS
                                                 static_cast<uint32_t>(input.encrypted2Length)));
     input.msgR2Encrypted.Free();
 
-    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), input.responderSessionParams, tlvWriterMsg2));
+    ReturnErrorOnFailure(
+        EncodeSessionParameters(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), input.responderSessionParams, tlvWriterMsg2));
 
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.Finalize(&msgR2));

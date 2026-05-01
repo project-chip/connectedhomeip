@@ -218,7 +218,7 @@ protected:
 
     struct EncodeSigma1Inputs : Sigma1Param
     {
-        const Crypto::P256PublicKey * initiatorEphPubKey         = nullptr;
+        const Crypto::P256PublicKey * initiatorEphPubKey = nullptr;
         SessionParameters initiatorSessionParams;
         uint8_t initiatorResume1MICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     };

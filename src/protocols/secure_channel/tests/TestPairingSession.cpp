@@ -134,7 +134,6 @@ TEST_F(TestPairingSession, PairingSessionEncodeDecodeTCPParams)
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-
 TEST_F(TestPairingSession, PairingSessionTryDecodeMissingMRPParams)
 {
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(64, 0);

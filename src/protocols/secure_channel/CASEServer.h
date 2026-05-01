@@ -74,7 +74,10 @@ public:
     CASESession & GetSession() { return mPairingSession; }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void SetLocalSessionParameters(const SessionParameters & sessionParams) { mPairingSession.SetLocalSessionParameters(sessionParams); }
+    void SetLocalSessionParameters(const SessionParameters & sessionParams)
+    {
+        mPairingSession.SetLocalSessionParameters(sessionParams);
+    }
 #endif
 
 private:
