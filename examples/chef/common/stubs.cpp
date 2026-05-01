@@ -79,7 +79,7 @@ void InitIdentifyCluster()
         if (epIndex >= kIdentifyTableSize)
             continue;
 
-        Identify::IdentifyTypeEnum idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kNone;
+        chip::app::Clusters::Identify::IdentifyTypeEnum idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kNone;
         if (endpointId == 1)
         {
             idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator;
