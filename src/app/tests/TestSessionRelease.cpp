@@ -222,8 +222,8 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, ReadHandlerSendStatusReportAfterSessionR
     // ReadHandler constructor calls
     //   GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration()
     // so the engine must be initialised first.
-    auto * engine                                       = InteractionModelEngine::GetInstance();
-    reporting::ReportSchedulerImpl * scheduler          = reporting::GetDefaultReportScheduler();
+    auto * engine                              = InteractionModelEngine::GetInstance();
+    reporting::ReportSchedulerImpl * scheduler = reporting::GetDefaultReportScheduler();
     ASSERT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), scheduler), CHIP_NO_ERROR);
 
     DoNothingExchangeDelegate ecDelegate;
@@ -265,8 +265,8 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, ReadHandlerSendStatusReportAfterSessionR
 // ---------------------------------------------------------------------------
 TEST_F_FROM_FIXTURE(TestSessionRelease, ReadHandlerSendReportDataAfterSessionReleaseDoesNotCrash)
 {
-    auto * engine                                       = InteractionModelEngine::GetInstance();
-    reporting::ReportSchedulerImpl * scheduler          = reporting::GetDefaultReportScheduler();
+    auto * engine                              = InteractionModelEngine::GetInstance();
+    reporting::ReportSchedulerImpl * scheduler = reporting::GetDefaultReportScheduler();
     ASSERT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), scheduler), CHIP_NO_ERROR);
 
     DoNothingExchangeDelegate ecDelegate;
@@ -341,8 +341,7 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, WriteHandlerSendWriteResponseAfterSessio
 // UseSuggestedResponseTimeout guard in CommandResponseSender.cpp, which is
 // only reached when HasMoreToSend() is true after popping the first chunk)
 // ---------------------------------------------------------------------------
-TEST_F_FROM_FIXTURE(TestSessionRelease,
-                    CommandResponseSenderSendCommandResponseAfterSessionReleaseDoesNotCrash)
+TEST_F_FROM_FIXTURE(TestSessionRelease, CommandResponseSenderSendCommandResponseAfterSessionReleaseDoesNotCrash)
 {
     DoNothingExchangeDelegate ecDelegate;
     ExchangeContext * ec = MakeRawExchangeWillSend(*this, ecDelegate);
