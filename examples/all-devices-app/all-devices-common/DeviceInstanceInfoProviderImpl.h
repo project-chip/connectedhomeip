@@ -26,11 +26,12 @@
 namespace chip {
 namespace DeviceLayer {
 
-class AppDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+class DeviceInstanceInfoProviderImpl : public DeviceInstanceInfoProvider
 {
 public:
-    AppDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate, chip::Optional<uint16_t> vendorId,
-                                  chip::Optional<uint16_t> productId);
+    DeviceInstanceInfoProviderImpl(DeviceInstanceInfoProvider * delegate,
+                                   chip::Optional<uint16_t> vendorId,
+                                   chip::Optional<uint16_t> productId);
 
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;

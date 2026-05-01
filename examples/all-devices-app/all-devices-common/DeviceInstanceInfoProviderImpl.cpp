@@ -16,24 +16,24 @@
  *    limitations under the License.
  */
 
-#include <app_options/AppDeviceInstanceInfoProvider.h>
+#include "DeviceInstanceInfoProviderImpl.h"
 
 namespace chip {
 namespace DeviceLayer {
 
-AppDeviceInstanceInfoProvider::AppDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate,
-                                                             chip::Optional<uint16_t> vendorId,
-                                                             chip::Optional<uint16_t> productId) :
+DeviceInstanceInfoProviderImpl::DeviceInstanceInfoProviderImpl(DeviceInstanceInfoProvider * delegate,
+                                                               chip::Optional<uint16_t> vendorId,
+                                                               chip::Optional<uint16_t> productId) :
     mDelegate(delegate),
     mVendorId(vendorId), mProductId(productId)
 {}
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetVendorName(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetVendorName(char * buf, size_t bufSize)
 {
     return mDelegate->GetVendorName(buf, bufSize);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetVendorId(uint16_t & vendorId)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetVendorId(uint16_t & vendorId)
 {
     if (mVendorId.HasValue())
     {
@@ -43,12 +43,12 @@ CHIP_ERROR AppDeviceInstanceInfoProvider::GetVendorId(uint16_t & vendorId)
     return mDelegate->GetVendorId(vendorId);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetProductName(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductName(char * buf, size_t bufSize)
 {
     return mDelegate->GetProductName(buf, bufSize);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetProductId(uint16_t & productId)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductId(uint16_t & productId)
 {
     if (mProductId.HasValue())
     {
@@ -58,42 +58,42 @@ CHIP_ERROR AppDeviceInstanceInfoProvider::GetProductId(uint16_t & productId)
     return mDelegate->GetProductId(productId);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetPartNumber(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetPartNumber(char * buf, size_t bufSize)
 {
     return mDelegate->GetPartNumber(buf, bufSize);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetProductURL(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductURL(char * buf, size_t bufSize)
 {
     return mDelegate->GetProductURL(buf, bufSize);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetProductLabel(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductLabel(char * buf, size_t bufSize)
 {
     return mDelegate->GetProductLabel(buf, bufSize);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetSerialNumber(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetSerialNumber(char * buf, size_t bufSize)
 {
     return mDelegate->GetSerialNumber(buf, bufSize);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
     return mDelegate->GetManufacturingDate(year, month, day);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     return mDelegate->GetHardwareVersion(hardwareVersion);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     return mDelegate->GetHardwareVersionString(buf, bufSize);
 }
 
-CHIP_ERROR AppDeviceInstanceInfoProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     return mDelegate->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
 }
