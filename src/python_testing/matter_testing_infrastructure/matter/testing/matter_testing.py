@@ -172,6 +172,11 @@ class SetupParameters:
 
 @dataclass
 class TestCleanupConfig:
+    """
+    A class to keep track of which cleanup steps should be performed.
+    Default behavior: all cleanup steps are enabled. Test classes can disable individual steps by
+    setting flags in setup_class or setup_test for per-test control, after calling super().
+    """
     disarm_failsafes: bool = True              # sends ArmFailSafe(expiryLengthSeconds=0) on GeneralCommissioning
     reset_acls_to_default: bool = True         # restores ACL on endpoint 0 to the state captured before the test ran
     close_commissioning_windows: bool = True   # sends RevokeCommissioning on AdministratorCommissioning
