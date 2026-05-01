@@ -2050,7 +2050,7 @@ endpoint 3 {
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    ram      attribute multiPressMax;
+    ram      attribute multiPressMax default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
