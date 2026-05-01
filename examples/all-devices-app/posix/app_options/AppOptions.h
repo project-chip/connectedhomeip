@@ -40,7 +40,14 @@ public:
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
-    static AppConfig & GetConfig() { return mConfig; }
+    static const AppConfig & GetConfig()
+    {
+        if (mConfig.deviceConfigs.empty())
+        {
+            mConfig.deviceConfigs.push_back({ "contact-sensor", 1, chip::kInvalidEndpointId });
+        }
+        return mConfig;
+    }
 
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return mConfig.deviceConfigs; }
 
