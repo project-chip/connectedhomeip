@@ -380,7 +380,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    static AppDeviceInstanceInfoProvider sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider());
+    const auto & config = AppOptions::GetConfig();
+    static AppDeviceInstanceInfoProvider sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();
