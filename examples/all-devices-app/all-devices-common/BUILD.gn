@@ -23,8 +23,8 @@ source_set("providers") {
   sources = [
     "DeviceInfoProviderImpl.cpp",
     "DeviceInfoProviderImpl.h",
-    "DeviceInstanceInfoProviderImpl.cpp",
-    "DeviceInstanceInfoProviderImpl.h",
+    "OverrideDeviceInstanceInfoProvider.cpp",
+    "OverrideDeviceInstanceInfoProvider.h",
   ]
 
   public_deps = [
