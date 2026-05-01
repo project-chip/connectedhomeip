@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,9 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <AllClustersExampleDeviceInfoProviderImpl.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInfoProvider.h>
@@ -24,22 +25,56 @@
 namespace chip {
 namespace DeviceLayer {
 
-class AllDevicesExampleDeviceInfoProviderImpl : public AllClustersExampleDeviceInfoProviderImpl
+class DeviceInfoProviderImpl : public DeviceInfoProvider
 {
 public:
-    AllDevicesExampleDeviceInfoProviderImpl() = default;
-    ~AllDevicesExampleDeviceInfoProviderImpl() override {}
+    DeviceInfoProviderImpl() = default;
+    ~DeviceInfoProviderImpl() override {}
 
     // Iterators
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override;
+    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override;
     SupportedLocalesIterator * IterateSupportedLocales() override;
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override;
 
-    static AllDevicesExampleDeviceInfoProviderImpl & GetDefaultInstance();
+    static DeviceInfoProviderImpl & GetDefaultInstance();
 
 protected:
-    class AllDevicesSupportedLocalesIteratorImpl : public SupportedLocalesIterator
+    class FixedLabelIteratorImpl : public FixedLabelIterator
     {
     public:
-        AllDevicesSupportedLocalesIteratorImpl() = default;
+        FixedLabelIteratorImpl(EndpointId endpoint);
+        size_t Count() override;
+        bool Next(FixedLabelType & output) override;
+        void Release() override { chip::Platform::Delete(this); }
+
+    private:
+        static constexpr size_t kNumSupportedFixedLabels = 1;
+        EndpointId mEndpoint                             = 0;
+        size_t mIndex                                    = 0;
+    };
+
+    class UserLabelIteratorImpl : public UserLabelIterator
+    {
+    public:
+        UserLabelIteratorImpl(DeviceInfoProviderImpl & provider, EndpointId endpoint);
+        size_t Count() override { return mTotal; }
+        bool Next(UserLabelType & output) override;
+        void Release() override { chip::Platform::Delete(this); }
+
+    private:
+        DeviceInfoProviderImpl & mProvider;
+        EndpointId mEndpoint = 0;
+        size_t mIndex        = 0;
+        size_t mTotal        = 0;
+        char mUserLabelNameBuf[kMaxLabelNameLength + 1];
+        char mUserLabelValueBuf[kMaxLabelValueLength + 1];
+    };
+
+    class SupportedLocalesIteratorImpl : public SupportedLocalesIterator
+    {
+    public:
+        SupportedLocalesIteratorImpl() = default;
         size_t Count() override;
         bool Next(CharSpan & output) override;
         void Release() override { chip::Platform::Delete(this); }
@@ -48,6 +83,28 @@ protected:
         static constexpr size_t kNumSupportedLocales = 1;
         size_t mIndex                                = 0;
     };
+
+    class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
+    {
+    public:
+        SupportedCalendarTypesIteratorImpl() = default;
+        size_t Count() override;
+        bool Next(CalendarType & output) override;
+        void Release() override { chip::Platform::Delete(this); }
+
+    private:
+        static constexpr size_t kNumSupportedCalendarTypes = 1;
+        size_t mIndex                                      = 0;
+    };
+
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override;
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override;
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override;
+
+private:
+    static constexpr size_t UserLabelTLVMaxSize() { return TLV::EstimateStructOverhead(kMaxLabelNameLength, kMaxLabelValueLength); }
+    static DeviceInfoProviderImpl sInstance;
 };
 
 } // namespace DeviceLayer

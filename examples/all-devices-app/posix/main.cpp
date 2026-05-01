@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include <AllDevicesExampleDeviceInfoProviderImpl.h>
+#include <DeviceInfoProviderImpl.h>
+#include <DeviceInstanceInfoProviderImpl.h>
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
 #include <DeviceFactoryPlatformOverride.h>
@@ -32,7 +33,7 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app_options/AppDeviceInstanceInfoProvider.h>
+
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
@@ -57,7 +58,7 @@ using namespace chip::ArgParser;
 namespace {
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
-AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
+DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
@@ -381,8 +382,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();
-    static AppDeviceInstanceInfoProvider sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(),
-                                                                        config.vendorId, config.productId);
+    static DeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();
