@@ -269,7 +269,7 @@ class TC_GC_2_7(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ResourceExhausted,
                                  f"Send JoinGroup command error should be {Status.ResourceExhausted} instead of {e.status}")
-            
+
         if fabric_index_2 is None:
             self.skip_step(11)
         else:
