@@ -44,7 +44,10 @@ pw_python_action("check_alchemy_metadata_tests") {
 
   _stamp = "${target_gen_dir}/check_alchemy_metadata.test.passed"
 
-  inputs = [ "check_alchemy_metadata.py" ]
+  inputs = [
+    "check_alchemy_metadata.py",
+    "${chip_root}/src/app/zap-templates/zcl/data-model/chip/alchemy_allowlists.yaml",
+  ]
 
   args = [
     "--stamp",
