@@ -58,9 +58,17 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     case kOptionKVS:
         mConfig.kvsPath = value;
         return true;
-    case kOptionDiscriminator:
-        mConfig.discriminator.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
+    case kOptionDiscriminator: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFF)
+        {
+            ChipLogError(Support, "Invalid discriminator: %s\n", value);
+            return false;
+        }
+        mConfig.discriminator.SetValue(static_cast<uint16_t>(val));
         return true;
+    }
     case kOptionVendorId:
         mConfig.vendorId.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
         return true;
