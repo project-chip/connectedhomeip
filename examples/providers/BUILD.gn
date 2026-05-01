@@ -55,5 +55,3 @@ static_library("all_clusters_device_info_provider") {
 
   public_configs = [ ":include_providers_dir" ]
 }
-
-

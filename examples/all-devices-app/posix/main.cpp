@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <DeviceInfoProviderImpl.h>
-#include <DeviceInstanceInfoProviderImpl.h>
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
 #include <DeviceFactoryPlatformOverride.h>
+#include <DeviceInfoProviderImpl.h>
+#include <DeviceInstanceInfoProviderImpl.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
@@ -382,7 +382,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();
-    static DeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);
+    static DeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(),
+                                                                         config.vendorId, config.productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();
