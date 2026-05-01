@@ -73,13 +73,13 @@ public:
                 (elem->mSessionInfo.peer_id == pInInfo->peer_id) &&
                 !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, sizeof(uint8_t) * 6))
             {
-                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%" PRIuPTR "]", i);
+                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%zu]", i);
                 return elem;
             }
 #ifdef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
             {
                 const WiFiPAFSession * pElmInfo = &elem->mSessionInfo;
-                ChipLogError(WiFiPAF, "EndPoint[%" PRIuPTR "]", i);
+                ChipLogError(WiFiPAF, "EndPoint[%zu]", i);
                 ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo->role);
                 ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo->id);
                 ChipLogError(WiFiPAF, "peer_id: [%d, %d]", pElmInfo->peer_id, pInInfo->peer_id);

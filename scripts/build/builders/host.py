@@ -652,8 +652,7 @@ class HostBuilder(GnBuilder):
                 args.extend([
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
-                ]
-                )
+                ])
             case HostBoard.ARM:
                 args.extend([
                     'target_cpu="arm"',
