@@ -275,10 +275,11 @@ class TC_GC_2_7(MatterBaseTest):
         else:
             self.step(11)
             # Use TH1 to remove TH2's fabric
-            logger.info(f"Cleaning up: Removing TH2 fabric index {fabric_index_2}")
-            await self.send_single_cmd(
-                dev_ctrl=self.th1,
-                cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_index_2)
+            logger.info(f"Cleaning up: Removing TH2 fabric index {self.th2.fabricId}")
+            await self.th1.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=0,
+                payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=self.th2.fabricId)
             )
 
 
