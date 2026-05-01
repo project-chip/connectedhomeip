@@ -262,7 +262,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     initParams.dataModelProvider             = &devices.DataModelProvider();
     initParams.groupDataProvider             = &gGroupDataProvider;
-    initParams.operationalServicePort        = CHIP_PORT;
+    if (AppOptions::GetConfig().port.HasValue())
+    {
+        initParams.operationalServicePort = AppOptions::GetConfig().port.Value();
+        ChipLogProgress(AppServer, "Overriding operationalServicePort to %u\n", initParams.operationalServicePort);
+    }
+    else
+    {
+        initParams.operationalServicePort = CHIP_PORT;
+    }
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     initParams.interfaceId                   = Inet::InterfaceId::Null();
 

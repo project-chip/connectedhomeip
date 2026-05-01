@@ -34,6 +34,7 @@ constexpr uint16_t kOptionKVS           = 0xffd3;
 constexpr uint16_t kOptionDiscriminator = 0xffd4;
 constexpr uint16_t kOptionVendorId      = 0xffd5;
 constexpr uint16_t kOptionProductId     = 0xffd6;
+constexpr uint16_t kOptionPort          = 0xffd7;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -75,6 +76,18 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     case kOptionProductId:
         mConfig.productId.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
         return true;
+    case kOptionPort: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFFF)
+        {
+            ChipLogError(Support, "Invalid port: %s\n", value);
+            return false;
+        }
+        mConfig.port.SetValue(static_cast<uint16_t>(val));
+        ChipLogProgress(AppServer, "Port option set to %u\n", static_cast<uint16_t>(val));
+        return true;
+    }
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -94,6 +107,7 @@ OptionSet * AppOptions::GetOptions()
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
         { "vendor-id", kArgumentRequired, kOptionVendorId },
         { "product-id", kArgumentRequired, kOptionProductId },
+        { "port", kArgumentRequired, kOptionPort },
         {}, // need empty terminator
     };
 

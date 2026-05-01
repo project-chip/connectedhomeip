@@ -37,6 +37,7 @@ public:
         chip::Optional<uint16_t> discriminator;
         chip::Optional<uint16_t> vendorId;
         chip::Optional<uint16_t> productId;
+        chip::Optional<uint16_t> port;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
