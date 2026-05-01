@@ -19,6 +19,7 @@
 #pragma once
 
 #include <Options.h>
+#include <devices/device-type-parser/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -28,35 +29,16 @@
 class AppOptions
 {
 public:
-    /**
-     * @brief Configuration for a single device instance.
-     *
-     * This structure holds the device type string (e.g. "on-off-light") and the
-     * endpoint ID where this device should be instantiated.
-     */
-    struct DeviceConfig
-    {
-        std::string type;
-        chip::EndpointId endpoint;
-    };
-
     static chip::ArgParser::OptionSet * GetOptions();
 
-    static const std::vector<DeviceConfig> & GetDeviceConfigs();
-
-    static const char * GetDeviceType() { return GetDeviceConfigs().front().type.c_str(); }
-
-    static chip::EndpointId GetDeviceEndpoint() { return GetDeviceConfigs().front().endpoint; }
-
     static bool EnableWiFi() { return mEnableWiFi; }
+
+    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries();
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
-    static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
-    static bool ParseDeviceConfig(const char * value, DeviceConfig & config);
-
-    static std::vector<DeviceConfig> mDeviceConfigs;
+    static DeviceTypeParser sParser;
     static bool mEnableWiFi;
 };
