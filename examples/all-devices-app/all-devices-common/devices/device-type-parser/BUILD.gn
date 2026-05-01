@@ -33,5 +33,3 @@ source_set("device-type-parser") {
     ":device-type-parser-includes",
   ]
 }
-
-
