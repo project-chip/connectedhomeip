@@ -48,7 +48,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         {
             return false;
         }
-        mConfig.deviceConfigs = sParser.GetDeviceTypeEntries();
+        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
         return true;
     }
     case kOptionWiFi:

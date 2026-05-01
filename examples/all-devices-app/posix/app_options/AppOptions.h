@@ -31,7 +31,7 @@ class AppOptions
 public:
     struct AppConfig
     {
-        std::vector<DeviceTypeParser::Entry> deviceConfigs;
+        std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
         bool enableWiFi = false;
         std::string kvsPath;
         chip::Optional<uint16_t> discriminator;
@@ -42,14 +42,14 @@ public:
     static chip::ArgParser::OptionSet * GetOptions();
     static const AppConfig & GetConfig()
     {
-        if (mConfig.deviceConfigs.empty())
+        if (mConfig.deviceTypeEntries.empty())
         {
-            mConfig.deviceConfigs.push_back({ "contact-sensor", 1, chip::kInvalidEndpointId });
+            mConfig.deviceTypeEntries.push_back({ "contact-sensor", 1, chip::kInvalidEndpointId });
         }
         return mConfig;
     }
 
-    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return mConfig.deviceConfigs; }
+    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
