@@ -1,5 +1,6 @@
 #include "GroupcastCluster.h"
 #include <access/AccessControl.h>
+#include <app/EventManagement.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AccessControl/Events.h>
 #include <clusters/Groupcast/AttributeIds.h>
@@ -67,16 +68,43 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     SetDataModelProvider(context.provider);
     UpdateUsedMcastAddrCount();
 
+    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
+    {
+        Groupcast::GetTesting().SetDelegate(this);
+    }
+
     return CHIP_NO_ERROR;
 }
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
+    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
+    {
+        Groupcast::GetTesting().SetDelegate(nullptr);
+    }
+
     mGroupcastTestingTimer.Cancel();
     mMembershipChangedTimer.Cancel();
     mGroupcastContext.groupDataProvider.RemoveListener(this);
     ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
+}
+
+void GroupcastCluster::FlushGroupcastTestingEvent()
+{
+    auto & testing = Groupcast::GetTesting();
+    VerifyOrReturn(testing.IsEnabled());
+
+    Clusters::Groupcast::Events::GroupcastTesting::Type event;
+
+    // Convert to event type
+    testing.ToEventType(event);
+
+    // Generate event on Root Endpoint (Endpoint 0)
+    DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
+    eventGenerator.GenerateEvent(event, kRootEndpointId);
+    eventGenerator.ScheduleUrgentEventDeliverySync();
+    testing.Clear();
 }
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

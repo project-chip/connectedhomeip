@@ -96,8 +96,7 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public SubscriptionsInfoProvider,
                                public TimedHandlerDelegate,
                                public WriteHandlerDelegate,
-                               public DeviceLoadStatusProvider,
-                               public Groupcast::Testing::Delegate
+                               public DeviceLoadStatusProvider
 {
 public:
     /**
@@ -438,9 +437,6 @@ public:
     MessageStats GetMessageStats() override;
 
     SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override;
-
-    // Groupcast::Testing::Delegate implementation
-    void FlushGroupcastTestingEvent() override;
 
 private:
     /* DataModel::ActionContext implementation */

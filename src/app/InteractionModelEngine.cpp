@@ -216,12 +216,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    if (groups != nullptr && groups->IsGroupcastEnabled())
-    {
-        Groupcast::GetTesting().SetDelegate(this);
-    }
-
     TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
                                                                                 : &EventManagement::GetInstance());
 
@@ -234,12 +228,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 void InteractionModelEngine::Shutdown()
 {
     VerifyOrReturn(State::kUninitialized != mState);
-
-    Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    if (groups != nullptr && groups->IsGroupcastEnabled())
-    {
-        Groupcast::GetTesting().SetDelegate(nullptr);
-    }
 
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
@@ -1063,23 +1051,6 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedMessageReceived(const PayloadHea
     // directly.
     newDelegate = this;
     return CHIP_NO_ERROR;
-}
-
-void InteractionModelEngine::FlushGroupcastTestingEvent()
-{
-    auto & testing = Groupcast::GetTesting();
-    VerifyOrReturn(testing.IsEnabled());
-
-    Clusters::Groupcast::Events::GroupcastTesting::Type event;
-
-    // Convert to event type
-    testing.ToEventType(event);
-
-    // Generate event
-    DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
-    eventGenerator.GenerateEvent(event, kRootEndpointId);
-    eventGenerator.ScheduleUrgentEventDeliverySync();
-    testing.Clear();
 }
 
 CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
