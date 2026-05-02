@@ -101,6 +101,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         ReturnErrorOnFailure(decoder.Decode(requestedSystemMode));
         if (EnsureKnownEnumValue(requestedSystemMode) == SystemModeEnum::kUnknownEnumValue)
         {
+            ChipLogError(Zcl, "Invalid value for SystemMode: %d", to_underlying(requestedSystemMode));
             return Status::InvalidValue;
         }
         auto status = SetSystemMode(requestedSystemMode);
@@ -117,7 +118,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHold));
         if (EnsureKnownEnumValue(requestedTemperatureSetpointHold) == TemperatureSetpointHoldEnum::kUnknownEnumValue)
         {
-            ChipLogDetail(Zcl, "Invalid value for TemperatureSetpointHold: %d", requestedTemperatureSetpointHold);
+            ChipLogError(Zcl, "Invalid value for TemperatureSetpointHold: %d", to_underlying(requestedTemperatureSetpointHold));
             return Status::InvalidValue;
         }
         SetAttributeValue(mTemperatureSetpointHold, requestedTemperatureSetpointHold, TemperatureSetpointHold::Id);
