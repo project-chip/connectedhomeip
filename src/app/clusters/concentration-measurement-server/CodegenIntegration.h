@@ -77,7 +77,7 @@ public:
     {
         if (mCluster.IsConstructed())
         {
-            LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Registration()));
+            LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
             mCluster.Destroy();
         }
     }
