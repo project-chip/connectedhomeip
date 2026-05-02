@@ -310,7 +310,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     }
     break;
     default:
-        ChipLogError(Zcl, "Unsupported Attribute: %d", request.path.mAttributeId);
+        ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
         return Status::UnsupportedAttribute;
     }
     return Status::Success;
