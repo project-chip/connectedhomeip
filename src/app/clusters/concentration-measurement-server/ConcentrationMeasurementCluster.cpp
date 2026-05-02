@@ -150,56 +150,11 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConcentrationMeasurementCluster::SetMinMeasuredValue(DataModel::Nullable<float> value)
-{
-    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    if (!value.IsNull() && !mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-    if (mMinMeasuredValue != value)
-    {
-        mMinMeasuredValue = value;
-        NotifyAttributeChanged(MinMeasuredValue::Id);
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConcentrationMeasurementCluster::SetMaxMeasuredValue(DataModel::Nullable<float> value)
-{
-    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    if (!value.IsNull() && !mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-    if (mMaxMeasuredValue != value)
-    {
-        mMaxMeasuredValue = value;
-        NotifyAttributeChanged(MaxMeasuredValue::Id);
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConcentrationMeasurementCluster::SetUncertainty(float value)
-{
-    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    if (mUncertainty != value)
-    {
-        mUncertainty = value;
-        NotifyAttributeChanged(Uncertainty::Id);
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (mPeakMeasuredValue != value)
-    {
-        mPeakMeasuredValue = value;
-        NotifyAttributeChanged(PeakMeasuredValue::Id);
-    }
+    SetAttributeValue(mPeakMeasuredValue, value, PeakMeasuredValue::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -207,11 +162,8 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValueWindow(uint32_t 
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (mPeakMeasuredValueWindow != value)
-    {
-        mPeakMeasuredValueWindow = value;
-        NotifyAttributeChanged(PeakMeasuredValueWindow::Id);
-    }
+    SetAttributeValue(mPeakMeasuredValueWindow, value, PeakMeasuredValueWindow::Id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -219,11 +171,8 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValue(DataModel::N
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (mAverageMeasuredValue != value)
-    {
-        mAverageMeasuredValue = value;
-        NotifyAttributeChanged(AverageMeasuredValue::Id);
-    }
+    SetAttributeValue(mAverageMeasuredValue, value, AverageMeasuredValue::Id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -231,11 +180,8 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValueWindow(uint32
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (mAverageMeasuredValueWindow != value)
-    {
-        mAverageMeasuredValueWindow = value;
-        NotifyAttributeChanged(AverageMeasuredValueWindow::Id);
-    }
+    SetAttributeValue(mAverageMeasuredValueWindow, value, AverageMeasuredValueWindow::Id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -251,11 +197,8 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetLevelValue(LevelValueEnum value)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
-    if (mLevelValue != value)
-    {
-        mLevelValue = value;
-        NotifyAttributeChanged(LevelValue::Id);
-    }
+    SetAttributeValue(mLevelValue, value, LevelValue::Id);
+
     return CHIP_NO_ERROR;
 }
 

@@ -88,9 +88,6 @@ public:
     // Push a new sensor reading. Validates range, stores, and notifies subscribers.
     // Returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the relevant feature flag was not set at construction.
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> value);
-    CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> value);
-    CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<float> value);
-    CHIP_ERROR SetUncertainty(float value);
     CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> value);
     CHIP_ERROR SetPeakMeasuredValueWindow(uint32_t value);
     CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> value);
