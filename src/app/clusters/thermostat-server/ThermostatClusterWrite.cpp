@@ -115,20 +115,23 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
     case TemperatureSetpointHold::Id: {
         TemperatureSetpointHoldEnum requestedTemperatureSetpointHold;
         ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHold));
-        if (EnsureKnownEnumValue(requestedTemperatureSetpointHold) == TemperatureSetpointHoldEnum::kUnknownEnumValue) {
+        if (EnsureKnownEnumValue(requestedTemperatureSetpointHold) == TemperatureSetpointHoldEnum::kUnknownEnumValue)
+        {
             ChipLogDetail(Zcl, "Invalid value for TemperatureSetpointHold: %d", requestedTemperatureSetpointHold);
             return Status::InvalidValue;
         }
-        SetAttributeValue(mTemperatureSetpointHold, requestedTemperatureSetpointHold,TemperatureSetpointHold::Id);
+        SetAttributeValue(mTemperatureSetpointHold, requestedTemperatureSetpointHold, TemperatureSetpointHold::Id);
         return Status::Success;
     }
     case TemperatureSetpointHoldDuration::Id: {
         uint16_t requestedTemperatureSetpointHoldDuration;
         ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHoldDuration));
-        if (requestedTemperatureSetpointHoldDuration > 1440) {
+        if (requestedTemperatureSetpointHoldDuration > 1440)
+        {
             return Status::InvalidValue;
         }
-        SetAttributeValue(mTemperatureSetpointHoldDuration, requestedTemperatureSetpointHoldDuration,TemperatureSetpointHoldDuration::Id);
+        SetAttributeValue(mTemperatureSetpointHoldDuration, requestedTemperatureSetpointHoldDuration,
+                          TemperatureSetpointHoldDuration::Id);
         return Status::Success;
     }
     default:
