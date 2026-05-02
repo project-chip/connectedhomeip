@@ -70,7 +70,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         {
             return encoder.EncodeNull();
         }
-        break;
+        return encoder.Encode(mLocalTemperature);
     case SystemMode::Id:
         return encoder.Encode(mSystemMode);
     case RemoteSensing::Id:
