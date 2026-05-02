@@ -64,7 +64,7 @@ public:
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium) :
         mCluster(aEndpointId,
                  ConcentrationMeasurementCluster::Config{ aClusterId, MakeFeatureFlags(), aMeasurementMedium,
-                                                         MeasurementUnitEnum::kUnknownEnumValue }),
+                                                          MeasurementUnitEnum::kUnknownEnumValue }),
         mRegistration(mCluster)
     {}
 

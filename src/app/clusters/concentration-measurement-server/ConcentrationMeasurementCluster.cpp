@@ -31,8 +31,7 @@ namespace Clusters {
 namespace ConcentrationMeasurement {
 
 ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endpointId, const Config & config) :
-    DefaultServerCluster({ endpointId, config.clusterId }),
-    mFeatures([&] {
+    DefaultServerCluster({ endpointId, config.clusterId }), mFeatures([&] {
         BitFlags<Feature> f = config.features;
         if (f.HasAny(Feature::kMediumLevel, Feature::kCriticalLevel))
             f.Set(Feature::kLevelIndication);
@@ -40,12 +39,11 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
             f.Set(Feature::kNumericMeasurement);
         return f;
     }()),
-    mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured),
-    mMaxMeasuredValue(config.maxMeasured), mUncertainty(config.uncertainty)
+    mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured), mMaxMeasuredValue(config.maxMeasured),
+    mUncertainty(config.uncertainty)
 {
     VerifyOrDie(std::find(AliasedClusters.begin(), AliasedClusters.end(), config.clusterId) != AliasedClusters.end());
 }
-
 
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
