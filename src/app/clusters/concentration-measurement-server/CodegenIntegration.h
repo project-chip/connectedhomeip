@@ -23,7 +23,6 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
-#include <optional>
 #include <type_traits>
 
 namespace chip {
@@ -63,10 +62,8 @@ class Instance
 public:
     // Constructor for clusters without kNumericMeasurement (level-indication only).
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium) :
-        mCluster(aEndpointId,
-                 ConcentrationMeasurementCluster::Config{ aClusterId, MakeFeatureFlags(), aMeasurementMedium,
-                                                          MeasurementUnitEnum::kUnknownEnumValue }),
-        mRegistration(mCluster)
+        mEndpointId(aEndpointId),
+        mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, MeasurementUnitEnum::kUnknownEnumValue }
     {}
 
     // Constructor for clusters with kNumericMeasurement.
@@ -78,9 +75,10 @@ public:
 
     ~Instance()
     {
-        if (mRegistered)
+        if (mCluster.IsConstructed())
         {
-            LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.value()));
+            LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Registration()));
+            mCluster.Destroy();
         }
     }
 
@@ -90,24 +88,19 @@ public:
      */
     CHIP_ERROR Init()
     {
-        mCluster.emplace(mEndpointId, mConfig);
-        mRegistration.emplace(mCluster.value());
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mRegistration.value());
-        if (err == CHIP_NO_ERROR)
-        {
-            mRegistered = true;
-        }
-        return err;
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+        mCluster.Create(mEndpointId, mConfig);
+        return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
     }
 
-    ServerClusterRegistration & Registration() { return mRegistration.value(); }
+    ServerClusterRegistration & Registration() { return mCluster.Registration(); }
 
     // Fixed-value setters: must be called before Init(). These configure the cluster's
     // immutable attributes (min/max range, uncertainty) via the Config passed to the constructor.
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<float> v)
     {
-        VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
         mConfig.minMeasured = v;
         return CHIP_NO_ERROR;
     }
@@ -115,7 +108,7 @@ public:
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<float> v)
     {
-        VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
         mConfig.maxMeasured = v;
         return CHIP_NO_ERROR;
     }
@@ -123,7 +116,7 @@ public:
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetUncertainty(float v)
     {
-        VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
         mConfig.uncertainty = v;
         return CHIP_NO_ERROR;
     }
@@ -134,37 +127,37 @@ public:
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v)
     {
-        return mCluster->SetMeasuredValue(v);
+        return mCluster.Cluster().SetMeasuredValue(v);
     }
 
     template <bool En = PeakMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> v)
     {
-        return mCluster->SetPeakMeasuredValue(v);
+        return mCluster.Cluster().SetPeakMeasuredValue(v);
     }
 
     template <bool En = PeakMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetPeakMeasuredValueWindow(uint32_t v)
     {
-        return mCluster->SetPeakMeasuredValueWindow(v);
+        return mCluster.Cluster().SetPeakMeasuredValueWindow(v);
     }
 
     template <bool En = AverageMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> v)
     {
-        return mCluster->SetAverageMeasuredValue(v);
+        return mCluster.Cluster().SetAverageMeasuredValue(v);
     }
 
     template <bool En = AverageMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetAverageMeasuredValueWindow(uint32_t v)
     {
-        return mCluster->SetAverageMeasuredValueWindow(v);
+        return mCluster.Cluster().SetAverageMeasuredValueWindow(v);
     }
 
     template <bool En = LevelIndicationEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetLevelValue(LevelValueEnum v)
     {
-        return mCluster->SetLevelValue(v);
+        return mCluster.Cluster().SetLevelValue(v);
     }
 
 private:
@@ -180,11 +173,9 @@ private:
         return f;
     }
 
-    bool mRegistered = false;
     EndpointId mEndpointId;
     ConcentrationMeasurementCluster::Config mConfig;
-    std::optional<ConcentrationMeasurementCluster> mCluster;
-    std::optional<ServerClusterRegistration> mRegistration;
+    LazyRegisteredServerCluster<ConcentrationMeasurementCluster> mCluster;
 };
 
 template <bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
