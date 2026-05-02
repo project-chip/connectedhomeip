@@ -56,7 +56,7 @@ public:
 
     // virtual ~UserConfirmationProvider() = default;
     UDCClientState mState;
-    const char * mInstanceName;
+    const char * mInstanceName = nullptr;
 
     bool mOnUserDirectedCommissioningRequestCalled = false;
     bool mFindCommissionableNodeCalled             = false;
