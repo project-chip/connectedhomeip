@@ -65,23 +65,18 @@ namespace ConcentrationMeasurement {
 class ConcentrationMeasurementCluster : public DefaultServerCluster
 {
 public:
-    /**
-     * @param endpointId   Endpoint this cluster lives on.
-     * @param clusterId    Aliased cluster ID (e.g. CarbonDioxideConcentrationMeasurement::Id).
-     * @param features     Feature flags enabled for this instance.
-     * @param medium       Measurement medium — fixed at construction.
-     * @param unit         Measurement unit — fixed at construction.
-     * @param minMeasured  Sensor minimum range — fixed at construction. Defaults to 0.
-     * @param maxMeasured  Sensor maximum range — fixed at construction. Defaults to null (unset).
-     * @param uncertainty  Sensor uncertainty — fixed at construction. Defaults to 0.
-     */
-    ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId, BitFlags<Feature> features,
-                                    MeasurementMediumEnum medium, MeasurementUnitEnum unit,
-                                    DataModel::Nullable<float> minMeasured = DataModel::MakeNullable(0.0f),
-                                    DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>(),
-                                    float uncertainty                      = 0.0f);
+    struct Config
+    {
+        ClusterId clusterId;
+        BitFlags<Feature> features;
+        MeasurementMediumEnum medium;
+        MeasurementUnitEnum unit;
+        DataModel::Nullable<float> minMeasured = DataModel::MakeNullable(0.0f);
+        DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>();
+        float uncertainty                      = 0.0f;
+    };
 
-    ~ConcentrationMeasurementCluster() override;
+    ConcentrationMeasurementCluster(EndpointId endpointId, const Config & config);
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
@@ -104,10 +99,21 @@ public:
 
 private:
     static constexpr uint32_t kWindowMaxSeconds = 604800;
+
+    static bool IsInRange(DataModel::Nullable<float> value, DataModel::Nullable<float> minV, DataModel::Nullable<float> maxV)
+    {
+        if (value.IsNull())
+            return true;
+        if (!minV.IsNull() && value.Value() < minV.Value())
+            return false;
+        if (!maxV.IsNull() && value.Value() > maxV.Value())
+            return false;
+        return true;
+    }
     static constexpr uint16_t kClusterRevision =
         static_cast<uint16_t>(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision);
 
-    BitFlags<Feature> mFeatures;
+    const BitFlags<Feature> mFeatures;
 
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;

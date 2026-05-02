@@ -62,14 +62,17 @@ class Instance
 public:
     // Constructor for clusters without kNumericMeasurement (level-indication only).
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium) :
-        mCluster(aEndpointId, aClusterId, MakeFeatureFlags(), aMeasurementMedium, MeasurementUnitEnum::kUnknownEnumValue),
+        mCluster(aEndpointId,
+                 ConcentrationMeasurementCluster::Config{ aClusterId, MakeFeatureFlags(), aMeasurementMedium,
+                                                         MeasurementUnitEnum::kUnknownEnumValue }),
         mRegistration(mCluster)
     {}
 
     // Constructor for clusters with kNumericMeasurement.
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium,
              MeasurementUnitEnum aMeasurementUnit) :
-        mCluster(aEndpointId, aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit),
+        mCluster(aEndpointId,
+                 ConcentrationMeasurementCluster::Config{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }),
         mRegistration(mCluster)
     {}
 
@@ -158,18 +161,12 @@ private:
     static constexpr BitFlags<Feature> MakeFeatureFlags()
     {
         BitFlags<Feature> f;
-        if constexpr (NumericMeasurementEnabled)
-            f.Set(Feature::kNumericMeasurement);
-        if constexpr (LevelIndicationEnabled)
-            f.Set(Feature::kLevelIndication);
-        if constexpr (MediumLevelEnabled)
-            f.Set(Feature::kMediumLevel);
-        if constexpr (CriticalLevelEnabled)
-            f.Set(Feature::kCriticalLevel);
-        if constexpr (PeakMeasurementEnabled)
-            f.Set(Feature::kPeakMeasurement);
-        if constexpr (AverageMeasurementEnabled)
-            f.Set(Feature::kAverageMeasurement);
+        f.Set(Feature::kNumericMeasurement, NumericMeasurementEnabled);
+        f.Set(Feature::kLevelIndication, LevelIndicationEnabled);
+        f.Set(Feature::kMediumLevel, MediumLevelEnabled);
+        f.Set(Feature::kCriticalLevel, CriticalLevelEnabled);
+        f.Set(Feature::kPeakMeasurement, PeakMeasurementEnabled);
+        f.Set(Feature::kAverageMeasurement, AverageMeasurementEnabled);
         return f;
     }
 

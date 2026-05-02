@@ -30,35 +30,22 @@ namespace app {
 namespace Clusters {
 namespace ConcentrationMeasurement {
 
-ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endpointId, ClusterId clusterId,
-                                                                 BitFlags<Feature> features, MeasurementMediumEnum medium,
-                                                                 MeasurementUnitEnum unit, DataModel::Nullable<float> minMeasured,
-                                                                 DataModel::Nullable<float> maxMeasured, float uncertainty) :
-    DefaultServerCluster({ endpointId, clusterId }),
-    mFeatures(features), mMedium(medium), mUnit(unit), mMinMeasuredValue(minMeasured), mMaxMeasuredValue(maxMeasured),
-    mUncertainty(uncertainty)
+ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endpointId, const Config & config) :
+    DefaultServerCluster({ endpointId, config.clusterId }),
+    mFeatures([&] {
+        BitFlags<Feature> f = config.features;
+        if (f.HasAny(Feature::kMediumLevel, Feature::kCriticalLevel))
+            f.Set(Feature::kLevelIndication);
+        if (f.HasAny(Feature::kPeakMeasurement, Feature::kAverageMeasurement))
+            f.Set(Feature::kNumericMeasurement);
+        return f;
+    }()),
+    mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured),
+    mMaxMeasuredValue(config.maxMeasured), mUncertainty(config.uncertainty)
 {
-    bool validCluster = false;
-    for (ClusterId id : AliasedClusters)
-    {
-        if (id == clusterId)
-        {
-            validCluster = true;
-            break;
-        }
-    }
-    VerifyOrDie(validCluster);
-    if (mFeatures.HasAny(Feature::kMediumLevel, Feature::kCriticalLevel))
-    {
-        mFeatures.Set(Feature::kLevelIndication);
-    }
-    if (mFeatures.HasAny(Feature::kPeakMeasurement, Feature::kAverageMeasurement))
-    {
-        mFeatures.Set(Feature::kNumericMeasurement);
-    }
+    VerifyOrDie(std::find(AliasedClusters.begin(), AliasedClusters.end(), config.clusterId) != AliasedClusters.end());
 }
 
-ConcentrationMeasurementCluster::~ConcentrationMeasurementCluster() {}
 
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
@@ -156,17 +143,7 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
 CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    if (!value.IsNull())
-    {
-        if (!mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-        if (!mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-    }
+    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (mMeasuredValue != value)
     {
         mMeasuredValue = value;
@@ -219,17 +196,7 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetUncertainty(float value)
 CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    if (!value.IsNull())
-    {
-        if (!mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-        if (!mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-    }
+    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (mPeakMeasuredValue != value)
     {
         mPeakMeasuredValue = value;
@@ -253,17 +220,7 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValueWindow(uint32_t 
 CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValue(DataModel::Nullable<float> value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    if (!value.IsNull())
-    {
-        if (!mMinMeasuredValue.IsNull() && value.Value() < mMinMeasuredValue.Value())
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-        if (!mMaxMeasuredValue.IsNull() && value.Value() > mMaxMeasuredValue.Value())
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-    }
+    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (mAverageMeasuredValue != value)
     {
         mAverageMeasuredValue = value;
