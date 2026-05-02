@@ -40,7 +40,7 @@ Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOpera
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->GetControlSequenceOfOperation();
     return Status::Success;
@@ -52,7 +52,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->SetControlSequenceOfOperation(value);
 }
@@ -66,7 +66,7 @@ Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     value = cluster->GetLocalTemperature();
     return Status::Success;
@@ -78,14 +78,13 @@ Status Set(EndpointId endpoint, int16_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->SetLocalTemperature(value);
 }
 
 Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kNo);
     return Set(endpoint, value);
 }
 
@@ -99,7 +98,7 @@ Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum 
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->GetSystemMode();
     return Status::Success;
@@ -111,7 +110,7 @@ Status Set(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum 
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->SetSystemMode(value);
 }
@@ -125,7 +124,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->SetRunningMode(value);
 }
@@ -140,7 +139,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->SetRunningState(value);
 }
@@ -153,7 +152,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->mSetpoints.absoluteHeatLimits.minimum;
     return Status::Success;
@@ -165,7 +164,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->ChangeSetpointAttribute(Id, value);
 }
@@ -178,7 +177,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->mSetpoints.absoluteHeatLimits.maximum;
     return Status::Success;
@@ -189,7 +188,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->ChangeSetpointAttribute(Id, value);
 }
@@ -203,7 +202,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->mSetpoints.occupiedCoolingSetpoint;
     return Status::Success;
@@ -214,7 +213,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->ChangeSetpointAttribute(Id, value);
 }
@@ -229,7 +228,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->mSetpoints.occupiedHeatingSetpoint;
     return Status::Success;
@@ -240,7 +239,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->ChangeSetpointAttribute(Id, value);
 }
@@ -255,7 +254,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->mSetpoints.unoccupiedCoolingSetpoint;
     return Status::Success;
@@ -266,7 +265,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->ChangeSetpointAttribute(Id, value);
 }
@@ -281,7 +280,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     *value = cluster->mSetpoints.unoccupiedHeatingSetpoint;
     return Status::Success;
@@ -292,7 +291,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     return cluster->ChangeSetpointAttribute(Id, value);
 }
@@ -306,7 +305,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Status::Failure;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     cluster->mFeatures = BitFlags<Thermostat::Feature>(value);
     return Status::Success;
