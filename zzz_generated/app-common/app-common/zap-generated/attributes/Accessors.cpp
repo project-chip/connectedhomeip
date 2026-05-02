@@ -14430,46 +14430,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace Thermostat {
 namespace Attributes {
 
-namespace PICoolingDemand {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
-{
-    using Traits = NumericAttributeTraits<uint8_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-} // namespace PICoolingDemand
-
-namespace PIHeatingDemand {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
-{
-    using Traits = NumericAttributeTraits<uint8_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-} // namespace PIHeatingDemand
-
 namespace HVACSystemTypeConfiguration {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint,

@@ -3360,7 +3360,7 @@ endpoint 5 {
     callback attribute localTemperature;
     callback attribute absMinHeatSetpointLimit;
     callback attribute absMaxHeatSetpointLimit;
-    persist  attribute PIHeatingDemand default = 0;
+    callback attribute PIHeatingDemand;
     callback attribute occupiedHeatingSetpoint;
     callback attribute minHeatSetpointLimit;
     callback attribute maxHeatSetpointLimit;

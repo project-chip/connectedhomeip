@@ -1004,6 +1004,8 @@
             "AbsMaxHeatSetpointLimit",
             "AbsMinCoolSetpointLimit",
             "AbsMaxCoolSetpointLimit",
+            "PICoolingDemand",
+            "PIHeatingDemand",
             "LocalTemperatureCalibration",
             "OccupiedCoolingSetpoint",
             "OccupiedHeatingSetpoint",
