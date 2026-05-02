@@ -112,6 +112,11 @@ private:
     BitMask<RelayStateBitmap> mRunningState;
     DataModel::Nullable<int16_t> mLocalTemperature;
 
+
+    TemperatureSetpointHoldEnum mTemperatureSetpointHold;
+    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
+    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
+
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
                                                           AttributeValueDecoder & decoder);
 

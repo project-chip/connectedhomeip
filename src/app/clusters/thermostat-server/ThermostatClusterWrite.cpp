@@ -112,8 +112,25 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         return persistence.DecodeAndStoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id }, decoder,
                                                            requestedSystemMode);
     }
-    case TemperatureSetpointHold::Id:
-    case TemperatureSetpointHoldDuration::Id:
+    case TemperatureSetpointHold::Id: {
+        TemperatureSetpointHoldEnum requestedTemperatureSetpointHold;
+        ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHold));
+        if (EnsureKnownEnumValue(requestedTemperatureSetpointHold) == TemperatureSetpointHoldEnum::kUnknownEnumValue) {
+            ChipLogDetail(Zcl, "Invalid value for TemperatureSetpointHold: %d", requestedTemperatureSetpointHold);
+            return Status::InvalidValue;
+        }
+        SetAttributeValue(mTemperatureSetpointHold, requestedTemperatureSetpointHold,TemperatureSetpointHold::Id);
+        return Status::Success;
+    }
+    case TemperatureSetpointHoldDuration::Id: {
+        uint16_t requestedTemperatureSetpointHoldDuration;
+        ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHoldDuration));
+        if (requestedTemperatureSetpointHoldDuration > 1440) {
+            return Status::InvalidValue;
+        }
+        SetAttributeValue(mTemperatureSetpointHoldDuration, requestedTemperatureSetpointHoldDuration,TemperatureSetpointHoldDuration::Id);
+        return Status::Success;
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }

@@ -2723,10 +2723,6 @@ namespace ActiveScheduleHandle {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
 } // namespace ActiveScheduleHandle
 
-namespace SetpointHoldExpiryTimestamp {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
-} // namespace SetpointHoldExpiryTimestamp
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap

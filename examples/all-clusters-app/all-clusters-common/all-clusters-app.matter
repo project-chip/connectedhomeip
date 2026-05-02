@@ -8309,7 +8309,7 @@ endpoint 1 {
     ram      attribute activeScheduleHandle;
     callback attribute presets;
     callback attribute schedules;
-    ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute setpointHoldExpiryTimestamp;
     callback attribute maxThermostatSuggestions;
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;
