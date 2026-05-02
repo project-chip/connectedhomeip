@@ -136,7 +136,8 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         return Status::Success;
     }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
+        ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
+        return Status::UnsupportedAttribute;
     }
 }
 
