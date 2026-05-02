@@ -163,6 +163,12 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         auto deadband = static_cast<uint8_t>(mSetpoints.deadBand / 10);
         return encoder.Encode(deadband);
     }
+    case TemperatureSetpointHold::Id: {
+        return encoder.Encode(mTemperatureSetpointHold);
+    }
+    case TemperatureSetpointHoldDuration::Id: {
+        return encoder.Encode(mTemperatureSetpointHoldDuration);
+    }
     case PresetTypes::Id: {
         auto & delegate = mDelegate;
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
@@ -260,6 +266,10 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
     break;
+    case SetpointHoldExpiryTimestamp::Id: {
+        ReturnErrorOnFailure(encoder.Encode(mSetpointHoldExpiryTimestamp));
+    }
+    break;
     case MaxThermostatSuggestions::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -300,6 +310,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     }
     break;
     default:
+        ChipLogError(Zcl, "Unsupported Attribute: %d", request.path.mAttributeId);
         return Status::UnsupportedAttribute;
     }
     return Status::Success;

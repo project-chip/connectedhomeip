@@ -3140,7 +3140,7 @@ endpoint 1 {
     ram      attribute numberOfPresets default = 0;
     ram      attribute activePresetHandle;
     callback attribute presets;
-    ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute setpointHoldExpiryTimestamp;
     callback attribute maxThermostatSuggestions;
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;

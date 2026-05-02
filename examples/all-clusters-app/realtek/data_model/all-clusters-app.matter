@@ -9162,7 +9162,7 @@ endpoint 1 {
     ram      attribute activeScheduleHandle;
     callback attribute presets;
     callback attribute schedules;
-    ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute setpointHoldExpiryTimestamp;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

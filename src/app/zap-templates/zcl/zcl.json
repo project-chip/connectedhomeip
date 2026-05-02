@@ -1021,6 +1021,7 @@
             "SystemMode",
             "TemperatureSetpointHold",
             "TemperatureSetpointHoldDuration",
+            "SetpointHoldExpiryTimestamp",
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason",
