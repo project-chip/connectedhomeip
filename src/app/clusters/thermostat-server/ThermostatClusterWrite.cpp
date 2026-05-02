@@ -104,12 +104,13 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
             return Status::InvalidValue;
         }
         auto status = SetSystemMode(requestedSystemMode);
-        if (status != Status::Success) {
+        if (status != Status::Success)
+        {
             return status;
         }
         AttributePersistence persistence(mContext->attributeStorage);
-        return persistence.DecodeAndStoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id },
-                                                                  decoder, requestedSystemMode);
+        return persistence.DecodeAndStoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id }, decoder,
+                                                           requestedSystemMode);
     }
     case TemperatureSetpointHold::Id:
     case TemperatureSetpointHoldDuration::Id:
