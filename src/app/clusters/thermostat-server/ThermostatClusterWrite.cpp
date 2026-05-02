@@ -103,39 +103,13 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         {
             return Status::InvalidValue;
         }
-
-        switch (EnsureKnownEnumValue(mControlSequenceOfOperation))
-        {
-        case ControlSequenceOfOperationEnum::kCoolingOnly:
-        case ControlSequenceOfOperationEnum::kCoolingWithReheat:
-            if (requestedSystemMode == SystemModeEnum::kHeat || requestedSystemMode == SystemModeEnum::kEmergencyHeat)
-            {
-                return Status::InvalidValue;
-            }
-            break;
-        case ControlSequenceOfOperationEnum::kHeatingOnly:
-        case ControlSequenceOfOperationEnum::kHeatingWithReheat:
-            if (requestedSystemMode == SystemModeEnum::kCool || requestedSystemMode == SystemModeEnum::kPrecooling)
-            {
-                return Status::InvalidValue;
-            }
-            break;
-        case ControlSequenceOfOperationEnum::kCoolingAndHeating:
-        case ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat:
-            break;
-        case ControlSequenceOfOperationEnum::kUnknownEnumValue:
-            // Feels like this should have been invalid state
-            return Status::InvalidValue;
+        auto status = SetSystemMode(requestedSystemMode);
+        if (status != Status::Success) {
+            return status;
         }
         AttributePersistence persistence(mContext->attributeStorage);
-        auto result = persistence.DecodeAndStoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id },
+        return persistence.DecodeAndStoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id },
                                                                   decoder, requestedSystemMode);
-        if (!result.IsSuccess())
-        {
-            return result;
-        }
-        mSystemMode = requestedSystemMode;
-        return Status::Success;
     }
     case TemperatureSetpointHold::Id:
     case TemperatureSetpointHoldDuration::Id:

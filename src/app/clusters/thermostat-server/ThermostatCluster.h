@@ -75,20 +75,20 @@ public:
 
     void OnAtomicWriteTimeout();
 
-    Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode);
     SystemModeEnum GetSystemMode() const { return mSystemMode; }
+    Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode);
 
-    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation);
     ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const { return mControlSequenceOfOperation; }
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation);
 
-    Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode);
     ThermostatRunningModeEnum GetRunningMode() const { return mRunningMode; }
+    Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode);
 
-    Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
     BitMask<RelayStateBitmap> GetRunningState() const { return mRunningState; }
+    Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
 
-    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature);
     DataModel::Nullable<int16_t> GetLocalTemperature() const { return mLocalTemperature; }
+    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature);
 
     Protocols::InteractionModel::Status ChangeSetpointAttribute(const AttributeId attributeId, int16_t temperature);
     Protocols::InteractionModel::Status SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
