@@ -2587,14 +2587,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 namespace Thermostat {
 namespace Attributes {
 
-namespace PICoolingDemand {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-} // namespace PICoolingDemand
-
-namespace PIHeatingDemand {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-} // namespace PIHeatingDemand
-
 namespace HVACSystemTypeConfiguration {
 Protocols::InteractionModel::Status
 Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value); // HVACSystemTypeBitmap

@@ -9289,8 +9289,8 @@ endpoint 0 {
     callback attribute absMaxHeatSetpointLimit;
     callback attribute absMinCoolSetpointLimit;
     callback attribute absMaxCoolSetpointLimit;
-    ram      attribute PICoolingDemand;
-    ram      attribute PIHeatingDemand;
+    callback attribute PICoolingDemand;
+    callback attribute PIHeatingDemand;
     callback attribute HVACSystemTypeConfiguration default = 0;
     callback attribute localTemperatureCalibration;
     callback attribute occupiedCoolingSetpoint;
