@@ -165,7 +165,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
             return Status::UnsupportedAttribute;
         }
         auto deadband = static_cast<uint8_t>(mSetpoints.deadBand / 10);
-        auto status = encoder.Encode(deadband);
+        auto status   = encoder.Encode(deadband);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Failed to encode MinSetpointDeadBand: %" CHIP_ERROR_FORMAT, status.Format());
