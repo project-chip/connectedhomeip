@@ -44,6 +44,8 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
 
     BitMask<Feature, uint32_t> featureMap;
 
+    ChipLogProgress(Zcl, "Reading Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
+
     uint32_t flags;
     if (FeatureMap::Get(request.path.mEndpointId, &flags) == Status::Success)
     {
@@ -160,15 +162,21 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         }
         return encoder.Encode(mSetpoints.coolLimitsOverride.Maximum());
     case MinSetpointDeadBand::Id: {
+        ChipLogProgress(Zcl, "Reading MinSetpointDeadBand attribute");
         if (!mSetpoints.autoSupported)
         {
+            ChipLogError(Zcl, "MinSetpointDeadBand attribute is not supported");
             return Status::UnsupportedAttribute;
         }
         auto deadband = static_cast<uint8_t>(mSetpoints.deadBand / 10);
-        auto status   = encoder.Encode(deadband);
+        
+        ChipLogProgress(Zcl, "MinSetpointDeadBand value: %d", deadband);
+        auto status = encoder.Encode(deadband);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Failed to encode MinSetpointDeadBand: %" CHIP_ERROR_FORMAT, status.Format());
+        } else {
+            ChipLogProgress(Zcl, "Successfully encoded MinSetpointDeadBand");
         }
         return status;
     }
