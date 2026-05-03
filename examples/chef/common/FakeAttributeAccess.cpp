@@ -265,7 +265,7 @@ public:
         case Switch::Id:
             switch (path.mAttributeId)
             {
-            case Switch::Attributes::CurrentPosition::Id:
+            case Switch::Attributes::CurrentPosition::Id: {
                 uint8_t currentPosition;
                 CHIP_ERROR err = decoder.Decode(currentPosition);
                 if (err != CHIP_NO_ERROR)
@@ -287,13 +287,14 @@ public:
                 }
                 return ::pw::OkStatus();
             }
+            }
             break;
 #endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case RelativeHumidityMeasurement::Id:
             switch (path.mAttributeId)
             {
-            case RelativeHumidityMeasurement::Attributes::MeasuredValue::Id:
+            case RelativeHumidityMeasurement::Attributes::MeasuredValue::Id: {
                 DataModel::Nullable<uint16_t> measuredValue;
                 CHIP_ERROR err = decoder.Decode(measuredValue);
                 if (err != CHIP_NO_ERROR)
@@ -317,6 +318,7 @@ public:
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
+            }
             }
             break;
 #endif // MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
