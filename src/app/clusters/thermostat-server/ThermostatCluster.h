@@ -111,6 +111,7 @@ private:
     ThermostatRunningModeEnum mRunningMode;
     BitMask<RelayStateBitmap> mRunningState;
     DataModel::Nullable<int16_t> mLocalTemperature;
+    int8_t mLocalTemperatureCalibration;
 
     TemperatureSetpointHoldEnum mTemperatureSetpointHold;
     DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
