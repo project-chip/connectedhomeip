@@ -262,7 +262,7 @@ public:
             break;
 #endif // MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
-        case Switch::Id:
+        case Switch::Id: {
             switch (path.mAttributeId)
             {
             case Switch::Attributes::CurrentPosition::Id:
@@ -287,10 +287,11 @@ public:
                 }
                 return ::pw::OkStatus();
             }
-            break;
+        }
+        break;
 #endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
-        case RelativeHumidityMeasurement::Id:
+        case RelativeHumidityMeasurement::Id: {
             switch (path.mAttributeId)
             {
             case RelativeHumidityMeasurement::Attributes::MeasuredValue::Id:
@@ -318,7 +319,8 @@ public:
                 }
                 return ::pw::OkStatus();
             }
-            break;
+        }
+        break;
 #endif // MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         }
         return std::nullopt;
