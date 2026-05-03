@@ -187,7 +187,7 @@ class TC_CGEN_2_5(MatterBaseTest):
             attribute=Clusters.GeneralCommissioning.Attributes.TCAcknowledgements,
             endpoint=ROOT_ENDPOINT_ID)
         asserts.assert_equal(acknowledgements, tc_user_response_to_simulate, "TCAcknowledgements does not match expected value.")
-        matter_asserts.assert_valid_uint16(accepted_version, "TCAcknowledgements is not a map16 type.")
+        matter_asserts.assert_valid_uint16(acknowledgements, "TCAcknowledgements is not a map16 type.")
 
         # Step 11: Verify TCMinRequiredVersion
         self.step(11)

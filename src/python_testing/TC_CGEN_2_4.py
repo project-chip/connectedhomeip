@@ -141,6 +141,7 @@ class TC_CGEN_2_4(MatterBaseTest):
 
         log.info('Step 18 - TH1 reads the location capability')
         cap = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1,
             cluster=Clusters.GeneralCommissioning,
             attribute=Clusters.GeneralCommissioning.Attributes.LocationCapability,
             endpoint=0)

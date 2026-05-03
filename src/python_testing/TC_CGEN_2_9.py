@@ -56,6 +56,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
         commissioner_fabric_index_on_dut = await self.read_single_attribute_check_success(
+            dev_ctrl=commissioner,
             cluster=Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
             endpoint=ROOT_ENDPOINT_ID)

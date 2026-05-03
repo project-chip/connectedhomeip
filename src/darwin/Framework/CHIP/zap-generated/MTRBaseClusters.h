@@ -8441,7 +8441,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command GetYearDaySchedule
  *
- * Returns the year day schedule data for the specified schedule and user indexes.
+ * Retrieve the specific year day schedule for the specific schedule and user indexes.
  */
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params completion:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
@@ -8471,19 +8471,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SetUser
  *
- * Set User into the lock.
+ * Set user into the lock.
  */
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command GetUser
  *
- * Retrieve User.
+ * Retrieve user.
  */
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params completion:(void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ClearUser
  *
- * Clears a User or all Users.
+ * Clears a user or all Users.
  */
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
@@ -8515,13 +8515,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SetAliroReaderConfig
  *
- * This command communicates an Aliro Reader configuration to the lock.
+ * This command allows communicating an Aliro Reader configuration, as defined in Aliro, to the lock.
  */
 - (void)setAliroReaderConfigWithParams:(MTRDoorLockClusterSetAliroReaderConfigParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command ClearAliroReaderConfig
  *
- * This command clears an existing Aliro Reader configuration for the lock.
+ * This command allows clearing an existing Aliro Reader configuration for the lock.
  */
 - (void)clearAliroReaderConfigWithParams:(MTRDoorLockClusterClearAliroReaderConfigParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)clearAliroReaderConfigWithCompletion:(MTRStatusCompletion)completion
@@ -20845,6 +20845,11 @@ typedef NS_ENUM(uint8_t, MTRDoorLockDlOperationSource) {
     MTRDoorLockDlOperationSourceRFID MTR_DEPRECATED("Please use MTRDoorLockOperationSourceRFID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x08,
     MTRDoorLockDlOperationSourceBiometric MTR_DEPRECATED("Please use MTRDoorLockOperationSourceBiometric", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x09,
 } MTR_DEPRECATED("Please use MTRDoorLockOperationSource", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+
+typedef NS_ENUM(uint8_t, MTRDoorLockStatusCode) {
+    MTRDoorLockStatusCodeDUPLICATE MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDoorLockStatusCodeOCCUPIED MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockUserStatus) {
     MTRDoorLockUserStatusAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,

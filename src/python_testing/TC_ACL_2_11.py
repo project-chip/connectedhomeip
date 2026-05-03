@@ -171,11 +171,11 @@ class TC_ACL_2_11(MatterBaseTest):
         # end
 
         self.step(5)
-        root_node_endpoint = 0
+        ROOT_NODE_ENDPOINT = 0
         parts_list = await self.read_single_attribute_check_success(
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.PartsList,
-            endpoint=root_node_endpoint)
+            endpoint=ROOT_NODE_ENDPOINT)
         set_of_endpoints = set(parts_list)
         for endpoint in set_of_endpoints:
             server_list = await self.read_single_attribute_check_success(

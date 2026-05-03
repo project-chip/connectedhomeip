@@ -6,7 +6,6 @@ from typing import Any, BinaryIO, List, Optional, Union
 
 from matter.testing.tasks import Subprocess
 
-
 @dataclass
 class OtaImagePath:
     path: str
