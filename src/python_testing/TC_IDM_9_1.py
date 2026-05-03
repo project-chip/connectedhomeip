@@ -57,9 +57,9 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep("1a", "Send a command with a uint16 parameter value out of range in the Invoke Request message to the DUT from the TH. Example: Command - ColorControl.MoveToColorTemperature, field - ColorTemperatureMireds, Constraint Max Value - 65279, Test Value - 65280",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
-            TestStep("1b", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is larger than the constraint allowed. Example: Command - SignVIDVerificationRequest, data field - ClientChallenge, Constraint - 32 bytes exactly, Test Value - 33 bytes",
+            TestStep("1b", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is larger than the constraint allowed. Example: Command - GeneralDiagnostics.TestEventTrigger, data field - EnableKey, Constraint - 16 bytes exactly, Test Value - 17 bytes",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
-            TestStep("1c", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is smaller than the constraint allowed. Example: Command - SignVIDVerificationRequest, data field - ClientChallenge, Constraint - 32 bytes exactly, Test Value - 31 bytes",
+            TestStep("1c", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is smaller than the constraint allowed. Example: Command - GeneralDiagnostics.TestEventTrigger, data field - EnableKey, Constraint - 16 bytes exactly, Test Value - 15 bytes",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
             TestStep("1d", "Set the data field of a command of data type string to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the string to a value that is larger than the maximum length allowed. Example: Command - SetRegulatoryConfig, data field - CountryCode, Constraint - 2",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
@@ -90,33 +90,33 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
-        # Step 1b: Test octstr max length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
-        # TODO: Follow-Up PR #https://github.com/project-chip/connectedhomeip/issues/71864 to do dynamic command testing for constraints based on available commands on endpoint being tested.
+        # Step 1b: Test octstr max length constraint violation using GeneralDiagnostics TestEventTrigger command.
+        # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 17-byte value violates the length constraint.
+        # TestEventTrigger lives on the root node (endpoint 0).
         self.step("1b")
-        if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest):
-            # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
+        if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
             try:
-                cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
-                    fabricIndex=1,
-                    clientChallenge=b'x' * 33
+                cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                    enableKey=b'\x00' * 17,
+                    eventTrigger=0,
                 )
-                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
+                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
                 asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
-        # Step 1c: Test octstr min length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
-        # TODO: Follow-Up PR #https://github.com/project-chip/connectedhomeip/issues/71864 to do dynamic command testing for constraints based on available commands on endpoint being tested.
+        # Step 1c: Test octstr min length constraint violation using GeneralDiagnostics TestEventTrigger command.
+        # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 15-byte value violates the length constraint.
+        # TestEventTrigger lives on the root node (endpoint 0).
         self.step("1c")
-        if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest):
-            # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
+        if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
             try:
-                cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
-                    fabricIndex=1,
-                    clientChallenge=b'x' * 31
+                cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                    enableKey=b'\x00' * 15,
+                    eventTrigger=0,
                 )
-                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
+                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
                 asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError,
@@ -212,8 +212,9 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
         log.info(f"Step 2 complete: Tested {tested_count} attributes, skipped {skipped_count}")
 
         if failed_attributes:
-            log.error(f"Failed attributes constraints not enforced: {', '.join(failed_attributes)}")
-            asserts.fail("Failed attributes constraints not enforced")
+            failed_list = ', '.join(failed_attributes)
+            log.error(f"Failed attributes constraints not enforced: {failed_list}")
+            asserts.fail(f"Failed attributes constraints not enforced: {failed_list}")
 
 
 if __name__ == "__main__":
