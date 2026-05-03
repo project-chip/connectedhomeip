@@ -73,6 +73,8 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mLocalTemperature);
     case SystemMode::Id:
         return encoder.Encode(mSystemMode);
+    case ThermostatRunningMode::Id:
+        return encoder.Encode(mRunningMode);
     case RemoteSensing::Id:
         if (localTemperatureNotExposedSupported)
         {
@@ -83,6 +85,8 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         break;
     case ControlSequenceOfOperation::Id:
         return encoder.Encode(mControlSequenceOfOperation);
+    case LocalTemperatureCalibration::Id:
+        return encoder.Encode(mLocalTemperatureCalibration);
     case OccupiedHeatingSetpoint::Id:
         if (!mSetpoints.heatSupported)
         {
