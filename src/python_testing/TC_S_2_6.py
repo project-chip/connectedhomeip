@@ -189,7 +189,7 @@ class TC_S_2_6(MatterBaseTest):
     async def _expect_copy_scene_resource_exhausted(
         self, dev_ctrl: ChipDeviceCtrl, ep: int, destination_scene_id: int
     ) -> None:
-        # Copy onto a scene ID that was never stored (same ID TH1 AddScene failed with in step 4b).
+        # Copy onto a scene ID that was never stored.
         cmd = S.Commands.CopyScene(
             mode=0,
             groupIdentifierFrom=GROUP_ID,
@@ -269,7 +269,7 @@ class TC_S_2_6(MatterBaseTest):
         self._teardown_remove_fabric_indices = []
         ep = self.matter_test_config.endpoint
 
-        # ECM discriminators: 12-bit in spec (0..4095). Distinct from each other and from harness DUT discriminators.
+        # ECM discriminators: 12-bit in spec (0..4095).
         reserved = set(self.matter_test_config.discriminators or [])
         discriminator_th2 = random.randint(0, 4095)
         while discriminator_th2 in reserved:
@@ -296,7 +296,7 @@ class TC_S_2_6(MatterBaseTest):
             dev_ctrl=self.TH3, endpoint=0, cluster=OC, attribute=OC.Attributes.CurrentFabricIndex
         )
         log.info("Fabric indices on DUT: TH1=%s TH2=%s TH3=%s", f1, f2, f3)
-        # Remove higher fabric index first in teardown if the test aborts before step 11.
+        # Remove higher fabric index first in teardown
         self._teardown_remove_fabric_indices = sorted([f2, f3], reverse=True)
 
         self.step("1a")
