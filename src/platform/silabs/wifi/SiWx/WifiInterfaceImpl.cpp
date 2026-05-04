@@ -21,7 +21,7 @@
 
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "ble_config.h"
-#endif
+#endif // defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "sl_status.h"
 #include "sl_wifi_device.h"
 #include <algorithm>
@@ -63,7 +63,7 @@ extern "C" {
 #if (EXP_BOARD)
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "rsi_bt_common_apis.h"
-#endif
+#endif // defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "sl_board_configuration.h"
 #endif
 
@@ -158,8 +158,8 @@ const sl_wifi_device_configuration_t config = {
                      .ext_custom_feature_bit_map = (0
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
                                                     | RSI_EXT_CUSTOM_FEATURE_BIT_MAP | SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE
-#endif
-#if defined(A2DP_POWER_SAVE_ENABLE)
+#endif // defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+#if defined(A2DP_POWER_SAVE_ENABLE) && A2DP_POWER_SAVE_ENABLE
                                                     | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
 #endif
                                                         ),
@@ -171,11 +171,11 @@ const sl_wifi_device_configuration_t config = {
                                             ),
 #else
                      .bt_feature_bit_map      = 0,
-#endif
+#endif // defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
                      .ext_tcp_ip_feature_bit_map = (SL_SI91X_CONFIG_FEAT_EXTENTION_VALID
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
                                                     | RSI_EXT_TCPIP_FEATURE_BITMAP
-#endif
+#endif // defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #ifdef RSI_PROCESS_MAX_RX_DATA
 
                                                     | SL_SI91X_EXT_TCP_MAX_RECV_LENGTH
@@ -220,7 +220,7 @@ const sl_wifi_device_configuration_t config = {
                      .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
                                                 | RSI_CONFIG_FEATURE_BITMAP
-#endif
+#endif // defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
                                                 ) }
 };
 
