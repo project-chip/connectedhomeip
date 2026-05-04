@@ -57,7 +57,6 @@ using MeasurementUnitEnum   = CarbonDioxideConcentrationMeasurement::Measurement
 
 namespace Attributes = CarbonDioxideConcentrationMeasurement::Attributes;
 
-
 } // namespace ConcentrationMeasurement
 } // namespace Clusters
 } // namespace app

@@ -111,10 +111,8 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
     if (mFeatures.Has(Feature::kNumericMeasurement))
     {
         static constexpr DataModel::AttributeEntry kNumericAttrs[] = {
-            Attributes::MeasuredValue::kMetadataEntry,
-            Attributes::MinMeasuredValue::kMetadataEntry,
-            Attributes::MaxMeasuredValue::kMetadataEntry,
-            Attributes::Uncertainty::kMetadataEntry,
+            Attributes::MeasuredValue::kMetadataEntry,    Attributes::MinMeasuredValue::kMetadataEntry,
+            Attributes::MaxMeasuredValue::kMetadataEntry, Attributes::Uncertainty::kMetadataEntry,
             Attributes::MeasurementUnit::kMetadataEntry,
         };
         ReturnErrorOnFailure(builder.AppendElements(kNumericAttrs));
