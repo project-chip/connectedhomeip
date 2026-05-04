@@ -15,6 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+config("includes") {
+  # allows includes like "providers/..."
+  include_dirs = [ ".." ]
+}
+
 source_set("device-info-provider") {
   sources = [
     "DeviceInfoProviderImpl.cpp",
@@ -26,7 +31,10 @@ source_set("device-info-provider") {
     "${chip_root}/src/platform",
   ]
 
-  public_configs = [ "${chip_root}/src:includes" ]
+  public_configs = [
+    ":includes",
+    "${chip_root}/src:includes",
+  ]
 }
 
 source_set("override-device-instance-info-provider") {
@@ -40,5 +48,8 @@ source_set("override-device-instance-info-provider") {
     "${chip_root}/src/platform",
   ]
 
-  public_configs = [ "${chip_root}/src:includes" ]
+  public_configs = [
+    ":includes",
+    "${chip_root}/src:includes",
+  ]
 }
