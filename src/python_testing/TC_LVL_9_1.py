@@ -36,8 +36,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
 
@@ -45,7 +43,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import TestStep
 
 
 class TC_LVL_9_1(MatterBaseTest):

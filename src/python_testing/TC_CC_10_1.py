@@ -43,7 +43,7 @@ from matter.interaction_model import Status
 import matter.clusters as Clusters
 from TC_GC_common import is_groupcast_on_root_node
 from mobly import asserts
-from typing import List, Tuple
+from typing import List
 
 
 kCCAttributeValueIDs = [0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
