@@ -49,6 +49,7 @@ static_library("helpers") {
 
   public_deps = [
     "${chip_root}/src/inet",
+    "${chip_root}/src/inet:inet_arg_parser",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
   ]
@@ -79,6 +80,8 @@ if (chip_build_tests) {
       "TestInetErrorStr.cpp",
     ]
     sources = []
+
+    defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
 
     if (chip_system_config_use_sockets && current_os != "zephyr") {
       test_sources += [ "TestInetEndPoint.cpp" ]

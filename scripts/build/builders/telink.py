@@ -19,6 +19,16 @@ from enum import Enum, auto
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
+
+class TelinkLogLevel(Enum):
+    DEFAULT = auto()  # default everything
+    ALL = auto()  # enable all logging
+    PROGRESS = auto()  # progress and above
+    ERROR = auto()  # error and above
+    NONE = auto()  # no chip_logging at all
+
 
 class TelinkApp(Enum):
     AIR_QUALITY_SENSOR = auto()
@@ -169,6 +179,8 @@ class TelinkBuilder(Builder):
                  thread_analyzer_config: bool = False,
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
+                 chip_enable_nfc_onboarding_payload: bool = False,
+                 log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -185,6 +197,8 @@ class TelinkBuilder(Builder):
         self.thread_analyzer_config = thread_analyzer_config
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
+        self.chip_enable_nfc_onboarding_payload = chip_enable_nfc_onboarding_payload
+        self.log_level = log_level
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -201,8 +215,7 @@ class TelinkBuilder(Builder):
         return cmd
 
     def generate(self):
-        if os.path.exists(self.output_dir):
-            return
+        os.makedirs(self.output_dir, exist_ok=True)
 
         flags = []
         if self.enable_ota:
@@ -232,6 +245,9 @@ class TelinkBuilder(Builder):
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
 
+        if self.chip_enable_nfc_onboarding_payload:
+            flags.append("-DCONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=y")
+
         if self.thread_analyzer_config:
             flags.append("-DCONFIG_THREAD_ANALYZER=y")
 
@@ -243,6 +259,19 @@ class TelinkBuilder(Builder):
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        if self.log_level == TelinkLogLevel.DEFAULT:
+            pass
+        elif self.log_level == TelinkLogLevel.ALL:
+            flags.append("-DTLNK_LOG_LEVEL=all")
+        elif self.log_level == TelinkLogLevel.PROGRESS:
+            flags.append("-DTLNK_LOG_LEVEL=progress")
+        elif self.log_level == TelinkLogLevel.ERROR:
+            flags.append("-DTLNK_LOG_LEVEL=error")
+        elif self.log_level == TelinkLogLevel.NONE:
+            flags.append("-DTLNK_LOG_LEVEL=none")
+        else:
+            raise Exception("Unknown log level: %r" % self.log_level)
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
@@ -259,7 +288,7 @@ class TelinkBuilder(Builder):
                       title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling Telink at %s', self.output_dir)
+        log.info('Compiling Telink at %s', self.output_dir)
 
         cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
 

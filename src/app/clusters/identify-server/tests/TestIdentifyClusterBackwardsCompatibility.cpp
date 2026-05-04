@@ -17,7 +17,7 @@
 
 #include <app/ConcreteClusterPath.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/testing/ClusterTester.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <gtest/gtest.h>
 #include <lib/support/TimerDelegateMock.h>

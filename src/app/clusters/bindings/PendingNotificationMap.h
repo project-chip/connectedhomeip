@@ -72,6 +72,8 @@ class PendingNotificationMap
 public:
     static constexpr uint8_t kMaxPendingNotifications = Table::kMaxBindingEntries;
 
+    PendingNotificationMap(Table & bindingTable) : mBindingTable(bindingTable) {}
+
     friend class Iterator;
 
     class Iterator
@@ -127,6 +129,8 @@ private:
     uint8_t mPendingBindingEntries[kMaxPendingNotifications];
     PendingNotificationContext * mPendingContexts[kMaxPendingNotifications];
     PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
+
+    Table & mBindingTable;
 
     uint8_t mNumEntries = 0;
 };

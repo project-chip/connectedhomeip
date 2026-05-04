@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+assert(current_toolchain != "",
+       "Build settings cannot be evaluated without a toolchain." +
+           " Do not import this file from default_args / args.gni.")
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/config/recommended.gni")
@@ -78,9 +82,6 @@ declare_args() {
   # Enable short error strings.
   chip_config_short_error_str = false
 
-  # Enable argument parser.
-  chip_config_enable_arg_parser = true
-
   # Memory management style: malloc, simple, platform.
   chip_config_memory_management = "malloc"
 
@@ -130,6 +131,9 @@ declare_args() {
   chip_enable_mrp_analytics =
       current_os == "linux" || current_os == "android" || current_os == "mac" ||
       current_os == "ios"
+
+  # enable UniqueID support in the descriptor cluster.
+  chip_enable_endpoint_unique_id = false
 }
 
 if (chip_target_style == "") {

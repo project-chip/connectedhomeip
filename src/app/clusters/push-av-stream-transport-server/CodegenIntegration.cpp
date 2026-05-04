@@ -87,7 +87,7 @@ void MatterPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -98,7 +98,7 @@ void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
             .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterPushAvStreamTransportPluginServerInitCallback() {}
@@ -121,7 +121,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     }
 }
 
-void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDelegate * delegate)
+void SetTLSClientManagementDelegate(EndpointId endpointId, TLSClientManagementDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting TLS Client Management delegate on endpoint %u", endpointId);
     if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
@@ -130,7 +130,7 @@ void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDe
     }
 }
 
-void SetTlsCertificateManagementDelegate(EndpointId endpointId, TlsCertificateManagementDelegate * delegate)
+void SetTLSCertificateManagementDelegate(EndpointId endpointId, TLSCertificateManagementDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting TLS Certificate Management delegate on endpoint %u", endpointId);
     uint16_t arrayIndex =
@@ -145,7 +145,7 @@ void SetTlsCertificateManagementDelegate(EndpointId endpointId, TlsCertificateMa
         ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set TLS Certificate Management delegate");
         return;
     }
-    gServers[arrayIndex].Cluster().SetTlsCertificateManagementDelegate(delegate);
+    gServers[arrayIndex].Cluster().SetTLSCertificateManagementDelegate(delegate);
 }
 } // namespace PushAvStreamTransport
 } // namespace Clusters

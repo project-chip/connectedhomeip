@@ -70,7 +70,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace TargetUpdated.
+} // namespace TargetUpdated
 } // namespace Events
 } // namespace TargetNavigator
 } // namespace Clusters

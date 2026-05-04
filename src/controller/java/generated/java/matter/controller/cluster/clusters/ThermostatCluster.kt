@@ -443,17 +443,11 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
       if (tag == ContextSpecificTag(TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE)) {
         numberOfTransitionsForSequence_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE)) {
+      } else if (tag == ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE)) {
         dayOfWeekForSequence_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_MODE_FOR_SEQUENCE)) {
+      } else if (tag == ContextSpecificTag(TAG_MODE_FOR_SEQUENCE)) {
         modeForSequence_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSITIONS)) {
+      } else if (tag == ContextSpecificTag(TAG_TRANSITIONS)) {
         transitions_decoded =
           buildList<ThermostatClusterWeeklyScheduleTransitionStruct> {
             tlvReader.enterArray(tag)
@@ -686,9 +680,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
       if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
         statusCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_ATTRIBUTE_STATUS)) {
+      } else if (tag == ContextSpecificTag(TAG_ATTRIBUTE_STATUS)) {
         attributeStatus_decoded =
           buildList<ThermostatClusterAtomicAttributeStatusStruct> {
             tlvReader.enterArray(tag)
@@ -697,9 +689,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
             }
             tlvReader.exitContainer()
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_TIMEOUT)) {
+      } else if (tag == ContextSpecificTag(TAG_TIMEOUT)) {
         timeout_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

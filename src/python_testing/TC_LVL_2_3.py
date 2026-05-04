@@ -18,12 +18,11 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# FIXME: https://github.com/project-chip/connectedhomeip/issues/36885
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CHIP_MICROWAVE_OVEN_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device speaker
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -44,8 +43,10 @@ import test_plan_support
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

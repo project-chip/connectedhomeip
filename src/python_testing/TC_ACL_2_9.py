@@ -40,16 +40,20 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
 class TC_ACL_2_9(MatterBaseTest):
     async def read_and_check_min_value(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, min_value: int):
-        result = await self.th2.ReadAttribute(self.dut_node_id, [(0, attribute)])
-        log.info(f"Result: {result}")
-        value = result[0][Clusters.Objects.AccessControl][attribute]
+        value = await self.read_single_attribute_check_success(
+            cluster=Clusters.Objects.AccessControl,
+            attribute=attribute,
+            dev_ctrl=self.th2,
+            endpoint=0)
         asserts.assert_greater_equal(
             value,
             min_value,

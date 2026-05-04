@@ -31,6 +31,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -266,6 +267,9 @@ CHIP_ERROR AppTask::Init()
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -278,9 +282,6 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 #endif
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -297,7 +298,7 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return err;
 }

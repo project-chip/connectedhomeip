@@ -73,7 +73,7 @@ public:
                 (elem->mSessionInfo.peer_id == pInInfo->peer_id) &&
                 !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, sizeof(uint8_t) * 6))
             {
-                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%lu]", i);
+                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%zu]", i);
                 return elem;
             }
 #ifdef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
@@ -240,22 +240,20 @@ CHIP_ERROR WiFiPAFLayer::Init(chip::System::Layer * systemLayer)
     return CHIP_NO_ERROR;
 }
 
-void WiFiPAFLayer::Shutdown(OnCancelDeviceHandle OnCancelDevice)
+void WiFiPAFLayer::Shutdown()
 {
-    ChipLogProgress(WiFiPAF, "WiFiPAF: Closing all WiFiPAF sessions to shutdown");
     uint8_t i;
     WiFiPAFSession * pPafSession;
 
     for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
         pPafSession = &mPafInfoVect[i];
-        if (pPafSession->id == UINT32_MAX)
+        if ((pPafSession->id == kUndefinedWiFiPafSessionId) || (pPafSession->id == 0))
         {
             // Unused session
             continue;
         }
         ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", pPafSession->id);
-        OnCancelDevice(pPafSession->id, pPafSession->role);
         WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(pPafSession));
         if (endPoint != nullptr)
         {
@@ -454,7 +452,7 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
         case PafInfoAccess::kAccNodeInfo:
             pPafSession->nodeId        = SessionInfo.nodeId;
             pPafSession->discriminator = SessionInfo.discriminator;
-            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %lu, disc: %x, sessions", SessionInfo.nodeId,
+            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %" PRIu64 ", disc: %x, sessions", SessionInfo.nodeId,
                             SessionInfo.discriminator);
             return CHIP_NO_ERROR;
         case PafInfoAccess::kAccSessionId:

@@ -115,10 +115,10 @@ void CommandResponseSender::StartSendingCommandResponses()
 
 void CommandResponseSender::OnDone(CommandHandlerImpl & apCommandObj)
 {
-    if (mState == State::ErrorSentDelayCloseUntilOnDone)
+    if (mState == State::ErrorSentDelayCloseUntilOnDone || apCommandObj.IsGroupRequest())
     {
-        // We have already sent a message to the client indicating that we are not expecting
-        // a response.
+        // We either have already sent a message to the client indicating that we are not expecting
+        // a response, or do not need to send response to a groupcast.
         Close();
         return;
     }

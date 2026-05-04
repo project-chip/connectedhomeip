@@ -40,6 +40,7 @@ class MatterTestConfig:
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
     pipe_name: typing.Union[str, None] = None
+    pipe_name_out: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
@@ -50,6 +51,10 @@ class MatterTestConfig:
     # By default, we start with maximized cert chains, as required for RR-1.1.
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
+
+    # Border Agent information for Thread MeshCoP Commissioning
+    thread_ba_host: Optional[str] = None
+    thread_ba_port: Optional[int] = None
 
     # By default, let's set validity to 10 years
     certificate_validity_period = int(timedelta(days=10*365).total_seconds())

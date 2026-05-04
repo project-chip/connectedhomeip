@@ -23,13 +23,13 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestTimeFormatLocalizationCluster.cpp" ]
 
-  sources = []
+  sources = [ "SampleDeviceProvider.h" ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/time-format-localization-server",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
   ]
 }

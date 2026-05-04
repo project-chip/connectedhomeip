@@ -43,9 +43,6 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
-    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
-    "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
-    "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -876,7 +873,7 @@ def main() -> int:
                 'import("${chip_root}/config/standalone/args.gni")',
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
-                'chip_enable_openthread = false',
+                'chip_enable_thread = false',
                 'chip_generate_link_map_file = true',
                 'chip_config_network_layer_ble = false',
                 'chip_device_project_config_include = "<CHIPProjectAppConfig.h>"',

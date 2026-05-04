@@ -42,7 +42,7 @@
 
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 
@@ -385,8 +385,13 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
             // We need to terminate event loop after performance single step.
             // Event loop processing work items until StopEventLoopTask is called.
             // Scheduling StopEventLoop task guarantees correct operation of the loop.
+            TEMPORARY_RETURN_IGNORED
             chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+                [](intptr_t) -> void {
+                    TEMPORARY_RETURN_IGNORED
+                    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+                },
+                (intptr_t) nullptr);
 #endif // CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
             chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;

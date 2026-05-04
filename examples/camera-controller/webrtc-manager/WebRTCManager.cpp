@@ -281,7 +281,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
         // Extract any candidates embedded in the SDP description
         std::vector<rtc::Candidate> candidates = desc.candidates();
-        ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+        ChipLogProgress(Camera, "Extracted %zu candidates from SDP description", candidates.size());
 
         for (const auto & candidate : candidates)
         {
@@ -496,7 +496,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
     }
     else
     {
-        ChipLogProgress(Camera, "Sent %lu ICE candidate(s)", candidateCount);
+        ChipLogProgress(Camera, "Sent %zu ICE candidate(s)", candidateCount);
 
         // Remove only the candidates that were successfully sent
         // New candidates may have arrived during transmission, so we remove from the front
@@ -505,13 +505,13 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
             mLocalCandidates.erase(mLocalCandidates.begin(), mLocalCandidates.begin() + candidateCount);
             if (!mLocalCandidates.empty())
             {
-                ChipLogProgress(Camera, "%lu new candidate(s) arrived during transmission, keeping for next batch",
+                ChipLogProgress(Camera, "%zu new candidate(s) arrived during transmission, keeping for next batch",
                                 mLocalCandidates.size());
             }
         }
         else
         {
-            ChipLogProgress(Camera, "Sent %lu ICE candidate(s), clearing list", mLocalCandidates.size());
+            ChipLogProgress(Camera, "Sent %zu ICE candidate(s), clearing list", mLocalCandidates.size());
             mLocalCandidates.clear();
         }
     }

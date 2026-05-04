@@ -31,7 +31,7 @@
 namespace chip {
 namespace app {
 
-/// An implementation of `InteractionModel::Model` that relies on code-generation
+/// An implementation of `DataModel::Provider` that relies on code-generation
 /// via zap/ember.
 ///
 /// The Ember framework uses generated files (like endpoint-config.h and various
@@ -41,8 +41,8 @@ namespace app {
 /// as well as application-specific overrides to provide data model functionality.
 ///
 /// Given that this relies on global data at link time, there generally can be
-/// only one CodegenDataModelProvider per application (you can create more instances,
-/// however they would share the exact same underlying data and storage).
+/// only one CodegenDataModelProvider per application. Per-cluster CodegenIntegration
+/// functions access the global singleton instance via `CodegenDataModelProvider::Instance()`.
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
@@ -53,7 +53,11 @@ public:
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset() { mPreviouslyFoundCluster = std::nullopt; }
 
-    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate)
+    {
+        VerifyOrDie(!mContext.has_value()); // can't change once started
+        mPersistentStorageDelegate = delegate;
+    }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
     SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
@@ -85,8 +89,6 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
 protected:
     // Temporary hack for a test: Initializes the data model for testing purposes only.

@@ -843,6 +843,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     MATTER_LOG_METRIC(kMetricDeviceVendorID, [payload.vendorID unsignedIntValue]);
     MATTER_LOG_METRIC(kMetricDeviceProductID, [payload.productID unsignedIntValue]);
+    MATTER_LOG_METRIC(kMetricDeviceDiscoveryCapabilities, static_cast<uint32_t>(payload.discoveryCapabilities));
 }
 
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
@@ -1226,7 +1227,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         using TimeZoneType = chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
         TimeZoneType timeZone;
         timeZone.validAt = 0;
-        timeZone.offset = static_cast<int32_t>(tz.secondsFromGMT - tz.daylightSavingTimeOffset);
+        timeZone.offset = static_cast<int32_t>(tz.secondsFromGMT) - static_cast<int32_t>(tz.daylightSavingTimeOffset);
         timeZone.name.Emplace(AsCharSpan(tz.name));
 
         params.SetTimeZone(chip::app::DataModel::List<TimeZoneType>(&timeZone, 1));

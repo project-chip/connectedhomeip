@@ -12,22 +12,28 @@ known_first_party = "matter"
 line-length = 132
 target-version = "py311"
 exclude = [
-    ".environment",
-    ".git",
-    ".github",
     ".*",
-    "build",
     "out",
+    "scripts/py_matter_yamltests/build",
+    "scripts/py_matter_idl/build",
+    "src/python_testing/matter_testing_infrastructure/build",
+    # Exclude submodules since we do not maintain them
+    # TODO: Use exact paths once we will have a way to sync and validate them in CI
+    "examples/common/QRCode/repo",
+    "examples/common/m5stack-tft/repo",
     "third_party",
-    "examples/common/QRCode/",
+    "examples/tv-casting-app/tests/",
     # TODO(#37698)
     "docs/development_controllers/matter-repl/*.ipynb",
 ]
 
+[tool.pyright]
+reportMissingTypeStubs = "warning"
+
 [tool.ruff.lint]
 select = [
     # Standard errors and warnings
-    "E", "W", "F",
+    "E", "PLE", "W", "F",
     # Ensure that async is used properly
     "ASYNC",
     # Consistent commas
@@ -36,6 +42,8 @@ select = [
     "C4", "RET", "SIM",
     # Ensure that scripts are executable
     "EXE",
+    # Check for common exception issues
+    "RSE",
     # Check for common logging issues
     "LOG",
     # Check for common optimization issues
@@ -52,3 +60,10 @@ ignore = [
     "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]
+
+[tool.mypy]
+mypy_path = ["matter/typings"]
+namespace_packages = true
+warn_unused_configs = true
+ignore_missing_imports = true
+explicit_package_bases = true

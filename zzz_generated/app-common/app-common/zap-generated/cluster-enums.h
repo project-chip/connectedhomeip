@@ -28,6 +28,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AirQuality/Enums.h>
+#include <clusters/AmbientContextSensing/Enums.h>
 #include <clusters/ApplicationBasic/Enums.h>
 #include <clusters/ApplicationLauncher/Enums.h>
 #include <clusters/AudioOutput/Enums.h>
@@ -79,6 +80,7 @@
 #include <clusters/Groupcast/Enums.h>
 #include <clusters/Groups/Enums.h>
 #include <clusters/HepaFilterMonitoring/Enums.h>
+#include <clusters/Humidistat/Enums.h>
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/Identify/Enums.h>
 #include <clusters/IlluminanceMeasurement/Enums.h>
@@ -99,6 +101,7 @@
 #include <clusters/MicrowaveOvenMode/Enums.h>
 #include <clusters/ModeSelect/Enums.h>
 #include <clusters/NetworkCommissioning/Enums.h>
+#include <clusters/NetworkIdentityManagement/Enums.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
 #include <clusters/OccupancySensing/Enums.h>
 #include <clusters/OnOff/Enums.h>
@@ -116,6 +119,7 @@
 #include <clusters/PowerSourceConfiguration/Enums.h>
 #include <clusters/PowerTopology/Enums.h>
 #include <clusters/PressureMeasurement/Enums.h>
+#include <clusters/ProximityRanging/Enums.h>
 #include <clusters/ProxyConfiguration/Enums.h>
 #include <clusters/ProxyDiscovery/Enums.h>
 #include <clusters/ProxyValid/Enums.h>

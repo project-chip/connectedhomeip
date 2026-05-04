@@ -7,6 +7,7 @@
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [],
         "AIR_QUALITY_CLUSTER": [],
         "ALARM_CLUSTER": [],
+        "AMBIENT_CONTEXT_SENSING_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": [],
         "APPLICATION_LAUNCHER_CLUSTER": [],
         "AUDIO_OUTPUT_CLUSTER": [],
@@ -43,6 +44,7 @@
         "DISHWASHER_MODE_CLUSTER": [],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [],
         "GROUPCAST_CLUSTER": [],
+        "HUMIDISTAT_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
@@ -79,6 +81,8 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "NETWORK_IDENTITY_MANAGEMENT_CLUSTER": [],
+        "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
@@ -150,6 +154,7 @@
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "WIFI_NETWORK_MANAGEMENT_CLUSTER": [],
         "ZONE_MANAGEMENT_CLUSTER": []
     },
     "ServerDirectories": {
@@ -164,6 +169,7 @@
         ],
         "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
+        "AMBIENT_CONTEXT_SENSING_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
@@ -212,7 +218,8 @@
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
         ],
-        "GROUPCAST_CLUSTER": ["groupcast-server"],
+        "GROUPCAST_CLUSTER": ["groupcast"],
+        "HUMIDISTAT_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
@@ -232,7 +239,7 @@
         "FAN_CONTROL_CLUSTER": ["fan-control-server"],
         "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
         "FIXED_LABEL_CLUSTER": ["fixed-label-server"],
-        "FLOW_MEASUREMENT_CLUSTER": [],
+        "FLOW_MEASUREMENT_CLUSTER": ["flow-measurement-server"],
         "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -243,7 +250,7 @@
         "GROUP_KEY_MANAGEMENT_CLUSTER": ["group-key-mgmt-server"],
         "ICD_MANAGEMENT_CLUSTER": ["icd-management-server"],
         "IDENTIFY_CLUSTER": ["identify-server"],
-        "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
+        "ILLUMINANCE_MEASUREMENT_CLUSTER": ["illuminance-measurement-server"],
         "JOINT_FABRIC_DATASTORE_CLUSTER": ["joint-fabric-datastore-server"],
         "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [
             "joint-fabric-administrator-server"
@@ -261,9 +268,13 @@
         "MESSAGES_CLUSTER": ["messages-server"],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
+        "NETWORK_IDENTITY_MANAGEMENT_CLUSTER": [
+            "network-identity-management-server"
+        ],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": ["push-av-stream-transport-server"],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
@@ -311,7 +322,9 @@
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
             "mode-base-server"
         ],
-        "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
+        "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [
+            "relative-humidity-measurement-server"
+        ],
         "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
         "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],
@@ -322,7 +335,7 @@
         "SWITCH_CLUSTER": ["switch-server"],
         "TARGET_NAVIGATOR_CLUSTER": ["target-navigator-server"],
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
-        "TEMPERATURE_MEASUREMENT_CLUSTER": [],
+        "TEMPERATURE_MEASUREMENT_CLUSTER": ["temperature-measurement-server"],
         "THERMOSTAT_CLUSTER": ["thermostat-server"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"

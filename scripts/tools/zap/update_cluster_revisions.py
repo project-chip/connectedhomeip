@@ -71,10 +71,7 @@ def runArgumentsParser():
                         help='If set, only clusters with this old revision will be updated.  This is a decimal integer.')
     parser.add_argument('--dry-run', default=False, action='store_true',
                         help="Don't do any generation, just log what .zap files would be updated (default: False)")
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.set_defaults(parallel=True)
-
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args()
 
     if args.cluster_id is None:

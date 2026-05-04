@@ -16,12 +16,15 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/InteractionModelEngine.h>
+#include <app/SubscriptionStats.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
+#include <transport/MessageStats.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -35,15 +38,14 @@ namespace {
 // Max decodable count allowed is 2048.
 constexpr uint16_t kMaxPayloadTestRequestCount = 2048;
 
-bool IsTestEventTriggerEnabled()
+bool IsTestEventTriggerEnabled(TestEventTriggerDelegate * testEventTriggerDelegate)
 {
-    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
-    if (triggerDelegate == nullptr)
+    if (testEventTriggerDelegate == nullptr)
     {
         return false;
     }
     uint8_t zeroByteSpanData[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
-    return !triggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData));
+    return !testEventTriggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData));
 }
 
 bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
@@ -58,7 +60,7 @@ bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
     return true;
 }
 
-TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
+TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey, TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
     {
@@ -70,14 +72,12 @@ TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
         return nullptr;
     }
 
-    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
-
-    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
+    if (testEventTriggerDelegate == nullptr || !testEventTriggerDelegate->DoesEnableKeyMatch(enableKey))
     {
         return nullptr;
     }
 
-    return triggerDelegate;
+    return testEventTriggerDelegate;
 }
 
 template <typename T>
@@ -116,9 +116,10 @@ CHIP_ERROR EncodeListOfValues(const T & valueList, CHIP_ERROR readError, Attribu
     return readError;
 }
 
-DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData)
+DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData,
+                                                     TestEventTriggerDelegate * testEventTriggerDelegate)
 {
-    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey, testEventTriggerDelegate);
     if (triggerDelegate == nullptr)
     {
         return Status::ConstraintError;
@@ -129,16 +130,14 @@ DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTr
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                                const Commands::TimeSnapshot::DecodableType & commandData)
+                                                                const Commands::TimeSnapshot::DecodableType & commandData,
+                                                                System::Clock::Milliseconds64 timeSinceNodeStartup)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
     Commands::TimeSnapshotResponse::Type response;
 
-    System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
-
-    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    response.systemTimeMs = static_cast<uint64_t>(timeSinceNodeStartup.count());
     handler.AddResponse(commandPath, response);
     return std::nullopt;
 }
@@ -150,7 +149,8 @@ std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler &
  */
 std::optional<DataModel::ActionReturnStatus>
 HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const Commands::TimeSnapshot::DecodableType & commandData)
+                                const Commands::TimeSnapshot::DecodableType & commandData,
+                                System::Clock::Milliseconds64 timeSinceNodeStartup)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -165,10 +165,7 @@ HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandP
         posix_time_ms = System::Clock::Milliseconds64{ 0 };
     }
 
-    System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
-
-    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    response.systemTimeMs = static_cast<uint64_t>(timeSinceNodeStartup.count());
     if (posix_time_ms.count() != 0)
     {
         response.posixTimeMs.SetNonNull(posix_time_ms.count());
@@ -179,7 +176,8 @@ HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandP
 
 std::optional<DataModel::ActionReturnStatus>
 HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                         const Commands::PayloadTestRequest::DecodableType & commandData)
+                         const Commands::PayloadTestRequest::DecodableType & commandData,
+                         TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     if (commandData.count > kMaxPayloadTestRequestCount)
     {
@@ -187,7 +185,7 @@ HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & c
     }
 
     // Ensure Test Event triggers are enabled and key matches.
-    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey, testEventTriggerDelegate);
     if (triggerDelegate == nullptr)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -219,10 +217,10 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Calling OnDeviceReboot here to maintain the event generation of the old implemenation of the
+    // Calling OnDeviceReboot here to maintain the event generation of the old implementation of the
     // server init callback. We consider startup to be a boot event here.
     GeneralDiagnostics::BootReasonEnum bootReason;
-    if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+    if (mDiagnosticsContext.diagnosticDataProvider.GetBootReason(bootReason) == CHIP_NO_ERROR)
     {
         OnDeviceReboot(bootReason);
     }
@@ -257,8 +255,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return EncodeValue(value, err, encoder);
     }
     case GeneralDiagnostics::Attributes::UpTime::Id: {
-        System::Clock::Seconds64 system_time_seconds =
-            std::chrono::duration_cast<System::Clock::Seconds64>(Server::GetInstance().TimeSinceInit());
+        System::Clock::Seconds64 system_time_seconds = std::chrono::duration_cast<System::Clock::Seconds64>(TimeSinceNodeStartup());
         return encoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case GeneralDiagnostics::Attributes::TotalOperationalHours::Id: {
@@ -272,8 +269,25 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return EncodeValue(value, err, encoder);
     }
     case GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id: {
-        bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
+        TestEventTriggerDelegate * currentDelegate = GetTestEventTriggerDelegate();
+        bool isTestEventTriggersEnabled            = IsTestEventTriggerEnabled(currentDelegate);
         return encoder.Encode(isTestEventTriggersEnabled);
+    }
+    case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
+        static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX,
+                      "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
+        const SubscriptionStats subscriptionStats =
+            mDiagnosticsContext.deviceLoadStatusProvider.GetSubscriptionStats(encoder.AccessingFabricIndex());
+        const MessageStats messageStatistics = mDiagnosticsContext.deviceLoadStatusProvider.GetMessageStats();
+
+        GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
+            .currentSubscriptions                  = subscriptionStats.numCurrentSubscriptions,
+            .currentSubscriptionsForFabric         = subscriptionStats.numCurrentSubscriptionsForFabric,
+            .totalSubscriptionsEstablished         = subscriptionStats.numTotalSubscriptions,
+            .totalInteractionModelMessagesSent     = messageStatistics.interactionModelMessagesSent,
+            .totalInteractionModelMessagesReceived = messageStatistics.interactionModelMessagesReceived,
+        };
+        return encoder.Encode(load);
     }
         // Note: Attribute ID 0x0009 was removed (#30002).
 
@@ -301,12 +315,12 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
     case GeneralDiagnostics::Commands::TestEventTrigger::Id: {
         GeneralDiagnostics::Commands::TestEventTrigger::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTestEventTrigger(request_data);
+        return HandleTestEventTrigger(request_data, mDiagnosticsContext.testEventTriggerDelegate);
     }
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTimeSnapshot(*handler, request.path, request_data);
+        return HandleTimeSnapshot(*handler, request.path, request_data, TimeSinceNodeStartup());
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
@@ -420,7 +434,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
-    if (GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    if (mDiagnosticsContext.diagnosticDataProvider.GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
@@ -431,7 +445,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
             return CHIP_NO_ERROR;
         });
 
-        GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
+        mDiagnosticsContext.diagnosticDataProvider.ReleaseNetworkInterfaces(netifs);
     }
     else
     {
@@ -439,6 +453,19 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     }
 
     return err;
+}
+
+System::Clock::Milliseconds64 GeneralDiagnosticsCluster::TimeSinceNodeStartup() const
+{
+    VerifyOrReturnValue(mContext != nullptr, System::Clock::Milliseconds64(0));
+    auto now         = System::SystemClock().GetMonotonicMilliseconds64();
+    auto startupTime = mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
+
+    if (startupTime > now)
+    {
+        return System::Clock::Milliseconds64(0);
+    }
+    return now - startupTime;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -450,23 +477,23 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
     case GeneralDiagnostics::Commands::TestEventTrigger::Id: {
         GeneralDiagnostics::Commands::TestEventTrigger::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTestEventTrigger(request_data);
+        return HandleTestEventTrigger(request_data, mDiagnosticsContext.testEventTriggerDelegate);
     }
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         if (mFunctionConfig.enablePosixTime)
         {
-            return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data);
+            return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data, TimeSinceNodeStartup());
         }
-        return HandleTimeSnapshot(*handler, request.path, request_data);
+        return HandleTimeSnapshot(*handler, request.path, request_data, TimeSinceNodeStartup());
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
         if (mFunctionConfig.enablePayloadSnapshot)
         {
             GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
             ReturnErrorOnFailure(request_data.Decode(input_arguments));
-            return HandlePayloadTestRequest(*handler, request.path, request_data);
+            return HandlePayloadTestRequest(*handler, request.path, request_data, mDiagnosticsContext.testEventTriggerDelegate);
         }
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }

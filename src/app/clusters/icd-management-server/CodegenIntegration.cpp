@@ -102,7 +102,7 @@ void MatterIcdManagementClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterIcdManagementClusterShutdownCallback(EndpointId endpointId)
+void MatterIcdManagementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
@@ -112,5 +112,5 @@ void MatterIcdManagementClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = static_cast<uint16_t>(IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size()),
             .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }

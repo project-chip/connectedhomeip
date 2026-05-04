@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/TLVWriter.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributeValueDecoder.h>
@@ -34,7 +35,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 
 TEST(TestAttributePersistence, TestLoadAndDecodeAndStoreNativeEndian)
 {
@@ -388,6 +389,695 @@ TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
         ASSERT_TRUE(readString.SetContent("some value"_span));
         ASSERT_FALSE(persistence.LoadString(path, readString));
         ASSERT_TRUE(readString.Content().empty());
+    }
+}
+
+TEST(TestAttributePersistence, TestLoadNativeEndianValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
+    constexpr uint32_t kValueToStore = 42;
+
+    // Store a non-null value directly
+    {
+        typename NumericAttributeTraits<uint32_t>::StorageType storageReadValue;
+        NumericAttributeTraits<uint32_t>::WorkingToStorage(kValueToStore, storageReadValue);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &storageReadValue, sizeof(storageReadValue)),
+                  CHIP_NO_ERROR);
+    }
+
+    // Test loading a non-null value into Nullable
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::MakeNullable<uint32_t>(99);
+
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, defaultValue));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), kValueToStore);
+    }
+
+    // Store a null value
+    {
+        typename NumericAttributeTraits<uint32_t>::StorageType nullValue;
+        NumericAttributeTraits<uint32_t>::SetNull(nullValue);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &nullValue, sizeof(nullValue)),
+                  CHIP_NO_ERROR);
+    }
+
+    // Test loading a null value
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::MakeNullable<uint32_t>(99);
+
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, defaultValue));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+
+    // Test loading from non-existent path with non-null default
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::MakeNullable<uint32_t>(123);
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(wrongPath, valueRead, defaultValue));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), 123u);
+    }
+
+    // Test loading from non-existent path with null default
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::NullNullable;
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(wrongPath, valueRead, defaultValue));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+}
+
+TEST(TestAttributePersistence, TestDecodeAndStoreNativeEndianValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kValueToStore = 0x12345678;
+
+    // Store a non-null value via decoder
+    {
+        DataModel::Nullable<uint32_t> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(kValueToStore));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(currentValue.IsNull());
+        EXPECT_EQ(currentValue.Value(), kValueToStore);
+    }
+
+    // Verify the value can be loaded back
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> errorRead;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, errorRead));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), kValueToStore);
+    }
+
+    // Store a null value via decoder
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kValueToStore);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+
+    // Verify the null value can be loaded back
+    {
+        DataModel::Nullable<uint32_t> valueRead = DataModel::MakeNullable<uint32_t>(999);
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, DataModel::MakeNullable<uint32_t>(0)));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+}
+
+TEST(TestAttributePersistence, TestNoOpOnSameValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kInitialValue = 42;
+
+    // Test no-op for same non-null value
+    {
+        DataModel::Nullable<uint32_t> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+    }
+
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kInitialValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_TRUE(status.IsNoOpSuccess());
+    }
+
+    // Test no-op for same null value
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kInitialValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+
+    {
+        DataModel::Nullable<uint32_t> currentValue; // null
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_TRUE(status.IsNoOpSuccess());
+    }
+}
+
+TEST(TestAttributePersistence, TestWriteOnDifferentValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kInitialValue = 42;
+    constexpr uint32_t kNewValue     = 99;
+
+    // Store initial non-null value
+    {
+        DataModel::Nullable<uint32_t> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        EXPECT_EQ(currentValue.Value(), kInitialValue);
+    }
+
+    // Store a different non-null value - should write
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kInitialValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(kNewValue));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_EQ(currentValue.Value(), kNewValue);
+    }
+
+    // Store null - should write
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kNewValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_TRUE(currentValue.IsNull());
+    }
+
+    // Store non-null after null - should write
+    {
+        DataModel::Nullable<uint32_t> currentValue; // null
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_EQ(currentValue.Value(), kInitialValue);
+    }
+}
+
+TEST(TestAttributePersistence, TestLoadNativeEndianValueNullableEnum)
+{
+    using namespace chip::app::Clusters;
+    using namespace chip::app::Clusters::TimeFormatLocalization;
+
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
+
+    // Store a non-null enum value directly
+    {
+        typename NumericAttributeTraits<CalendarTypeEnum>::StorageType storageValue;
+        NumericAttributeTraits<CalendarTypeEnum>::WorkingToStorage(CalendarTypeEnum::kGregorian, storageValue);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &storageValue, sizeof(storageValue)),
+                  CHIP_NO_ERROR);
+    }
+
+    // Test loading a non-null enum value into Nullable
+    {
+        DataModel::Nullable<CalendarTypeEnum> valueRead;
+        DataModel::Nullable<CalendarTypeEnum> defaultValue = DataModel::MakeNullable(CalendarTypeEnum::kPersian);
+
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, defaultValue));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), CalendarTypeEnum::kGregorian);
+    }
+
+    // Store a null value
+    {
+        typename NumericAttributeTraits<CalendarTypeEnum>::StorageType nullValue;
+        NumericAttributeTraits<CalendarTypeEnum>::SetNull(nullValue);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &nullValue, sizeof(nullValue)),
+                  CHIP_NO_ERROR);
+    }
+
+    // Test loading a null value
+    {
+        DataModel::Nullable<CalendarTypeEnum> valueRead;
+        DataModel::Nullable<CalendarTypeEnum> defaultValue = DataModel::MakeNullable(CalendarTypeEnum::kPersian);
+
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, defaultValue));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+
+    // Test loading from non-existent path with non-null default
+    {
+        DataModel::Nullable<CalendarTypeEnum> valueRead;
+        DataModel::Nullable<CalendarTypeEnum> defaultValue = DataModel::MakeNullable(CalendarTypeEnum::kBuddhist);
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(wrongPath, valueRead, defaultValue));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), CalendarTypeEnum::kBuddhist);
+    }
+
+    // Test loading from non-existent path with null default
+    {
+        DataModel::Nullable<CalendarTypeEnum> valueRead;
+        DataModel::Nullable<CalendarTypeEnum> defaultValue = DataModel::NullNullable;
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(wrongPath, valueRead, defaultValue));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+}
+
+TEST(TestAttributePersistence, TestDecodeAndStoreNativeEndianValueNullableEnum)
+{
+    using namespace chip::app::Clusters;
+    using namespace chip::app::Clusters::TimeFormatLocalization;
+
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+
+    // Store a non-null valid enum value via decoder
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kGregorian));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(currentValue.IsNull());
+        EXPECT_EQ(currentValue.Value(), CalendarTypeEnum::kGregorian);
+    }
+
+    // Verify the value can be loaded back
+    {
+        DataModel::Nullable<CalendarTypeEnum> valueRead;
+        DataModel::Nullable<CalendarTypeEnum> defaultValue = DataModel::MakeNullable(CalendarTypeEnum::kPersian);
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, defaultValue));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), CalendarTypeEnum::kGregorian);
+    }
+
+    // Store a null value via decoder
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+
+    // Verify the null value can be loaded back
+    {
+        DataModel::Nullable<CalendarTypeEnum> valueRead = DataModel::MakeNullable(CalendarTypeEnum::kBuddhist);
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, DataModel::MakeNullable(CalendarTypeEnum::kPersian)));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+
+    // Test that kUnknownEnumValue wrapped in Nullable is rejected
+    {
+        const ConcreteAttributePath path2(4, 5, 6);
+        const uint8_t testUnknownValue = static_cast<uint8_t>(CalendarTypeEnum::kUnknownEnumValue) + 1;
+        ASSERT_EQ(EnsureKnownEnumValue(static_cast<CalendarTypeEnum>(testUnknownValue)), CalendarTypeEnum::kUnknownEnumValue);
+
+        DataModel::Nullable<CalendarTypeEnum> currentValue;
+        WriteOperation writeOp(path2);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(testUnknownValue);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path2, decoder, currentValue),
+                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+    // Test that null bypasses kUnknownEnumValue check (null is valid)
+    {
+        const ConcreteAttributePath path3(7, 8, 9);
+        DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
+        WriteOperation writeOp(path3);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path3, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+}
+
+TEST(TestAttributePersistence, TestNoOpOnSameValueNullableEnum)
+{
+    using namespace chip::app::Clusters;
+    using namespace chip::app::Clusters::TimeFormatLocalization;
+
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+
+    // Test no-op for same non-null enum value
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kGregorian));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        EXPECT_EQ(currentValue.Value(), CalendarTypeEnum::kGregorian);
+    }
+
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kGregorian));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_TRUE(status.IsNoOpSuccess());
+        EXPECT_EQ(currentValue.Value(), CalendarTypeEnum::kGregorian);
+    }
+
+    // Test no-op for same null value
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue; // null
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_TRUE(status.IsNoOpSuccess());
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+}
+
+TEST(TestAttributePersistence, TestWriteOnDifferentValueNullableEnum)
+{
+    using namespace chip::app::Clusters;
+    using namespace chip::app::Clusters::TimeFormatLocalization;
+
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+
+    // Store initial non-null enum value
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kGregorian));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        EXPECT_EQ(currentValue.Value(), CalendarTypeEnum::kGregorian);
+    }
+
+    // Store a different non-null enum value - should write
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kBuddhist));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_EQ(currentValue.Value(), CalendarTypeEnum::kBuddhist);
+    }
+
+    // Verify the new value is persisted
+    {
+        DataModel::Nullable<CalendarTypeEnum> loadedValue;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, loadedValue, DataModel::MakeNullable(CalendarTypeEnum::kPersian)));
+        ASSERT_FALSE(loadedValue.IsNull());
+        ASSERT_EQ(loadedValue.Value(), CalendarTypeEnum::kBuddhist);
+    }
+
+    // Store null - should write
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kBuddhist);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_TRUE(currentValue.IsNull());
+    }
+
+    // Verify null is persisted
+    {
+        DataModel::Nullable<CalendarTypeEnum> loadedValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, loadedValue, DataModel::MakeNullable(CalendarTypeEnum::kPersian)));
+        ASSERT_TRUE(loadedValue.IsNull());
+    }
+
+    // Store non-null after null - should write
+    {
+        DataModel::Nullable<CalendarTypeEnum> currentValue; // null
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kCoptic));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_EQ(currentValue.Value(), CalendarTypeEnum::kCoptic);
+    }
+
+    // Verify the final value is persisted
+    {
+        DataModel::Nullable<CalendarTypeEnum> loadedValue;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, loadedValue, DataModel::MakeNullable(CalendarTypeEnum::kPersian)));
+        ASSERT_FALSE(loadedValue.IsNull());
+        ASSERT_EQ(loadedValue.Value(), CalendarTypeEnum::kCoptic);
+    }
+}
+
+// A fake encodable TLV structure, for testing purposes only.
+struct TestTLVStruct
+{
+    uint32_t a = 0;
+    bool b     = false;
+
+    bool operator==(const TestTLVStruct & other) const { return a == other.a && b == other.b; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+    {
+        TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), a));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), b));
+        return writer.EndContainer(outer);
+    }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader)
+    {
+        TLV::TLVType outer;
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        // Format of structure during Encode is known, so we force ordering.
+        ReturnErrorOnFailure(reader.Next());
+        VerifyOrReturnError(reader.GetTag() == TLV::ContextTag(1), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(reader.Get(a));
+
+        ReturnErrorOnFailure(reader.Next());
+        VerifyOrReturnError(reader.GetTag() == TLV::ContextTag(2), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(reader.Get(b));
+        VerifyOrReturnError(reader.Next() == CHIP_ERROR_END_OF_TLV, CHIP_ERROR_INVALID_ARGUMENT);
+
+        return reader.ExitContainer(outer);
+    }
+};
+
+TEST(TestAttributePersistence, TestStoreAndLoadTLV)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath kPath(1, 2, 3);
+    const ConcreteAttributePath kOtherInvalidPath(1, 2, 4);
+    constexpr size_t kBufferSize = 128;
+
+    TestTLVStruct valueToStore{ .a = 12345, .b = true };
+    TestTLVStruct valueToStore2{ .a = 67890, .b = false };
+
+    // Test StoreTLV with external buffer
+    {
+        uint8_t buffer[kBufferSize];
+        MutableByteSpan span(buffer);
+        EXPECT_EQ(persistence.StoreTLV(kPath, valueToStore, span), CHIP_NO_ERROR);
+    }
+
+    // Test LoadTLV with external buffer
+    {
+        uint8_t buffer[kBufferSize];
+        MutableByteSpan span(buffer);
+        TestTLVStruct loadedValue;
+        EXPECT_EQ(persistence.LoadTLV(kPath, loadedValue, span), CHIP_NO_ERROR);
+        EXPECT_EQ(loadedValue, valueToStore);
+    }
+
+    // Test LoadTLV from wrong path
+    {
+        uint8_t buffer[kBufferSize];
+        MutableByteSpan span(buffer);
+        TestTLVStruct loadedValue;
+        EXPECT_NE(persistence.LoadTLV(kOtherInvalidPath, loadedValue, span), CHIP_NO_ERROR);
+    }
+
+    // Test StoreTLV with stack allocation (convenience overload)
+    {
+        EXPECT_EQ(persistence.StoreTLV<kBufferSize>(kPath, valueToStore2), CHIP_NO_ERROR);
+    }
+
+    // Test StoreTLV with too small buffer
+    {
+        uint8_t buffer[4]; // Too small for TestTLVStruct
+        MutableByteSpan span(buffer);
+        EXPECT_EQ(persistence.StoreTLV(kPath, valueToStore, span), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+}
+
+TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+    const ConcreteAttributePath path(1, 2, 3);
+
+    // Helper to write raw bytes to storage
+    auto writeRaw = [&](const ByteSpan & data) {
+        return storageDelegate.SyncSetKeyValue(
+            DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(), data.data(),
+            static_cast<uint16_t>(data.size()));
+    };
+
+    // 1. Not a structure (Just an integer)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail because it expects a Structure
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_WRONG_TLV_TYPE);
+    }
+
+    // 2. Empty Structure
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail because it expects an element inside
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_END_OF_TLV);
+    }
+
+    // 3. Structure with Wrong Element Tag (Context Tag 2 instead of 1)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail on tag check
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // 4. Structure with Extra Element
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 200), CHIP_NO_ERROR); // Extra
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail on VerifyEndOfContainer inside container
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    }
+
+    // 5. Trailing Data after Structure
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), (uint32_t) 200), CHIP_NO_ERROR); // Trailing
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        uint8_t readBuffer[128];
+        // Should fail on VerifyEndOfContainer outside container
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     }
 }
 

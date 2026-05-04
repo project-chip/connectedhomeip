@@ -30,7 +30,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     FreeRTOS:
@@ -43,12 +43,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:175
+            image: ghcr.io/project-chip/chip-build-nxp:181
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -56,7 +56,7 @@ jobs:
                   extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
               id: changed_paths
               with:
                   filters: |
@@ -73,21 +73,21 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm \
+                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory \
                       build \
                   "
             - name: Get MCXW71 contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release contact \
-                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm/app.elf \
+                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory/app.elf \
                     /tmp/bloat_reports/
 
             - name: Build MCXW72 examples
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-frdm \
+                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory \
                       build \
                   "
 
@@ -127,7 +127,7 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory \
-                      --target nxp-rw61x-freertos-thermostat-wifi-se05x \
+                      --target nxp-rw61x-freertos-thermostat-wifi-se05x-factory \
                       build \
                   "
             - name: Build RW61X thermostat ethernet example app
@@ -153,17 +153,17 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:175
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:181
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: nxp
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
               id: changed_paths
               with:
                   filters: |
@@ -181,6 +181,19 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-all-clusters \
                       --target nxp-rw61x-zephyr-thermostat \
+                      --target nxp-rw61x-zephyr-thermostat-thread \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
+                      build \
+                  "
+            - name: clean build
+              run: rm -rf ./out
+            - name: Build NXP Zephyr Unit Tests
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-zephyr-unit-test \
                       build \
                   "

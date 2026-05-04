@@ -31,6 +31,8 @@
 #else
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #endif
+#include "board.h"
+#include "os_msg.h"
 #include "os_task.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -39,6 +41,13 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platforms/openthread-system.h>
+
+#if WATCH_DOG_ENABLE
+#include "matter_wdt.h"
+
+#define WATCHDOG_MSG_MAX_NUM 5
+static void * matter_wdt_io_queue_handle;
+#endif
 
 namespace {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
@@ -101,6 +110,16 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mThreadTask = NULL;
+
+#if WATCH_DOG_ENABLE
+    if (os_msg_queue_create(&matter_wdt_io_queue_handle, "wdtQ", WATCHDOG_MSG_MAX_NUM, sizeof(T_IO_MSG)) == false)
+    {
+        ChipLogError(DeviceLayer, "Failed to create watchdog message queue");
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
+    matter_wdt_init(matter_wdt_io_queue_handle);
+#endif
 
     ChipLogProgress(DeviceLayer, "ThreadStackManagerImpl::InitThreadStack");
     // Initialize the OpenThread platform layer
@@ -167,8 +186,22 @@ void ThreadStackManagerImpl::ExecuteThreadTask(void)
     AllocateThreadTaskSecureContext();
 #endif
 
+#if WATCH_DOG_ENABLE
+    matter_wdt_watchdog_open();
+#endif
+
     while (true)
     {
+#if WATCH_DOG_ENABLE
+        while (os_msg_recv(matter_wdt_io_queue_handle, &io_msg, 0) == true)
+        {
+            if (io_msg.type == IO_MSG_TYPE_RESET_WDG_TIMER)
+            {
+                matter_wdt_watchdog_feed();
+            }
+        }
+#endif
+
         LockThreadStack();
         ProcessThreadActivity();
         UnlockThreadStack();
@@ -210,9 +243,26 @@ void ThreadStackManagerImpl::ExecuteThreadTask(void)
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
     AllocateThreadTaskSecureContext();
 #endif
+
+#if WATCH_DOG_ENABLE
+    matter_wdt_watchdog_open();
+#endif
+
     uint32_t notify;
+    T_IO_MSG io_msg;
+
     while (true)
     {
+#if WATCH_DOG_ENABLE
+        while (os_msg_recv(matter_wdt_io_queue_handle, &io_msg, 0) == true)
+        {
+            if (io_msg.type == IO_MSG_TYPE_RESET_WDG_TIMER)
+            {
+                matter_wdt_watchdog_feed();
+            }
+        }
+#endif
+
         LockThreadStack();
         ProcessThreadActivity();
         UnlockThreadStack();

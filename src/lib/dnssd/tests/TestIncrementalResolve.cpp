@@ -30,7 +30,7 @@
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -51,6 +51,11 @@ const auto kTestCommissionerNode = testing::TestQName<4>({ "C5038835313B8B98", "
 const auto kTestHostName = testing::TestQName<2>({ "abcd", "local" });
 
 const auto kIrrelevantHostName = testing::TestQName<2>({ "different", "local" });
+
+// Non-Matter name that is longer than `kMaxStoredNameLength`, meaning it will not fit in the server name storage of
+// IncrementalResolver
+const auto kLongNonMatterNode =
+    testing::TestQName<4>({ "455UT80006LA.DFPGLWE-fac0e7b473ee4a44966ab1487258d398", "not_a_matter_device", "_tcp", "local" });
 
 void PreloadSrvRecord(SrvRecord & record)
 {
@@ -180,6 +185,29 @@ TEST(TestIncrementalResolve, TestInactiveResetOnInitError)
 
     // test host name is not a 'matter' name
     EXPECT_NE(resolver.InitializeParsing(kTestHostName.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActiveCommissionParse());
+    EXPECT_FALSE(resolver.IsActiveOperationalParse());
+}
+
+TEST(TestIncrementalResolve, TestLongNonMatterNameReturnsUnsupportedServiceName)
+{
+    IncrementalResolver resolver;
+
+    EXPECT_FALSE(resolver.IsActive());
+
+    SrvRecord srvRecord;
+    PreloadSrvRecord(srvRecord);
+
+    // Ensure that kLongNonMatterNode is a name that does NOT fit in the server name storage of IncrementalResolver; This verifies
+    // that InitializeParsing rejects overly long non-Matter names with a clear error, instead of returning CHIP_ERROR_NO_MEMORY.
+    StoredServerName name;
+    EXPECT_EQ(name.Set(kLongNonMatterNode.Serialized()), CHIP_ERROR_NO_MEMORY);
+
+    // InitializeParsing should return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME for non-matter service names, even if they are too
+    // long to fit in the server name storage of IncrementalResolver.
+    EXPECT_EQ(resolver.InitializeParsing(kLongNonMatterNode.Serialized(), 0, srvRecord), CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME);
 
     EXPECT_FALSE(resolver.IsActive());
     EXPECT_FALSE(resolver.IsActiveCommissionParse());

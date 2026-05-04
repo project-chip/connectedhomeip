@@ -102,7 +102,7 @@ def get_fuzz_test_cases(context):
         raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
 
     except Exception as e:
-        raise Exception(f"Error executing {context.fuzz_test_binary_path}: {e}")
+        raise RuntimeError(f"Error executing {context.fuzz_test_binary_path}: {e}")
 
 
 def check_if_coverage_tools_detected():
@@ -112,8 +112,8 @@ def check_if_coverage_tools_detected():
             missing.append(tool)
 
     if missing:
-        raise Exception("Following required coverage packages not found: " + ", ".join(missing) +
-                        "\nPlease either install them or source the correct environment")
+        raise RuntimeError("Following required coverage packages not found: " + ", ".join(missing) +
+                           "\nPlease either install them or source the correct environment")
 
 
 def run_fuzz_test(context):

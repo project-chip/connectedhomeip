@@ -27,13 +27,10 @@ chip_test_suite("tests") {
     "TestSystemErrorStr.cpp",
     "TestSystemPacketBuffer.cpp",
     "TestSystemScheduleLambda.cpp",
+    "TestSystemScheduleWork.cpp",
     "TestSystemTimer.cpp",
     "TestTimeSource.cpp",
   ]
-
-  if (chip_device_platform != "fake") {
-    test_sources += [ "TestSystemScheduleWork.cpp" ]
-  }
 
   # SystemPacketBuffer on nrfconnect uses LwIP buffers, which ignore the
   #  requested allocation size and always allocate at max-size.  So our test,
@@ -43,7 +40,10 @@ chip_test_suite("tests") {
   }
 
   if (chip_system_config_event_loop == "Select") {
-    test_sources += [ "TestSystemWakeEvent.cpp" ]
+    test_sources += [
+      "TestSystemEventSource.cpp",
+      "TestSystemWakeEvent.cpp",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

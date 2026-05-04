@@ -14,22 +14,22 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
 
     ByteSpan span(data, len);
 
-    (void) ExtractFabricIdFromCert(span, &fabricId);
-    (void) ExtractNodeIdFabricIdFromOpCert(span, &nodeId, &fabricId);
+    RETURN_SAFELY_IGNORED ExtractFabricIdFromCert(span, &fabricId);
+    RETURN_SAFELY_IGNORED ExtractNodeIdFabricIdFromOpCert(span, &nodeId, &fabricId);
 
     {
         ChipDN dn;
-        (void) ExtractSubjectDNFromX509Cert(span, dn);
+        RETURN_SAFELY_IGNORED ExtractSubjectDNFromX509Cert(span, dn);
     }
 
     {
         Credentials::P256PublicKeySpan key;
-        (void) ExtractPublicKeyFromChipCert(span, key);
+        RETURN_SAFELY_IGNORED ExtractPublicKeyFromChipCert(span, key);
     }
 
     {
         ChipCertificateData certData;
-        (void) DecodeChipCert(span, certData);
+        RETURN_SAFELY_IGNORED DecodeChipCert(span, certData);
     }
 
     return 0;

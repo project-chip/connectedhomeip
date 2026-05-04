@@ -191,3 +191,9 @@ tests:
       attribute: InterfaceEnabled
       response:
           value: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: network-manager
+      app: network-manager

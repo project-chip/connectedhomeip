@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 
 project(chip_main)
 
@@ -145,7 +145,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
     ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
@@ -153,11 +152,10 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/src/app/clusters/microwave-oven-control-server/microwave-oven-control-server.cpp
+    ${chip_dir}/src/app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/camera-av-settings-user-level-management-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp

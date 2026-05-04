@@ -17,13 +17,16 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DeviceLoadStatusProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -46,13 +49,23 @@ public:
                                         GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
                                         GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
                                         // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-                                        //       it will be forced as mandatory by the cluster constructor
+                                        // DeviceLoadStatus is also listed as mandatory for revision 3 and beyond.
+                                        // They will be forced as mandatory by the cluster constructor.
                                         >;
 
-    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
+    struct Context
+    {
+        DeviceLoadStatusProvider & deviceLoadStatusProvider;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        TestEventTriggerDelegate * testEventTriggerDelegate;
+    };
+
+    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                              Context && context) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
-        mFeatureFlags(featureFlags)
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()
+                                  .ForceSet<GeneralDiagnostics::Attributes::DeviceLoadStatus::Id>()),
+        mFeatureFlags(featureFlags), mDiagnosticsContext(std::move(context))
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -99,42 +112,47 @@ public:
 
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
     {
-        return DeviceLayer::GetDiagnosticDataProvider().GetRebootCount(rebootCount);
+        return mDiagnosticsContext.diagnosticDataProvider.GetRebootCount(rebootCount);
     }
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
     {
-        return DeviceLayer::GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
+        return mDiagnosticsContext.diagnosticDataProvider.GetTotalOperationalHours(totalOperationalHours);
     }
     CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const
     {
-        return DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+        return mDiagnosticsContext.diagnosticDataProvider.GetBootReason(bootReason);
     }
     CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
     {
-        return DeviceLayer::GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults);
+        return mDiagnosticsContext.diagnosticDataProvider.GetActiveHardwareFaults(hardwareFaults);
     }
     CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
     {
-        return DeviceLayer::GetDiagnosticDataProvider().GetActiveRadioFaults(radioFaults);
+        return mDiagnosticsContext.diagnosticDataProvider.GetActiveRadioFaults(radioFaults);
     }
     CHIP_ERROR GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
     {
-        return DeviceLayer::GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
+        return mDiagnosticsContext.diagnosticDataProvider.GetActiveNetworkFaults(networkFaults);
     }
 
 protected:
     OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
     BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
+    Context mDiagnosticsContext;
+
+    System::Clock::Milliseconds64 TimeSinceNodeStartup() const;
+
+    TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mDiagnosticsContext.testEventTriggerDelegate; }
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
-                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags, Context && context,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags),
+        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, std::move(context)),
         mFunctionConfig(functionsConfig)
     {}
 

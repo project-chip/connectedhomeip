@@ -26,7 +26,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters::OnOff::Internal::ModeSelect {
 
-void SetStartupOnMode(EndpointId endpoint)
+void UpdateCurrentModeToOnMode(EndpointId endpoint)
 {
     VerifyOrReturn(emberAfContainsAttribute(endpoint, Clusters::ModeSelect::Id, Clusters::ModeSelect::Attributes::OnMode::Id));
 

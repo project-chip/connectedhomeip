@@ -742,10 +742,6 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
                 ChipLogError(JointFabric, "Joint Commissioning Method (nodeId=%ld) failed: RPC OwnershipTransfer Timeout Error",
                              nodeId);
             }
-            else
-            {
-                ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", nodeId);
-            }
         }
     }
     else

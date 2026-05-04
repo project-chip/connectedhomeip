@@ -678,13 +678,9 @@ class CameraAvStreamManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded = tlvReader.getByteArray(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_IMAGE_CODEC)) {
+      } else if (tag == ContextSpecificTag(TAG_IMAGE_CODEC)) {
         imageCodec_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_RESOLUTION)) {
+      } else if (tag == ContextSpecificTag(TAG_RESOLUTION)) {
         resolution_decoded =
           CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(tag, tlvReader)
       } else {

@@ -71,8 +71,9 @@ class stm32Builder(GnBuilder):
         self.extra_gn_options.append('treat_warnings_as_errors=false')
 
     def GnBuildArgs(self):
-
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
     def build_outputs(self):
         extensions = ["bin", "elf"]

@@ -1486,6 +1486,33 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     PlatformMgr().PostEventOrDie(&event);
 }
 
+void ConnectivityManagerImpl::_WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam)
+{
+    mPafAdvParam.freq_list_len = pafAdvParam.freq_list_len;
+    mPafAdvParam.freq_list     = std::make_unique<uint16_t[]>(mPafAdvParam.freq_list_len);
+    for (size_t i = 0; i < mPafAdvParam.freq_list_len; i++)
+    {
+        mPafAdvParam.freq_list[i] = pafAdvParam.freq_list[i];
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId)
+{
+    if (enabled)
+    {
+        VerifyOrReturnError(mPafAdvParam.freq_list_len > 0, CHIP_ERROR_INCORRECT_STATE);
+        auto res = WiFiPAFPublish(mPafAdvParam);
+        if ((res == CHIP_NO_ERROR) && (mPafAdvParam.publish_id != kUndefinedWiFiPafSessionId))
+        {
+            publishId = mPafAdvParam.publish_id;
+        }
+        return res;
+    }
+    // Cancel paf_publish, publish_id should be valid
+    VerifyOrReturnError((publishId != 0) && (publishId != WiFiPAF::kUndefinedWiFiPafSessionId), CHIP_ERROR_INCORRECT_STATE);
+    return WiFiPAFCancelPublish(publishId);
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
                                                       OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
@@ -1652,6 +1679,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
+    VerifyOrReturnError(((id != kUndefinedWiFiPafSessionId) && (id != 0)), CHIP_ERROR_INTERNAL);
     switch (role)
     {
     case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
@@ -2186,18 +2214,19 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
     memcpy(result.ssid, ssidStr, ssidLen);
     memcpy(result.bssid, bssidBuf, bssidLen);
-    result.ssidLen = ssidLen;
+    result.ssidLen     = ssidLen;
+    result.signal.type = NetworkCommissioning::WirelessSignalType::kdBm;
     if (signal < INT8_MIN)
     {
-        result.rssi = INT8_MIN;
+        result.signal.strength = INT8_MIN;
     }
     else if (signal > INT8_MAX)
     {
-        result.rssi = INT8_MAX;
+        result.signal.strength = INT8_MAX;
     }
     else
     {
-        result.rssi = static_cast<uint8_t>(signal);
+        result.signal.strength = static_cast<uint8_t>(signal);
     }
 
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);

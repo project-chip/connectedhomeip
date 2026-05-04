@@ -47,9 +47,4 @@ source_set("single-endpoint-device") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
   ]
-
-  public_configs = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/:includes",
-    "${chip_root}/src:includes",
-  ]
 }

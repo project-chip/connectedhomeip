@@ -34,6 +34,7 @@
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/Optional.h>
@@ -41,6 +42,7 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
@@ -459,18 +461,46 @@ public:
     }
 };
 
+namespace {
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+chip::TestPersistentStorageDelegate gTestStorage;
+chip::Crypto::DefaultSessionKeystore gSessionKeystore;
+chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+} // namespace
+
 class TestCommandInteraction : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
         AppContext::SetUp();
+
+        gTestStorage.ClearStorage();
+        gGroupsProvider.SetStorageDelegate(&gTestStorage);
+        gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
+        ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
+        chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
+
+        uint8_t buf[sizeof(chip::CompressedFabricId)];
+        chip::MutableByteSpan span(buf);
+        ASSERT_EQ(GetBobFabric()->GetCompressedFabricIdBytes(span), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
+
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(TestCommandInteractionModel::Instance());
         chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
+        chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
+        if (provider != nullptr)
+        {
+            provider->Finish();
+        }
+        chip::Credentials::SetGroupDataProvider(nullptr);
+
         chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
@@ -500,6 +530,7 @@ public:
     void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative();
     void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse();
     void TestCommandHandler_ReleaseWithExchangeClosed();
+    void TestCommandHandler_GetExchangeContextWhenAsync();
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -1625,6 +1656,29 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
+{
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    SessionHandle groupSession = GetSessionBobToFriends();
+    EXPECT_TRUE(groupSession->IsGroupSession());
+    EXPECT_EQ(commandSender.SendGroupCommandRequest(groupSession), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    // No response is expected for a group command, so OnResponse and OnError should not be called.
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    // There should be no invoke response messages.
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 TEST_F(TestCommandInteraction, TestCommandSenderCommandAsyncSuccessResponseFlow)
 {
 
@@ -2088,11 +2142,42 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchan
 
     // Mimic closure of the exchange that would happen on a session release and verify that releasing the handle there-after
     // is handled gracefully.
-    asyncCommandHandle.Get()->GetExchangeContext()->GetSessionHolder().Release();
-    asyncCommandHandle.Get()->GetExchangeContext()->OnSessionReleased();
+    asyncCommandHandle.TestOnlyReleaseSession();
     asyncCommandHandle = nullptr;
 }
 #endif
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GetExchangeContextWhenAsync)
+{
+
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    asyncCommandHandle = nullptr;
+    asyncCommand       = true;
+
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    // Verify that async command handle has been allocated
+    CommandHandler * handler = asyncCommandHandle.Get();
+    ASSERT_NE(handler, nullptr);
+
+    // when gone async: Ensure that GetExchangeContext returns nullptr while TryGetExchangeContextWhenAsync returns a valid pointer
+    ASSERT_EQ(handler->GetExchangeContext(), nullptr);
+
+    // Cast to CommandHandlerImpl to access TryGetExchangeContextWhenAsync, which is not accessible via CommandHandler
+    auto * impl = static_cast<CommandHandlerImpl *>(handler);
+    ASSERT_NE(impl->TryGetExchangeContextWhenAsync(), nullptr);
+
+    asyncCommandHandle = nullptr;
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
 
 } // namespace app
 } // namespace chip

@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "ServerClusterInterface.h"
 #include <app/server-cluster/ServerClusterExtension.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -28,9 +29,9 @@ CHIP_ERROR ServerClusterExtension::Startup(ServerClusterContext & context)
     return mUnderlying.Startup(context);
 }
 
-void ServerClusterExtension::Shutdown()
+void ServerClusterExtension::Shutdown(ClusterShutdownType shutdownType)
 {
-    mUnderlying.Shutdown();
+    mUnderlying.Shutdown(shutdownType);
     mContext = nullptr;
 }
 
@@ -38,7 +39,8 @@ void ServerClusterExtension::NotifyAttributeChanged(AttributeId id)
 {
     VerifyOrReturn(mContext != nullptr);
     mVersionDelta++;
-    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mClusterPath.mEndpointId, mClusterPath.mClusterId, id });
+    mContext->provider.NotifyAttributeChanged({ mClusterPath.mEndpointId, mClusterPath.mClusterId, id },
+                                              DataModel::AttributeChangeType::kReportable);
 }
 
 Span<const ConcreteClusterPath> ServerClusterExtension::GetPaths() const

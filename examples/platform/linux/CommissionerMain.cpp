@@ -41,7 +41,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -133,7 +133,9 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
     factoryParams.sessionKeystore          = &gSessionKeystore;
-    factoryParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&gServerStorage);
+    // We're running alongside an existing Server, so use the existing DataModelProvider
+    // without changing the underlying persistent storage delegate.
+    factoryParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(nullptr);
 
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     gGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
