@@ -196,6 +196,12 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
 
     if (on)
     {
+        // If either of these come back as NULL, that should mean the fan is operating in auto mode.
+        // I have no idea what that means for this case, so I'll just set them to high because this
+        // is just an example.
+        // In theory these should always be NULL together or not at all, so hopefully
+        // the checks for only percent.IsNull() or only speed.IsNull() are more theoretical
+        // than practical.
         mOnOffClusterOn = true;
 
         DataModel::Nullable<Percent> percent = GetPercentSetting();
