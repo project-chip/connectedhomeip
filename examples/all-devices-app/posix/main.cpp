@@ -272,7 +272,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         initParams.operationalServicePort = CHIP_PORT;
     }
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-    initParams.interfaceId                   = Inet::InterfaceId::Null();
+    
+    if (AppOptions::GetConfig().interfaceId.HasValue())
+    {
+        initParams.interfaceId = Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(AppOptions::GetConfig().interfaceId.Value()));
+    }
+    else
+    {
+        initParams.interfaceId = Inet::InterfaceId::Null();
+    }
 
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");

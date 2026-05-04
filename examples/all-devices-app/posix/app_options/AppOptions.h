@@ -38,6 +38,7 @@ public:
         chip::Optional<uint16_t> vendorId;
         chip::Optional<uint16_t> productId;
         chip::Optional<uint16_t> port;
+        chip::Optional<uint32_t> interfaceId;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
