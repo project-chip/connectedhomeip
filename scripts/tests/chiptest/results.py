@@ -29,8 +29,8 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, ClassVar, TypeAlias
 
+from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue
 from chiptest.log_config import LogConfig
-from chiptest.work_queue import CancellableQueue, EndOfQueue
 
 log = logging.getLogger(__name__)
 
