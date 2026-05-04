@@ -90,8 +90,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
-
 protected:
     // Temporary hack for a test: Initializes the data model for testing purposes only.
     // This method serves as a placeholder and should NOT be used outside of specific tests.

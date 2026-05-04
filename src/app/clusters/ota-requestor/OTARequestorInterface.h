@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +20,9 @@
  * Any implementation of the OTA Requestor must implement this interface.
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
-
+#include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 #include <lib/core/ClusterEnums.h>
 
 #pragma once
@@ -137,17 +138,10 @@ private:
     size_t mMaxSize  = CHIP_CONFIG_MAX_FABRICS;
 };
 
-// Interface class to connect the OTA Software Update Requestor cluster command processing
-// with the core OTA Requestor logic
-class OTARequestorInterface
+// Interface class to handle the OTA Software Update Requestor cluster commands.
+class OTARequestorCommandInterface
 {
 public:
-    using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-
-    // Reset any relevant states
-    virtual void Reset(void) = 0;
-
     /**
      * Called to handle an AnnounceOTAProvider command and is responsible for sending the status. The caller is responsible for
      * validating fields in the command.
@@ -155,6 +149,20 @@ public:
     virtual void HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) = 0;
+
+    virtual ~OTARequestorCommandInterface() = default;
+};
+
+// Interface class to connect the OTA Software Update Requestor cluster command processing
+// with the core OTA Requestor logic
+class OTARequestorInterface : public OTARequestorCommandInterface
+{
+public:
+    using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+
+    // Reset any relevant states
+    virtual void Reset(void) = 0;
 
     // Destructor
     virtual ~OTARequestorInterface() = default;

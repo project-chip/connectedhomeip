@@ -33,6 +33,11 @@ extern "C" {
 #include <stddef.h>
 #include <string.h>
 
+// GN fix that SLC doesn't need (probably)
+#ifndef SLI_SI91X_MCU_INTERFACE
+#define SLI_SI91X_MCU_INTERFACE 0
+#endif
+
 #define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
 #ifdef CHIP_SHELL_MAX_LINE_SIZE
 #define MAX_BUFFER_SIZE CHIP_SHELL_MAX_LINE_SIZE
@@ -152,7 +157,7 @@ typedef struct
 #if CHIP_DETAIL_LOGGING
 #define UART_MAX_QUEUE_SIZE 60
 #else
-#define UART_MAX_QUEUE_SIZE 20
+#define UART_MAX_QUEUE_SIZE 25
 #endif
 #endif
 

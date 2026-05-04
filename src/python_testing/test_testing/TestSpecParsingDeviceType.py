@@ -17,13 +17,13 @@
 import re
 import xml.etree.ElementTree as ElementTree
 
-from DeviceConformanceTests import DeviceConformanceTests, get_supersets
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, conformance_allowed
+from matter.testing.device_conformance_tests import DeviceConformanceTests, get_supersets
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
                                          parse_single_device_type)

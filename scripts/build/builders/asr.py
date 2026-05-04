@@ -173,7 +173,9 @@ class ASRBuilder(GnBuilder):
         self.extra_gn_options.append('asr_toolchain_root="%s"' % os.environ['ASR_TOOLCHAIN_PATH'])
 
     def GnBuildArgs(self):
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
     def build_outputs(self):
         extensions = ["out"]

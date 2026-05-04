@@ -29,67 +29,20 @@ using namespace chip::ArgParser;
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType = 0xffd0;
-constexpr uint16_t kOptionEndpoint   = 0xffd1;
 constexpr uint16_t kOptionWiFi       = 0xffd2;
 
-std::vector<AppOptions::DeviceConfig> AppOptions::mDeviceConfigs;
+DeviceTypeParser AppOptions::sParser;
 bool AppOptions::mEnableWiFi = false;
 
-const std::vector<AppOptions::DeviceConfig> & AppOptions::GetDeviceConfigs()
+const std::vector<DeviceTypeParser::Entry> & AppOptions::GetDeviceTypeEntries()
 {
-    if (mDeviceConfigs.empty())
+    const auto & entries = sParser.GetDeviceTypeEntries();
+    if (entries.empty())
     {
-        static const std::vector<DeviceConfig> kDefault = { { "contact-sensor", 1 } };
+        static const std::vector<DeviceTypeParser::Entry> kDefault = { { "contact-sensor", 1, kInvalidEndpointId } };
         return kDefault;
     }
-    return mDeviceConfigs;
-}
-
-bool AppOptions::ParseEndpointId(const char * str, chip::EndpointId & endpoint)
-{
-    char * endptr;
-    long val = strtol(str, &endptr, 10);
-
-    if (endptr == str || *endptr != '\0' || val < 0 || val > UINT16_MAX)
-    {
-        return false;
-    }
-
-    endpoint = static_cast<chip::EndpointId>(val);
-    return true;
-}
-
-/**
- * Parses a device configuration string in the format "type" or "type:endpoint".
- *
- * Example: "speaker:2" -> type="speaker", endpoint=2
- *
- * @param value The string to parse.
- * @param config The DeviceConfig structure to populate.
- * @return true on success, false on failure (e.g. invalid format or endpoint ID).
- */
-bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
-{
-    VerifyOrReturnValue(value != nullptr, false);
-
-    config.endpoint = 1; // Default to endpoint 1
-
-    const char * colonPos = strchr(value, ':');
-    if (colonPos != nullptr)
-    {
-        config.type.assign(value, static_cast<size_t>(colonPos - value));
-
-        if (!ParseEndpointId(colonPos + 1, config.endpoint))
-        {
-            ChipLogError(Support, "Invalid endpoint ID in device config: %s\n", value);
-            return false;
-        }
-    }
-    else
-    {
-        config.type = value;
-    }
-    return true;
+    return entries;
 }
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
@@ -98,36 +51,9 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     switch (identifier)
     {
     case kOptionDeviceType: {
-        DeviceConfig config;
-        if (!ParseDeviceConfig(value, config))
+        if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;
-        }
-
-        ChipLogProgress(AppServer, "Adding device type %s on endpoint %d", config.type.c_str(), config.endpoint);
-        mDeviceConfigs.push_back(std::move(config));
-        return true;
-    }
-    case kOptionEndpoint: {
-        chip::EndpointId ep;
-        if (value == nullptr || !ParseEndpointId(value, ep))
-        {
-            ChipLogError(Support, "Invalid endpoint ID: %s\n", value ? value : "(null)");
-            return false;
-        }
-
-        if (mDeviceConfigs.empty())
-        {
-            ChipLogError(Support, "Warning: --endpoint specified before --device. Creating default 'contact-sensor'.");
-            DeviceConfig config;
-            config.type     = "contact-sensor";
-            config.endpoint = ep;
-            mDeviceConfigs.push_back(std::move(config));
-        }
-        else
-        {
-            mDeviceConfigs.back().endpoint = ep;
-            ChipLogProgress(AppServer, "Updated last device to endpoint %d", ep);
         }
         return true;
     }
@@ -147,7 +73,6 @@ OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
-        { "endpoint", kArgumentRequired, kOptionEndpoint },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
@@ -164,13 +89,9 @@ OptionSet * AppOptions::GetOptions()
         }
         result.replace(result.length() - 1, 1, ">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint'\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
-        result += "       Example: --device chime:1 --device speaker:2\n\n";
-
-        // rest of the help
-        result += "  --endpoint <endpoint-number>\n";
-        result += "       Define the endpoint for the preceding device (default 1)\n\n";
+        result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";

@@ -40,6 +40,7 @@ import asyncio
 from typing import List
 
 from mobly import asserts
+from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
@@ -64,10 +65,10 @@ class TC_MOD_2_3(MatterBaseTest):
     def steps_TC_MOD_2_3(self) -> list[TestStep]:
         return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
-            TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH"),
-            TestStep("0b", "TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster by writing the GroupKeyMap attribute with two entries as follows: * List item 1: - FabricIndex: 1 - GroupId: 0x0001 - GroupKeySetId: 0x01a1"),
-            TestStep("0c", "TH sends a _RemoveAllGroups_ command to DUT. If a status response is expected, DUT sends a response to TH with the _Status_ field equal to 0x00 (SUCCESS)."),
-            TestStep("1a", "TH sends a _AddGroup_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _AddGroupResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS) and the _GroupID_ field set to _G~1~_."),
+            TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. EpochKey0 only."),
+            TestStep("0b", "If the Groupcast cluster is enabled on the root node, skip this step. Otherwise, TH binds GroupIds 0x0001, with GroupKeySetID 0x01a1 in the GroupKeyMap attribute of GroupKeyManagement cluster."),
+            TestStep("0c", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast LeaveGroup command with GroupID field as 0 to DUT. Otherwise, TH sends a RemoveAllGroups command to DUT."),
+            TestStep("1a", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast JoinGroup command with GroupID 1, Endpoints set with the EndpointId where ModeSelect cluster is enabled and KeySetID 0x01a1 to DUT. Otherwise, TH sends AddGroup command to DUT with the GroupID field set to 1."),
             TestStep("1b", "TH sends a _RemoveAllScenes_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _RemoveAllScenes_ command to TH with the _Status_ field set to 0x00 (SUCCESS) and _GroupID_ field set to _G~1~_."),
             TestStep("1c", "TH sends a _GetSceneMembership_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _GetSceneMembershipResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS), the _Capacity_ field recorded into _SC~0~_ for later use, the _GroupID_ field set to _G~1~_ and the _SceneList_ field containing 0 entry"),
             TestStep("2", "TH reads the _SupportedModes attribute_ from the DUT. Verify that the DUT response provides a list of supported modes. Record the list of supported modes under _L~1~_ for usage in step 5a. Skip tests 3 to 7 if less than 1 mode is supported."),
@@ -87,44 +88,52 @@ class TC_MOD_2_3(MatterBaseTest):
     @async_test_body
     async def setup_test(self):
         super().setup_test()
-        # Pre-Condition: Commissioning
         self.step("0")
 
         self.step("0a")
 
         self.TH1 = self.default_controller
         self.kGroupKeyset1 = 0x01a1
+        self.kGroup1 = 0x0001
+        self.groupcast_enabled = await is_groupcast_on_root_node(self)
+
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             epochKey0=bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf"),
-            epochStartTime0=1110000,
-            epochKey1=bytes.fromhex("b0b1b2b3b4b5b6b7b8b9babbbcbdbebf"),
-            epochStartTime1=1110001,
-            epochKey2=bytes.fromhex("c0c1c2c3c4c5c6c7c8c9cacbcccdcecf"),
-            epochStartTime2=1110002)
+            epochStartTime0=1110000)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
 
         self.step("0b")
-        self.kGroup1 = 0x0001
-        mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
-
-        mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-            groupId=self.kGroup1,
-            groupKeySetID=self.kGroupKeyset1,
-            fabricIndex=1))
-        result = await self.TH1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs))])
-        asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
-
-        th1 = self.default_controller
+        if not self.groupcast_enabled:
+            mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
+            mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
+                groupId=self.kGroup1,
+                groupKeySetID=self.kGroupKeyset1,
+                fabricIndex=1))
+            result = await self.TH1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs))])
+            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
         self.step("0c")
-        await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
+        if self.groupcast_enabled:
+            # Check if there are any groups on the DUT.
+            membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
+            if membership:
+                # LeaveGroup with groupID 0 will leave all groups on the fabric.
+                await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        else:
+            await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step("1a")
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(self.kGroup1, "Group1"))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 1 failed")
+        if self.groupcast_enabled:
+            await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
+                groupID=self.kGroup1,
+                endpoints=[self.matter_test_config.endpoint],
+                keySetID=self.kGroupKeyset1))
+        else:
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(self.kGroup1, "Group1"))
+            asserts.assert_equal(result.status, Status.Success, "Adding Group 1 failed")
 
         self.step("1b")
         result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
@@ -139,12 +148,13 @@ class TC_MOD_2_3(MatterBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        th1 = self.default_controller
-
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
+        result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
         asserts.assert_equal(result.status, Status.Success, "Remove All Scenes failed on status")
         asserts.assert_equal(result.groupID, self.kGroup1, "Remove All Scenes failed on groupID")
-        await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
+        if self.groupcast_enabled:
+            await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        else:
+            await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
         super().teardown_test()
 
     @async_test_body

@@ -22,6 +22,7 @@ config:
     nodeId: 0x12344321
     cluster: "Scenes Management"
     endpoint: 1
+    groupcastendpoint: 0
     G1:
         type: group_id
         defaultValue: 0x0001
@@ -81,8 +82,8 @@ tests:
                         EpochStartTime0: 1110000,
                         EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
                         EpochStartTime1: 1110001,
-                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
-                        EpochStartTime2: 1110002,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
                         GroupKeyMulticastPolicy: 0,
                     }
 
@@ -90,6 +91,7 @@ tests:
           "Step 0c: TH binds GroupIds 0x0001 and 0x0002 with GroupKeySetID
           0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster
           by writing the GroupKeyMap attribute with two entries as follows:"
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -101,16 +103,59 @@ tests:
                   { FabricIndex: 1, GroupId: G2, GroupKeySetID: 0x01a1 },
               ]
 
-    - label: "Step 0d: TH sends a RemoveAllGroups command to DUT."
-      PICS: G.S.C04.Rsp
+    - label:
+          "Step 0d: If the Groupcast cluster is enabled on the RootNode
+          endpoint, the TH reads the Groupcast _membership_ attribute on the DUT"
+      PICS: "GC.S"
+      cluster: "Groupcast"
+      endpoint: groupcastendpoint
+      command: "readAttribute"
+      attribute: "Membership"
+      response:
+          saveAs: membershipList
+          constraints:
+              type: list
+
+    - label:
+          "Step 0e: If the Groupcast cluster is enabled on the RootNode
+          endpoint, TH sends Groupcast LeaveGroup command with GroupID = 0 to
+          DUT"
+      PICS: "GC.S"
+      runIf: membershipList
+      cluster: "Groupcast"
+      endpoint: groupcastendpoint
+      command: "LeaveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0000
+
+    - label: "Step 0e: TH sends a RemoveAllGroups command to DUT."
+      PICS: "!GC.S && G.S.C04.Rsp"
       cluster: "Groups"
       endpoint: endpoint
       command: "RemoveAllGroups"
 
     - label:
+          "Step 1a: If Groupcast is enabled on RootNode, TH sends JoinGroup with
+          G1, Scene endpoint, and KeySetID 0x01a1"
+      PICS: GC.S
+      cluster: "Groupcast"
+      endpoint: groupcastendpoint
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
+
+    - label:
           "Step 1a: TH sends a AddGroup command to DUT with the GroupID field
           set to G1."
-      PICS: G.S.C00.Rsp
+      PICS: "!GC.S && G.S.C00.Rsp"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -368,7 +413,7 @@ tests:
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 250ms"
-      PICS: PICS_SDK_CI_ONLY && S.S.C05.Rsp
+      PICS: "PICS_SDK_CI_ONLY && S.S.C05.Rsp"
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -514,7 +559,7 @@ tests:
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 250ms"
-      PICS: PICS_SDK_CI_ONLY && S.S.C05.Rsp
+      PICS: "PICS_SDK_CI_ONLY && S.S.C05.Rsp"
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -576,7 +621,7 @@ tests:
     - label:
           "Step 5a: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      PICS: S.S.C01.Rsp && PICS_SDK_CI_ONLY
+      PICS: "S.S.C01.Rsp && PICS_SDK_CI_ONLY"
       command: "ViewScene"
       arguments:
           values:
@@ -698,7 +743,7 @@ tests:
           [1720440014.728] [13252:13254] [TOO]            }
           [1720440014.729] [13252:13254] [TOO]        }
           [1720440014.729] [13252:13254] [TOO]    }
-      PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
+      PICS: "S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP"
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -834,7 +879,7 @@ tests:
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 60 000 000 (60 000s) and a set of extension fields appropriate to
           AC1."
-      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      PICS: "S.S.C00.Rsp && PICS_SDK_CI_ONLY"
       command: "AddScene"
       arguments:
           values:
@@ -905,7 +950,7 @@ tests:
           set to GI (Where GI is a group currently absent from the group table),
           the SceneID field set to 0x01, the TransitionTime field set to 1000
           (1s) and a set of extension fields appropriate to AC1."
-      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      PICS: "S.S.C00.Rsp && PICS_SDK_CI_ONLY"
       command: "AddScene"
       arguments:
           values:
@@ -1090,7 +1135,7 @@ tests:
           ExtensionField (Unscenable attribute ID for given cluster). This
           should fail and return a status of 0x85 (INVALID_COMMAND)."
       ## TODO: Change test to test for an existing bu non scenable attribute ID once scenability check is possible, see issue: https://github.com/project-chip/connectedhomeip/issues/24177
-      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      PICS: "S.S.C00.Rsp && PICS_SDK_CI_ONLY"
       command: "AddScene"
       arguments:
           values:
@@ -1475,10 +1520,26 @@ tests:
                 value: [0x01, 0x02]
 
     - label:
+          "Step 13a: If Groupcast is enabled on RootNode, TH sends JoinGroup
+          with G2, Scene endpoint, and KeySetID 0x01a1"
+      PICS: GC.S
+      cluster: "Groupcast"
+      endpoint: groupcastendpoint
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
+
+    - label:
           "Step 13a: If capacity allows, TH sends a AddGroup command to DUT with
           the GroupID field set to G2."
       runIf: ContinueTest
-      PICS: G.S.C00.Rsp
+      PICS: "!GC.S && G.S.C00.Rsp"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -1643,5 +1704,5 @@ tests:
       command: "KeySetRemove"
       arguments:
           values:
-              - name: GroupKeySetID
+              - name: "GroupKeySetID"
                 value: 0x01a1

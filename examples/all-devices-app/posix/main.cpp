@@ -19,8 +19,10 @@
 #include <AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
+#include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -33,6 +35,7 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
+#include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
@@ -147,11 +150,13 @@ public:
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-        for (const auto & config : AppOptions::GetDeviceConfigs())
+        for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
-            auto device = DeviceFactory::GetInstance().Create(config.type);
+            auto device = DeviceFactory::GetInstance().Create(entry.type);
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
-            ReturnErrorOnFailure(device->Register(config.endpoint, mDataModelProvider, kInvalidEndpointId));
+            ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
+                            entry.endpoint, entry.parentId);
+            ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
             mConstructedDevices.push_back(std::move(device));
         }
 
@@ -188,14 +193,24 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
-
     });
+
+    RegisterDeviceFactoryOverrides(gTimerDelegate);
 
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
+    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+    gGroupDataProvider.SetGroupcastEnabled(true);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
+    SuccessOrDie(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();

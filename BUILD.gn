@@ -173,7 +173,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [ "${chip_root}/src/app/server" ]
     }
 
-    if (chip_build_tests) {
+    if (chip_build_tests && chip_device_platform != "fake") {
       deps += [
         "//examples:example_tests",
         "//src:tests",
@@ -185,6 +185,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       if (current_os == "android" && current_toolchain == default_toolchain) {
         deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
       }
+    }
+
+    if (chip_link_tests && chip_device_platform == "fake") {
+      deps += [ "//:fake_platform_tests" ]
     }
 
     if (chip_with_lwip) {
@@ -258,9 +262,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   }
 
   group("check") {
-    if (chip_link_tests) {
+    if (chip_link_tests && chip_device_platform != "fake") {
       deps = [
-        "//:fake_platform_tests",
         "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
         "//scripts/py_matter_idl:matter-idl.tests",
@@ -275,6 +278,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       if (current_os == "linux" || current_os == "mac") {
         deps += [ "${chip_root}/scripts/tools/zap:tests" ]
       }
+    } else if (chip_link_tests && chip_device_platform == "fake") {
+      deps = [ "//:fake_platform_tests" ]
     }
   }
 } else {

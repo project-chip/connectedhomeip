@@ -57,13 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0402" name="Temperature Measurement Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0402" name="Temperature Measurement Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2241 2370"/>
     <revision revision="3" summary="CCB 2823"/>
     <revision revision="4" summary="New data model format and notation"/>
     <revision revision="5" summary="Removed P quality"/>
+    <revision revision="6" summary="Added F quality to MinMeasuredValue, MaxMeasuredValue and Tolerance attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0402" name="Temperature Measurement"/>
@@ -87,7 +88,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
         <between>
@@ -98,7 +99,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
         <min>
@@ -114,6 +115,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
       <constraint>
         <max value="2048"/>

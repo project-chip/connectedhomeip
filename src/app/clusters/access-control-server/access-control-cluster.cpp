@@ -63,7 +63,10 @@ using ArlReviewEvent = Events::FabricRestrictionReviewUpdate::Type;
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 namespace {
-CHIP_ERROR ReadAcl(FabricTable & fabricTable, Access::AccessControl & accessControl, AttributeValueEncoder & aEncoder)
+using EntryProvider = CHIP_ERROR (Access::AccessControl::*)(FabricIndex, AccessControl::EntryIterator &) const;
+
+CHIP_ERROR ReadAclEntries(FabricTable & fabricTable, Access::AccessControl & accessControl, AttributeValueEncoder & aEncoder,
+                          EntryProvider provider)
 {
     AccessControl::EntryIterator iterator;
     AccessControl::Entry entry;
@@ -72,7 +75,7 @@ CHIP_ERROR ReadAcl(FabricTable & fabricTable, Access::AccessControl & accessCont
         for (auto & info : fabricTable)
         {
             auto fabric = info.GetFabricIndex();
-            ReturnErrorOnFailure(accessControl.Entries(fabric, iterator));
+            ReturnErrorOnFailure((accessControl.*provider)(fabric, iterator));
             CHIP_ERROR err = CHIP_NO_ERROR;
             while ((err = iterator.Next(entry)) == CHIP_NO_ERROR)
             {
@@ -468,7 +471,10 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     switch (request.path.mAttributeId)
     {
     case AccessControl::Attributes::Acl::Id:
-        return ReadAcl(mClusterContext.fabricTable, mClusterContext.accessControl, encoder);
+        return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder, &Access::AccessControl::Entries);
+    case AccessControl::Attributes::AuxiliaryACL::Id:
+        return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder,
+                              &Access::AccessControl::AuxiliaryEntries);
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case AccessControl::Attributes::Extension::Id:
         return ReadExtension(mClusterContext.persistentStorage, mClusterContext.fabricTable, encoder);
@@ -490,6 +496,13 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
         break;
     case AccessControl::Attributes::FeatureMap::Id: {
         value = 0;
+
+        // The kAuxiliary feature can only be set if the group auxiliary access control delegate
+        // is defined. Without it, none of the functionality protected by this feature will function.
+        if (mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered())
+        {
+            value |= to_underlying(Clusters::AccessControl::Feature::kAuxiliary);
+        }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
         value |= to_underlying(Clusters::AccessControl::Feature::kManagedDevice);
@@ -527,8 +540,11 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
 
-#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS || CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
+        // The AuxiliaryACL attribute can only be set if the group auxiliary access control delegate
+        // is defined. Without it, none of the reporting functionality of auxiliary ACLs will function.
+        { .enabled  = mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered(),
+          .metadata = Attributes::AuxiliaryACL::kMetadataEntry },
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
         { .enabled = true, .metadata = Attributes::Extension::kMetadataEntry },
 #endif
@@ -539,9 +555,6 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
     };
 
     return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), Span(kOptionalAttributes));
-#else
-    return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), {});
-#endif
 }
 
 CHIP_ERROR AccessControlCluster::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
