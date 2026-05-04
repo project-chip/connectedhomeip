@@ -1008,3 +1008,114 @@ async def test_TC_OPCREDS_3_8(self):
     # Do test step logic if command is available, else this test is skipped
 
 ```
+
+## Wildcard subscription read verification
+
+This verification is enabled by default for tests that do not explicitly disable
+it.
+
+### Overview
+
+Certification tests can use a background **wildcard attribute subscription**
+(all endpoints, all clusters, all attributes) to cross-check routine attribute
+reads against values observed through the subscription path.
+
+The framework maintains a subscription-backed attribute cache and, when enabled,
+read helpers compare direct read responses against cached subscription values to
+help detect missing reports, stale values, or reporting inconsistencies.
+
+The comparison path is implemented in `matter_testing.py`
+(`verify_attribute_subscription_value`, `read_single_attribute_check_success`,
+and related helpers), while subscription client handling lives in
+`event_attribute_reporting.py`.
+
+### Architecture
+
+#### Secondary controller
+
+The wildcard subscription runs on a dedicated `ChipDeviceController` rather than
+`default_controller`.
+
+This avoids interference from test code that issues `ReadAttribute` calls with
+`keepSubscriptions=False` on the primary controller, which could otherwise tear
+down the background subscription.
+
+#### Subscription flags
+
+The wildcard subscribe uses:
+
+-   `keepSubscriptions=False`
+-   `autoResubscribe=False`
+
+`keepSubscriptions=False` avoids leaving stale server-side subscriptions behind
+if setup is retried.
+
+`autoResubscribe=False` avoids repeated client resubscribe attempts when tests
+temporarily overwrite ACLs in ways that remove the subscription controller's
+administer privilege, which can otherwise add noise and unnecessary DUT load.
+
+#### ACL handling
+
+Before the subscription starts, the framework snapshots the DUT ACL and appends
+an administer entry for the subscription controller.
+
+`teardown_test` restores the original ACL snapshot so each test starts from a
+known ACL state.
+
+Tests that replace the entire ACL during a step should include the subscription
+controller entry (see `get_subscription_acl_entry()` on `MatterBaseTest`) if
+subscription coverage needs to remain active through that step.
+
+### C/Q excluded attributes
+
+Attributes marked in the data model XML with:
+
+-   **Changes Omitted (C)**
+-   **Quieter Reporting (Q)**
+
+are excluded from wildcard subscription verification, since these attributes are
+not expected to behave like ordinary report-driven attributes.
+
+A small transitional allowlist (`_CQ_EXPECTED_BUT_NOT_YET_MARKED` in
+`matter_testing.py`) can treat additional attributes as C until XML/spec
+metadata catches up.
+
+Each temporary entry should cite a tracking issue and be removed once the data
+model is corrected and regenerated.
+
+### Disabling the wildcard subscription or verification
+
+**Disable the background subscription entirely** (no cache, no ACL append for
+the subscription controller):
+
+-   Per test class: `disable_wildcard_subscription = True`
+-   Per run / harness: `--no-wildcard-subscription`
+    (`matter_test_config.no_wildcard_subscription`)
+
+**Keep the subscription but skip comparing reads to the cache:**
+
+-   Per test class: `default_verify_wildcard_subscription = False`
+-   Single read: pass `verify_wildcard_subscription=False` to the read helper,
+    otherwise this defaults to True.
+
+### Known limitations
+
+This framework has exposed cases where some attributes are effectively polled on
+read in the SDK rather than updated through a reporting path.
+
+Such attributes may appear in the subscription priming read but later disagree
+with a direct read, producing mismatches that are not DUT subscription failures.
+
+The canonical example is Software Diagnostics heap counters.
+
+These issues are tracked separately as SDK/spec/XML alignment gaps rather than
+framework defects.
+
+Per-fabric attributes may also require special handling when comparing values
+across controllers operating on different fabrics (for example, fabric-scoped
+attributes such as CurrentFabricIndex can legitimately differ across fabrics and
+should not be treated as subscription failures).
+
+Direct reads may also occasionally overtake in-flight subscription reports
+during attribute transitions, which can create transient mismatches that are
+framework timing artifacts rather than missing DUT reports.

@@ -57,8 +57,3 @@ CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH=y
 
 # Enable OTA Requestor
 CONFIG_ENABLE_OTA_REQUESTOR=y
-
-# Enable Groupcast cluster
-config CONFIG_CHIP_ENABLE_GROUPCAST
-	bool
-	default y
