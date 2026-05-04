@@ -102,37 +102,35 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
 
     ReturnErrorOnFailure(DefaultServerCluster::Attributes(path, builder));
 
-    using Flags                                 = BitFlags<DataModel::AttributeQualityFlags>;
-    constexpr chip::Access::Privilege kViewPriv = chip::Access::Privilege::kView;
+    // Use generated metadata entries — aliased clusters share the same attribute definitions.
+    namespace Meta = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Attributes;
 
-    ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementMedium::Id, Flags{}, kViewPriv, std::nullopt)));
+    ReturnErrorOnFailure(builder.Append(Meta::MeasurementMedium::kMetadataEntry));
 
     if (mFeatures.Has(Feature::kNumericMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MinMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MaxMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(Uncertainty::Id, Flags{}, kViewPriv, std::nullopt)));
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(MeasurementUnit::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(Meta::MeasuredValue::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Meta::MinMeasuredValue::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Meta::MaxMeasuredValue::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Meta::Uncertainty::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Meta::MeasurementUnit::kMetadataEntry));
     }
 
     if (mFeatures.Has(Feature::kPeakMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(PeakMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
-        ReturnErrorOnFailure(
-            builder.Append(DataModel::AttributeEntry(PeakMeasuredValueWindow::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(Meta::PeakMeasuredValue::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Meta::PeakMeasuredValueWindow::kMetadataEntry));
     }
 
     if (mFeatures.Has(Feature::kAverageMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(AverageMeasuredValue::Id, Flags{}, kViewPriv, std::nullopt)));
-        ReturnErrorOnFailure(
-            builder.Append(DataModel::AttributeEntry(AverageMeasuredValueWindow::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(Meta::AverageMeasuredValue::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Meta::AverageMeasuredValueWindow::kMetadataEntry));
     }
 
     if (mFeatures.Has(Feature::kLevelIndication))
     {
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry(LevelValue::Id, Flags{}, kViewPriv, std::nullopt)));
+        ReturnErrorOnFailure(builder.Append(Meta::LevelValue::kMetadataEntry));
     }
 
     return CHIP_NO_ERROR;
