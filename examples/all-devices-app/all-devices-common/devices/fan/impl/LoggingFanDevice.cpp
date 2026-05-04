@@ -188,8 +188,8 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
             mode, percentCurrent, speedCurrent);
     }
 
-    auto & onOff         = OnOffCluster();
-    const bool powered   = onOff.GetOnOff();
+    auto & onOff       = OnOffCluster();
+    const bool powered = onOff.GetOnOff();
     if (!powered)
     {
         ApplyOnOffToFan(FanControlCluster(), false);
