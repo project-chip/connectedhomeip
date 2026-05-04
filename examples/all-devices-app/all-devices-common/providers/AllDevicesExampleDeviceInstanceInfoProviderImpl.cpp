@@ -16,27 +16,26 @@
  *    limitations under the License.
  */
 
-#include "OverrideDeviceInstanceInfoProvider.h"
+#include "AllDevicesExampleDeviceInstanceInfoProviderImpl.h"
 
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-OverrideDeviceInstanceInfoProvider::OverrideDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate,
-                                                                       std::optional<uint16_t> vendorId,
-                                                                       std::optional<uint16_t> productId) :
+AllDevicesExampleDeviceInstanceInfoProviderImpl::AllDevicesExampleDeviceInstanceInfoProviderImpl(
+    DeviceInstanceInfoProvider * delegate, std::optional<uint16_t> vendorId, std::optional<uint16_t> productId) :
     mDelegate(delegate),
     mVendorId(vendorId), mProductId(productId)
 {}
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetVendorName(char * buf, size_t bufSize)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetVendorName(char * buf, size_t bufSize)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetVendorName(buf, bufSize);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetVendorId(uint16_t & vendorId)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetVendorId(uint16_t & vendorId)
 {
     if (mVendorId.has_value())
     {
@@ -47,13 +46,13 @@ CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetVendorId(uint16_t & vendorId)
     return mDelegate->GetVendorId(vendorId);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetProductName(char * buf, size_t bufSize)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetProductName(char * buf, size_t bufSize)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetProductName(buf, bufSize);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetProductId(uint16_t & productId)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetProductId(uint16_t & productId)
 {
     if (mProductId.has_value())
     {
@@ -64,49 +63,49 @@ CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetProductId(uint16_t & productId
     return mDelegate->GetProductId(productId);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetPartNumber(char * buf, size_t bufSize)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetPartNumber(char * buf, size_t bufSize)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetPartNumber(buf, bufSize);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetProductURL(char * buf, size_t bufSize)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetProductURL(char * buf, size_t bufSize)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetProductURL(buf, bufSize);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetProductLabel(char * buf, size_t bufSize)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetProductLabel(char * buf, size_t bufSize)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetProductLabel(buf, bufSize);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetSerialNumber(char * buf, size_t bufSize)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetSerialNumber(char * buf, size_t bufSize)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetSerialNumber(buf, bufSize);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetManufacturingDate(year, month, day);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetHardwareVersion(hardwareVersion);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetHardwareVersionString(buf, bufSize);
 }
 
-CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+CHIP_ERROR AllDevicesExampleDeviceInstanceInfoProviderImpl::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->GetRotatingDeviceIdUniqueId(uniqueIdSpan);

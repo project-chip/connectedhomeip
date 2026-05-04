@@ -86,10 +86,7 @@ protected:
     class SupportedLocalesIteratorImpl : public SupportedLocalesIterator
     {
     public:
-        static SupportedLocalesIteratorImpl * Create()
-        {
-            return chip::Platform::New<SupportedLocalesIteratorImpl>();
-        }
+        static SupportedLocalesIteratorImpl * Create() { return chip::Platform::New<SupportedLocalesIteratorImpl>(); }
         size_t Count() override;
         bool Next(CharSpan & output) override;
         void Release() override { chip::Platform::Delete(this); }
@@ -98,7 +95,7 @@ protected:
         template <typename U, typename... UArgs>
         friend U * chip::Platform::New(UArgs &&... args);
 
-        SupportedLocalesIteratorImpl() = default;
+        SupportedLocalesIteratorImpl()               = default;
         static constexpr size_t kNumSupportedLocales = 1;
         size_t mIndex                                = 0;
     };
@@ -106,10 +103,7 @@ protected:
     class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
     {
     public:
-        static SupportedCalendarTypesIteratorImpl * Create()
-        {
-            return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
-        }
+        static SupportedCalendarTypesIteratorImpl * Create() { return chip::Platform::New<SupportedCalendarTypesIteratorImpl>(); }
         size_t Count() override;
         bool Next(CalendarType & output) override;
         void Release() override { chip::Platform::Delete(this); }
@@ -118,7 +112,7 @@ protected:
         template <typename U, typename... UArgs>
         friend U * chip::Platform::New(UArgs &&... args);
 
-        SupportedCalendarTypesIteratorImpl() = default;
+        SupportedCalendarTypesIteratorImpl()               = default;
         static constexpr size_t kNumSupportedCalendarTypes = 1;
         size_t mIndex                                      = 0;
     };

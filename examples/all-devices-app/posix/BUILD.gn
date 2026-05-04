@@ -24,8 +24,6 @@ executable("all-devices-app") {
   ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:override-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
@@ -35,6 +33,8 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",

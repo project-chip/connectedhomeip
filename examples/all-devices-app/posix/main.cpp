@@ -19,8 +19,6 @@
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
 #include <DeviceFactoryPlatformOverride.h>
-#include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
-#include <providers/OverrideDeviceInstanceInfoProvider.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
@@ -33,6 +31,8 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
+#include <providers/AllDevicesExampleDeviceInstanceInfoProviderImpl.h>
 
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -259,15 +259,16 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SuccessOrDie(devices.Startup());
 
-    initParams.dataModelProvider             = &devices.DataModelProvider();
-    initParams.groupDataProvider             = &gGroupDataProvider;
+    initParams.dataModelProvider      = &devices.DataModelProvider();
+    initParams.groupDataProvider      = &gGroupDataProvider;
     initParams.operationalServicePort = AppOptions::GetConfig().port.value_or(CHIP_PORT);
     ChipLogProgress(AppServer, "Using operationalServicePort %u\n", initParams.operationalServicePort);
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-    
+
     if (AppOptions::GetConfig().interfaceId.has_value())
     {
-        initParams.interfaceId = Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(AppOptions::GetConfig().interfaceId.value()));
+        initParams.interfaceId =
+            Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(AppOptions::GetConfig().interfaceId.value()));
     }
     else
     {
@@ -387,12 +388,13 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
-    
+
     static AllDevicesExampleDeviceInfoProviderImpl sExampleDeviceInfoProvider;
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();
-    static OverrideDeviceInstanceInfoProvider sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);
+    static AllDevicesExampleDeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(
+        DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();

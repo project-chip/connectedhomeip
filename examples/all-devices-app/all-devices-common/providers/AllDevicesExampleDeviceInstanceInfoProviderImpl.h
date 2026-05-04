@@ -20,17 +20,17 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-#include <platform/DeviceInstanceInfoProvider.h>
 #include <optional>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-class OverrideDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+class AllDevicesExampleDeviceInstanceInfoProviderImpl : public DeviceInstanceInfoProvider
 {
 public:
-    OverrideDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate, std::optional<uint16_t> vendorId,
-                                       std::optional<uint16_t> productId);
+    AllDevicesExampleDeviceInstanceInfoProviderImpl(DeviceInstanceInfoProvider * delegate, std::optional<uint16_t> vendorId,
+                                                    std::optional<uint16_t> productId);
 
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;

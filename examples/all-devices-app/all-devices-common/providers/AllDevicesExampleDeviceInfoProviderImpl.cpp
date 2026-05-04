@@ -84,7 +84,8 @@ CHIP_ERROR AllDevicesExampleDeviceInfoProviderImpl::GetUserLabelLength(EndpointI
     return mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val, len);
 }
 
-CHIP_ERROR AllDevicesExampleDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
+CHIP_ERROR AllDevicesExampleDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index,
+                                                                   const UserLabelType & userLabel)
 {
     VerifyOrReturnError(CanCastTo<uint32_t>(index), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -114,8 +115,10 @@ DeviceInfoProvider::UserLabelIterator * AllDevicesExampleDeviceInfoProviderImpl:
     return UserLabelIteratorImpl::Create(*this, endpoint);
 }
 
-AllDevicesExampleDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(AllDevicesExampleDeviceInfoProviderImpl & provider, EndpointId endpoint) :
-    mProvider(provider), mEndpoint(endpoint)
+AllDevicesExampleDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(
+    AllDevicesExampleDeviceInfoProviderImpl & provider, EndpointId endpoint) :
+    mProvider(provider),
+    mEndpoint(endpoint)
 {
     size_t total = 0;
     ReturnOnFailure(mProvider.GetUserLabelLength(mEndpoint, total));

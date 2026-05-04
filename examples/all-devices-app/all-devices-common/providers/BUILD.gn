@@ -37,10 +37,10 @@ source_set("all-devices-example-device-info-provider") {
   ]
 }
 
-source_set("override-device-instance-info-provider") {
+source_set("all-devices-example-device-instance-info-provider") {
   sources = [
-    "OverrideDeviceInstanceInfoProvider.cpp",
-    "OverrideDeviceInstanceInfoProvider.h",
+    "AllDevicesExampleDeviceInstanceInfoProviderImpl.cpp",
+    "AllDevicesExampleDeviceInstanceInfoProviderImpl.h",
   ]
 
   public_deps = [
