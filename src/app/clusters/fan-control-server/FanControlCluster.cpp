@@ -418,6 +418,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
     }
     if (!IsFanModeSupportedBySequence(value))
     {
+        // TODO: Add spec-compliant ConstraintError for unsupported FanMode vs FanModeSequence once
+        // REPL tests in matter-test-scripts are updated. https://github.com/project-chip/matter-test-scripts/issues/780
         return Status::InvalidInState;
     }
 

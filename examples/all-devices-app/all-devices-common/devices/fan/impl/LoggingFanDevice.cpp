@@ -28,11 +28,38 @@ namespace {
 bool IsFanDriveOutputActive(const FanControl::FanDriveState & state)
 {
     using FanControl::FanModeEnum;
-    if (state.mode == FanModeEnum::kOff)
+
+    // NOTE: Automatically syncing the FanControl cluster's state (FanMode, PercentSetting,
+    // SpeedSetting) to the OnOff cluster is a product/manufacturer choice.
+    // The Matter SDK does not mandate that changing a fan speed setting implicitly
+    // turns the device on. In this example application, we have chosen to implement
+    // a behavior where any non-zero/active setting turns the OnOff cluster ON,
+    // and turning all settings to zero/Off turns the OnOff cluster OFF.
+
+    // 1. Check FanMode: If the mode is not Off, the fan should be considered ON.
+    if (state.mode != FanModeEnum::kOff)
     {
-        return false;
+        return true;
     }
-    return state.percentCurrent > 0 || state.speedCurrent > 0;
+
+    // 2. Check PercentSetting: If a percentage is set and it's greater than 0,
+    // the manufacturer logic dictates the device should turn ON.
+    if (!state.percentSetting.IsNull() && state.percentSetting.Value() > 0)
+    {
+        return true;
+    }
+
+    // 3. Check SpeedSetting: If a specific speed is set and it's greater than 0,
+    // the manufacturer logic dictates the device should turn ON.
+    if (!state.speedSetting.IsNull() && state.speedSetting.Value() > 0)
+    {
+        return true;
+    }
+
+    // If we reach this point, all relevant settings indicate the fan is off
+    // (mode is kOff, and settings are 0 or Null).
+    // Return false to explicitly turn the OnOff cluster OFF.
+    return false;
 }
 
 void ApplyOnOffToFan(FanControlCluster & fan, bool on)
