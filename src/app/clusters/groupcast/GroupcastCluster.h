@@ -39,7 +39,7 @@ namespace Clusters {
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
  */
-class GroupcastCluster : public DefaultServerCluster, public Credentials::GroupDataProvider::GroupListener, public Groupcast::Testing::Delegate
+class GroupcastCluster : public DefaultServerCluster, public Credentials::GroupDataProvider::GroupListener, public ::chip::Groupcast::Testing::Delegate
 {
 public:
     static constexpr uint16_t kMaxMembershipEndpoints = 255;

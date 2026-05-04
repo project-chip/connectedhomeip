@@ -4,12 +4,12 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AccessControl/Events.h>
 #include <clusters/Groupcast/AttributeIds.h>
+#include <clusters/Groupcast/Events.h>
 #include <clusters/Groupcast/Attributes.h>
 #include <clusters/Groupcast/Metadata.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <transport/raw/GroupcastTesting.h>
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -70,7 +70,7 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 
     if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
     {
-        Groupcast::GetTesting().SetDelegate(this);
+        ::chip::Groupcast::GetTesting().SetDelegate(this);
     }
 
     return CHIP_NO_ERROR;
@@ -80,7 +80,7 @@ void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
     {
-        Groupcast::GetTesting().SetDelegate(nullptr);
+        ::chip::Groupcast::GetTesting().SetDelegate(nullptr);
     }
 
     mGroupcastTestingTimer.Cancel();
@@ -92,7 +92,7 @@ void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 
 void GroupcastCluster::FlushGroupcastTestingEvent()
 {
-    auto & testing = Groupcast::GetTesting();
+    auto & testing = ::chip::Groupcast::GetTesting();
     VerifyOrReturn(testing.IsEnabled());
 
     Clusters::Groupcast::Events::GroupcastTesting::Type event;
