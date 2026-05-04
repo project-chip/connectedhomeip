@@ -35,8 +35,6 @@ void WpaSupplicantClient::GDBusWpaSupplicant::Reset()
 
 CHIP_ERROR WpaSupplicantClient::Init(ConnectivityManagerImpl & inConnectivityManagerImpl) noexcept
 {
-    VerifyOrReturnError(mConnectivityManagerImpl == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
-
     mConnectivityManagerImpl = &inConnectivityManagerImpl;
 
     return CHIP_NO_ERROR;
