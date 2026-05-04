@@ -146,6 +146,7 @@ def deinit_modules(modules: list, force: bool) -> None:
 
     subprocess.check_call(cmd)
 
+
 def parse_platform_list(values):
     result = []
     for v in values:
@@ -153,10 +154,12 @@ def parse_platform_list(values):
         result.extend([item.strip() for item in v.split(',') if item.strip()])
     return result
 
+
 def validate_platforms(raw_platforms):
     invalid = [p for p in raw_platforms if p not in ALL_PLATFORMS]
     if invalid:
         raise SystemExit(f"Invalid platform(s): {invalid}\nValid choices: {sorted(ALL_PLATFORMS)}")
+
 
 def main():
     logging.basicConfig(format='%(message)s', level=logging.INFO)
