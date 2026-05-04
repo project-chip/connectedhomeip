@@ -50,17 +50,21 @@ class TC_SC_TC_4_1(MatterBaseTest):
 
     def steps_TC_SC_TC_4_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioner petitions the Thread Border Agent to become the Thread Commissioner with a 12-bit discriminator"),
-            TestStep(2, 'Validate the discriminator and perform the commissioning')
+            TestStep(1, "DUT is ready to be discovered", is_commissioning=False),
+            TestStep(2, "TH establishes PASE session over Thread Meshcop with DUT", is_commissioning=False),
         ]
 
     @async_test_body
     async def test_TC_SC_TC_4_1(self):
-        commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         self.step(1)
-        commissioner.SetSkipCommissioningComplete(True)
+        self.wait_for_user_input("Power on the DUT")
         self.step(2)
-        await self.commission_devices()
+        commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+        commissioner.SetThreadOperationalDataset(self.matter_test_config.thread_operational_dataset)
+        await commissioner.EstablishPASESessionThreadMeshcop(baAddr=self.matter_test_config.thread_ba_host,
+                                                             setupCode=self.first_setup_code(),
+                                                             nodeId=self.matter_test_config.dut_node_ids[0],
+                                                             baPort=self.matter_test_config.thread_ba_port)
 
 
 if __name__ == "__main__":

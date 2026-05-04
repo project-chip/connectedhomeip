@@ -66,10 +66,10 @@ class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
   }
 
   companion object {
-    private const val TAG_PRIVILEGE = 1
-    private const val TAG_AUTH_MODE = 2
-    private const val TAG_SUBJECTS = 3
-    private const val TAG_TARGETS = 4
+    private const val TAG_PRIVILEGE = 0
+    private const val TAG_AUTH_MODE = 1
+    private const val TAG_SUBJECTS = 2
+    private const val TAG_TARGETS = 3
 
     fun fromTlv(
       tlvTag: Tag,

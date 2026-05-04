@@ -43,7 +43,6 @@ set(SRC_DIRS_LIST
     # all-devices-common device modules
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime"
-    "${ALL_DEVICES_COMMON_DIR}/devices/chime/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"
@@ -55,6 +54,8 @@ set(SRC_DIRS_LIST
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl"
 )
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}

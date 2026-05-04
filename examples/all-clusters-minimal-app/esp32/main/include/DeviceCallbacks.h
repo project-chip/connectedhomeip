@@ -28,6 +28,7 @@
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/CommonDeviceCallbacks.h>
+#include <lib/support/CodeUtils.h>
 
 class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
@@ -51,5 +52,5 @@ class AppDeviceCallbacksDelegate : public DeviceCallbacksDelegate
 public:
     void OnIPv4ConnectivityEstablished(void) override;
     void OnIPv4ConnectivityLost(void) override;
-    void OnDnssdInitialized(void) override { InitBindingHandlers(); }
+    void OnDnssdInitialized(void) override { LogErrorOnFailure(InitBindingHandlers()); }
 };

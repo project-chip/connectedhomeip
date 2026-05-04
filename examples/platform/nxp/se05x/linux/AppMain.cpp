@@ -751,10 +751,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
 
-            args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
             args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
-            TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
-            LinuxDeviceOptions::GetInstance().mPublishId = args.publish_id;
+            DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(args);
         }
     }
 #endif

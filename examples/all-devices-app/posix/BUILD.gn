@@ -18,6 +18,7 @@ import("${chip_root}/src/platform/device.gni")
 
 executable("all-devices-app") {
   sources = [
+    "PosixChimeDevice.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -31,6 +32,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",
@@ -40,6 +42,7 @@ executable("all-devices-app") {
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
 
