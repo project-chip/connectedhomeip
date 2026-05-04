@@ -188,7 +188,7 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
             mode, percentCurrent, speedCurrent);
     }
 
-    auto & onOff = OnOffCluster();
+    auto & onOff        = OnOffCluster();
     const bool setForOn = IsFanSetForOn(newState);
 
     ApplyOnOffToFan(FanControlCluster(), setForOn);
