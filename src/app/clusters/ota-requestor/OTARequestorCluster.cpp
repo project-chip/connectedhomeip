@@ -157,7 +157,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
                             Protocols::InteractionModel::Status::ConstraintError,
                             ChipLogError(Zcl, "Metadata size %u exceeds max %u",
                                          static_cast<unsigned>(metadataForNode.Value().size()),
-                                         static_cast<unsigned>(kMaxMetadataLen)););
+                                         static_cast<unsigned>(kMaxMetadataLen)));
         VerifyOrReturnError(data.announcementReason != OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUnknownEnumValue,
                             Protocols::InteractionModel::Status::ConstraintError,
                             ChipLogError(Zcl, "Received unknown announcement reason"));
