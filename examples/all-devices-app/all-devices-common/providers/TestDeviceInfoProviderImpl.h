@@ -41,12 +41,19 @@ protected:
     class FixedLabelIteratorImpl : public FixedLabelIterator
     {
     public:
-        FixedLabelIteratorImpl(EndpointId endpoint);
+        static FixedLabelIteratorImpl * Create(EndpointId endpoint)
+        {
+            return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
+        }
         size_t Count() override;
         bool Next(FixedLabelType & output) override;
         void Release() override { chip::Platform::Delete(this); }
 
     private:
+        template <typename U, typename... UArgs>
+        friend U * chip::Platform::New(UArgs &&... args);
+
+        FixedLabelIteratorImpl(EndpointId endpoint);
         static constexpr size_t kNumSupportedFixedLabels = 1;
         EndpointId mEndpoint                             = 0;
         size_t mIndex                                    = 0;
@@ -55,12 +62,19 @@ protected:
     class UserLabelIteratorImpl : public UserLabelIterator
     {
     public:
-        UserLabelIteratorImpl(TestDeviceInfoProviderImpl & provider, EndpointId endpoint);
+        static UserLabelIteratorImpl * Create(TestDeviceInfoProviderImpl & provider, EndpointId endpoint)
+        {
+            return chip::Platform::New<UserLabelIteratorImpl>(provider, endpoint);
+        }
         size_t Count() override { return mTotal; }
         bool Next(UserLabelType & output) override;
         void Release() override { chip::Platform::Delete(this); }
 
     private:
+        template <typename U, typename... UArgs>
+        friend U * chip::Platform::New(UArgs &&... args);
+
+        UserLabelIteratorImpl(TestDeviceInfoProviderImpl & provider, EndpointId endpoint);
         TestDeviceInfoProviderImpl & mProvider;
         EndpointId mEndpoint = 0;
         size_t mIndex        = 0;
@@ -72,12 +86,19 @@ protected:
     class SupportedLocalesIteratorImpl : public SupportedLocalesIterator
     {
     public:
-        SupportedLocalesIteratorImpl() = default;
+        static SupportedLocalesIteratorImpl * Create()
+        {
+            return chip::Platform::New<SupportedLocalesIteratorImpl>();
+        }
         size_t Count() override;
         bool Next(CharSpan & output) override;
         void Release() override { chip::Platform::Delete(this); }
 
     private:
+        template <typename U, typename... UArgs>
+        friend U * chip::Platform::New(UArgs &&... args);
+
+        SupportedLocalesIteratorImpl() = default;
         static constexpr size_t kNumSupportedLocales = 1;
         size_t mIndex                                = 0;
     };
@@ -85,12 +106,19 @@ protected:
     class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
     {
     public:
-        SupportedCalendarTypesIteratorImpl() = default;
+        static SupportedCalendarTypesIteratorImpl * Create()
+        {
+            return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
+        }
         size_t Count() override;
         bool Next(CalendarType & output) override;
         void Release() override { chip::Platform::Delete(this); }
 
     private:
+        template <typename U, typename... UArgs>
+        friend U * chip::Platform::New(UArgs &&... args);
+
+        SupportedCalendarTypesIteratorImpl() = default;
         static constexpr size_t kNumSupportedCalendarTypes = 1;
         size_t mIndex                                      = 0;
     };

@@ -41,7 +41,7 @@ constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
 
 DeviceInfoProvider::FixedLabelIterator * TestDeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
-    return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
+    return FixedLabelIteratorImpl::Create(endpoint);
 }
 
 TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
@@ -111,7 +111,7 @@ CHIP_ERROR TestDeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, si
 
 DeviceInfoProvider::UserLabelIterator * TestDeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
 {
-    return chip::Platform::New<UserLabelIteratorImpl>(*this, endpoint);
+    return UserLabelIteratorImpl::Create(*this, endpoint);
 }
 
 TestDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(TestDeviceInfoProviderImpl & provider, EndpointId endpoint) :
@@ -168,7 +168,7 @@ bool TestDeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & out
 
 DeviceInfoProvider::SupportedLocalesIterator * TestDeviceInfoProviderImpl::IterateSupportedLocales()
 {
-    return chip::Platform::New<SupportedLocalesIteratorImpl>();
+    return SupportedLocalesIteratorImpl::Create();
 }
 
 size_t TestDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
@@ -189,7 +189,7 @@ bool TestDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & o
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * TestDeviceInfoProviderImpl::IterateSupportedCalendarTypes()
 {
-    return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
+    return SupportedCalendarTypesIteratorImpl::Create();
 }
 
 size_t TestDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
