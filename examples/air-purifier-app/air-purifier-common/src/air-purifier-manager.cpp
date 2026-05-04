@@ -191,8 +191,8 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
     }
     bool on = static_cast<bool>(*value);
 
-    uint8_t newSpeed   = 0;
-    uint8_t newPercent = 0;
+    uint8_t new_speed   = 0;
+    uint8_t new_percent = 0;
 
     if (on)
     {
@@ -215,8 +215,8 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         if (percent.IsNull() && speed.IsNull())
         {
             // Operating in auto mode, set to 100
-            newPercent = 100;
-            newSpeed   = speedMax;
+            new_percent = 100;
+            new_speed   = speedMax;
         }
         else if (percent.IsNull())
         {
@@ -224,8 +224,8 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
             ChipLogError(NotSpecified,
                          "AirPurifierManager::HandleOnOff: PercentSetting is null when SpeedSetting is not. Setting PercentCurrent "
                          "from Speed");
-            newSpeed   = speed.Value();
-            newPercent = static_cast<uint8_t>(static_cast<uint16_t>(newSpeed) * 100u / speedMax);
+            new_speed   = speed.Value();
+            new_percent = static_cast<uint8_t>(new_speed * 100u / speedMax);
         }
         else if (speed.IsNull())
         {
@@ -233,19 +233,19 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
             ChipLogError(NotSpecified,
                          "AirPurifierManager::HandleOnOff: SpeedSetting is null when PercentSetting is not. Setting SpeedCurrent "
                          "from Percent");
-            newPercent = percent.Value();
-            newSpeed   = static_cast<uint8_t>(static_cast<uint16_t>(newPercent) * speedMax / 100u);
+            new_percent = percent.Value();
+            new_speed   = static_cast<uint8_t>(new_percent * speedMax / 100u);
         }
         else
         {
-            newPercent = percent.Value();
-            newSpeed   = speed.Value();
+            new_percent = percent.Value();
+            new_speed   = speed.Value();
         }
     }
     else
     {
-        newPercent = 0;
-        newSpeed   = 0;
+        new_percent = 0;
+        new_speed   = 0;
     }
 
     FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpointId);
@@ -255,13 +255,13 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
     }
     else
     {
-        if (!cluster->SetPercentCurrent(static_cast<chip::Percent>(newPercent)))
+        if (!cluster->SetPercentCurrent(static_cast<chip::Percent>(new_percent)))
         {
             ChipLogError(NotSpecified, "AirPurifierManager::HandleOnOff: SetPercentCurrent failed");
         }
         if (cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
         {
-            if (!cluster->SetSpeedCurrent(newSpeed))
+            if (!cluster->SetSpeedCurrent(new_speed))
             {
                 ChipLogError(NotSpecified, "AirPurifierManager::HandleOnOff: SetSpeedCurrent failed");
             }
