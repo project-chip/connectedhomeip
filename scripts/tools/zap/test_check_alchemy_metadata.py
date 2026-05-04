@@ -273,6 +273,9 @@ class TestValidateFile(unittest.TestCase):
         )
         p = self._write_xml(content)
         errors = cam.validate_file(p)
+        # TODO This line is intended to fail just to confirm that the tests are
+        # runnin in the CI, it will be removed after confirmation.
+        self.assertTrue(False)
         self.assertTrue(any("dirty" in e for e in errors),
                         f"Expected dirty-suffix error, got: {errors}")
 
