@@ -38,6 +38,7 @@
 #include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -246,9 +247,8 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     // Invoke the command.
     auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
     ASSERT_FALSE(result.IsSuccess());
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status, // NOLINT(bugprone-unchecked-optional-access)
-              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status, DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
 }
 
 TEST_F(TestOTARequestorCluster, ReadAttributesTest)
@@ -489,10 +489,10 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
     ASSERT_TRUE(generatedEvent.has_value());
-    EXPECT_EQ(generatedEvent->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     DownloadError::DecodableType decodedEvent;
-    ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 0x12345678u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 0x123456789ABCDEF0u);
     EXPECT_TRUE(decodedEvent.progressPercent.IsNull());
@@ -504,9 +504,9 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
     ASSERT_TRUE(generatedEvent.has_value());
-    EXPECT_EQ(generatedEvent->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
-    ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 0x12345678u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 0x123456789ABCDEF0u);
     ASSERT_FALSE(decodedEvent.progressPercent.IsNull());
