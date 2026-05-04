@@ -67,7 +67,7 @@ from support_modules.icd_support import ICDBaseTest, ICDTransition
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError
-from matter.testing.commissioning import get_setup_payload_info_config
+from matter.testing.commissioning import CommissioningInfo, commission_device, get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -95,13 +95,20 @@ class TC_ICDB_2_3(ICDBaseTest):
         # TH1 commissions DUT
         setup_payload_infos = get_setup_payload_info_config(self.matter_test_config)
         setup_payload_info = setup_payload_infos[0]
-        self.th1_dut_node_id = self.dut_node_id
-        await self.th1.CommissionOnNetwork(
-            nodeId=self.th1_dut_node_id,
-            setupPinCode=setup_payload_info.passcode,
-            filterType=setup_payload_info.filter_type,
-            filter=setup_payload_info.filter_value
+        commissioning_info = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method or "on-network",
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            thread_ba_host=self.matter_test_config.thread_ba_host,
+            thread_ba_port=self.matter_test_config.thread_ba_port,
         )
+        self.th1_dut_node_id = self.dut_node_id
+        status = await commission_device(self.th1, self.th1_dut_node_id, setup_payload_info, commissioning_info)
+        asserts.assert_true(status, f"Failed to commission DUT to TH1's fabric: {status}")
 
         # TH2 setup with ICD registration on its own fabric
         th2_ca = self.certificate_authority_manager.NewCertificateAuthority()
