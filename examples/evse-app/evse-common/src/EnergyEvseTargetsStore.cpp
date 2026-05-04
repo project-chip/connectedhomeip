@@ -272,6 +272,12 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
             newChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
 
         ChipLogProgress(AppServer, "SetTargets: DayOfWeekForSequence = 0x%02x", newBitmask);
+        if (newBitmask == 0)
+        {
+            // No days in the bitmask - nothing to do for this entry
+            ChipLogProgress(AppServer, "SetTargets: DayOfWeekForSequence is 0, skipping this entry");
+            continue;
+        }
 
         PrintTargets(mChargingTargetSchedulesList);
 
