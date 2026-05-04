@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,16 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-app_config_dependent_sources = [
-  "PresetStructWithOwnedMembers.cpp",
-  "PresetStructWithOwnedMembers.h",
-  "thermostat-delegate.h",
-  "thermostat-server-atomic.cpp",
-  "thermostat-server-events.cpp",
-  "thermostat-server-events.h",
-  "thermostat-server-presets.cpp",
-  "thermostat-server-presets.h",
-  "thermostat-server-suggestions.cpp",
-  "thermostat-server.cpp",
-  "thermostat-server.h",
-]
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tests.gni")
+
+config("device-type-parser-includes") {
+  include_dirs = [ "../.." ]
+}
+
+source_set("device-type-parser") {
+  sources = [
+    "DeviceTypeParser.cpp",
+    "DeviceTypeParser.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/lib" ]
+
+  public_configs = [
+    "${chip_root}/src:includes",
+    ":device-type-parser-includes",
+  ]
+}
