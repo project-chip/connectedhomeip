@@ -23,7 +23,8 @@
 #include "CRTPHelpers.h"
 
 /**
- * @brief CRTP base for AppTask, exposing override hooks for customizable APIs.
+ * @brief CRTP layer over `AppTask` that exposes `*Impl()` override hooks for
+ *        customizable APIs.
  *
  * Each public method dispatches to `Derived::*Impl()`. Overrides are optional: default
  * `*Impl()` implementations in the private section forward to `AppTask`. Override in
@@ -35,11 +36,13 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    // External triggers — entry points that pass context into AppTask (e.g. PostEvent). Optional override: *Impl().
+    // Initialization hooks.
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
     CHIP_ERROR InitLight() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLightImpl); }
 
+    // External callbacks invoked outside the AppTask thread (e.g. button ISR, OnOff cluster).
+    // Implementations typically post an event to the AppTask queue.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
@@ -50,7 +53,7 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffectImpl, effect);
     }
 
-    // AppTask-thread event handlers (queued events, timers, data model). Optional override: *Impl().
+    // Handlers invoked from AppTask, timer, or stack threads — see each method for the exact context.
     static void LightActionEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightActionEventHandlerImpl, aEvent);
@@ -79,16 +82,17 @@ private:
 
     /** Default implementations — override in Derived to customize. */
 
-    // External triggers (*Impl)
+    // Initialization hooks (*Impl)
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 
     CHIP_ERROR InitLightImpl() { return AppTask::InitLight(); }
 
+    // External callbacks (*Impl)
     void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction) { AppTask::ButtonEventHandler(button, btnAction); }
 
     void OnTriggerOffWithEffectImpl(OnOffEffect * effect) { AppTask::OnTriggerOffWithEffect(effect); }
 
-    // AppTask-thread event handlers (*Impl)
+    // Event / timer / data-model handlers (*Impl)
     void LightActionEventHandlerImpl(AppEvent * aEvent) { AppTask::LightActionEventHandler(aEvent); }
 
     void LightTimerEventHandlerImpl(void * timerCbArg) { AppTask::LightTimerEventHandler(timerCbArg); }

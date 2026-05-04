@@ -80,27 +80,26 @@ folders, then update the corresponding paths in `BUILD.gn`.
 ### How to Override APIs
 
 `CustomerAppTask` extends the base AppTask through the Curiously Recurring
-Template Pattern (CRTP). You override only the `*Impl()` methods you need, the
+Template Pattern (CRTP). You override only the `*Impl()` methods you need; the
 base declares one `*Impl()` per overridable API. Steps:
 
 1. Find the method to override in the base API (see
    [Override API reference](#override-api-reference) below).
 2. Declare the same method signature in `CustomerAppTask` in your
-   `CustomerAppTask.h` under `private:`
+   `CustomerAppTask.h` under `private:`. Match the base `*Impl()` signature
+   exactly — note that `*Impl()` overrides are **non-static instance methods**
+   even when the public dispatcher (e.g. `ButtonEventHandler`) is `static`.
 3. Implement the method in `CustomerAppTask.cpp`.
-4. Build the project. Each overridable API is resolved as follows: **if you
-   implemented that `*Impl()` in CustomerAppTask, your implementation is used,
-   otherwise the Silicon Labs default implementation is used.** You only
-   implement what you need, everything else falls back to the default
-   automatically.
+4. Build. The CRTP layer automatically routes each call to your `*Impl()` if
+   present, otherwise to the Silicon Labs default.
 
 ### DataModelCallbacks and CustomerAppTask
 
-What used to live in `DataModelCallbacks.cpp` is now under the `AppTask.cpp`
-
-`MatterPostAttributeChangeCallback` is implemented in
-`examples/platform/silabs/BaseApplication.cpp`. The function logic is defined
-under `DMPostAttributeChangeCallback` under `AppTask.cpp`
+What used to live in `DataModelCallbacks.cpp` now lives in `AppTask.cpp`. The
+Matter SDK's `MatterPostAttributeChangeCallback` is implemented in
+`examples/platform/silabs/BaseApplication.cpp` and forwards to
+`AppTask::DMPostAttributeChangeCallback` (defined in `AppTask.cpp`), which you
+can customize via `DMPostAttributeChangeCallbackImpl()` in `CustomerAppTask`.
 
 Forwarding into `AppTask` still goes through CRTP as in
 [How to Override APIs](#how-to-override-apis).
@@ -175,7 +174,6 @@ CHIP_ERROR CustomerAppTask::AppInitImpl()
     return err;
 }
 
-// override code goes here
 void CustomerAppTask::ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction)
 {
     SILABS_LOG("CustomerAppTask: custom implementation (ButtonEventHandlerImpl)");
