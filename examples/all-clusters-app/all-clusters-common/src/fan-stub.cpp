@@ -157,7 +157,9 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    // NOLINTNEXTLINE(bugprone-signed-bitwise): VerifyOrDie expands nlassert code that mixes signed flags with '&'.
     VerifyOrDie(aPath.mClusterId == FanControl::Id);
+    // NOLINTNEXTLINE(bugprone-signed-bitwise): VerifyOrDie expands nlassert code that mixes signed flags with '&'.
     VerifyOrDie(aPath.mEndpointId == mEndpoint);
 
     switch (aPath.mAttributeId)
@@ -176,6 +178,7 @@ CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, Attr
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
+    // NOLINTNEXTLINE(bugprone-signed-bitwise): VerifyOrDie expands nlassert code that mixes signed flags with '&'.
     VerifyOrDie(mFanControlManager == nullptr);
     mFanControlManager = new FanControlManager(endpoint);
     AttributeAccessInterfaceRegistry::Instance().Register(mFanControlManager);
