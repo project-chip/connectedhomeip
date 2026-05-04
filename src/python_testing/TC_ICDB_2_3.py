@@ -148,7 +148,7 @@ class TC_ICDB_2_3(ICDBaseTest):
             TestStep(3, "TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ICDCounter attributes.",
                      "Store values for later use."),
             TestStep(4, "Wait for a full active-to-idle-to-active ICD transition cycle. TH1 reads the ICDCounter attribute.",
-                     "Verify ICDCounter is greater than the initial value."),
+                     "Verify ICDCounter is greater than the value from step 3."),
             TestStep(5, "TH2 sends UnregisterClient command with TH2's checkInNodeID.",
                      "Command success."),
             TestStep(6, "Wait for a full active-to-idle-to-active ICD transition cycle. TH1 reads the ICDCounter attribute.",
@@ -156,7 +156,7 @@ class TC_ICDB_2_3(ICDBaseTest):
             TestStep(7, "TH1 sends UnregisterClient command with TH1's checkInNodeID.",
                      "Command success."),
             TestStep(8, "Wait for a full active-to-idle-to-active ICD transition cycle. TH1 reads the ICDCounter attribute.",
-                     "Verify ICDCounter is unchanged from the value after TH2 unregister."),
+                     "Verify ICDCounter is unchanged from the value after TH2 unregister (step 6)."),
         ]
 
     def pics_TC_ICDB_2_3(self) -> list[str]:
@@ -172,7 +172,7 @@ class TC_ICDB_2_3(ICDBaseTest):
         # Commissioning DUT to TH1 and TH2 with ICD client registration.
         self.step("precondition")
 
-        # *** STEP 1a ***
+        # *** STEP 1 ***
         # TH1 reads from the DUT the RegisteredClients attribute.
         self.step(1)
         th1_registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
@@ -228,12 +228,12 @@ class TC_ICDB_2_3(ICDBaseTest):
                                        idle_mode_duration_s=idle_mode_duration_s)
         current_icd_counter_after_full_cycle = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
 
-        # Verify ICDCounter is greater than the initial value.
+        # Verify ICDCounter is greater than the value from step 3.
         asserts.assert_greater(current_icd_counter_after_full_cycle, icd_counter_initial,
                                f"Current ICDCounter ({current_icd_counter_after_full_cycle}) must be greater than the initial value ({icd_counter_initial}).")
 
         # *** STEP 5 ***
-        # TH2 sends UnregisterClient command with the TH2's checkInNodeID.
+        # TH2 sends UnregisterClient command with TH2's checkInNodeID.
         self.step(5)
         try:
             await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=th2_check_in_node_id), controller=self.th2, node_id=self.th2_dut_node_id)
@@ -268,7 +268,7 @@ class TC_ICDB_2_3(ICDBaseTest):
                                        idle_mode_duration_s=idle_mode_duration_s)
         current_icd_counter_after_th1_unregister = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
 
-        # Verify ICDCounter is unchanged from the value after TH2 unregister.
+        # Verify ICDCounter is unchanged from the value after TH2 unregister (step 6).
         asserts.assert_equal(current_icd_counter_after_th1_unregister, current_icd_counter_after_th2_unregister,
                              f"Current ICDCounter ({current_icd_counter_after_th1_unregister}) must be unchanged from the value after TH2 unregister ({current_icd_counter_after_th2_unregister}).")
 
