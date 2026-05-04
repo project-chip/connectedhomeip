@@ -4,8 +4,8 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AccessControl/Events.h>
 #include <clusters/Groupcast/AttributeIds.h>
-#include <clusters/Groupcast/Events.h>
 #include <clusters/Groupcast/Attributes.h>
+#include <clusters/Groupcast/Events.h>
 #include <clusters/Groupcast/Metadata.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
