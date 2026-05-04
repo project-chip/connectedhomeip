@@ -47,6 +47,7 @@ public:
     typedef void (*SilabsButtonCb)(uint8_t, uint8_t);
     virtual void SetButtonsCb(SilabsButtonCb callback) {}
     virtual uint8_t GetButtonState(uint8_t button) { return 0; }
+    virtual void SleepButtonActionHandler(void){};
 
     // LEDS
     virtual void InitLed(void) {}
