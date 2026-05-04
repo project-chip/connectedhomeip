@@ -19,8 +19,8 @@
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
 #include <DeviceFactoryPlatformOverride.h>
-#include <DeviceInfoProviderImpl.h>
-#include <OverrideDeviceInstanceInfoProvider.h>
+#include "../all-devices-common/DeviceInfoProviderImpl.h"
+#include "../all-devices-common/OverrideDeviceInstanceInfoProvider.h"
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
