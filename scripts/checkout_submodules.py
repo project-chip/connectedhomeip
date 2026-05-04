@@ -146,6 +146,17 @@ def deinit_modules(modules: list, force: bool) -> None:
 
     subprocess.check_call(cmd)
 
+def parse_platform_list(values):
+    result = []
+    for v in values:
+        # split on comma, strip whitespace, ignore empty entries
+        result.extend([item.strip() for item in v.split(',') if item.strip()])
+    return result
+
+def validate_platforms(raw_platforms):
+    invalid = [p for p in raw_platforms if p not in ALL_PLATFORMS]
+    if invalid:
+        raise SystemExit(f"Invalid platform(s): {invalid}\nValid choices: {sorted(ALL_PLATFORMS)}")
 
 def main():
     logging.basicConfig(format='%(message)s', level=logging.INFO)
@@ -156,8 +167,8 @@ def main():
                         help='Allow global git options to be modified if necessary, e.g. safe.directory')
     parser.add_argument('--shallow', action='store_true',
                         help='Fetch submodules without history')
-    parser.add_argument('--platform', nargs='+', choices=ALL_PLATFORMS, default=[],
-                        help='Process submodules for specific platforms only')
+    parser.add_argument('--platform', nargs='+', type=str, default=[],
+                        help='Process submodules for specific platforms only (space- or comma-separated)')
     parser.add_argument('--force', action='store_true',
                         help='Perform action despite of warnings')
     parser.add_argument('--deinit-unmatched', action='store_true',
@@ -169,7 +180,9 @@ def main():
     args = parser.parse_args()
 
     modules = list(load_module_info())
-    selected_platforms = set(args.platform)
+    raw_platforms = parse_platform_list(args.platform)
+    validate_platforms(raw_platforms)
+    selected_platforms = set(raw_platforms)
     selected_modules = [
         m for m in modules if module_matches_platforms(m, selected_platforms)]
     unmatched_modules = [m for m in modules if not module_matches_platforms(
