@@ -35,7 +35,8 @@
 set -euo pipefail
 
 CHIP_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-PW_CLANG="$CHIP_ROOT/.environment/cipd/packages/pigweed/bin"
+PW_CLANG="$(command -v clang || true)"
+PW_CLANGXX="$(command -v clang++ || true)"
 DEFAULT_SYSROOT="$HOME/.cache/matter/msan_sysroot"
 IGNORELIST="$CHIP_ROOT/build/config/compiler/msan_ignorelist.txt"
 SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
@@ -112,8 +113,18 @@ SYSROOT="${OUT_DIR:-${SYSROOT_MSAN:-$DEFAULT_SYSROOT}}"
 STAMP="$SYSROOT/.build_complete"
 LOCKFILE="$SYSROOT/.build.lock"
 
-if [[ ! -x "$PW_CLANG/clang" ]]; then
-    echo "ERROR: Pigweed clang not found at $PW_CLANG/clang" >&2
+if [[ ! -x "$PW_CLANG" ]] || [[ ! -x "$PW_CLANGXX" ]]; then
+    echo "ERROR: Pigweed clang/clang++ not found on PATH" >&2
+    echo "  clang:   ${PW_CLANG:-<none>}" >&2
+    echo "  clang++: ${PW_CLANGXX:-<none>}" >&2
+    echo "Run: source scripts/activate.sh" >&2
+    exit 1
+fi
+
+LLVM_COMMIT="$("$PW_CLANG" --version | grep -oP '[0-9a-f]{40}' || true)"
+if [[ -z "$LLVM_COMMIT" ]]; then
+    echo "ERROR: clang on PATH is not Pigweed's (no LLVM commit in --version)" >&2
+    echo "  clang: $PW_CLANG" >&2
     echo "Run: source scripts/activate.sh" >&2
     exit 1
 fi
@@ -132,7 +143,7 @@ compute_input_hash() {
     {
         sha256sum <"$SCRIPT_PATH" | cut -d' ' -f1
         sha256sum <"$IGNORELIST" | cut -d' ' -f1
-        "$PW_CLANG/clang" --version
+        "$PW_CLANG" --version
     } | sha256sum | cut -d' ' -f1
 }
 
@@ -184,8 +195,6 @@ on_error() {
 }
 trap on_error ERR
 
-LLVM_COMMIT=$("$PW_CLANG/clang" --version | grep -oP '[0-9a-f]{40}')
-
 echo ">>> Building MSAN sysroot at $SYSROOT (this takes 5-15 min)"
 
 # libc++ / libc++abi (MSan-instrumented)
@@ -197,7 +206,7 @@ cd "$SRC/llvm-project"
 git fetch --depth 1 origin "$LLVM_COMMIT"
 git checkout FETCH_HEAD
 cmake -GNinja -S "$SRC/llvm-project/runtimes" -B "$SRC/libcxx" \
-    -DCMAKE_C_COMPILER="$PW_CLANG/clang" -DCMAKE_CXX_COMPILER="$PW_CLANG/clang++" \
+    -DCMAKE_C_COMPILER="$PW_CLANG" -DCMAKE_CXX_COMPILER="$PW_CLANGXX" \
     -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_USE_SANITIZER=MemoryWithOrigins -DCMAKE_INSTALL_PREFIX="$SYSROOT" \
     -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=OFF
@@ -209,7 +218,7 @@ echo ">>> OpenSSL"
 cd "$SRC"
 [[ -d "openssl-$OPENSSL_VERSION" ]] || { wget -q "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && tar xzf "openssl-$OPENSSL_VERSION.tar.gz"; }
 cd "openssl-$OPENSSL_VERSION"
-CC="$PW_CLANG/clang $MSAN" ./Configure linux-x86_64 --prefix="$SYSROOT" --openssldir="$SYSROOT/ssl" no-asm no-shared -DPURIFY
+CC="$PW_CLANG $MSAN" ./Configure linux-x86_64 --prefix="$SYSROOT" --openssldir="$SYSROOT/ssl" no-asm no-shared -DPURIFY
 make -j"$(nproc)" build_libs
 make install_dev
 
@@ -218,7 +227,7 @@ echo ">>> zlib"
 cd "$SRC"
 [[ -d "zlib-$ZLIB_VERSION" ]] || { wget -q "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.gz" && tar xzf "zlib-$ZLIB_VERSION.tar.gz"; }
 cd "zlib-$ZLIB_VERSION"
-CC="$PW_CLANG/clang" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" ./configure --prefix="$SYSROOT" --static
+CC="$PW_CLANG" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" ./configure --prefix="$SYSROOT" --static
 make -j"$(nproc)" && make install
 
 # libffi
@@ -226,7 +235,7 @@ echo ">>> libffi"
 cd "$SRC"
 [[ -d "libffi-$LIBFFI_VERSION" ]] || { wget -q "https://github.com/libffi/libffi/releases/download/v$LIBFFI_VERSION/libffi-$LIBFFI_VERSION.tar.gz" && tar xzf "libffi-$LIBFFI_VERSION.tar.gz"; }
 cd "libffi-$LIBFFI_VERSION"
-CC="$PW_CLANG/clang" CXX="$PW_CLANG/clang++" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
+CC="$PW_CLANG" CXX="$PW_CLANGXX" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
 
@@ -235,7 +244,7 @@ echo ">>> pcre2"
 cd "$SRC"
 [[ -d "pcre2-$PCRE2_VERSION" ]] || { wget -q "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$PCRE2_VERSION/pcre2-$PCRE2_VERSION.tar.gz" && tar xzf "pcre2-$PCRE2_VERSION.tar.gz"; }
 cd "pcre2-$PCRE2_VERSION"
-CC="$PW_CLANG/clang" CXX="$PW_CLANG/clang++" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
+CC="$PW_CLANG" CXX="$PW_CLANGXX" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
 
@@ -246,8 +255,8 @@ cd "$SRC"
 
 cat >"$SRC/msan-native.ini" <<EOF
 [binaries]
-c = '$PW_CLANG/clang'
-cpp = '$PW_CLANG/clang++'
+c = '$PW_CLANG'
+cpp = '$PW_CLANGXX'
 ar = 'ar'
 strip = 'strip'
 pkgconfig = 'pkg-config'
