@@ -51,8 +51,7 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo),
-    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext          = nullptr;
     mInputFormatContext     = nullptr;
@@ -97,11 +96,38 @@ PushAVClipRecorder::~PushAVClipRecorder()
     ChipLogDetail(Camera, "PushAVClipRecorder destructor called for sessionID: %" PRIu64 " Track name: %s",
                   mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
 
-    Stop();
+    // Ensure recording is properly stopped to send PushTransportEnd event
+    if (GetRecorderStatus())
+    {
+        Stop();
+    }
+
+    // Wait for the worker thread to finish if it's still running
     if (mWorkerThread.joinable())
     {
+        ChipLogProgress(Camera, "Waiting for worker thread to complete for connection %u", mConnectionID);
         mWorkerThread.join();
+        ChipLogProgress(Camera, "Worker thread completed for connection %u", mConnectionID);
     }
+
+    {
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        while (!mVideoQueue.empty())
+        {
+            AVPacket * packet = mVideoQueue.front();
+            mVideoQueue.pop();
+            av_packet_free(&packet);
+        }
+        while (!mAudioQueue.empty())
+        {
+            AVPacket * packet = mAudioQueue.front();
+            mAudioQueue.pop();
+            av_packet_free(&packet);
+        }
+    }
+
+    // Clean up FFmpeg resources
+    CleanupOutput();
 
     std::filesystem::path mpdPath = mUploadFileBasePath / "index.mpd";
     if (IsFileReadyForUpload(mpdPath))
@@ -363,8 +389,11 @@ void PushAVClipRecorder::Start()
 
 void PushAVClipRecorder::Stop()
 {
+    mDeinitializeRecorder = true;
     if (GetRecorderStatus())
     {
+        SetRecorderStatus(false);
+
         // Call the cluster server's NotifyTransportStopped method asynchronously to prevent blocking
         if (mPushAvStreamTransportServer != nullptr)
         {
@@ -384,29 +413,13 @@ void PushAVClipRecorder::Stop()
                 ChipLogProgress(Camera, "Async thread: NotifyTransportStopped completed for connection %u", connectionID);
             }).detach();
         }
-        else
-        {
-            ChipLogError(Camera, "PushAVClipRecorder::~PushAVClipRecorder - Cluster server reference is null for connection %u",
-                         mConnectionID);
-        }
-        SetRecorderStatus(false);
-        mCondition.notify_one();
-        while (!mVideoQueue.empty())
-        {
-            av_packet_free(&mVideoQueue.front());
-            mVideoQueue.pop();
-        }
-        while (!mAudioQueue.empty())
-        {
-            av_packet_free(&mAudioQueue.front());
-            mAudioQueue.pop();
-        }
     }
     else
     {
         ChipLogError(Camera, "Error recording is not running");
     }
-    mDeinitializeRecorder = true;
+    mCondition.notify_all();
+
     ChipLogProgress(Camera, "Recording stopped for sessionID: %" PRIu64 " Track name: %s", mClipInfo.mSessionNumber,
                     mClipInfo.mTrackName.c_str());
 }
@@ -916,8 +929,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
     {
         ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %" PRIu64 " Track name: %s, Reason: %s",
                       mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(), reasonStr);
-        Stop();
-        mCurrentClipStartPts = AV_NOPTS_VALUE;
+        mDeinitializeRecorder = true;
+        mCurrentClipStartPts  = AV_NOPTS_VALUE;
     }
 
     //  Helper function for safe path formatting using std::filesystem
