@@ -54,7 +54,7 @@ function show_help() {
     echo
     echo "Options:"
     echo "  -h, --help                 Display this information"
-    echo "  --verbose                  Verbose output"
+    echo "  -v, --verbose              Verbose output"
     echo "  --cpu                      Comma separated list of CPU architectures. Like arm or arm64"
     echo "  --tizen-sdk-path           Set directory for Tizen SDK installation. Default is $TIZEN_SDK_ROOT"
     echo "  --tizen-sdk-data-path      Set directory for Tizen SDK runtime data. Default is $TIZEN_SDK_DATA_PATH"
@@ -481,7 +481,7 @@ TIZEN_STUDIO_SDK_ARM64_ZIPS=(
 )
 
 # Since Tizen 10.0 Tizen SDK uses GCC 14.2.
-if awk "BEGIN {exit !($TIZEN_VERSION >= 10.0)}"; then
+if awk -v VER="$TIZEN_VERSION" "BEGIN {exit !(VER >= 10.0)}"; then
     TIZEN_STUDIO_GCC_VERSION=14.2
     TIZEN_STUDIO_COMMON_ZIPS+=("sbi-toolchain-gcc-14.2.cpp.app_2.2.31_ubuntu-64.zip")
     TIZEN_STUDIO_SDK_ARM_ZIPS+=("cross-arm-gcc-14.2_0.2.16_ubuntu-64.zip")
@@ -579,7 +579,7 @@ TIZEN_SDK_SNAPSHOTS_UNIFIED_RPMS=()
 
 # Handle differences in Tizen SDK versions. For example, since
 # Tizen 10.0 the PCRE2 library is provided by the BASE repository.
-if awk "BEGIN {exit !($TIZEN_VERSION >= 10.0)}"; then
+if awk -v VER="$TIZEN_VERSION" "BEGIN {exit !(VER >= 10.0)}"; then
     TIZEN_SDK_BASE_RPMS+=(
         'pcre2-devel-[0-9]*'
         'libunwind-[0-9]*'
