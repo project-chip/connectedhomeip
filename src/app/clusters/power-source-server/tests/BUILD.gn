@@ -21,7 +21,12 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestPowerSourceCluster"
 
-  test_sources = [ "TestPowerSourceCluster.cpp" ]
+  test_sources = [
+    "TestFullWiredPowerSourceCluster.cpp",
+    "TestMinimalWiredPowerSourceCluster.cpp",
+    "TestFullBatteryPowerSourceCluster.cpp",
+    "TestMinimalBatteryPowerSourceCluster.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 

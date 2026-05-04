@@ -57,13 +57,13 @@ struct IsOneOf<T>
 class AttributeSet
 {
 public:
-    explicit AttributeSet(uint32_t initialValue) : mSetBits(initialValue) {}
+    constexpr explicit AttributeSet(uint32_t initialValue) : mSetBits(initialValue) {}
 
-    AttributeSet()                                       = default;
-    AttributeSet(const AttributeSet & other)             = default;
-    AttributeSet(AttributeSet && other)                  = default;
-    AttributeSet & operator=(const AttributeSet & other) = default;
-    AttributeSet & operator=(AttributeSet && other)      = default;
+    constexpr AttributeSet()                                       = default;
+    constexpr AttributeSet(const AttributeSet & other)             = default;
+    constexpr AttributeSet(AttributeSet && other)                  = default;
+    constexpr AttributeSet & operator=(const AttributeSet & other) = default;
+    constexpr AttributeSet & operator=(AttributeSet && other)      = default;
 
     // Checks if an attribute ID is set.
     //
@@ -84,6 +84,8 @@ public:
         static_assert(id < 32, "Attribute ID must be settable");
         return Set(id, true);
     }
+
+    constexpr uint32_t Raw() const { return mSetBits; }
 
 protected:
     constexpr AttributeSet & Set(AttributeId id, bool value = true)
@@ -140,7 +142,7 @@ template <AttributeId... OptionalAttributeIds>
 class OptionalAttributeSet : public AttributeSet
 {
 public:
-    explicit OptionalAttributeSet(uint32_t initialValue) : AttributeSet(initialValue & All()) {}
+    constexpr explicit OptionalAttributeSet(uint32_t initialValue) : AttributeSet(initialValue & All()) {}
     OptionalAttributeSet(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
     OptionalAttributeSet() = default;
 

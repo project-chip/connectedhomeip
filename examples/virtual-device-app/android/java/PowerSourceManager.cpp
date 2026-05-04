@@ -86,13 +86,13 @@ jboolean PowerSourceManager::SetBatPercentRemaining(jint endpoint, jint value)
     using namespace chip::DeviceLayer;
 
     CHIP_ERROR err;
-    if (PowerSourceCluster * cluster = FindClusterOnEndpoint(static_cast<chip::EndpointId>(endpoint)); cluster == nullptr)
+    if (auto * cluster = FindBatteryClusterOnEndpoint(static_cast<chip::EndpointId>(endpoint)); cluster == nullptr)
     {
         err = CHIP_ERROR_INCORRECT_STATE;
     }
     else
     {
-        err = cluster->SetBatPercentRemaining(Optional(static_cast<uint8_t>(value * 2)));
+        err = cluster->SetBatPercentRemaining(static_cast<uint8_t>(value * 2));
     }
 
     ChipLogDetail(Zcl, "Device App::PowerSource::SetBatPercentRemaining: endpoint:%d, percent:%d", endpoint, value);

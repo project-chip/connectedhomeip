@@ -70,7 +70,7 @@ public:
      *
      * @param other     Flag(s) to set. Any flags not set in @a other are unaffected.
      */
-    BitFlags & Set(const BitFlags & other)
+    constexpr BitFlags & Set(const BitFlags & other)
     {
         mValue |= other.mValue;
         return *this;

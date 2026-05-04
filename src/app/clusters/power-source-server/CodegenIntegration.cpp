@@ -19,375 +19,416 @@
 #include "CodegenIntegration.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/attribute-storage.h>
 #include <app/server/Server.h>
-#include <app/static-cluster-config/PowerSource.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <include/platform/CHIPDeviceLayer.h>
+#include <platform/DefaultTimerDelegate.h>
 
-#include <variant>
+#include <type_traits>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PowerSource;
 using namespace chip::app::Clusters::PowerSource::Attributes;
-using namespace chip::app::Clusters::PowerSource::StaticApplicationConfig;
+using namespace chip::app::Clusters::PowerSource::detail;
 
 namespace {
 
-constexpr size_t kPowerSourceFixedClusterCount = kFixedClusterConfig.size();
+DefaultTimerDelegate gTimerDelegate;
 
-// invariant: endpointId is null IFF configOrCluster is std::monostate
-struct ConfigOrCluster
-{
-    ConstexprIntegralOptional<EndpointId> endpointId;
-    std::variant<std::monostate,
-                 WiredPowerSourceCluster::Configuration,
-                 BatteryPowerSourceCluster::Configuration,
-                 RegisteredServerCluster<WiredPowerSourceCluster>,
-                 RegisteredServerCluster<BatteryPowerSourceCluster>> configOrCluster;
-};
+constexpr size_t kPowerSourceFixedClusterCount = PowerSource::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kPowerSourceMaxClusterCount   = kPowerSourceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-template <size_t index>
-constexpr auto GetClusterConfigFromIndex()
+using LazyRegisteredWiredSourceCluster = std::conditional_t<wiredSupportNeeded, LazyRegisteredServerCluster<EmberWiredPowerSourceCluster>, void>;
+using LazyRegisteredBatterySourceCluster = std::conditional_t<batterySupportNeeded, LazyRegisteredServerCluster<EmberBatteryPowerSourceCluster>, void>;
+
+using LazyRegisteredPowerSourceCluster = std::conditional_t<wiredSupportNeeded,
+                                            std::conditional_t<batterySupportNeeded,
+                                                std::variant<LazyRegisteredWiredSourceCluster, LazyRegisteredBatterySourceCluster>,
+                                                LazyRegisteredWiredSourceCluster>,
+                                            std::conditional_t<batterySupportNeeded,
+                                                LazyRegisteredBatterySourceCluster,
+                                                std::monostate>>;
+
+LazyRegisteredPowerSourceCluster gServers[kPowerSourceMaxClusterCount];
+std::array<StringAttributeStorageModule<kAllAttributes.Raw()>, CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> gStringAttributeStorage;
+
+CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpointId, AttributeId attributeId)
 {
-    if constexpr (index >= kPowerSourceFixedClusterCount)
+    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpointId, PowerSource::Id, attributeId);
+    VerifyOrDie(metadata != nullptr);
+    VerifyOrDie(!metadata->IsExternal());
+    VerifyOrDie(metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE || metadata->attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+    VerifyOrDie(metadata->defaultValue.ptrToDefaultValue != nullptr);
+
+    size_t bytesForLength = (metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE) ? 1 : 2;
+
+    size_t size = metadata->size - bytesForLength;
+    return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + bytesForLength, size);
+}
+
+template<size_t maxLength, class GetAccessor>
+CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpointId, std::string & storage)
+{
+    char buffer[maxLength];
+    MutableCharSpan span(buffer);
+    if (getter(endpointId, span) != Protocols::InteractionModel::Status::Success)
     {
-        // Dynamic endpoint, no config at compile time
-        return std::pair(ConstexprIntegralOptional<EndpointId>{}, std::monostate{});
+        // an acceptable default of empty string
+        span.reduce_size(0);
     }
-    else
+    storage = std::string(span.data(), span.size());
+    return CharSpan(storage.data(), storage.size());
+}
+
+// templated to be able to use `if constexpr` inside the functions
+template<bool wiredSupported = wiredSupportNeeded,
+         bool batterySupported = batterySupportNeeded,
+         uint32_t batteryFeatureBits = kBatteryFeatures.Raw(),
+         class EmberWiredPowerSourceClusterT = EmberWiredPowerSourceCluster,
+         class EmberBatteryPowerSourceClusterT = EmberBatteryPowerSourceCluster,
+         class LazyRegisteredWiredSourceClusterT = LazyRegisteredWiredSourceCluster,
+         class LazyRegisteredBatterySourceClusterT = LazyRegisteredBatterySourceCluster,
+         class StringStorageModuleT = StringAttributeStorageModule<kAllAttributes.Raw()>>
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+    constexpr static BitFlags<Feature> batteryFeatures{ batteryFeatureBits };
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        // Static endpoint, get config from StaticClusterConfig
-        constexpr auto endpointConfig = kFixedClusterConfig[index];
-        constexpr auto defaults = GetAttributeDefaultValuesOnEndpoint<endpointConfig.endpointNumber>();
+        PowerSourceOptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        BitFlags<Feature> features(featureMap);
+        using namespace chip::Protocols;
 
-        if constexpr(endpointConfig.featureMap.Has(Feature::kWired) ^ endpointConfig.featureMap.Has(Feature::kBattery))
+        // Enforce a valid configuration from ember
+
+        VerifyOrDieWithMsg(
+            // Exactly one of wired or battery features must be set
+            features.Has(Feature::kWired) ^ features.Has(Feature::kBattery) &&
+            // features reported by ember must be a subset of features that are enabled on any endpoint in zap tool
+            (features.Raw() & kAllFeatures.Raw()) == features.Raw(), Zcl, "CreateRegistration called with invalid feature map");
+
+        CharSpan description{};
+        if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
         {
-            // Invalid config, ignore, probably a dummy endpoint for dynamic endpoints zap code generation which will be disabled
-            return std::pair(ConstexprIntegralOptional<EndpointId>{}, std::monostate{});
-        }
-        else if constexpr (endpointConfig.featureMap.Has(Feature::kWired))
-        {
-            CharSpan description{};
-            WiredCurrentTypeEnum currentType{};
-
-            if constexpr (defaults.HasDefaultValue(Description::Id))
-            {
-                description = defaults.description;
-            }
-            static_assert(defaults.HasDefaultValue(WiredCurrentType::Id), "WiredCurrentType is required to have a default value when the Wired feature is enabled.");
-            currentType = defaults.wiredCurrentType;
-
-            WiredPowerSourceCluster::Configuration config(description, currentType);
-            if constexpr (defaults.HasDefaultValue(Status::Id))
-            {
-                config.status = defaults.status;
-            }
-            if constexpr (defaults.HasDefaultValue(Order::Id))
-            {
-                config.order = defaults.order;
-            }
-            if constexpr (defaults.HasDefaultValue(WiredNominalVoltage::Id))
-            {
-                config.nominalVoltage = defaults.wiredNominalVoltage;
-            }
-            if constexpr (defaults.HasDefaultValue(WiredMaximumCurrent::Id))
-            {
-                config.maximumCurrent = defaults.wiredMaximumCurrent;
-            }
-            if constexpr (defaults.HasDefaultValue(WiredAssessedInputVoltage::Id))
-            {
-                config.assessedInputVoltage = defaults.wiredAssessedInputVoltage;
-            }
-            if constexpr (defaults.HasDefaultValue(WiredAssessedInputFrequency::Id))
-            {
-                config.assessedInputFrequency = defaults.wiredAssessedInputFrequency;
-            }
-            if constexpr (defaults.HasDefaultValue(WiredAssessedCurrent::Id))
-            {
-                config.assessedCurrent = defaults.wiredAssessedCurrent;
-            }
-            if constexpr (defaults.HasDefaultValue(WiredPresent::Id))
-            {
-                config.isPresent = defaults.wiredIsPresent;
-            }
-            return std::pair(endpointConfig.endpointNumber, config);
+            // for fixed endpoints
+            description = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, Description::Id);
         }
         else
         {
-            CharSpan description{};
-            BatReplaceabilityEnum replaceability = BatReplaceabilityEnum::kUnspecified;
-
-            if constexpr (defaults.HasDefaultValue(Description::Id))
-            {
-                description = defaults.description;
-            }
-            if constexpr (defaults.HasDefaultValue(BatReplaceability::Id))
-            {
-                replaceability = defaults.batReplaceability;
-            }
-
-            BatteryPowerSourceCluster::Configuration config(description, replaceability);
-            if constexpr (defaults.HasDefaultValue(Status::Id))
-            {
-                config.status = defaults.status;
-            }
-            if constexpr (defaults.HasDefaultValue(Order::Id))
-            {
-                config.order = defaults.order;
-            }
-
-            if constexpr (defaults.HasDefaultValue(BatVoltage::Id))
-            {
-                config.voltage = defaults.batVoltage;
-            }
-            if constexpr (defaults.HasDefaultValue(BatPercentRemaining::Id))
-            {
-                config.percentRemaining = defaults.batPercentRemaining;
-            }
-            if constexpr (defaults.HasDefaultValue(BatTimeRemaining::Id))
-            {
-                config.timeRemaining = defaults.batTimeRemaining;
-            }
-            if constexpr (defaults.HasDefaultValue(BatChargeLevel::Id))
-            {
-                config.chargeLevel = defaults.batChargeLevel;
-            }
-            if constexpr (defaults.HasDefaultValue(BatReplacementNeeded::Id))
-            {
-                config.replacementNeeded = defaults.batReplacementNeeded;
-            }
-            if constexpr (defaults.HasDefaultValue(BatPresent::Id))
-            {
-                config.isPresent = defaults.batPresent;
-            }
-
-            if constexpr (endpointConfig.featureMap.Has(Feature::kReplaceable))
-            {
-                CharSpan replacementDescription{};
-                if constexpr (defaults.HasDefaultValue(BatReplacementDescription::Id))
-                {
-                    replacementDescription = defaults.batReplacementDescription;
-                }
-                uint8_t quantity = 0;
-                if constexpr (defaults.HasDefaultValue(BatQuantity::Id))
-                {
-                    quantity = defaults.batQuantity;
-                }
-
-                config.MakeReplaceable(replacementDescription, quantity);
-
-                if constexpr (defaults.HasDefaultValue(BatCommonDesignation::Id))
-                {
-                    config.commonDesignation = defaults.batCommonDesignation;
-                }
-                if constexpr (defaults.HasDefaultValue(BatANSIDesignation::Id))
-                {
-                    config.ansiDesignation = defaults.batANSIDesignation;
-                }
-                if constexpr (defaults.HasDefaultValue(BatIECDesignation::Id))
-                {
-                    config.iecDesignation = defaults.batIECDesignation;
-                }
-                if constexpr (defaults.HasDefaultValue(BatApprovedChemistry::Id))
-                {
-                    config.approvedChemistry = defaults.batApprovedChemistry;
-                }
-            }
-
-            if constexpr (endpointConfig.featureMap.Has(Feature::kRechargeable))
-            {
-                config.MakeRechargeable();
-
-                if constexpr (defaults.HasDefaultValue(BatChargeState::Id))
-                {
-                    config.chargeState = defaults.batChargeState;
-                }
-                if constexpr (defaults.HasDefaultValue(BatTimeToFullCharge::Id))
-                {
-                    config.timeToFullCharge = defaults.batTimeToFullCharge;
-                }
-                if constexpr (defaults.HasDefaultValue(BatFunctionalWhileCharging::Id))
-                {
-                    config.functionalWhileCharging = defaults.batFunctionalWhileCharging;
-                }
-                if constexpr (defaults.HasDefaultValue(BatChargingCurrent::Id))
-                {
-                    config.chargingCurrent = defaults.batChargingCurrent;
-                }
-            }
-
-            if constexpr (endpointConfig.featureMap.HasAny(Feature::kReplaceable, Feature::kRechargeable))
-            {
-                if constexpr (defaults.HasDefaultValue(BatCapacity::Id))
-                {
-                    config.capacity = defaults.batCapacity;
-                }
-            }
-            return std::pair(endpointConfig.endpointNumber, config);
+            // for dynamic endpoints
+            description = GetCharStringDefaultValueFromEmber<Description::TypeInfo::MaxLength()>(Description::Get, endpointId,
+                // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
+                static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).description);
         }
+
+#define SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                                                              \
+    if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))\
+    {\
+        if (attr_type val{}; attr_name::Get(endpointId, &val) == InteractionModel::Status::Success)                                         \
+        {                                                                                                                              \
+            config.config_field_name = val;                                                                 \
+        }\
     }
-}
 
-// Force compile time evaluation of GetClusterConfigFromIndex
-// This will make all the generated objects in the StaticClusterConfig to be used only at compile time, and thus can be optimized away.
-template <size_t I>
-constexpr auto kConfigForIndex = GetClusterConfigFromIndex<I>();
+#define SetNullableAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                                                      \
+    if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))\
+    {\
+        if (DataModel::Nullable<attr_type> val{}; attr_name::Get(endpointId, val) == InteractionModel::Status::Success)                     \
+        {                                                                                                                              \
+            if (!val.IsNull())                                                                                                               \
+            {                                                                                                                          \
+                config.config_field_name = val.Value();                          \
+            }    \
+        }                                                                                                                      \
+    }
 
-// Helper
-template <std::size_t... Is>
-auto GetClusterConfigArrayImpl(std::index_sequence<Is...>) {
-    // If it is for a static endpoint, create the config using information from StaticClusterConfig.
-    // For a dynamic endpoint, create empty std::monostate variant which can be replaced with a config later
-    return std::array{ ConfigOrCluster{kConfigForIndex<Is>.first, kConfigForIndex<Is>.second} ... };
-}
-
-template <std::size_t N>
-std::array<ConfigOrCluster, N> GetClusterConfigArray() {
-    return GetClusterConfigArrayImpl(std::make_index_sequence<N>{});
-}
-
-constexpr size_t kPowerSourceMaxClusterCount   = kPowerSourceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-auto gConfigsOrClusters = GetClusterConfigArray<kPowerSourceMaxClusterCount>();
-
-bool FindIndexForEndpoint(EndpointId endpointId, size_t & index)
-{
-    for (size_t i = 0; i < gConfigsOrClusters.size(); ++i)
-    {
-        if (gConfigsOrClusters[i].endpointId.HasValue() && gConfigsOrClusters[i].endpointId.value == endpointId)
+        if constexpr (wiredSupported)
         {
-            index = i;
-            return true;
+            if (features.Has(Feature::kWired))
+            {
+                typename EmberWiredPowerSourceClusterT::WiredCurrentTypeEnum currentType;
+                VerifyOrDie(optionalAttributeSet.IsSet(WiredCurrentType::Id));
+                VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
+
+                typename EmberWiredPowerSourceClusterT::ConfigType config(endpointId, description, currentType);
+                if constexpr (EmberWiredPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(WiredAssessedInputVoltage::Id))
+                {
+                    if (DataModel::Nullable<uint32_t> val{}; WiredAssessedInputVoltage::Get(endpointId, val) == InteractionModel::Status::Success)
+                    {
+                        if (!val.IsNull())
+                        {
+                            config.wiredAssessedInputVoltage = val.Value();
+                        }
+                    }
+                }
+                SetNullableAttributeDefaultFromEmber(Wired, uint32_t, WiredAssessedInputVoltage, wiredAssessedInputVoltage);
+                SetNullableAttributeDefaultFromEmber(Wired, uint16_t, WiredAssessedInputFrequency, wiredAssessedInputFrequency);
+                SetNullableAttributeDefaultFromEmber(Wired, uint32_t, WiredAssessedCurrent, wiredAssessedCurrent);
+                SetAttributeDefaultFromEmber(Wired, uint32_t, WiredNominalVoltage, wiredNominalVoltage);
+                SetAttributeDefaultFromEmber(Wired, uint32_t, WiredMaximumCurrent, wiredMaximumCurrent);
+                SetAttributeDefaultFromEmber(Wired, bool, WiredPresent, wiredPresent);
+
+                config.usedOptionalAttributes = optionalAttributeSet;
+                LazyRegisteredWiredSourceClusterT * server;
+                if constexpr (batterySupported)
+                {
+                    gServers[clusterInstanceIndex] = LazyRegisteredWiredSourceClusterT();
+                    server = std::get_if<LazyRegisteredWiredSourceClusterT>(&gServers[clusterInstanceIndex]);
+                }
+                else
+                {
+                    server = &gServers[clusterInstanceIndex];
+                }
+
+                //this should never fail
+                VerifyOrDie(server != nullptr);
+
+                server->Create(config);
+                return server->Registration();
+            }
+        }
+        if constexpr (batterySupported)
+        {
+            if (features.Has(Feature::kBattery))
+            {
+                // default value
+                typename EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum replaceability = EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum::kUnspecified;
+                VerifyOrDie(optionalAttributeSet.IsSet(BatReplaceability::Id));
+                // try to read, if fails, default will be used
+                BatReplaceability::Get(endpointId, &replaceability);
+
+                typename EmberBatteryPowerSourceClusterT::ConfigType config(endpointId, description, replaceability, gTimerDelegate);
+
+                SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatVoltage, batVoltage);
+                SetNullableAttributeDefaultFromEmber(Battery, uint8_t, BatPercentRemaining, batPercentRemaining);
+                SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatTimeRemaining, batTimeRemaining);
+                SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeLevelEnum, BatChargeLevel, batChargeLevel);
+                SetAttributeDefaultFromEmber(Battery, bool, BatReplacementNeeded, batReplacementNeeded);
+                SetAttributeDefaultFromEmber(Battery, bool, BatPresent, batPresent);
+
+                if constexpr (batteryFeatures.Has(Feature::kReplaceable))
+                {
+                    if (features.Has(Feature::kReplaceable))
+                    {
+                        VerifyOrDie(optionalAttributeSet.IsSet(BatReplacementDescription::Id));
+                        CharSpan replacementDescription{};
+                        if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
+                        {
+                            // for fixed endpoints
+                            replacementDescription = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatReplacementDescription::Id);
+                        }
+                        else
+                        {
+                            // for dynamic endpoints
+                            replacementDescription = GetCharStringDefaultValueFromEmber<BatReplacementDescription::TypeInfo::MaxLength()>(BatReplacementDescription::Get, endpointId,
+                                // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
+                                static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).batReplacementDescription);
+                        }
+
+                        uint8_t quantity;
+                        VerifyOrDie(optionalAttributeSet.IsSet(BatQuantity::Id));
+                        VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
+                        config.MakeReplaceable(replacementDescription, quantity);
+
+                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatCommonDesignationEnum, BatCommonDesignation, batCommonDesignation);
+
+                        if constexpr (EmberBatteryPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(BatANSIDesignation::Id))
+                        {
+                            if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
+                            {
+                                // for fixed endpoints
+                                config.batANSIDesignation = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatANSIDesignation::Id);
+                            }
+                            else
+                            {
+                                // for dynamic endpoints
+                                config.batANSIDesignation = GetCharStringDefaultValueFromEmber<BatANSIDesignation::TypeInfo::MaxLength()>(BatANSIDesignation::Get, endpointId,
+                                    // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
+                                    static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).batANSIDesignation);
+                            }
+                        }
+
+                        if constexpr (EmberBatteryPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(BatIECDesignation::Id))
+                        {
+                            if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
+                            {
+                                // for fixed endpoints
+                                config.batIECDesignation = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatIECDesignation::Id);
+                            }
+                            else
+                            {
+                                // for dynamic endpoints
+                                config.batIECDesignation = GetCharStringDefaultValueFromEmber<BatIECDesignation::TypeInfo::MaxLength()>(BatIECDesignation::Get, endpointId,
+                                    // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
+                                    static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).batIECDesignation);
+                            }
+                        }
+
+                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatApprovedChemistryEnum, BatApprovedChemistry, batApprovedChemistry);
+                    }
+                }
+                if constexpr (batteryFeatures.Has(Feature::kRechargeable))
+                {
+                    if (features.Has(Feature::kRechargeable))
+                    {
+                        config.MakeRechargeable();
+                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeStateEnum, BatChargeState, batChargeState);
+                        SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatTimeToFullCharge, batTimeToFullCharge);
+                        SetAttributeDefaultFromEmber(Battery, bool, BatFunctionalWhileCharging, batFunctionalWhileCharging);
+                        SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatChargingCurrent, batChargingCurrent);
+                    }
+                }
+
+                SetAttributeDefaultFromEmber(Battery, uint32_t, BatCapacity, capacity);
+
+                config.usedOptionalAttributes = optionalAttributeSet;
+                LazyRegisteredBatterySourceClusterT * server;
+                if constexpr (wiredSupported)
+                {
+                    gServers[clusterInstanceIndex] = LazyRegisteredBatterySourceClusterT();
+                    server = std::get_if<LazyRegisteredBatterySourceClusterT>(&gServers[clusterInstanceIndex]);
+                }
+                else
+                {
+                    server = &gServers[clusterInstanceIndex];
+                }
+
+                //this should never fail
+                VerifyOrDie(server != nullptr);
+                server->Create(config);
+
+                return server->Registration();
+            }
+        }
+
+#undef SetAttributeDefaultFromEmber
+#undef SetNullableAttributeDefaultFromEmber
+
+        // unreachable
+        chipDie();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        if constexpr (wiredSupported && batterySupported)
+        {
+            return std::visit([](auto & server) { return server.IsConstructed() ? &server.Cluster() : nullptr; }, gServers[clusterInstanceIndex]);
+        }
+        else
+        {
+            VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+            return &gServers[clusterInstanceIndex].Cluster();
         }
     }
-    return false;
-}
+
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override
+    {
+        if constexpr (wiredSupported && batterySupported)
+        {
+            std::visit([](auto & server) { server.Destroy(); }, gServers[clusterInstanceIndex]);
+        }
+        else
+        {
+            gServers[clusterInstanceIndex].Destroy();
+        }
+    }
+};
 
 } // namespace
 
 void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
 {
-    size_t index{};
-    VerifyOrDieWithMsg(FindIndexForEndpoint(endpointId, index), Zcl, "Invalid endpoint for power source cluster: %u", endpointId);
-    VerifyOrDieWithMsg(!std::holds_alternative<RegisteredServerCluster<WiredPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster) &&
-                       !std::holds_alternative<RegisteredServerCluster<BatteryPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster),
-                        Zcl, "PowerSource cluster for endpoint %u is already initialized", endpointId);
+    uint32_t featureBits{};
+    FeatureMap::Get(endpointId, &featureBits);
+    BitFlags<Feature> features(featureBits);
+    VerifyOrDieWithMsg(features.HasAny(Feature::kWired, Feature::kBattery), Zcl, "Empty feature map for PowerSource cluster on endpoint %d", endpointId);
 
-    if (std::holds_alternative<WiredPowerSourceCluster::Configuration>(gConfigsOrClusters[index].configOrCluster))
+    if (features.HasAll(Feature::kWired, Feature::kBattery))
     {
-        auto * pConfig = std::get_if<WiredPowerSourceCluster::Configuration>(&gConfigsOrClusters[index].configOrCluster);
-        gConfigsOrClusters[index].configOrCluster.emplace<RegisteredServerCluster<WiredPowerSourceCluster>>(endpointId, *pConfig);
-        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Register(
-            std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster)->Registration()));
-
-    }
-    else if (std::holds_alternative<BatteryPowerSourceCluster::Configuration>(gConfigsOrClusters[index].configOrCluster))
-    {
-        auto * pConfig = std::get_if<BatteryPowerSourceCluster::Configuration>(&gConfigsOrClusters[index].configOrCluster);
-        gConfigsOrClusters[index].configOrCluster.emplace<RegisteredServerCluster<BatteryPowerSourceCluster>>(endpointId, DeviceLayer::SystemLayer(), *pConfig);
-        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Register(
-            std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster)->Registration()));
+        // both wired and battery are specified, it is likely this is a disabled configuration for dynamic endpoints
+        return;
     }
 
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = PowerSource::Id,
+            .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
+            .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
 }
 
 void MatterPowerSourceClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    size_t index{};
-    VerifyOrDieWithMsg(FindIndexForEndpoint(endpointId, index), Zcl, "Invalid endpoint for power source cluster: %u", endpointId);
+    IntegrationDelegate integrationDelegate;
 
-    if (!std::holds_alternative<RegisteredServerCluster<WiredPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster) &&
-        !std::holds_alternative<RegisteredServerCluster<BatteryPowerSourceCluster>>(gConfigsOrClusters[index].configOrCluster))
-    {
-        // cluster was never created, nothing to do
-        return;
-    }
-
-    auto * pWiredCluster = std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
-    if (pWiredCluster) // cluster is wired type
-    {
-        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Unregister(&pWiredCluster->Cluster()));
-    }
-    else // cluster is battery type
-    {
-        auto * pBatteryCluster = std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
-        SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Unregister(&pBatteryCluster->Cluster()));
-    }
-
-    gConfigsOrClusters[index].configOrCluster.emplace<std::monostate>(); // reset to default state
-    gConfigsOrClusters[index].endpointId.reset();
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = PowerSource::Id,
+            .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
+            .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
+        },
+        integrationDelegate, shutdownType);
 }
 
 void MatterPowerSourcePluginServerInitCallback() {}
 
 namespace chip::app::Clusters::PowerSource {
 
-WiredPowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const WiredPowerSourceCluster::Configuration & config)
+EmberWiredPowerSourceCluster * FindWiredClusterOnEndpoint(EndpointId endpointId)
 {
-    for (auto & configOrCluster : gConfigsOrClusters)
+    if constexpr (!wiredSupportNeeded)
     {
-        if (!configOrCluster.endpointId.HasValue())
-        {
-            configOrCluster.endpointId = id;
-            configOrCluster.configOrCluster.emplace<RegisteredServerCluster<WiredPowerSourceCluster>>(id, config);
-            auto * pCluster = std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&configOrCluster.configOrCluster);
-            if (pCluster == nullptr || CodegenDataModelProvider::Instance().Registry().Register(pCluster->Registration()) != CHIP_NO_ERROR)
-            {
-                configOrCluster.configOrCluster.emplace<std::monostate>();
-                configOrCluster.endpointId.reset();
-                return nullptr;
-            }
-            return &pCluster->Cluster();
-        }
+        return nullptr;
     }
-
-    ChipLogError(Zcl, "Dynamic endpoint count reached maximum for power source cluster");
-    return nullptr;
-}
-
-BatteryPowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const BatteryPowerSourceCluster::Configuration & config)
-{
-    for (auto & configOrCluster : gConfigsOrClusters)
+    else
     {
-        if (!configOrCluster.endpointId.HasValue())
-        {
-            configOrCluster.endpointId = id;
-            configOrCluster.configOrCluster.emplace<RegisteredServerCluster<BatteryPowerSourceCluster>>(id, DeviceLayer::SystemLayer(), config);
-            auto * pCluster = std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&configOrCluster.configOrCluster);
-            if (pCluster == nullptr || CodegenDataModelProvider::Instance().Registry().Register(pCluster->Registration()) != CHIP_NO_ERROR)
+        IntegrationDelegate integrationDelegate;
+
+        ServerClusterInterface * powerSource = CodegenClusterIntegration::FindClusterOnEndpoint(
             {
-                configOrCluster.configOrCluster.emplace<std::monostate>();
-                configOrCluster.endpointId.reset();
-                return nullptr;
-            }
-            return &pCluster->Cluster();
-        }
+                .endpointId                = endpointId,
+                .clusterId                 = PowerSource::Id,
+                .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
+                .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
+            },
+            integrationDelegate);
+
+        return static_cast<EmberWiredPowerSourceCluster *>(powerSource);
     }
-
-    ChipLogError(Zcl, "Dynamic endpoint count reached maximum for power source cluster");
-    return nullptr;
 }
 
-WiredPowerSourceCluster * FindWiredClusterOnEndpoint(EndpointId endpointId)
+EmberBatteryPowerSourceCluster * FindBatteryClusterOnEndpoint(EndpointId endpointId)
 {
-    size_t index{};
-    VerifyOrReturnValue(FindIndexForEndpoint(endpointId, index), nullptr);
+    if constexpr (!batterySupportNeeded)
+    {
+        return nullptr;
+    }
+    else
+    {
+        IntegrationDelegate integrationDelegate;
 
-    auto * pCluster = std::get_if<RegisteredServerCluster<WiredPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
-    VerifyOrReturnValue(pCluster, nullptr);
-    return &pCluster->Cluster();
-}
+        ServerClusterInterface * powerSource = CodegenClusterIntegration::FindClusterOnEndpoint(
+            {
+                .endpointId                = endpointId,
+                .clusterId                 = PowerSource::Id,
+                .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
+                .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
+            },
+            integrationDelegate);
 
-BatteryPowerSourceCluster * FindBatteryClusterOnEndpoint(EndpointId endpointId)
-{
-    size_t index{};
-    VerifyOrReturnValue(FindIndexForEndpoint(endpointId, index), nullptr);
-
-    auto * pCluster = std::get_if<RegisteredServerCluster<BatteryPowerSourceCluster>>(&gConfigsOrClusters[index].configOrCluster);
-    VerifyOrReturnValue(pCluster, nullptr);
-    return &pCluster->Cluster();
+        return static_cast<EmberBatteryPowerSourceCluster *>(powerSource);
+    }
 }
 
 } // namespace chip::app::Clusters::PowerSource
