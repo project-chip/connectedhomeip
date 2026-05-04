@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-    "PresetStructWithOwnedMembers.cpp",
-    "PresetStructWithOwnedMembers.h",
-    "ThermostatClusterAtomic.cpp",
-    "ThermostatClusterEvents.cpp",
-    "ThermostatClusterEvents.h",
-    "ThermostatClusterPresets.cpp",
-    "ThermostatClusterPresets.h",
-    "ThermostatClusterSuggestions.cpp",
-    "ThermostatCluster.cpp",
-    "ThermostatCluster.h",
-    "ThermostatDelegate.h",
-    "ThermostatSuggestionStructWithOwnedMembers.cpp",
-    "ThermostatSuggestionStructWithOwnedMembers.h"
+  "PresetStructWithOwnedMembers.cpp",
+  "PresetStructWithOwnedMembers.h",
+  "ThermostatCluster.cpp",
+  "ThermostatCluster.h",
+  "ThermostatClusterAtomic.cpp",
+  "ThermostatClusterEvents.cpp",
+  "ThermostatClusterEvents.h",
+  "ThermostatClusterPresets.cpp",
+  "ThermostatClusterPresets.h",
+  "ThermostatClusterSuggestions.cpp",
+  "ThermostatDelegate.h",
+  "ThermostatSuggestionStructWithOwnedMembers.cpp",
+  "ThermostatSuggestionStructWithOwnedMembers.h",
 ]
