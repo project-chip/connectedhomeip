@@ -23,14 +23,17 @@
 #include "CRTPHelpers.h"
 
 /**
- * @brief CRTP layer over `AppTask` that exposes `*Impl()` override hooks for
- *        customizable APIs.
+ * @brief CRTP override layer for `AppTask`.
  *
- * Each public method dispatches to `Derived::*Impl()`. Overrides are optional: default
- * `*Impl()` implementations in the private section forward to `AppTask`. Override in
- * Derived only for the behaviors you want to customize.
+ * Each public entry point dispatches to a corresponding `Derived::*Impl()` hook.
+ * The default `*Impl()` (declared private below) forwards to `AppTask`, so
+ * `Derived` only needs to override the hooks whose behavior it wants to
+ * customize.
  *
- * @tparam Derived The derived class type (CRTP pattern)
+ * Customer code overrides these hooks in `CustomerAppTask`; see the app README
+ * ("How to Override APIs").
+ *
+ * @tparam Derived The CRTP derived class (`CustomerAppTask`).
  */
 template <typename Derived>
 class AppTaskImpl : public AppTask
