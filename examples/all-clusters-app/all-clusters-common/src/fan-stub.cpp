@@ -57,16 +57,10 @@ static FanControlManager * mFanControlManager = nullptr;
 
 CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
-    // Return PercentSetting attribute value for now
-    DataModel::Nullable<Percent> percentSetting;
-    if (FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpoint); c != nullptr)
-    {
-        percentSetting = c->GetPercentSetting();
-    }
     Percent ret = 0;
-    if (!percentSetting.IsNull())
+    if (FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpoint); cluster != nullptr)
     {
-        ret = percentSetting.Value();
+        ret = cluster->GetPercentCurrent();
     }
 
     return aEncoder.Encode(ret);
@@ -74,17 +68,11 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 
 CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
-    // Return SpeedCurrent attribute value for now
-    DataModel::Nullable<uint8_t> speedSetting;
-    if (FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpoint);
-        c != nullptr && c->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        speedSetting = c->GetSpeedSetting();
-    }
     uint8_t ret = 0;
-    if (!speedSetting.IsNull())
+    if (FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpoint);
+        cluster != nullptr && cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
     {
-        ret = speedSetting.Value();
+        ret = cluster->GetSpeedCurrent();
     }
 
     return aEncoder.Encode(ret);

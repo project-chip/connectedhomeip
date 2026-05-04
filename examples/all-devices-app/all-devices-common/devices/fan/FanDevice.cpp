@@ -68,6 +68,11 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
+    {
+        ScopedSceneTable table(mScenesTableProvider);
+        table->RegisterHandler(&mOnOffCluster.Cluster());
+    }
+
     // Fan
     FanControlCluster::Config fanConfig(endpoint, &mFanDelegate);
     fanConfig.WithSpeedMax(10)
@@ -93,6 +98,12 @@ void FanDevice::Unregister(CodeDrivenDataModelProvider & provider)
 
     if (mOnOffCluster.IsConstructed())
     {
+        if (mOnOffCluster.Cluster().IsInList())
+        {
+            ScopedSceneTable table(mScenesTableProvider);
+            table->UnregisterHandler(&mOnOffCluster.Cluster());
+        }
+
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
         mOnOffCluster.Destroy();

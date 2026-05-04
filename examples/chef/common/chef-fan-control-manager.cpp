@@ -210,38 +210,34 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 {
     ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
     mPercentCurrent = aNewPercentCurrent;
-    Status status   = Status::Success;
     if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
     {
-        status = fc->SetPercentSetting(DataModel::Nullable<Percent>(mPercentCurrent)).GetStatusCode().GetStatus();
+        if (!fc->SetPercentCurrent(static_cast<Percent>(mPercentCurrent)))
+        {
+            ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute");
+        }
     }
     else
     {
-        status = Status::UnsupportedEndpoint;
-    }
-    if (status != Status::Success)
-    {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute: %d",
-                     to_underlying(status));
+                     to_underlying(Status::UnsupportedEndpoint));
     }
 }
 
 void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
 {
     mSpeedCurrent = aNewSpeedCurrent;
-    Status status = Status::Success;
     if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
     {
-        status = fc->SetSpeedSetting(MakeNullable(aNewSpeedCurrent)).GetStatusCode().GetStatus();
+        if (!fc->SetSpeedCurrent(mSpeedCurrent))
+        {
+            ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute");
+        }
     }
     else
     {
-        status = Status::UnsupportedEndpoint;
-    }
-    if (status != Status::Success)
-    {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute: %d",
-                     to_underlying(status));
+                     to_underlying(Status::UnsupportedEndpoint));
     }
 }
 
@@ -415,7 +411,25 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
         return Status::Success;
     }
 
-    return fc->SetFanMode(FanModeEnum::kOff).GetStatusCode().GetStatus();
+    if (fc->GetPercentCurrent() != Percent{ 0 })
+    {
+        if (!fc->SetPercentCurrent(Percent{ 0 }))
+        {
+            ChipLogError(DeviceLayer, "ChefFanControlManager::OffCommand: SetPercentCurrent failed");
+            return Status::Failure;
+        }
+    }
+
+    if (fc->GetFeatureMap().Has(Feature::kMultiSpeed) && fc->GetSpeedCurrent() != 0)
+    {
+        if (!fc->SetSpeedCurrent(0))
+        {
+            ChipLogError(DeviceLayer, "ChefFanControlManager::OffCommand: SetSpeedCurrent failed");
+            return Status::Failure;
+        }
+    }
+
+    return Status::Success;
 }
 
 void HandleOnOffAttributeChangeForFan(EndpointId endpointId, bool value)

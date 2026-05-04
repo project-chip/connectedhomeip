@@ -38,21 +38,13 @@ void AirPurifierManager::Init()
     mThermostatManager.Init();
 
     DataModel::Nullable<Percent> percentSetting = GetPercentSetting();
-    if (percentSetting.IsNull())
-    {
-        PercentSettingWriteCallback(0);
-    }
-    else
+    if (!percentSetting.IsNull())
     {
         PercentSettingWriteCallback(percentSetting.Value());
     }
 
     DataModel::Nullable<uint8_t> speedSetting = GetSpeedSetting();
-    if (speedSetting.IsNull())
-    {
-        SpeedSettingWriteCallback(0);
-    }
-    else
+    if (!speedSetting.IsNull())
     {
         SpeedSettingWriteCallback(speedSetting.Value());
     }
@@ -93,12 +85,12 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
     VerifyOrReturnError(aDirection != FanControl::StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpointId);
-    VerifyOrReturnError(fcluster != nullptr, Status::UnsupportedEndpoint);
-    VerifyOrReturnError(fcluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed), Status::Failure);
+    FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+    VerifyOrReturnError(cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed), Status::Failure);
 
-    uint8_t speedMax                          = fcluster->GetSpeedMax();
-    DataModel::Nullable<uint8_t> speedSetting = fcluster->GetSpeedSetting();
+    uint8_t speedMax                          = cluster->GetSpeedMax();
+    DataModel::Nullable<uint8_t> speedSetting = cluster->GetSpeedSetting();
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
@@ -154,7 +146,7 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
         }
     }
 
-    return fcluster->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
+    return cluster->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -163,11 +155,7 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
     {
     case FanControl::Attributes::PercentSetting::Id: {
         DataModel::Nullable<Percent> percentSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
-        if (percentSetting.IsNull())
-        {
-            PercentSettingWriteCallback(0);
-        }
-        else
+        if (!percentSetting.IsNull())
         {
             PercentSettingWriteCallback(percentSetting.Value());
         }
@@ -176,11 +164,7 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
 
     case FanControl::Attributes::SpeedSetting::Id: {
         DataModel::Nullable<uint8_t> speedSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
-        if (speedSetting.IsNull())
-        {
-            SpeedSettingWriteCallback(0);
-        }
-        else
+        if (!speedSetting.IsNull())
         {
             SpeedSettingWriteCallback(speedSetting.Value());
         }
