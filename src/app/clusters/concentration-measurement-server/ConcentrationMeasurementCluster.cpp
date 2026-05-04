@@ -48,6 +48,25 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
 {
+    // Nullable<float> attributes share identical encode logic — dispatch via offset table.
+    struct NullableFloatAttr
+    {
+        AttributeId id;
+        const DataModel::Nullable<float> & value;
+    };
+    const NullableFloatAttr kNullableFloatAttrs[] = {
+        { MeasuredValue::Id, mMeasuredValue },
+        { MinMeasuredValue::Id, mMinMeasuredValue },
+        { MaxMeasuredValue::Id, mMaxMeasuredValue },
+        { PeakMeasuredValue::Id, mPeakMeasuredValue },
+        { AverageMeasuredValue::Id, mAverageMeasuredValue },
+    };
+    for (const auto & attr : kNullableFloatAttrs)
+    {
+        if (request.path.mAttributeId == attr.id)
+            return encoder.Encode(attr.value);
+    }
+
     switch (request.path.mAttributeId)
     {
     case MeasurementMedium::Id:
@@ -59,29 +78,14 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(con
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(kClusterRevision);
 
-    case MeasuredValue::Id:
-        return encoder.Encode(mMeasuredValue);
-
-    case MinMeasuredValue::Id:
-        return encoder.Encode(mMinMeasuredValue);
-
-    case MaxMeasuredValue::Id:
-        return encoder.Encode(mMaxMeasuredValue);
-
     case Uncertainty::Id:
         return encoder.Encode(mUncertainty);
 
     case MeasurementUnit::Id:
         return encoder.Encode(mUnit);
 
-    case PeakMeasuredValue::Id:
-        return encoder.Encode(mPeakMeasuredValue);
-
     case PeakMeasuredValueWindow::Id:
         return encoder.Encode(mPeakMeasuredValueWindow);
-
-    case AverageMeasuredValue::Id:
-        return encoder.Encode(mAverageMeasuredValue);
 
     case AverageMeasuredValueWindow::Id:
         return encoder.Encode(mAverageMeasuredValueWindow);
@@ -102,35 +106,41 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
 
     ReturnErrorOnFailure(DefaultServerCluster::Attributes(path, builder));
 
-    // Use generated metadata entries — aliased clusters share the same attribute definitions.
-    namespace Meta = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Attributes;
-
-    ReturnErrorOnFailure(builder.Append(Meta::MeasurementMedium::kMetadataEntry));
+    ReturnErrorOnFailure(builder.Append(Attributes::MeasurementMedium::kMetadataEntry));
 
     if (mFeatures.Has(Feature::kNumericMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(Meta::MeasuredValue::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(Meta::MinMeasuredValue::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(Meta::MaxMeasuredValue::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(Meta::Uncertainty::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(Meta::MeasurementUnit::kMetadataEntry));
+        static constexpr DataModel::AttributeEntry kNumericAttrs[] = {
+            Attributes::MeasuredValue::kMetadataEntry,
+            Attributes::MinMeasuredValue::kMetadataEntry,
+            Attributes::MaxMeasuredValue::kMetadataEntry,
+            Attributes::Uncertainty::kMetadataEntry,
+            Attributes::MeasurementUnit::kMetadataEntry,
+        };
+        ReturnErrorOnFailure(builder.AppendElements(kNumericAttrs));
     }
 
     if (mFeatures.Has(Feature::kPeakMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(Meta::PeakMeasuredValue::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(Meta::PeakMeasuredValueWindow::kMetadataEntry));
+        static constexpr DataModel::AttributeEntry kPeakAttrs[] = {
+            Attributes::PeakMeasuredValue::kMetadataEntry,
+            Attributes::PeakMeasuredValueWindow::kMetadataEntry,
+        };
+        ReturnErrorOnFailure(builder.AppendElements(kPeakAttrs));
     }
 
     if (mFeatures.Has(Feature::kAverageMeasurement))
     {
-        ReturnErrorOnFailure(builder.Append(Meta::AverageMeasuredValue::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(Meta::AverageMeasuredValueWindow::kMetadataEntry));
+        static constexpr DataModel::AttributeEntry kAvgAttrs[] = {
+            Attributes::AverageMeasuredValue::kMetadataEntry,
+            Attributes::AverageMeasuredValueWindow::kMetadataEntry,
+        };
+        ReturnErrorOnFailure(builder.AppendElements(kAvgAttrs));
     }
 
     if (mFeatures.Has(Feature::kLevelIndication))
     {
-        ReturnErrorOnFailure(builder.Append(Meta::LevelValue::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Attributes::LevelValue::kMetadataEntry));
     }
 
     return CHIP_NO_ERROR;
@@ -140,11 +150,8 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (mMeasuredValue != value)
-    {
-        mMeasuredValue = value;
-        NotifyAttributeChanged(MeasuredValue::Id);
-    }
+    SetAttributeValue(mMeasuredValue, value, MeasuredValue::Id);
+
     return CHIP_NO_ERROR;
 }
 

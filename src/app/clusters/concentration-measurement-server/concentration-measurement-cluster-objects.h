@@ -21,6 +21,7 @@
 // Provides ClusterId constants like CarbonDioxideConcentrationMeasurement::Id,
 // and Globals::Attributes::FeatureMap::Id etc.
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <clusters/CarbonDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
 
@@ -55,6 +56,7 @@ using MeasurementMediumEnum = CarbonDioxideConcentrationMeasurement::Measurement
 using MeasurementUnitEnum   = CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum;
 
 namespace Attributes = CarbonDioxideConcentrationMeasurement::Attributes;
+
 
 } // namespace ConcentrationMeasurement
 } // namespace Clusters
