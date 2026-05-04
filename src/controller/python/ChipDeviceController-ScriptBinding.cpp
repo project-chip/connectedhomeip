@@ -303,7 +303,7 @@ void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * s
 
 PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions)
 {
-    VerifyOrDie(storageAdapter != nullptr);
+    VerifyOrDie(storageAdapter != nullptr); // NOLINT(bugprone-signed-bitwise)
 
     FactoryInitParams factoryParams;
 
