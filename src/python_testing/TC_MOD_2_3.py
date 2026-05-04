@@ -116,7 +116,7 @@ class TC_MOD_2_3(MatterBaseTest):
             result = await self.TH1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
-       membership = None
+        membership = None
         self.step("0c")
         if self.groupcast_enabled:
             membership = await self.read_single_attribute_check_success(
