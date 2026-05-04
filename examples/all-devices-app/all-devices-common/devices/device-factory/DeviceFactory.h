@@ -141,14 +141,14 @@ private:
             return std::make_unique<LoggingSpeakerDevice>(
                 LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
         };
-        mRegistry["soil-sensor"] = []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); };
+        mRegistry["soil-sensor"]        = []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); };
         mRegistry["temperature-sensor"] = []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); };
-        mRegistry["fan"]         = [this]() {
+        mRegistry["fan"]                = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
-                        .groupDataProvider = mContext->groupDataProvider,
-                        .fabricTable       = mContext->fabricTable,
-                        .timerDelegate     = mContext->timerDelegate,
+                               .groupDataProvider = mContext->groupDataProvider,
+                               .fabricTable       = mContext->fabricTable,
+                               .timerDelegate     = mContext->timerDelegate,
             });
         };
     }
