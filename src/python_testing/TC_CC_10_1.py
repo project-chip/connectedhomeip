@@ -43,10 +43,7 @@ from matter.interaction_model import Status
 import matter.clusters as Clusters
 from TC_GC_common import is_groupcast_on_root_node
 from mobly import asserts
-import asyncio
-import time
-from typing import Tuple
-from typing import List
+from typing import List, Tuple
 
 
 kCCAttributeValueIDs = [0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
@@ -70,26 +67,6 @@ class TC_CC_10_1(MatterBaseTest):
             clusterID=Clusters.Objects.ColorControl.id,
             attributeValueList=efs_attribute_value_list
         )
-
-    async def _wait_for_attributes_within_boundaries(self, cluster, attributes: List[Tuple[int, int, int]], timeout_sec: int = 1):
-        """Wait for attributes to be within boundaries.
-
-        Args:
-            cluster: cluster to read the attribute from
-            attributes: list of (attribute_id, min_value, max_value) tuples
-            timeout_sec: timeout in seconds
-        """
-        for attribute in attributes:
-            start_time = time.time()
-
-            value = await self.read_single_attribute_check_success(cluster, attribute[0])
-            while value < attribute[1] or value > attribute[2]:
-                remaining = timeout_sec - (time.time() - start_time)
-                if remaining <= 0:
-                    raise Exception(
-                        f"Timeout waiting for attribute {attribute[0]} to be within boundaries: {attribute[1]} - {attribute[2]}")
-                await asyncio.sleep(0.1)
-                value = await self.read_single_attribute_check_success(cluster, attribute[0])
 
     def desc_TC_CC_10_1(self) -> str:
         """Returns a description of this test"""
@@ -241,7 +218,7 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("2b")
         if self.pics_guard(self.check_pics("CC.S.F00")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentHue, 170, 230), (attributes.CurrentSaturation, 42, 58)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentHue, 170, 230), (attributes.CurrentSaturation, 42, 58)])
 
         self.step("2c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
@@ -272,7 +249,7 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("3b")
         if self.pics_guard(self.check_pics("CC.S.F03")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentX, 31000, 35000), (attributes.CurrentY, 17000, 21000)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentX, 31000, 35000), (attributes.CurrentY, 17000, 21000)])
 
         self.step("3c")
         if self.pics_guard(self.check_pics("CC.S.F03")):
@@ -310,7 +287,7 @@ class TC_CC_10_1(MatterBaseTest):
         if self.pics_guard(self.check_pics("CC.S.F04")):
             CTmax = round(CTtarget * (1 + kTempTolerance))
             CTmin = round(CTtarget * (1 - kTempTolerance))
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.ColorTemperatureMireds, CTmin, CTmax)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.ColorTemperatureMireds, CTmin, CTmax)])
         self.step("4c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
@@ -342,7 +319,7 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("5b")
         if self.pics_guard(self.check_pics("CC.S.F01")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.EnhancedCurrentHue, 18200, 21800), (attributes.CurrentSaturation, 42, 58)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.EnhancedCurrentHue, 18200, 21800), (attributes.CurrentSaturation, 42, 58)])
 
         self.step("5c")
         if self.pics_guard(self.check_pics("CC.S.F01")):
@@ -396,7 +373,7 @@ class TC_CC_10_1(MatterBaseTest):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
         self.step("6c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentSaturation, 0xD8, 0xE8)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentSaturation, 0xD8, 0xE8)])
 
         self.step("7a")
         if self.pics_guard(self.check_pics("CC.S.F03")):
@@ -430,7 +407,7 @@ class TC_CC_10_1(MatterBaseTest):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x03))
         self.step("7c")
         if self.pics_guard(self.check_pics("CC.S.F03")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentX, 14000, 18000), (attributes.CurrentY, 11000, 15000)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentX, 14000, 18000), (attributes.CurrentY, 11000, 15000)])
 
         self.step("8a")
         if self.pics_guard(self.check_pics("CC.S.F04")):
@@ -461,7 +438,7 @@ class TC_CC_10_1(MatterBaseTest):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x04))
         self.step("8c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.ColorTemperatureMireds, ColorTempPhysicalMinMiredsValue, ColorTempPhysicalMaxMiredsValue)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.ColorTemperatureMireds, ColorTempPhysicalMinMiredsValue, ColorTempPhysicalMaxMiredsValue)])
 
         self.step("9a")
         if self.pics_guard(self.check_pics("CC.S.F01")):
@@ -494,7 +471,7 @@ class TC_CC_10_1(MatterBaseTest):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x05))
         self.step("9c")
         if self.pics_guard(self.check_pics("CC.S.F01")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.EnhancedCurrentHue, 10200, 13800), (attributes.CurrentSaturation, 62, 78)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.EnhancedCurrentHue, 10200, 13800), (attributes.CurrentSaturation, 62, 78)])
 
         self.step("10a")
         if self.pics_guard(self.check_pics("CC.S.F02")):
@@ -526,7 +503,7 @@ class TC_CC_10_1(MatterBaseTest):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x06))
         self.step("10c")
         if self.pics_guard(self.check_pics("CC.S.F02")):
-            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.ColorLoopActive, 1, 1)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.ColorLoopActive, 1, 1)])
 
         self.step("10d")
         if self.pics_guard(self.check_pics("CC.S.F02")):
