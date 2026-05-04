@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 namespace {
 
-bool IsFanDriveOutputActive(const FanControl::FanDriveState & state)
+bool IsFanSetForOn(const FanControl::FanDriveState & state)
 {
     using FanControl::FanModeEnum;
 
@@ -188,7 +188,18 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
             mode, percentCurrent, speedCurrent);
     }
 
-    LogErrorOnFailure(OnOffCluster().SetOnOff(IsFanDriveOutputActive(newState)));
+    auto & onOff         = OnOffCluster();
+    const bool powered   = onOff.GetOnOff();
+    if (!powered)
+    {
+        ApplyOnOffToFan(FanControlCluster(), false);
+    }
+    const bool setForOn = IsFanSetForOn(newState);
+    if (setForOn && !powered)
+    {
+        return;
+    }
+    LogErrorOnFailure(onOff.SetOnOff(setForOn));
 }
 
 void LoggingFanDevice::OnRockSettingChanged(BitMask<FanControl::RockBitmap> newValue)
