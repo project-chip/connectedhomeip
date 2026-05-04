@@ -120,7 +120,7 @@ class TestResult:
                         log.error("%s Failed in %0.2f seconds", symbol, result.duration_seconds,
                                   exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
 
-                return result
+            return result
 
 
 @dataclass
