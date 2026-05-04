@@ -32,6 +32,7 @@
 #include <clusters/Pm25ConcentrationMeasurement/Metadata.h>
 #include <clusters/RadonConcentrationMeasurement/Metadata.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <lib/support/BitFlags.h>
 
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
@@ -76,6 +77,14 @@ public:
         float uncertainty                      = 0.0f;
     };
 
+    using OptionalAttributeSet = app::OptionalAttributeSet<Attributes::MeasuredValue::Id, Attributes::MinMeasuredValue::Id,
+                                                            Attributes::MaxMeasuredValue::Id, Attributes::Uncertainty::Id,
+                                                            Attributes::MeasurementUnit::Id, Attributes::PeakMeasuredValue::Id,
+                                                            Attributes::PeakMeasuredValueWindow::Id,
+                                                            Attributes::AverageMeasuredValue::Id,
+                                                            Attributes::AverageMeasuredValueWindow::Id,
+                                                            Attributes::LevelValue::Id>;
+
     ConcentrationMeasurementCluster(EndpointId endpointId, const Config & config);
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -111,6 +120,7 @@ private:
         static_cast<uint16_t>(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision);
 
     const BitFlags<Feature> mFeatures;
+    const OptionalAttributeSet mOptionalAttributeSet;
 
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;
