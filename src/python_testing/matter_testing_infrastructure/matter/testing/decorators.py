@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2025-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ and endpoint matching.
 import asyncio
 import logging
 from enum import IntFlag
-from functools import partial
+from functools import partial, wraps
 from typing import TYPE_CHECKING, Callable, Type
 
 from mobly import asserts
@@ -261,6 +261,7 @@ def async_test_body(body):
     a asyncio-run synchronous method. This decorator does the wrapping.
     """
 
+    @wraps(body)
     def async_runner(self: "MatterBaseTest", *args, **kwargs):
         return _async_runner(body, self, *args, **kwargs)
     return async_runner
@@ -294,6 +295,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
         Note that currently this test is limited to devices with a SINGLE matching endpoint.
     """
     def run_on_singleton_matching_endpoint_internal(body):
+        @wraps(body)
         def matching_runner(self: "MatterBaseTest", *args, **kwargs):
             # Import locally to avoid circular dependency
             from matter.testing.matter_testing import MatterBaseTest
@@ -351,6 +353,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
         PICS values internally.
     """
     def run_if_endpoint_matches_internal(body):
+        @wraps(body)
         def per_endpoint_runner(test_instance, *args, **kwargs):
             runner_with_timeout = asyncio.wait_for(
                 should_run_test_on_endpoint(test_instance, accept_function), timeout=60)
@@ -369,3 +372,26 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                 body(test_instance, *args, **kwargs), timeout=timeout))
         return per_endpoint_runner
     return run_if_endpoint_matches_internal
+
+
+def pics(*pics_list):
+    """Decorator to declare PICS codes required for a test method.
+
+    Provides an alternative to defining a separate pics_* method.
+    The pics_* method takes precedence if both are defined.
+
+    Usage:
+        @pics("OO.S", "S.S")
+        @async_test_body
+        async def test_TC_OO_2_1(self):
+            ...
+    """
+    if not pics_list:
+        raise ValueError("@pics requires at least one PICS code")
+
+    def decorator(fn):
+        if hasattr(fn, '_pics'):
+            raise ValueError("@pics cannot be applied more than once to the same method")
+        fn._pics = list(pics_list)
+        return fn
+    return decorator
