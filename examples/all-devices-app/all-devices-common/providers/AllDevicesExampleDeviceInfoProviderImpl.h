@@ -25,11 +25,11 @@
 namespace chip {
 namespace DeviceLayer {
 
-class TestDeviceInfoProviderImpl : public DeviceInfoProvider
+class AllDevicesExampleDeviceInfoProviderImpl : public DeviceInfoProvider
 {
 public:
-    TestDeviceInfoProviderImpl() = default;
-    ~TestDeviceInfoProviderImpl() override {}
+    AllDevicesExampleDeviceInfoProviderImpl() = default;
+    ~AllDevicesExampleDeviceInfoProviderImpl() override {}
 
     // Iterators
     FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override;
@@ -62,7 +62,7 @@ protected:
     class UserLabelIteratorImpl : public UserLabelIterator
     {
     public:
-        static UserLabelIteratorImpl * Create(TestDeviceInfoProviderImpl & provider, EndpointId endpoint)
+        static UserLabelIteratorImpl * Create(AllDevicesExampleDeviceInfoProviderImpl & provider, EndpointId endpoint)
         {
             return chip::Platform::New<UserLabelIteratorImpl>(provider, endpoint);
         }
@@ -74,8 +74,8 @@ protected:
         template <typename U, typename... UArgs>
         friend U * chip::Platform::New(UArgs &&... args);
 
-        UserLabelIteratorImpl(TestDeviceInfoProviderImpl & provider, EndpointId endpoint);
-        TestDeviceInfoProviderImpl & mProvider;
+        UserLabelIteratorImpl(AllDevicesExampleDeviceInfoProviderImpl & provider, EndpointId endpoint);
+        AllDevicesExampleDeviceInfoProviderImpl & mProvider;
         EndpointId mEndpoint = 0;
         size_t mIndex        = 0;
         size_t mTotal        = 0;

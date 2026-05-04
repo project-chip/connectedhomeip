@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "TestDeviceInfoProviderImpl.h"
+#include "AllDevicesExampleDeviceInfoProviderImpl.h"
 
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
@@ -39,22 +39,22 @@ constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
 constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
 } // anonymous namespace
 
-DeviceInfoProvider::FixedLabelIterator * TestDeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
+DeviceInfoProvider::FixedLabelIterator * AllDevicesExampleDeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
     return FixedLabelIteratorImpl::Create(endpoint);
 }
 
-TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
+AllDevicesExampleDeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
 {
     mIndex = 0;
 }
 
-size_t TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
+size_t AllDevicesExampleDeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 {
     return kNumSupportedFixedLabels;
 }
 
-bool TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
+bool AllDevicesExampleDeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
 {
     VerifyOrReturnError(mIndex < kNumSupportedFixedLabels, false);
 
@@ -72,19 +72,19 @@ bool TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & o
     return true;
 }
 
-CHIP_ERROR TestDeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
+CHIP_ERROR AllDevicesExampleDeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
     return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val,
                                      static_cast<uint16_t>(sizeof(val)));
 }
 
-CHIP_ERROR TestDeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
+CHIP_ERROR AllDevicesExampleDeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
     uint16_t len = static_cast<uint16_t>(sizeof(val));
     return mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val, len);
 }
 
-CHIP_ERROR TestDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
+CHIP_ERROR AllDevicesExampleDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
 {
     VerifyOrReturnError(CanCastTo<uint32_t>(index), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -103,18 +103,18 @@ CHIP_ERROR TestDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_
         static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR TestDeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, size_t index)
+CHIP_ERROR AllDevicesExampleDeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, size_t index)
 {
     return mStorage->SyncDeleteKeyValue(
         DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)).KeyName());
 }
 
-DeviceInfoProvider::UserLabelIterator * TestDeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
+DeviceInfoProvider::UserLabelIterator * AllDevicesExampleDeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
 {
     return UserLabelIteratorImpl::Create(*this, endpoint);
 }
 
-TestDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(TestDeviceInfoProviderImpl & provider, EndpointId endpoint) :
+AllDevicesExampleDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(AllDevicesExampleDeviceInfoProviderImpl & provider, EndpointId endpoint) :
     mProvider(provider), mEndpoint(endpoint)
 {
     size_t total = 0;
@@ -123,7 +123,7 @@ TestDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(TestDev
     mIndex = 0;
 }
 
-bool TestDeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
+bool AllDevicesExampleDeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 {
     VerifyOrReturnError(mIndex < mTotal, false);
     VerifyOrReturnError(CanCastTo<uint32_t>(mIndex), false);
@@ -166,17 +166,17 @@ bool TestDeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & out
     return true;
 }
 
-DeviceInfoProvider::SupportedLocalesIterator * TestDeviceInfoProviderImpl::IterateSupportedLocales()
+DeviceInfoProvider::SupportedLocalesIterator * AllDevicesExampleDeviceInfoProviderImpl::IterateSupportedLocales()
 {
     return SupportedLocalesIteratorImpl::Create();
 }
 
-size_t TestDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
+size_t AllDevicesExampleDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
     return kNumSupportedLocales;
 }
 
-bool TestDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
+bool AllDevicesExampleDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
     static const char * kAllSupportedLocales[kNumSupportedLocales] = { "en-US" };
 
@@ -187,17 +187,17 @@ bool TestDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & o
     return true;
 }
 
-DeviceInfoProvider::SupportedCalendarTypesIterator * TestDeviceInfoProviderImpl::IterateSupportedCalendarTypes()
+DeviceInfoProvider::SupportedCalendarTypesIterator * AllDevicesExampleDeviceInfoProviderImpl::IterateSupportedCalendarTypes()
 {
     return SupportedCalendarTypesIteratorImpl::Create();
 }
 
-size_t TestDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
+size_t AllDevicesExampleDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
     return kNumSupportedCalendarTypes;
 }
 
-bool TestDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
+bool AllDevicesExampleDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
     static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] = {
         app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian
