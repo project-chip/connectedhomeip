@@ -36,17 +36,18 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.decorators import async_test_body
+from matter.interaction_model import Status
+import matter.clusters as Clusters
+from TC_GC_common import is_groupcast_on_root_node
+from mobly import asserts
 import asyncio
+import time
+from typing import Tuple
 from typing import List
 
-from mobly import asserts
-from TC_GC_common import is_groupcast_on_root_node
-
-import matter.clusters as Clusters
-from matter.interaction_model import Status
-from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
 
 kCCAttributeValueIDs = [0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
 kTempTolerance = 0.15
@@ -69,6 +70,26 @@ class TC_CC_10_1(MatterBaseTest):
             clusterID=Clusters.Objects.ColorControl.id,
             attributeValueList=efs_attribute_value_list
         )
+
+    async def _wait_for_attributes_within_boundaries(self, cluster, attributes: List[Tuple[int, int, int]], timeout_sec: int = 1):
+        """Wait for attributes to be within boundaries.
+
+        Args:
+            cluster: cluster to read the attribute from
+            attributes: list of (attribute_id, min_value, max_value) tuples
+            timeout_sec: timeout in seconds
+        """
+        for attribute in attributes:
+            start_time = time.time()
+
+            value = await self.read_single_attribute_check_success(cluster, attribute[0])
+            while value < attribute[1] or value > attribute[2]:
+                remaining = timeout_sec - (time.time() - start_time)
+                if remaining <= 0:
+                    raise Exception(
+                        f"Timeout waiting for attribute {attribute[0]} to be within boundaries: {attribute[1]} - {attribute[2]}")
+                await asyncio.sleep(0.1)
+                value = await self.read_single_attribute_check_success(cluster, attribute[0])
 
     def desc_TC_CC_10_1(self) -> str:
         """Returns a description of this test"""
@@ -217,19 +238,10 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("2a")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.MoveToHueAndSaturation(200, 50, 0, 1, 1))
-            await asyncio.sleep(1)
 
         self.step("2b")
         if self.pics_guard(self.check_pics("CC.S.F00")):
-            result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.CurrentHue), (self.matter_test_config.endpoint, attributes.CurrentSaturation)])
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentHue], 230, "CurrentHue is not less than or equal to 230")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.CurrentHue], 170,
-                                         "CurrentHue is not greater than or equal to 170")
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentSaturation], 58, "CurrentSaturation is not less than or equal 58")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
-                                         [attributes.CurrentSaturation], 42, "CurrentSaturation is not greater than or equal 42")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentHue, 170, 230), (attributes.CurrentSaturation, 42, 58)])
 
         self.step("2c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
@@ -257,19 +269,10 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("3a")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.MoveToColor(32768, 19660, 0, 1, 1))
-            await asyncio.sleep(1)
 
         self.step("3b")
         if self.pics_guard(self.check_pics("CC.S.F03")):
-            result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.CurrentX), (self.matter_test_config.endpoint, attributes.CurrentY)])
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentX], 35000, "CurrentX is not less than or equal to 35000")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.CurrentX], 31000,
-                                         "CurrentX is not greater than or equal to 31000")
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentY], 21000, "CurrentY is not less than or equal to 21000")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.CurrentY], 17000,
-                                         "CurrentY is not greater than or equal to 17000")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentX, 31000, 35000), (attributes.CurrentY, 17000, 21000)])
 
         self.step("3c")
         if self.pics_guard(self.check_pics("CC.S.F03")):
@@ -302,20 +305,12 @@ class TC_CC_10_1(MatterBaseTest):
         if self.pics_guard(self.check_pics("CC.S.F04")):
             CTtarget = round((ColorTempPhysicalMinMiredsValue + ColorTempPhysicalMaxMiredsValue) / 2)
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.MoveToColorTemperature(CTtarget, 0, 1, 1))
-            await asyncio.sleep(1)
 
         self.step("4b")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             CTmax = round(CTtarget * (1 + kTempTolerance))
             CTmin = round(CTtarget * (1 - kTempTolerance))
-            ct_mireds = await self.read_single_attribute_check_success(
-                cluster=cluster,
-                attribute=attributes.ColorTemperatureMireds,
-                endpoint=self.matter_test_config.endpoint)
-            asserts.assert_less_equal(ct_mireds, CTmax,
-                                      "ColorTemperatureMireds is not less than or equal to %d" % CTmax)
-            asserts.assert_greater_equal(ct_mireds, CTmin,
-                                         "ColorTemperatureMireds is not greater than or equal to %d" % CTmin)
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.ColorTemperatureMireds, CTmin, CTmax)])
         self.step("4c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
@@ -344,19 +339,10 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("5a")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.EnhancedMoveToHueAndSaturation(20000, 50, 0, 1, 1))
-            await asyncio.sleep(1)
 
         self.step("5b")
         if self.pics_guard(self.check_pics("CC.S.F01")):
-            result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.EnhancedCurrentHue), (self.matter_test_config.endpoint, attributes.CurrentSaturation)])
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster][attributes.EnhancedCurrentHue], 21800,
-                                      "EnhancedCurrentHue is not less than or equal to 21800")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.EnhancedCurrentHue], 18200,
-                                         "EnhancedCurrentHue is not greater than or equal to 18200")
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentSaturation], 58, "CurrentSaturation is not 58")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
-                                         [attributes.CurrentSaturation], 42, "CurrentSaturation is not 42")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.EnhancedCurrentHue, 18200, 21800), (attributes.CurrentSaturation, 42, 58)])
 
         self.step("5c")
         if self.pics_guard(self.check_pics("CC.S.F01")):
@@ -408,13 +394,9 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("6b")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
-            # delay between recall scene and attribute read
-            await asyncio.sleep(1)
         self.step("6c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
-            CurrentSaturation = await self.read_single_attribute_check_success(cluster, attributes.CurrentSaturation)
-            asserts.assert_less_equal(CurrentSaturation, 0xE8, "CurrentSaturation is above limit")
-            asserts.assert_greater_equal(CurrentSaturation, 0xD8, "CurrentSaturation is below limit")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentSaturation, 0xD8, 0xE8)])
 
         self.step("7a")
         if self.pics_guard(self.check_pics("CC.S.F03")):
@@ -446,19 +428,9 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("7b")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x03))
-            # delay between recall scene and attribute read
-            await asyncio.sleep(1)
         self.step("7c")
         if self.pics_guard(self.check_pics("CC.S.F03")):
-            result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.CurrentX), (self.matter_test_config.endpoint, attributes.CurrentY)])
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentX], 18000, "CurrentX is above limit")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
-                                         [attributes.CurrentX], 14000, "CurrentX is below limit")
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentY], 15000, "CurrentY is above limit")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
-                                         [attributes.CurrentY], 11000, "CurrentY is below limit")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.CurrentX, 14000, 18000), (attributes.CurrentY, 11000, 15000)])
 
         self.step("8a")
         if self.pics_guard(self.check_pics("CC.S.F04")):
@@ -487,15 +459,9 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("8b")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x04))
-            # delay between recall scene and attribute read
-            await asyncio.sleep(1)
         self.step("8c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
-            ColorTemperatureMireds = await self.read_single_attribute_check_success(cluster, attributes.ColorTemperatureMireds)
-            asserts.assert_less_equal(ColorTemperatureMireds,
-                                      ColorTempPhysicalMaxMiredsValue, "ColorTemperatureMireds is above limit")
-            asserts.assert_greater_equal(ColorTemperatureMireds,
-                                         ColorTempPhysicalMinMiredsValue, "ColorTemperatureMireds is below limit")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.ColorTemperatureMireds, ColorTempPhysicalMinMiredsValue, ColorTempPhysicalMaxMiredsValue)])
 
         self.step("9a")
         if self.pics_guard(self.check_pics("CC.S.F01")):
@@ -526,19 +492,9 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("9b")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x05))
-            # delay between recall scene and attribute read
-            await asyncio.sleep(1)
         self.step("9c")
         if self.pics_guard(self.check_pics("CC.S.F01")):
-            result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.EnhancedCurrentHue), (self.matter_test_config.endpoint, attributes.CurrentSaturation)])
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.EnhancedCurrentHue], 13800, "EnhancedCurrentHue is above limit")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.EnhancedCurrentHue],
-                                         10200, "EnhancedCurrentHue is below limit")
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentSaturation], 78, "CurrentSaturation is above limit")
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
-                                         [attributes.CurrentSaturation], 62, "CurrentSaturation is below limit")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.EnhancedCurrentHue, 10200, 13800), (attributes.CurrentSaturation, 62, 78)])
 
         self.step("10a")
         if self.pics_guard(self.check_pics("CC.S.F02")):
@@ -568,12 +524,9 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("10b")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x06))
-            # delay between recall scene and attribute read
-            await asyncio.sleep(1)
         self.step("10c")
         if self.pics_guard(self.check_pics("CC.S.F02")):
-            ColorLoopActive = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopActive)
-            asserts.assert_equal(ColorLoopActive, 1, "ColorLoopActive is not 1")
+            await self._wait_for_attributes_within_boundaries(cluster, [(attributes.ColorLoopActive, 1, 1)])
 
         self.step("10d")
         if self.pics_guard(self.check_pics("CC.S.F02")):
