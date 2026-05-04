@@ -282,20 +282,21 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR ReadHandler::AcquireExchangeForSend()
 {
-    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
-        // The underlying secure session can be released out from under us (for
-        // example, when a TCP connection is closed). ExchangeContext::OnSessionReleased
-        // calls DoClose, keeping the EC alive but session-less. Guard against a
-        // missing session and propagate a normal error instead of crashing.
+        // We already hold mExchangeCtx from the inbound request. The underlying
+        // session can be released while a send is pending (e.g. TCP teardown);
+        // guard before grabbing it to avoid crashing in UseSuggestedResponseTimeout.
         VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
     {
+        // For subscription re-reports, the previous exchange was released after
+        // the last send. mExchangeCtx must be null here; open a fresh exchange
+        // from the stored session handle.
         VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
@@ -307,8 +308,13 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
     }
+    return CHIP_NO_ERROR;
+}
 
-    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
+{
+    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(AcquireExchangeForSend());
     return StatusResponse::Send(aStatus, mExchangeCtx.Get(), /* aExpectResponse = */ false);
 }
 
@@ -316,30 +322,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 {
     VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
-    if (IsPriming() || IsChunkedReport())
-    {
-        // The underlying secure session can be released out from under us (for
-        // example, when a TCP connection is closed). ExchangeContext::OnSessionReleased
-        // calls DoClose, keeping the EC alive but session-less. Guard against a
-        // missing session and propagate a normal error instead of crashing.
-        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
-        mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
-    }
-    else
-    {
-        VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
-#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
-#else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange =
-            mManagementCallback.GetInteractionModelEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
-#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mExchangeCtx.Grab(exchange);
-    }
-
-    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(AcquireExchangeForSend());
 
     if (!IsReporting())
     {
@@ -349,11 +332,6 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
 
-    // The underlying secure session can be released out from under us (for
-    // example, when a TCP connection is closed). ExchangeContext::OnSessionReleased
-    // calls DoClose, keeping the EC alive but session-less. Guard against a
-    // missing session and propagate a normal error instead of crashing.
-    VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
     mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     CHIP_ERROR err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                responseExpected ? Messaging::SendMessageFlags::kExpectResponse
