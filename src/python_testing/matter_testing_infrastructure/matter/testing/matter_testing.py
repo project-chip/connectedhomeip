@@ -1076,16 +1076,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         Args:
             cluster: Cluster to read attributes from.
             attribute_bounds: List of (attribute, min_value, max_value) tuples.
-            timeout_sec: Maximum time to wait for all attributes to be in range.
+            timeout_sec: Maximum time to wait for each attribute to be in range.
 
         Raises:
             TimeoutError: If any attribute does not reach its expected range before timeout.
         """
         for attribute, min_value, max_value in attribute_bounds:
-            deadline = time.time() + timeout_sec
+            deadline = time.monotonic() + timeout_sec
             value = await self.read_single_attribute_check_success(cluster, attribute)
             while value < min_value or value > max_value:  # type: ignore[operator]
-                if time.time() >= deadline:
+                if time.monotonic() >= deadline:
                     raise TimeoutError(
                         f"Timeout waiting for {attribute} to be in range [{min_value}, {max_value}], last value: {value}")
                 await asyncio.sleep(0.1)
