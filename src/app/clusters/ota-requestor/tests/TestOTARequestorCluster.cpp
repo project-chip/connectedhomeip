@@ -450,6 +450,7 @@ TEST_F(TestOTARequestorCluster, GenerateVersionAppliedEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateVersionAppliedEvent(event), CHIP_NO_ERROR);
     auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, VersionApplied::Id));
     VersionApplied::DecodableType decodedEvent;
