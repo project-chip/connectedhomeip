@@ -19,7 +19,7 @@
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
 #include <DeviceFactoryPlatformOverride.h>
-#include <providers/DeviceInfoProviderImpl.h>
+#include <providers/TestDeviceInfoProviderImpl.h>
 #include <providers/OverrideDeviceInstanceInfoProvider.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
@@ -395,7 +395,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
     
-    static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
+    static TestDeviceInfoProviderImpl sExampleDeviceInfoProvider;
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();

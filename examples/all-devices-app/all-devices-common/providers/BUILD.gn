@@ -20,10 +20,10 @@ config("includes") {
   include_dirs = [ ".." ]
 }
 
-source_set("device-info-provider") {
+source_set("test-device-info-provider") {
   sources = [
-    "DeviceInfoProviderImpl.cpp",
-    "DeviceInfoProviderImpl.h",
+    "TestDeviceInfoProviderImpl.cpp",
+    "TestDeviceInfoProviderImpl.h",
   ]
 
   public_deps = [

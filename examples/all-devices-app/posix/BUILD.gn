@@ -24,7 +24,7 @@ executable("all-devices-app") {
   ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:device-info-provider",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:test-device-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:override-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",

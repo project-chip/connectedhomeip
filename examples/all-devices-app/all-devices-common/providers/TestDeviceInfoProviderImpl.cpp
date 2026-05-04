@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "DeviceInfoProviderImpl.h"
+#include "TestDeviceInfoProviderImpl.h"
 
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
@@ -39,22 +39,22 @@ constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
 constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
 } // anonymous namespace
 
-DeviceInfoProvider::FixedLabelIterator * DeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
+DeviceInfoProvider::FixedLabelIterator * TestDeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
     return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
 }
 
-DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
+TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
 {
     mIndex = 0;
 }
 
-size_t DeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
+size_t TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::Count()
 {
     return kNumSupportedFixedLabels;
 }
 
-bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
+bool TestDeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & output)
 {
     VerifyOrReturnError(mIndex < kNumSupportedFixedLabels, false);
 
@@ -72,19 +72,19 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
     return true;
 }
 
-CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
+CHIP_ERROR TestDeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
     return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val,
                                      static_cast<uint16_t>(sizeof(val)));
 }
 
-CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
+CHIP_ERROR TestDeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
     uint16_t len = static_cast<uint16_t>(sizeof(val));
     return mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val, len);
 }
 
-CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
+CHIP_ERROR TestDeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
 {
     VerifyOrReturnError(CanCastTo<uint32_t>(index), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -103,18 +103,18 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
         static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR DeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, size_t index)
+CHIP_ERROR TestDeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, size_t index)
 {
     return mStorage->SyncDeleteKeyValue(
         DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)).KeyName());
 }
 
-DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
+DeviceInfoProvider::UserLabelIterator * TestDeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
 {
     return chip::Platform::New<UserLabelIteratorImpl>(*this, endpoint);
 }
 
-DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoProviderImpl & provider, EndpointId endpoint) :
+TestDeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(TestDeviceInfoProviderImpl & provider, EndpointId endpoint) :
     mProvider(provider), mEndpoint(endpoint)
 {
     size_t total = 0;
@@ -123,7 +123,7 @@ DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoP
     mIndex = 0;
 }
 
-bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
+bool TestDeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 {
     VerifyOrReturnError(mIndex < mTotal, false);
     VerifyOrReturnError(CanCastTo<uint32_t>(mIndex), false);
@@ -166,17 +166,17 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
     return true;
 }
 
-DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSupportedLocales()
+DeviceInfoProvider::SupportedLocalesIterator * TestDeviceInfoProviderImpl::IterateSupportedLocales()
 {
     return chip::Platform::New<SupportedLocalesIteratorImpl>();
 }
 
-size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
+size_t TestDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
     return kNumSupportedLocales;
 }
 
-bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
+bool TestDeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
     static const char * kAllSupportedLocales[kNumSupportedLocales] = { "en-US" };
 
@@ -187,17 +187,17 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
     return true;
 }
 
-DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
+DeviceInfoProvider::SupportedCalendarTypesIterator * TestDeviceInfoProviderImpl::IterateSupportedCalendarTypes()
 {
     return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
 }
 
-size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
+size_t TestDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
 {
     return kNumSupportedCalendarTypes;
 }
 
-bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
+bool TestDeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
     static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] = {
         app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian
