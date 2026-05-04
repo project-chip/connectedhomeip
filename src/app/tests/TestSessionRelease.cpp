@@ -35,7 +35,7 @@
  *     and GetSessionHandle's VerifyOrDieWithObject) crash the process.
  *
  * These tests pin down the contract that the patched call sites must
- * tolerate a released session by returning CHIP_ERROR_CONNECTION_ABORTED
+ * tolerate a released session by returning CHIP_ERROR_MISSING_SECURE_SESSION
  * instead of crashing.
  *
  * Crash-site coverage (one test per patched guard):
@@ -137,14 +137,15 @@ public:
 };
 
 // ---------------------------------------------------------------------------
-// Helper: create an exchange that will survive a session release.
+// Helper: create an exchange that will hit the IsSendExpected() branch in
+// ExchangeContext::OnSessionReleased.
 //
 // Calling WillSendMessage() before the session is expired ensures that when
-// ExchangeContext::OnSessionReleased fires and calls DoClose(true), the
-// ExchangeHolder delegate sees IsSendExpected()==true in OnExchangeClosing
-// and therefore does NOT null out its mpExchangeCtx raw pointer.  The EC
-// stays alive (ref-count unchanged because DoClose does not call Release()),
-// but mSession is empty.
+// OnSessionReleased fires it reaches the IsSendExpected() branch, which calls
+// DoClose(true).  kFlagWillSendMessage is NOT cleared, so ExchangeHolder sees
+// IsSendExpected()==true in OnExchangeClosing and keeps its mpExchangeCtx raw
+// pointer.  The EC remains alive (refcount unchanged by DoClose); callers must
+// check HasSessionHandle() before attempting any send.
 // ---------------------------------------------------------------------------
 static ExchangeContext * MakeRawExchangeWillSend(chip::Testing::AppContext & ctx, DoNothingExchangeDelegate & delegate)
 {
@@ -163,7 +164,7 @@ static ExchangeContext * MakeRawExchangeWillSend(chip::Testing::AppContext & ctx
 // StatusResponse::Send on an exchange whose session has been released.
 // Without the guard, this crashes inside Optional::Value() via
 // ExchangeContext::UseSuggestedResponseTimeout. With the fix,
-// StatusResponse::Send returns CHIP_ERROR_CONNECTION_ABORTED.
+// StatusResponse::Send returns CHIP_ERROR_MISSING_SECURE_SESSION.
 TEST_F(TestSessionRelease, StatusResponseSendAfterSessionReleaseDoesNotCrash)
 {
     DoNothingExchangeDelegate delegate;
@@ -180,9 +181,13 @@ TEST_F(TestSessionRelease, StatusResponseSendAfterSessionReleaseDoesNotCrash)
     EXPECT_FALSE(exchange->HasSessionHandle());
     EXPECT_EQ(StatusResponse::Send(Protocols::InteractionModel::Status::Success, &exchange.Get(),
                                    /* aExpectResponse = */ false),
-              CHIP_ERROR_CONNECTION_ABORTED);
+              CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    // Drop the original EC ref retained by NewExchangeToBob.
+    // OnSessionReleased called DoClose(true), which did NOT drop the initial
+    // EC ref.  Call Close() explicitly here to release it (DoClose is
+    // idempotent so the call body is a no-op, but the Release() in Close()
+    // drops refcount from 2 to 1).  The ExchangeHandle destructor then
+    // drops the final ref, freeing the EC cleanly.
     exchange->Close();
 }
 
@@ -204,8 +209,10 @@ TEST_F(TestSessionRelease, StatusResponseSendExpectingResponseAfterSessionReleas
     EXPECT_FALSE(exchange->HasSessionHandle());
     EXPECT_EQ(StatusResponse::Send(Protocols::InteractionModel::Status::Busy, &exchange.Get(),
                                    /* aExpectResponse = */ true),
-              CHIP_ERROR_CONNECTION_ABORTED);
+              CHIP_ERROR_MISSING_SECURE_SESSION);
 
+    // Same as above: DoClose(true) kept the EC alive. Close() releases the
+    // initial ref (refcount 2→1), then ~ExchangeHandle releases the last ref.
     exchange->Close();
 }
 
@@ -244,19 +251,21 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, ReadHandlerSendStatusReportAfterSessionR
 
     ExpireSessionAliceToBob();
 
-    // After DoClose(true), ExchangeHolder keeps mpExchangeCtx because
-    // IsSendExpected() was true.  mSession is empty.
+    // After OnSessionReleased, ExchangeContext::OnSessionReleased calls
+    // DoClose(true).  kFlagWillSendMessage is NOT cleared, so ExchangeHolder
+    // keeps its raw pointer (IsSendExpected()==true in OnExchangeClosing).
+    // mExchangeCtx.Get() is non-null but HasSessionHandle() is false.
     ASSERT_NE(rh.mExchangeCtx.Get(), nullptr);
-    EXPECT_FALSE(rh.mExchangeCtx.Get()->HasSessionHandle());
+    ASSERT_FALSE(rh.mExchangeCtx.Get()->HasSessionHandle());
 
-    // Without the ReadHandler.cpp guard: crashes at
-    //   GetSessionHandle() VerifyOrDieWithObject(mSession, this)
-    // With the guard: returns CHIP_ERROR_CONNECTION_ABORTED.
-    EXPECT_EQ(rh.SendStatusReport(Protocols::InteractionModel::Status::Success), CHIP_ERROR_CONNECTION_ABORTED);
+    // Without the ReadHandler.cpp guard: crashes (null pointer dereference on
+    // the session). With the guard: returns CHIP_ERROR_MISSING_SECURE_SESSION.
+    EXPECT_EQ(rh.SendStatusReport(Protocols::InteractionModel::Status::Success), CHIP_ERROR_MISSING_SECURE_SESSION);
 
     engine->Shutdown();
-    // ReadHandler destructor releases mExchangeCtx; ExchangeHolder::Release
-    // aborts the (already-closed) EC, dropping its last ref.
+    // ReadHandler destructor calls ExchangeHolder::Release(). mExchangeCtx is
+    // non-null and IsSendExpected()==true, so Release() calls Abort() on the
+    // still-alive EC: DoClose(no-op) + Release() drops refcount to 0 → freed.
 }
 
 // ---------------------------------------------------------------------------
@@ -281,14 +290,14 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, ReadHandlerSendReportDataAfterSessionRel
     ExpireSessionAliceToBob();
 
     ASSERT_NE(rh.mExchangeCtx.Get(), nullptr);
-    EXPECT_FALSE(rh.mExchangeCtx.Get()->HasSessionHandle());
+    ASSERT_FALSE(rh.mExchangeCtx.Get()->HasSessionHandle());
 
     System::PacketBufferHandle payload = System::PacketBufferHandle::New(64);
     ASSERT_FALSE(payload.IsNull());
 
-    // Without the ReadHandler.cpp guard: crashes at GetSessionHandle()
-    // With the guard: returns CHIP_ERROR_CONNECTION_ABORTED.
-    EXPECT_EQ(rh.SendReportData(std::move(payload), /* aMoreChunks = */ false), CHIP_ERROR_CONNECTION_ABORTED);
+    // Without the ReadHandler.cpp guard: crashes (null pointer dereference).
+    // With the guard: returns CHIP_ERROR_MISSING_SECURE_SESSION.
+    EXPECT_EQ(rh.SendReportData(std::move(payload), /* aMoreChunks = */ false), CHIP_ERROR_MISSING_SECURE_SESSION);
 
     engine->Shutdown();
 }
@@ -324,16 +333,20 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, WriteHandlerSendWriteResponseAfterSessio
 
     ExpireSessionAliceToBob();
 
-    // ExchangeHolder keeps the EC alive (IsSendExpected was true).
+    // ExchangeHolder keeps its pointer: IsSendExpected()==true in
+    // OnExchangeClosing (kFlagWillSendMessage not cleared by DoClose).
     ASSERT_NE(wh.mExchangeCtx.Get(), nullptr);
-    EXPECT_FALSE(wh.mExchangeCtx.Get()->HasSessionHandle());
+    ASSERT_FALSE(wh.mExchangeCtx.Get()->HasSessionHandle());
 
-    // Without the WriteHandler.cpp guard: crashes at UseSuggestedResponseTimeout
-    // With the guard: returns CHIP_ERROR_CONNECTION_ABORTED.
-    EXPECT_EQ(wh.SendWriteResponse(std::move(messageWriter)), CHIP_ERROR_CONNECTION_ABORTED);
+    // WriteHandler::SendWriteResponse has a pre-existing null-exchange guard
+    // (VerifyOrExit(mExchangeCtx, ...)) that passes (non-null), followed by
+    // the HasSessionHandle() guard (VerifyOrExit(mExchangeCtx->HasSessionHandle(), ...))
+    // which fires, returning CHIP_ERROR_MISSING_SECURE_SESSION.
+    EXPECT_EQ(wh.SendWriteResponse(std::move(messageWriter)), CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    // WriteHandler destructor releases mExchangeCtx; ExchangeHolder::Release
-    // aborts the already-closed EC.
+    // WriteHandler destructor calls ExchangeHolder::Release(). mExchangeCtx is
+    // non-null and IsSendExpected()==true, so Release() calls Abort() on the
+    // still-alive EC: DoClose(no-op) + Release() drops refcount to 0 → freed.
 }
 
 // ---------------------------------------------------------------------------
@@ -365,15 +378,18 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, CommandResponseSenderSendCommandResponse
 
     ExpireSessionAliceToBob();
 
+    // ExchangeHolder keeps its pointer (IsSendExpected()==true in
+    // OnExchangeClosing; kFlagWillSendMessage not cleared by DoClose).
     ASSERT_NE(crs.mExchangeCtx.Get(), nullptr);
-    EXPECT_FALSE(crs.mExchangeCtx.Get()->HasSessionHandle());
+    ASSERT_FALSE(crs.mExchangeCtx.Get()->HasSessionHandle());
 
-    // Without the CommandResponseSender.cpp guard: crashes at
-    //   UseSuggestedResponseTimeout (mSession->ComputeRoundTripTimeout)
-    // With the guard: returns CHIP_ERROR_CONNECTION_ABORTED.
-    EXPECT_EQ(crs.SendCommandResponse(), CHIP_ERROR_CONNECTION_ABORTED);
+    // Without the CommandResponseSender.cpp guard: crashes (null pointer
+    // dereference on the session). With the guard: CHIP_ERROR_MISSING_SECURE_SESSION.
+    EXPECT_EQ(crs.SendCommandResponse(), CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    // CommandResponseSender destructor releases mExchangeCtx.
+    // CommandResponseSender destructor calls ExchangeHolder::Release().
+    // mExchangeCtx is non-null and IsSendExpected()==true, so Release() calls
+    // Abort() on the still-alive EC: DoClose(no-op) + Release() → freed.
 }
 
 } // namespace app

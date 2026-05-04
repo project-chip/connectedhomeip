@@ -154,10 +154,11 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     if (HasMoreToSend())
     {
         sendFlag = Messaging::SendMessageFlags::kExpectResponse;
-        // The exchange's session may have been released out from under us (for
-        // example, when a TCP connection is closed). UseSuggestedResponseTimeout
-        // requires a valid session, so guard here and propagate a normal error.
-        VerifyOrReturnError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
+        // The underlying secure session can be released out from under us (for
+        // example, when a TCP connection is closed). ExchangeContext::OnSessionReleased
+        // calls DoClose, keeping the EC alive but session-less. Guard against a
+        // missing session and propagate a normal error instead of crashing.
+        VerifyOrReturnError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
 

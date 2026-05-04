@@ -42,7 +42,7 @@ CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Mes
     // are still synchronously processing an inbound message on this exchange).
     // UseSuggestedResponseTimeout requires a valid session, so guard here and
     // propagate a normal error instead of crashing inside Optional::Value().
-    VerifyOrReturnError(apExchangeContext->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
+    VerifyOrReturnError(apExchangeContext->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
     apExchangeContext->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     ReturnErrorOnFailure(apExchangeContext->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
                                                         aExpectResponse ? Messaging::SendMessageFlags::kExpectResponse

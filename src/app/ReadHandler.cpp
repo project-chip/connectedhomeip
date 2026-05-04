@@ -288,11 +288,10 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
     if (IsPriming() || IsChunkedReport())
     {
         // The underlying secure session can be released out from under us (for
-        // example, when a TCP connection is closed) while this exchange is still
-        // alive. GetSessionHandle() VerifyOrDies if mSession is empty, so guard
-        // here and propagate a normal error instead of crashing. See
-        // connectedhomeip issue #43714.
-        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
+        // example, when a TCP connection is closed). ExchangeContext::OnSessionReleased
+        // calls DoClose, keeping the EC alive but session-less. Guard against a
+        // missing session and propagate a normal error instead of crashing.
+        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
@@ -320,11 +319,10 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     if (IsPriming() || IsChunkedReport())
     {
         // The underlying secure session can be released out from under us (for
-        // example, when a TCP connection is closed) while this exchange is still
-        // alive. GetSessionHandle() VerifyOrDies if mSession is empty, so guard
-        // here and propagate a normal error instead of crashing. See
-        // connectedhomeip issue #43714.
-        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
+        // example, when a TCP connection is closed). ExchangeContext::OnSessionReleased
+        // calls DoClose, keeping the EC alive but session-less. Guard against a
+        // missing session and propagate a normal error instead of crashing.
+        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
@@ -351,10 +349,11 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
 
-    // The exchange's session may have been released out from under us (for
-    // example, when a TCP connection is closed). UseSuggestedResponseTimeout
-    // requires a valid session, so guard here and propagate a normal error.
-    VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_CONNECTION_ABORTED);
+    // The underlying secure session can be released out from under us (for
+    // example, when a TCP connection is closed). ExchangeContext::OnSessionReleased
+    // calls DoClose, keeping the EC alive but session-less. Guard against a
+    // missing session and propagate a normal error instead of crashing.
+    VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
     mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     CHIP_ERROR err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                responseExpected ? Messaging::SendMessageFlags::kExpectResponse
