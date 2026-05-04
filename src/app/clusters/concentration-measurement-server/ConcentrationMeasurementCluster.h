@@ -120,12 +120,23 @@ private:
     const BitFlags<Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
 
-    MeasurementMediumEnum mMedium;
-    MeasurementUnitEnum mUnit;
+    [[maybe_unused]] MeasurementMediumEnum mMedium;
+    [[maybe_unused]] MeasurementUnitEnum mUnit;
     DataModel::Nullable<float> mMinMeasuredValue;
     DataModel::Nullable<float> mMaxMeasuredValue;
-    float mUncertainty;
+    [[maybe_unused]] float mUncertainty;
+    struct AttrDispatch
+    {
+        AttributeId id;
+        ptrdiff_t offset;
+        CHIP_ERROR (*encode)(AttributeValueEncoder &, const char *);
+    };
 
+    static const AttrDispatch kDispatchTable[];
+
+    __attribute__((noinline)) CHIP_ERROR SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,
+                                                          DataModel::Nullable<float> value);
+    __attribute__((noinline)) CHIP_ERROR SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value);
     DataModel::Nullable<float> mMeasuredValue;
     DataModel::Nullable<float> mPeakMeasuredValue;
     uint32_t mPeakMeasuredValueWindow = 0;

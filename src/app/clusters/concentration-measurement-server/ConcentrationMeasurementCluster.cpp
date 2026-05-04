@@ -66,60 +66,68 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
     mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured), mMaxMeasuredValue(config.maxMeasured),
     mUncertainty(config.uncertainty)
 {
-    VerifyOrDie(std::find(AliasedClusters.begin(), AliasedClusters.end(), config.clusterId) != AliasedClusters.end());
+    VerifyOrDie(std::find(AliasedClusters.begin(), AliasedClusters.end(), config.clusterId) != AliasedClusters.end()); // NOLINT(bugprone-signed-bitwise)
 }
 
-DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                             AttributeValueEncoder & encoder)
+namespace {
+
+CHIP_ERROR EncodeNullableFloat(AttributeValueEncoder & encoder, const char * member)
 {
-    // Nullable<float> attributes share identical encode logic — dispatch via offset table.
-    struct NullableFloatAttr
+    return encoder.Encode(*reinterpret_cast<const DataModel::Nullable<float> *>(member));
+}
+
+CHIP_ERROR EncodeFloat(AttributeValueEncoder & encoder, const char * member)
+{
+    return encoder.Encode(*reinterpret_cast<const float *>(member));
+}
+
+CHIP_ERROR EncodeMediumEnum(AttributeValueEncoder & encoder, const char * member)
+{
+    return encoder.Encode(*reinterpret_cast<const MeasurementMediumEnum *>(member));
+}
+
+CHIP_ERROR EncodeUnitEnum(AttributeValueEncoder & encoder, const char * member)
+{
+    return encoder.Encode(*reinterpret_cast<const MeasurementUnitEnum *>(member));
+}
+
+CHIP_ERROR EncodeLevelEnum(AttributeValueEncoder & encoder, const char * member)
+{
+    return encoder.Encode(*reinterpret_cast<const LevelValueEnum *>(member));
+}
+
+} // namespace
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+const ConcentrationMeasurementCluster::AttrDispatch
+ConcentrationMeasurementCluster::kDispatchTable[] = {
+    { MeasuredValue::Id,        offsetof(ConcentrationMeasurementCluster, mMeasuredValue),        EncodeNullableFloat },
+    { MinMeasuredValue::Id,     offsetof(ConcentrationMeasurementCluster, mMinMeasuredValue),     EncodeNullableFloat },
+    { MaxMeasuredValue::Id,     offsetof(ConcentrationMeasurementCluster, mMaxMeasuredValue),     EncodeNullableFloat },
+    { PeakMeasuredValue::Id,    offsetof(ConcentrationMeasurementCluster, mPeakMeasuredValue),    EncodeNullableFloat },
+    { AverageMeasuredValue::Id, offsetof(ConcentrationMeasurementCluster, mAverageMeasuredValue), EncodeNullableFloat },
+
+    { MeasurementMedium::Id,   offsetof(ConcentrationMeasurementCluster, mMedium),       EncodeMediumEnum },
+    { MeasurementUnit::Id,     offsetof(ConcentrationMeasurementCluster, mUnit),         EncodeUnitEnum },
+    { Uncertainty::Id,         offsetof(ConcentrationMeasurementCluster, mUncertainty),  EncodeFloat },
+    { LevelValue::Id,          offsetof(ConcentrationMeasurementCluster, mLevelValue),   EncodeLevelEnum },
+};
+#pragma GCC diagnostic pop
+
+DataModel::ActionReturnStatus
+ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                               AttributeValueEncoder & encoder)
+{
+    const AttributeId id = request.path.mAttributeId;
+
+    for (const auto & entry : kDispatchTable)
     {
-        AttributeId id;
-        const DataModel::Nullable<float> & value;
-    };
-    const NullableFloatAttr kNullableFloatAttrs[] = {
-        { MeasuredValue::Id, mMeasuredValue },
-        { MinMeasuredValue::Id, mMinMeasuredValue },
-        { MaxMeasuredValue::Id, mMaxMeasuredValue },
-        { PeakMeasuredValue::Id, mPeakMeasuredValue },
-        { AverageMeasuredValue::Id, mAverageMeasuredValue },
-    };
-    for (const auto & attr : kNullableFloatAttrs)
-    {
-        if (request.path.mAttributeId == attr.id)
-            return encoder.Encode(attr.value);
+        if (entry.id == id)
+            return entry.encode(encoder, reinterpret_cast<const char *>(this) + entry.offset);
     }
 
-    switch (request.path.mAttributeId)
-    {
-    case MeasurementMedium::Id:
-        return encoder.Encode(mMedium);
-
-    case Attributes::FeatureMap::Id:
-        return encoder.Encode(mFeatures);
-
-    case Attributes::ClusterRevision::Id:
-        return encoder.Encode(kClusterRevision);
-
-    case Uncertainty::Id:
-        return encoder.Encode(mUncertainty);
-
-    case MeasurementUnit::Id:
-        return encoder.Encode(mUnit);
-
-    case PeakMeasuredValueWindow::Id:
-        return encoder.Encode(mPeakMeasuredValueWindow);
-
-    case AverageMeasuredValueWindow::Id:
-        return encoder.Encode(mAverageMeasuredValueWindow);
-
-    case LevelValue::Id:
-        return encoder.Encode(mLevelValue);
-
-    default:
-        return Status::UnsupportedAttribute;
-    }
+    return Status::UnsupportedAttribute;
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath & path,
@@ -144,48 +152,46 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
                                                 chip::Span<const DataModel::AttributeEntry>(kOptionalAttrs), mOptionalAttributeSet);
 }
 
+CHIP_ERROR ConcentrationMeasurementCluster::SetNullableFloat(Feature feature, DataModel::Nullable<float> & field,
+                                                              AttributeId id, DataModel::Nullable<float> value)
+{
+    VerifyOrReturnError(mFeatures.Has(feature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    SetAttributeValue(field, value, id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value)
+{
+    VerifyOrReturnError(mFeatures.Has(feature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    SetAttributeValue(field, value, id);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)
 {
-    VerifyOrReturnError(mFeatures.Has(Feature::kNumericMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mMeasuredValue, value, MeasuredValue::Id);
-
-    return CHIP_NO_ERROR;
+    return SetNullableFloat(Feature::kNumericMeasurement, mMeasuredValue, MeasuredValue::Id, value);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValue(DataModel::Nullable<float> value)
 {
-    VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mPeakMeasuredValue, value, PeakMeasuredValue::Id);
-    return CHIP_NO_ERROR;
+    return SetNullableFloat(Feature::kPeakMeasurement, mPeakMeasuredValue, PeakMeasuredValue::Id, value);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetPeakMeasuredValueWindow(uint32_t value)
 {
-    VerifyOrReturnError(mFeatures.Has(Feature::kPeakMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mPeakMeasuredValueWindow, value, PeakMeasuredValueWindow::Id);
-
-    return CHIP_NO_ERROR;
+    return SetWindow(Feature::kPeakMeasurement, mPeakMeasuredValueWindow, PeakMeasuredValueWindow::Id, value);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValue(DataModel::Nullable<float> value)
 {
-    VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mAverageMeasuredValue, value, AverageMeasuredValue::Id);
-
-    return CHIP_NO_ERROR;
+    return SetNullableFloat(Feature::kAverageMeasurement, mAverageMeasuredValue, AverageMeasuredValue::Id, value);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValueWindow(uint32_t value)
 {
-    VerifyOrReturnError(mFeatures.Has(Feature::kAverageMeasurement), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mAverageMeasuredValueWindow, value, AverageMeasuredValueWindow::Id);
-
-    return CHIP_NO_ERROR;
+    return SetWindow(Feature::kAverageMeasurement, mAverageMeasuredValueWindow, AverageMeasuredValueWindow::Id, value);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetLevelValue(LevelValueEnum value)
