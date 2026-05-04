@@ -141,8 +141,7 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
         Attributes::LevelValue::kMetadataEntry,
     };
     return AttributeListBuilder(builder).Append(chip::Span<const DataModel::AttributeEntry>(kMandatoryAttrs),
-                                                chip::Span<const DataModel::AttributeEntry>(kOptionalAttrs),
-                                                mOptionalAttributeSet);
+                                                chip::Span<const DataModel::AttributeEntry>(kOptionalAttrs), mOptionalAttributeSet);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)

@@ -22,6 +22,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/CarbonDioxideConcentrationMeasurement/Metadata.h>
 #include <clusters/CarbonMonoxideConcentrationMeasurement/Metadata.h>
 #include <clusters/FormaldehydeConcentrationMeasurement/Metadata.h>
@@ -32,7 +33,6 @@
 #include <clusters/Pm25ConcentrationMeasurement/Metadata.h>
 #include <clusters/RadonConcentrationMeasurement/Metadata.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
 #include <lib/support/BitFlags.h>
 
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
@@ -77,13 +77,11 @@ public:
         float uncertainty                      = 0.0f;
     };
 
-    using OptionalAttributeSet = app::OptionalAttributeSet<Attributes::MeasuredValue::Id, Attributes::MinMeasuredValue::Id,
-                                                            Attributes::MaxMeasuredValue::Id, Attributes::Uncertainty::Id,
-                                                            Attributes::MeasurementUnit::Id, Attributes::PeakMeasuredValue::Id,
-                                                            Attributes::PeakMeasuredValueWindow::Id,
-                                                            Attributes::AverageMeasuredValue::Id,
-                                                            Attributes::AverageMeasuredValueWindow::Id,
-                                                            Attributes::LevelValue::Id>;
+    using OptionalAttributeSet =
+        app::OptionalAttributeSet<Attributes::MeasuredValue::Id, Attributes::MinMeasuredValue::Id, Attributes::MaxMeasuredValue::Id,
+                                  Attributes::Uncertainty::Id, Attributes::MeasurementUnit::Id, Attributes::PeakMeasuredValue::Id,
+                                  Attributes::PeakMeasuredValueWindow::Id, Attributes::AverageMeasuredValue::Id,
+                                  Attributes::AverageMeasuredValueWindow::Id, Attributes::LevelValue::Id>;
 
     ConcentrationMeasurementCluster(EndpointId endpointId, const Config & config);
 
