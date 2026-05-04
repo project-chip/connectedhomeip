@@ -254,7 +254,7 @@ chip_test_suite("tests") {
   # Factory reset implies reboot. Zephyr native‑sim does not reboot,
   # so execution after reset is undefined and causes event dispatch
   # to jump to freed callbacks.
-  if (!(current_os == "zephyr" && (target_cpu == "x86" || target_cpu == "x64"))) {
+  if (current_os != "zephyr" || (target_cpu != "x86" && target_cpu != "x64")) {
     test_sources += [ "TestServer.cpp" ]
   }
 
