@@ -24,8 +24,8 @@ namespace chip {
 namespace DeviceLayer {
 
 OverrideDeviceInstanceInfoProvider::OverrideDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate,
-                                                                       chip::Optional<uint16_t> vendorId,
-                                                                       chip::Optional<uint16_t> productId) :
+                                                                       std::optional<uint16_t> vendorId,
+                                                                       std::optional<uint16_t> productId) :
     mDelegate(delegate),
     mVendorId(vendorId), mProductId(productId)
 {}
@@ -38,9 +38,9 @@ CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetVendorName(char * buf, size_t 
 
 CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetVendorId(uint16_t & vendorId)
 {
-    if (mVendorId.HasValue())
+    if (mVendorId.has_value())
     {
-        vendorId = mVendorId.Value();
+        vendorId = mVendorId.value();
         return CHIP_NO_ERROR;
     }
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -55,9 +55,9 @@ CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetProductName(char * buf, size_t
 
 CHIP_ERROR OverrideDeviceInstanceInfoProvider::GetProductId(uint16_t & productId)
 {
-    if (mProductId.HasValue())
+    if (mProductId.has_value())
     {
-        productId = mProductId.Value();
+        productId = mProductId.value();
         return CHIP_NO_ERROR;
     }
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);

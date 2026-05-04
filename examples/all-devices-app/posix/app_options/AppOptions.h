@@ -23,6 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -34,11 +35,11 @@ public:
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
         bool enableWiFi = false;
         std::string kvsPath;
-        chip::Optional<uint16_t> discriminator;
-        chip::Optional<uint16_t> vendorId;
-        chip::Optional<uint16_t> productId;
-        chip::Optional<uint16_t> port;
-        chip::Optional<uint32_t> interfaceId;
+        std::optional<uint16_t> discriminator;
+        std::optional<uint16_t> vendorId;
+        std::optional<uint16_t> productId;
+        std::optional<uint16_t> port;
+        std::optional<uint32_t> interfaceId;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();

@@ -68,14 +68,14 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             ChipLogError(Support, "Invalid discriminator: %s\n", value);
             return false;
         }
-        mConfig.discriminator.SetValue(static_cast<uint16_t>(val));
+        mConfig.discriminator = static_cast<uint16_t>(val);
         return true;
     }
     case kOptionVendorId:
-        mConfig.vendorId.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
+        mConfig.vendorId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
         return true;
     case kOptionProductId:
-        mConfig.productId.SetValue(static_cast<uint16_t>(strtoul(value, nullptr, 0)));
+        mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
         return true;
     case kOptionPort: {
         char * endptr;
@@ -85,12 +85,12 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             ChipLogError(Support, "Invalid port: %s\n", value);
             return false;
         }
-        mConfig.port.SetValue(static_cast<uint16_t>(val));
+        mConfig.port = static_cast<uint16_t>(val);
         ChipLogProgress(AppServer, "Port option set to %u\n", static_cast<uint16_t>(val));
         return true;
     }
     case kOptionInterfaceId:
-        mConfig.interfaceId.SetValue(static_cast<uint32_t>(strtoul(value, nullptr, 0)));
+        mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
         return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);

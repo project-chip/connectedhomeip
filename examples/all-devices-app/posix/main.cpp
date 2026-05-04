@@ -261,9 +261,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     initParams.dataModelProvider             = &devices.DataModelProvider();
     initParams.groupDataProvider             = &gGroupDataProvider;
-    if (AppOptions::GetConfig().port.HasValue())
+    if (AppOptions::GetConfig().port.has_value())
     {
-        initParams.operationalServicePort = AppOptions::GetConfig().port.Value();
+        initParams.operationalServicePort = AppOptions::GetConfig().port.value();
         ChipLogProgress(AppServer, "Overriding operationalServicePort to %u\n", initParams.operationalServicePort);
     }
     else
@@ -272,9 +272,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     
-    if (AppOptions::GetConfig().interfaceId.HasValue())
+    if (AppOptions::GetConfig().interfaceId.has_value())
     {
-        initParams.interfaceId = Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(AppOptions::GetConfig().interfaceId.Value()));
+        initParams.interfaceId = Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(AppOptions::GetConfig().interfaceId.value()));
     }
     else
     {
@@ -357,9 +357,9 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, const AppOptions::AppConfig & config)
 {
     auto discriminator = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR);
-    if (config.discriminator.HasValue())
+    if (config.discriminator.has_value())
     {
-        discriminator = config.discriminator.Value();
+        discriminator = config.discriminator.value();
     }
 
     const auto setupPasscode             = MakeOptional(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));

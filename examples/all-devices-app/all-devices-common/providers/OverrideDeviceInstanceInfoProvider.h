@@ -19,9 +19,9 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <optional>
 
 namespace chip {
 namespace DeviceLayer {
@@ -29,8 +29,8 @@ namespace DeviceLayer {
 class OverrideDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
 {
 public:
-    OverrideDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate, chip::Optional<uint16_t> vendorId,
-                                       chip::Optional<uint16_t> productId);
+    OverrideDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * delegate, std::optional<uint16_t> vendorId,
+                                       std::optional<uint16_t> productId);
 
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
@@ -47,8 +47,8 @@ public:
 
 private:
     DeviceInstanceInfoProvider * mDelegate;
-    chip::Optional<uint16_t> mVendorId;
-    chip::Optional<uint16_t> mProductId;
+    std::optional<uint16_t> mVendorId;
+    std::optional<uint16_t> mProductId;
 };
 
 } // namespace DeviceLayer
