@@ -58,7 +58,6 @@ using namespace chip::ArgParser;
 namespace {
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
-DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
@@ -395,7 +394,9 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
-    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    
+    static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
+    DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();
     static OverrideDeviceInstanceInfoProvider sAppDeviceInstanceInfoProvider(DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);

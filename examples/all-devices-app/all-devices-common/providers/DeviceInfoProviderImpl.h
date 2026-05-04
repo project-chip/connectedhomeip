@@ -37,8 +37,6 @@ public:
     SupportedLocalesIterator * IterateSupportedLocales() override;
     SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override;
 
-    static DeviceInfoProviderImpl & GetDefaultInstance();
-
 protected:
     class FixedLabelIteratorImpl : public FixedLabelIterator
     {
@@ -104,7 +102,6 @@ protected:
 
 private:
     static constexpr size_t UserLabelTLVMaxSize() { return TLV::EstimateStructOverhead(kMaxLabelNameLength, kMaxLabelValueLength); }
-    static DeviceInfoProviderImpl sInstance;
 };
 
 } // namespace DeviceLayer

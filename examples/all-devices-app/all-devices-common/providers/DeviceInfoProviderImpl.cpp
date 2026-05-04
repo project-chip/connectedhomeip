@@ -39,13 +39,6 @@ constexpr TLV::Tag kLabelNameTag  = TLV::ContextTag(0);
 constexpr TLV::Tag kLabelValueTag = TLV::ContextTag(1);
 } // anonymous namespace
 
-DeviceInfoProviderImpl DeviceInfoProviderImpl::sInstance;
-
-DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
-{
-    return sInstance;
-}
-
 DeviceInfoProvider::FixedLabelIterator * DeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
     return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
