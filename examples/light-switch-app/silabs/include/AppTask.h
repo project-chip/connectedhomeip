@@ -25,12 +25,18 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <variant>
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/data-model/Nullable.h>
 #include <ble/Ble.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceLayer.h>
 
 /**********************************************************
@@ -44,6 +50,49 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+
+struct GenericSwitchEventData
+{
+    chip::EndpointId endpoint;
+    chip::EventId event;
+};
+
+struct CommandBase
+{
+    chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionsMask;
+    chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionsOverride;
+
+    CommandBase() : optionsMask(0), optionsOverride(0) {}
+};
+
+struct BindingCommandData
+{
+    chip::EndpointId localEndpointId = 1;
+    chip::CommandId commandId;
+    chip::ClusterId clusterId;
+    bool isGroup = false;
+
+    struct MoveToLevel : public CommandBase
+    {
+        uint8_t level;
+        chip::app::DataModel::Nullable<uint16_t> transitionTime;
+    };
+    struct Move : public CommandBase
+    {
+        chip::app::Clusters::LevelControl::MoveModeEnum moveMode;
+        chip::app::DataModel::Nullable<uint8_t> rate;
+    };
+    struct Step : public CommandBase
+    {
+        chip::app::Clusters::LevelControl::StepModeEnum stepMode;
+        uint8_t stepSize;
+        chip::app::DataModel::Nullable<uint16_t> transitionTime;
+    };
+    struct Stop : public CommandBase
+    {
+    };
+    std::variant<MoveToLevel, Move, Step, Stop> commandData;
+};
 
 /**********************************************************
  * AppTask Declaration
@@ -78,26 +127,47 @@ public:
         static void TimerCallback(void * timerCbArg);
     };
 
-    /**
-     * @brief AppTask task main loop function
-     *
-     * @param pvParameter FreeRTOS task parameter
-     */
+    enum class LightSwitchAction : uint8_t
+    {
+        Toggle,
+        On,
+        Off
+    };
+
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
 
-    /**
-     * @brief Event handler when a button is pressed
-     * Function posts an event for button processing
-     *
-     * @param buttonHandle BTN0 or BTN1
-     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
-     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
-     */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     static void AppEventHandler(AppEvent * aEvent);
+
+    CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
+
+    void GenericSwitchOnInitialPress();
+
+    void GenericSwitchOnShortRelease();
+
+    void TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand = false);
+
+    void TriggerLevelControlAction(chip::app::Clusters::LevelControl::StepModeEnum stepMode, bool isGroupCommand = false);
+
+    chip::app::Clusters::LevelControl::StepModeEnum getStepMode();
+
+    void changeStepMode();
+
+    void SwitchActionEventHandler(uint16_t eventType);
+
+    CHIP_ERROR InitBindingHandler();
+
+    static void SwitchWorkerFunction(intptr_t context);
+
+    static void BindingWorkerFunction(intptr_t context);
+
+    static void PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                            uint8_t * value);
+
+    static void OnOffClusterInitCallback(chip::EndpointId endpoint);
 
 private:
     static AppTask sAppTask;
@@ -114,14 +184,6 @@ private:
      */
     CHIP_ERROR AppInit() override;
 
-    /**
-     * @brief PB1 Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
-     *
-     * @param aEvent button event being processed
-     */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
-
     static void OnLongPressTimeout(Timer & timer);
 
     /**
@@ -129,4 +191,32 @@ private:
      *        long-pressed to trigger the level-control action
      */
     void HandleLongPress();
+
+    chip::EndpointId mLightSwitchEndpoint                          = chip::kInvalidEndpointId;
+    chip::EndpointId mGenericSwitchEndpoint                        = chip::kInvalidEndpointId;
+    chip::app::Clusters::LevelControl::StepModeEnum mStepDirection = chip::app::Clusters::LevelControl::StepModeEnum::kUp;
+
+    static void GenericSwitchWorkerFunction(intptr_t context);
+
+    static void InitBindingHandlerInternal(intptr_t arg);
+
+    static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
+                                          chip::OperationalDeviceProxy * peer_device, void * context);
+
+    static void LightSwitchContextReleaseHandler(void * context);
+
+    static void ProcessOnOffUnicastBindingCommand(chip::CommandId commandId,
+                                                  const chip::app::Clusters::Binding::TableEntry & binding,
+                                                  chip::Messaging::ExchangeManager * exchangeMgr,
+                                                  const chip::SessionHandle & sessionHandle);
+
+    static void ProcessOnOffGroupBindingCommand(chip::CommandId commandId,
+                                                const chip::app::Clusters::Binding::TableEntry & binding);
+
+    static void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data,
+                                                         const chip::app::Clusters::Binding::TableEntry & binding,
+                                                         chip::OperationalDeviceProxy * peer_device);
+
+    static void ProcessLevelControlGroupBindingCommand(BindingCommandData * data,
+                                                       const chip::app::Clusters::Binding::TableEntry & binding);
 };

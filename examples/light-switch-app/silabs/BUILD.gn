@@ -106,9 +106,6 @@ silabs_executable("light_switch_app") {
 
   sources = [
     "src/AppTask.cpp",
-    "src/BindingHandler.cpp",
-    "src/DataModelCallbacks.cpp",
-    "src/LightSwitchMgr.cpp",
   ]
 
   deps = [
