@@ -72,7 +72,6 @@ static_library("SiWx") {
     "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "SiWxPlatformInterface.h",
     "ble/BLEManagerImpl.cpp",
     "ble/sl_si91x_ble_init.cpp",
     "ble/sl_si91x_ble_init.h",

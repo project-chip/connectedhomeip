@@ -17,8 +17,8 @@ import threading
 from collections.abc import Callable
 from typing import ClassVar, TypeAlias
 
+from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
 from chiptest.results import ResultQueueT, TestResult
-from chiptest.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
 
 log = logging.getLogger(__name__)
 

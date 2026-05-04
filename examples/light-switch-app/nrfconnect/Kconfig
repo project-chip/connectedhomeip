@@ -47,9 +47,6 @@ config NRF_WIFI_LOW_POWER
 
 endif # CHIP_WIFI
 
-config CONFIG_CHIP_ENABLE_GROUPCAST
-	bool
-	default y
 
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"

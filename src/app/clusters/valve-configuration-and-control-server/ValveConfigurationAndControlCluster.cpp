@@ -457,11 +457,12 @@ void ValveConfigurationAndControlCluster::HandleUpdateRemainingDurationInternal(
 void ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration)
 {
     System::Clock::Milliseconds64 now = System::SystemClock().GetMonotonicMilliseconds64();
-    AttributeDirtyState dirtyState    = mRemainingDuration.SetValue(remainingDuration, now);
-    if (dirtyState == AttributeDirtyState::kMustReport)
-    {
-        NotifyAttributeChanged(Attributes::RemainingDuration::Id);
-    }
+    VerifyOrReturn(mRemainingDuration.value() != remainingDuration);
+
+    auto changeLevel = mRemainingDuration.SetValue(remainingDuration, now);
+    NotifyAttributeChanged(Attributes::RemainingDuration::Id,
+                           changeLevel == AttributeDirtyState::kMustReport ? DataModel::AttributeChangeType::kReportable
+                                                                           : DataModel::AttributeChangeType::kQuiet);
 }
 
 // Function to handle the StateChange that also allows to generate an event if needed.

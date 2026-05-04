@@ -52,6 +52,9 @@ public:
     inline void SetButtonsCb(SilabsButtonCb callback) override { mButtonCallback = callback; }
     static SilabsButtonCb mButtonCallback;
     uint8_t GetButtonState(uint8_t button) override;
+#ifdef SL_ICD_ENABLED
+    void SleepButtonActionHandler(void) override;
+#endif // SL_ICD_ENABLED
 
 #if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     void StartScheduler(void) override;
