@@ -36,7 +36,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
               with:
                   ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap
@@ -67,7 +67,7 @@ jobs:
             image: ghcr.io/project-chip/chip-build-efr32:191
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
               with:
                   ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap

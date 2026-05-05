@@ -51,18 +51,17 @@ public:
 
     /**
      * Gets the list of parsed device configurations.
-     * If no devices were parsed, returns a default list (e.g. contact-sensor on endpoint 1).
      */
     const std::vector<Entry> & GetDeviceTypeEntries();
 
     /**
      * Clears the list of parsed device configurations.
      */
-    void Clear() { mDeviceConfigs.clear(); }
+    void Clear() { mDeviceTypeEntries.clear(); }
 
 private:
     bool ParseDeviceTypeEntry(const char * value, Entry & entry);
     static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
 
-    std::vector<Entry> mDeviceConfigs;
+    std::vector<Entry> mDeviceTypeEntries;
 };
