@@ -40,11 +40,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void StopAllSessions() override
-    {
-        ChipLogProgress(AppServer, "Esp32BleRssiRangingAdapter: StopAllSessions stub");
-    }
+    void StopAllSessions() override { ChipLogProgress(AppServer, "Esp32BleRssiRangingAdapter: StopAllSessions stub"); }
 
     CHIP_ERROR GetActiveSessionIds(std::vector<uint8_t> & sessionIds) override { return CHIP_NO_ERROR; }
-
 };

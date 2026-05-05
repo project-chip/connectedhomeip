@@ -411,7 +411,6 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
     EXPECT_FALSE(result.response->sessionID.IsNull());
     EXPECT_NE(result.response->sessionID.Value(), 0);
 
-
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -561,7 +560,6 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     driver.mCallback->OnSessionStopped(7, RangingSessionStatusEnum::kSessionEndTimeReached);
-
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
     ASSERT_NE(eventInfo, std::nullopt);
