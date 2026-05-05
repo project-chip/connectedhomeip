@@ -91,8 +91,8 @@ platform-specific code owns the ranging infrastructure.
 
 ### 1. Platform Override File
 
-Each platform (POSIX, ESP32) has a `DeviceFactoryPlatformOverride` that
-owns the controller, driver, and adapter as statics:
+Each platform (POSIX, ESP32) has a `DeviceFactoryPlatformOverride` that owns the
+controller, driver, and adapter as statics:
 
 ```cpp
 // DeviceFactoryPlatformOverride.cpp
@@ -152,25 +152,25 @@ The `DefaultProximityRangingDriver` connects to the controller via
 -   `Shutdown()`: Removes itself as a listener, nulls the callback
 
 The controller and adapters are static objects with app lifetime. The
-controller's destructor calls `StopAllSessions()` on all adapters during
-program exit.
+controller's destructor calls `StopAllSessions()` on all adapters during program
+exit.
 
 ## Driver Interface
 
-| Method                     | Description                                              |
-| -------------------------- | -------------------------------------------------------- |
-| `Init(callback)`           | Store callback, register as listener                     |
-| `Shutdown()`               | Unregister as listener, null callback                    |
-| `HandleStartRanging()`     | Start a ranging session (synchronous)                    |
-| `HandleStopRanging()`      | Stop a ranging session (synchronous)                     |
-| `GetRangingCapabilities()` | Encode the list of supported capabilities                |
-| `GetFeatureMap()`          | Return the feature bitmap for this driver                |
-| `GetActiveSessionIds()`    | Return active session IDs (for session ID generation)    |
-| `GetBleDeviceId()`         | Return BLE Device ID (optional, BLERBC feature)          |
-| `GetWiFiDevIK()`           | Return Wi-Fi Device Identity Key (optional, WFUSDPD)     |
-| `GetBLTDevIK()`            | Return BLT Device Identity Key (optional, BLTCS)         |
-| `GetBLTCSSecurityLevel()`  | Return BLTCS security level (optional, BLTCS)            |
-| `GetBLTCSModeCapability()` | Return BLTCS mode capability (optional, BLTCS)           |
+| Method                     | Description                                           |
+| -------------------------- | ----------------------------------------------------- |
+| `Init(callback)`           | Store callback, register as listener                  |
+| `Shutdown()`               | Unregister as listener, null callback                 |
+| `HandleStartRanging()`     | Start a ranging session (synchronous)                 |
+| `HandleStopRanging()`      | Stop a ranging session (synchronous)                  |
+| `GetRangingCapabilities()` | Encode the list of supported capabilities             |
+| `GetFeatureMap()`          | Return the feature bitmap for this driver             |
+| `GetActiveSessionIds()`    | Return active session IDs (for session ID generation) |
+| `GetBleDeviceId()`         | Return BLE Device ID (optional, BLERBC feature)       |
+| `GetWiFiDevIK()`           | Return Wi-Fi Device Identity Key (optional, WFUSDPD)  |
+| `GetBLTDevIK()`            | Return BLT Device Identity Key (optional, BLTCS)      |
+| `GetBLTCSSecurityLevel()`  | Return BLTCS security level (optional, BLTCS)         |
+| `GetBLTCSModeCapability()` | Return BLTCS mode capability (optional, BLTCS)        |
 
 ## Attribute Change Notifications
 
@@ -228,6 +228,6 @@ ensures the device maintains a stable identity across reboots.
 ## Multi-Endpoint Support
 
 Multiple endpoints can share a single `RangingTechnologyController` and adapter
-set. Each endpoint has its own or can share the `DefaultProximityRangingDriver` which
-registers as a listener on the shared controller. All listeners receive session events and
-attribute change notifications.
+set. Each endpoint has its own or can share the `DefaultProximityRangingDriver`
+which registers as a listener on the shared controller. All listeners receive
+session events and attribute change notifications.
