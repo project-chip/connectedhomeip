@@ -31,7 +31,6 @@
 #include <clusters/PowerSource/Metadata.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TimerDelegate.h>
-#include <lib/support/TimerDelegateMock.h>
 
 #include <limits>
 
