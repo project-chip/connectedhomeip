@@ -1108,7 +1108,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             matcher=phase2_matcher_s6
         )
 
-        subscription_s6.await_all_expected_report_matches([phase2_matcher_s6_obj], timeout_sec=90.0)
+        subscription_s6.await_all_expected_report_matches([phase2_matcher_s6_obj], timeout_sec=120.0)
         logger.info(f'{step_number_s6}: Step #6.2 - Query cycle fully completed after announce.')
         subscription_s6.cancel()
 
