@@ -1316,6 +1316,15 @@ static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInAVAnalysisCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AvAnalysis;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInCommodityTariffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommodityTariff;
@@ -1820,6 +1829,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::Chime::Id: {
         return CommandNeedsTimedInvokeInChimeCluster(commandID);
+    }
+    case Clusters::AvAnalysis::Id: {
+        return CommandNeedsTimedInvokeInAVAnalysisCluster(commandID);
     }
     case Clusters::CommodityTariff::Id: {
         return CommandNeedsTimedInvokeInCommodityTariffCluster(commandID);

@@ -14344,6 +14344,125 @@ class ChipClusters:
             },
         },
     }
+    _AV_ANALYSIS_CLUSTER_INFO = {
+        "clusterName": "AvAnalysis",
+        "clusterId": 0x00000557,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "EnableContextTriggers",
+                "args": {
+                    "contextTriggers": "ContextTriggerStruct",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "DisableContextTriggers",
+                "args": {
+                    "contextTriggers": "ContextTriggerStruct",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "EstablishAnalysisStream",
+                "args": {
+                    "nodeID": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "ActivateAnalysisStream",
+                "args": {
+                    "analysisStreamID": "int",
+                    "webRTCEndpointID": "int",
+                    "pushAVEndpointID": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "DeactivateAnalysisStream",
+                "args": {
+                    "analysisStreamID": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "RemoveAnalysisStream",
+                "args": {
+                    "analysisStreamID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedAmbientContexts",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ActiveAmbientContextTriggers",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxAnalysisStreamCount",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "CurrentAnalysisStreamCount",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "AnalysisStreams",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "TrackingEnabled",
+                "attributeId": 0x00000005,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _COMMODITY_TARIFF_CLUSTER_INFO = {
         "clusterName": "CommodityTariff",
         "clusterId": 0x00000700,
@@ -16470,6 +16589,7 @@ class ChipClusters:
         0x00000554: _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         0x00000555: _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         0x00000556: _CHIME_CLUSTER_INFO,
+        0x00000557: _AV_ANALYSIS_CLUSTER_INFO,
         0x00000700: _COMMODITY_TARIFF_CLUSTER_INFO,
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
@@ -16619,6 +16739,7 @@ class ChipClusters:
         "WebRTCTransportRequestor": _WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER_INFO,
         "PushAvStreamTransport": _PUSH_AV_STREAM_TRANSPORT_CLUSTER_INFO,
         "Chime": _CHIME_CLUSTER_INFO,
+        "AvAnalysis": _AV_ANALYSIS_CLUSTER_INFO,
         "CommodityTariff": _COMMODITY_TARIFF_CLUSTER_INFO,
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,

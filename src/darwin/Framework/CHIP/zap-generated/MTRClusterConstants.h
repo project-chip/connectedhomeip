@@ -214,6 +214,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeWebRTCTransportRequestorID MTR_PROVISIONALLY_AVAILABLE = 0x00000554,
     MTRClusterIDTypePushAVStreamTransportID MTR_PROVISIONALLY_AVAILABLE = 0x00000555,
     MTRClusterIDTypeChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000556,
+    MTRClusterIDTypeAVAnalysisID MTR_PROVISIONALLY_AVAILABLE = 0x00000557,
     MTRClusterIDTypeCommodityTariffID MTR_PROVISIONALLY_AVAILABLE = 0x00000700,
     MTRClusterIDTypeEcosystemInformationID MTR_PROVISIONALLY_AVAILABLE = 0x00000750,
     MTRClusterIDTypeCommissionerControlID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000751,
@@ -4064,6 +4065,19 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterChimeAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterChimeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster AVAnalysis attributes
+    MTRAttributeIDTypeClusterAVAnalysisAttributeSupportedAmbientContextsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeActiveAmbientContextTriggersID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeMaxAnalysisStreamCountID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeCurrentAnalysisStreamCountID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeAnalysisStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeTrackingEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterAVAnalysisAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster CommodityTariff attributes
     MTRAttributeIDTypeClusterCommodityTariffAttributeTariffInfoID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterCommodityTariffAttributeTariffUnitID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -6373,6 +6387,15 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster Chime commands
     MTRCommandIDTypeClusterChimeCommandPlayChimeSoundID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
+    // Cluster AVAnalysis commands
+    MTRCommandIDTypeClusterAVAnalysisCommandEnableContextTriggersID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterAVAnalysisCommandDisableContextTriggersID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterAVAnalysisCommandActivateAnalysisStreamID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterAVAnalysisCommandDeactivateAnalysisStreamID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterAVAnalysisCommandRemoveAnalysisStreamID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+
     // Cluster CommodityTariff commands
     MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7062,6 +7085,11 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster Chime events
     MTREventIDTypeClusterChimeEventChimeStartedPlayingID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+
+    // Cluster AVAnalysis events
+    MTREventIDTypeClusterAVAnalysisEventAnalysisSessionStartID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterAVAnalysisEventAnalysisSessionEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterAVAnalysisEventPerceivedContextID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
     // Cluster CommissionerControl events
     MTREventIDTypeClusterCommissionerControlEventCommissioningRequestResultID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,

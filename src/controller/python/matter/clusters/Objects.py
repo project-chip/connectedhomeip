@@ -172,6 +172,7 @@ __all__ = [
     "WebRTCTransportRequestor",
     "PushAvStreamTransport",
     "Chime",
+    "AvAnalysis",
     "CommodityTariff",
     "EcosystemInformation",
     "CommissionerControl",
@@ -691,12 +692,12 @@ class Globals:
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
+                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[Nullable, Globals.Enums.TestGlobalEnum]),
                     ])
 
             name: 'str' = ""
             myBitmap: 'typing.Union[Nullable, uint]' = NullValue
-            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+            myEnum: 'typing.Union[Nullable, Globals.Enums.TestGlobalEnum]' = NullValue
 
         @dataclass
         class ViewportStruct(ClusterObject):
@@ -725,8 +726,8 @@ class Globals:
                         ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=Globals.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=bool),
                         ClusterObjectFieldDescriptor(Label="videoStreams", Tag=7, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="audioStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
@@ -737,8 +738,8 @@ class Globals:
             peerNodeID: 'uint' = 0
             peerEndpointID: 'uint' = 0
             streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
-            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
             metadataEnabled: 'bool' = False
             videoStreams: 'typing.Optional[typing.List[uint]]' = None
             audioStreams: 'typing.Optional[typing.List[uint]]' = None
@@ -52623,6 +52624,478 @@ class Chime(Cluster):
                     ])
 
             chimeID: uint = 0
+
+
+@dataclass
+class AvAnalysis(Cluster):
+    id: typing.ClassVar[int] = 0x00000557
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="supportedAmbientContexts", Tag=0x00000000, Type=typing.List[Globals.Structs.SemanticTagStruct]),
+                ClusterObjectFieldDescriptor(Label="activeAmbientContextTriggers", Tag=0x00000001, Type=typing.List[AvAnalysis.Structs.ContextTriggerStruct]),
+                ClusterObjectFieldDescriptor(Label="maxAnalysisStreamCount", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="currentAnalysisStreamCount", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="analysisStreams", Tag=0x00000004, Type=typing.Optional[typing.List[AvAnalysis.Structs.AnalysisStreamStruct]]),
+                ClusterObjectFieldDescriptor(Label="trackingEnabled", Tag=0x00000005, Type=bool),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    supportedAmbientContexts: typing.List[Globals.Structs.SemanticTagStruct] = field(default_factory=lambda: [])
+    activeAmbientContextTriggers: typing.List[AvAnalysis.Structs.ContextTriggerStruct] = field(default_factory=lambda: [])
+    maxAnalysisStreamCount: typing.Optional[uint] = None
+    currentAnalysisStreamCount: typing.Optional[uint] = None
+    analysisStreams: typing.Optional[typing.List[AvAnalysis.Structs.AnalysisStreamStruct]] = None
+    trackingEnabled: bool = False
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Enums:
+        class AnalysisStreamStateEnum(MatterIntEnum):
+            kPendingInitiation = 0x00
+            kFailure = 0x01
+            kWebRTCInitiated = 0x02
+            kPushAVAllocated = 0x03
+            kWebRTCActive = 0x04
+            kPushAVActive = 0x05
+            kPushAVPendingDeactivation = 0x06
+            kWebRTCPendingDeactivation = 0x07
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 8
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kLocalContextDetection = 0x1
+            kRemoteContextDetection = 0x2
+            kPerZoneContextDetection = 0x4
+
+    class Structs:
+        @dataclass
+        class AnalysisStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="analysisStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="webRTCEndpointID", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="pushAVEndpointID", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="analysisStreamState", Tag=3, Type=AvAnalysis.Enums.AnalysisStreamStateEnum),
+                    ])
+
+            analysisStreamID: 'uint' = 0
+            webRTCEndpointID: 'typing.Union[None, Nullable, uint]' = None
+            pushAVEndpointID: 'typing.Union[None, Nullable, uint]' = None
+            analysisStreamState: 'AvAnalysis.Enums.AnalysisStreamStateEnum' = 0
+
+        @dataclass
+        class ContextTriggerStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="context", Tag=0, Type=Globals.Structs.SemanticTagStruct),
+                        ClusterObjectFieldDescriptor(Label="zoneIDs", Tag=1, Type=typing.Union[None, Nullable, typing.List[uint]]),
+                    ])
+
+            context: 'Globals.Structs.SemanticTagStruct' = field(default_factory=lambda: Globals.Structs.SemanticTagStruct())
+            zoneIDs: 'typing.Union[None, Nullable, typing.List[uint]]' = None
+
+        @dataclass
+        class TrackedContext(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="identifiedContextID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="identifiedContext", Tag=1, Type=Globals.Structs.SemanticTagStruct),
+                        ClusterObjectFieldDescriptor(Label="previousZone", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="currentZone", Tag=3, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="startTime", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endTime", Tag=5, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            identifiedContextID: 'uint' = 0
+            identifiedContext: 'Globals.Structs.SemanticTagStruct' = field(default_factory=lambda: Globals.Structs.SemanticTagStruct())
+            previousZone: 'typing.Union[None, Nullable, uint]' = None
+            currentZone: 'typing.Union[None, Nullable, uint]' = None
+            startTime: 'uint' = 0
+            endTime: 'typing.Union[Nullable, uint]' = NullValue
+
+    class Commands:
+        @dataclass
+        class EnableContextTriggers(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000557
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextTriggers", Tag=0, Type=typing.Union[Nullable, typing.List[AvAnalysis.Structs.ContextTriggerStruct]]),
+                    ])
+
+            contextTriggers: typing.Union[Nullable, typing.List[AvAnalysis.Structs.ContextTriggerStruct]] = NullValue
+
+        @dataclass
+        class DisableContextTriggers(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000557
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextTriggers", Tag=0, Type=typing.Union[Nullable, typing.List[AvAnalysis.Structs.ContextTriggerStruct]]),
+                    ])
+
+            contextTriggers: typing.Union[Nullable, typing.List[AvAnalysis.Structs.ContextTriggerStruct]] = NullValue
+
+        @dataclass
+        class EstablishAnalysisStream(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000557
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'EstablishAnalysisStreamResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=0, Type=uint),
+                    ])
+
+            nodeID: uint = 0
+
+        @dataclass
+        class EstablishAnalysisStreamResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000557
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="analysisStreamID", Tag=0, Type=uint),
+                    ])
+
+            analysisStreamID: uint = 0
+
+        @dataclass
+        class ActivateAnalysisStream(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000557
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="analysisStreamID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="webRTCEndpointID", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="pushAVEndpointID", Tag=2, Type=typing.Optional[uint]),
+                    ])
+
+            analysisStreamID: uint = 0
+            webRTCEndpointID: typing.Optional[uint] = None
+            pushAVEndpointID: typing.Optional[uint] = None
+
+        @dataclass
+        class DeactivateAnalysisStream(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000557
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="analysisStreamID", Tag=0, Type=uint),
+                    ])
+
+            analysisStreamID: uint = 0
+
+        @dataclass
+        class RemoveAnalysisStream(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000557
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="analysisStreamID", Tag=0, Type=uint),
+                    ])
+
+            analysisStreamID: uint = 0
+
+    class Attributes:
+        @dataclass
+        class SupportedAmbientContexts(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[Globals.Structs.SemanticTagStruct])
+
+            value: typing.List[Globals.Structs.SemanticTagStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class ActiveAmbientContextTriggers(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[AvAnalysis.Structs.ContextTriggerStruct])
+
+            value: typing.List[AvAnalysis.Structs.ContextTriggerStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class MaxAnalysisStreamCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class CurrentAnalysisStreamCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class AnalysisStreams(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AvAnalysis.Structs.AnalysisStreamStruct]])
+
+            value: typing.Optional[typing.List[AvAnalysis.Structs.AnalysisStreamStruct]] = None
+
+        @dataclass
+        class TrackingEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: bool = False
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+    class Events:
+        @dataclass
+        class AnalysisSessionStart(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="triggeredZones", Tag=1, Type=typing.Union[Nullable, typing.List[uint]]),
+                    ])
+
+            sessionID: uint = 0
+            triggeredZones: typing.Union[Nullable, typing.List[uint]] = NullValue
+
+        @dataclass
+        class AnalysisSessionEnd(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                    ])
+
+            sessionID: uint = 0
+
+        @dataclass
+        class PerceivedContext(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000557
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceNodeId", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="sourceStartTimestamp", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="newIdentifiedContexts", Tag=3, Type=typing.Optional[typing.List[AvAnalysis.Structs.TrackedContext]]),
+                        ClusterObjectFieldDescriptor(Label="currentIdentifiedContexts", Tag=4, Type=typing.Optional[typing.List[AvAnalysis.Structs.TrackedContext]]),
+                        ClusterObjectFieldDescriptor(Label="expiredContexts", Tag=5, Type=typing.Optional[typing.List[AvAnalysis.Structs.TrackedContext]]),
+                    ])
+
+            sessionID: uint = 0
+            sourceNodeId: typing.Optional[uint] = None
+            sourceStartTimestamp: typing.Optional[uint] = None
+            newIdentifiedContexts: typing.Optional[typing.List[AvAnalysis.Structs.TrackedContext]] = None
+            currentIdentifiedContexts: typing.Optional[typing.List[AvAnalysis.Structs.TrackedContext]] = None
+            expiredContexts: typing.Optional[typing.List[AvAnalysis.Structs.TrackedContext]] = None
 
 
 @dataclass

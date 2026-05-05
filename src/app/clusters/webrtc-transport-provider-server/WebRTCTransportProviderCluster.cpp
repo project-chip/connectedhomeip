@@ -825,13 +825,13 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     // If VideoStreamID was in the request, it should be in the response
     if (req.videoStreamID.HasValue())
     {
-        resp.videoStreamID.SetValue(outSession.videoStreamID);
+        resp.videoStreamID.SetValue(outSession.videoStreamID.Value());
     }
 
     // If AudioStreamID was in the request, it should be in the response
     if (req.audioStreamID.HasValue())
     {
-        resp.audioStreamID.SetValue(outSession.audioStreamID);
+        resp.audioStreamID.SetValue(outSession.audioStreamID.Value());
     }
 
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::SolicitOffer::Id);
@@ -1117,13 +1117,13 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     // Set VideoStreamID only if present in the original request.
     if (req.videoStreamID.HasValue())
     {
-        resp.videoStreamID.SetValue(outSession.videoStreamID);
+        resp.videoStreamID.SetValue(outSession.videoStreamID.Value());
     }
 
     // Set AudioStreamID only if present in the original request.
     if (req.audioStreamID.HasValue())
     {
-        resp.audioStreamID.SetValue(outSession.audioStreamID);
+        resp.audioStreamID.SetValue(outSession.audioStreamID.Value());
     }
 
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::ProvideOffer::Id);

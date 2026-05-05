@@ -553,7 +553,7 @@ struct Type
 public:
     chip::CharSpan name;
     DataModel::Nullable<chip::BitMask<Globals::TestGlobalBitmap>> myBitmap;
-    Optional<DataModel::Nullable<Globals::TestGlobalEnum>> myEnum;
+    DataModel::Nullable<Globals::TestGlobalEnum> myEnum;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -616,8 +616,8 @@ public:
     chip::NodeId peerNodeID              = static_cast<chip::NodeId>(0);
     chip::EndpointId peerEndpointID      = static_cast<chip::EndpointId>(0);
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
-    DataModel::Nullable<uint16_t> videoStreamID;
-    DataModel::Nullable<uint16_t> audioStreamID;
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     bool metadataEnabled = static_cast<bool>(0);
     Optional<DataModel::List<const uint16_t>> videoStreams;
     Optional<DataModel::List<const uint16_t>> audioStreams;
@@ -643,8 +643,8 @@ public:
     chip::NodeId peerNodeID              = static_cast<chip::NodeId>(0);
     chip::EndpointId peerEndpointID      = static_cast<chip::EndpointId>(0);
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
-    DataModel::Nullable<uint16_t> videoStreamID;
-    DataModel::Nullable<uint16_t> audioStreamID;
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     bool metadataEnabled = static_cast<bool>(0);
     Optional<DataModel::DecodableList<uint16_t>> videoStreams;
     Optional<DataModel::DecodableList<uint16_t>> audioStreams;

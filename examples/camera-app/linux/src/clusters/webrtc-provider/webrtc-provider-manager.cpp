@@ -201,20 +201,20 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // Use the first stream from the arrays if available
     if (!videoStreams.empty())
     {
-        outSession.videoStreamID.SetNonNull(videoStreams[0]);
+        outSession.videoStreamID.SetValue(videoStreams[0]);
     }
     else
     {
-        outSession.videoStreamID.SetNull();
+        outSession.videoStreamID.Value().SetNull();
     }
 
     if (!audioStreams.empty())
     {
-        outSession.audioStreamID.SetNonNull(audioStreams[0]);
+        outSession.audioStreamID.SetValue(audioStreams[0]);
     }
     else
     {
-        outSession.audioStreamID.SetNull();
+        outSession.audioStreamID.Value().SetNull();
     }
 
     outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
@@ -428,20 +428,20 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // Use the first stream from the arrays if available
     if (!videoStreams.empty())
     {
-        outSession.videoStreamID.SetNonNull(videoStreams[0]);
+        outSession.videoStreamID.SetValue(videoStreams[0]);
     }
     else
     {
-        outSession.videoStreamID.SetNull();
+        outSession.videoStreamID.Value().SetNull();
     }
 
     if (!audioStreams.empty())
     {
-        outSession.audioStreamID.SetNonNull(audioStreams[0]);
+        outSession.audioStreamID.SetValue(audioStreams[0]);
     }
     else
     {
-        outSession.audioStreamID.SetNull();
+        outSession.audioStreamID.Value().SetNull();
     }
 
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.

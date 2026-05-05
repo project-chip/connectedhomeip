@@ -11778,6 +11778,213 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRAVAnalysisClusterAnalysisStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _analysisStreamID = @(0);
+
+        _webRTCEndpointID = nil;
+
+        _pushAVEndpointID = nil;
+
+        _analysisStreamState = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAVAnalysisClusterAnalysisStreamStruct alloc] init];
+
+    other.analysisStreamID = self.analysisStreamID;
+    other.webRTCEndpointID = self.webRTCEndpointID;
+    other.pushAVEndpointID = self.pushAVEndpointID;
+    other.analysisStreamState = self.analysisStreamState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: analysisStreamID:%@; webRTCEndpointID:%@; pushAVEndpointID:%@; analysisStreamState:%@; >", NSStringFromClass([self class]), _analysisStreamID, _webRTCEndpointID, _pushAVEndpointID, _analysisStreamState];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAVAnalysisClusterContextTriggerStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _context = [MTRDataTypeSemanticTagStruct new];
+
+        _zoneIDs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAVAnalysisClusterContextTriggerStruct alloc] init];
+
+    other.context = self.context;
+    other.zoneIDs = self.zoneIDs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: context:%@; zoneIDs:%@; >", NSStringFromClass([self class]), _context, _zoneIDs];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAVAnalysisClusterTrackedContext
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _identifiedContextID = @(0);
+
+        _identifiedContext = [MTRDataTypeSemanticTagStruct new];
+
+        _previousZone = nil;
+
+        _currentZone = nil;
+
+        _startTime = @(0);
+
+        _endTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAVAnalysisClusterTrackedContext alloc] init];
+
+    other.identifiedContextID = self.identifiedContextID;
+    other.identifiedContext = self.identifiedContext;
+    other.previousZone = self.previousZone;
+    other.currentZone = self.currentZone;
+    other.startTime = self.startTime;
+    other.endTime = self.endTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: identifiedContextID:%@; identifiedContext:%@; previousZone:%@; currentZone:%@; startTime:%@; endTime:%@; >", NSStringFromClass([self class]), _identifiedContextID, _identifiedContext, _previousZone, _currentZone, _startTime, _endTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAVAnalysisClusterAnalysisSessionStartEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sessionID = @(0);
+
+        _triggeredZones = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAVAnalysisClusterAnalysisSessionStartEvent alloc] init];
+
+    other.sessionID = self.sessionID;
+    other.triggeredZones = self.triggeredZones;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; triggeredZones:%@; >", NSStringFromClass([self class]), _sessionID, _triggeredZones];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAVAnalysisClusterAnalysisSessionEndEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sessionID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAVAnalysisClusterAnalysisSessionEndEvent alloc] init];
+
+    other.sessionID = self.sessionID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; >", NSStringFromClass([self class]), _sessionID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAVAnalysisClusterPerceivedContextEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sessionID = @(0);
+
+        _sourceNodeId = nil;
+
+        _sourceStartTimestamp = nil;
+
+        _newIdentifiedContexts = nil;
+
+        _currentIdentifiedContexts = nil;
+
+        _expiredContexts = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAVAnalysisClusterPerceivedContextEvent alloc] init];
+
+    other.sessionID = self.sessionID;
+    other.sourceNodeId = self.sourceNodeId;
+    other.sourceStartTimestamp = self.sourceStartTimestamp;
+    other.newIdentifiedContexts = self.newIdentifiedContexts;
+    other.currentIdentifiedContexts = self.currentIdentifiedContexts;
+    other.expiredContexts = self.expiredContexts;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; sourceNodeId:%@; sourceStartTimestamp:%@; newIdentifiedContexts:%@; currentIdentifiedContexts:%@; expiredContexts:%@; >", NSStringFromClass([self class]), _sessionID, _sourceNodeId, _sourceStartTimestamp, _newIdentifiedContexts, _currentIdentifiedContexts, _expiredContexts];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRCommodityTariffClusterPeakPeriodStruct
 - (instancetype)init
 {

@@ -63,6 +63,10 @@
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
 #include <clusters/AudioOutput/Structs.ipp>
+#include <clusters/AvAnalysis/Attributes.ipp>
+#include <clusters/AvAnalysis/Commands.ipp>
+#include <clusters/AvAnalysis/Events.ipp>
+#include <clusters/AvAnalysis/Structs.ipp>
 #include <clusters/BallastConfiguration/Attributes.ipp>
 #include <clusters/BallastConfiguration/Commands.ipp>
 #include <clusters/BallastConfiguration/Events.ipp>
@@ -1453,6 +1457,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::Chime::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AvAnalysis::Id: {
         switch (aCommand)
         {
         default:

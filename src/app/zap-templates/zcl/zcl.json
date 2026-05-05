@@ -16,6 +16,7 @@
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",
+        "av-analysis-cluster.xml",
         "ballast-configuration-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",

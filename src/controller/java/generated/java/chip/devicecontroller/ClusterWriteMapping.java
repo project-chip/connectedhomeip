@@ -3440,6 +3440,30 @@ public class ClusterWriteMapping {
     );
     writeChimeInteractionInfo.put("writeEnabledAttribute", writeChimeEnabledAttributeInteractionInfo);
     writeAttributeMap.put("chime", writeChimeInteractionInfo);
+    Map<String, InteractionInfo> writeAvAnalysisInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeAvAnalysisTrackingEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo avAnalysistrackingEnabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeAvAnalysisTrackingEnabledCommandParams.put(
+        "value",
+        avAnalysistrackingEnabledCommandParameterInfo
+    );
+    InteractionInfo writeAvAnalysisTrackingEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AvAnalysisCluster) cluster).writeTrackingEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAvAnalysisTrackingEnabledCommandParams
+    );
+    writeAvAnalysisInteractionInfo.put("writeTrackingEnabledAttribute", writeAvAnalysisTrackingEnabledAttributeInteractionInfo);
+    writeAttributeMap.put("avAnalysis", writeAvAnalysisInteractionInfo);
     Map<String, InteractionInfo> writeCommodityTariffInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("commodityTariff", writeCommodityTariffInteractionInfo);
     Map<String, InteractionInfo> writeEcosystemInformationInteractionInfo = new LinkedHashMap<>();
