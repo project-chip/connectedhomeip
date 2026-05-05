@@ -100,7 +100,8 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        AttributeSet optionalAttributeSet(PowerSource::detail::GetValidOptionalAttributeSet(AttributeSet(optionalAttributeBits), BitFlags<PowerSource::Feature>(featureMap)));
+        AttributeSet optionalAttributeSet(PowerSource::detail::GetValidOptionalAttributeSet(
+            AttributeSet(optionalAttributeBits), BitFlags<PowerSource::Feature>(featureMap)));
         BitFlags<Feature> features(featureMap);
         using namespace chip::Protocols;
 
