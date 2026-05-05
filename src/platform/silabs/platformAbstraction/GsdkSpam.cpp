@@ -310,11 +310,6 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
-// Sleep Button Action Handler does nothing for now, but it is here to be overridden by the platform if needed.
-#ifdef SL_ICD_ENABLED
-void SilabsPlatform::SleepButtonActionHandler() {}
-#endif // SL_ICD_ENABLED
-
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
 {
