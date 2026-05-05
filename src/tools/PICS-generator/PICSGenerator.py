@@ -175,12 +175,11 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                 supportElement.text = "true"
 
     # Event PICS.
-    # EventList (0xFFFA) is provisional, so we can't read the supported events
-    # back from the device the way we do for attributes and commands. Use the
-    # parsed cluster conformance instead: evaluate it against the DUT's actual
-    # feature/attribute/command set and auto-mark anything that comes back
-    # MANDATORY. This handles AND/OR/NOT/parens that the previous string
-    # equality check missed (e.g. "ACL.S AND ACL.S.F00").
+    # EventList (0xFFFA) is deprecated and the SDK no longer implements it, so
+    # we can't read supported events back from the device. Use the parsed
+    # cluster conformance instead and auto-mark events that come back
+    # MANDATORY for this DUT's feature set. Handles AND/OR/NOT and parens
+    # that the previous string equality check missed (e.g. "ACL.S AND ACL.S.F00").
     serverEventsNode = root.find("./clusterSide[@type='Server']/events")
     if serverEventsNode is not None:
         for picsItem in serverEventsNode:
@@ -428,8 +427,9 @@ commandTag = ".C"
 acceptedCommandTag = ".Rsp"
 generatedCommandTag = ".Tx"
 
-# List of globale attributes (server)
-# Does not read ClusterRevision [0xFFFD] (not relevant), EventList [0xFFFA] (Provisional)
+# List of global attributes (server).
+# Does not read ClusterRevision [0xFFFD] (not relevant) or EventList [0xFFFA]
+# (deprecated, not implemented by the SDK).
 featureMapAttributeId = "0xFFFC"
 attributeListAttributeId = "0xFFFB"
 acceptedCommandListAttributeId = "0xFFF9"
