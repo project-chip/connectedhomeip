@@ -1944,7 +1944,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         except Exception as e:
             LOGGER.warning("[verify_subscription] Could not read ACL to check for conflict: %s", e)
             return False
-          
+
     async def poll_until_attributes_in_range(
             self, cluster: ClusterObjects.Cluster,
             attribute_bounds: List[Tuple[Type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
