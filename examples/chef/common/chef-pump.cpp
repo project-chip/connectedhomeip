@@ -20,6 +20,7 @@
 #include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/flow-measurement-server/CodegenIntegration.h>
+#include <app/clusters/pressure-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
@@ -91,17 +92,16 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexPressureMeasurement(endpointId);
     if (epIndex < kPressureMeasurementCount)
     {
-        auto updatedPressure = onOff ? PressureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
-        PressureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedPressure);
-        MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
-                                               PressureMeasurement::Attributes::MeasuredValue::Id);
+        // Use null when off: spec says null indicates unknown measurement, and 0 may violate MinMeasuredValue constraint.
+        auto updatedPressure = onOff ? PressureRangeMax[epIndex] : DataModel::Nullable<int16_t>();
+        LogErrorOnFailure(PressureMeasurement::SetMeasuredValue(endpointId, updatedPressure));
     }
 
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
         // Use null when off: spec says null indicates unknown measurement, and 0 may violate MinMeasuredValue constraint.
-        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : chip::app::DataModel::Nullable<uint16_t>();
+        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : DataModel::Nullable<uint16_t>();
         LogErrorOnFailure(FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow));
     }
 
@@ -161,9 +161,7 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     if (epIndex < kPressureMeasurementCount)
     {
         DataModel::Nullable<int16_t> updatedPressure = LevelToSetpoint(level, PressureRangeMin[epIndex], PressureRangeMax[epIndex]);
-        PressureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedPressure);
-        MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
-                                               PressureMeasurement::Attributes::MeasuredValue::Id);
+        LogErrorOnFailure(PressureMeasurement::SetMeasuredValue(endpointId, updatedPressure));
     }
 
     epIndex = getIndexFlowMeasurement(endpointId);
@@ -305,8 +303,8 @@ void init()
         epIndex = getIndexPressureMeasurement(endpointId);
         if (epIndex < kPressureMeasurementCount)
         {
-            VerifyOrDieWithMsg(PressureMeasurement::Attributes::MeasuredValue::SetNull(endpointId) == Status::Success, DeviceLayer,
-                               "Failed to initialize Pressure Measured Value to NULL for Endpoint: %d", endpointId);
+            VerifyOrDieWithMsg(PressureMeasurement::SetMeasuredValue(endpointId, DataModel::Nullable<int16_t>()) == CHIP_NO_ERROR,
+                               DeviceLayer, "Failed to initialize Pressure Measured Value to NULL for Endpoint: %d", endpointId);
             if (PressureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, PressureRangeMin[epIndex]) != Status::Success ||
                 PressureRangeMin[epIndex].IsNull())
             {

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -32,11 +34,13 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
-    "${chip_root}/examples/providers:all_devices_device_info_provider",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
@@ -57,6 +61,7 @@ executable("all-devices-app") {
   ]
 
   output_dir = root_out_dir
+  output_name = all_devices_computed_name
 }
 
 group("posix") {

@@ -2692,6 +2692,11 @@ cluster DoorLock = 257 {
     kAliro = 10;
   }
 
+  enum StatusCodeEnum : enum8 {
+    kDUPLICATE = 2 [spec_name = "DUPLICATE"];
+    kOCCUPIED = 3 [spec_name = "OCCUPIED"];
+  }
+
   enum UserStatusEnum : enum8 {
     kAvailable = 0;
     kOccupiedEnabled = 1;
@@ -2932,15 +2937,15 @@ cluster DoorLock = 257 {
   attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
   attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
   attribute access(write: administer) optional int16u expiringUserTimeout = 53;
-  provisional readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
-  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
-  provisional readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
-  provisional readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
-  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
-  provisional readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
-  provisional readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
-  provisional readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
-  provisional readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
+  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3042,7 +3047,7 @@ cluster DoorLock = 257 {
   request struct SetUserRequest {
     DataOperationTypeEnum operationType = 0;
     int16u userIndex = 1;
-    nullable char_string userName = 2;
+    nullable char_string<10> userName = 2;
     nullable int32u userUniqueID = 3;
     nullable UserStatusEnum userStatus = 4;
     nullable UserTypeEnum userType = 5;
@@ -3055,7 +3060,7 @@ cluster DoorLock = 257 {
 
   response struct GetUserResponse = 28 {
     int16u userIndex = 0;
-    nullable char_string userName = 1;
+    nullable char_string<10> userName = 1;
     nullable int32u userUniqueID = 2;
     nullable UserStatusEnum userStatus = 3;
     nullable UserTypeEnum userType = 4;
@@ -3073,7 +3078,7 @@ cluster DoorLock = 257 {
   request struct SetCredentialRequest {
     DataOperationTypeEnum operationType = 0;
     CredentialStruct credential = 1;
-    long_octet_string credentialData = 2;
+    octet_string credentialData = 2;
     nullable int16u userIndex = 3;
     nullable UserStatusEnum userStatus = 4;
     nullable UserTypeEnum userType = 5;
@@ -3127,7 +3132,7 @@ cluster DoorLock = 257 {
   command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
   /** Set a time-specific schedule ID for a specified user. */
   command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
-  /** Returns the year day schedule data for the specified schedule and user indexes. */
+  /** Retrieve the specific year day schedule for the specific schedule and user indexes. */
   command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
   /** Clears the specific year day schedule or all year day schedules for the specific user. */
   command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
@@ -3137,11 +3142,11 @@ cluster DoorLock = 257 {
   command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
   /** Clears the holiday schedule or all holiday schedules. */
   command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
-  /** Set User into the lock. */
+  /** Set user into the lock. */
   timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
-  /** Retrieve User. */
+  /** Retrieve user. */
   command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
-  /** Clears a User or all Users. */
+  /** Clears a user or all Users. */
   timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
   /** Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser. */
   timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
@@ -3151,9 +3156,9 @@ cluster DoorLock = 257 {
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
   /** This command causes the lock device to unlock the door without pulling the latch. */
   timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
-  /** This command communicates an Aliro Reader configuration to the lock. */
+  /** This command allows communicating an Aliro Reader configuration, as defined in Aliro, to the lock. */
   timed command access(invoke: administer) SetAliroReaderConfig(SetAliroReaderConfigRequest): DefaultSuccess = 40;
-  /** This command clears an existing Aliro Reader configuration for the lock. */
+  /** This command allows clearing an existing Aliro Reader configuration for the lock. */
   timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
 }
 

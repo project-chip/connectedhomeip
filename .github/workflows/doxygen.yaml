@@ -92,7 +92,7 @@ jobs:
             - name: "Print Actor"
               run: echo ${{github.actor}}
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Generate
               run: scripts/helpers/doxygen.sh
             - name: Extract branch name
@@ -101,7 +101,7 @@ jobs:
               id: extract_branch
             - name: Deploy if master
               if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
-              uses: peaceiris/actions-gh-pages@v4
+              uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4
               with:
                   deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}
                   external_repository: project-chip/connectedhomeip-doc

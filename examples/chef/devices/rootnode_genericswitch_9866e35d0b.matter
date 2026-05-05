@@ -2013,5 +2013,50 @@ endpoint 2 {
     callback attribute clusterRevision;
   }
 }
+endpoint 3 {
+  device type ma_genericswitch = 15, version 1;
+
+
+  server cluster Identify {
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Identify;
+    handle command TriggerEffect;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Switch {
+    emits event InitialPress;
+    emits event ShortRelease;
+    emits event MultiPressOngoing;
+    emits event MultiPressComplete;
+    ram      attribute numberOfPositions default = 2;
+    callback attribute currentPosition;
+    ram      attribute multiPressMax default = 2;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 22;
+    callback attribute clusterRevision;
+  }
+}
 
 
