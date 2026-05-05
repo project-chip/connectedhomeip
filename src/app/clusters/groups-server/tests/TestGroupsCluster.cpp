@@ -917,7 +917,23 @@ TEST_F(TestGroupsCluster, TestAuxiliaryAccessUpdatedEvent)
         EXPECT_TRUE(updatedInfo.HasAuxiliaryACL());
     }
 
-    // 4. Call legacy RemoveGroup -> Should generate event because group had HasAuxiliaryACL = true,
+    // 4. Call legacy AddGroup to update name (no new endpoint) -> Should NOT emit event
+    {
+        auto result = InvokeAddGroup(kGroupId, "UpdatedName2");
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(ResponseStatus(result), Status::Success);
+
+        auto event = mClusterTester->GetNextGeneratedEvent();
+        EXPECT_FALSE(event.has_value());
+
+        // Verify AuxACL is still true and name is updated
+        GroupDataProvider::GroupInfo updatedInfo;
+        ASSERT_EQ(mGroupDataProvider.GetGroupInfo(kFabricIndex1, kGroupId, updatedInfo), CHIP_NO_ERROR);
+        EXPECT_TRUE(updatedInfo.HasAuxiliaryACL());
+        EXPECT_TRUE(CharSpan(updatedInfo.name, strlen(updatedInfo.name)).data_equal("UpdatedName2"_span));
+    }
+
+    // 5. Call legacy RemoveGroup -> Should generate event because group had HasAuxiliaryACL = true,
     // so aux acl entires will be removed (or updated)
     {
         Groups::Commands::RemoveGroup::Type removeRequest;
