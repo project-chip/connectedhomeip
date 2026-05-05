@@ -414,6 +414,7 @@ class HostBuilder(GnBuilder):
                  openthread_endpoint=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 all_devices_enabled_devices=None,
                  ):
         """
         Construct a host builder.
@@ -597,6 +598,11 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_endpoint_unique_id=true')
             else:
                 self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
+
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
+        if self.all_devices_enabled_devices:
+            devices_str = '[' + ','.join(f'"{d}"' for d in self.all_devices_enabled_devices) + ']'
+            self.extra_gn_options.append(f'all_devices_enabled_devices={devices_str}')
 
         if openthread_endpoint:
             if enable_wifi:
@@ -814,7 +820,21 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.KOTLIN_MATTER_CONTROLLER:
             self.createJavaExecutable("kotlin-matter-controller")
 
+    def _AllDevicesOutputName(self):
+        """Return the binary name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            # device built with all-examples does not change the name.
+            return 'example-device-app'
+        return 'all-devices-app'
+
     def build_outputs(self):
+        if self.app == HostApp.ALL_DEVICES_APP:
+            base = self._AllDevicesOutputName()
+            for name in [base, base + '.map']:
+                if not self.options.enable_link_map_file and name.endswith('.map'):
+                    continue
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
         for name in self.app.OutputNames():
             if not self.options.enable_link_map_file and name.endswith(".map"):
                 continue
