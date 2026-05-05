@@ -29,7 +29,7 @@ namespace DeviceLayer {
  *
  * This class provides a base interface for factory data providers.
  * It implements the DeviceAttestationCredentialsProvider, CommissionableDataProvider, and DeviceInstanceInfoProvider interfaces
- * and can be used to
+ * and can be used as the common base for implementations that load Matter factory data from programmed device storage.
  */
 class FactoryDataProviderBase : public chip::Credentials::DeviceAttestationCredentialsProvider,
                                 public CommissionableDataProvider,
