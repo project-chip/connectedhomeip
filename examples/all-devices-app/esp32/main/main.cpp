@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <ESP32DimmableLightDevice.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -279,6 +280,15 @@ void InitServer(intptr_t context)
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
+    });
+
+    // Override dimmable-light with ESP32 hardware implementation that drives a real LED
+    DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return std::make_unique<ESP32DimmableLightDevice>(ESP32DimmableLightDevice::Context{
+            .groupDataProvider = gGroupDataProvider,
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .timerDelegate     = gTimerDelegate,
+        });
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
