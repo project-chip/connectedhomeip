@@ -59,11 +59,6 @@ void ApplyOnOffToFan(FanControlCluster & fan, bool on)
         return;
     }
 
-    if (fan.GetFanMode() == FanControl::FanModeEnum::kOff)
-    {
-        return;
-    }
-
     const auto percentSetting = fan.GetPercentSetting();
     if (!percentSetting.IsNull())
     {
@@ -93,43 +88,81 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> direction=%u wrap=%d lowestOff=%d",
                     static_cast<unsigned>(to_underlying(aDirection)), aWrap, aLowestOff);
 
+    VerifyOrReturnError(aDirection != FanControl::StepDirectionEnum::kUnknownEnumValue,
+                        Protocols::InteractionModel::Status::InvalidCommand);
+
     auto & cluster = FanControlCluster();
+    VerifyOrReturnError(cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed),
+                        Protocols::InteractionModel::Status::Failure);
 
-    auto currentSpeedNullable = cluster.GetSpeedSetting();
-    uint8_t currentSpeed      = currentSpeedNullable.IsNull() ? 0 : currentSpeedNullable.Value();
-    uint8_t maxSpeed          = cluster.GetSpeedMax();
-    uint8_t newSpeed          = currentSpeed;
+    const uint8_t speedMax = cluster.GetSpeedMax();
+    const auto speedSetting  = cluster.GetSpeedSetting();
+    uint8_t newSpeedSetting  = speedSetting.ValueOr(0);
 
+    // Match all-clusters-app FanControlManager::HandleStep boundary and null semantics (TC-FAN-3.5).
     if (aDirection == FanControl::StepDirectionEnum::kIncrease)
     {
-        if (currentSpeed < maxSpeed)
+        if (speedSetting.IsNull())
         {
-            newSpeed++;
+            newSpeedSetting = 1;
         }
-        else if (aWrap)
+        else if (speedSetting.Value() < speedMax)
         {
-            newSpeed = aLowestOff ? 0 : 1;
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
+        }
+        else if (speedSetting.Value() == speedMax)
+        {
+            if (aWrap)
+            {
+                newSpeedSetting = aLowestOff ? 0 : 1;
+            }
         }
     }
     else if (aDirection == FanControl::StepDirectionEnum::kDecrease)
     {
-        uint8_t lowestSpeed = aLowestOff ? 0 : 1;
-        if (currentSpeed > lowestSpeed)
+        if (speedSetting.IsNull())
         {
-            newSpeed--;
+            newSpeedSetting = aLowestOff ? 0 : 1;
         }
-        else if (aWrap)
+        else if ((speedSetting.Value() > 1) && (speedSetting.Value() <= speedMax))
         {
-            newSpeed = maxSpeed;
+            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+        }
+        else if (speedSetting.Value() == 1)
+        {
+            if (aLowestOff)
+            {
+                newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+            }
+            else if (aWrap)
+            {
+                newSpeedSetting = speedMax;
+            }
+        }
+        else if (speedSetting.Value() == 0)
+        {
+            if (aWrap)
+            {
+                newSpeedSetting = speedMax;
+            }
+            else if (!aLowestOff)
+            {
+                newSpeedSetting = 1;
+            }
         }
     }
 
-    if (newSpeed != currentSpeed)
+    if (!speedSetting.IsNull() && newSpeedSetting != speedSetting.Value())
     {
-        ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from %u to %u", currentSpeed, newSpeed);
+        ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from %u to %u", speedSetting.Value(),
+                        newSpeedSetting);
+    }
+    else if (speedSetting.IsNull())
+    {
+        ChipLogProgress(DeviceLayer, "LoggingFanDevice::HandleStep() -> Speed changed from NULL to %u", newSpeedSetting);
     }
 
-    return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeed)).GetStatusCode().GetStatus();
+    return cluster.SetSpeedSetting(DataModel::MakeNullable(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 
 void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
@@ -187,9 +220,7 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
         return;
     }
 
-    const bool setForOn = IsFanSetForOn(newState);
-    ApplyOnOffToFan(fan, setForOn);
-    LogErrorOnFailure(onOff.SetOnOff(setForOn));
+    ApplyOnOffToFan(fan, IsFanSetForOn(newState));
 }
 
 void LoggingFanDevice::OnRockSettingChanged(BitMask<FanControl::RockBitmap> newValue)
