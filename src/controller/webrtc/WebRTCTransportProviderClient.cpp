@@ -327,8 +327,8 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     session.streamUsage    = mCurrentStreamUsage;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    session.videoStreamID.Value() = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    session.audioStreamID.Value() = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
 
     WebRTCTransportRequestorManager::Instance().UpsertSession(session);
 }
@@ -351,13 +351,13 @@ void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader da
     session.streamUsage    = mCurrentStreamUsage;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : chip::app::DataModel::NullNullable;
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : chip::app::DataModel::NullNullable;
+    session.videoStreamID.Value() = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : chip::app::DataModel::NullNullable;
+    session.audioStreamID.Value() = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : chip::app::DataModel::NullNullable;
 
     // If DeferredOffer == FALSE these fields MUST be valid
     if (!value.deferredOffer)
     {
-        if (session.videoStreamID.IsNull() && session.audioStreamID.IsNull())
+        if (session.videoStreamID.Value().IsNull() && session.audioStreamID.Value().IsNull())
         {
             ChipLogError(Camera, "Provider reported DeferredOffer=FALSE but did not supply valid Video and Audio stream IDs");
             return;
