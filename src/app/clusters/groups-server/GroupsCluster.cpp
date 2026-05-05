@@ -18,8 +18,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/scenes-server/Constants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <clusters/GroupKeyManagement/Ids.h>
 #include <clusters/AccessControl/Events.h>
+#include <clusters/GroupKeyManagement/Ids.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Metadata.h>

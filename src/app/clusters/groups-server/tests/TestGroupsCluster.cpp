@@ -20,8 +20,8 @@
 #include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyIntegrationDelegate.h>
 #include <app/server-cluster/testing/ClusterTester.h>
-#include <clusters/AccessControl/Events.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <clusters/AccessControl/Events.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Metadata.h>
@@ -892,7 +892,7 @@ TEST_F(TestGroupsCluster, TestAuxiliaryAccessUpdatedEvent)
 
     // 2. Pre-create a group with HasAuxiliaryACL = true in GroupDataProvider (0 endpoints)
     uint8_t flags = static_cast<uint8_t>(GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL) |
-                    static_cast<uint8_t>(GroupDataProvider::GroupInfo::Flags::kMcastAddrPolicy);
+        static_cast<uint8_t>(GroupDataProvider::GroupInfo::Flags::kMcastAddrPolicy);
     GroupDataProvider::GroupInfo info(kGroupId, "AuxGroup", flags);
     ASSERT_EQ(mGroupDataProvider.SetGroupInfo(kFabricIndex1, info), CHIP_NO_ERROR);
 
