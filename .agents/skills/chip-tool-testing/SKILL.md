@@ -7,9 +7,10 @@ description:
 
 # Testing Matter Examples with Chip-Tool
 
-This skill provides guidelines for building Matter example applications and
-`chip-tool`, and using `chip-tool` to commission and interact with the examples
-in a simulated environment (like Linux POSIX).
+This skill provides guidelines for building Matter example applications and `chip-tool`, and using `chip-tool` to commission and interact with the examples in a simulated environment (like Linux POSIX).
+
+> [!NOTE]
+> While `chip-tool` and examples support multiple platforms, these guidelines focus on the Linux/POSIX environment, which is the standard environment for agent execution.
 
 ## Building from Source
 
@@ -49,8 +50,7 @@ Run the example application (usually in a separate terminal or the background):
 ./out/linux-x64-all-devices-boringssl/all-devices-app
 ```
 
-_Note: Use a clean KVS file or clear the existing one to ensure it enters
-commissioning mode._
+_Note: Use a clean KVS file (by specifying a new, non-existent file path with `--KVS`) or clear the existing one (by deleting the file) to ensure the application enters commissioning mode on startup._
 
 ### 1. Determine Pairing Credentials
 
@@ -71,6 +71,9 @@ mode on startup. On Linux, the default KVS file is `/tmp/chip_kvs`:
 ```bash
 rm /tmp/chip_kvs
 ```
+
+> [!NOTE]
+> **Persistence Testing**: If you are performing a persistence test (verifying state across restarts), do NOT delete the KVS file. Reuse the same KVS file to preserve stored attributes.
 
 #### Over IP (On-Network)
 
