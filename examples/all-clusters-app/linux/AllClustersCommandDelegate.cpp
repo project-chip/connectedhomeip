@@ -644,7 +644,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
-        VerifyOrDie(false && "Named pipe command not supported, see log above.");
+        VerifyOrDie(false);
     }
 
 exit:
