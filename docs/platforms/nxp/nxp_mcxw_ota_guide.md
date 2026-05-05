@@ -73,7 +73,7 @@ The OTA image used must be updated to include the new factory data.
 The OTA topology used for OTA testing is illustrated in the figure below.
 Topology is similar with the one used for Matter Test Events.
 
-![OTA_TOPOLOGY](../../../examples/platform/nxp/mcxw71/doc/images/ota_topology.JPG)
+![OTA_TOPOLOGY](../../../examples/platform/nxp/mcxw72/doc/images/ota_topology.JPG)
 
 The concept for OTA is the next one:
 

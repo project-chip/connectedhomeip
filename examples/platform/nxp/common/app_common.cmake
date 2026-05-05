@@ -266,8 +266,8 @@ if (CONFIG_CHIP_APP_OTA_REQUESTOR)
     endif()
     if (CONFIG_CHIP_APP_PLATFORM_OTA_UTILS)
         target_sources(app PRIVATE
-            # Use the example provided by mcxw71 platform until a common solution is proposed.
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/ota/OtaUtils.cpp
+            # Use the example provided by mcxw72 platform until a common solution is proposed.
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw72/ota/OtaUtils.cpp
         )
     endif()
 endif()
@@ -292,8 +292,8 @@ if (CONFIG_CHIP_APP_UI_FEEDBACK)
             )
         else()
             target_sources(app PRIVATE
-                # Use the example provided by mcxw71 platform until a common solution is proposed.
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/util/LedOnOff.cpp
+                # Use the example provided by mcxw72 platform until a common solution is proposed.
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw72/util/LedOnOff.cpp
             )
         endif()
     endif()
