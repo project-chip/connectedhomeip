@@ -28,6 +28,7 @@
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/EventIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Events.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
