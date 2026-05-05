@@ -8399,8 +8399,8 @@ endpoint 1 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = -27315;
-    ram      attribute maxMeasuredValue default = 32766;
+    ram      attribute minMeasuredValue default = 0x8000;
+    ram      attribute maxMeasuredValue default = 0x8000;
     ram      attribute tolerance;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -8864,7 +8864,6 @@ endpoint 2 {
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
-    ram      attribute batPercentRemaining default = 100;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -9019,3 +9018,5 @@ endpoint 65534 {
     handle command ReorderNetwork;
   }
 }
+
+

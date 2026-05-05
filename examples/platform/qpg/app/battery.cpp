@@ -90,7 +90,7 @@ void SetBatteryVoltage(uint32_t voltage)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([voltage] {
         CHIP_ERROR err;
-        if (PowerSourceCluster * cluster = FindClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
+        if (EmberBatteryPowerSourceCluster * cluster = FindBatteryClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
         {
             err = CHIP_ERROR_INCORRECT_STATE;
         }
@@ -109,7 +109,7 @@ void SetBatteryPercentageRemaining(DoubledPercentage value)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([value] {
         CHIP_ERROR err;
-        if (PowerSourceCluster * cluster = FindClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
+        if (EmberBatteryPowerSourceCluster * cluster = FindBatteryClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
         {
             err = CHIP_ERROR_INCORRECT_STATE;
         }
@@ -128,7 +128,7 @@ void SetBatChargeLevel(BatChargeLevelEnum level)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([level] {
         CHIP_ERROR err;
-        if (PowerSourceCluster * cluster = FindClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
+        if (EmberBatteryPowerSourceCluster * cluster = FindBatteryClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
         {
             err = CHIP_ERROR_INCORRECT_STATE;
         }
