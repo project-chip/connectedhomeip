@@ -91,7 +91,10 @@ public:
     DummyPowerSourceCluster & operator=(const DummyPowerSourceCluster &) = delete;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                        AttributeValueEncoder & encoder) override { return {}; }
+                                                AttributeValueEncoder & encoder) override
+    {
+        return {};
+    }
 
     PowerSourceStatusEnum GetStatus() const { return {}; }
     uint8_t GetOrder() const { return {}; }
