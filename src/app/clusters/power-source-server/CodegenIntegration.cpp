@@ -90,6 +90,7 @@ template <bool wiredSupported = wiredSupportNeeded, bool batterySupported = batt
           class EmberBatteryPowerSourceClusterT     = EmberBatteryPowerSourceCluster,
           class LazyRegisteredWiredSourceClusterT   = LazyRegisteredWiredSourceCluster,
           class LazyRegisteredBatterySourceClusterT = LazyRegisteredBatterySourceCluster,
+          class LazyRegisteredPowerSourceClusterT   = LazyRegisteredPowerSourceCluster,
           class StringStorageModuleT                = StringAttributeStorageModule<kAllAttributes.Raw()>>
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -343,27 +344,33 @@ public:
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
+        // The type is the same, just making this whole section depending to the class tempaltes,
+        // so that compiler will not complain on the code inside if constexpr.
+        LazyRegisteredPowerSourceClusterT & gServer = gServers[clusterInstanceIndex];
         if constexpr (wiredSupported && batterySupported)
         {
             return std::visit([](auto & server) { return server.IsConstructed() ? &server.Cluster() : nullptr; },
-                              gServers[clusterInstanceIndex]);
+                              gServer);
         }
         else
         {
-            VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-            return &gServers[clusterInstanceIndex].Cluster();
+            VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+            return &gServer.Cluster();
         }
     }
 
     void ReleaseRegistration(unsigned clusterInstanceIndex) override
     {
+        // The type is the same, just making this whole section depending to the class tempaltes,
+        // so that compiler will not complain on the code inside if constexpr.
+        LazyRegisteredPowerSourceClusterT & gServer = gServers[clusterInstanceIndex];
         if constexpr (wiredSupported && batterySupported)
         {
-            std::visit([](auto & server) { server.Destroy(); }, gServers[clusterInstanceIndex]);
+            std::visit([](auto & server) { server.Destroy(); }, gServer);
         }
         else
         {
-            gServers[clusterInstanceIndex].Destroy();
+            gServer.Destroy();
         }
     }
 };
