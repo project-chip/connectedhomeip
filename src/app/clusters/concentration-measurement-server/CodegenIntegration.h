@@ -73,12 +73,12 @@ public:
         mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
     {}
 
-    ~Instance()
+   ~Instance()
     {
-        if (mCluster.IsConstructed())
+        if (mRegistered)
         {
+            mRegistered = false;
             LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
-            mCluster.Destroy();
         }
     }
 
@@ -88,9 +88,16 @@ public:
      */
     CHIP_ERROR Init()
     {
-        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mRegistered, CHIP_NO_ERROR);
         mCluster.Create(mEndpointId, mConfig);
-        return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+        if (err != CHIP_NO_ERROR)
+        {
+            mCluster.Destroy();
+            return err;
+        }
+        mRegistered = true;
+        return CHIP_NO_ERROR;
     }
 
     ServerClusterRegistration & Registration() { return mCluster.Registration(); }
@@ -173,6 +180,7 @@ private:
         return f;
     }
 
+    bool mRegistered = false;
     EndpointId mEndpointId;
     ConcentrationMeasurementCluster::Config mConfig;
     LazyRegisteredServerCluster<ConcentrationMeasurementCluster> mCluster;

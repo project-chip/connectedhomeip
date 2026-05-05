@@ -66,6 +66,9 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
     mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured), mMaxMeasuredValue(config.maxMeasured),
     mUncertainty(config.uncertainty)
 {
+    (void) mMedium;
+    (void) mUnit;
+    (void) mUncertainty;
     VerifyOrDie(std::find(AliasedClusters.begin(), AliasedClusters.end(), config.clusterId) !=
                 AliasedClusters.end()); // NOLINT(bugprone-signed-bitwise)
 }

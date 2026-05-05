@@ -120,11 +120,11 @@ private:
     const BitFlags<Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
 
-    [[maybe_unused]] MeasurementMediumEnum mMedium;
-    [[maybe_unused]] MeasurementUnitEnum mUnit;
+    MeasurementMediumEnum mMedium;
+    MeasurementUnitEnum mUnit;
     DataModel::Nullable<float> mMinMeasuredValue;
     DataModel::Nullable<float> mMaxMeasuredValue;
-    [[maybe_unused]] float mUncertainty;
+    float mUncertainty;
     struct AttrDispatch
     {
         AttributeId id;
