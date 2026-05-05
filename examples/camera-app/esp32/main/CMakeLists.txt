@@ -26,6 +26,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CHIP_ROOT}/examples/platform/esp32"
                       "${CHIP_ROOT}/src/app/clusters/camera-av-stream-management-server"
                       "${CHIP_ROOT}/src/app/clusters/webrtc-transport-provider-server"
+                      "${CHIP_ROOT}/src/app/clusters/push-av-stream-transport-server"
                       "${CAMERA_COMMON_DIR}/include/camera-avstream-controller"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_CURRENT_LIST_DIR}/common"
@@ -41,6 +42,7 @@ set(SRC_DIRS_LIST
                       "${APP_COMMON_GEN_DIR}/attributes"
                       "${APP_COMMON_GEN_DIR}"
                       "${CHIP_ROOT}/src/app/clusters/camera-av-stream-management-server"
+                      "${CHIP_ROOT}/src/app/clusters/push-av-stream-transport-server"
                       "${CHIP_ROOT}/examples/providers"
                       "${CHIP_ROOT}/examples/platform/esp32/ota"
                       "${CHIP_ROOT}/examples/platform/esp32/common"
@@ -68,6 +70,8 @@ target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
+
+target_link_libraries(${COMPONENT_LIB} PRIVATE uriparser::uriparser)
 
 if (CONFIG_ENABLE_ENCRYPTED_OTA)
 	create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin

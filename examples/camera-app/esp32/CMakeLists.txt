@@ -30,8 +30,20 @@ set(EXTRA_COMPONENT_DIRS
 set(ENABLE_SIGNALLING_ONLY "enable only the signalling" ON)
 set(ENABLE_STREAMING_ONLY "enable only the streaming" OFF)
 
-
 project(chip-camera-app)
+
+# Build uriparser as a static library using its CMakeLists.txt
+get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip REALPATH)
+get_filename_component(URIPARSER_DIR ${CHIP_ROOT}/third_party/uriparser/repo REALPATH)
+
+# Configure uriparser build options
+set(URIPARSER_SHARED_LIBS OFF CACHE BOOL "Build shared libraries (rather than static ones)" FORCE)
+set(URIPARSER_BUILD_DOCS OFF CACHE BOOL "Build API documentation" FORCE)
+set(URIPARSER_BUILD_TOOLS OFF CACHE BOOL "Build tools" FORCE)
+set(URIPARSER_ENABLE_INSTALL OFF CACHE BOOL "Enable installation of uriparser" FORCE)
+
+# Add uriparser as a subdirectory - this is allowed at project level
+add_subdirectory(${URIPARSER_DIR} ${CMAKE_BINARY_DIR}/uriparser EXCLUDE_FROM_ALL)
 
 # WARNING: This is just an example for using key for decrypting the encrypted OTA image
 # Please do not use it as is.
