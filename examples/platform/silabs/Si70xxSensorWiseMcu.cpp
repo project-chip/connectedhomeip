@@ -131,9 +131,7 @@ sl_status_t Init()
 
 sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
 {
-    sl_status_t status      = SL_STATUS_OK;
-    int32_t tempTemperature = 0;
-    uint32_t tempHumidity   = 0;
+    sl_status_t status = SL_STATUS_OK;
 
 #if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
     // Add PS requirement to keep the sensor awake
@@ -144,6 +142,8 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     // Remove PS requirement to allow device to sleep (always remove, even on error)
     sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS3);
 #else
+    int32_t tempTemperature = 0;
+    uint32_t tempHumidity   = 0;
     status = sl_si91x_si70xx_measure_rh_and_temp(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, &tempHumidity, &tempTemperature);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 

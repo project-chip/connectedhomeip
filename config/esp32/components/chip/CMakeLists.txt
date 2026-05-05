@@ -487,6 +487,10 @@ if (CONFIG_ENABLE_ENCRYPTED_OTA)
     list(APPEND matter_requires espressif__esp_encrypted_img)
 endif()
 
+if (CONFIG_ENABLE_DELTA_OTA)
+    list(APPEND matter_requires espressif__esp_delta_ota)
+endif()
+
 add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
                      REQUIRES ${matter_requires})
 

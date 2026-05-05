@@ -28,12 +28,18 @@
 #include <system/SystemError.h>
 
 #include <zephyr/settings/settings.h>
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
+#include <version.h>
+#else
+#include <zephyr/version.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 namespace {
 
+#if KERNEL_VERSION_MAJOR < 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR < 4)
 struct ReadEntry
 {
     void * destination;           // destination address
@@ -41,6 +47,7 @@ struct ReadEntry
     size_t readSize;              // [out] size of read entry value
     CHIP_ERROR result;            // [out] read result
 };
+#endif
 
 struct DeleteSubtreeEntry
 {
@@ -87,6 +94,7 @@ CHIP_ERROR MakeFullKey(char (&fullKey)[SETTINGS_MAX_NAME_LEN + 1], const char * 
     return CHIP_NO_ERROR;
 }
 
+#if KERNEL_VERSION_MAJOR < 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR < 4)
 int LoadEntryCallback(const char * name, size_t entrySize, settings_read_cb readCb, void * cbArg, void * param)
 {
     ReadEntry & entry = *static_cast<ReadEntry *>(param);
@@ -123,6 +131,7 @@ int LoadEntryCallback(const char * name, size_t entrySize, settings_read_cb read
     // Return 1 to stop processing further keys
     return 1;
 }
+#endif
 
 int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_read_cb /* readCb */, void * /* cbArg */,
                           void * param)
@@ -143,6 +152,49 @@ int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_re
     return 0;
 }
 
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+void LoadOneAndVerifyResult(const char * fullkey, void * dest_buf, size_t dest_size, size_t * readSize, CHIP_ERROR * result)
+{
+    ssize_t bytesRead = settings_load_one(fullkey, dest_buf, dest_size);
+
+    // If the return code is -ENOENT the key is not found.
+    // A return value of 0 is a successful read of an existing zero-length value.
+    if ((bytesRead == -ENOENT) || (!bytesRead))
+    {
+        *result   = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        *readSize = 0;
+        return;
+    }
+    if ((bytesRead == kEmptyValueSize) && !memcmp(dest_buf, kEmptyValue, kEmptyValueSize))
+    {
+        *result   = CHIP_NO_ERROR;
+        *readSize = 0;
+        return;
+    }
+    // settings_load_one() returns the stored value length on success even when the
+    // buffer is smaller than the value; the callback only copies min(dest_size, len)
+    // bytes. Report how many bytes were placed in dest_buf for CHIP KVS semantics.
+    if ((size_t) bytesRead > dest_size)
+    {
+        *result   = CHIP_ERROR_BUFFER_TOO_SMALL;
+        *readSize = dest_size;
+        return;
+    }
+    else if (bytesRead >= 0)
+    {
+        *result = CHIP_NO_ERROR;
+    }
+    else
+    {
+        *result = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
+    *readSize = (bytesRead > 0) ? bytesRead : 0;
+
+    return;
+}
+#endif
+
 } // namespace
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
@@ -155,6 +207,70 @@ void KeyValueStoreManagerImpl::Init()
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+    CHIP_ERROR result;
+    size_t readSize = 0;
+    ssize_t ret     = 0;
+    uint8_t emptyValue[kEmptyValueSize];
+    // Offset and partial reads are not supported, for now just return NOT_IMPLEMENTED.
+    // Support can be added in the future if this is needed.
+    VerifyOrReturnError(offset_bytes == 0, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    char fullKey[SETTINGS_MAX_NAME_LEN + 1];
+    ReturnErrorOnFailure(MakeFullKey(fullKey, key));
+
+    if ((!value) || (value_size == 0))
+    {
+        // we want only to verify that the key exists
+        ret = settings_get_val_len(fullKey);
+
+        // Zephyr: length > 0 if present; 0 if key does not exist; negative on error.
+        if (ret > 0)
+        {
+            result = CHIP_NO_ERROR;
+        }
+        else if (ret == 0 || ret == -ENOENT)
+        {
+            result = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        }
+        else
+        {
+            result = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
+        // check that this pointer is not null as it is an optional argument
+        if (read_bytes_size)
+        {
+            *read_bytes_size = 0;
+        }
+
+        return result;
+    }
+
+    if (value_size < kEmptyValueSize)
+    {
+        LoadOneAndVerifyResult(fullKey, emptyValue, kEmptyValueSize, &readSize, &result);
+        if (readSize)
+        {
+            memcpy(value, emptyValue, value_size);
+        }
+        if (readSize > value_size)
+        {
+            result = CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+    }
+    else
+    {
+        LoadOneAndVerifyResult(fullKey, value, value_size, &readSize, &result);
+    }
+
+    // Assign readSize only in case read_bytes_size is not nullptr, as it is optional argument
+    if (read_bytes_size)
+    {
+        *read_bytes_size = readSize;
+    }
+
+    return result;
+#else
     // Offset and partial reads are not supported, for now just return NOT_IMPLEMENTED.
     // Support can be added in the future if this is needed.
     VerifyOrReturnError(offset_bytes == 0, CHIP_ERROR_NOT_IMPLEMENTED);
@@ -172,6 +288,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
 
     return entry.result;
+#endif
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
@@ -195,8 +312,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     char fullKey[SETTINGS_MAX_NAME_LEN + 1];
     ReturnErrorOnFailure(MakeFullKey(fullKey, key));
 
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+    // settings_get_val_len() returns 0 when the key is missing (not an error code).
+    VerifyOrReturnError(settings_get_val_len(fullKey) > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+#else
     VerifyOrReturnError(Get(key, nullptr, 0) != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND,
                         CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+#endif
     VerifyOrReturnError(settings_delete(fullKey) == 0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     return CHIP_NO_ERROR;

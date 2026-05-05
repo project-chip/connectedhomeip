@@ -19,12 +19,21 @@ _compiler_subdir = "gcc"
 if (is_clang) {
   _compiler_subdir = "clang"
 }
-_output_dir = "build/$current_cpu-$_compiler_subdir"
+_output_dir = "${target_out_dir}/$current_cpu-$_compiler_subdir"
 
 action("build_libdatachannel") {
   script = "scripts/build_libdatachannel.py"
-  outputs = [ "$target_gen_dir/repo/${_output_dir}/libdatachannel.so" ]
-  args = [ "--output-dir=${_output_dir}" ]
+  outputs = [
+    "${_output_dir}/libdatachannel-static.a",
+    "${_output_dir}/deps/usrsctp/usrsctplib/libusrsctp.a",
+    "${_output_dir}/deps/libsrtp/libsrtp2.a",
+    "${_output_dir}/deps/libjuice/libjuice-static.a",
+  ]
+
+  args = [
+    "--build-dir",
+    rebase_path(_output_dir, root_out_dir),
+  ]
 
   if (is_clang) {
     args += [ "--clang" ]
@@ -45,31 +54,28 @@ action("build_libdatachannel") {
 
 config("datachannel_config") {
   libs = [
-    "datachannel",
+    "datachannel-static",
     "usrsctp",
     "srtp2",
-    "juice",
+    "juice-static",
+
+    # We build static libraries and srtp2 depends on openssl
+    # TODO: can we somehow query this dynamically?
+    "ssl",
+    "crypto",
   ]
 
   cflags_cc = [ "-Wno-shadow" ]
-
-  # suppress known `libdatachannel` int conversion issues
-  cflags = [ "-Wno-implicit-int-conversion" ]
-
   if (is_clang) {
-    # We build static libraries and srtp2 depends on openssl
-    # TODO: can we somehow query this dynamically?
-    libs += [
-      "ssl",
-      "crypto",
-    ]
+    # suppress known `libdatachannel` int conversion issues
+    cflags = [ "-Wno-implicit-int-conversion" ]
   }
 
   lib_dirs = [
-    rebase_path("repo/${_output_dir}"),
-    rebase_path("repo/${_output_dir}/deps/usrsctp/usrsctplib"),
-    rebase_path("repo/${_output_dir}/deps/libsrtp"),
-    rebase_path("repo/${_output_dir}/deps/libjuice"),
+    "${_output_dir}",
+    "${_output_dir}/deps/usrsctp/usrsctplib",
+    "${_output_dir}/deps/libsrtp",
+    "${_output_dir}/deps/libjuice",
   ]
 }
 

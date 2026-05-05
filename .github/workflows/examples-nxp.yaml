@@ -48,7 +48,7 @@ jobs:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -56,7 +56,7 @@ jobs:
                   extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
-              uses: dorny/paths-filter@v4
+              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
               id: changed_paths
               with:
                   filters: |
@@ -68,20 +68,6 @@ jobs:
               if: ${{ !env.ACT }}
               with:
                   gh-context: ${{ toJson(github) }}
-
-            - name: Build MCXW71 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory \
-                      build \
-                  "
-            - name: Get MCXW71 contact sensor size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp mcxw71+release contact \
-                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory/app.elf \
-                    /tmp/bloat_reports/
 
             - name: Build MCXW72 examples
               run: |
@@ -157,13 +143,13 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: nxp
             - name: Detect changed paths
-              uses: dorny/paths-filter@v4
+              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
               id: changed_paths
               with:
                   filters: |
