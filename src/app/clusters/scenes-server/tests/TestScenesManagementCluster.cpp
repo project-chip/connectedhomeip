@@ -204,6 +204,7 @@ public:
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex, GroupId) override { return nullptr; }
     uint16_t getMaxMembershipCount() override { return 0; }
     uint16_t getMaxMcastAddrCount() override { return 0; }
+    bool ConsumeAuxAclNotificationNeeded() override { return false; }
 
     bool mHasEndpoint = true;
 };

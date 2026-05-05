@@ -17,12 +17,11 @@
 
 #include "LEDWidget.h"
 #include "ColorFormat.h"
+#include <lib/support/CodeUtils.h>
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
-#include "led_strip.h"
-
-static const char TAG[] = "LEDWidget";
+static constexpr char TAG[] = "LEDWidget";
 
 void LEDWidget::Init(void)
 {
@@ -30,14 +29,15 @@ void LEDWidget::Init(void)
     mBrightness = UINT8_MAX;
 
 #if CONFIG_LED_TYPE_RMT
-    rmt_config_t config             = RMT_DEFAULT_CONFIG_TX((gpio_num_t) CONFIG_LED_GPIO, (rmt_channel_t) CONFIG_LED_RMT_CHANNEL);
-    led_strip_config_t strip_config = LED_STRIP_DEFAULT_CONFIG(1, (led_strip_dev_t) config.channel);
+    led_strip_config_t strip_config = {};
+    strip_config.strip_gpio_num     = (gpio_num_t) CONFIG_LED_GPIO;
+    strip_config.max_leds           = 1;
 
-    config.clk_div = 2;
-    rmt_config(&config);
-    rmt_driver_install(config.channel, 0, 0);
+    led_strip_rmt_config_t rmt_config = {};
+    rmt_config.resolution_hz          = 10 * 1000 * 1000; // 10 MHz
 
-    mStrip      = led_strip_new_rmt_ws2812(&strip_config);
+    VerifyOrReturn(led_strip_new_rmt_device(&strip_config, &rmt_config, &mStrip) == ESP_OK,
+                   ESP_LOGE("LEDWidget", "Failed to create LED strip"));
     mHue        = 0;
     mSaturation = 0;
 #else
@@ -125,8 +125,8 @@ void LEDWidget::DoSet(void)
     {
         HsvColor_t hsv = { mHue, mSaturation, brightness };
         RgbColor_t rgb = HsvToRgb(hsv);
-        mStrip->set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
-        mStrip->refresh(mStrip, 100);
+        led_strip_set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
+        led_strip_refresh(mStrip);
     }
 #else
     if (mGPIONum < GPIO_NUM_MAX)

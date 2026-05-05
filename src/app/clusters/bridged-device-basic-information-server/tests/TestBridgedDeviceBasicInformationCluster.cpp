@@ -13,8 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/Optional.h"
-#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
@@ -41,9 +39,11 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 #include <string>
 
@@ -209,13 +209,6 @@ struct TestBridgedDeviceBasicInformationCluster : public ::testing::Test
 
     MockDeviceInstanceInfoProvider mDeviceInfoProvider;
     MockConfigurationManager mMockConfigManager;
-
-    BasicInformationCluster::Context mBasicInfoContext = {
-        .deviceInstanceInfoProvider = mDeviceInfoProvider,
-        .configurationManager       = mMockConfigManager,
-        .platformManager            = DeviceLayer::PlatformMgr(),
-        .subscriptionsPerFabric     = 1,
-    };
 
     TestServerClusterContext mContext;
     MockDelegate mDelegate;
@@ -1068,7 +1061,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestNodeLabelPersistence)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestBasicInformationClusterProxy)
 {
-    BasicInformationCluster basicInfo(BasicInformationCluster::OptionalAttributesSet(), mBasicInfoContext);
+    BasicInformationCluster basicInfo(BasicInformationOptionalAttributesSet(), mDeviceInfoProvider, mMockConfigManager,
+                                      chip::DeviceLayer::PlatformMgr(), static_cast<uint16_t>(1));
 
     // Initial value in our mock is 10
     EXPECT_EQ(mMockConfigManager.mConfigurationVersion, 10u);

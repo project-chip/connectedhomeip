@@ -52,6 +52,9 @@ public:
     inline void SetButtonsCb(SilabsButtonCb callback) override { mButtonCallback = callback; }
     static SilabsButtonCb mButtonCallback;
     uint8_t GetButtonState(uint8_t button) override;
+#ifdef SL_ICD_ENABLED
+    void SleepButtonActionHandler(void) override;
+#endif // SL_ICD_ENABLED
 
 #if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     void StartScheduler(void) override;
@@ -94,6 +97,10 @@ public:
 
 private:
     friend SilabsPlatform & GetPlatform(void);
+
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+    sl_status_t EnableSi70xxSensorGpio() override;
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
     // To make underlying SDK thread safe
     void SilabsPlatformLock(void);

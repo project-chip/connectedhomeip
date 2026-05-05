@@ -289,6 +289,12 @@ void InitServer(intptr_t context)
         return;
     }
 
+    initParams.groupDataProvider = &gGroupDataProvider;
+    gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
+    SuccessOrDie(gGroupDataProvider.Init());
+    Credentials::SetGroupDataProvider(&gGroupDataProvider);
+
     initParams.dataModelProvider =
         PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);
     initParams.operationalServicePort        = CHIP_PORT;

@@ -136,7 +136,7 @@ class RealtekBuilder(Builder):
     def CmakeBuildFlags(self) -> str:
         flags = [
             "-DCMAKE_BUILD_TYPE=Release",
-            f"-DCMAKE_TOOLCHAIN_FILE={self.ot_src_dir}/src/bee4/arm-none-eabi.cmake",
+            f"-DCMAKE_TOOLCHAIN_FILE={self.ot_src_dir}/src/rtl87x2g/arm-none-eabi.cmake",
             "-DBUILD_TYPE=sdk",
             f"-DBUILD_TARGET={self.board.BoardName}",
             f"-DBUILD_BOARD_TARGET={self.board.BoardName}",
@@ -173,11 +173,11 @@ class RealtekBuilder(Builder):
         if self.os_env != RtkOsUsed.FREERTOS:
             # For freertos, app.ld needs to be precompiled with gcc
             return
-        cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
+        cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/rtl87x2g/{board_name}/app.ld -o {ot_src_dir}/src/rtl87x2g/{board_name}/app.ld.gen'.format(
             ot_src_dir=self.ot_src_dir,
             board_name=self.board.BoardName)
         self._Execute(['bash', '-c', cmd])
-        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
+        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} -DPython3_EXECUTABLE=$(which python3) {example_folder} -B{out_folder}'.format(
             build_flags=self.CmakeBuildFlags(),
             example_folder=self.rtk_matter_dir,
             out_folder=self.output_dir)
@@ -190,7 +190,7 @@ class RealtekBuilder(Builder):
                 cmd.append('-j' + str(self.ninja_jobs))
             cmd.append(self.app.TargetName)
             self._Execute(cmd, title='Building ' + self.identifier)
-            cleanup_cmd = ['rm', '-rf', f"{self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen"]
+            cleanup_cmd = ['rm', '-rf', f"{self.root}/third_party/openthread/ot-realtek/src/rtl87x2g/{self.board.BoardName}/*.gen"]
             self._Execute(cleanup_cmd, title='Cleaning up generated files')
         else:
             cmd = self.get_cmd_prefixes()

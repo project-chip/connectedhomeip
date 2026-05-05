@@ -202,12 +202,8 @@ class Runner:
         cmd = subproc.to_cmd()
         log.info('RunSubprocess starting application %s', " ".join(cmd))
 
-        outpipe = LogPipe(
-            logging.DEBUG, capture_delegate=self.capture_delegate,
-            name=name + ' OUT')
-        errpipe = LogPipe(
-            logging.INFO, capture_delegate=self.capture_delegate,
-            name=name + ' ERR')
+        outpipe = LogPipe(logging.DEBUG, capture_delegate=self.capture_delegate, name=name + ' STDOUT')
+        errpipe = LogPipe(logging.INFO, capture_delegate=self.capture_delegate, name=name + ' STDERR')
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)

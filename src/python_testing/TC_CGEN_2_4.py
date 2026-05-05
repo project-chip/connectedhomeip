@@ -140,8 +140,11 @@ class TC_CGEN_2_4(MatterBaseTest):
         await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
 
         log.info('Step 18 - TH1 reads the location capability')
-        attr = Clusters.GeneralCommissioning.Attributes.LocationCapability
-        cap = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0, attribute=attr)
+        cap = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1,
+            cluster=Clusters.GeneralCommissioning,
+            attribute=Clusters.GeneralCommissioning.Attributes.LocationCapability,
+            endpoint=0)
         if cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor:
             newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kOutdoor
         elif cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kOutdoor:

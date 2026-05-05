@@ -238,15 +238,15 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif
 
 #if CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
-    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
+    LogErrorOnFailure(sWiFiNetworkCommissioningInstance.Init());
 #endif // CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
 #if CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
-    sEthernetNetworkCommissioningInstance.Init();
+    LogErrorOnFailure(sEthernetNetworkCommissioningInstance.Init());
 #endif // CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #ifdef CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
-    sThreadNetworkDriver.Init();
+    LogErrorOnFailure(sThreadNetworkDriver.Init());
 #endif // CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
