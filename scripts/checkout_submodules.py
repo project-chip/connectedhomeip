@@ -147,7 +147,6 @@ def deinit_modules(modules: list, force: bool) -> None:
     subprocess.check_call(cmd)
 
 
-
 def main():
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
