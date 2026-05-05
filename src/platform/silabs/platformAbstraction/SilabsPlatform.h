@@ -20,6 +20,7 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatformBase.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "sl_component_catalog.h"
 
 namespace chip {
 namespace DeviceLayer {
