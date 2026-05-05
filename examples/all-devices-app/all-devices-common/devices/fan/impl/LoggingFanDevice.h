@@ -47,6 +47,9 @@ public:
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
+
+private:
+    bool mOnOffClusterTurnedOff = false;
 };
 
 } // namespace app

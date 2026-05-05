@@ -179,6 +179,11 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
     if (!onOff.GetOnOff())
     {
         ApplyOnOffToFan(fan, false);
+        if (!mOnOffClusterTurnedOff && IsFanSetForOn(newState))
+        {
+            LogErrorOnFailure(onOff.SetOnOff(true));
+            ApplyOnOffToFan(fan, true);
+        }
         return;
     }
 
@@ -213,6 +218,7 @@ void LoggingFanDevice::OnOffStartup(bool on)
 
 void LoggingFanDevice::OnOnOffChanged(bool on)
 {
+    mOnOffClusterTurnedOff = !on;
     ApplyOnOffToFan(FanControlCluster(), on);
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffChanged() -> %s", on ? "ON" : "OFF");
 }
