@@ -95,9 +95,9 @@ Protocols::InteractionModel::Status LoggingFanDevice::HandleStep(FanControl::Ste
     VerifyOrReturnError(cluster.GetFeatureMap().Has(FanControl::Feature::kMultiSpeed),
                         Protocols::InteractionModel::Status::Failure);
 
-    const uint8_t speedMax = cluster.GetSpeedMax();
-    const auto speedSetting  = cluster.GetSpeedSetting();
-    uint8_t newSpeedSetting  = speedSetting.ValueOr(0);
+    const uint8_t speedMax  = cluster.GetSpeedMax();
+    const auto speedSetting = cluster.GetSpeedSetting();
+    uint8_t newSpeedSetting = speedSetting.ValueOr(0);
 
     // Match all-clusters-app FanControlManager::HandleStep boundary and null semantics (TC-FAN-3.5).
     if (aDirection == FanControl::StepDirectionEnum::kIncrease)
