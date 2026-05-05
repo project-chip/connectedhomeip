@@ -175,6 +175,52 @@ CHIP_ERROR se05x_check_object_exists(uint32_t keyid, bool * key_exists)
     return CHIP_NO_ERROR;
 }
 
+
+/* Read object size from se05x */
+CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t *psize)
+{
+    smStatus_t smstatus   = SM_NOT_OK;
+    SE05x_Result_t exists = kSE05x_Result_NA;
+
+    VerifyOrReturnError(psize != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (se05x_session_open() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x error: Error in session open");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (gex_sss_chip_ctx.ks.session == NULL)
+    {
+        ChipLogError(Crypto, "se05x error: Session is NULL");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // First check if object exists
+    smstatus = Se05x_API_CheckObjectExists(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, objid, &exists);
+    if (smstatus != SM_OK)
+    {
+        ChipLogError(Crypto, "se05x error: Error in Se05x_API_CheckObjectExists for objid 0x%" PRIx32, objid);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (exists == kSE05x_Result_FAILURE)
+    {
+        ChipLogDetail(Crypto, "se05x info: Object does not exist for objid 0x%" PRIx32, objid);
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Read the object size
+    smstatus = Se05x_API_ReadSize(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, objid, psize);
+    if (smstatus != SM_OK)
+    {
+        ChipLogError(Crypto, "se05x error: Error in Se05x_API_ReadSize for objid 0x%" PRIx32, objid);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 /* Delete key in se05x */
 void se05x_delete_key(uint32_t keyid)
 {
