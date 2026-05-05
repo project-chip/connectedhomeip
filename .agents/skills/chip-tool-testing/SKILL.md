@@ -88,3 +88,26 @@ After successful commissioning, you can use `chip-tool` to interact with data mo
 ## Troubleshooting
 - **Timeout**: If a command times out, you can increase it with `--timeout <seconds>`.
 - **Configuration Cache**: `chip-tool` caches state in `chip_tool_config.ini` (often in the current directory or `/tmp`). Deleting this file can resolve stale configuration issues. You can also specify a custom directory with `--storage-directory <path>`.
+
+## Reporting Results
+
+When completing a test task using this skill, you should output a structured report to the user containing the following evidence:
+
+### 1. Build Process
+- State which targets were built and for which platform.
+
+### 2. Device Configuration and Startup
+- State the command used to run the application and any specific arguments used (like `--device`).
+- Include the pairing credentials (Setup PIN and Discriminator) extracted from the logs.
+
+### 3. Commissioning Evidence
+- Provide the `chip-tool` command used for commissioning.
+- Include a snippet of the logs showing successful commissioning (e.g., `Commissioning complete for node ID...`).
+
+### 4. Data Model Verification
+- Include the commands used to read `PartsList` or other attributes to verify the data model hierarchy.
+- Provide the output snippets showing the expected endpoints and relationships.
+
+### 5. Interaction Evidence
+- List the commands used to read/write attributes or invoke commands on each endpoint.
+- State the result (e.g., `Status=0x0 (SUCCESS)`) to prove it worked.
