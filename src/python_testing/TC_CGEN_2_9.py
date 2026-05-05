@@ -55,11 +55,11 @@ class TC_CGEN_2_9(MatterBaseTest):
     async def remove_commissioner_fabric(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
-        commissioner_fabric_index_on_dut = await self.read_single_attribute(
+        commissioner_fabric_index_on_dut = await self.read_single_attribute_check_success(
             dev_ctrl=commissioner,
-            node_id=self.dut_node_id,
-            endpoint=ROOT_ENDPOINT_ID,
-            attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+            cluster=Clusters.OperationalCredentials,
+            attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
+            endpoint=ROOT_ENDPOINT_ID)
         log.info(f"Commissioner's fabricIndex on DUT: {commissioner_fabric_index_on_dut}")
 
         fabrics: list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
