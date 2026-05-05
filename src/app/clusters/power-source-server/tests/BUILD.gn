@@ -22,10 +22,10 @@ chip_test_suite("tests") {
   output_name = "libTestPowerSourceCluster"
 
   test_sources = [
-    "TestFullWiredPowerSourceCluster.cpp",
-    "TestMinimalWiredPowerSourceCluster.cpp",
     "TestFullBatteryPowerSourceCluster.cpp",
+    "TestFullWiredPowerSourceCluster.cpp",
     "TestMinimalBatteryPowerSourceCluster.cpp",
+    "TestMinimalWiredPowerSourceCluster.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

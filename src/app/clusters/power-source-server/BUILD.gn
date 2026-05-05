@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 source_set("power-source-server") {
   sources = [
     "Modules.h",
-    "PowerSourceCluster.h"
+    "PowerSourceCluster.h",
   ]
 
   public_deps = [
