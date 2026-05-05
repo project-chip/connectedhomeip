@@ -1,5 +1,49 @@
+exclude: |
+    (?x)^(
+        third_party/|
+        out/|
+        examples/chef/zzz_generated/|
+        zzz_generated/|
+        src/controller/python/matter/clusters/Objects.py|
+        src/controller/python/matter/clusters/CHIPClusters.py|
+        scripts/py_matter_idl/matter/idl/tests/outputs/|
+        scripts/tools/zap/tests/outputs/|
+        src/darwin/Framework/CHIP/zap-generated/|
+        examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/
+    )
+
 repos:
-  - repo: https://github.com/google/keep-sorted
-    rev: v0.7.1
-    hooks:
-      - id: keep-sorted
+    - repo: https://github.com/google/keep-sorted
+      rev: c71803fd297b5736f3bfab1cfd84424ca52e961a # v0.7.1
+      hooks:
+          - id: keep-sorted
+
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: 41d2daf392fbf43341a77f24a9c6481a4b66af98 # v0.9.10
+      hooks:
+          - id: ruff
+            args: [--fix-only]
+
+    - repo: https://github.com/hhatto/autopep8
+      rev: 4046ad49e25b7fa1db275bf66b1b7d60600ac391 # v2.3.2
+      hooks:
+          - id: autopep8
+
+    - repo: https://github.com/pycqa/isort
+      rev: c235f5e450b4b84e58d114ed4c589cbf454175a3 # 5.13.2
+      hooks:
+          - id: isort
+
+    - repo: https://github.com/pre-commit/mirrors-clang-format
+      rev: 0c9f6988b324eb7fc7dcf171bfce13faa9b13ad3 # v16.0.6
+      hooks:
+          - id: clang-format
+            files: \.(c|cc|cpp|ipp|cxx|c\+\+|C|cs|h|hh|hpp|hxx|h\+\+|H|js|m|mm)$
+
+    # Validates that .github/workflows/*.{yml,yaml} parse and conform to the
+    # GitHub Actions schema. Catches the silent-skip class where a workflow
+    # with a YAML/schema error never runs and never posts a check.
+    - repo: https://github.com/python-jsonschema/check-jsonschema
+      rev: f805888065fdb6162e1f800e50bb9460cbd223d6 # 0.37.2
+      hooks:
+          - id: check-github-workflows

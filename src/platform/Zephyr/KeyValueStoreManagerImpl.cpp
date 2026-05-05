@@ -152,7 +152,7 @@ int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_re
     return 0;
 }
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
 void LoadOneAndVerifyResult(const char * fullkey, void * dest_buf, size_t dest_size, size_t * readSize, CHIP_ERROR * result)
 {
     ssize_t bytesRead = settings_load_one(fullkey, dest_buf, dest_size);
@@ -171,10 +171,13 @@ void LoadOneAndVerifyResult(const char * fullkey, void * dest_buf, size_t dest_s
         *readSize = 0;
         return;
     }
+    // settings_load_one() returns the stored value length on success even when the
+    // buffer is smaller than the value; the callback only copies min(dest_size, len)
+    // bytes. Report how many bytes were placed in dest_buf for CHIP KVS semantics.
     if ((size_t) bytesRead > dest_size)
     {
         *result   = CHIP_ERROR_BUFFER_TOO_SMALL;
-        *readSize = static_cast<size_t>(bytesRead);
+        *readSize = dest_size;
         return;
     }
     else if (bytesRead >= 0)
@@ -204,7 +207,7 @@ void KeyValueStoreManagerImpl::Init()
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
     CHIP_ERROR result;
     size_t readSize = 0;
     ssize_t ret     = 0;
@@ -220,11 +223,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     {
         // we want only to verify that the key exists
         ret = settings_get_val_len(fullKey);
-        if (ret >= 0)
+
+        // Zephyr: length > 0 if present; 0 if key does not exist; negative on error.
+        if (ret > 0)
         {
             result = CHIP_NO_ERROR;
         }
-        else if (ret == -ENOENT)
+        else if (ret == 0 || ret == -ENOENT)
         {
             result = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
         }
@@ -307,8 +312,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     char fullKey[SETTINGS_MAX_NAME_LEN + 1];
     ReturnErrorOnFailure(MakeFullKey(fullKey, key));
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
-    VerifyOrReturnError(settings_get_val_len(fullKey) >= 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+    // settings_get_val_len() returns 0 when the key is missing (not an error code).
+    VerifyOrReturnError(settings_get_val_len(fullKey) > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 #else
     VerifyOrReturnError(Get(key, nullptr, 0) != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND,
                         CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);

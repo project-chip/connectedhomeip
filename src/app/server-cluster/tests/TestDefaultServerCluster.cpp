@@ -195,6 +195,18 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 234));
+
+    // Test kQuiet
+    context.ChangeListener().DirtyList().clear();
+    context.ChangeListener().ChangedList().clear();
+
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    cluster.NotifyAttributeChanged(345, AttributeChangeType::kQuiet);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+
+    ASSERT_EQ(context.ChangeListener().ChangedList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().ChangedList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 345));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
 }
 
 TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
