@@ -20,7 +20,8 @@ using namespace chip::Testing;
 using namespace chip::app::Clusters::PowerSource::TestSupport;
 
 struct TestMinimalBatteryPowerSourceCluster : public TestBase
-{};
+{
+};
 
 TEST_F(TestMinimalBatteryPowerSourceCluster, AttributeTest)
 {
@@ -28,17 +29,10 @@ TEST_F(TestMinimalBatteryPowerSourceCluster, AttributeTest)
     MinimalBatteryPowerSourceCluster cluster(config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster,
-        {
-            Status::kMetadataEntry,
-            Order::kMetadataEntry,
-            Description::kMetadataEntry,
-            BatChargeLevel::kMetadataEntry,
-            BatReplacementNeeded::kMetadataEntry,
-            BatReplaceability::kMetadataEntry,
-            EndpointList::kMetadataEntry
-        }));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        { Status::kMetadataEntry, Order::kMetadataEntry, Description::kMetadataEntry,
+                                          BatChargeLevel::kMetadataEntry, BatReplacementNeeded::kMetadataEntry,
+                                          BatReplaceability::kMetadataEntry, EndpointList::kMetadataEntry }));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

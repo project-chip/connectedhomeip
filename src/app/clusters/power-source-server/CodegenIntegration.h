@@ -39,14 +39,15 @@ constexpr BitFlags<Feature> GetAllFeaturesEnabledOnSomeEndpoint()
     return features;
 }
 
-constexpr BitFlags<Feature> kAllFeatures = GetAllFeaturesEnabledOnSomeEndpoint();
-constexpr BitFlags<Feature> kWiredFeature = BitFlags<Feature>(kAllFeatures.Raw() & to_underlying(Feature::kWired));
+constexpr BitFlags<Feature> kAllFeatures     = GetAllFeaturesEnabledOnSomeEndpoint();
+constexpr BitFlags<Feature> kWiredFeature    = BitFlags<Feature>(kAllFeatures.Raw() & to_underlying(Feature::kWired));
 constexpr BitFlags<Feature> kBatteryFeatures = BitFlags<Feature>(kAllFeatures.Raw() & ~to_underlying(Feature::kWired));
 
-constexpr bool wiredSupportNeeded = kWiredFeature.Has(Feature::kWired);
+constexpr bool wiredSupportNeeded   = kWiredFeature.Has(Feature::kWired);
 constexpr bool batterySupportNeeded = kBatteryFeatures.Has(Feature::kBattery);
 
-static_assert(wiredSupportNeeded || batterySupportNeeded, "At least one of Wired or Battery features must be used by some endpoint");
+static_assert(wiredSupportNeeded || batterySupportNeeded,
+              "At least one of Wired or Battery features must be used by some endpoint");
 
 constexpr AttributeSet GetAllAttributesEnabledOnSomeEndpoint()
 {
@@ -65,10 +66,11 @@ constexpr AttributeSet kAllAttributes = GetAllAttributesEnabledOnSomeEndpoint();
 
 } // namespace detail
 
-// Dummy class to allow well-formed code when wired or battery support is not needed/supported but the code is written for them to be needed/supported.
-// For example see the code in `src/app/clusters/power-source-configuration-server/power-source-configuration-server.cpp` lines 78-91.
-// This code needs to work regardless of whether wired or battery support is there. And a `GetOrder` member function needs to be defined.
-// Note that this class has all constructors deleted, so it will not actually be instantiated and used. Only a nullptr of this type will be used.
+// Dummy class to allow well-formed code when wired or battery support is not needed/supported but the code is written for them to
+// be needed/supported. For example see the code in
+// `src/app/clusters/power-source-configuration-server/power-source-configuration-server.cpp` lines 78-91. This code needs to work
+// regardless of whether wired or battery support is there. And a `GetOrder` member function needs to be defined. Note that this
+// class has all constructors deleted, so it will not actually be instantiated and used. Only a nullptr of this type will be used.
 // This class is also an overview of functionality that the actuall PowerSourceCluster can have.
 class DummyPowerSourceCluster final : public ::chip::app::DefaultServerCluster
 {
@@ -84,8 +86,8 @@ public:
     using BatChargeStateEnum       = PowerSource::BatChargeStateEnum;
     using BatChargeFaultEnum       = PowerSource::BatChargeFaultEnum;
 
-    DummyPowerSourceCluster() = delete;
-    DummyPowerSourceCluster(const DummyPowerSourceCluster &) = delete;
+    DummyPowerSourceCluster()                                            = delete;
+    DummyPowerSourceCluster(const DummyPowerSourceCluster &)             = delete;
     DummyPowerSourceCluster & operator=(const DummyPowerSourceCluster &) = delete;
 
     PowerSourceStatusEnum GetStatus() const { return {}; }
@@ -149,8 +151,12 @@ public:
     CHIP_ERROR SetEndpointList(Span<const EndpointId>) { return {}; }
 };
 
-using EmberWiredPowerSourceCluster = std::conditional_t<detail::wiredSupportNeeded, PowerSourceCluster<detail::kWiredFeature.Raw(), detail::kAllAttributes.Raw()>, DummyPowerSourceCluster>;
-using EmberBatteryPowerSourceCluster = std::conditional_t<detail::batterySupportNeeded, PowerSourceCluster<detail::kBatteryFeatures.Raw(), detail::kAllAttributes.Raw()>, DummyPowerSourceCluster>;
+using EmberWiredPowerSourceCluster =
+    std::conditional_t<detail::wiredSupportNeeded, PowerSourceCluster<detail::kWiredFeature.Raw(), detail::kAllAttributes.Raw()>,
+                       DummyPowerSourceCluster>;
+using EmberBatteryPowerSourceCluster =
+    std::conditional_t<detail::batterySupportNeeded,
+                       PowerSourceCluster<detail::kBatteryFeatures.Raw(), detail::kAllAttributes.Raw()>, DummyPowerSourceCluster>;
 
 EmberWiredPowerSourceCluster * FindWiredClusterOnEndpoint(EndpointId id);
 EmberBatteryPowerSourceCluster * FindBatteryClusterOnEndpoint(EndpointId id);

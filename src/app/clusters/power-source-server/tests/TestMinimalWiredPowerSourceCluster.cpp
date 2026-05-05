@@ -20,7 +20,8 @@ using namespace chip::Testing;
 using namespace chip::app::Clusters::PowerSource::TestSupport;
 
 struct TestMinimalWiredPowerSourceCluster : public TestBase
-{};
+{
+};
 
 TEST_F(TestMinimalWiredPowerSourceCluster, AttributeTest)
 {
@@ -28,15 +29,9 @@ TEST_F(TestMinimalWiredPowerSourceCluster, AttributeTest)
     MinimalWiredPowerSourceCluster cluster(config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster,
-        {
-            Status::kMetadataEntry,
-            Order::kMetadataEntry,
-            Description::kMetadataEntry,
-            WiredCurrentType::kMetadataEntry,
-            EndpointList::kMetadataEntry
-        }));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        { Status::kMetadataEntry, Order::kMetadataEntry, Description::kMetadataEntry,
+                                          WiredCurrentType::kMetadataEntry, EndpointList::kMetadataEntry }));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

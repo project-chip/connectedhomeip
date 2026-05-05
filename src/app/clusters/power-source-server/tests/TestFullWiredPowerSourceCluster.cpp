@@ -20,7 +20,8 @@ using namespace chip::Testing;
 using namespace chip::app::Clusters::PowerSource::TestSupport;
 
 struct TestFullWiredPowerSourceCluster : public TestBase
-{};
+{
+};
 
 TEST_F(TestFullWiredPowerSourceCluster, AttributeTest)
 {
@@ -30,20 +31,10 @@ TEST_F(TestFullWiredPowerSourceCluster, AttributeTest)
 
     EXPECT_TRUE(IsAttributesListEqualTo(
         cluster,
-        {
-            Status::kMetadataEntry,
-            Order::kMetadataEntry,
-            Description::kMetadataEntry,
-            WiredAssessedInputVoltage::kMetadataEntry,
-            WiredAssessedInputFrequency::kMetadataEntry,
-            WiredCurrentType::kMetadataEntry,
-            WiredAssessedCurrent::kMetadataEntry,
-            WiredNominalVoltage::kMetadataEntry,
-            WiredMaximumCurrent::kMetadataEntry,
-            WiredPresent::kMetadataEntry,
-            ActiveWiredFaults::kMetadataEntry,
-            EndpointList::kMetadataEntry
-        }));
+        { Status::kMetadataEntry, Order::kMetadataEntry, Description::kMetadataEntry, WiredAssessedInputVoltage::kMetadataEntry,
+          WiredAssessedInputFrequency::kMetadataEntry, WiredCurrentType::kMetadataEntry, WiredAssessedCurrent::kMetadataEntry,
+          WiredNominalVoltage::kMetadataEntry, WiredMaximumCurrent::kMetadataEntry, WiredPresent::kMetadataEntry,
+          ActiveWiredFaults::kMetadataEntry, EndpointList::kMetadataEntry }));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -71,7 +62,8 @@ TEST_F(TestFullWiredPowerSourceCluster, ReadAttributeTest)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-template <uint32_t> struct debug_val;
+template <uint32_t>
+struct debug_val;
 TEST_F(TestFullWiredPowerSourceCluster, TestGetters)
 {
     FullWiredPowerSourceConfig config(kTestEndpointId, CharSpan{}, WiredCurrentTypeEnum::kAc);

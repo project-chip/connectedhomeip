@@ -19,8 +19,8 @@
 #include "CodegenIntegration.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/attribute-storage.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -41,16 +41,16 @@ DefaultTimerDelegate gTimerDelegate;
 constexpr size_t kPowerSourceFixedClusterCount = PowerSource::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kPowerSourceMaxClusterCount   = kPowerSourceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-using LazyRegisteredWiredSourceCluster = std::conditional_t<wiredSupportNeeded, LazyRegisteredServerCluster<EmberWiredPowerSourceCluster>, void>;
-using LazyRegisteredBatterySourceCluster = std::conditional_t<batterySupportNeeded, LazyRegisteredServerCluster<EmberBatteryPowerSourceCluster>, void>;
+using LazyRegisteredWiredSourceCluster =
+    std::conditional_t<wiredSupportNeeded, LazyRegisteredServerCluster<EmberWiredPowerSourceCluster>, void>;
+using LazyRegisteredBatterySourceCluster =
+    std::conditional_t<batterySupportNeeded, LazyRegisteredServerCluster<EmberBatteryPowerSourceCluster>, void>;
 
-using LazyRegisteredPowerSourceCluster = std::conditional_t<wiredSupportNeeded,
-                                            std::conditional_t<batterySupportNeeded,
-                                                std::variant<LazyRegisteredWiredSourceCluster, LazyRegisteredBatterySourceCluster>,
-                                                LazyRegisteredWiredSourceCluster>,
-                                            std::conditional_t<batterySupportNeeded,
-                                                LazyRegisteredBatterySourceCluster,
-                                                std::monostate>>;
+using LazyRegisteredPowerSourceCluster = std::conditional_t<
+    wiredSupportNeeded,
+    std::conditional_t<batterySupportNeeded, std::variant<LazyRegisteredWiredSourceCluster, LazyRegisteredBatterySourceCluster>,
+                       LazyRegisteredWiredSourceCluster>,
+    std::conditional_t<batterySupportNeeded, LazyRegisteredBatterySourceCluster, std::monostate>>;
 
 LazyRegisteredPowerSourceCluster gServers[kPowerSourceMaxClusterCount];
 std::array<StringAttributeStorageModule<kAllAttributes.Raw()>, CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> gStringAttributeStorage;
@@ -60,7 +60,8 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpointId, PowerSource::Id, attributeId);
     VerifyOrDie(metadata != nullptr);
     VerifyOrDie(!metadata->IsExternal());
-    VerifyOrDie(metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE || metadata->attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+    VerifyOrDie(metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE ||
+                metadata->attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
     VerifyOrDie(metadata->defaultValue.ptrToDefaultValue != nullptr);
 
     size_t bytesForLength = (metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE) ? 1 : 2;
@@ -69,7 +70,7 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
     return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + bytesForLength, size);
 }
 
-template<size_t maxLength, class GetAccessor>
+template <size_t maxLength, class GetAccessor>
 CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpointId, std::string & storage)
 {
     char buffer[maxLength];
@@ -84,17 +85,16 @@ CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpo
 }
 
 // templated to be able to use `if constexpr` inside the functions
-template<bool wiredSupported = wiredSupportNeeded,
-         bool batterySupported = batterySupportNeeded,
-         uint32_t batteryFeatureBits = kBatteryFeatures.Raw(),
-         class EmberWiredPowerSourceClusterT = EmberWiredPowerSourceCluster,
-         class EmberBatteryPowerSourceClusterT = EmberBatteryPowerSourceCluster,
-         class LazyRegisteredWiredSourceClusterT = LazyRegisteredWiredSourceCluster,
-         class LazyRegisteredBatterySourceClusterT = LazyRegisteredBatterySourceCluster,
-         class StringStorageModuleT = StringAttributeStorageModule<kAllAttributes.Raw()>>
+template <bool wiredSupported = wiredSupportNeeded, bool batterySupported = batterySupportNeeded,
+          uint32_t batteryFeatureBits = kBatteryFeatures.Raw(), class EmberWiredPowerSourceClusterT = EmberWiredPowerSourceCluster,
+          class EmberBatteryPowerSourceClusterT     = EmberBatteryPowerSourceCluster,
+          class LazyRegisteredWiredSourceClusterT   = LazyRegisteredWiredSourceCluster,
+          class LazyRegisteredBatterySourceClusterT = LazyRegisteredBatterySourceCluster,
+          class StringStorageModuleT                = StringAttributeStorageModule<kAllAttributes.Raw()>>
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
     constexpr static BitFlags<Feature> batteryFeatures{ batteryFeatureBits };
+
 public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
@@ -108,8 +108,9 @@ public:
         VerifyOrDieWithMsg(
             // Exactly one of wired or battery features must be set
             features.Has(Feature::kWired) ^ features.Has(Feature::kBattery) &&
-            // features reported by ember must be a subset of features that are enabled on any endpoint in zap tool
-            (features.Raw() & kAllFeatures.Raw()) == features.Raw(), Zcl, "CreateRegistration called with invalid feature map");
+                // features reported by ember must be a subset of features that are enabled on any endpoint in zap tool
+                (features.Raw() & kAllFeatures.Raw()) == features.Raw(),
+            Zcl, "CreateRegistration called with invalid feature map");
 
         CharSpan description{};
         if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
@@ -120,30 +121,33 @@ public:
         else
         {
             // for dynamic endpoints
-            description = GetCharStringDefaultValueFromEmber<Description::TypeInfo::MaxLength()>(Description::Get, endpointId,
-                // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
-                static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).description);
+            description = GetCharStringDefaultValueFromEmber<Description::TypeInfo::MaxLength()>(
+                Description::Get, endpointId,
+                // this static cast does nothing, it is here to make the code template dependent on class template, so the code will
+                // compile.
+                static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
+                    .description);
         }
 
-#define SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                                                              \
-    if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))\
-    {\
-        if (attr_type val{}; attr_name::Get(endpointId, &val) == InteractionModel::Status::Success)                                         \
-        {                                                                                                                              \
-            config.config_field_name = val;                                                                 \
-        }\
+#define SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                   \
+    if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
+    {                                                                                                                              \
+        if (attr_type val{}; attr_name::Get(endpointId, &val) == InteractionModel::Status::Success)                                \
+        {                                                                                                                          \
+            config.config_field_name = val;                                                                                        \
+        }                                                                                                                          \
     }
 
-#define SetNullableAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                                                      \
-    if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))\
-    {\
-        if (DataModel::Nullable<attr_type> val{}; attr_name::Get(endpointId, val) == InteractionModel::Status::Success)                     \
-        {                                                                                                                              \
-            if (!val.IsNull())                                                                                                               \
-            {                                                                                                                          \
-                config.config_field_name = val.Value();                          \
-            }    \
-        }                                                                                                                      \
+#define SetNullableAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                           \
+    if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
+    {                                                                                                                              \
+        if (DataModel::Nullable<attr_type> val{}; attr_name::Get(endpointId, val) == InteractionModel::Status::Success)            \
+        {                                                                                                                          \
+            if (!val.IsNull())                                                                                                     \
+            {                                                                                                                      \
+                config.config_field_name = val.Value();                                                                            \
+            }                                                                                                                      \
+        }                                                                                                                          \
     }
 
         if constexpr (wiredSupported)
@@ -157,7 +161,8 @@ public:
                 typename EmberWiredPowerSourceClusterT::ConfigType config(endpointId, description, currentType);
                 if constexpr (EmberWiredPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(WiredAssessedInputVoltage::Id))
                 {
-                    if (DataModel::Nullable<uint32_t> val{}; WiredAssessedInputVoltage::Get(endpointId, val) == InteractionModel::Status::Success)
+                    if (DataModel::Nullable<uint32_t> val{};
+                        WiredAssessedInputVoltage::Get(endpointId, val) == InteractionModel::Status::Success)
                     {
                         if (!val.IsNull())
                         {
@@ -184,7 +189,7 @@ public:
                     server = &gServers[clusterInstanceIndex];
                 }
 
-                //this should never fail
+                // this should never fail
                 VerifyOrDie(server != nullptr);
 
                 server->Create(config);
@@ -196,17 +201,20 @@ public:
             if (features.Has(Feature::kBattery))
             {
                 // default value
-                typename EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum replaceability = EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum::kUnspecified;
+                typename EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum replaceability =
+                    EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum::kUnspecified;
                 VerifyOrDie(optionalAttributeSet.IsSet(BatReplaceability::Id));
                 // try to read, if fails, default will be used
                 BatReplaceability::Get(endpointId, &replaceability);
 
-                typename EmberBatteryPowerSourceClusterT::ConfigType config(endpointId, description, replaceability, gTimerDelegate);
+                typename EmberBatteryPowerSourceClusterT::ConfigType config(endpointId, description, replaceability,
+                                                                            gTimerDelegate);
 
                 SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatVoltage, batVoltage);
                 SetNullableAttributeDefaultFromEmber(Battery, uint8_t, BatPercentRemaining, batPercentRemaining);
                 SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatTimeRemaining, batTimeRemaining);
-                SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeLevelEnum, BatChargeLevel, batChargeLevel);
+                SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeLevelEnum, BatChargeLevel,
+                                             batChargeLevel);
                 SetAttributeDefaultFromEmber(Battery, bool, BatReplacementNeeded, batReplacementNeeded);
                 SetAttributeDefaultFromEmber(Battery, bool, BatPresent, batPresent);
 
@@ -219,14 +227,20 @@ public:
                         if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
                         {
                             // for fixed endpoints
-                            replacementDescription = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatReplacementDescription::Id);
+                            replacementDescription =
+                                GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatReplacementDescription::Id);
                         }
                         else
                         {
                             // for dynamic endpoints
-                            replacementDescription = GetCharStringDefaultValueFromEmber<BatReplacementDescription::TypeInfo::MaxLength()>(BatReplacementDescription::Get, endpointId,
-                                // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
-                                static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).batReplacementDescription);
+                            replacementDescription =
+                                GetCharStringDefaultValueFromEmber<BatReplacementDescription::TypeInfo::MaxLength()>(
+                                    BatReplacementDescription::Get, endpointId,
+                                    // this static cast does nothing, it is here to make the code template dependent on class
+                                    // template, so the code will compile.
+                                    static_cast<StringStorageModuleT &>(
+                                        gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
+                                        .batReplacementDescription);
                         }
 
                         uint8_t quantity;
@@ -234,21 +248,28 @@ public:
                         VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
                         config.MakeReplaceable(replacementDescription, quantity);
 
-                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatCommonDesignationEnum, BatCommonDesignation, batCommonDesignation);
+                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatCommonDesignationEnum,
+                                                     BatCommonDesignation, batCommonDesignation);
 
                         if constexpr (EmberBatteryPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(BatANSIDesignation::Id))
                         {
                             if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
                             {
                                 // for fixed endpoints
-                                config.batANSIDesignation = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatANSIDesignation::Id);
+                                config.batANSIDesignation =
+                                    GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatANSIDesignation::Id);
                             }
                             else
                             {
                                 // for dynamic endpoints
-                                config.batANSIDesignation = GetCharStringDefaultValueFromEmber<BatANSIDesignation::TypeInfo::MaxLength()>(BatANSIDesignation::Get, endpointId,
-                                    // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
-                                    static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).batANSIDesignation);
+                                config.batANSIDesignation =
+                                    GetCharStringDefaultValueFromEmber<BatANSIDesignation::TypeInfo::MaxLength()>(
+                                        BatANSIDesignation::Get, endpointId,
+                                        // this static cast does nothing, it is here to make the code template dependent on class
+                                        // template, so the code will compile.
+                                        static_cast<StringStorageModuleT &>(
+                                            gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
+                                            .batANSIDesignation);
                             }
                         }
 
@@ -257,18 +278,25 @@ public:
                             if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
                             {
                                 // for fixed endpoints
-                                config.batIECDesignation = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatIECDesignation::Id);
+                                config.batIECDesignation =
+                                    GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatIECDesignation::Id);
                             }
                             else
                             {
                                 // for dynamic endpoints
-                                config.batIECDesignation = GetCharStringDefaultValueFromEmber<BatIECDesignation::TypeInfo::MaxLength()>(BatIECDesignation::Get, endpointId,
-                                    // this static cast does nothing, it is here to make the code template dependent on class template, so the code will compile.
-                                    static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).batIECDesignation);
+                                config.batIECDesignation =
+                                    GetCharStringDefaultValueFromEmber<BatIECDesignation::TypeInfo::MaxLength()>(
+                                        BatIECDesignation::Get, endpointId,
+                                        // this static cast does nothing, it is here to make the code template dependent on class
+                                        // template, so the code will compile.
+                                        static_cast<StringStorageModuleT &>(
+                                            gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
+                                            .batIECDesignation);
                             }
                         }
 
-                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatApprovedChemistryEnum, BatApprovedChemistry, batApprovedChemistry);
+                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatApprovedChemistryEnum,
+                                                     BatApprovedChemistry, batApprovedChemistry);
                     }
                 }
                 if constexpr (batteryFeatures.Has(Feature::kRechargeable))
@@ -276,7 +304,8 @@ public:
                     if (features.Has(Feature::kRechargeable))
                     {
                         config.MakeRechargeable();
-                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeStateEnum, BatChargeState, batChargeState);
+                        SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeStateEnum,
+                                                     BatChargeState, batChargeState);
                         SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatTimeToFullCharge, batTimeToFullCharge);
                         SetAttributeDefaultFromEmber(Battery, bool, BatFunctionalWhileCharging, batFunctionalWhileCharging);
                         SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatChargingCurrent, batChargingCurrent);
@@ -297,7 +326,7 @@ public:
                     server = &gServers[clusterInstanceIndex];
                 }
 
-                //this should never fail
+                // this should never fail
                 VerifyOrDie(server != nullptr);
                 server->Create(config);
 
@@ -316,7 +345,8 @@ public:
     {
         if constexpr (wiredSupported && batterySupported)
         {
-            return std::visit([](auto & server) { return server.IsConstructed() ? &server.Cluster() : nullptr; }, gServers[clusterInstanceIndex]);
+            return std::visit([](auto & server) { return server.IsConstructed() ? &server.Cluster() : nullptr; },
+                              gServers[clusterInstanceIndex]);
         }
         else
         {
@@ -345,7 +375,8 @@ void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
     uint32_t featureBits{};
     FeatureMap::Get(endpointId, &featureBits);
     BitFlags<Feature> features(featureBits);
-    VerifyOrDieWithMsg(features.HasAny(Feature::kWired, Feature::kBattery), Zcl, "Empty feature map for PowerSource cluster on endpoint %d", endpointId);
+    VerifyOrDieWithMsg(features.HasAny(Feature::kWired, Feature::kBattery), Zcl,
+                       "Empty feature map for PowerSource cluster on endpoint %d", endpointId);
 
     if (features.HasAll(Feature::kWired, Feature::kBattery))
     {

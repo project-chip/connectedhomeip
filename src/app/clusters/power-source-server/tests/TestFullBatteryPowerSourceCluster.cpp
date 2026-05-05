@@ -20,7 +20,8 @@ using namespace chip::Testing;
 using namespace chip::app::Clusters::PowerSource::TestSupport;
 
 struct TestFullBatteryPowerSourceCluster : public TestBase
-{};
+{
+};
 
 TEST_F(TestFullBatteryPowerSourceCluster, AttributeTest)
 {
@@ -30,34 +31,31 @@ TEST_F(TestFullBatteryPowerSourceCluster, AttributeTest)
     FullBatteryPowerSourceCluster cluster(config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster,
-        {
-            Status::kMetadataEntry,
-            Order::kMetadataEntry,
-            Description::kMetadataEntry,
-            BatVoltage::kMetadataEntry,
-            BatPercentRemaining::kMetadataEntry,
-            BatTimeRemaining::kMetadataEntry,
-            BatChargeLevel::kMetadataEntry,
-            BatReplacementNeeded::kMetadataEntry,
-            BatReplaceability::kMetadataEntry,
-            BatPresent::kMetadataEntry,
-            ActiveBatFaults::kMetadataEntry,
-            BatReplacementDescription::kMetadataEntry,
-            BatCommonDesignation::kMetadataEntry,
-            BatANSIDesignation::kMetadataEntry,
-            BatIECDesignation::kMetadataEntry,
-            BatApprovedChemistry::kMetadataEntry,
-            BatCapacity::kMetadataEntry,
-            BatQuantity::kMetadataEntry,
-            BatChargeState::kMetadataEntry,
-            BatTimeToFullCharge::kMetadataEntry,
-            BatFunctionalWhileCharging::kMetadataEntry,
-            BatChargingCurrent::kMetadataEntry,
-            ActiveBatChargeFaults::kMetadataEntry,
-            EndpointList::kMetadataEntry
-        }));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        { Status::kMetadataEntry,
+                                          Order::kMetadataEntry,
+                                          Description::kMetadataEntry,
+                                          BatVoltage::kMetadataEntry,
+                                          BatPercentRemaining::kMetadataEntry,
+                                          BatTimeRemaining::kMetadataEntry,
+                                          BatChargeLevel::kMetadataEntry,
+                                          BatReplacementNeeded::kMetadataEntry,
+                                          BatReplaceability::kMetadataEntry,
+                                          BatPresent::kMetadataEntry,
+                                          ActiveBatFaults::kMetadataEntry,
+                                          BatReplacementDescription::kMetadataEntry,
+                                          BatCommonDesignation::kMetadataEntry,
+                                          BatANSIDesignation::kMetadataEntry,
+                                          BatIECDesignation::kMetadataEntry,
+                                          BatApprovedChemistry::kMetadataEntry,
+                                          BatCapacity::kMetadataEntry,
+                                          BatQuantity::kMetadataEntry,
+                                          BatChargeState::kMetadataEntry,
+                                          BatTimeToFullCharge::kMetadataEntry,
+                                          BatFunctionalWhileCharging::kMetadataEntry,
+                                          BatChargingCurrent::kMetadataEntry,
+                                          ActiveBatChargeFaults::kMetadataEntry,
+                                          EndpointList::kMetadataEntry }));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -174,12 +172,11 @@ TEST_F(TestFullBatteryPowerSourceCluster, TestBounds)
     CharSpan longTestText =
         "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes"_span;
 
-
     FullBatteryPowerSourceConfig config(kTestEndpointId, longTestText, BatReplaceabilityEnum::kUnspecified, timerDelegate);
     config.MakeReplaceable(longTestText, 0);
     config.MakeRechargeable();
     config.batANSIDesignation = longTestText;
-    config.batIECDesignation = longTestText;
+    config.batIECDesignation  = longTestText;
 
     FullBatteryPowerSourceCluster cluster(config);
     ClusterTester tester(cluster);

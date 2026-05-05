@@ -7,8 +7,8 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/power-source-server/PowerSourceCluster.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/support/TimerDelegateMock.h>
 
 namespace chip::app::Clusters::PowerSource::TestSupport {
@@ -27,14 +27,14 @@ struct TestBase : public ::testing::Test
         chip::Platform::MemoryShutdown();
     }
 
-    template<typename AttrTypeInfo>
+    template <typename AttrTypeInfo>
     void ReadAttribute(chip::Testing::ClusterTester & tester)
     {
         typename AttrTypeInfo::DecodableType value{};
         EXPECT_EQ(tester.ReadAttribute(AttrTypeInfo::GetAttributeId(), value), CHIP_NO_ERROR);
     }
 
-    template<typename AttrTypeInfo>
+    template <typename AttrTypeInfo>
     void TestStringAttributeReadLength(chip::Testing::ClusterTester & tester)
     {
         typename AttrTypeInfo::DecodableType value{};
@@ -42,7 +42,7 @@ struct TestBase : public ::testing::Test
         EXPECT_LE(value.size(), AttrTypeInfo::MaxLength());
     }
 
-    template<typename ClusterType>
+    template <typename ClusterType>
     void TestOrderPersistence(typename ClusterType::ConfigType & config)
     {
         uint8_t testOrder = 3;
@@ -72,9 +72,9 @@ struct TestBase : public ::testing::Test
 
         // test that setting orderAttributeFetchFromPersistentStorageDuringStartup to false keeps the order value from persisting
         {
-            uint8_t testOrderNewValue = 123;
+            uint8_t testOrderNewValue                                    = 123;
             config.orderAttributeFetchFromPersistentStorageDuringStartup = false;
-            config.order = testOrderNewValue;
+            config.order                                                 = testOrderNewValue;
             ClusterType cluster(config);
 
             // this will not get the value from persistent storage.

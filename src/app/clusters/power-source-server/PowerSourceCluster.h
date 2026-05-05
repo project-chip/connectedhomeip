@@ -21,9 +21,9 @@
 
 #include <algorithm>
 #include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/PowerSource/Attributes.h>
 #include <clusters/PowerSource/Commands.h>
 #include <clusters/PowerSource/Enums.h>
@@ -38,7 +38,7 @@ namespace chip::app::Clusters {
 
 namespace PowerSource::detail {
 
-template<class T, class = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, void>>
+template <class T, class = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, void>>
 constexpr static T SpanToBitSet(Span<const uint8_t> span)
 {
     T val{};
@@ -49,7 +49,7 @@ constexpr static T SpanToBitSet(Span<const uint8_t> span)
     return val;
 }
 
-template<class T, class = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, void>>
+template <class T, class = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, void>>
 constexpr static void BitSetToSpan(T bitset, Span<uint8_t> & buffer)
 {
     size_t bufInd = 0;
@@ -63,7 +63,7 @@ constexpr static void BitSetToSpan(T bitset, Span<uint8_t> & buffer)
     buffer.reduce_size(bufInd);
 }
 
-template<class To, class From, class = std::enable_if_t<sizeof(From) == sizeof(To), void>>
+template <class To, class From, class = std::enable_if_t<sizeof(From) == sizeof(To), void>>
 constexpr static Span<To> ConvertSpanType(Span<From> span)
 {
     return Span(reinterpret_cast<To *>(span.data()), span.size());
@@ -139,16 +139,19 @@ constexpr static AttributeSet MandatoryAttributeSetFromFeatures(BitFlags<PowerSo
     using namespace PowerSource::Attributes;
     constexpr uint32_t wiredMandatoryAttributeBits = OptionalAttributeSet<WiredCurrentType::Id>::All();
 
-    constexpr uint32_t batteryMandatoryAttributeBits = OptionalAttributeSet<BatChargeLevel::Id, BatReplacementNeeded::Id, BatReplaceability::Id>::All();
+    constexpr uint32_t batteryMandatoryAttributeBits =
+        OptionalAttributeSet<BatChargeLevel::Id, BatReplacementNeeded::Id, BatReplaceability::Id>::All();
 
-    constexpr uint32_t replaceableBatteryMandatoryAttributeBits = OptionalAttributeSet<BatReplacementDescription::Id, BatQuantity::Id>::All();
+    constexpr uint32_t replaceableBatteryMandatoryAttributeBits =
+        OptionalAttributeSet<BatReplacementDescription::Id, BatQuantity::Id>::All();
 
-    constexpr uint32_t rechargeableBatteryMandatoryAttributeBits = OptionalAttributeSet<BatChargeState::Id, BatFunctionalWhileCharging::Id>::All();
+    constexpr uint32_t rechargeableBatteryMandatoryAttributeBits =
+        OptionalAttributeSet<BatChargeState::Id, BatFunctionalWhileCharging::Id>::All();
 
     uint32_t attributeBits = (wiredMandatoryAttributeBits * features.Has(PowerSource::Feature::kWired)) |
-                                (batteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kBattery)) |
-                                (replaceableBatteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kReplaceable)) |
-                                (rechargeableBatteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kRechargeable));
+        (batteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kBattery)) |
+        (replaceableBatteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kReplaceable)) |
+        (rechargeableBatteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kRechargeable));
     return AttributeSet(attributeBits);
 }
 
@@ -157,95 +160,85 @@ constexpr static AttributeSet MandatoryAttributeSetFromFeatures(BitFlags<PowerSo
 constexpr static AttributeSet DisabledAttributeSetFromFeatures(BitFlags<PowerSource::Feature> features)
 {
     using namespace PowerSource::Attributes;
-    constexpr uint32_t wiredAttributeBits = OptionalAttributeSet<
-        WiredAssessedInputVoltage::Id, WiredAssessedInputFrequency::Id,
-        WiredCurrentType::Id, WiredAssessedCurrent::Id,
-        WiredNominalVoltage::Id, WiredMaximumCurrent::Id,
-        WiredPresent::Id, ActiveWiredFaults::Id>::All();
+    constexpr uint32_t wiredAttributeBits =
+        OptionalAttributeSet<WiredAssessedInputVoltage::Id, WiredAssessedInputFrequency::Id, WiredCurrentType::Id,
+                             WiredAssessedCurrent::Id, WiredNominalVoltage::Id, WiredMaximumCurrent::Id, WiredPresent::Id,
+                             ActiveWiredFaults::Id>::All();
 
-    constexpr uint32_t batteryAttributeBits = OptionalAttributeSet<
-        BatVoltage::Id, BatPercentRemaining::Id,
-        BatTimeRemaining::Id, BatChargeLevel::Id,
-        BatReplacementNeeded::Id, BatReplaceability::Id,
-        BatPresent::Id, ActiveBatFaults::Id>::All();
+    constexpr uint32_t batteryAttributeBits =
+        OptionalAttributeSet<BatVoltage::Id, BatPercentRemaining::Id, BatTimeRemaining::Id, BatChargeLevel::Id,
+                             BatReplacementNeeded::Id, BatReplaceability::Id, BatPresent::Id, ActiveBatFaults::Id>::All();
 
-    constexpr uint32_t replaceableBatteryAttributeBits = OptionalAttributeSet<
-        BatReplacementDescription::Id, BatCommonDesignation::Id,
-        BatANSIDesignation::Id, BatIECDesignation::Id,
-        BatApprovedChemistry::Id, BatQuantity::Id>::All();
+    constexpr uint32_t replaceableBatteryAttributeBits =
+        OptionalAttributeSet<BatReplacementDescription::Id, BatCommonDesignation::Id, BatANSIDesignation::Id, BatIECDesignation::Id,
+                             BatApprovedChemistry::Id, BatQuantity::Id>::All();
 
-    constexpr uint32_t rechargeableBatteryAttributeBits = OptionalAttributeSet<
-        BatChargeState::Id,
-        BatTimeToFullCharge::Id, BatFunctionalWhileCharging::Id,
-        BatChargingCurrent::Id, ActiveBatChargeFaults::Id>::All();
+    constexpr uint32_t rechargeableBatteryAttributeBits =
+        OptionalAttributeSet<BatChargeState::Id, BatTimeToFullCharge::Id, BatFunctionalWhileCharging::Id, BatChargingCurrent::Id,
+                             ActiveBatChargeFaults::Id>::All();
 
     constexpr uint32_t capacityAttributeBit = OptionalAttributeSet<BatCapacity::Id>::All();
 
-    uint32_t attributeBits = ~(wiredAttributeBits * !features.Has(PowerSource::Feature::kWired) |
-                                batteryAttributeBits * !features.Has(PowerSource::Feature::kBattery) |
-                                replaceableBatteryAttributeBits * !features.Has(PowerSource::Feature::kReplaceable) |
-                                rechargeableBatteryAttributeBits * !features.Has(PowerSource::Feature::kRechargeable) |
-                                capacityAttributeBit * !(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable)));
+    uint32_t attributeBits =
+        ~(wiredAttributeBits * !features.Has(PowerSource::Feature::kWired) |
+          batteryAttributeBits * !features.Has(PowerSource::Feature::kBattery) |
+          replaceableBatteryAttributeBits * !features.Has(PowerSource::Feature::kReplaceable) |
+          rechargeableBatteryAttributeBits * !features.Has(PowerSource::Feature::kRechargeable) |
+          capacityAttributeBit *
+              !(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable)));
     return AttributeSet(attributeBits);
 }
 
-constexpr static AttributeSet GetValidOptionalAttributeSet(AttributeSet optionalAttributeSet, BitFlags<PowerSource::Feature> features)
+constexpr static AttributeSet GetValidOptionalAttributeSet(AttributeSet optionalAttributeSet,
+                                                           BitFlags<PowerSource::Feature> features)
 {
-    uint32_t bits = (optionalAttributeSet.Raw()
-        | MandatoryAttributeSetFromFeatures(features).Raw())
-        & DisabledAttributeSetFromFeatures(features).Raw();
+    uint32_t bits = (optionalAttributeSet.Raw() | MandatoryAttributeSetFromFeatures(features).Raw()) &
+        DisabledAttributeSetFromFeatures(features).Raw();
     return AttributeSet(bits);
 }
 
 } // namespace PowerSource::detail
-using PowerSourceOptionalAttributeSet = app::OptionalAttributeSet<
-    PowerSource::Attributes::WiredAssessedInputVoltage::Id,
-    PowerSource::Attributes::WiredAssessedInputFrequency::Id,
-    PowerSource::Attributes::WiredAssessedCurrent::Id,
-    PowerSource::Attributes::WiredNominalVoltage::Id,
-    PowerSource::Attributes::WiredMaximumCurrent::Id,
-    PowerSource::Attributes::WiredPresent::Id,
-    PowerSource::Attributes::ActiveWiredFaults::Id,
-    PowerSource::Attributes::BatVoltage::Id,
-    PowerSource::Attributes::BatPercentRemaining::Id,
-    PowerSource::Attributes::BatTimeRemaining::Id,
-    PowerSource::Attributes::BatPresent::Id,
-    PowerSource::Attributes::ActiveBatFaults::Id,
-    PowerSource::Attributes::BatCommonDesignation::Id,
-    PowerSource::Attributes::BatANSIDesignation::Id,
-    PowerSource::Attributes::BatIECDesignation::Id,
-    PowerSource::Attributes::BatApprovedChemistry::Id,
-    PowerSource::Attributes::BatCapacity::Id,
-    PowerSource::Attributes::BatTimeToFullCharge::Id,
-    PowerSource::Attributes::BatChargingCurrent::Id,
-    PowerSource::Attributes::ActiveBatChargeFaults::Id
->;
+using PowerSourceOptionalAttributeSet =
+    app::OptionalAttributeSet<PowerSource::Attributes::WiredAssessedInputVoltage::Id,
+                              PowerSource::Attributes::WiredAssessedInputFrequency::Id,
+                              PowerSource::Attributes::WiredAssessedCurrent::Id, PowerSource::Attributes::WiredNominalVoltage::Id,
+                              PowerSource::Attributes::WiredMaximumCurrent::Id, PowerSource::Attributes::WiredPresent::Id,
+                              PowerSource::Attributes::ActiveWiredFaults::Id, PowerSource::Attributes::BatVoltage::Id,
+                              PowerSource::Attributes::BatPercentRemaining::Id, PowerSource::Attributes::BatTimeRemaining::Id,
+                              PowerSource::Attributes::BatPresent::Id, PowerSource::Attributes::ActiveBatFaults::Id,
+                              PowerSource::Attributes::BatCommonDesignation::Id, PowerSource::Attributes::BatANSIDesignation::Id,
+                              PowerSource::Attributes::BatIECDesignation::Id, PowerSource::Attributes::BatApprovedChemistry::Id,
+                              PowerSource::Attributes::BatCapacity::Id, PowerSource::Attributes::BatTimeToFullCharge::Id,
+                              PowerSource::Attributes::BatChargingCurrent::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id>;
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
-struct PowerSourceClusterConfig : public PowerSource::detail::AllModulesExceptEndpointList<supportedFeatureBits, supportedOptionalAttributeBits>
+struct PowerSourceClusterConfig
+    : public PowerSource::detail::AllModulesExceptEndpointList<supportedFeatureBits, supportedOptionalAttributeBits>
 {
     constexpr static BitFlags<PowerSource::Feature> supportedFeatures{ supportedFeatureBits };
     static_assert(supportedFeatures.Has(PowerSource::Feature::kWired) ^ supportedFeatures.Has(PowerSource::Feature::kBattery),
                   "Exactly one of Wired or Battery features must be set");
 
-    static constexpr AttributeSet supportedOptionalAttributeSet = PowerSource::detail::GetValidOptionalAttributeSet(AttributeSet(supportedOptionalAttributeBits), supportedFeatures);
-
+    static constexpr AttributeSet supportedOptionalAttributeSet =
+        PowerSource::detail::GetValidOptionalAttributeSet(AttributeSet(supportedOptionalAttributeBits), supportedFeatures);
 
     PowerSourceClusterConfig(EndpointId endpointId, CharSpan desc, PowerSource::WiredCurrentTypeEnum currType)
     {
-        static_assert(supportedFeatures.Has(PowerSource::Feature::kWired), "This constructor should only be used for a Wired power source configuration");
-        mEndpointId = endpointId;
-        this->description = desc;
+        static_assert(supportedFeatures.Has(PowerSource::Feature::kWired),
+                      "This constructor should only be used for a Wired power source configuration");
+        mEndpointId            = endpointId;
+        this->description      = desc;
         this->wiredCurrentType = currType;
     }
 
-    PowerSourceClusterConfig(EndpointId endpointId, CharSpan desc, PowerSource::BatReplaceabilityEnum replability, TimerDelegate & timerDelegate)
+    PowerSourceClusterConfig(EndpointId endpointId, CharSpan desc, PowerSource::BatReplaceabilityEnum replability,
+                             TimerDelegate & timerDelegate)
     {
         static_assert(supportedFeatures.Has(PowerSource::Feature::kBattery),
                       "This constructor should only be used for a Battery power source configuration");
-        mEndpointId = endpointId;
-        this->description = desc;
+        mEndpointId             = endpointId;
+        this->description       = desc;
         this->batReplaceability = replability;
-        this->mTimerDelegate = &timerDelegate;
+        this->mTimerDelegate    = &timerDelegate;
     }
 
     PowerSourceClusterConfig & MakeReplaceable(CharSpan replDesc, uint8_t quan)
@@ -253,7 +246,7 @@ struct PowerSourceClusterConfig : public PowerSource::detail::AllModulesExceptEn
         static_assert(supportedFeatures.Has(PowerSource::Feature::kReplaceable),
                       "This method can only be used for a power source configuration that supports being replaceable");
         this->batReplacementDescription = replDesc;
-        this->batQuantity = quan;
+        this->batQuantity               = quan;
 
         this->batReplaceable = true;
         return *this;
@@ -270,13 +263,14 @@ struct PowerSourceClusterConfig : public PowerSource::detail::AllModulesExceptEn
     /// if set true, `PowerSourceCluster::Startup` function will fetch the `Order` attribute's value from the persistent storage.
     /// if set false, the value will be the default value set in the `PowerSourceClusterConfig` (0 if not set explicitly).
     bool orderAttributeFetchFromPersistentStorageDuringStartup = true;
-    PowerSourceOptionalAttributeSet usedOptionalAttributes { UINT32_MAX }; // all supported attributes are marked as used by default.
+    PowerSourceOptionalAttributeSet usedOptionalAttributes{ UINT32_MAX }; // all supported attributes are marked as used by default.
     EndpointId mEndpointId{};
 };
 
 template <std::underlying_type_t<PowerSource::Feature> supportedFeatureBits, uint32_t supportedOptionalAttributeBits>
 class PowerSourceCluster : protected PowerSourceClusterConfig<supportedFeatureBits, supportedOptionalAttributeBits>,
-                           protected PowerSource::detail::BatteryTimerContextsModule<BitFlags<PowerSource::Feature>(supportedFeatureBits).Has(PowerSource::Feature::kBattery)>,
+                           protected PowerSource::detail::BatteryTimerContextsModule<
+                               BitFlags<PowerSource::Feature>(supportedFeatureBits).Has(PowerSource::Feature::kBattery)>,
                            protected PowerSource::detail::EndpointListModule,
                            public DefaultServerCluster
 {
@@ -297,11 +291,10 @@ public:
     using BatChargeFaultEnum       = PowerSource::BatChargeFaultEnum;
 
     static_assert(supportedFeatures.Has(PowerSource::Feature::kWired) ^ supportedFeatures.Has(PowerSource::Feature::kBattery),
-                "Exactly one of Wired or Battery features must be set");
+                  "Exactly one of Wired or Battery features must be set");
 
     PowerSourceCluster(const ConfigType & config) :
-        ConfigType(config),
-        DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
+        ConfigType(config), DefaultServerCluster({ config.mEndpointId, PowerSource::Id })
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
@@ -312,7 +305,8 @@ public:
         VerifyOrReturnValue(this->orderAttributeFetchFromPersistentStorageDuringStartup, CHIP_NO_ERROR);
 
         AttributePersistence attributePersistence(context.attributeStorage);
-        attributePersistence.LoadNativeEndianValue<uint8_t>({ mPath.mEndpointId, mPath.mClusterId, PowerSource::Attributes::Order::Id }, this->order, this->order);
+        attributePersistence.LoadNativeEndianValue<uint8_t>(
+            { mPath.mEndpointId, mPath.mClusterId, PowerSource::Attributes::Order::Id }, this->order, this->order);
 
         // if getting the value from persistent storage fails, continue with our lives.
         return CHIP_NO_ERROR;
@@ -323,38 +317,70 @@ public:
     {
         using namespace PowerSource::Attributes;
         using namespace PowerSource::detail;
-        // `ReadAttribute` is guaranteed to only be called for attributes that are supported by the cluster, so the code below is valid.
+        // `ReadAttribute` is guaranteed to only be called for attributes that are supported by the cluster, so the code below is
+        // valid.
         AttributeId id = request.path.mAttributeId;
-        if (id == Status::Id) { return encoder.Encode(this->status); }
-        if (id == Order::Id) { return encoder.Encode(this->order); }
-        if (id == Description::Id) { return encoder.Encode(this->description.SubSpan(0, std::min(this->description.size(), Description::TypeInfo::MaxLength()))); }
+        if (id == Status::Id)
+        {
+            return encoder.Encode(this->status);
+        }
+        if (id == Order::Id)
+        {
+            return encoder.Encode(this->order);
+        }
+        if (id == Description::Id)
+        {
+            return encoder.Encode(
+                this->description.SubSpan(0, std::min(this->description.size(), Description::TypeInfo::MaxLength())));
+        }
         if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputVoltage::Id))
         {
-            if (id == WiredAssessedInputVoltage::Id) { return EncodeOptional(encoder, this->wiredAssessedInputVoltage); }
+            if (id == WiredAssessedInputVoltage::Id)
+            {
+                return EncodeOptional(encoder, this->wiredAssessedInputVoltage);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputFrequency::Id))
         {
-            if (id == WiredAssessedInputFrequency::Id) { return EncodeOptional(encoder, this->wiredAssessedInputFrequency); }
+            if (id == WiredAssessedInputFrequency::Id)
+            {
+                return EncodeOptional(encoder, this->wiredAssessedInputFrequency);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(WiredCurrentType::Id))
         {
-            if (id == WiredCurrentType::Id) { return encoder.Encode(this->wiredCurrentType); }
+            if (id == WiredCurrentType::Id)
+            {
+                return encoder.Encode(this->wiredCurrentType);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedCurrent::Id))
         {
-            if (id == WiredAssessedCurrent::Id) { return EncodeOptional(encoder, this->wiredAssessedCurrent); }
+            if (id == WiredAssessedCurrent::Id)
+            {
+                return EncodeOptional(encoder, this->wiredAssessedCurrent);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(WiredNominalVoltage::Id))
         {
-            if (id == WiredNominalVoltage::Id) { return encoder.Encode(this->wiredNominalVoltage); }
+            if (id == WiredNominalVoltage::Id)
+            {
+                return encoder.Encode(this->wiredNominalVoltage);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(WiredMaximumCurrent::Id))
         {
-            if (id == WiredMaximumCurrent::Id) { return encoder.Encode(this->wiredMaximumCurrent); }
+            if (id == WiredMaximumCurrent::Id)
+            {
+                return encoder.Encode(this->wiredMaximumCurrent);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(WiredPresent::Id))
         {
-            if (id == WiredPresent::Id) { return encoder.Encode(this->wiredPresent); }
+            if (id == WiredPresent::Id)
+            {
+                return encoder.Encode(this->wiredPresent);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(ActiveWiredFaults::Id))
         {
@@ -368,31 +394,52 @@ public:
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatVoltage::Id))
         {
-            if (id == BatVoltage::Id) { return EncodeOptional(encoder, this->batVoltage); }
+            if (id == BatVoltage::Id)
+            {
+                return EncodeOptional(encoder, this->batVoltage);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatPercentRemaining::Id))
         {
-            if (id == BatPercentRemaining::Id) { return EncodeOptional(encoder, this->batPercentRemaining); }
+            if (id == BatPercentRemaining::Id)
+            {
+                return EncodeOptional(encoder, this->batPercentRemaining);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeRemaining::Id))
         {
-            if (id == BatTimeRemaining::Id) { return EncodeOptional(encoder, this->batTimeRemaining); }
+            if (id == BatTimeRemaining::Id)
+            {
+                return EncodeOptional(encoder, this->batTimeRemaining);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatChargeLevel::Id))
         {
-            if (id == BatChargeLevel::Id) { return encoder.Encode(this->batChargeLevel); }
+            if (id == BatChargeLevel::Id)
+            {
+                return encoder.Encode(this->batChargeLevel);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatReplacementNeeded::Id))
         {
-            if (id == BatReplacementNeeded::Id) { return encoder.Encode(this->batReplacementNeeded); }
+            if (id == BatReplacementNeeded::Id)
+            {
+                return encoder.Encode(this->batReplacementNeeded);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatReplaceability::Id))
         {
-            if (id == BatReplaceability::Id) { return encoder.Encode(this->batReplaceability); }
+            if (id == BatReplaceability::Id)
+            {
+                return encoder.Encode(this->batReplaceability);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatPresent::Id))
         {
-            if (id == BatPresent::Id) { return encoder.Encode(this->batPresent); }
+            if (id == BatPresent::Id)
+            {
+                return encoder.Encode(this->batPresent);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(ActiveBatFaults::Id))
         {
@@ -406,47 +453,83 @@ public:
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatReplacementDescription::Id))
         {
-            if (id == BatReplacementDescription::Id) { return encoder.Encode(this->batReplacementDescription.SubSpan(0, std::min(this->batReplacementDescription.size(), BatReplacementDescription::TypeInfo::MaxLength()))); }
+            if (id == BatReplacementDescription::Id)
+            {
+                return encoder.Encode(this->batReplacementDescription.SubSpan(
+                    0, std::min(this->batReplacementDescription.size(), BatReplacementDescription::TypeInfo::MaxLength())));
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatCommonDesignation::Id))
         {
-            if (id == BatCommonDesignation::Id) { return encoder.Encode(this->batCommonDesignation); }
+            if (id == BatCommonDesignation::Id)
+            {
+                return encoder.Encode(this->batCommonDesignation);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatANSIDesignation::Id))
         {
-            if (id == BatANSIDesignation::Id) { return encoder.Encode(this->batANSIDesignation.SubSpan(0, std::min(this->batANSIDesignation.size(), BatANSIDesignation::TypeInfo::MaxLength()))); }
+            if (id == BatANSIDesignation::Id)
+            {
+                return encoder.Encode(this->batANSIDesignation.SubSpan(
+                    0, std::min(this->batANSIDesignation.size(), BatANSIDesignation::TypeInfo::MaxLength())));
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatIECDesignation::Id))
         {
-            if (id == BatIECDesignation::Id) { return encoder.Encode(this->batIECDesignation.SubSpan(0, std::min(this->batIECDesignation.size(), BatIECDesignation::TypeInfo::MaxLength()))); }
+            if (id == BatIECDesignation::Id)
+            {
+                return encoder.Encode(this->batIECDesignation.SubSpan(
+                    0, std::min(this->batIECDesignation.size(), BatIECDesignation::TypeInfo::MaxLength())));
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatApprovedChemistry::Id))
         {
-            if (id == BatApprovedChemistry::Id) { return encoder.Encode(this->batApprovedChemistry); }
+            if (id == BatApprovedChemistry::Id)
+            {
+                return encoder.Encode(this->batApprovedChemistry);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatCapacity::Id))
         {
-            if (id == BatCapacity::Id) { return encoder.Encode(this->batCapacity); }
+            if (id == BatCapacity::Id)
+            {
+                return encoder.Encode(this->batCapacity);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatQuantity::Id))
         {
-            if (id == BatQuantity::Id) { return encoder.Encode(this->batQuantity); }
+            if (id == BatQuantity::Id)
+            {
+                return encoder.Encode(this->batQuantity);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatChargeState::Id))
         {
-            if (id == BatChargeState::Id) { return encoder.Encode(this->batChargeState); }
+            if (id == BatChargeState::Id)
+            {
+                return encoder.Encode(this->batChargeState);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeToFullCharge::Id))
         {
-            if (id == BatTimeToFullCharge::Id) { return EncodeOptional(encoder, this->batTimeToFullCharge); }
+            if (id == BatTimeToFullCharge::Id)
+            {
+                return EncodeOptional(encoder, this->batTimeToFullCharge);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatFunctionalWhileCharging::Id))
         {
-            if (id == BatFunctionalWhileCharging::Id) { return encoder.Encode(this->batFunctionalWhileCharging); }
+            if (id == BatFunctionalWhileCharging::Id)
+            {
+                return encoder.Encode(this->batFunctionalWhileCharging);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(BatChargingCurrent::Id))
         {
-            if (id == BatChargingCurrent::Id) { return EncodeOptional(encoder, this->batChargingCurrent); }
+            if (id == BatChargingCurrent::Id)
+            {
+                return EncodeOptional(encoder, this->batChargingCurrent);
+            }
         }
         if constexpr (supportedOptionalAttributeSet.IsSet(ActiveBatChargeFaults::Id))
         {
@@ -458,9 +541,18 @@ public:
                 return EncodeListOfValues(encoder, faultsSpan);
             }
         }
-        if (id == EndpointList::Id) { return EncodeListOfValues(encoder, GetEndpointList()); }
-        if (id == Globals::Attributes::FeatureMap::Id) { return encoder.Encode(Features()); }
-        if (id == Globals::Attributes::ClusterRevision::Id) { return encoder.Encode(PowerSource::kRevision); }
+        if (id == EndpointList::Id)
+        {
+            return EncodeListOfValues(encoder, GetEndpointList());
+        }
+        if (id == Globals::Attributes::FeatureMap::Id)
+        {
+            return encoder.Encode(Features());
+        }
+        if (id == Globals::Attributes::ClusterRevision::Id)
+        {
+            return encoder.Encode(PowerSource::kRevision);
+        }
 
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -470,67 +562,61 @@ public:
         using namespace PowerSource::Attributes;
         AttributeListBuilder attributeListBuilder(builder);
 
-        AttributeSet optionalAttributeSet(PowerSource::detail::GetValidOptionalAttributeSet(this->usedOptionalAttributes, Features()).Raw()
-                                                                         & supportedOptionalAttributeSet.Raw());
+        AttributeSet optionalAttributeSet(
+            PowerSource::detail::GetValidOptionalAttributeSet(this->usedOptionalAttributes, Features()).Raw() &
+            supportedOptionalAttributeSet.Raw());
 
         constexpr DataModel::AttributeEntry kOptionalAttributes[] = { WiredAssessedInputVoltage::kMetadataEntry,
-                                                                    WiredAssessedInputFrequency::kMetadataEntry,
-                                                                    WiredCurrentType::kMetadataEntry,
-                                                                    WiredAssessedCurrent::kMetadataEntry,
-                                                                    WiredNominalVoltage::kMetadataEntry,
-                                                                    WiredMaximumCurrent::kMetadataEntry,
-                                                                    WiredPresent::kMetadataEntry,
-                                                                    ActiveWiredFaults::kMetadataEntry,
-                                                                    BatVoltage::kMetadataEntry,
-                                                                    BatPercentRemaining::kMetadataEntry,
-                                                                    BatTimeRemaining::kMetadataEntry,
-                                                                    BatChargeLevel::kMetadataEntry,
-                                                                    BatReplacementNeeded::kMetadataEntry,
-                                                                    BatReplaceability::kMetadataEntry,
-                                                                    BatPresent::kMetadataEntry,
-                                                                    ActiveBatFaults::kMetadataEntry,
-                                                                    BatReplacementDescription::kMetadataEntry,
-                                                                    BatCommonDesignation::kMetadataEntry,
-                                                                    BatANSIDesignation::kMetadataEntry,
-                                                                    BatIECDesignation::kMetadataEntry,
-                                                                    BatApprovedChemistry::kMetadataEntry,
-                                                                    BatCapacity::kMetadataEntry,
-                                                                    BatQuantity::kMetadataEntry,
-                                                                    BatChargeState::kMetadataEntry,
-                                                                    BatTimeToFullCharge::kMetadataEntry,
-                                                                    BatFunctionalWhileCharging::kMetadataEntry,
-                                                                    BatChargingCurrent::kMetadataEntry,
-                                                                    ActiveBatChargeFaults::kMetadataEntry };
+                                                                      WiredAssessedInputFrequency::kMetadataEntry,
+                                                                      WiredCurrentType::kMetadataEntry,
+                                                                      WiredAssessedCurrent::kMetadataEntry,
+                                                                      WiredNominalVoltage::kMetadataEntry,
+                                                                      WiredMaximumCurrent::kMetadataEntry,
+                                                                      WiredPresent::kMetadataEntry,
+                                                                      ActiveWiredFaults::kMetadataEntry,
+                                                                      BatVoltage::kMetadataEntry,
+                                                                      BatPercentRemaining::kMetadataEntry,
+                                                                      BatTimeRemaining::kMetadataEntry,
+                                                                      BatChargeLevel::kMetadataEntry,
+                                                                      BatReplacementNeeded::kMetadataEntry,
+                                                                      BatReplaceability::kMetadataEntry,
+                                                                      BatPresent::kMetadataEntry,
+                                                                      ActiveBatFaults::kMetadataEntry,
+                                                                      BatReplacementDescription::kMetadataEntry,
+                                                                      BatCommonDesignation::kMetadataEntry,
+                                                                      BatANSIDesignation::kMetadataEntry,
+                                                                      BatIECDesignation::kMetadataEntry,
+                                                                      BatApprovedChemistry::kMetadataEntry,
+                                                                      BatCapacity::kMetadataEntry,
+                                                                      BatQuantity::kMetadataEntry,
+                                                                      BatChargeState::kMetadataEntry,
+                                                                      BatTimeToFullCharge::kMetadataEntry,
+                                                                      BatFunctionalWhileCharging::kMetadataEntry,
+                                                                      BatChargingCurrent::kMetadataEntry,
+                                                                      ActiveBatChargeFaults::kMetadataEntry };
 
         return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optionalAttributeSet);
     }
 
-#define ENABLE_IF_ATTRIBUTE_SUPPORTED(attrName) \
-    static_assert(supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::attrName::Id), "This method can only be used if the " #attrName " attribute is supported"); \
-    if constexpr (!supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::attrName::Id)) \
-    { \
-        return {}; \
-    } \
+#define ENABLE_IF_ATTRIBUTE_SUPPORTED(attrName)                                                                                    \
+    static_assert(supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::attrName::Id),                                      \
+                  "This method can only be used if the " #attrName " attribute is supported");                                     \
+    if constexpr (!supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::attrName::Id))                                     \
+    {                                                                                                                              \
+        return {};                                                                                                                 \
+    }                                                                                                                              \
     else
 
-#define ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(attrName) \
-    static_assert(supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::attrName::Id), "This method can only be used if the " #attrName " attribute is supported"); \
+#define ENABLE_IF_ATTRIBUTE_SUPPORTED_NO_RETURN(attrName)                                                                          \
+    static_assert(supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::attrName::Id),                                      \
+                  "This method can only be used if the " #attrName " attribute is supported");                                     \
     if constexpr (supportedOptionalAttributeSet.IsSet(PowerSource::Attributes::attrName::Id))
 
     // Getters
 
-    PowerSourceStatusEnum GetStatus() const
-    {
-        return this->status;
-    }
-    uint8_t GetOrder() const
-    {
-        return this->order;
-    }
-    CharSpan GetDescription() const
-    {
-        return this->description;
-    }
+    PowerSourceStatusEnum GetStatus() const { return this->status; }
+    uint8_t GetOrder() const { return this->order; }
+    CharSpan GetDescription() const { return this->description; }
     std::optional<uint32_t> GetWiredAssessedInputVoltage() const
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(WiredAssessedInputVoltage)
@@ -733,10 +819,7 @@ public:
             buffer = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(span);
         }
     }
-    Span<const EndpointId> GetEndpointList() const
-    {
-        return Span(this->endpointList.Get(), this->endpointListCount);
-    }
+    Span<const EndpointId> GetEndpointList() const { return Span(this->endpointList.Get(), this->endpointListCount); }
 
     // Setters
 
@@ -875,7 +958,8 @@ public:
                 // there should be no normal way to get to this point without setting the timer delegate
                 VerifyOrDie(this->mTimerDelegate != nullptr);
                 SetAttributeValue(this->batPercentRemaining, val, PowerSource::Attributes::BatPercentRemaining::Id);
-                ReturnErrorOnFailure(this->mTimerDelegate->StartTimer(&this->batPercentRemainingNotifyTimerContext, kNotifyTimerDuration));
+                ReturnErrorOnFailure(
+                    this->mTimerDelegate->StartTimer(&this->batPercentRemainingNotifyTimerContext, kNotifyTimerDuration));
                 this->batPercentRemainingNotifyTimerContext.timerExpired = false;
                 return CHIP_NO_ERROR;
             }
@@ -904,7 +988,8 @@ public:
                 // there should be no normal way to get to this point without setting the timer delegate
                 VerifyOrDie(this->mTimerDelegate != nullptr);
                 SetAttributeValue(this->batTimeRemaining, val, PowerSource::Attributes::BatTimeRemaining::Id);
-                ReturnErrorOnFailure(this->mTimerDelegate->StartTimer(&this->batTimeRemainingNotifyTimerContext, kNotifyTimerDuration));
+                ReturnErrorOnFailure(
+                    this->mTimerDelegate->StartTimer(&this->batTimeRemainingNotifyTimerContext, kNotifyTimerDuration));
                 this->batTimeRemainingNotifyTimerContext.timerExpired = false;
                 return CHIP_NO_ERROR;
             }
@@ -941,7 +1026,8 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveBatFaults)
         {
-            uint8_t newBitSet = PowerSource::detail::SpanToBitSet<uint8_t>(PowerSource::detail::ConvertSpanType<const uint8_t>(val));
+            uint8_t newBitSet =
+                PowerSource::detail::SpanToBitSet<uint8_t>(PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeBatFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -1007,7 +1093,8 @@ public:
                 // there should be no normal way to get to this point without setting the timer delegate
                 VerifyOrDie(this->mTimerDelegate != nullptr);
                 SetAttributeValue(this->batTimeToFullCharge, val, PowerSource::Attributes::BatTimeToFullCharge::Id);
-                ReturnErrorOnFailure(this->mTimerDelegate->StartTimer(&this->batTimeToFullChargeNotifyTimerContext, kNotifyTimerDuration));
+                ReturnErrorOnFailure(
+                    this->mTimerDelegate->StartTimer(&this->batTimeToFullChargeNotifyTimerContext, kNotifyTimerDuration));
                 this->batTimeToFullChargeNotifyTimerContext.timerExpired = false;
                 return CHIP_NO_ERROR;
             }
@@ -1037,7 +1124,8 @@ public:
     {
         ENABLE_IF_ATTRIBUTE_SUPPORTED(ActiveBatChargeFaults)
         {
-            uint16_t newBitSet = PowerSource::detail::SpanToBitSet<uint16_t>(PowerSource::detail::ConvertSpanType<const uint8_t>(val));
+            uint16_t newBitSet =
+                PowerSource::detail::SpanToBitSet<uint16_t>(PowerSource::detail::ConvertSpanType<const uint8_t>(val));
             if (this->activeBatChargeFaultsBitSet == newBitSet)
             {
                 return CHIP_NO_ERROR;
@@ -1126,10 +1214,10 @@ private:
         auto oldSpan             = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(oldSpanNonConverted);
         auto newSpanNonConverted = Span(newBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
         PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-        auto newSpan             = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(newSpanNonConverted);
+        auto newSpan = PowerSource::detail::ConvertSpanType<WiredFaultEnum>(newSpanNonConverted);
 
         PowerSource::Events::WiredFaultChange::Type event_data{ oldSpan, newSpan };
-        if(mContext != nullptr)
+        if (mContext != nullptr)
         {
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
         }
@@ -1153,10 +1241,10 @@ private:
         auto oldSpan             = PowerSource::detail::ConvertSpanType<BatFaultEnum>(oldSpanNonConverted);
         auto newSpanNonConverted = Span(newBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
         PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-        auto newSpan             = PowerSource::detail::ConvertSpanType<BatFaultEnum>(newSpanNonConverted);
+        auto newSpan = PowerSource::detail::ConvertSpanType<BatFaultEnum>(newSpanNonConverted);
 
         PowerSource::Events::BatFaultChange::Type event_data{ oldSpan, newSpan };
-        if(mContext != nullptr)
+        if (mContext != nullptr)
         {
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
         }
@@ -1180,10 +1268,10 @@ private:
         auto oldSpan             = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(oldSpanNonConverted);
         auto newSpanNonConverted = Span(newBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
         PowerSource::detail::BitSetToSpan(newBitSet, newSpanNonConverted);
-        auto newSpan             = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(newSpanNonConverted);
+        auto newSpan = PowerSource::detail::ConvertSpanType<BatChargeFaultEnum>(newSpanNonConverted);
 
         PowerSource::Events::BatChargeFaultChange::Type event_data{ oldSpan, newSpan };
-        if(mContext != nullptr)
+        if (mContext != nullptr)
         {
             mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
         }
@@ -1195,15 +1283,27 @@ private:
     static constexpr System::Clock::Timeout kNotifyTimerDuration = System::Clock::Seconds16(10);
 };
 
-using FullWiredPowerSourceConfig = PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), UINT32_MAX>;
-using FullWiredPowerSourceCluster = PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), UINT32_MAX>;
-using FullBatteryPowerSourceConfig = PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery, PowerSource::Feature::kReplaceable, PowerSource::Feature::kRechargeable).Raw(), UINT32_MAX>;
-using FullBatteryPowerSourceCluster = PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery, PowerSource::Feature::kReplaceable, PowerSource::Feature::kRechargeable).Raw(), UINT32_MAX>;
+using FullWiredPowerSourceConfig =
+    PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), UINT32_MAX>;
+using FullWiredPowerSourceCluster =
+    PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), UINT32_MAX>;
+using FullBatteryPowerSourceConfig =
+    PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery, PowerSource::Feature::kReplaceable,
+                                                            PowerSource::Feature::kRechargeable)
+                                 .Raw(),
+                             UINT32_MAX>;
+using FullBatteryPowerSourceCluster =
+    PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery, PowerSource::Feature::kReplaceable,
+                                                      PowerSource::Feature::kRechargeable)
+                           .Raw(),
+                       UINT32_MAX>;
 
-using MinimalWiredPowerSourceConfig = PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), 0>;
+using MinimalWiredPowerSourceConfig =
+    PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), 0>;
 using MinimalWiredPowerSourceCluster = PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired).Raw(), 0>;
-using MinimalBatteryPowerSourceConfig = PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery).Raw(), 0>;
-using MinimalBatteryPowerSourceCluster = PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery).Raw(), 0>;
-
+using MinimalBatteryPowerSourceConfig =
+    PowerSourceClusterConfig<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery).Raw(), 0>;
+using MinimalBatteryPowerSourceCluster =
+    PowerSourceCluster<BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery).Raw(), 0>;
 
 } // namespace chip::app::Clusters
