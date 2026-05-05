@@ -39,11 +39,11 @@ DefaultTimerDelegate sTimerDelegate;
 // Groupcast implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
 
-static constexpr size_t kGroupcastFixedClusterCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kGroupcastFixedClusterCount = Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size();
 
 static_assert((kGroupcastFixedClusterCount == 0) ||
                   ((kGroupcastFixedClusterCount == 1) &&
-                   Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == chip::kRootEndpointId),
+                   Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == chip::kRootEndpointId),
               "Groupcast cluster MUST be on endpoint 0");
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -62,7 +62,7 @@ public:
                 .timerDelegate     = sTimerDelegate,
                 .accessControl     = Server::GetInstance().GetAccessControl(),
             },
-            BitFlags<Groupcast::Feature>(featureMap));
+            BitFlags<Clusters::Groupcast::Feature>(featureMap));
         return gServer.Registration();
     }
 
@@ -80,10 +80,10 @@ public:
 
 void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
 {
-    if constexpr (Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
+    if constexpr (Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
     {
-        static_assert((Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
-                       Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
+        static_assert((Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+                       Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
                       "Can only have groupcast cluster on endpoint 0");
     }
 
@@ -94,8 +94,8 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                = endpointId,
-            .clusterId                 = Groupcast::Id,
-            .fixedClusterInstanceCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .clusterId                 = Clusters::Groupcast::Id,
+            .fixedClusterInstanceCount = Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
@@ -117,8 +117,8 @@ void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterC
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                = endpointId,
-            .clusterId                 = Groupcast::Id,
-            .fixedClusterInstanceCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .clusterId                 = Clusters::Groupcast::Id,
+            .fixedClusterInstanceCount = Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate, shutdownType);
