@@ -29,6 +29,13 @@ The binary will be located in `out/linux-x64-all-devices-boringssl/all-devices-a
 
 ## Testing Guidelines
 
+### Running the Example
+Run the example application (usually in a separate terminal or the background):
+```bash
+./out/linux-x64-all-devices-boringssl/all-devices-app
+```
+*Note: Use a clean KVS file or clear the existing one to ensure it enters commissioning mode.*
+
 ### 1. Determine Pairing Credentials
 Check the application logs on startup to find the setup PIN code and discriminator.
 Example log:
@@ -38,14 +45,17 @@ Example log:
 ```
 
 ### 2. Commissioning (Pairing)
-Make sure the device is in commissioning mode. If using a persistent storage (KVS), you may need to use a clean KVS file or clear it to force commissioning mode on startup.
+Make sure the device is in commissioning mode. If using a persistent storage (KVS), you may need to use a clean KVS file or clear it to force commissioning mode on startup. On Linux, the default KVS file is `/tmp/chip_kvs`:
+```bash
+rm /tmp/chip_kvs
+```
 
 #### Over IP (On-Network)
 If the device is already on the same IP network (e.g., running locally on the same host):
 
 - **With Long Discriminator**:
   ```bash
-  chip-tool pairing onnetwork-long <node_id> <pin_code> <discriminator>
+  chip-tool pairing onnetwork-long <node_id> <setup_pin> <discriminator>
   ```
 - **Without Discriminator** (looks for any commissionable device):
   ```bash
