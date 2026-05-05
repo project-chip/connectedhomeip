@@ -170,8 +170,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Steps 1, 2, 4 do not trigger an OTA image transfer — the provider is killed immediately
         # after each verification. Step 3 triggers a download after the 180s delay but the
         # provider is killed right after confirming kDownloading (download aborted, no apply).
-        # Step 6 is the single step where the full OTA update is allowed to complete (DUT
-        # upgrades to V2). Step 7 runs last so the same V2 image is served as a "same version"
+        # Step 5 is the single step where the full OTA update is allowed to complete (DUT
+        # upgrades to V2). Step 6 runs last so the same V2 image is served as a "same version"
         # update — the DUT has just applied V2 and will reject it. This means only one firmware
         # image (V2) is needed for the entire test.
         return [
@@ -198,7 +198,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                      "QueryStatus is set to 'UpdateAvailable'. "
                      "Set ImageURI to the location where the image is located.",
                      "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."),
-            TestStep(7, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
+            TestStep(6, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
                      "Software Version is set to the same version the DUT just applied (V2), which is numerically equal to the current version.",
                      "Verify that the DUT does not start transferring the software image."),
         ]
@@ -479,7 +479,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_3]: Prerequisites - Setup Provider
         # The provider is started with busy/180s args. The provider is killed immediately after
         # confirming kDownloading so the download is aborted and no full OTA update is applied
-        # in this step. The full OTA update happens in Step 6.
+        # in this step. The full OTA update happens in Step 5.
         # ------------------------------------------------------------------------------------
         step_number_s3 = "[STEP_3]"
         logger.info(f'{step_number_s3}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
@@ -620,13 +620,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.6 - Close Provider Process
         # Kill immediately after download start is confirmed so the download is aborted.
-        # The single full OTA update is reserved for Step 6.
+        # The single full OTA update is reserved for Step 5.
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.6 - Close Provider Process (aborting download)')
         self.current_provider_app_proc.terminate()
 
         # kIdle wait removed: when the provider is killed mid-BDX the DUT can take many
-        # minutes to recover (BDX timeout + retry backoff). Step 7 handles any stale
+        # minutes to recover (BDX timeout + retry backoff). Step 5 handles any stale
         # StateTransition events by filtering them in a loop (see Option B comments there).
 
         self.step(4)
