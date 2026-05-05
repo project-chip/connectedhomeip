@@ -35,6 +35,7 @@ class PlatformAction(argparse.Action):
                     items.append(item)
         setattr(namespace, self.dest, items)
 
+
 log = logging.getLogger(__name__)
 
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
