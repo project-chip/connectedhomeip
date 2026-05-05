@@ -17,6 +17,7 @@
 
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
 
+#include <algorithm>
 #include <app/EventLogging.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ProximityRanging/Metadata.h>
@@ -188,7 +189,7 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
                                                    CommandHandler * handler)
 {
     Commands::StartRangingRequest::DecodableType commandData;
-    VerifyOrReturnValue(commandData.Decode(reader) == CHIP_NO_ERROR, Status::InvalidCommand);
+    ReturnErrorOnFailure(commandData.Decode(reader));
 
     Commands::StartRangingResponse::Type response;
     ResultCodeEnum resultCode;
@@ -251,13 +252,12 @@ void ProximityRangingCluster::OnMeasurementData(uint8_t sessionId, const Structs
 
 void ProximityRangingCluster::OnSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status)
 {
-    if (mContext != nullptr)
-    {
-        Events::RangingSessionStatus::Type event;
-        event.sessionID = sessionId;
-        event.status    = status;
-        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    }
+    VerifyOrReturn(mContext != nullptr);
+
+    Events::RangingSessionStatus::Type event;
+    event.sessionID = sessionId;
+    event.status    = status;
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 uint8_t ProximityRangingCluster::GenerateSessionId()
@@ -272,21 +272,12 @@ uint8_t ProximityRangingCluster::GenerateSessionId()
     for (uint8_t attempt = 0; attempt <= kMaxActiveSessions; attempt++)
     {
         uint8_t candidate = mNextSessionId++;
-        // Specification defines SessionID as non-zero (1-255)
         if (candidate == kInvalidSessionId)
         {
             candidate = mNextSessionId++;
         }
-        bool collision = false;
-        for (size_t i = 0; i < activeSessions.size(); i++)
-        {
-            if (activeSessions.data()[i] == candidate)
-            {
-                collision = true;
-                break;
-            }
-        }
-        if (!collision)
+        if (std::none_of(activeSessions.data(), activeSessions.data() + activeSessions.size(),
+                         [candidate](uint8_t value) { return value == candidate; }))
         {
             return candidate;
         }
