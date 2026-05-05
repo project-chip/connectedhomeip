@@ -72,7 +72,7 @@ constexpr AttributeSet kAllAttributes = GetAllAttributesEnabledOnSomeEndpoint();
 // regardless of whether wired or battery support is there. And a `GetOrder` member function needs to be defined. Note that this
 // class has all constructors deleted, so it will not actually be instantiated and used. Only a nullptr of this type will be used.
 // This class is also an overview of functionality that the actuall PowerSourceCluster can have.
-class DummyPowerSourceCluster final : public ::chip::app::DefaultServerCluster
+class DummyPowerSourceCluster final : public DefaultServerCluster
 {
 public:
     using PowerSourceStatusEnum    = PowerSource::PowerSourceStatusEnum;
@@ -93,7 +93,7 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
     {
-        return {};
+        return CHIP_NO_ERROR;
     }
 
     PowerSourceStatusEnum GetStatus() const { return {}; }
