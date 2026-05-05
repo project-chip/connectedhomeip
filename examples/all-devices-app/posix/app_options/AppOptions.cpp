@@ -28,22 +28,17 @@ using namespace chip;
 using namespace chip::ArgParser;
 
 // App custom argument handling
-constexpr uint16_t kOptionDeviceType = 0xffd0;
-constexpr uint16_t kOptionWiFi       = 0xffd2;
+constexpr uint16_t kOptionDeviceType    = 0xffd0;
+constexpr uint16_t kOptionWiFi          = 0xffd2;
+constexpr uint16_t kOptionKVS           = 0xffd3;
+constexpr uint16_t kOptionDiscriminator = 0xffd4;
+constexpr uint16_t kOptionVendorId      = 0xffd5;
+constexpr uint16_t kOptionProductId     = 0xffd6;
+constexpr uint16_t kOptionPort          = 0xffd7;
+constexpr uint16_t kOptionInterfaceId   = 0xffd8;
 
 DeviceTypeParser AppOptions::sParser;
-bool AppOptions::mEnableWiFi = false;
-
-const std::vector<DeviceTypeParser::Entry> & AppOptions::GetDeviceTypeEntries()
-{
-    const auto & entries = sParser.GetDeviceTypeEntries();
-    if (entries.empty())
-    {
-        static const std::vector<DeviceTypeParser::Entry> kDefault = { { "contact-sensor", 1, kInvalidEndpointId } };
-        return kDefault;
-    }
-    return entries;
-}
+AppOptions::AppConfig AppOptions::mConfig;
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
@@ -55,11 +50,47 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         {
             return false;
         }
+        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
         return true;
     }
     case kOptionWiFi:
-        mEnableWiFi = true;
+        mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
+        return true;
+    case kOptionKVS:
+        mConfig.kvsPath = value;
+        return true;
+    case kOptionDiscriminator: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFF)
+        {
+            ChipLogError(Support, "Invalid discriminator: %s\n", value);
+            return false;
+        }
+        mConfig.discriminator = static_cast<uint16_t>(val);
+        return true;
+    }
+    case kOptionVendorId:
+        mConfig.vendorId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionProductId:
+        mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionPort: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFFF)
+        {
+            ChipLogError(Support, "Invalid port: %s\n", value);
+            return false;
+        }
+        mConfig.port = static_cast<uint16_t>(val);
+        ChipLogProgress(AppServer, "Port option set to %u\n", static_cast<uint16_t>(val));
+        return true;
+    }
+    case kOptionInterfaceId:
+        mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
         return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
@@ -76,6 +107,12 @@ OptionSet * AppOptions::GetOptions()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
+        { "KVS", kArgumentRequired, kOptionKVS },
+        { "discriminator", kArgumentRequired, kOptionDiscriminator },
+        { "vendor-id", kArgumentRequired, kOptionVendorId },
+        { "product-id", kArgumentRequired, kOptionProductId },
+        { "port", kArgumentRequired, kOptionPort },
+        { "interface-id", kArgumentRequired, kOptionInterfaceId },
         {}, // need empty terminator
     };
 

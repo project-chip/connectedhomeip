@@ -23,22 +23,41 @@
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
 class AppOptions
 {
 public:
+    struct AppConfig
+    {
+        std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
+        bool enableWiFi = false;
+        std::string kvsPath;
+        std::optional<uint16_t> discriminator;
+        std::optional<uint16_t> vendorId;
+        std::optional<uint16_t> productId;
+        std::optional<uint16_t> port;
+        std::optional<uint32_t> interfaceId;
+    };
+
     static chip::ArgParser::OptionSet * GetOptions();
+    static const AppConfig & GetConfig()
+    {
+        if (mConfig.deviceTypeEntries.empty())
+        {
+            mConfig.deviceTypeEntries.push_back({ "contact-sensor", 1, chip::kInvalidEndpointId });
+        }
+        return mConfig;
+    }
 
-    static bool EnableWiFi() { return mEnableWiFi; }
-
-    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries();
+    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
     static DeviceTypeParser sParser;
-    static bool mEnableWiFi;
+    static AppConfig mConfig;
 };

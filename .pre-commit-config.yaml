@@ -39,3 +39,11 @@ repos:
       hooks:
           - id: clang-format
             files: \.(c|cc|cpp|ipp|cxx|c\+\+|C|cs|h|hh|hpp|hxx|h\+\+|H|js|m|mm)$
+
+    # Validates that .github/workflows/*.{yml,yaml} parse and conform to the
+    # GitHub Actions schema. Catches the silent-skip class where a workflow
+    # with a YAML/schema error never runs and never posts a check.
+    - repo: https://github.com/python-jsonschema/check-jsonschema
+      rev: f805888065fdb6162e1f800e50bb9460cbd223d6 # 0.37.2
+      hooks:
+          - id: check-github-workflows
