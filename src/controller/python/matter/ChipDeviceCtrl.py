@@ -1572,14 +1572,23 @@ class ChipDeviceControllerBase():
                 ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
         closure = DeviceAvailableClosure(eventLoop, future)
+        # Py_IncRef pairs with the Py_DecRef inside DeviceAvailableClosure.deviceAvailable():
+        # it pins the closure in memory so the C callback can safely access it after this
+        # Python frame returns. This pairing also protects against use-after-free if the
+        # except branch below re-raises before the C callback fires.
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
         try:
             await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
                 self.devCtrl, nodeId, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
                 timeoutMs)
-        except:
-            # Ensure we clean up the future if CallAsync fails (e.g. timeout).
-            # This signals the callback (which might fire later) that we are no longer interested.
+        except BaseException:
+            # Ensure we cancel the future if CallAsync fails (e.g. timeout or cancellation).
+            # We catch BaseException so that asyncio.CancelledError (BaseException-derived in
+            # Python 3.8+) also triggers cleanup. The closure is intentionally NOT decref'd
+            # here: if CallAsync already submitted the request to the C SDK, the callback may
+            # still fire and would attempt to access the closure pointer. The Py_IncRef above
+            # keeps the closure alive until the C callback runs and releases it. The exception
+            # is re-raised so cancellation/timeout still propagate to the caller.
             future.cancel()
             raise
 
