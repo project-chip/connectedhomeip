@@ -275,7 +275,7 @@ private:
 #endif
 
     /**
-     * A generation counter for the dirty attribute set.
+     * A generation counter for the dirty attrbute set.
      * ReadHandlers can save the generation value when generating reports.
      *
      * Then we can tell whether they might have missed reporting an attribute by

@@ -22,8 +22,6 @@
 #include <DeviceEnergyManagementManager.h>
 #include <ElectricalSensorManager.h>
 #include <EnergyEvseManager.h>
-#include <app/clusters/power-source-server/PowerSourceCluster.h>
-#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
 
 using chip::Protocols::InteractionModel::Status;
 namespace chip {

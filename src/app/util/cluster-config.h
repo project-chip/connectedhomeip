@@ -23,9 +23,6 @@
 
 namespace chip {
 namespace app {
-
-// pre declare the type to not add its header file as a dependency
-namespace DataModel { template<class T> class Nullable; }
 namespace Clusters {
 namespace StaticApplicationConfig {
 
@@ -46,23 +43,6 @@ struct ClusterConfiguration
     Span<const AttributeId> enabledAttributes;
     Span<const CommandId> enabledCommands;
 };
-
-// Helper to remove DataModel::Nullable from optional attributes' types, so that they can be stored in a compileTime object
-// Because DataModel::Nullable is not a literal type, it cannot be used in a compile-time context.
-template<typename AttributeType>
-struct RemoveNullable
-{
-    using Type = AttributeType;
-};
-
-template<typename T>
-struct RemoveNullable<DataModel::Nullable<T>>
-{
-    using Type = T;
-};
-
-template<typename AttributeType>
-using RemoveNullableT = typename RemoveNullable<AttributeType>::Type;
 
 } // namespace StaticApplicationConfig
 } // namespace Clusters
