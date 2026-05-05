@@ -91,23 +91,16 @@ After successful commissioning, you can use `chip-tool` to interact with data mo
 
 ## Reporting Results
 
-When completing a test task using this skill, you should output a structured report to the user containing the following evidence:
+When completing a test task using this skill, you should output a structured report to the user. Since every test may verify different features, do not force a fixed sequence of steps. Instead, follow these general guidelines for reporting each item you verified:
 
-### 1. Build Process
-- State which targets were built and for which platform.
+For each verified feature, command, or configuration item, provide:
+1. **What was verified**: A clear description of the intent (e.g., "Verified that Endpoint 2 is a child of Endpoint 1").
+2. **The command ran**: The exact `chip-tool` or shell command you used.
+3. **The proof (logs)**: A snippet of the output or logs that proves the verification was successful (e.g., the attribute value read or the success status).
 
-### 2. Device Configuration and Startup
-- State the command used to run the application and any specific arguments used (like `--device`).
-- Include the pairing credentials (Setup PIN and Discriminator) extracted from the logs.
-
-### 3. Commissioning Evidence
-- Provide the `chip-tool` command used for commissioning.
-- Include a snippet of the logs showing successful commissioning (e.g., `Commissioning complete for node ID...`).
-
-### 4. Data Model Verification
-- Include the commands used to read `PartsList` or other attributes to verify the data model hierarchy.
-- Provide the output snippets showing the expected endpoints and relationships.
-
-### 5. Interaction Evidence
-- List the commands used to read/write attributes or invoke commands on each endpoint.
-- State the result (e.g., `Status=0x0 (SUCCESS)`) to prove it worked.
+### General Guidelines for Content:
+- **Build Process**: Mention which targets were built and if any custom flags were used.
+- **Startup**: Include the command used to run the application, and the pairing credentials (Setup PIN and Discriminator) found in the logs.
+- **Commissioning**: Show the command used and the log snippet confirming success.
+- **Data Model**: If hierarchy or device composition was verified, show the relevant `Descriptor` reads.
+- **Cluster Interaction**: For any attribute read/write or command invocation, show the command and the response status.
