@@ -77,6 +77,18 @@ public:
     CHIP_ERROR GetOperationalDataSetFormSE05x(char * opDataSet, size_t * opDataSetLen);
 
     /**
+     * @brief Set ISCommWithoutPowerAttr of SE05x for NFC Commissioning
+     *
+     * NOTE: This is not called from the SE05x app.
+     * Call this function based on platform specific implementation.
+     * Set to False during boot up of device
+     * Set to True during shutdown of the device.
+     *
+     * @return CHIP_NO_ERROR on success, appropriate error code otherwise
+     */
+    CHIP_ERROR SetISCommWithoutPowerAttr(bool is_comm_without_power);
+
+    /**
      * @brief Get the singleton instance
      * @return Reference to the NFCDataRetrievalInfo singleton
      */
