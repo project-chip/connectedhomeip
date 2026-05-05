@@ -23,7 +23,7 @@
 #include <zephyr/version.h>
 #endif
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
 struct net_in6_addr;
 #else
 struct in6_addr;
@@ -34,7 +34,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace InetUtils {
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
 using ZephyrIn6Addr = ::net_in6_addr;
 #else
 using ZephyrIn6Addr = ::in6_addr;

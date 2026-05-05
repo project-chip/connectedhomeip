@@ -798,7 +798,7 @@ public:
      * @param instanceName DNS-SD instance name for the client requesting commissioning
      *
      */
-    void FindCommissionableNode(char * instanceName) override;
+    void FindCommissionableNode(const char * instanceName) override;
 
     /**
      * @brief
