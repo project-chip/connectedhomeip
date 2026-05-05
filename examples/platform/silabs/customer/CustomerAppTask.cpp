@@ -17,19 +17,20 @@
  *    limitations under the License.
  */
 
+/**
+ * @file
+ * @brief Customer-facing AppTask definition site.
+ *
+ * Add `*Impl()` overrides here to customize individual AppTask behaviors.
+ * Any `*Impl()` you do not override keeps the default AppTask behavior.
+ *
+ * See the app README ("Override API Reference") for the full list of
+ * overridable methods.
+ */
+
 #include "CustomerAppTask.h"
 
 CustomerAppTask CustomerAppTask::sAppTask;
-
-/**
- * @brief Minimal AppTaskImpl-derived class.
- *
- * Default AppTask behavior applies for any *Impl() methods you do not override.
- * Override *Impl() methods in this class to customize individual behaviors.
- *
- * For full list of overridable methods, including required overrides for custom
- * behavior, and further documentation see app README file.
- */
 
 AppTask & AppTask::GetAppTask()
 {

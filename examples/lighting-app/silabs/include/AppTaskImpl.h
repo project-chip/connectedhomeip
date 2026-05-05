@@ -23,126 +23,90 @@
 #include "CRTPHelpers.h"
 
 /**
- * @brief CRTP base for AppTask, exposing override hooks for customizable APIs.
+ * @brief CRTP override layer for `AppTask`.
  *
- * Each public method dispatches to `Derived::*Impl()`. All overrides are optional:
- * a default `*Impl()` exists in the private section and falls through to the base
- * `AppTask` implementation. Override `*Impl()` in Derived only for the behaviors
- * you want to customize.
+ * Each public entry point dispatches to a corresponding `Derived::*Impl()` hook.
+ * The default `*Impl()` (declared private below) forwards to `AppTask`, so
+ * `Derived` only needs to override the hooks whose behavior it wants to
+ * customize.
  *
- * @tparam Derived The derived class type (CRTP pattern)
+ * Customer code overrides these hooks in `CustomerAppTask`; see the app README
+ * ("How to Override APIs").
+ *
+ * @tparam Derived The CRTP derived class (`CustomerAppTask`).
  */
 template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    using Action_t = AppTask::Action_t;
-
-    // optional override: AppInitImpl()
+    // Initialization hooks.
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
-    // optional override: InitLightImpl()
     CHIP_ERROR InitLight() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLightImpl); }
 
-    // optional override: InitiateActionImpl()
-    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
-    {
-        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitiateActionImpl, aActor, aAction, aValue);
-    }
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    // optional override: InitiateLightCtrlActionImpl()
-    bool InitiateLightCtrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
-    {
-        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitiateLightCtrlActionImpl, aActor, aAction, aAttributeId, value);
-    }
-#endif
-
-    // optional override: OnTriggerOffWithEffectImpl()
-    static void OnTriggerOffWithEffect(OnOffEffect * effect)
-    {
-        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffectImpl, effect);
-    }
-
-    // optional override: ButtonEventHandlerImpl()
+    // External callbacks invoked outside the AppTask thread (e.g. button ISR, OnOff cluster).
+    // Implementations typically post an event to the AppTask queue.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
-    // optional override: DMPostAttributeChangeCallbackImpl()
-    void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
+    static void OnTriggerOffWithEffect(OnOffEffect * effect)
     {
-        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMPostAttributeChangeCallbackImpl, attributePath, type, size, value);
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffectImpl, effect);
     }
 
-    // optional override: OnLightActionInitiatedImpl()
-    void OnLightActionInitiated(Action_t aAction, int32_t aActor, uint8_t * aValue)
+    // Handlers invoked from AppTask, timer, or stack threads — see each method for the exact context.
+    static void LightActionEventHandler(AppEvent * aEvent)
     {
-        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, OnLightActionInitiatedImpl, aAction, aActor, aValue);
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightActionEventHandlerImpl, aEvent);
     }
 
-    // optional override: OnLightActionCompletedImpl()
-    void OnLightActionCompleted(Action_t aAction)
-    {
-        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, OnLightActionCompletedImpl, aAction);
-    }
-
-    // optional override: LightTimerEventHandlerImpl()
     static void LightTimerEventHandler(void * timerCbArg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightTimerEventHandlerImpl, timerCbArg);
     }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    // optional override: LightControlEventHandlerImpl()
     static void LightControlEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightControlEventHandlerImpl, aEvent);
     }
 #endif
 
+    void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+    {
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMPostAttributeChangeCallbackImpl, attributePath, type, size, value);
+    }
+
 private:
     friend Derived;
 
     /** Default implementations — override in Derived to customize. */
+
+    // Initialization hooks (*Impl)
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 
     CHIP_ERROR InitLightImpl() { return AppTask::InitLight(); }
 
-    bool InitiateActionImpl(int32_t aActor, Action_t aAction, uint8_t * aValue)
-    {
-        return AppTask::InitiateAction(aActor, aAction, aValue);
-    }
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    bool InitiateLightCtrlActionImpl(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
-    {
-        return AppTask::InitiateLightCtrlAction(aActor, aAction, aAttributeId, value);
-    }
-#endif
+    // External callbacks (*Impl)
+    void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction) { AppTask::ButtonEventHandler(button, btnAction); }
 
     void OnTriggerOffWithEffectImpl(OnOffEffect * effect) { AppTask::OnTriggerOffWithEffect(effect); }
 
-    void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction) { AppTask::ButtonEventHandler(button, btnAction); }
-
-    void DMPostAttributeChangeCallbackImpl(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                           uint8_t * value)
-    {
-        AppTask::DMPostAttributeChangeCallback(attributePath, type, size, value);
-    }
-
-    void OnLightActionInitiatedImpl(Action_t aAction, int32_t aActor, uint8_t * aValue)
-    {
-        AppTask::OnLightActionInitiated(aAction, aActor, aValue);
-    }
-
-    void OnLightActionCompletedImpl(Action_t aAction) { AppTask::OnLightActionCompleted(aAction); }
+    // Event / timer / data-model handlers (*Impl)
+    void LightActionEventHandlerImpl(AppEvent * aEvent) { AppTask::LightActionEventHandler(aEvent); }
 
     void LightTimerEventHandlerImpl(void * timerCbArg) { AppTask::LightTimerEventHandler(timerCbArg); }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     void LightControlEventHandlerImpl(AppEvent * aEvent) { AppTask::LightControlEventHandler(aEvent); }
 #endif
+
+    void DMPostAttributeChangeCallbackImpl(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                           uint8_t * value)
+    {
+        AppTask::DMPostAttributeChangeCallback(attributePath, type, size, value);
+    }
 };
