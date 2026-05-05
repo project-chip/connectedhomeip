@@ -2188,8 +2188,12 @@ endpoint 1 {
     persist  attribute order;
     ram      attribute description;
     ram      attribute batPercentRemaining default = 95;
+    ram      attribute batChargeLevel;
+    ram      attribute batReplacementNeeded;
+    ram      attribute batReplaceability;
     ram      attribute batPresent default = 1;
     ram      attribute batChargeState default = 4;
+    ram      attribute batFunctionalWhileCharging;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

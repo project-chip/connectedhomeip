@@ -96,7 +96,7 @@ void SetBatteryVoltage(uint32_t voltage)
         }
         else
         {
-            err = cluster->SetBatVoltage(Optional(voltage));
+            err = cluster->SetBatVoltage(voltage);
         }
         if (err != CHIP_NO_ERROR)
         {
@@ -115,7 +115,7 @@ void SetBatteryPercentageRemaining(DoubledPercentage value)
         }
         else
         {
-            err = cluster->SetBatPercentRemaining(Optional(value));
+            err = cluster->SetBatPercentRemaining(value);
         }
         if (err != CHIP_NO_ERROR)
         {

@@ -3017,6 +3017,7 @@ endpoint 0 {
     ram      attribute description default = "USB";
     ram      attribute wiredCurrentType default = 0;
     ram      attribute wiredAssessedCurrent;
+    callback attribute activeWiredFaults;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
