@@ -316,7 +316,7 @@ CHIP_ERROR se05x_read_root_cert(uint8_t * root_cert_buf, size_t * root_cert_buf_
     VerifyOrReturnError(buf_len >= kLengthFieldSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Extract root certificate length from header (big-endian)
-    const size_t root_cert_len = static_cast<size_t>((root_cert_buf[0] << 8) | root_cert_buf[1]);
+    const size_t root_cert_len = static_cast<size_t>(((root_cert_buf[0] << 8) | root_cert_buf[1]) - 3);
 
     // Validate certificate length
     VerifyOrReturnError(root_cert_len > 0, CHIP_ERROR_INTERNAL);
