@@ -43,8 +43,9 @@
 '''
 Purpose
 Verify that after client registration and subscription request, the ICD state machine enters the
-subscribed state and stops sending check-in messages for the duration of the subscription.
-After the subscription is torn down, the DUT resumes sending check-in messages.
+subscribed state, periodically sends subscription reports, and stops sending check-in messages
+for the duration of the subscription. After the subscription is torn down, the DUT resumes
+sending check-in messages.
 
 Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/icdbehavior.adoc#322-tc-icdb-22-icd-state-machine---with-client-registration-and-active-subscription---single-fabric-dut_server
@@ -117,7 +118,7 @@ class TC_ICDB_2_2(ICDBaseTest):
                      "No check-in message is sent."),
             TestStep(5, "TH reads the ICDCounter attribute.",
                      "Verify ICDCounter is unchanged from icd_counter_at_subscription."),
-            TestStep(6, "TH waits for DUT to transition to Idle Mode then back to Active Mode. TH writes a new value to the NodeLabel attribute of the BasicInformation cluster.",
+            TestStep(6, "Wait for a full active-to-idle-to-active ICD transition cycle. TH writes a new value to the NodeLabel attribute of the BasicInformation cluster.",
                      "The subscription receives a report for the NodeLabel attribute within MaxInterval."),
             TestStep(7, "TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle.", """
                      DUT resumed sending check-in messages after the subscription was torn down.
@@ -204,11 +205,12 @@ class TC_ICDB_2_2(ICDBaseTest):
                              f"Before: {icd_counter_at_subscription}, After: {icd_counter_while_subscribed}")
 
         # *** STEP 6 ***
-        # TH waits for DUT to transition to Idle Mode then back to Active Mode.
+        # Wait for a full active-to-idle-to-active ICD transition cycle.
         # TH writes a new value to the NodeLabel attribute of the BasicInformation cluster.
         self.step(6)
-        await self.wait_for_transition(ICDTransition.ActiveToIdle, active_mode_duration_ms=active_mode_duration_ms)
-        await self.wait_for_transition(ICDTransition.IdleToActive, idle_mode_duration_s=idle_mode_duration_s)
+        await self.wait_for_transition(ICDTransition.FullCycle,
+                                       active_mode_duration_ms=active_mode_duration_ms,
+                                       idle_mode_duration_s=idle_mode_duration_s)
 
         node_label_subscription = await TH.ReadAttribute(
             nodeId=self.dut_node_id,
