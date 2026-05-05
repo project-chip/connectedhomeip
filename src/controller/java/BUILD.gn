@@ -65,13 +65,21 @@ source_set("android_chip_im_jni") {
     "CHIPInteractionClient-JNI.h",
   ]
 
-  if (matter_enable_tlv_decoder_api) {
+  if (matter_enable_tlv_decoder_cpp) {
     defines = [ "USE_JAVA_TLV_ENCODE_DECODE" ]
-    sources += [
-      "CHIPTLVValueDecoder-JNI.cpp",
-      "zap-generated/CHIPAttributeTLVValueDecoder.cpp",
-      "zap-generated/CHIPEventTLVValueDecoder.cpp",
-    ]
+    sources += [ "CHIPTLVValueDecoder-JNI.cpp" ]
+
+    if (chip_tlv_decoder_attribute_source_override != "") {
+      sources += [ chip_tlv_decoder_attribute_source_override ]
+    } else {
+      sources += [ "zap-generated/CHIPAttributeTLVValueDecoder.cpp" ]
+    }
+
+    if (chip_tlv_decoder_event_source_override != "") {
+      sources += [ chip_tlv_decoder_event_source_override ]
+    } else {
+      sources += [ "zap-generated/CHIPEventTLVValueDecoder.cpp" ]
+    }
   }
 
   deps = [

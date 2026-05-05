@@ -80,7 +80,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace PushTransportBegin.
+} // namespace PushTransportBegin
 namespace PushTransportEnd {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -121,7 +121,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace PushTransportEnd.
+} // namespace PushTransportEnd
 } // namespace Events
 } // namespace PushAvStreamTransport
 } // namespace Clusters

@@ -54,20 +54,20 @@ struct StaticInitLLVMProfile {
 } gInitLLVMProfilingPaths;
 """
 
+log = logging.getLogger(__name__)
+
 
 @click.command()
 @click.option(
     "--log-level",
     default="INFO",
-    type=click.Choice([k for k in __LOG_LEVELS__], case_sensitive=False),
+    type=click.Choice(list(__LOG_LEVELS__), case_sensitive=False),
     help="Determines the verbosity of script output.",
 )
 @click.option(
-    "--no-log-timestamps",
-    default=False,
-    is_flag=True,
-    help="Skip timestaps in log output",
-)
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     "--output",
     help="What file to output when runnning under clang profiling",
@@ -76,24 +76,22 @@ struct StaticInitLLVMProfile {
     "--raw-profile-filename",
     help="Filename to use for output",
 )
-def main(log_level, no_log_timestamps, output, raw_profile_filename):
-    log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
-    if no_log_timestamps:
-        log_fmt = "%(levelname)-7s %(message)s"
+def main(log_level, log_timestamps, output, raw_profile_filename):
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     expected_output = jinja2.Template(_CPP_TEMPLATE).render(raw_profile_filename=raw_profile_filename)
     if os.path.exists(output):
         with open(output) as f:
             if f.read() == expected_output:
-                logging.info("File %s is already as expected. Will not re-write", output)
+                log.info("File %s is already as expected. Will not re-write", output)
                 sys.exit(0)
 
-    logging.info("Writing output to %s (profile name: %s)", output, raw_profile_filename)
+    log.info("Writing output to %s (profile name: %s)", output, raw_profile_filename)
     with open(output, "wt") as f:
         f.write(expected_output)
 
-    logging.debug("Writing completed")
+    log.debug("Writing completed")
 
 
 if __name__ == "__main__":

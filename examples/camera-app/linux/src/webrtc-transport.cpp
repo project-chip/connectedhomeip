@@ -41,7 +41,7 @@ SDPType RtcTypeToSDPType(rtc::Description::Type type)
 WebrtcTransport::WebrtcTransport()
 {
     ChipLogProgress(Camera, "WebrtcTransport created");
-    mRequestArgs = { 0, 0, 0, 0, 0, 0 }; // Initialize request arguments to zero
+    mRequestArgs = {}; // Default initialize request arguments
 }
 
 WebrtcTransport::~WebrtcTransport()
@@ -60,6 +60,11 @@ void WebrtcTransport::SetCallbacks(OnTransportLocalDescriptionCallback onLocalDe
 void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
 {
     mRequestArgs = args;
+}
+
+void WebrtcTransport::SetICEServers(const std::vector<ICEServerInfo> & servers)
+{
+    mICEServers = servers;
 }
 
 WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
@@ -145,13 +150,13 @@ void WebrtcTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t video
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mLocalVideoTrack != nullptr;
+    return mLocalVideoTrack != nullptr && mLocalVideoTrack->IsReady();
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mLocalAudioTrack != nullptr;
+    return mLocalAudioTrack != nullptr && mLocalAudioTrack->IsReady();
 }
 
 const char * WebrtcTransport::GetStateStr() const
@@ -195,7 +200,7 @@ void WebrtcTransport::Start()
         return;
     }
 
-    mPeerConnection = CreateWebRTCPeerConnection();
+    mPeerConnection = CreateWebRTCPeerConnection(mICEServers);
 
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
                                   [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },

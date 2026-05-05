@@ -29,6 +29,7 @@ public:
     LEDWidget() : mLEDHandle(NULL) {}
 
     static void InitGpio();
+    static void InitGpio(T_LED_PWM_PARAM * ledPwmList, uint8_t ledPwmNum);
     void Init(uint8_t gpioNum);
     void Set(bool state);
     void Invert(void);

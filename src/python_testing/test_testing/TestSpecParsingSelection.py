@@ -16,11 +16,11 @@
 #
 
 
-from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, ConformanceException
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.global_attribute_ids import is_standard_attribute_id
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
@@ -52,6 +52,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
                              "Incorrect directory selected for 1.5")
         asserts.assert_equal(dm_from_spec_version(0x01050100), PrebuiltDataModelDirectory.k1_5_1,
                              "Incorrect directory selected for 1.5.1")
+        asserts.assert_equal(dm_from_spec_version(0x01060000), PrebuiltDataModelDirectory.k1_6,
+                             "Incorrect directory selected for 1.6")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -79,6 +81,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             dm_from_spec_version(0x01040101)
         with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
             dm_from_spec_version(0x01050001)
+        with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
+            dm_from_spec_version(0x01060001)
 
     def _create_device(self, spec_version: uint, tc_enabled: bool):
         if spec_version is None:
@@ -139,14 +143,15 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         self._create_device(spec_version, tc_enabled)
         # build the spec XMLs for the stated version
         self.build_spec_xmls()
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         problem_strs = [str(p) for p in problems]
         problem_str = "\n".join(problem_strs)
         spec_version_str = f'{spec_version:08X}' if spec_version is not None else "None (1.2)"
         asserts.assert_equal(success, expect_success_conformance,
                              f"Improper conformance result for spec version {spec_version_str}, TC: {tc_enabled} problems: {problem_str}")
 
-        success, problems = self.check_revisions(ignore_in_progress=False)
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification=False)
         asserts.assert_equal(success, expect_success_revisions,
                              f"Improper revision result for spec version {spec_version_str}, TC: {tc_enabled} problems: {problems}")
 

@@ -148,7 +148,7 @@ void PlatformManagerImpl::_Shutdown()
 
 bool PlatformManagerImpl::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    if (!err.IsRange(ChipError::Range::kPlatform))
+    if (!err.IsRange(ChipError::Range::kPlatformExtended))
     {
         return false;
     }

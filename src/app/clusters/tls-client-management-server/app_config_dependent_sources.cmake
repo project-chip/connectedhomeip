@@ -16,9 +16,14 @@
 TARGET_SOURCES(
         ${APP_TARGET}
         PRIVATE
+        "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+TARGET_SOURCES(
+        ${APP_TARGET}
+        PRIVATE
         "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.cpp"
         "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.h"
-        "${CLUSTER_DIR}/CodegenIntegration.cpp"
         "${CLUSTER_DIR}/TLSClientManagementCluster.cpp"
         "${CLUSTER_DIR}/TLSClientManagementCluster.h"
 )

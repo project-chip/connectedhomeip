@@ -1,11 +1,15 @@
 #include "DeviceTypes.h"
+#include "FakeAttributeAccess.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
+#include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPMem.h> // For chip::Platform
+#include <lib/support/TypeTraits.h>
 
 using chip::app::DataModel::Nullable;
 
@@ -75,12 +79,45 @@ void InitIdentifyCluster()
         if (epIndex >= kIdentifyTableSize)
             continue;
 
-        gIdentifyInstanceTable[epIndex] =
-            std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+        chip::app::Clusters::Identify::IdentifyTypeEnum idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kNone;
+        if (endpointId == 1)
+        {
+            idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator;
+        }
+
+        gIdentifyInstanceTable[epIndex] = std::make_unique<struct Identify>(endpointId, nullptr, nullptr, idType);
     }
 }
 } // namespace
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "content-launch/chef-content-launch-delegate.h"
+#endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "application-basic/chef-application-basic-delegate.h"
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "application-launch/chef-application-launch-delegate.h"
+#endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-management/chef-water-heater-management.h"
+#endif
+
+#if MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-mode/chef-water-heater-mode.h"
+#endif
+
+#include "clusters/mode-base/chef-mode-base-default.h"
+
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/chime/chef-chime-delegate.h"
+#include <app/clusters/chime-server/CodegenIntegration.h>
+#endif
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -97,16 +134,60 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]  
 
 namespace PostionSemanticTag {
 
-constexpr const uint8_t kNamespace                                   = 0x08; // Common Position Namespace
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft   = { .namespaceID = kNamespace, .tag = 0x00 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight  = { .namespaceID = kNamespace, .tag = 0x01 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namespaceID = kNamespace, .tag = 0x02 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
+constexpr const uint8_t kNamespace                                 = 0x08; // Common Position Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft = {
+    .namespaceID = kNamespace, .tag = 0x00, .label = MakeOptional(Nullable<Span<const char>>("left"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight = {
+    .namespaceID = kNamespace, .tag = 0x01, .label = MakeOptional(Nullable<Span<const char>>("right"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop = {
+    .namespaceID = kNamespace, .tag = 0x02, .label = MakeOptional(Nullable<Span<const char>>("top"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = {
+    .namespaceID = kNamespace, .tag = 0x03, .label = MakeOptional(Nullable<Span<const char>>("bottom"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = {
+    .namespaceID = kNamespace, .tag = 0x04, .label = MakeOptional(Nullable<Span<const char>>("middle"_span))
+};
 
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
 } // namespace PostionSemanticTag
+
+namespace NumberSemanticTag {
+constexpr const uint8_t kNamespace                                = 0x07; // Common Number Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = {
+    .namespaceID = kNamespace, .tag = 0x01, .label = MakeOptional(Nullable<Span<const char>>("one"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = {
+    .namespaceID = kNamespace, .tag = 0x02, .label = MakeOptional(Nullable<Span<const char>>("two"_span))
+};
+} // namespace NumberSemanticTag
+
+namespace GenericSwitch {
+
+// These are generic tags
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottomTagList[] = { PostionSemanticTag::kBottom,
+                                                                                  NumberSemanticTag::kTwo };
+// These are representative tags.
+namespace BilresaRotary {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRotaryTagList[] = {
+    { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
+    { .namespaceID = 0x43, .tag = 0x04 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("rotary"_span)) },
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kButtonTagList[] = {
+    { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
+    { .namespaceID = 0x43, .tag = 0x02 },
+    { .namespaceID = 0x43, .tag = 0x06 },
+    { .namespaceID = 0x43, .tag = 0x05 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("button"_span)) },
+};
+} // namespace BilresaRotary
+
+} // namespace GenericSwitch
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"
@@ -154,6 +235,14 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 #include "microwave-oven-control/chef-microwave-oven-control.h"
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/mode-select/chef-supported-modes-manager.h"
+#endif
+
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "laundry-dryer-controls/chef-laundry-dryer-controls-delegate.h"
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -330,7 +419,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, Device::kPumpDeviceTypeId))
         {
             chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
         }
@@ -345,7 +434,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
-        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, Device::kPumpDeviceTypeId))
         {
             chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
         }
@@ -361,6 +450,19 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         HandleFanControlAttributeChange(attributeId, type, size, value);
     }
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    if (clusterId == Thermostat::Id &&
+        (attributeId == Thermostat::Attributes::OccupiedHeatingSetpoint::Id ||
+         attributeId == Thermostat::Attributes::LocalTemperature::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankVolume::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankPercentage::Id) &&
+        DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        MatterReportingAttributeChangeCallback(attributePath.mEndpointId, WaterHeaterManagement::Id,
+                                               WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id);
+    }
+#endif
 }
 
 /** @brief OnOff Cluster Init
@@ -396,34 +498,39 @@ void emberAfChannelClusterInitCallback(EndpointId endpoint)
 
 #ifdef MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER
 #include "keypad-input/KeypadInputManager.h"
-static KeypadInputManager keypadInputManager;
+static KeypadInputManager keypadInputManager[MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
-    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager[ep]);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_LOW_POWER_SERVER
 #include "low-power/LowPowerManager.h"
-static LowPowerManager lowPowerManager;
+static LowPowerManager lowPowerManager[MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LowPower::Id, MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager[ep]);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "target-navigator/TargetNavigatorManager.h"
-static TargetNavigatorManager targetNavigatorManager;
+static TargetNavigatorManager targetNavigatorManager[MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
+                                                       MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager[ep]);
 }
 #endif
 
@@ -447,14 +554,14 @@ void RefrigeratorTemperatureControlledCabinetInit()
     EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
     EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
     EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
-    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
+    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, Device::kRefrigeratorDeviceTypeId))
     {
         return;
     }
     ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
     TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kRefEndpointId);
 
-    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
@@ -462,7 +569,7 @@ void RefrigeratorTemperatureControlledCabinetInit()
             kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
     }
 
-    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
@@ -483,11 +590,11 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
     switch (kCooktopEpId)
     {
     case DeviceTypes::ExpectedEndpointId::kCooktopStandAlone:
-        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, Device::kCooktopDeviceTypeId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktop;
-            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, Device::kCookSurfaceDeviceTypeId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -499,13 +606,13 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
         break;
     case DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven:
         EndpointId kOvenEpId = DeviceTypes::ExpectedEndpointId::kOven;
-        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
-            DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, Device::kCooktopDeviceTypeId) &&
+            DeviceTypes::EndpointHasDeviceType(kOvenEpId, Device::kOvenDeviceTypeId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
             EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktopOven;
-            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, Device::kCookSurfaceDeviceTypeId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -526,7 +633,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
     EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
     EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
-    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, Device::kOvenDeviceTypeId))
     {
         return;
     }
@@ -534,7 +641,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
     TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kOvenEpId);
 
-    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
@@ -548,12 +655,184 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     CooktopCookSurfaceInit(kCooktopEpId);
 }
 
+/**
+ * This initializer is for the generic switch application rootnode_genericswitch_9866e35d0b. To not have this initialiser affect
+ * new generic switch chef app, use a different set of endpoints.
+ */
+void GenericSwitchInit()
+{
+    if (!DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(3, Device::kGenericSwitchDeviceTypeId))
+    {
+        return;
+    }
+    // Rotary endpoint
+    LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::BilresaRotary::kRotaryTagList)));
+
+    // This is just a momentary switch endpoint with no multi press.
+    LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kTopTagList)));
+
+    // Button endpoint
+    LogErrorOnFailure(SetTagList(3, Span(GenericSwitch::BilresaRotary::kButtonTagList)));
+}
+
+/**
+ * This initializer is for the laundry dryer application rootnode_laundrydryer_01796fe396. To not have this initialiser affect
+ * new laundry dryer chef apps, use a different endpoint.
+ */
+void LaundryDryerInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: LaundryDryerInit called more than once");
+    called = true;
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    // Only initialises Laundry Dryer Controls. Other clusters are initialised through ember calls.
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kLaundryDryerDeviceTypeId))
+    {
+        Platform::New<LaundryDryerControls::Chef::ChefDelegate>()->Register(1);
+    }
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
+/*
+ * This initializer is for the casting video player application rootnode_castingvideoplayer_contentapp_34699714e7. To not have this
+ * initialiser affect new apps video player device types, use different endpoints.
+ */
+void CastingvideoplayerContentappInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: CastingvideoplayerContentappInit called more than once");
+    called = true;
+
+#if (MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                              \
+    (MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                             \
+    (MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    chip::EndpointId kPlatformEndpoint             = 1;
+    chip::EndpointId kAppAEndpoint                 = 2;
+    static constexpr uint16_t kAllowedVendorList[] = { 0xFFF1 };
+
+    if (!DeviceTypes::EndpointHasDeviceType(kPlatformEndpoint, Device::kCastingVideoPlayerDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(kAppAEndpoint, Device::kContentAppDeviceTypeId))
+    {
+        return;
+    }
+    ChipLogProgress(NotSpecified, "This is a Casting Video Player Platform");
+
+    // Content Launcher Delegates
+    Platform::New<ContentLauncher::Chef::ChefDelegate>(kPlatformEndpoint)->Register();
+    Platform::New<ContentLauncher::Chef::ChefDelegate>(kAppAEndpoint)->Register();
+
+    // App basic delegates
+    ApplicationBasic::Chef::ChefDelegate * appABasic =
+        Platform::New<ApplicationBasic::Chef::ChefDelegate>(kAppAEndpoint,                            // Endpoint ID
+                                                            "TEST_VENDOR",                            // vendorName
+                                                            0xFFF1,                                   // catalogVendorId
+                                                            "Application_A_ID",                       // applicationId
+                                                            "Application_A_Name",                     // applicationName
+                                                            "Version_1",                              // applicationVersion
+                                                            Span<const uint16_t>(kAllowedVendorList), // allowedVendorList
+                                                            32768                                     // productId
+        );
+    appABasic->Register();
+
+    // Application Launcher Delegates
+    ApplicationLauncher::Chef::PlatformDelegate * platformLauncher =
+        Platform::New<ApplicationLauncher::Chef::PlatformDelegate>(kPlatformEndpoint, Span<const uint16_t>(kAllowedVendorList));
+    platformLauncher->Register();
+    ApplicationLauncher::Chef::AppDelegate * appALauncher =
+        Platform::New<ApplicationLauncher::Chef::AppDelegate>(kAppAEndpoint, appABasic);
+    appALauncher->Register();
+    VerifyOrDie(platformLauncher->AddAppDelegate(appALauncher) == CHIP_NO_ERROR);
+    appALauncher->setPlatformDelegate(platformLauncher);
+#endif
+}
+
+/*
+ * This initializer is for the water heater application rootnode_waterheater_21bd13d651. To not have this initialiser
+ * affect new water heater applications, use different endpoints.
+ */
+void WaterHeaterInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: WaterHeaterInit called more than once");
+    called = true;
+
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    if (!DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        return;
+    }
+    // WaterHeaterManagement initialisation
+    static WaterHeaterManagement::Chef::ChefDelegate delegate;
+    delegate.SetEndpointId(1);
+    static WaterHeaterManagement::Instance instance(
+        1, delegate,
+        WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
+                                       to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
+    VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
+
+    // WaterHeaterMode initialisation
+    uint32_t WaterHeaterModefeatureMap = 0;
+    static ModeBase::DefaultChefDelegate WaterHeaterModeDelegate(WaterHeaterMode::Chef::kSupportedModes);
+    static ModeBase::Instance WaterHeaterModeInstance(&WaterHeaterModeDelegate, 1, WaterHeaterMode::Id, WaterHeaterModefeatureMap);
+    VerifyOrDieWithMsg(WaterHeaterModeInstance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterMode instance.");
+#endif
+}
+
+/**
+ * This initializer is for the chime application.
+ */
+void ChimeInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: ChimeInit called more than once");
+    called = true;
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kChimeDeviceTypeId))
+    {
+        static auto * delegate  = Platform::New<Chime::ChefChimeDelegate>();
+        static auto chimeServer = Platform::New<ChimeServer>(1, *delegate);
+        VerifyOrDieWithMsg(chimeServer->Init() == CHIP_NO_ERROR, Zcl, "Error: ChimeServer::Init failed");
+        uint8_t defaultChimeID = 0;
+        VerifyOrDieWithMsg(delegate->GetChimeIDByIndex(0, defaultChimeID) == CHIP_NO_ERROR, Zcl,
+                           "Initialisation Error: Failed to get chime ID from chef delegate");
+        VerifyOrDieWithMsg(chimeServer->SetSelectedChime(defaultChimeID) == Protocols::InteractionModel::Status::Success, Zcl,
+                           "Initialisation Error: Failed to set default chime ID to %d", defaultChimeID);
+    }
+#endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
+void InitModeSelect()
+{
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kModeSelectDeviceTypeId))
+    {
+        using namespace chip::app::Clusters::ModeSelect;
+        using namespace chip::app::Clusters::ModeSelect::Chef;
+        static ChefSupportedModesManager supportedModesManager;
+        static SupportedModesManager::ModeOptionsProvider modeOptions(
+            kDefaultModeOptions, kDefaultModeOptions + (sizeof(kDefaultModeOptions) / sizeof(kDefaultModeOptions[0])));
+        VerifyOrDieWithMsg(supportedModesManager.AddModeOptionsProvider(1, modeOptions) == CHIP_NO_ERROR, Zcl,
+                           "InitModeSelect: Failed to AddModeOptionsProvider");
+        setSupportedModesManager(&supportedModesManager);
+    }
+#endif // MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
+    GenericSwitchInit();
+    LaundryDryerInit();
+    CastingvideoplayerContentappInit();
+    WaterHeaterInit();
+    ChimeInit();
+    InitModeSelect();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
@@ -584,6 +863,8 @@ void ApplicationInit()
 #if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     InitIdentifyCluster();
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+
+    chip::app::Clusters::Chef::RegisterAttributeAccessor();
 }
 
 void ApplicationShutdown()

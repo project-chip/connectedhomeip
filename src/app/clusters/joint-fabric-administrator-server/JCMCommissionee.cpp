@@ -335,23 +335,58 @@ TrustVerificationError JCMCommissionee::CrossCheckAdministratorIds()
 CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
 {
     auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const CertsAttr::DecodableType & roots) {
-        // Find the RCAC
-        auto iter = roots.begin();
-        if (!iter.Next())
-        {
-            onComplete(CHIP_ERROR_INTERNAL);
-            return;
-        }
-        ByteSpan rootSpan = iter.GetValue();
+        Credentials::P256PublicKeySpan rootPubKeySpan(mInfo.rootPublicKey.Get());
+        Crypto::P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
 
-        // Copy the RCAC to mInfo
-        mInfo.adminRCAC.CopyFromSpan(rootSpan);
-        if ((rootSpan.size() == 0) || (mInfo.adminRCAC.AllocatedSize() != rootSpan.size()))
+        bool foundMatchingRCAC = false;
+        auto iter              = roots.begin();
+        while (iter.Next())
         {
-            ChipLogError(JointFabric, "JCM: Failed to store administrator root cert");
+            ByteSpan rootSpan = iter.GetValue();
+            Credentials::P256PublicKeySpan trustedCAPublicKeySpan;
+
+            CHIP_ERROR err = Credentials::ExtractPublicKeyFromChipCert(rootSpan, trustedCAPublicKeySpan);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(JointFabric, "JCM: Failed to extract root public key: %s", err.AsString());
+                onComplete(err);
+                return;
+            }
+            Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
+
+            // From 11.18.5.5. TrustedRootCertificates Attribute:
+            // To match a root with a given fabric, the root certificate’s subject and subject public key need to be
+            // cross-referenced with the NOC or ICAC certificates that appear in the NOCs attribute for a given fabric.
+            if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && rootSpan.size())
+            {
+                mInfo.adminRCAC.CopyFromSpan(rootSpan);
+                if (mInfo.adminRCAC.AllocatedSize() != rootSpan.size())
+                {
+                    ChipLogError(JointFabric, "JCM: Failed to store administrator root cert");
+                    onComplete(CHIP_ERROR_INTERNAL);
+                    return;
+                }
+                foundMatchingRCAC = true;
+                break;
+            }
+        }
+
+        CHIP_ERROR iterErr = iter.GetStatus();
+        if (iterErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "JCM: Error decoding TrustedRootCertificates. iter status: %" CHIP_ERROR_FORMAT,
+                         iterErr.Format());
             onComplete(CHIP_ERROR_INTERNAL);
             return;
         }
+
+        if (!foundMatchingRCAC)
+        {
+            ChipLogError(JointFabric, "JCM: Did not find a matching RCAC");
+            onComplete(CHIP_ERROR_CERT_NOT_FOUND);
+            return;
+        }
+
         ChipLogProgress(JointFabric, "JCM: Successfully read admin RCAC");
 
         onComplete(CHIP_NO_ERROR);

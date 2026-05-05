@@ -132,11 +132,20 @@ public:
 
     Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
 
+    /**
+     * Expire the fail-safe if there is an active PASE session, since this indicates that the fail-safe is for the commissioning
+     * happening over the PASE session, and not for some unrelated non-commissioning activity.
+     */
+    void ExpireFailSafeIfHeldByOpenPASESession();
+
 private:
     //////////// SessionDelegate Implementation ///////////////
     void OnSessionReleased() override;
 
     void SetBLE(bool ble) { mIsBLE = ble; }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void SetWiFiPAF(bool paf) { mIsWiFiPAF = paf; }
+#endif
 
     CHIP_ERROR SetTemporaryDiscriminator(uint16_t discriminator);
 
@@ -201,6 +210,13 @@ private:
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    bool mIsWiFiPAF = false;
+    // Both 0 and kUndefinedWiFiPafSessionId are invalid publish-id.
+    // Use 0 as the default value so that the PAF definition does not need to be included.
+    uint32_t mPublishId = 0;
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     // Boolean that tracks whether we are currently in a Joint Commissioning Mode.

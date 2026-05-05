@@ -120,7 +120,7 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void);
 sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void);
 #endif // SL_BTLCTRL_MUX
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 /****************************************************************************
  * @fn  sl_status_t sl_wfx_host_pre_lcd_spi_transfer()
  * @brief
@@ -138,7 +138,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void);
  * @return SL_STATUS_OK
  *****************************************************************************/
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void);
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 
 #if SL_UARTCTRL_MUX
 /****************************************************************************

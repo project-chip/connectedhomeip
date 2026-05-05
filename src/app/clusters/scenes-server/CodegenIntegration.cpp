@@ -167,7 +167,7 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
     ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
     VerifyOrReturn(cluster != nullptr);
 
-    TEMPORARY_RETURN_IGNORED cluster->GroupWillBeRemoved(aFabricIx, aGroupId);
+    LogErrorOnFailure(cluster->GroupWillBeRemoved(aFabricIx, aGroupId));
 }
 
 void ScenesServer::MakeSceneInvalid(EndpointId aEndpointId, FabricIndex aFabricIx)
@@ -175,35 +175,35 @@ void ScenesServer::MakeSceneInvalid(EndpointId aEndpointId, FabricIndex aFabricI
     ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
     VerifyOrReturn(cluster != nullptr);
 
-    TEMPORARY_RETURN_IGNORED cluster->MakeSceneInvalid(aFabricIx);
+    LogErrorOnFailure(cluster->MakeSceneInvalid(aFabricIx));
 }
 
 void ScenesServer::MakeSceneInvalidForAllFabrics(EndpointId aEndpointId)
 {
     ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
     VerifyOrReturn(cluster != nullptr);
-    TEMPORARY_RETURN_IGNORED cluster->MakeSceneInvalidForAllFabrics();
+    LogErrorOnFailure(cluster->MakeSceneInvalidForAllFabrics());
 }
 
 void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
     ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
     VerifyOrReturn(cluster != nullptr);
-    TEMPORARY_RETURN_IGNORED cluster->StoreCurrentScene(aFabricIx, aGroupId, aSceneId);
+    LogErrorOnFailure(cluster->StoreCurrentScene(aFabricIx, aGroupId, aSceneId));
 }
 
 void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
     ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
     VerifyOrReturn(cluster != nullptr);
-    TEMPORARY_RETURN_IGNORED cluster->RecallScene(aFabricIx, aGroupId, aSceneId);
+    LogErrorOnFailure(cluster->RecallScene(aFabricIx, aGroupId, aSceneId));
 }
 
 void ScenesServer::RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex)
 {
     ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
     VerifyOrReturn(cluster != nullptr);
-    TEMPORARY_RETURN_IGNORED cluster->RemoveFabric(aFabricIndex);
+    LogErrorOnFailure(cluster->RemoveFabric(aFabricIndex));
 }
 
 } // namespace chip::app::Clusters::ScenesManagement

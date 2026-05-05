@@ -286,5 +286,5 @@ tests:
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
 # for details about the block below.
 CI:
-    - name: energy-management
-      app: energy-management
+    - name: evse
+      app: evse

@@ -16,8 +16,10 @@ import("//build_overrides/chip.gni")
 
 source_set("basic-information") {
   sources = [
-    "BasicInformationCluster.cpp",
     "BasicInformationCluster.h",
+    "BasicInformationOptionalAttributes.h",
+    "DeviceLayerBasicInformationPolicy.h",
+    "PolicyBased.h",
   ]
   public_deps = [
     "${chip_root}/src/app:constants",

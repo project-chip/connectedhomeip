@@ -34,7 +34,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -66,7 +66,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -98,7 +98,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -135,7 +135,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -174,7 +174,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -213,7 +213,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -252,7 +252,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -284,7 +284,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -318,7 +318,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -355,7 +355,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -392,7 +392,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -424,7 +424,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -457,7 +457,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -485,7 +485,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -513,7 +513,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -545,7 +545,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -578,7 +578,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -612,7 +612,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -648,7 +648,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -684,7 +684,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -722,7 +722,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -754,7 +754,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -790,7 +790,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -826,7 +826,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -864,7 +864,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -896,7 +896,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -926,7 +926,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -956,7 +956,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1007,7 +1007,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1041,7 +1041,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1073,7 +1073,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1107,7 +1107,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1139,7 +1139,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1171,7 +1171,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1205,7 +1205,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1237,7 +1237,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1269,7 +1269,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1303,7 +1303,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1335,7 +1335,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1369,7 +1369,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1397,7 +1397,7 @@ MTR_DEPRECATED("This command has been removed", ios(16.1, 16.4), macos(13.0, 13.
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1441,7 +1441,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1481,7 +1481,7 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams",
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1532,7 +1532,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1580,7 +1580,7 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageResponse
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1603,7 +1603,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1635,7 +1635,7 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequest
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1667,7 +1667,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1703,7 +1703,7 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRespons
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1726,7 +1726,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1758,7 +1758,7 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateApplie
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1796,7 +1796,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1830,7 +1830,7 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProvid
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1869,7 +1869,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1901,7 +1901,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1939,7 +1939,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -1971,7 +1971,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2003,7 +2003,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2035,7 +2035,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2071,7 +2071,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2122,7 +2122,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2158,7 +2158,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2202,7 +2202,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2234,7 +2234,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2266,7 +2266,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2304,7 +2304,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2340,7 +2340,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2374,7 +2374,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2412,7 +2412,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2444,7 +2444,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2499,7 +2499,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2535,7 +2535,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2578,7 +2578,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2606,7 +2606,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2661,7 +2661,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2708,7 +2708,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2736,7 +2736,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2764,7 +2764,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2792,7 +2792,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2826,7 +2826,7 @@ MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2860,7 +2860,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2890,7 +2890,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2920,7 +2920,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2969,7 +2969,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -2999,7 +2999,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3031,7 +3031,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3069,7 +3069,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3104,7 +3104,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3132,7 +3132,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3162,7 +3162,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3194,7 +3194,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3233,7 +3233,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3263,7 +3263,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3299,7 +3299,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3331,7 +3331,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3373,7 +3373,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3405,7 +3405,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3439,7 +3439,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3473,7 +3473,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3503,7 +3503,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3533,7 +3533,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3572,7 +3572,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3604,7 +3604,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3657,7 +3657,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3687,7 +3687,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3717,7 +3717,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3751,7 +3751,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3779,7 +3779,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3809,7 +3809,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3851,7 +3851,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3902,7 +3902,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3932,7 +3932,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -3981,7 +3981,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4009,7 +4009,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4039,7 +4039,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4069,7 +4069,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4097,7 +4097,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4125,7 +4125,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4174,7 +4174,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4225,7 +4225,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4255,7 +4255,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4306,7 +4306,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4357,7 +4357,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4408,7 +4408,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4461,7 +4461,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4491,7 +4491,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4540,7 +4540,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4570,7 +4570,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4600,7 +4600,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4638,7 +4638,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4668,7 +4668,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4696,7 +4696,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4724,7 +4724,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4752,7 +4752,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4780,7 +4780,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4827,7 +4827,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4855,7 +4855,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4902,7 +4902,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4940,7 +4940,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -4995,7 +4995,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5056,7 +5056,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5109,7 +5109,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5162,7 +5162,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5219,7 +5219,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5249,7 +5249,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5312,7 +5312,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5365,6 +5365,8 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nullable useAuxiliaryACL MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nullable replaceEndpoints MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable mcastAddrPolicy MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5375,7 +5377,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5407,7 +5409,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5462,7 +5464,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5494,7 +5496,39 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRGroupcastClusterGroupcastTestingParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull testOperation MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable durationSeconds MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5522,7 +5556,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5550,7 +5584,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5578,7 +5612,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5608,7 +5642,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5638,7 +5672,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5670,7 +5704,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5698,7 +5732,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5728,7 +5762,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5756,7 +5790,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5786,7 +5820,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5835,7 +5869,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5896,7 +5930,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5926,7 +5960,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5960,7 +5994,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -5988,7 +6022,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6020,7 +6054,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6052,7 +6086,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6080,7 +6114,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6114,7 +6148,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6146,7 +6180,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6174,7 +6208,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6221,7 +6255,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6255,7 +6289,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6287,7 +6321,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6315,7 +6349,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6345,7 +6379,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6373,7 +6407,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6401,7 +6435,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6431,7 +6465,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6482,7 +6516,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6533,7 +6567,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6584,7 +6618,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6614,7 +6648,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6646,7 +6680,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6688,7 +6722,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6720,7 +6754,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6764,7 +6798,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6800,7 +6834,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6836,7 +6870,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6868,7 +6902,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6906,7 +6940,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6942,7 +6976,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -6978,7 +7012,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7008,7 +7042,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7046,7 +7080,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7080,7 +7114,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7122,7 +7156,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7157,7 +7191,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7205,7 +7239,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7244,7 +7278,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7284,7 +7318,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7318,7 +7352,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7352,7 +7386,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7392,7 +7426,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7426,7 +7460,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7456,7 +7490,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7492,7 +7526,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7520,7 +7554,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7548,7 +7582,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7576,7 +7610,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7604,7 +7638,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7634,7 +7668,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7664,7 +7698,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7694,7 +7728,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7724,7 +7758,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7752,7 +7786,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7786,7 +7820,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7814,7 +7848,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7848,7 +7882,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7882,7 +7916,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7912,7 +7946,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -7963,7 +7997,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8016,7 +8050,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8052,7 +8086,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8092,7 +8126,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8124,7 +8158,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8171,7 +8205,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8201,7 +8235,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8231,7 +8265,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8265,7 +8299,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8295,7 +8329,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8352,7 +8386,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8386,7 +8420,47 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRHumidistatClusterSetSettingsParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nullable userSetpoint MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable mode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable mistType MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable continuous MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable sleep MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable optimal MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8424,7 +8498,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8460,7 +8534,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8498,7 +8572,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8534,7 +8608,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8570,7 +8644,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8608,7 +8682,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8646,7 +8720,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8684,7 +8758,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8720,7 +8794,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8758,7 +8832,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8794,7 +8868,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8837,7 +8911,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8873,7 +8947,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8911,7 +8985,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8949,7 +9023,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -8991,7 +9065,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9023,7 +9097,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9063,7 +9137,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9105,7 +9179,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9121,6 +9195,314 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRProximityRangingClusterStartRangingRequestParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull technology MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRProximityRangingClusterWiFiRangingDeviceRoleConfigStruct * _Nullable wiFiRangingDeviceRoleConfig MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRProximityRangingClusterBLERangingDeviceRoleConfigStruct * _Nullable bleRangingDeviceRoleConfig MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct * _Nullable bltChannelSoundingDeviceRoleConfig MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable frequencyBand MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable bandwidth MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull securityMode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRProximityRangingClusterRangingTriggerConditionStruct * _Nonnull trigger MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) MTRProximityRangingClusterReportingConditionStruct * _Nullable reportingCondition MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRProximityRangingClusterStartRangingResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull resultCode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable sessionID MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRProximityRangingClusterStartRangingResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRProximityRangingClusterStopRangingRequestParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterAddClientParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSData * _Nonnull clientIdentity MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterAddClientResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull clientIndex MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRNetworkIdentityManagementClusterAddClientResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterRemoveClientParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nullable clientIndex MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable clientIdentifier MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterQueryIdentityParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nullable networkIdentityIndex MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable networkIdentityType MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable identifier MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterQueryIdentityResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSData * _Nonnull identity MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRNetworkIdentityManagementClusterQueryIdentityResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterImportAdminSecretParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSData * _Nonnull networkAdministratorSharedSecret MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterExportAdminSecretParams : NSObject <NSCopying>
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSData * _Nonnull networkAdministratorSharedSecret MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRWiFiNetworkManagementClusterNetworkPassphraseRequestParams : NSObject <NSCopying>
 /**
@@ -9133,7 +9515,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9180,7 +9562,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9208,7 +9590,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9259,7 +9641,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9289,7 +9671,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9319,7 +9701,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9349,7 +9731,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9379,7 +9761,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9428,7 +9810,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9460,7 +9842,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9496,7 +9878,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9526,7 +9908,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9568,7 +9950,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9625,7 +10007,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9661,7 +10043,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9693,7 +10075,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9725,7 +10107,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9757,7 +10139,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9785,7 +10167,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9813,7 +10195,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9841,7 +10223,7 @@ MTR_DEPRECATED("Please use MTRMediaPlaybackClusterStopParams", ios(16.1, 16.4), 
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9869,7 +10251,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9897,7 +10279,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9925,7 +10307,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9955,7 +10337,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -9985,7 +10367,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10015,7 +10397,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10045,7 +10427,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10077,7 +10459,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10111,7 +10493,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10143,7 +10525,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10173,7 +10555,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10201,7 +10583,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10231,7 +10613,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10259,7 +10641,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10287,7 +10669,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10319,7 +10701,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10347,7 +10729,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10377,7 +10759,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10407,7 +10789,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10449,7 +10831,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10483,7 +10865,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10515,7 +10897,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10551,7 +10933,7 @@ MTR_DEPRECATED("Please use MTRContentLauncherClusterLauncherResponseParams", ios
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10572,7 +10954,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10604,7 +10986,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10636,7 +11018,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10666,7 +11048,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10696,7 +11078,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10728,7 +11110,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10762,7 +11144,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10792,7 +11174,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10830,7 +11212,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10860,7 +11242,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10892,7 +11274,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10920,7 +11302,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10967,7 +11349,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -10995,7 +11377,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11027,7 +11409,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11057,7 +11439,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11085,7 +11467,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11113,7 +11495,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11143,7 +11525,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11173,7 +11555,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11203,7 +11585,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11233,7 +11615,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11263,7 +11645,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11293,7 +11675,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11323,7 +11705,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11353,7 +11735,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11385,7 +11767,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11438,7 +11820,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11489,7 +11871,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11519,7 +11901,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11549,7 +11931,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11579,7 +11961,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11619,7 +12001,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11668,7 +12050,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11718,7 +12100,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11771,7 +12153,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11801,7 +12183,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11843,7 +12225,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11896,7 +12278,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11926,7 +12308,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11956,7 +12338,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -11988,7 +12370,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12045,7 +12427,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12079,7 +12461,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12109,7 +12491,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12141,7 +12523,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12171,7 +12553,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12203,7 +12585,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12239,7 +12621,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12287,7 +12669,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12364,7 +12746,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12419,7 +12801,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12451,7 +12833,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12483,7 +12865,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12519,7 +12901,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12551,7 +12933,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12583,7 +12965,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12615,7 +12997,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12645,7 +13027,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12694,7 +13076,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12726,7 +13108,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12758,7 +13140,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12794,7 +13176,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12824,7 +13206,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12873,7 +13255,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12903,7 +13285,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -12956,7 +13338,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13011,7 +13393,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13043,7 +13425,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13100,7 +13482,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13130,7 +13512,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13160,7 +13542,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13200,7 +13582,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13229,7 +13611,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nullable groupCATVersion MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupPermission MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable groupPermission MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -13240,7 +13622,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13270,7 +13652,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13306,7 +13688,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13325,7 +13707,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRJointFabricDatastoreClusterUpdateAdminParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSString * _Nullable friendlyName MTR_PROVISIONALLY_AVAILABLE;
 
@@ -13340,7 +13722,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13370,7 +13752,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13402,7 +13784,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13432,7 +13814,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13464,7 +13846,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13494,7 +13876,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13528,7 +13910,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13562,7 +13944,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13596,7 +13978,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13630,7 +14012,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13664,7 +14046,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13696,7 +14078,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13728,7 +14110,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13756,7 +14138,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13775,7 +14157,9 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRJointFabricAdministratorClusterICACCSRResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull icaccsr MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable icaccsr MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRJointFabricAdministratorClusterICACCSRResponseParams with a response-value dictionary
@@ -13805,7 +14189,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13862,7 +14246,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13890,7 +14274,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13937,7 +14321,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13967,7 +14351,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -13999,7 +14383,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14048,7 +14432,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14097,7 +14481,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14146,7 +14530,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14178,7 +14562,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14235,7 +14619,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14265,7 +14649,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14314,7 +14698,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14363,7 +14747,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14401,7 +14785,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14450,7 +14834,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14499,7 +14883,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14527,7 +14911,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14555,7 +14939,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestParams", ios(16.1, 16.4), ma
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14585,7 +14969,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14619,7 +15003,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificResponseParams", ios
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14638,7 +15022,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14666,7 +15050,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams", ios(16.1,
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14696,7 +15080,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14730,7 +15114,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsResponseParams",
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14749,7 +15133,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14777,7 +15161,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams", ios(16.1, 1
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14807,7 +15191,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14841,7 +15225,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentResponseParams
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14860,7 +15244,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14888,7 +15272,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams", ios(1
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14928,7 +15312,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14972,7 +15356,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentResponseP
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -14995,7 +15379,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15027,7 +15411,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams", ios(16.
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15057,7 +15441,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15091,7 +15475,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseResponsePara
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15112,7 +15496,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15142,7 +15526,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams"
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15174,7 +15558,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15210,7 +15594,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams", ios(16
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15241,7 +15625,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15281,7 +15665,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestPa
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15317,7 +15701,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15357,7 +15741,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalResponsePara
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15378,7 +15762,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15408,7 +15792,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams"
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15492,7 +15876,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15580,7 +15964,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalRespo
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15601,7 +15985,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15631,7 +16015,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestP
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15661,7 +16045,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15695,7 +16079,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams", ios(16.1
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15716,7 +16100,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15746,7 +16130,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestPar
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15776,7 +16160,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15810,7 +16194,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams", ios
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15831,7 +16215,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15861,7 +16245,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestPara
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15891,7 +16275,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15925,7 +16309,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseParams"
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15946,7 +16330,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -15976,7 +16360,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequ
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16006,7 +16390,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16040,7 +16424,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventRes
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16061,7 +16445,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16091,7 +16475,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgument
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16140,7 +16524,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16170,7 +16554,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParam
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16221,7 +16605,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16253,7 +16637,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams", ios(16.
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16304,7 +16688,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16334,7 +16718,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParam
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16386,7 +16770,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16438,7 +16822,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalReque
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16468,7 +16852,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16498,7 +16882,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams", 
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16526,7 +16910,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16554,7 +16938,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams", ios(1
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16584,7 +16968,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16614,7 +16998,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentReques
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16648,7 +17032,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16682,7 +17066,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams",
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16712,7 +17096,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16742,7 +17126,7 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventReq
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16776,7 +17160,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16810,7 +17194,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16840,7 +17224,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16872,7 +17256,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16900,7 +17284,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16930,7 +17314,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -16979,7 +17363,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */
@@ -17030,7 +17414,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * If not nil, a timed invoke is done, with the provided value used as the timed
  * request timeout.  The value should be chosen small enough to provide the
  * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
+ * from the server to the client (for the status response and actual invoke
  * request) within the timeout window.
  *
  */

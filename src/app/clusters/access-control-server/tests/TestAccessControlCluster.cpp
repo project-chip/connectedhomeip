@@ -106,6 +106,11 @@ struct TestAccessControlCluster : public ::testing::Test
         Access::GetAccessControl().Finish();
         Platform::MemoryShutdown();
     }
+    inline static AccessControlCluster::Context defaultContext{
+        .persistentStorage = Server::GetInstance().GetPersistentStorage(),
+        .fabricTable       = Server::GetInstance().GetFabricTable(),
+        .accessControl     = Access::GetAccessControl(),
+    };
 };
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -114,7 +119,7 @@ struct TestAccessControlCluster : public ::testing::Test
 // and restores the previous provider in TearDown().
 struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluster
 {
-    TestAccessControlClusterWithMockProvider() : mTester(mCluster) {}
+    TestAccessControlClusterWithMockProvider() : mCluster(defaultContext), mTester(mCluster) {}
 
     void SetUp() override
     {
@@ -134,6 +139,7 @@ struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluste
 
     TestAccessRestrictionProvider mMockProvider;
     AccessControlCluster mCluster;
+    // mTester must be declared after mCluster to ensure proper construction order
     Testing::ClusterTester mTester;
 
 private:
@@ -143,13 +149,13 @@ private:
 
 TEST_F(TestAccessControlCluster, CompileTest)
 {
-    AccessControlCluster cluster;
+    AccessControlCluster cluster(defaultContext);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, AccessControl::Id }), BitFlags<ClusterQualityFlags>());
 }
 
 TEST_F(TestAccessControlCluster, CommandsTest)
 {
-    AccessControlCluster cluster;
+    AccessControlCluster cluster(defaultContext);
     ConcreteClusterPath accessControlPath = ConcreteClusterPath(kRootEndpointId, AccessControl::Id);
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
@@ -180,7 +186,7 @@ TEST_F(TestAccessControlCluster, CommandsTest)
 
 TEST_F(TestAccessControlCluster, AttributesTest)
 {
-    AccessControlCluster cluster;
+    AccessControlCluster cluster(defaultContext);
 
     std::vector<DataModel::AttributeEntry> expectedAttributes(AccessControl::Attributes::kMandatoryMetadata.begin(),
                                                               AccessControl::Attributes::kMandatoryMetadata.end());
@@ -215,7 +221,7 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
 // Test that all available attributes (mandatory and optional) can be read
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
 {
-    AccessControlCluster cluster;
+    AccessControlCluster cluster(defaultContext);
     Testing::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

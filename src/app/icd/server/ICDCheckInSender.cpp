@@ -101,11 +101,8 @@ CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTa
 
     AddressResolve::NodeLookupRequest request(peerId);
 
-    memcpy(mAes128KeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
-           entry.aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
-
-    memcpy(mHmac128KeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
-           entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+    memcpy(mAes128KeyHandle.OpaqueBytes().data(), entry.aesKeyHandle.OpaqueBytes().data(), Crypto::Aes128KeyHandle::Size());
+    memcpy(mHmac128KeyHandle.OpaqueBytes().data(), entry.hmacKeyHandle.OpaqueBytes().data(), Crypto::Hmac128KeyHandle::Size());
 
     CHIP_ERROR err = AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 

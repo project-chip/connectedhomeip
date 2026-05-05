@@ -197,7 +197,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=30,  # An acceptable value for min frame rate
+                minFrameRate=min(15, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -289,7 +289,10 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         asserts.assert_equal(aAllocatedVideoStreams[0].streamUsage, aStreamUsagePriorities[0], "Stream Usage does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].videoCodec,
                              aRateDistortionTradeOffPoints[0].codec, "Video codec does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate, 30, "MinFrameRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate,
+                             min(15, aVideoSensorParams.maxFPS),
+                             "MinFrameRate does not match")
+
         asserts.assert_equal(aAllocatedVideoStreams[0].maxFrameRate, aVideoSensorParams.maxFPS, "MaxFrameRate does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].minResolution, aMinViewportRes, "MinResolution does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.width,

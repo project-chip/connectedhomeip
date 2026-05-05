@@ -17,8 +17,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device temperature-sensor
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -107,7 +107,7 @@ class TC_TMP_2_1(MatterBaseTest):
                 measured_value, max_bound, "Measured value is greater than max bound")
 
         self.step(7)
-        if self.pics_guard("TMP.S.A0003"):
+        if self.pics_guard(self.check_pics("TMP.S.A0003")):
             tolerance = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.Tolerance)
             asserts.assert_greater_equal(tolerance, 0, "Tolerance is less than 0")
             asserts.assert_less_equal(tolerance, 2048, "Tolerance is greater than 2048")

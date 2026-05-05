@@ -980,6 +980,82 @@ public static class ActionsClusterEndpointListStruct {
     return output.toString();
   }
 }
+public static class BasicInformationClusterLocationDescriptorStruct {
+  public String locationName;
+  public @Nullable Integer floorNumber;
+  public @Nullable Integer areaType;
+  private static final long LOCATION_NAME_ID = 0L;
+  private static final long FLOOR_NUMBER_ID = 1L;
+  private static final long AREA_TYPE_ID = 2L;
+
+  public BasicInformationClusterLocationDescriptorStruct(
+    String locationName,
+    @Nullable Integer floorNumber,
+    @Nullable Integer areaType
+  ) {
+    this.locationName = locationName;
+    this.floorNumber = floorNumber;
+    this.areaType = areaType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
+    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static BasicInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String locationName = null;
+    @Nullable Integer floorNumber = null;
+    @Nullable Integer areaType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          locationName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          floorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new BasicInformationClusterLocationDescriptorStruct(
+      locationName,
+      floorNumber,
+      areaType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicInformationClusterLocationDescriptorStruct {\n");
+    output.append("\tlocationName: ");
+    output.append(locationName);
+    output.append("\n");
+    output.append("\tfloorNumber: ");
+    output.append(floorNumber);
+    output.append("\n");
+    output.append("\tareaType: ");
+    output.append(areaType);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class BasicInformationClusterCapabilityMinimaStruct {
   public Integer caseSessionsPerFabric;
   public Integer subscriptionsPerFabric;
@@ -3191,6 +3267,82 @@ public static class TimeSynchronizationClusterTrustedTimeSourceStruct {
     return output.toString();
   }
 }
+public static class BridgedDeviceBasicInformationClusterLocationDescriptorStruct {
+  public String locationName;
+  public @Nullable Integer floorNumber;
+  public @Nullable Integer areaType;
+  private static final long LOCATION_NAME_ID = 0L;
+  private static final long FLOOR_NUMBER_ID = 1L;
+  private static final long AREA_TYPE_ID = 2L;
+
+  public BridgedDeviceBasicInformationClusterLocationDescriptorStruct(
+    String locationName,
+    @Nullable Integer floorNumber,
+    @Nullable Integer areaType
+  ) {
+    this.locationName = locationName;
+    this.floorNumber = floorNumber;
+    this.areaType = areaType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
+    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static BridgedDeviceBasicInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String locationName = null;
+    @Nullable Integer floorNumber = null;
+    @Nullable Integer areaType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          locationName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          floorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new BridgedDeviceBasicInformationClusterLocationDescriptorStruct(
+      locationName,
+      floorNumber,
+      areaType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicInformationClusterLocationDescriptorStruct {\n");
+    output.append("\tlocationName: ");
+    output.append(locationName);
+    output.append("\n");
+    output.append("\tfloorNumber: ");
+    output.append(floorNumber);
+    output.append("\n");
+    output.append("\tareaType: ");
+    output.append(areaType);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class BridgedDeviceBasicInformationClusterProductAppearanceStruct {
   public Integer finish;
   public @Nullable Integer primaryColor;
@@ -3655,6 +3807,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   public @Nullable Long epochStartTime1;
   public @Nullable byte[] epochKey2;
   public @Nullable Long epochStartTime2;
+  public Integer groupKeyMulticastPolicy;
   private static final long GROUP_KEY_SET_ID_ID = 0L;
   private static final long GROUP_KEY_SECURITY_POLICY_ID = 1L;
   private static final long EPOCH_KEY0_ID = 2L;
@@ -3663,6 +3816,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   private static final long EPOCH_START_TIME1_ID = 5L;
   private static final long EPOCH_KEY2_ID = 6L;
   private static final long EPOCH_START_TIME2_ID = 7L;
+  private static final long GROUP_KEY_MULTICAST_POLICY_ID = 8L;
 
   public GroupKeyManagementClusterGroupKeySetStruct(
     Integer groupKeySetID,
@@ -3672,7 +3826,8 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable byte[] epochKey1,
     @Nullable Long epochStartTime1,
     @Nullable byte[] epochKey2,
-    @Nullable Long epochStartTime2
+    @Nullable Long epochStartTime2,
+    Integer groupKeyMulticastPolicy
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -3682,6 +3837,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     this.epochStartTime1 = epochStartTime1;
     this.epochKey2 = epochKey2;
     this.epochStartTime2 = epochStartTime2;
+    this.groupKeyMulticastPolicy = groupKeyMulticastPolicy;
   }
 
   public StructType encodeTlv() {
@@ -3694,6 +3850,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     values.add(new StructElement(EPOCH_START_TIME1_ID, epochStartTime1 != null ? new UIntType(epochStartTime1) : new NullType()));
     values.add(new StructElement(EPOCH_KEY2_ID, epochKey2 != null ? new ByteArrayType(epochKey2) : new NullType()));
     values.add(new StructElement(EPOCH_START_TIME2_ID, epochStartTime2 != null ? new UIntType(epochStartTime2) : new NullType()));
+    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, new UIntType(groupKeyMulticastPolicy)));
 
     return new StructType(values);
   }
@@ -3710,6 +3867,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable Long epochStartTime1 = null;
     @Nullable byte[] epochKey2 = null;
     @Nullable Long epochStartTime2 = null;
+    Integer groupKeyMulticastPolicy = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3751,6 +3909,11 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
           UIntType castingValue = element.value(UIntType.class);
           epochStartTime2 = castingValue.value(Long.class);
         }
+      } else if (element.contextTagNum() == GROUP_KEY_MULTICAST_POLICY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          groupKeyMulticastPolicy = castingValue.value(Integer.class);
+        }
       }
     }
     return new GroupKeyManagementClusterGroupKeySetStruct(
@@ -3761,7 +3924,8 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
       epochKey1,
       epochStartTime1,
       epochKey2,
-      epochStartTime2
+      epochStartTime2,
+      groupKeyMulticastPolicy
     );
   }
 
@@ -3792,6 +3956,70 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     output.append("\n");
     output.append("\tepochStartTime2: ");
     output.append(epochStartTime2);
+    output.append("\n");
+    output.append("\tgroupKeyMulticastPolicy: ");
+    output.append(groupKeyMulticastPolicy);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class GroupKeyManagementClusterGroupcastAdoptionStruct {
+  public Boolean groupcastAdopted;
+  public Integer fabricIndex;
+  private static final long GROUPCAST_ADOPTED_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public GroupKeyManagementClusterGroupcastAdoptionStruct(
+    Boolean groupcastAdopted,
+    Integer fabricIndex
+  ) {
+    this.groupcastAdopted = groupcastAdopted;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(GROUPCAST_ADOPTED_ID, new BooleanType(groupcastAdopted)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static GroupKeyManagementClusterGroupcastAdoptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Boolean groupcastAdopted = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == GROUPCAST_ADOPTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          groupcastAdopted = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new GroupKeyManagementClusterGroupcastAdoptionStruct(
+      groupcastAdopted,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GroupKeyManagementClusterGroupcastAdoptionStruct {\n");
+    output.append("\tgroupcastAdopted: ");
+    output.append(groupcastAdopted);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5867,36 +6095,41 @@ public static class ScenesManagementClusterSceneInfoStruct {
 }
 public static class GroupcastClusterMembershipStruct {
   public Integer groupID;
-  public ArrayList<Integer> endpoints;
+  public Optional<ArrayList<Integer>> endpoints;
   public Integer keySetID;
-  public Boolean hasAuxiliaryACL;
+  public Optional<Boolean> hasAuxiliaryACL;
+  public Integer mcastAddrPolicy;
   public Integer fabricIndex;
   private static final long GROUP_ID_ID = 0L;
   private static final long ENDPOINTS_ID = 1L;
   private static final long KEY_SET_ID_ID = 2L;
   private static final long HAS_AUXILIARY_ACL_ID = 3L;
+  private static final long MCAST_ADDR_POLICY_ID = 4L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public GroupcastClusterMembershipStruct(
     Integer groupID,
-    ArrayList<Integer> endpoints,
+    Optional<ArrayList<Integer>> endpoints,
     Integer keySetID,
-    Boolean hasAuxiliaryACL,
+    Optional<Boolean> hasAuxiliaryACL,
+    Integer mcastAddrPolicy,
     Integer fabricIndex
   ) {
     this.groupID = groupID;
     this.endpoints = endpoints;
     this.keySetID = keySetID;
     this.hasAuxiliaryACL = hasAuxiliaryACL;
+    this.mcastAddrPolicy = mcastAddrPolicy;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(GROUP_ID_ID, new UIntType(groupID)));
-    values.add(new StructElement(ENDPOINTS_ID, ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints))));
+    values.add(new StructElement(ENDPOINTS_ID, endpoints.<BaseTLVType>map((nonOptionalendpoints) -> ArrayType.generateArrayType(nonOptionalendpoints, (elementnonOptionalendpoints) -> new UIntType(elementnonOptionalendpoints))).orElse(new EmptyType())));
     values.add(new StructElement(KEY_SET_ID_ID, new UIntType(keySetID)));
-    values.add(new StructElement(HAS_AUXILIARY_ACL_ID, new BooleanType(hasAuxiliaryACL)));
+    values.add(new StructElement(HAS_AUXILIARY_ACL_ID, hasAuxiliaryACL.<BaseTLVType>map((nonOptionalhasAuxiliaryACL) -> new BooleanType(nonOptionalhasAuxiliaryACL)).orElse(new EmptyType())));
+    values.add(new StructElement(MCAST_ADDR_POLICY_ID, new UIntType(mcastAddrPolicy)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -5907,9 +6140,10 @@ public static class GroupcastClusterMembershipStruct {
       return null;
     }
     Integer groupID = null;
-    ArrayList<Integer> endpoints = null;
+    Optional<ArrayList<Integer>> endpoints = Optional.empty();
     Integer keySetID = null;
-    Boolean hasAuxiliaryACL = null;
+    Optional<Boolean> hasAuxiliaryACL = Optional.empty();
+    Integer mcastAddrPolicy = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_ID_ID) {
@@ -5920,7 +6154,7 @@ public static class GroupcastClusterMembershipStruct {
       } else if (element.contextTagNum() == ENDPOINTS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          endpoints = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+          endpoints = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
         }
       } else if (element.contextTagNum() == KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5930,7 +6164,12 @@ public static class GroupcastClusterMembershipStruct {
       } else if (element.contextTagNum() == HAS_AUXILIARY_ACL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          hasAuxiliaryACL = castingValue.value(Boolean.class);
+          hasAuxiliaryACL = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == MCAST_ADDR_POLICY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mcastAddrPolicy = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5944,6 +6183,7 @@ public static class GroupcastClusterMembershipStruct {
       endpoints,
       keySetID,
       hasAuxiliaryACL,
+      mcastAddrPolicy,
       fabricIndex
     );
   }
@@ -5963,6 +6203,9 @@ public static class GroupcastClusterMembershipStruct {
     output.append("\n");
     output.append("\thasAuxiliaryACL: ");
     output.append(hasAuxiliaryACL);
+    output.append("\n");
+    output.append("\tmcastAddrPolicy: ");
+    output.append(mcastAddrPolicy);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -11127,6 +11370,97 @@ public static class OccupancySensingClusterHoldTimeLimitsStruct {
     return output.toString();
   }
 }
+public static class OccupancySensingClusterPredictedOccupancyStruct {
+  public Long startTimestamp;
+  public Long endTimestamp;
+  public Integer occupancy;
+  public Integer confidence;
+  private static final long START_TIMESTAMP_ID = 0L;
+  private static final long END_TIMESTAMP_ID = 1L;
+  private static final long OCCUPANCY_ID = 2L;
+  private static final long CONFIDENCE_ID = 3L;
+
+  public OccupancySensingClusterPredictedOccupancyStruct(
+    Long startTimestamp,
+    Long endTimestamp,
+    Integer occupancy,
+    Integer confidence
+  ) {
+    this.startTimestamp = startTimestamp;
+    this.endTimestamp = endTimestamp;
+    this.occupancy = occupancy;
+    this.confidence = confidence;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(START_TIMESTAMP_ID, new UIntType(startTimestamp)));
+    values.add(new StructElement(END_TIMESTAMP_ID, new UIntType(endTimestamp)));
+    values.add(new StructElement(OCCUPANCY_ID, new UIntType(occupancy)));
+    values.add(new StructElement(CONFIDENCE_ID, new UIntType(confidence)));
+
+    return new StructType(values);
+  }
+
+  public static OccupancySensingClusterPredictedOccupancyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long startTimestamp = null;
+    Long endTimestamp = null;
+    Integer occupancy = null;
+    Integer confidence = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == START_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == END_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == OCCUPANCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          occupancy = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONFIDENCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          confidence = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OccupancySensingClusterPredictedOccupancyStruct(
+      startTimestamp,
+      endTimestamp,
+      occupancy,
+      confidence
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OccupancySensingClusterPredictedOccupancyStruct {\n");
+    output.append("\tstartTimestamp: ");
+    output.append(startTimestamp);
+    output.append("\n");
+    output.append("\tendTimestamp: ");
+    output.append(endTimestamp);
+    output.append("\n");
+    output.append("\toccupancy: ");
+    output.append(occupancy);
+    output.append("\n");
+    output.append("\tconfidence: ");
+    output.append(confidence);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class SoilMeasurementClusterMeasurementAccuracyRangeStruct {
   public Long rangeMin;
   public Long rangeMax;
@@ -11612,6 +11946,67 @@ public static class AmbientContextSensingClusterHoldTimeLimitsStruct {
     return output.toString();
   }
 }
+public static class AmbientContextSensingClusterObjectCountConfigStruct {
+  public ChipStructs.AmbientContextSensingClusterSemanticTagStruct countingObject;
+  public Integer objectCountThreshold;
+  private static final long COUNTING_OBJECT_ID = 0L;
+  private static final long OBJECT_COUNT_THRESHOLD_ID = 1L;
+
+  public AmbientContextSensingClusterObjectCountConfigStruct(
+    ChipStructs.AmbientContextSensingClusterSemanticTagStruct countingObject,
+    Integer objectCountThreshold
+  ) {
+    this.countingObject = countingObject;
+    this.objectCountThreshold = objectCountThreshold;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(COUNTING_OBJECT_ID, countingObject.encodeTlv()));
+    values.add(new StructElement(OBJECT_COUNT_THRESHOLD_ID, new UIntType(objectCountThreshold)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterObjectCountConfigStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.AmbientContextSensingClusterSemanticTagStruct countingObject = null;
+    Integer objectCountThreshold = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == COUNTING_OBJECT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          countingObject = ChipStructs.AmbientContextSensingClusterSemanticTagStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == OBJECT_COUNT_THRESHOLD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          objectCountThreshold = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientContextSensingClusterObjectCountConfigStruct(
+      countingObject,
+      objectCountThreshold
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterObjectCountConfigStruct {\n");
+    output.append("\tcountingObject: ");
+    output.append(countingObject);
+    output.append("\n");
+    output.append("\tobjectCountThreshold: ");
+    output.append(objectCountThreshold);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class AmbientContextSensingClusterPredictedActivityStruct {
   public Long startTimestamp;
   public Long endTimestamp;
@@ -11728,6 +12123,976 @@ public static class AmbientContextSensingClusterPredictedActivityStruct {
     output.append("\n");
     output.append("\tconfidence: ");
     output.append(confidence);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterRDRStruct {
+  public Integer azimuth;
+  public Integer elevation;
+  public Integer azimuthAccuracy;
+  public Integer elevationAccuracy;
+  public Integer reference;
+  private static final long AZIMUTH_ID = 0L;
+  private static final long ELEVATION_ID = 1L;
+  private static final long AZIMUTH_ACCURACY_ID = 2L;
+  private static final long ELEVATION_ACCURACY_ID = 3L;
+  private static final long REFERENCE_ID = 4L;
+
+  public ProximityRangingClusterRDRStruct(
+    Integer azimuth,
+    Integer elevation,
+    Integer azimuthAccuracy,
+    Integer elevationAccuracy,
+    Integer reference
+  ) {
+    this.azimuth = azimuth;
+    this.elevation = elevation;
+    this.azimuthAccuracy = azimuthAccuracy;
+    this.elevationAccuracy = elevationAccuracy;
+    this.reference = reference;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AZIMUTH_ID, new UIntType(azimuth)));
+    values.add(new StructElement(ELEVATION_ID, new IntType(elevation)));
+    values.add(new StructElement(AZIMUTH_ACCURACY_ID, new UIntType(azimuthAccuracy)));
+    values.add(new StructElement(ELEVATION_ACCURACY_ID, new UIntType(elevationAccuracy)));
+    values.add(new StructElement(REFERENCE_ID, new UIntType(reference)));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterRDRStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer azimuth = null;
+    Integer elevation = null;
+    Integer azimuthAccuracy = null;
+    Integer elevationAccuracy = null;
+    Integer reference = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AZIMUTH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          azimuth = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ELEVATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          elevation = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AZIMUTH_ACCURACY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          azimuthAccuracy = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ELEVATION_ACCURACY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          elevationAccuracy = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == REFERENCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          reference = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ProximityRangingClusterRDRStruct(
+      azimuth,
+      elevation,
+      azimuthAccuracy,
+      elevationAccuracy,
+      reference
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterRDRStruct {\n");
+    output.append("\tazimuth: ");
+    output.append(azimuth);
+    output.append("\n");
+    output.append("\televation: ");
+    output.append(elevation);
+    output.append("\n");
+    output.append("\tazimuthAccuracy: ");
+    output.append(azimuthAccuracy);
+    output.append("\n");
+    output.append("\televationAccuracy: ");
+    output.append(elevationAccuracy);
+    output.append("\n");
+    output.append("\treference: ");
+    output.append(reference);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterRangingMeasurementDataStruct {
+  public Optional<byte[]> wiFiDevIK;
+  public Optional<Long> BLEDeviceID;
+  public Optional<byte[]> BLTDevIK;
+  public Optional<Long> timeOfMeasurement;
+  public Optional<Long> timeOfMeasurementOffset;
+  public @Nullable Integer distance;
+  public Optional<Integer> errorMargin;
+  public Optional<ChipStructs.ProximityRangingClusterRDRStruct> rdr;
+  public Optional<Integer> detectedAttackLevel;
+  public @Nullable Optional<Integer> rssi;
+  public @Nullable Optional<Integer> txPower;
+  private static final long WI_FI_DEV_IK_ID = 0L;
+  private static final long BLE_DEVICE_ID_ID = 1L;
+  private static final long BLT_DEV_IK_ID = 2L;
+  private static final long TIME_OF_MEASUREMENT_ID = 3L;
+  private static final long TIME_OF_MEASUREMENT_OFFSET_ID = 4L;
+  private static final long DISTANCE_ID = 5L;
+  private static final long ERROR_MARGIN_ID = 6L;
+  private static final long RDR_ID = 7L;
+  private static final long DETECTED_ATTACK_LEVEL_ID = 8L;
+  private static final long RSSI_ID = 9L;
+  private static final long TX_POWER_ID = 10L;
+
+  public ProximityRangingClusterRangingMeasurementDataStruct(
+    Optional<byte[]> wiFiDevIK,
+    Optional<Long> BLEDeviceID,
+    Optional<byte[]> BLTDevIK,
+    Optional<Long> timeOfMeasurement,
+    Optional<Long> timeOfMeasurementOffset,
+    @Nullable Integer distance,
+    Optional<Integer> errorMargin,
+    Optional<ChipStructs.ProximityRangingClusterRDRStruct> rdr,
+    Optional<Integer> detectedAttackLevel,
+    @Nullable Optional<Integer> rssi,
+    @Nullable Optional<Integer> txPower
+  ) {
+    this.wiFiDevIK = wiFiDevIK;
+    this.BLEDeviceID = BLEDeviceID;
+    this.BLTDevIK = BLTDevIK;
+    this.timeOfMeasurement = timeOfMeasurement;
+    this.timeOfMeasurementOffset = timeOfMeasurementOffset;
+    this.distance = distance;
+    this.errorMargin = errorMargin;
+    this.rdr = rdr;
+    this.detectedAttackLevel = detectedAttackLevel;
+    this.rssi = rssi;
+    this.txPower = txPower;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(WI_FI_DEV_IK_ID, wiFiDevIK.<BaseTLVType>map((nonOptionalwiFiDevIK) -> new ByteArrayType(nonOptionalwiFiDevIK)).orElse(new EmptyType())));
+    values.add(new StructElement(BLE_DEVICE_ID_ID, BLEDeviceID.<BaseTLVType>map((nonOptionalBLEDeviceID) -> new UIntType(nonOptionalBLEDeviceID)).orElse(new EmptyType())));
+    values.add(new StructElement(BLT_DEV_IK_ID, BLTDevIK.<BaseTLVType>map((nonOptionalBLTDevIK) -> new ByteArrayType(nonOptionalBLTDevIK)).orElse(new EmptyType())));
+    values.add(new StructElement(TIME_OF_MEASUREMENT_ID, timeOfMeasurement.<BaseTLVType>map((nonOptionaltimeOfMeasurement) -> new UIntType(nonOptionaltimeOfMeasurement)).orElse(new EmptyType())));
+    values.add(new StructElement(TIME_OF_MEASUREMENT_OFFSET_ID, timeOfMeasurementOffset.<BaseTLVType>map((nonOptionaltimeOfMeasurementOffset) -> new UIntType(nonOptionaltimeOfMeasurementOffset)).orElse(new EmptyType())));
+    values.add(new StructElement(DISTANCE_ID, distance != null ? new UIntType(distance) : new NullType()));
+    values.add(new StructElement(ERROR_MARGIN_ID, errorMargin.<BaseTLVType>map((nonOptionalerrorMargin) -> new UIntType(nonOptionalerrorMargin)).orElse(new EmptyType())));
+    values.add(new StructElement(RDR_ID, rdr.<BaseTLVType>map((nonOptionalrdr) -> nonOptionalrdr.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(DETECTED_ATTACK_LEVEL_ID, detectedAttackLevel.<BaseTLVType>map((nonOptionaldetectedAttackLevel) -> new UIntType(nonOptionaldetectedAttackLevel)).orElse(new EmptyType())));
+    values.add(new StructElement(RSSI_ID, rssi != null ? rssi.<BaseTLVType>map((nonOptionalrssi) -> new IntType(nonOptionalrssi)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(TX_POWER_ID, txPower != null ? txPower.<BaseTLVType>map((nonOptionaltxPower) -> new IntType(nonOptionaltxPower)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterRangingMeasurementDataStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<byte[]> wiFiDevIK = Optional.empty();
+    Optional<Long> BLEDeviceID = Optional.empty();
+    Optional<byte[]> BLTDevIK = Optional.empty();
+    Optional<Long> timeOfMeasurement = Optional.empty();
+    Optional<Long> timeOfMeasurementOffset = Optional.empty();
+    @Nullable Integer distance = null;
+    Optional<Integer> errorMargin = Optional.empty();
+    Optional<ChipStructs.ProximityRangingClusterRDRStruct> rdr = Optional.empty();
+    Optional<Integer> detectedAttackLevel = Optional.empty();
+    @Nullable Optional<Integer> rssi = null;
+    @Nullable Optional<Integer> txPower = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == WI_FI_DEV_IK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          wiFiDevIK = Optional.of(castingValue.value(byte[].class));
+        }
+      } else if (element.contextTagNum() == BLE_DEVICE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          BLEDeviceID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == BLT_DEV_IK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          BLTDevIK = Optional.of(castingValue.value(byte[].class));
+        }
+      } else if (element.contextTagNum() == TIME_OF_MEASUREMENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          timeOfMeasurement = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == TIME_OF_MEASUREMENT_OFFSET_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          timeOfMeasurementOffset = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == DISTANCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          distance = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ERROR_MARGIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          errorMargin = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == RDR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          rdr = Optional.of(ChipStructs.ProximityRangingClusterRDRStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == DETECTED_ATTACK_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          detectedAttackLevel = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == RSSI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          rssi = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TX_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          txPower = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ProximityRangingClusterRangingMeasurementDataStruct(
+      wiFiDevIK,
+      BLEDeviceID,
+      BLTDevIK,
+      timeOfMeasurement,
+      timeOfMeasurementOffset,
+      distance,
+      errorMargin,
+      rdr,
+      detectedAttackLevel,
+      rssi,
+      txPower
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterRangingMeasurementDataStruct {\n");
+    output.append("\twiFiDevIK: ");
+    output.append(wiFiDevIK.isPresent() ? Arrays.toString(wiFiDevIK.get()) : "");
+    output.append("\n");
+    output.append("\tBLEDeviceID: ");
+    output.append(BLEDeviceID);
+    output.append("\n");
+    output.append("\tBLTDevIK: ");
+    output.append(BLTDevIK.isPresent() ? Arrays.toString(BLTDevIK.get()) : "");
+    output.append("\n");
+    output.append("\ttimeOfMeasurement: ");
+    output.append(timeOfMeasurement);
+    output.append("\n");
+    output.append("\ttimeOfMeasurementOffset: ");
+    output.append(timeOfMeasurementOffset);
+    output.append("\n");
+    output.append("\tdistance: ");
+    output.append(distance);
+    output.append("\n");
+    output.append("\terrorMargin: ");
+    output.append(errorMargin);
+    output.append("\n");
+    output.append("\trdr: ");
+    output.append(rdr);
+    output.append("\n");
+    output.append("\tdetectedAttackLevel: ");
+    output.append(detectedAttackLevel);
+    output.append("\n");
+    output.append("\trssi: ");
+    output.append(rssi);
+    output.append("\n");
+    output.append("\ttxPower: ");
+    output.append(txPower);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterBLERangingDeviceRoleConfigStruct {
+  public Integer role;
+  public Long peerBLEDeviceID;
+  private static final long ROLE_ID = 0L;
+  private static final long PEER_BLE_DEVICE_ID_ID = 1L;
+
+  public ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
+    Integer role,
+    Long peerBLEDeviceID
+  ) {
+    this.role = role;
+    this.peerBLEDeviceID = peerBLEDeviceID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ROLE_ID, new UIntType(role)));
+    values.add(new StructElement(PEER_BLE_DEVICE_ID_ID, new UIntType(peerBLEDeviceID)));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterBLERangingDeviceRoleConfigStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer role = null;
+    Long peerBLEDeviceID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ROLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          role = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PEER_BLE_DEVICE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerBLEDeviceID = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new ProximityRangingClusterBLERangingDeviceRoleConfigStruct(
+      role,
+      peerBLEDeviceID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterBLERangingDeviceRoleConfigStruct {\n");
+    output.append("\trole: ");
+    output.append(role);
+    output.append("\n");
+    output.append("\tpeerBLEDeviceID: ");
+    output.append(peerBLEDeviceID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {
+  public Integer role;
+  public byte[] peerBLTDevIK;
+  public Optional<Integer> BLTCSMode;
+  public Optional<Integer> BLTCSSecurityLevel;
+  public Optional<byte[]> ltk;
+  private static final long ROLE_ID = 0L;
+  private static final long PEER_BLT_DEV_IK_ID = 1L;
+  private static final long BLTCS_MODE_ID = 2L;
+  private static final long BLTCS_SECURITY_LEVEL_ID = 3L;
+  private static final long LTK_ID = 4L;
+
+  public ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
+    Integer role,
+    byte[] peerBLTDevIK,
+    Optional<Integer> BLTCSMode,
+    Optional<Integer> BLTCSSecurityLevel,
+    Optional<byte[]> ltk
+  ) {
+    this.role = role;
+    this.peerBLTDevIK = peerBLTDevIK;
+    this.BLTCSMode = BLTCSMode;
+    this.BLTCSSecurityLevel = BLTCSSecurityLevel;
+    this.ltk = ltk;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ROLE_ID, new UIntType(role)));
+    values.add(new StructElement(PEER_BLT_DEV_IK_ID, new ByteArrayType(peerBLTDevIK)));
+    values.add(new StructElement(BLTCS_MODE_ID, BLTCSMode.<BaseTLVType>map((nonOptionalBLTCSMode) -> new UIntType(nonOptionalBLTCSMode)).orElse(new EmptyType())));
+    values.add(new StructElement(BLTCS_SECURITY_LEVEL_ID, BLTCSSecurityLevel.<BaseTLVType>map((nonOptionalBLTCSSecurityLevel) -> new UIntType(nonOptionalBLTCSSecurityLevel)).orElse(new EmptyType())));
+    values.add(new StructElement(LTK_ID, ltk.<BaseTLVType>map((nonOptionalltk) -> new ByteArrayType(nonOptionalltk)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer role = null;
+    byte[] peerBLTDevIK = null;
+    Optional<Integer> BLTCSMode = Optional.empty();
+    Optional<Integer> BLTCSSecurityLevel = Optional.empty();
+    Optional<byte[]> ltk = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ROLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          role = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PEER_BLT_DEV_IK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          peerBLTDevIK = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == BLTCS_MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          BLTCSMode = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == BLTCS_SECURITY_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          BLTCSSecurityLevel = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == LTK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          ltk = Optional.of(castingValue.value(byte[].class));
+        }
+      }
+    }
+    return new ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
+      role,
+      peerBLTDevIK,
+      BLTCSMode,
+      BLTCSSecurityLevel,
+      ltk
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {\n");
+    output.append("\trole: ");
+    output.append(role);
+    output.append("\n");
+    output.append("\tpeerBLTDevIK: ");
+    output.append(Arrays.toString(peerBLTDevIK));
+    output.append("\n");
+    output.append("\tBLTCSMode: ");
+    output.append(BLTCSMode);
+    output.append("\n");
+    output.append("\tBLTCSSecurityLevel: ");
+    output.append(BLTCSSecurityLevel);
+    output.append("\n");
+    output.append("\tltk: ");
+    output.append(ltk.isPresent() ? Arrays.toString(ltk.get()) : "");
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterRangingCapabilitiesStruct {
+  public Integer technology;
+  public Integer frequencyBand;
+  public Boolean periodicRangingSupport;
+  private static final long TECHNOLOGY_ID = 0L;
+  private static final long FREQUENCY_BAND_ID = 1L;
+  private static final long PERIODIC_RANGING_SUPPORT_ID = 2L;
+
+  public ProximityRangingClusterRangingCapabilitiesStruct(
+    Integer technology,
+    Integer frequencyBand,
+    Boolean periodicRangingSupport
+  ) {
+    this.technology = technology;
+    this.frequencyBand = frequencyBand;
+    this.periodicRangingSupport = periodicRangingSupport;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TECHNOLOGY_ID, new UIntType(technology)));
+    values.add(new StructElement(FREQUENCY_BAND_ID, new UIntType(frequencyBand)));
+    values.add(new StructElement(PERIODIC_RANGING_SUPPORT_ID, new BooleanType(periodicRangingSupport)));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterRangingCapabilitiesStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer technology = null;
+    Integer frequencyBand = null;
+    Boolean periodicRangingSupport = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TECHNOLOGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          technology = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FREQUENCY_BAND_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          frequencyBand = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PERIODIC_RANGING_SUPPORT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          periodicRangingSupport = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new ProximityRangingClusterRangingCapabilitiesStruct(
+      technology,
+      frequencyBand,
+      periodicRangingSupport
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterRangingCapabilitiesStruct {\n");
+    output.append("\ttechnology: ");
+    output.append(technology);
+    output.append("\n");
+    output.append("\tfrequencyBand: ");
+    output.append(frequencyBand);
+    output.append("\n");
+    output.append("\tperiodicRangingSupport: ");
+    output.append(periodicRangingSupport);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterRangingTriggerConditionStruct {
+  public Long startTime;
+  public Long endTime;
+  public Optional<Long> rangingInstanceInterval;
+  private static final long START_TIME_ID = 0L;
+  private static final long END_TIME_ID = 1L;
+  private static final long RANGING_INSTANCE_INTERVAL_ID = 2L;
+
+  public ProximityRangingClusterRangingTriggerConditionStruct(
+    Long startTime,
+    Long endTime,
+    Optional<Long> rangingInstanceInterval
+  ) {
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.rangingInstanceInterval = rangingInstanceInterval;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(START_TIME_ID, new UIntType(startTime)));
+    values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
+    values.add(new StructElement(RANGING_INSTANCE_INTERVAL_ID, rangingInstanceInterval.<BaseTLVType>map((nonOptionalrangingInstanceInterval) -> new UIntType(nonOptionalrangingInstanceInterval)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterRangingTriggerConditionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long startTime = null;
+    Long endTime = null;
+    Optional<Long> rangingInstanceInterval = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == START_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == END_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RANGING_INSTANCE_INTERVAL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          rangingInstanceInterval = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ProximityRangingClusterRangingTriggerConditionStruct(
+      startTime,
+      endTime,
+      rangingInstanceInterval
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterRangingTriggerConditionStruct {\n");
+    output.append("\tstartTime: ");
+    output.append(startTime);
+    output.append("\n");
+    output.append("\tendTime: ");
+    output.append(endTime);
+    output.append("\n");
+    output.append("\trangingInstanceInterval: ");
+    output.append(rangingInstanceInterval);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterReportingConditionStruct {
+  public Optional<Integer> minDistanceCondition;
+  public Optional<Integer> maxDistanceCondition;
+  public Optional<Integer> errorMarginCondition;
+  private static final long MIN_DISTANCE_CONDITION_ID = 0L;
+  private static final long MAX_DISTANCE_CONDITION_ID = 1L;
+  private static final long ERROR_MARGIN_CONDITION_ID = 2L;
+
+  public ProximityRangingClusterReportingConditionStruct(
+    Optional<Integer> minDistanceCondition,
+    Optional<Integer> maxDistanceCondition,
+    Optional<Integer> errorMarginCondition
+  ) {
+    this.minDistanceCondition = minDistanceCondition;
+    this.maxDistanceCondition = maxDistanceCondition;
+    this.errorMarginCondition = errorMarginCondition;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_DISTANCE_CONDITION_ID, minDistanceCondition.<BaseTLVType>map((nonOptionalminDistanceCondition) -> new UIntType(nonOptionalminDistanceCondition)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_DISTANCE_CONDITION_ID, maxDistanceCondition.<BaseTLVType>map((nonOptionalmaxDistanceCondition) -> new UIntType(nonOptionalmaxDistanceCondition)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_MARGIN_CONDITION_ID, errorMarginCondition.<BaseTLVType>map((nonOptionalerrorMarginCondition) -> new UIntType(nonOptionalerrorMarginCondition)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterReportingConditionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> minDistanceCondition = Optional.empty();
+    Optional<Integer> maxDistanceCondition = Optional.empty();
+    Optional<Integer> errorMarginCondition = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_DISTANCE_CONDITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minDistanceCondition = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == MAX_DISTANCE_CONDITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxDistanceCondition = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ERROR_MARGIN_CONDITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          errorMarginCondition = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ProximityRangingClusterReportingConditionStruct(
+      minDistanceCondition,
+      maxDistanceCondition,
+      errorMarginCondition
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterReportingConditionStruct {\n");
+    output.append("\tminDistanceCondition: ");
+    output.append(minDistanceCondition);
+    output.append("\n");
+    output.append("\tmaxDistanceCondition: ");
+    output.append(maxDistanceCondition);
+    output.append("\n");
+    output.append("\terrorMarginCondition: ");
+    output.append(errorMarginCondition);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {
+  public Integer role;
+  public byte[] peerWiFiDevIK;
+  public Optional<byte[]> pmk;
+  private static final long ROLE_ID = 0L;
+  private static final long PEER_WI_FI_DEV_IK_ID = 1L;
+  private static final long PMK_ID = 2L;
+
+  public ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct(
+    Integer role,
+    byte[] peerWiFiDevIK,
+    Optional<byte[]> pmk
+  ) {
+    this.role = role;
+    this.peerWiFiDevIK = peerWiFiDevIK;
+    this.pmk = pmk;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ROLE_ID, new UIntType(role)));
+    values.add(new StructElement(PEER_WI_FI_DEV_IK_ID, new ByteArrayType(peerWiFiDevIK)));
+    values.add(new StructElement(PMK_ID, pmk.<BaseTLVType>map((nonOptionalpmk) -> new ByteArrayType(nonOptionalpmk)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer role = null;
+    byte[] peerWiFiDevIK = null;
+    Optional<byte[]> pmk = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ROLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          role = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PEER_WI_FI_DEV_IK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          peerWiFiDevIK = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == PMK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          pmk = Optional.of(castingValue.value(byte[].class));
+        }
+      }
+    }
+    return new ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct(
+      role,
+      peerWiFiDevIK,
+      pmk
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterWiFiRangingDeviceRoleConfigStruct {\n");
+    output.append("\trole: ");
+    output.append(role);
+    output.append("\n");
+    output.append("\tpeerWiFiDevIK: ");
+    output.append(Arrays.toString(peerWiFiDevIK));
+    output.append("\n");
+    output.append("\tpmk: ");
+    output.append(pmk.isPresent() ? Arrays.toString(pmk.get()) : "");
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class NetworkIdentityManagementClusterActiveNetworkIdentityStruct {
+  public Integer index;
+  public Integer type;
+  public byte[] identifier;
+  public Long createdTimestamp;
+  public Boolean current;
+  public @Nullable Integer remainingClients;
+  private static final long INDEX_ID = 0L;
+  private static final long TYPE_ID = 1L;
+  private static final long IDENTIFIER_ID = 2L;
+  private static final long CREATED_TIMESTAMP_ID = 3L;
+  private static final long CURRENT_ID = 4L;
+  private static final long REMAINING_CLIENTS_ID = 5L;
+
+  public NetworkIdentityManagementClusterActiveNetworkIdentityStruct(
+    Integer index,
+    Integer type,
+    byte[] identifier,
+    Long createdTimestamp,
+    Boolean current,
+    @Nullable Integer remainingClients
+  ) {
+    this.index = index;
+    this.type = type;
+    this.identifier = identifier;
+    this.createdTimestamp = createdTimestamp;
+    this.current = current;
+    this.remainingClients = remainingClients;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(INDEX_ID, new UIntType(index)));
+    values.add(new StructElement(TYPE_ID, new UIntType(type)));
+    values.add(new StructElement(IDENTIFIER_ID, new ByteArrayType(identifier)));
+    values.add(new StructElement(CREATED_TIMESTAMP_ID, new UIntType(createdTimestamp)));
+    values.add(new StructElement(CURRENT_ID, new BooleanType(current)));
+    values.add(new StructElement(REMAINING_CLIENTS_ID, remainingClients != null ? new UIntType(remainingClients) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static NetworkIdentityManagementClusterActiveNetworkIdentityStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer index = null;
+    Integer type = null;
+    byte[] identifier = null;
+    Long createdTimestamp = null;
+    Boolean current = null;
+    @Nullable Integer remainingClients = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          index = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          type = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          identifier = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == CREATED_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          createdTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          current = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == REMAINING_CLIENTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          remainingClients = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new NetworkIdentityManagementClusterActiveNetworkIdentityStruct(
+      index,
+      type,
+      identifier,
+      createdTimestamp,
+      current,
+      remainingClients
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("NetworkIdentityManagementClusterActiveNetworkIdentityStruct {\n");
+    output.append("\tindex: ");
+    output.append(index);
+    output.append("\n");
+    output.append("\ttype: ");
+    output.append(type);
+    output.append("\n");
+    output.append("\tidentifier: ");
+    output.append(Arrays.toString(identifier));
+    output.append("\n");
+    output.append("\tcreatedTimestamp: ");
+    output.append(createdTimestamp);
+    output.append("\n");
+    output.append("\tcurrent: ");
+    output.append(current);
+    output.append("\n");
+    output.append("\tremainingClients: ");
+    output.append(remainingClients);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class NetworkIdentityManagementClusterClientStruct {
+  public Integer clientIndex;
+  public byte[] clientIdentifier;
+  public @Nullable Integer networkIdentityIndex;
+  private static final long CLIENT_INDEX_ID = 0L;
+  private static final long CLIENT_IDENTIFIER_ID = 1L;
+  private static final long NETWORK_IDENTITY_INDEX_ID = 2L;
+
+  public NetworkIdentityManagementClusterClientStruct(
+    Integer clientIndex,
+    byte[] clientIdentifier,
+    @Nullable Integer networkIdentityIndex
+  ) {
+    this.clientIndex = clientIndex;
+    this.clientIdentifier = clientIdentifier;
+    this.networkIdentityIndex = networkIdentityIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CLIENT_INDEX_ID, new UIntType(clientIndex)));
+    values.add(new StructElement(CLIENT_IDENTIFIER_ID, new ByteArrayType(clientIdentifier)));
+    values.add(new StructElement(NETWORK_IDENTITY_INDEX_ID, networkIdentityIndex != null ? new UIntType(networkIdentityIndex) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static NetworkIdentityManagementClusterClientStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer clientIndex = null;
+    byte[] clientIdentifier = null;
+    @Nullable Integer networkIdentityIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CLIENT_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clientIndex = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CLIENT_IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          clientIdentifier = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == NETWORK_IDENTITY_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          networkIdentityIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new NetworkIdentityManagementClusterClientStruct(
+      clientIndex,
+      clientIdentifier,
+      networkIdentityIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("NetworkIdentityManagementClusterClientStruct {\n");
+    output.append("\tclientIndex: ");
+    output.append(clientIndex);
+    output.append("\n");
+    output.append("\tclientIdentifier: ");
+    output.append(Arrays.toString(clientIdentifier));
+    output.append("\n");
+    output.append("\tnetworkIdentityIndex: ");
+    output.append(networkIdentityIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -19382,9 +20747,9 @@ public static class JointFabricDatastoreClusterDatastoreNodeInformationEntryStru
   public Long nodeID;
   public String friendlyName;
   public ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct commissioningStatusEntry;
-  private static final long NODE_ID_ID = 1L;
-  private static final long FRIENDLY_NAME_ID = 2L;
-  private static final long COMMISSIONING_STATUS_ENTRY_ID = 3L;
+  private static final long NODE_ID_ID = 0L;
+  private static final long FRIENDLY_NAME_ID = 1L;
+  private static final long COMMISSIONING_STATUS_ENTRY_ID = 2L;
 
   public JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
     Long nodeID,
@@ -19545,106 +20910,15 @@ public static class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStru
     return output.toString();
   }
 }
-public static class JointFabricDatastoreClusterDatastoreEndpointEntryStruct {
-  public Integer endpointID;
-  public Long nodeID;
-  public String friendlyName;
-  public ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry;
-  private static final long ENDPOINT_ID_ID = 0L;
-  private static final long NODE_ID_ID = 1L;
-  private static final long FRIENDLY_NAME_ID = 2L;
-  private static final long STATUS_ENTRY_ID = 3L;
-
-  public JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
-    Integer endpointID,
-    Long nodeID,
-    String friendlyName,
-    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry
-  ) {
-    this.endpointID = endpointID;
-    this.nodeID = nodeID;
-    this.friendlyName = friendlyName;
-    this.statusEntry = statusEntry;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
-    values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
-    values.add(new StructElement(FRIENDLY_NAME_ID, new StringType(friendlyName)));
-    values.add(new StructElement(STATUS_ENTRY_ID, statusEntry.encodeTlv()));
-
-    return new StructType(values);
-  }
-
-  public static JointFabricDatastoreClusterDatastoreEndpointEntryStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer endpointID = null;
-    Long nodeID = null;
-    String friendlyName = null;
-    ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct statusEntry = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == ENDPOINT_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          endpointID = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == NODE_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          nodeID = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == FRIENDLY_NAME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          friendlyName = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == STATUS_ENTRY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          statusEntry = ChipStructs.JointFabricDatastoreClusterDatastoreStatusEntryStruct.decodeTlv(castingValue);
-        }
-      }
-    }
-    return new JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
-      endpointID,
-      nodeID,
-      friendlyName,
-      statusEntry
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("JointFabricDatastoreClusterDatastoreEndpointEntryStruct {\n");
-    output.append("\tendpointID: ");
-    output.append(endpointID);
-    output.append("\n");
-    output.append("\tnodeID: ");
-    output.append(nodeID);
-    output.append("\n");
-    output.append("\tfriendlyName: ");
-    output.append(friendlyName);
-    output.append("\n");
-    output.append("\tstatusEntry: ");
-    output.append(statusEntry);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class JointFabricDatastoreClusterDatastoreBindingTargetStruct {
   public Optional<Long> node;
   public Optional<Integer> group;
   public Optional<Integer> endpoint;
   public Optional<Long> cluster;
-  private static final long NODE_ID = 1L;
-  private static final long GROUP_ID = 2L;
-  private static final long ENDPOINT_ID = 3L;
-  private static final long CLUSTER_ID = 4L;
+  private static final long NODE_ID = 0L;
+  private static final long GROUP_ID = 1L;
+  private static final long ENDPOINT_ID = 2L;
+  private static final long CLUSTER_ID = 3L;
 
   public JointFabricDatastoreClusterDatastoreBindingTargetStruct(
     Optional<Long> node,
@@ -19914,10 +21188,10 @@ public static class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct
   public Integer authMode;
   public @Nullable ArrayList<Long> subjects;
   public @Nullable ArrayList<ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlTargetStruct> targets;
-  private static final long PRIVILEGE_ID = 1L;
-  private static final long AUTH_MODE_ID = 2L;
-  private static final long SUBJECTS_ID = 3L;
-  private static final long TARGETS_ID = 4L;
+  private static final long PRIVILEGE_ID = 0L;
+  private static final long AUTH_MODE_ID = 1L;
+  private static final long SUBJECTS_ID = 2L;
+  private static final long TARGETS_ID = 3L;
 
   public JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
     Integer privilege,
@@ -20096,10 +21370,10 @@ public static class JointFabricDatastoreClusterDatastoreAdministratorInformation
   public String friendlyName;
   public Integer vendorID;
   public byte[] icac;
-  private static final long NODE_ID_ID = 1L;
-  private static final long FRIENDLY_NAME_ID = 2L;
-  private static final long VENDOR_ID_ID = 3L;
-  private static final long ICAC_ID = 4L;
+  private static final long NODE_ID_ID = 0L;
+  private static final long FRIENDLY_NAME_ID = 1L;
+  private static final long VENDOR_ID_ID = 2L;
+  private static final long ICAC_ID = 3L;
 
   public JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
     Long nodeID,
@@ -20177,6 +21451,82 @@ public static class JointFabricDatastoreClusterDatastoreAdministratorInformation
     output.append("\n");
     output.append("\ticac: ");
     output.append(Arrays.toString(icac));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class JointFabricDatastoreClusterDatastoreEndpointEntryStruct {
+  public Integer endpointID;
+  public Long nodeID;
+  public String friendlyName;
+  private static final long ENDPOINT_ID_ID = 0L;
+  private static final long NODE_ID_ID = 1L;
+  private static final long FRIENDLY_NAME_ID = 2L;
+
+  public JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
+    Integer endpointID,
+    Long nodeID,
+    String friendlyName
+  ) {
+    this.endpointID = endpointID;
+    this.nodeID = nodeID;
+    this.friendlyName = friendlyName;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
+    values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
+    values.add(new StructElement(FRIENDLY_NAME_ID, new StringType(friendlyName)));
+
+    return new StructType(values);
+  }
+
+  public static JointFabricDatastoreClusterDatastoreEndpointEntryStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpointID = null;
+    Long nodeID = null;
+    String friendlyName = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          nodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == FRIENDLY_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          friendlyName = castingValue.value(String.class);
+        }
+      }
+    }
+    return new JointFabricDatastoreClusterDatastoreEndpointEntryStruct(
+      endpointID,
+      nodeID,
+      friendlyName
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("JointFabricDatastoreClusterDatastoreEndpointEntryStruct {\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
+    output.append("\tnodeID: ");
+    output.append(nodeID);
+    output.append("\n");
+    output.append("\tfriendlyName: ");
+    output.append(friendlyName);
     output.append("\n");
     output.append("}\n");
     return output.toString();

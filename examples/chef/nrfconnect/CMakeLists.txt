@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
@@ -81,6 +81,7 @@ endif()
 target_sources(app PRIVATE
     ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
     ${CHEF}/common/DeviceTypes.cpp
+    ${CHEF}/common/FakeAttributeAccess.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
     ${CHEF}/common/chef-fan-control-manager.cpp
@@ -92,12 +93,17 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-pump.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
+    ${CHEF}/common/clusters/application-basic/chef-application-basic-delegate.cpp
+    ${CHEF}/common/clusters/application-launch/chef-application-launch-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
     ${CHEF}/common/clusters/channel/ChannelManager.cpp
+    ${CHEF}/common/clusters/chime/chef-chime-delegate.cpp
+    ${CHEF}/common/clusters/content-launch/chef-content-launch-delegate.cpp
     ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp
     ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
+    ${CHEF}/common/clusters/laundry-dryer-controls/chef-laundry-dryer-controls-delegate.cpp
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
@@ -105,6 +111,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/oven-mode/chef-oven-mode.cpp
     ${CHEF}/common/clusters/microwave-oven-mode/chef-microwave-oven-mode.cpp
     ${CHEF}/common/clusters/microwave-oven-control/chef-microwave-oven-control.cpp
+    ${CHEF}/common/clusters/mode-base/chef-mode-base-default.cpp
+    ${CHEF}/common/clusters/mode-select/chef-supported-modes-manager.cpp
     ${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp
     ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
@@ -112,6 +120,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
+    ${CHEF}/common/clusters/water-heater-management/chef-water-heater-management.cpp
     ${CHEF}/common/clusters/window-covering/chef-window-covering.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/nrfconnect/AppTask.cpp

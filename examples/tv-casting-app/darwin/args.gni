@@ -24,7 +24,24 @@ chip_project_config_include_dirs = [
   "${chip_root}/examples/tv-casting-app/tv-casting-common",
 ]
 
-chip_build_libshell = true
+import(
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
+
+# Use slim cluster-objects: only the ~36 clusters a casting client needs.
+chip_cluster_objects_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
+
+if (optimize_apk_size) {
+  # Size-optimized build: smaller framework, fewer debug features.
+  # Excludes legacy chip-tool command sources and their transitive deps
+  # (tracing, JSON, jsoncpp, interaction model test suites).
+  # The -ffunction-sections, -fdata-sections, -fvisibility=hidden, and
+  # -flto=thin flags are applied automatically by tv-casting-common/BUILD.gn
+  # when optimize_apk_size is true.
+  chip_build_libshell = false
+  matter_enable_tracing_support = false
+} else {
+  chip_build_libshell = true
+}
 
 # Example Credentials like ExampleDAC.h/cpp are not required for the tv-casting-app
 chip_build_example_creds = false

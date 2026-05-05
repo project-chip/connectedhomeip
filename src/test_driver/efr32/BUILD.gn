@@ -45,7 +45,7 @@ pw_proto_library("nl_test_service") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_common_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -96,7 +96,7 @@ source_set("efr32_test_main") {
   ]
 
   # OpenThread Settings
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",

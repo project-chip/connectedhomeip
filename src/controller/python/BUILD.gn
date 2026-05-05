@@ -105,8 +105,8 @@ shared_library("ChipDeviceCtrl") {
       ]
     }
     defines += [ "CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS=20" ]
-    defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
+    defines += [ "CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT=100" ]
 
     if (chip_python_supports_stack_locking) {
       sources += [ "matter/native/ChipMainLoopWork_StackLock.cpp" ]

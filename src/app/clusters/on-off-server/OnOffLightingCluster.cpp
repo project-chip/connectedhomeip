@@ -28,6 +28,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <cstdint>
+
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
 
@@ -128,11 +130,6 @@ CHIP_ERROR OnOffLightingCluster::AcceptedCommands(const ConcreteClusterPath & pa
 CHIP_ERROR OnOffLightingCluster::Attributes(const ConcreteClusterPath & path,
                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    AttributeListBuilder listBuilder(builder);
-
-    // Base attributes
-    ReturnErrorOnFailure(OnOffCluster::Attributes(path, builder));
-
     static const DataModel::AttributeEntry kLightingAttributes[] = {
         Attributes::GlobalSceneControl::kMetadataEntry,
         Attributes::OnTime::kMetadataEntry,
@@ -140,7 +137,10 @@ CHIP_ERROR OnOffLightingCluster::Attributes(const ConcreteClusterPath & path,
         Attributes::StartUpOnOff::kMetadataEntry,
     };
 
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>(kLightingAttributes), {});
+    ReturnErrorOnFailure(builder.AppendElements(kLightingAttributes));
+
+    // Base attributes, this includes mandatory metadata.
+    return OnOffCluster::Attributes(path, builder);
 }
 
 DataModel::ActionReturnStatus OnOffLightingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -343,7 +343,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
         LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
     }
 
-    SetAttributeValue<uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
+    SetAttributeValue<uint16_t, uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
     UpdateTimer();
     return Status::Success;
 }
@@ -365,7 +365,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
 
     if (mOnTime == 0)
     {
-        SetAttributeValue<uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
+        SetAttributeValue<uint16_t, uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
     }
     UpdateTimer();
     return Status::Success;
@@ -393,7 +393,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOffWithEffect(const Da
     {
         if (mScenesIntegrationDelegate != nullptr)
         {
-            LogErrorOnFailure(mScenesIntegrationDelegate->StoreCurrentGlobalScene(request.subjectDescriptor->fabricIndex));
+            LogErrorOnFailure(mScenesIntegrationDelegate->StoreCurrentGlobalScene(request.subjectDescriptor.fabricIndex));
         }
 
         DataModel::ActionReturnStatus status =
@@ -405,7 +405,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOffWithEffect(const Da
 
         ReturnErrorOnFailure(SetOnOffFromCommand(false));
 
-        SetAttributeValue<uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
+        SetAttributeValue<uint16_t, uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
 
         UpdateTimer();
         return Status::Success;
@@ -423,7 +423,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithRecallGlobalScen
 
     if (mScenesIntegrationDelegate != nullptr)
     {
-        CHIP_ERROR err = mScenesIntegrationDelegate->RecallGlobalScene(request.subjectDescriptor->fabricIndex);
+        CHIP_ERROR err = mScenesIntegrationDelegate->RecallGlobalScene(request.subjectDescriptor.fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
             // Spec requirement:
@@ -443,7 +443,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithRecallGlobalScen
 
     if (mOnTime == 0)
     {
-        SetAttributeValue<uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
+        SetAttributeValue<uint16_t, uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
     }
     UpdateTimer();
 

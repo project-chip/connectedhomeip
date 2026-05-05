@@ -44,6 +44,7 @@ class CmdLineArgs:
     templateFile: str
     outputDir: str
     runBootstrap: bool
+    retries: int
     parallel: bool = True
     prettify_output: bool = True
     version_check: bool = True
@@ -76,8 +77,34 @@ def checkDirExists(path):
 
 
 def getFilePath(name, prefix_chip_root_dir=True):
-    if prefix_chip_root_dir:
+    """Resolve a file path and verify that it exists.
+
+    Resolution is attempted in the following order:
+
+    1. If ``name`` is absolute, use it directly.
+    2. If ``prefix_chip_root_dir`` is True and ``name`` is relative, resolve
+       it against the repository root (``CHIP_ROOT_DIR``).  This is the
+       legacy behaviour and is tried first to preserve backward compatibility.
+    3. If (2) does not yield an existing file, resolve ``name`` against the
+       current working directory as a fallback.
+
+    In all cases the resolved path is validated with :func:`checkFileExists`;
+    if the file is not found the program exits with an error message.
+
+    Args:
+        name (str): A file path, either absolute or relative.
+        prefix_chip_root_dir (bool): When True (the default), relative paths
+            are first resolved against ``CHIP_ROOT_DIR``.  When False, ``name``
+            is used as-is (typically because the caller has already produced an
+            absolute path, e.g. via environment-variable expansion).
+
+    Returns:
+        str: The resolved, verified absolute path to the file.
+    """
+    if prefix_chip_root_dir and not os.path.isabs(name):
         fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isfile(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
     else:
         fullpath = name
     checkFileExists(fullpath)
@@ -85,7 +112,12 @@ def getFilePath(name, prefix_chip_root_dir=True):
 
 
 def getDirPath(name):
-    fullpath = os.path.join(CHIP_ROOT_DIR, name)
+    if not os.path.isabs(name):
+        fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isdir(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
+    else:
+        fullpath = name
     checkDirExists(fullpath)
     return fullpath
 
@@ -96,22 +128,21 @@ def detectZclFile(zapFile):
     prefix_chip_root_dir = True
     path = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
-    if zapFile:
-        with open(zapFile) as f:
-            data = json.load(f)
-        for package in data["package"]:
-            if package["type"] != "zcl-properties":
-                continue
+    with open(zapFile) as f:
+        data = json.load(f)
+    for package in data["package"]:
+        if package["type"] != "zcl-properties":
+            continue
 
-            prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
-            # found the right path, try to figure out the actual path
-            if package["pathRelativity"] == "relativeToZap":
-                path = os.path.abspath(os.path.join(
-                    os.path.dirname(zapFile), package["path"]))
-            elif package["pathRelativity"] == "resolveEnvVars":
-                path = os.path.expandvars(package["path"])
-            else:
-                path = package["path"]
+        prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
+        # found the right path, try to figure out the actual path
+        if package["pathRelativity"] == "relativeToZap":
+            path = os.path.abspath(os.path.join(
+                os.path.dirname(zapFile), package["path"]))
+        elif package["pathRelativity"] == "resolveEnvVars":
+            path = os.path.expandvars(package["path"])
+        else:
+            path = package["path"]
 
     return getFilePath(path, prefix_chip_root_dir)
 
@@ -126,34 +157,28 @@ def runArgumentsParser() -> CmdLineArgs:
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
-    parser.add_argument('zap', nargs="?", default=None, help='Path to the application .zap file')
-    parser.add_argument('-t', '--templates', default=default_templates,
-                        help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
-    parser.add_argument('-z', '--zcl',
-                        help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
-    parser.add_argument('-o', '--output-dir', default=None,
-                        help='Output directory for the generated files (default: a temporary directory in out)')
-    parser.add_argument('-m', '--matter-file-name', default=None,
-                        help='Where to copy any generated .matter file')
-    parser.add_argument('--run-bootstrap', default=None, action='store_true',
+    parser.add_argument('zap', nargs="?", help='path to the application .zap file')
+    parser.add_argument('-t', '--templates', metavar='FILE', default=default_templates,
+                        help='path to the .zapt templates records to use for generating artifacts (default: %(default)s)')
+    parser.add_argument('-z', '--zcl', metavar='FILE',
+                        help='path to the zcl templates records to use for generating artifacts (default: read from the .zap)')
+    parser.add_argument('-o', '--output-dir', metavar='DIR',
+                        help='output directory for the generated files (default: a temporary directory in out)')
+    parser.add_argument('-m', '--matter-file-name', metavar='FILE',
+                        help='move generated .matter file to the destination FILE (default: next to the source .zap)')
+    parser.add_argument('--run-bootstrap', action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.add_argument('--lock-file', help='serialize zap invocations by using the specified lock file.')
-    parser.add_argument('--prettify-output', action='store_true')
-    parser.add_argument('--no-prettify-output',
-                        action='store_false', dest='prettify_output')
-    parser.add_argument('--version-check', action='store_true')
-    parser.add_argument('--no-version-check',
-                        action='store_false', dest='version_check')
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--lock-file', metavar='FILE',
+                        help='serialize zap invocations by using the specified lock file')
+    parser.add_argument('--prettify-output', action=argparse.BooleanOptionalAction, default=True,
+                        help='run code prettifier (e.g. clang-format) on generated output (default: %(default)s)')
+    parser.add_argument('--version-check', action=argparse.BooleanOptionalAction, default=True,
+                        help='check zap version before running (default: %(default)s)')
+    parser.add_argument('--retries', type=int, metavar='NUM', default=1,
+                        help='retry running zap-cli in case of failure (default: %(default)s)')
     parser.add_argument('--keep-output-dir', action='store_true',
                         help='Keep any created output directory. Useful for temporary directories.')
-    parser.set_defaults(parallel=True)
-    parser.set_defaults(prettify_output=True)
-    parser.set_defaults(version_check=True)
-    parser.set_defaults(lock_file=None)
-    parser.set_defaults(keep_output_dir=False)
-    parser.set_defaults(matter_file_name=None)
     args = parser.parse_args()
 
     delete_output_dir = False
@@ -172,16 +197,20 @@ def runArgumentsParser() -> CmdLineArgs:
 
     if args.zcl:
         zcl_file = getFilePath(args.zcl)
-    else:
+    elif zap_file:
         zcl_file = detectZclFile(zap_file)
+    else:
+        zcl_file = getFilePath(DEFAULT_DATA_MODEL_DESCRIPTION_FILE)
 
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
     if args.matter_file_name:
-        matter_file_name = getFilePath(args.matter_file_name)
+        matter_file_name = args.matter_file_name
     else:
-        matter_file_name = None
+        # If the .matter file is going to be generated, place it next to
+        # the source .zap file (the same name but with .matter extension).
+        matter_file_name = matterPathFromZapPath(zap_file)
 
     return CmdLineArgs(
         zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
@@ -191,6 +220,7 @@ def runArgumentsParser() -> CmdLineArgs:
         lock_file=args.lock_file,
         delete_output_dir=delete_output_dir,
         matter_file_name=matter_file_name,
+        retries=args.retries,
     )
 
 
@@ -209,15 +239,13 @@ def matterPathFromZapPath(zap_config_path):
 
 def extractGeneratedIdl(output_dir, matter_name):
     """Find a file Clusters.matter in the output directory and
-       place it along with the input zap file.
+       move it to matter_name.
 
        Intent is to make the "zap content" more humanly understandable.
     """
     idl_path = os.path.join(output_dir, "Clusters.matter")
-    if not os.path.exists(idl_path):
-        return
-
-    shutil.move(idl_path, matter_name)
+    if os.path.exists(idl_path):
+        shutil.move(idl_path, matter_name)
 
 
 def runGeneration(cmdLineArgs):
@@ -242,15 +270,20 @@ def runGeneration(cmdLineArgs):
         # Parallel-compatible runs will need separate state
         args.append('--tempState')
 
-    tool.run('generate', *args)
+    for i in range(cmdLineArgs.retries):
+        try:
+            tool.run('generate', *args)
+            break
+        except subprocess.CalledProcessError:
+            if i < cmdLineArgs.retries - 1:
+                log.exception("Failure to generate, retrying (%d retries left)", cmdLineArgs.retries - i - 1)
+                continue
+            if cmdLineArgs.retries > 1:
+                log.error("Zap execution failure after %d retries", cmdLineArgs.retries)
+            raise
 
     if cmdLineArgs.matter_file_name:
-        matter_name = cmdLineArgs.matter_file_name
-    else:
-        matter_name = matterPathFromZapPath(zap_file)
-
-    if matter_name:
-        extractGeneratedIdl(output_dir, matter_name)
+        extractGeneratedIdl(output_dir, cmdLineArgs.matter_file_name)
 
 
 def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
@@ -353,7 +386,7 @@ def main():
 
         # on 64 bit systems, allow maximum memory usage to go over 4GB (#15620)
         if sys.maxsize >= 2**32:
-            os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
+            os.environ["NODE_OPTIONS"] = "--max-old-space-size=16384 --no-force-async-hooks-checks"
 
         # `zap-cli` may extract things into a temporary directory. ensure extraction
         # does not conflict.

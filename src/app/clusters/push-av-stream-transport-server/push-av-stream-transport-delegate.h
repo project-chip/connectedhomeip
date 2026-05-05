@@ -307,6 +307,15 @@ public:
     virtual CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) = 0;
 
     /**
+     * @brief Gets the current CMAF session number for the specified connection.
+     *
+     * @param connectionID The connection ID for which to get the session number
+     * @param sessionNumber Output parameter for the current session number
+     * @return true if a session number is available, false otherwise
+     */
+    virtual bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) = 0;
+
+    /**
      * @brief Sets the PushAvStreamTransportServer instance for the delegate.
      *
      * This method is called by the PushAvStreamTransportServer to provide

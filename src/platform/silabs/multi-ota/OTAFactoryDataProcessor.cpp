@@ -20,8 +20,9 @@
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
 
 namespace chip {
-
-using namespace ::chip::DeviceLayer::Silabs;
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 {
@@ -30,7 +31,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
+    ReturnErrorOnFailure(OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock));
 #endif
     error = DecodeTlv();
 
@@ -133,16 +134,16 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
     switch (tag)
     {
     case (int) FactoryTags::kDacKey:
-        ChipLogProgress(SoftwareUpdate, "Set Device Attestation Key");
+        ChipLogDetail(SoftwareUpdate, "Set Device Attestation Key");
         return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationKey(newValue);
     case (int) FactoryTags::kDacCert:
-        ChipLogProgress(SoftwareUpdate, "Set Device Attestation Cert");
+        ChipLogDetail(SoftwareUpdate, "Set Device Attestation Cert");
         return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationCert(newValue);
     case (int) FactoryTags::kPaiCert:
-        ChipLogProgress(SoftwareUpdate, "Set Product Attestionation Intermediate Cert");
+        ChipLogDetail(SoftwareUpdate, "Set Product Attestation Intermediate Cert");
         return Provision::Manager::GetInstance().GetStorage().SetProductAttestationIntermediateCert(newValue);
     case (int) FactoryTags::kCdCert:
-        ChipLogProgress(SoftwareUpdate, "Set Certification Declaration");
+        ChipLogDetail(SoftwareUpdate, "Set Certification Declaration");
         return Provision::Manager::GetInstance().GetStorage().SetCertificationDeclaration(newValue);
     }
 
@@ -150,4 +151,7 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
     return CHIP_ERROR_NOT_FOUND;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

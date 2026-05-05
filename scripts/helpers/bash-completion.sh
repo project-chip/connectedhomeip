@@ -29,7 +29,7 @@ _chip_build_example() {
     # Get the first non-option argument taking into account the options with their arguments.
     for ((i = 1; i <= COMP_CWORD; i++)); do
         case "${COMP_WORDS[i]}" in
-            --log-level | --target | --repo | --out-prefix | --ninja-jobs | --pregen-dir | --dry-run-output | --pw-command-launcher)
+            --log-level | --target | --build-profile | --repo | --out-prefix | --ninja-jobs | --pregen-dir | --dry-run-output | --pw-command-launcher)
                 ((i == COMP_CWORD)) && break
                 ((i == COMP_CWORD - 1)) && [[ "${COMP_WORDS[i + 1]}" = "=" ]] && break
                 [[ "${COMP_WORDS[i + 1]}" = "=" ]] && ((i++))
@@ -51,6 +51,11 @@ _chip_build_example() {
             --target)
                 readarray -t COMPREPLY < <(compgen -W "$("$1" targets --format=completion "$cur")" -- "$cur")
                 compopt -o nospace
+                return
+                ;;
+            --log-level | --build-profile)
+                # Parse values from the "[foo|bar|baz]" part of the help text for the given option.
+                readarray -t COMPREPLY < <(compgen -W "$("$1" --help | awk -F'[][]' -v o="$prev" 'index($1, o) { gsub(/[|]/, " "); print $2 }')" -- "$cur")
                 return
                 ;;
             --repo | --out-prefix | --pregen-dir)
@@ -214,7 +219,7 @@ complete -F _chip_app chip-all-clusters-app
 complete -F _chip_app chip-bridge-app
 complete -F _chip_app chip-dishwasher-app
 complete -F _chip_app chip-energy-gateway-app
-complete -F _chip_app chip-energy-management-app
+complete -F _chip_app chip-evse-app
 complete -F _chip_app chip-lighting-app
 complete -F _chip_app chip-lock-app
 complete -F _chip_app chip-log-source-app
@@ -225,5 +230,6 @@ complete -F _chip_app chip-refrigerator-app
 complete -F _chip_app chip-rvc-app
 complete -F _chip_app chip-tv-app
 complete -F _chip_app chip-tv-casting-app
+complete -F _chip_app matter-water-heater-app
 
 complete -F _chip_tool chip-tool

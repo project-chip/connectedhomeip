@@ -6,7 +6,6 @@ from typing import Any, BinaryIO, List, Optional, Union
 
 from matter.testing.tasks import Subprocess
 
-
 @dataclass
 class OtaImagePath:
     path: str
@@ -34,12 +33,6 @@ class IcdAppServerSubprocess(AppServerSubprocess):
     def pause(self, check_state: bool = True) -> None: ...
     def resume(self, check_state: bool = True) -> None: ...
     def terminate(self) -> None: ...
-
-
-class JFControllerSubprocess(Subprocess):
-    PREFIX: bytes
-    def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
-                 vendor_id: int, extra_args: List[str] = ...) -> None: ...
 
 
 class OTAProviderSubprocess(AppServerSubprocess):

@@ -48,8 +48,7 @@ class WriteOperation
 public:
     WriteOperation(const app::ConcreteDataAttributePath & path)
     {
-        mRequest.path              = path;
-        mRequest.subjectDescriptor = &kDenySubjectDescriptor;
+        mRequest.emplace(app::DataModel::WriteAttributeRequest(path, kDenySubjectDescriptor));
     }
 
     WriteOperation(EndpointId endpoint, ClusterId cluster, AttributeId attribute) :
@@ -58,35 +57,38 @@ public:
 
     WriteOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
     {
-        mRequest.subjectDescriptor = &descriptor;
+        auto path  = mRequest->path;
+        auto flags = mRequest->writeFlags;
+        mRequest.emplace(app::DataModel::WriteAttributeRequest(path, descriptor));
+        mRequest->writeFlags = flags;
         return *this;
     }
 
     WriteOperation & SetDataVersion(Optional<DataVersion> version)
     {
-        mRequest.path.mDataVersion = version;
+        mRequest->path.mDataVersion = version;
         return *this;
     }
 
     WriteOperation & SetWriteFlags(const BitFlags<app::DataModel::WriteFlags> & flags)
     {
-        mRequest.writeFlags = flags;
-        return *this;
-    }
-
-    WriteOperation & SetOperationFlags(const BitFlags<app::DataModel::OperationFlags> & flags)
-    {
-        mRequest.operationFlags = flags;
+        mRequest->writeFlags = flags;
         return *this;
     }
 
     WriteOperation & SetPathExpanded(bool value)
     {
-        mRequest.path.mExpanded = value;
+        mRequest->path.mExpanded = value;
         return *this;
     }
 
-    const app::DataModel::WriteAttributeRequest & GetRequest() const { return mRequest; }
+    WriteOperation & SetListOperation(app::ConcreteDataAttributePath::ListOperation listOp)
+    {
+        mRequest->path.mListOp = listOp;
+        return *this;
+    }
+
+    const app::DataModel::WriteAttributeRequest & GetRequest() const { return *mRequest; }
 
     // Helper to encode a value, using EncodeForWrite for fabric-scoped types
     template <typename T>
@@ -132,17 +134,13 @@ public:
     app::AttributeValueDecoder DecoderFor(const T & value)
     {
         mTLVReader = ReadEncodedValue(value);
-        if (mRequest.subjectDescriptor == nullptr)
-        {
-            app::AttributeValueDecoder(mTLVReader, kDenySubjectDescriptor);
-        }
-        return app::AttributeValueDecoder(mTLVReader, *mRequest.subjectDescriptor);
+        return app::AttributeValueDecoder(mTLVReader, mRequest->subjectDescriptor);
     }
 
 private:
     constexpr static size_t kMaxTLVBufferSize = 1024;
 
-    app::DataModel::WriteAttributeRequest mRequest;
+    std::optional<app::DataModel::WriteAttributeRequest> mRequest;
 
     // where data is being written
     uint8_t mTLVBuffer[kMaxTLVBufferSize] = { 0 };
