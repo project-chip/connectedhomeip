@@ -67,7 +67,7 @@ from mobly import asserts
 from support_modules.icd_support import ICDBaseTest, ICDTransition
 
 import matter.clusters as Clusters
-from matter.testing.commissioning import get_setup_payload_info_config
+from matter.testing.commissioning import CommissioningInfo, commission_device, get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -93,12 +93,19 @@ class TC_ICDB_2_2(ICDBaseTest):
         TH.EnableICDRegistration(TH.GenerateICDRegistrationParameters())
 
         # Commission the DUT
-        await TH.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
-            setupPinCode=info.passcode,
-            filterType=info.filter_type,
-            filter=info.filter_value
+        commissioning_info = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method or "on-network",
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            thread_ba_host=self.matter_test_config.thread_ba_host,
+            thread_ba_port=self.matter_test_config.thread_ba_port,
         )
+        status = await commission_device(TH, self.dut_node_id, info, commissioning_info)
+        asserts.assert_true(status, f"Failed to commission DUT to TH's fabric: {status}")
 
     def desc_TC_ICDB_2_2(self) -> str:
         return "[TC-ICDB-2.2] ICD State Machine - With client registration and active subscription - Single Fabric [DUT as Server]"
