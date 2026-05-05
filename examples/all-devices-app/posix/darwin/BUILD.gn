@@ -33,6 +33,8 @@ source_set("darwin") {
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger/impl:ble-rssi",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
     "${chip_root}/src/app:app_config",

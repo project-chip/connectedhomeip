@@ -1,0 +1,110 @@
+/*
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "BleRssiRangingAdapter.h"
+
+#include <crypto/RandUtils.h>
+#include <lib/support/BufferWriter.h>
+#include <string.h>
+
+BleRssiRangingAdapter::~BleRssiRangingAdapter() = default;
+
+CHIP_ERROR BleRssiRangingAdapter::Init(chip::PersistentStorageDelegate * store)
+{
+    mpStore = store;
+
+    if (mpStore != nullptr)
+    {
+        uint8_t buf[sizeof(uint64_t)];
+        uint16_t size = sizeof(buf);
+        if (mpStore->SyncGetKeyValue(kBleDeviceIdKeyName, buf, size) == CHIP_NO_ERROR && size == sizeof(buf))
+        {
+            mBleDeviceId = chip::Encoding::BigEndian::Get64(buf);
+        }
+    }
+
+    if (mBleDeviceId == kInvalidBleDeviceId)
+    {
+        ReturnErrorOnFailure(GenerateBleDeviceId());
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BleRssiRangingAdapter::EncodeBeaconPayload(uint64_t bleDeviceId, uint16_t messageCounter, int8_t txPower,
+                                                      chip::ByteSpan sessionKey,
+                                                      chip::Ble::ChipBLEProximityRangingIdentificationInfo & outPayload)
+{
+    outPayload.Init();
+    outPayload.SetMsgCounter(messageCounter);
+    outPayload.SetTxPower(txPower);
+
+    // TODO: Apply HMAC-based obfuscation using sessionKey. For now, encode the
+    // BLEDeviceId in plain big-endian form in the first 8 bytes of the field.
+    uint8_t plain[16] = {};
+    chip::Encoding::BigEndian::Put64(plain, bleDeviceId);
+    outPayload.SetObfuscatedBLEDeviceId(plain);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BleRssiRangingAdapter::DecodeBeaconPayload(const chip::Ble::ChipBLEProximityRangingIdentificationInfo & payload,
+                                                      uint64_t candidateBleDeviceId, chip::ByteSpan sessionKey)
+{
+    // TODO: Apply HMAC-based verification using sessionKey. For now, compare
+    // the candidate directly against the plain-encoded BLEDeviceId.
+    uint8_t expected[16] = {};
+    chip::Encoding::BigEndian::Put64(expected, candidateBleDeviceId);
+
+    if (memcmp(payload.GetObfuscatedBLEDeviceId(), expected, sizeof(expected)) != 0)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BleRssiRangingAdapter::GenerateBleDeviceId()
+{
+    static constexpr uint8_t kMaxGenerationAttempts = 3;
+    for (uint8_t i = 0; i < kMaxGenerationAttempts; i++)
+    {
+        uint64_t id = chip::Crypto::GetRandU64();
+        if (id != kInvalidBleDeviceId)
+        {
+            mBleDeviceId = id;
+
+            if (mpStore != nullptr)
+            {
+                uint8_t buf[sizeof(uint64_t)];
+                chip::Encoding::BigEndian::Put64(buf, mBleDeviceId);
+                (void) mpStore->SyncSetKeyValue(kBleDeviceIdKeyName, buf, sizeof(buf));
+            }
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_INTERNAL;
+}
+
+uint64_t BleRssiRangingAdapter::GetBleDeviceId()
+{
+    if (mBleDeviceId == kInvalidBleDeviceId)
+    {
+        (void) GenerateBleDeviceId();
+    }
+    return mBleDeviceId;
+}

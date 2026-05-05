@@ -1,0 +1,213 @@
+/*
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "RangingTechnologyController.h"
+
+#include <clusters/ProximityRanging/AttributeIds.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ProximityRanging {
+
+RangingTechnologyController::~RangingTechnologyController()
+{
+    // Clear listeners first to prevent callbacks during teardown
+    mListenerCount = 0;
+    for (size_t i = 0; i < mAdapterCount; i++)
+    {
+        mAdapters[i]->StopAllSessions();
+        mAdapters[i]->SetCallback(nullptr);
+    }
+}
+
+void RangingTechnologyController::AddListener(Listener * listener)
+{
+    VerifyOrReturn(listener != nullptr);
+    for (size_t i = 0; i < mListenerCount; i++)
+    {
+        if (mListeners[i] == listener)
+        {
+            return;
+        }
+    }
+    if (mListenerCount >= kMaxListeners)
+    {
+        ChipLogError(AppServer, "RangingTechnologyController: max listeners reached, cannot add");
+        return;
+    }
+    mListeners[mListenerCount++] = listener;
+}
+
+void RangingTechnologyController::RemoveListener(Listener * listener)
+{
+    for (size_t i = 0; i < mListenerCount; i++)
+    {
+        if (mListeners[i] == listener)
+        {
+            mListeners[i]              = mListeners[--mListenerCount];
+            mListeners[mListenerCount] = nullptr;
+            return;
+        }
+    }
+}
+
+CHIP_ERROR RangingTechnologyController::RegisterAdapter(RangingAdapter & adapter)
+{
+    for (size_t i = 0; i < mAdapterCount; i++)
+    {
+        VerifyOrReturnError(mAdapters[i]->GetTechnology() != adapter.GetTechnology(), CHIP_ERROR_DUPLICATE_KEY_ID);
+    }
+    VerifyOrReturnError(mAdapterCount < kMaxControllerAdapters, CHIP_ERROR_NO_MEMORY);
+
+    mAdapters[mAdapterCount++] = &adapter;
+    adapter.SetCallback(this);
+    OnAttributeChanged(Attributes::RangingCapabilities::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RangingTechnologyController::GetRangingCapabilities(AttributeValueEncoder & encoder)
+{
+    return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+        for (size_t i = 0; i < mAdapterCount; i++)
+        {
+            ReturnErrorOnFailure(listEncoder.Encode(mAdapters[i]->GetCapabilities()));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+ResultCodeEnum RangingTechnologyController::StartSession(uint8_t sessionId,
+                                                         const Commands::StartRangingRequest::DecodableType & request)
+{
+    RangingAdapter * adapter = FindAdapter(request.technology);
+    VerifyOrReturnValue(adapter != nullptr, ResultCodeEnum::kRejectedInfeasibleRanging);
+
+    SessionEntry entry;
+    entry.sessionId = sessionId;
+    entry.adapter   = adapter;
+
+    ResultCodeEnum result = adapter->StartSession(sessionId, request);
+    if (result == ResultCodeEnum::kAccepted)
+    {
+        mSessions.push_back(entry);
+        OnAttributeChanged(Attributes::SessionIDList::Id);
+    }
+    return result;
+}
+
+CHIP_ERROR RangingTechnologyController::StopSession(uint8_t sessionId)
+{
+    for (auto it = mSessions.begin(); it != mSessions.end(); ++it)
+    {
+        if (it->sessionId == sessionId)
+        {
+            CHIP_ERROR err = it->adapter->StopSession(sessionId);
+            if (err == CHIP_NO_ERROR)
+            {
+                mSessions.erase(it);
+                OnAttributeChanged(Attributes::SessionIDList::Id);
+            }
+            return err;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+void RangingTechnologyController::StopAllSessions()
+{
+    for (auto & entry : mSessions)
+    {
+        [[maybe_unused]] auto err = entry.adapter->StopSession(entry.sessionId);
+    }
+    mSessions.clear();
+}
+
+CHIP_ERROR RangingTechnologyController::GetActiveSessionIds(Span<uint8_t> & sessionIds)
+{
+    size_t count = std::min(mSessions.size(), sessionIds.size());
+    for (size_t i = 0; i < count; i++)
+    {
+        sessionIds.data()[i] = mSessions[i].sessionId;
+    }
+    sessionIds.reduce_size(count);
+    return CHIP_NO_ERROR;
+}
+
+void RangingTechnologyController::OnRangingSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status)
+{
+    for (auto it = mSessions.begin(); it != mSessions.end(); ++it)
+    {
+        if (it->sessionId == sessionId)
+        {
+            mSessions.erase(it);
+            break;
+        }
+    }
+
+    for (size_t i = 0; i < mListenerCount; i++)
+    {
+        mListeners[i]->OnAttributeChanged(Attributes::SessionIDList::Id);
+        mListeners[i]->OnSessionStopped(sessionId, status);
+    }
+}
+
+void RangingTechnologyController::OnMeasurementData(uint8_t sessionId,
+                                                    const Structs::RangingMeasurementDataStruct::Type & measurement)
+{
+    for (size_t i = 0; i < mListenerCount; i++)
+    {
+        mListeners[i]->OnSessionMeasurement(sessionId, measurement);
+    }
+}
+
+void RangingTechnologyController::OnAttributeChanged(AttributeId attributeId)
+{
+    for (size_t i = 0; i < mListenerCount; i++)
+    {
+        mListeners[i]->OnAttributeChanged(attributeId);
+    }
+}
+
+RangingAdapter * RangingTechnologyController::FindAdapter(RangingTechEnum technology)
+{
+    for (size_t i = 0; i < mAdapterCount; i++)
+    {
+        if (mAdapters[i]->GetTechnology() == technology)
+        {
+            return mAdapters[i];
+        }
+    }
+    return nullptr;
+}
+
+uint64_t RangingTechnologyController::GetBleDeviceId()
+{
+    auto * adapter = FindAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    if (adapter == nullptr)
+    {
+        return 0;
+    }
+    return adapter->GetBleDeviceId();
+}
+
+} // namespace ProximityRanging
+} // namespace Clusters
+} // namespace app
+} // namespace chip

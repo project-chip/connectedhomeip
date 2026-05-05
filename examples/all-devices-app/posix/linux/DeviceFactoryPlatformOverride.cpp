@@ -16,24 +16,46 @@
  */
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixChimeDevice.h>
-#include <app_config/enabled_devices.h>
 #include <devices/device-factory/DeviceFactory.h>
+#include <devices/proximity-ranger/DefaultProximityRangingDriver.h>
+#include <devices/proximity-ranger/ProximityRangerDevice.h>
+
+#include "LinuxBleRssiRangingAdapter.h"
+
+namespace {
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters::ProximityRanging;
+
+LinuxBleRssiRangingAdapter sBleAdapter;
+RangingTechnologyController sRangingController;
+DefaultProximityRangingDriver sRangingDriver{ sRangingController, BitMask<Feature>(Feature::kBleBeaconRssi) };
+
+} // namespace
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
 {
-    if constexpr (ALL_DEVICES_ENABLE_CHIME)
-    {
-        DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate]() {
-            static const ChimeDevice::Sound kDefaultSounds[] = {
-                { 0, "Ding Dong"_span },
-                { 1, "Ring Ring"_span },
-            };
-            return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+    (void) sBleAdapter.Init(storageDelegate);
+    (void) sRangingController.RegisterAdapter(sBleAdapter);
+
+    DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate]() {
+        static const ChimeDevice::Sound kDefaultSounds[] = {
+            { 0, "Ding Dong"_span },
+            { 1, "Ring Ring"_span },
+        };
+        return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+    });
+
+    DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
+        return std::make_unique<ProximityRangerDevice>(ProximityRangerDevice::Context{
+            .timerDelegate = timerDelegate,
+            .driver        = sRangingDriver,
         });
-    }
+    });
 }
 
 } // namespace app
