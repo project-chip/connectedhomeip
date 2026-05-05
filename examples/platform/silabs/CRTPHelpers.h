@@ -57,10 +57,10 @@ struct mfp_sig<Ret (C::*)(Args...) const>
  * Only for optional overrides (Base must have a default func).
  */
 #define CRTP_CHECK_OPTIONAL_IMPL(Base, Derived, func)                                                                              \
-    static_assert(std::is_same<decltype(&Derived::func), decltype(&Base::func)>::value ||                                          \
-                      std::is_same<typename mfp_sig<decltype(&Derived::func)>::type,                                               \
-                                   typename mfp_sig<decltype(&Base::func)>::type>::value,                                          \
-                  #Derived "::" #func "() signature does not match " #Base "::" #func "()")
+    static_assert(                                                                                                                 \
+        std::is_same<decltype(&Derived::func), decltype(&Base::func)>::value ||                                                    \
+            std::is_same<typename mfp_sig<decltype(&Derived::func)>::type, typename mfp_sig<decltype(&Base::func)>::type>::value,  \
+        #Derived "::" #func "() signature does not match " #Base "::" #func "()")
 
 /** Cast this to Derived* (use in instance methods). */
 #define CRTP_THIS(Derived) static_cast<Derived *>(this)

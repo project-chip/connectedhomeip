@@ -79,8 +79,8 @@ folders, then update the corresponding paths in `BUILD.gn`.
 
 ### How to Override APIs
 
-`CustomerAppTask` extends the base AppTask through the Curiously Recurring
-Template Pattern (CRTP). You override only the `*Impl()` methods you need; the
+`CustomerAppTask` derives from the base AppTask through the Curiously Recurring
+Template Pattern (CRTP). You override only the `*Impl()` methods you need, the
 base declares one `*Impl()` per overridable API. Steps:
 
 1. Find the method to override in the base API (see
