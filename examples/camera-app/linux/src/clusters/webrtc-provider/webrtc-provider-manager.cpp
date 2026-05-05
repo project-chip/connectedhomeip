@@ -205,7 +205,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     }
     else
     {
-        outSession.videoStreamID.Value().SetNull();
+        outSession.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
     }
 
     if (!audioStreams.empty())
@@ -214,7 +214,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     }
     else
     {
-        outSession.audioStreamID.Value().SetNull();
+        outSession.audioStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
     }
 
     outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
@@ -432,7 +432,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     }
     else
     {
-        outSession.videoStreamID.Value().SetNull();
+        outSession.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
     }
 
     if (!audioStreams.empty())
@@ -441,7 +441,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     }
     else
     {
-        outSession.audioStreamID.Value().SetNull();
+        outSession.audioStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
     }
 
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
