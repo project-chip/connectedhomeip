@@ -100,7 +100,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        PowerSourceOptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        AttributeSet optionalAttributeSet(PowerSource::detail::GetValidOptionalAttributeSet(AttributeSet(optionalAttributeBits), BitFlags<PowerSource::Feature>(featureMap)));
         BitFlags<Feature> features(featureMap);
         using namespace chip::Protocols;
 
@@ -156,7 +156,6 @@ public:
             if (features.Has(Feature::kWired))
             {
                 typename EmberWiredPowerSourceClusterT::WiredCurrentTypeEnum currentType;
-                VerifyOrDie(optionalAttributeSet.IsSet(WiredCurrentType::Id));
                 VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
 
                 typename EmberWiredPowerSourceClusterT::ConfigType config(endpointId, description, currentType);
@@ -204,7 +203,6 @@ public:
                 // default value
                 typename EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum replaceability =
                     EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum::kUnspecified;
-                VerifyOrDie(optionalAttributeSet.IsSet(BatReplaceability::Id));
                 // try to read, if fails, default will be used
                 BatReplaceability::Get(endpointId, &replaceability);
 
@@ -223,7 +221,6 @@ public:
                 {
                     if (features.Has(Feature::kReplaceable))
                     {
-                        VerifyOrDie(optionalAttributeSet.IsSet(BatReplacementDescription::Id));
                         CharSpan replacementDescription{};
                         if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
                         {
@@ -245,7 +242,6 @@ public:
                         }
 
                         uint8_t quantity;
-                        VerifyOrDie(optionalAttributeSet.IsSet(BatQuantity::Id));
                         VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
                         config.MakeReplaceable(replacementDescription, quantity);
 
@@ -313,7 +309,7 @@ public:
                     }
                 }
 
-                SetAttributeDefaultFromEmber(Battery, uint32_t, BatCapacity, capacity);
+                SetAttributeDefaultFromEmber(Battery, uint32_t, BatCapacity, batCapacity);
 
                 config.usedOptionalAttributes = optionalAttributeSet;
                 LazyRegisteredBatterySourceClusterT * server;

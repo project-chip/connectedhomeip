@@ -34,33 +34,33 @@ namespace chip::app::Clusters::PowerSource::detail {
 // without EndpointList
 struct MandatoryModule
 {
-    PowerSourceStatusEnum status;
-    uint8_t order;
-    CharSpan description;
+    PowerSourceStatusEnum status{};
+    uint8_t order{};
+    CharSpan description{};
 };
 
 struct WiredMandatoryModule
 {
-    WiredCurrentTypeEnum wiredCurrentType;
+    WiredCurrentTypeEnum wiredCurrentType{};
 };
 
 struct BatteryMandatoryModule
 {
-    BatChargeLevelEnum batChargeLevel;
-    bool batReplacementNeeded;
-    BatReplaceabilityEnum batReplaceability;
+    BatChargeLevelEnum batChargeLevel{};
+    bool batReplacementNeeded{};
+    BatReplaceabilityEnum batReplaceability{};
 };
 
 struct ReplaceableMandatoryModule
 {
-    CharSpan batReplacementDescription;
-    uint8_t batQuantity;
+    CharSpan batReplacementDescription{};
+    uint8_t batQuantity{};
 };
 
 struct RechargeableMandatoryModule
 {
-    BatChargeStateEnum batChargeState;
-    bool batFunctionalWhileCharging;
+    BatChargeStateEnum batChargeState{};
+    bool batFunctionalWhileCharging{};
 };
 
 template <bool used>
@@ -70,7 +70,7 @@ struct WiredAssessedInputVoltageModule
 template <>
 struct WiredAssessedInputVoltageModule<true>
 {
-    std::optional<uint32_t> wiredAssessedInputVoltage;
+    std::optional<uint32_t> wiredAssessedInputVoltage{};
 };
 
 template <bool used>
@@ -80,7 +80,7 @@ struct WiredAssessedInputFrequencyModule
 template <>
 struct WiredAssessedInputFrequencyModule<true>
 {
-    std::optional<uint16_t> wiredAssessedInputFrequency;
+    std::optional<uint16_t> wiredAssessedInputFrequency{};
 };
 
 template <bool used>
@@ -90,7 +90,7 @@ struct WiredAssessedCurrentModule
 template <>
 struct WiredAssessedCurrentModule<true>
 {
-    std::optional<uint32_t> wiredAssessedCurrent;
+    std::optional<uint32_t> wiredAssessedCurrent{};
 };
 
 template <bool used>
@@ -100,7 +100,7 @@ struct WiredNominalVoltageModule
 template <>
 struct WiredNominalVoltageModule<true>
 {
-    uint32_t wiredNominalVoltage;
+    uint32_t wiredNominalVoltage{};
 };
 
 template <bool used>
@@ -110,7 +110,7 @@ struct WiredMaximumCurrentModule
 template <>
 struct WiredMaximumCurrentModule<true>
 {
-    uint32_t wiredMaximumCurrent;
+    uint32_t wiredMaximumCurrent{};
 };
 
 template <bool used>
@@ -120,7 +120,7 @@ struct WiredPresentModule
 template <>
 struct WiredPresentModule<true>
 {
-    bool wiredPresent;
+    bool wiredPresent{};
 };
 
 template <bool used>
@@ -131,7 +131,7 @@ template <>
 struct ActiveWiredFaultsModule<true>
 {
 protected:
-    uint8_t activeWiredFaultsBitSet;
+    uint8_t activeWiredFaultsBitSet{};
 };
 
 template <bool used>
@@ -141,7 +141,7 @@ struct BatVoltageModule
 template <>
 struct BatVoltageModule<true>
 {
-    std::optional<uint32_t> batVoltage;
+    std::optional<uint32_t> batVoltage{};
 };
 
 template <bool used>
@@ -151,7 +151,7 @@ struct BatPercentRemainingModule
 template <>
 struct BatPercentRemainingModule<true>
 {
-    std::optional<uint8_t> batPercentRemaining;
+    std::optional<uint8_t> batPercentRemaining{};
 };
 
 template <bool used>
@@ -161,7 +161,7 @@ struct BatTimeRemainingModule
 template <>
 struct BatTimeRemainingModule<true>
 {
-    std::optional<uint32_t> batTimeRemaining;
+    std::optional<uint32_t> batTimeRemaining{};
 };
 
 template <bool used>
@@ -171,7 +171,7 @@ struct BatPresentModule
 template <>
 struct BatPresentModule<true>
 {
-    bool batPresent;
+    bool batPresent{};
 };
 
 template <bool used>
@@ -182,7 +182,7 @@ template <>
 struct ActiveBatFaultsModule<true>
 {
 protected:
-    uint8_t activeBatFaultsBitSet;
+    uint8_t activeBatFaultsBitSet{};
 };
 
 template <bool used>
@@ -192,7 +192,7 @@ struct BatCommonDesignationModule
 template <>
 struct BatCommonDesignationModule<true>
 {
-    BatCommonDesignationEnum batCommonDesignation;
+    BatCommonDesignationEnum batCommonDesignation{};
 };
 
 template <bool used>
@@ -202,7 +202,7 @@ struct BatANSIDesignationModule
 template <>
 struct BatANSIDesignationModule<true>
 {
-    CharSpan batANSIDesignation;
+    CharSpan batANSIDesignation{};
 };
 
 template <bool used>
@@ -212,7 +212,7 @@ struct BatIECDesignationModule
 template <>
 struct BatIECDesignationModule<true>
 {
-    CharSpan batIECDesignation;
+    CharSpan batIECDesignation{};
 };
 
 template <bool used>
@@ -222,7 +222,7 @@ struct BatApprovedChemistryModule
 template <>
 struct BatApprovedChemistryModule<true>
 {
-    BatApprovedChemistryEnum batApprovedChemistry;
+    BatApprovedChemistryEnum batApprovedChemistry{};
 };
 
 template <bool used>
@@ -232,7 +232,7 @@ struct BatCapacityModule
 template <>
 struct BatCapacityModule<true>
 {
-    uint32_t batCapacity;
+    uint32_t batCapacity{};
 };
 
 template <bool used>
@@ -242,7 +242,7 @@ struct BatTimeToFullChargeModule
 template <>
 struct BatTimeToFullChargeModule<true>
 {
-    std::optional<uint32_t> batTimeToFullCharge;
+    std::optional<uint32_t> batTimeToFullCharge{};
 };
 
 template <bool used>
@@ -252,7 +252,7 @@ struct BatChargingCurrentModule
 template <>
 struct BatChargingCurrentModule<true>
 {
-    std::optional<uint32_t> batChargingCurrent;
+    std::optional<uint32_t> batChargingCurrent{};
 };
 
 template <bool used>
@@ -263,13 +263,13 @@ template <>
 struct ActiveBatChargeFaultsModule<true>
 {
 protected:
-    uint16_t activeBatChargeFaultsBitSet;
+    uint16_t activeBatChargeFaultsBitSet{};
 };
 
 struct EndpointListModule
 {
 protected:
-    Platform::ScopedMemoryBuffer<EndpointId> endpointList;
+    Platform::ScopedMemoryBuffer<EndpointId> endpointList{};
     uint16_t endpointListCount = 0;
 };
 
@@ -375,14 +375,14 @@ struct BatteryTimerContextsModule
 template <>
 struct BatteryTimerContextsModule<true>
 {
-    BatteryTimerContext batPercentRemainingNotifyTimerContext;
-    BatteryTimerContext batTimeRemainingNotifyTimerContext;
-    BatteryTimerContext batTimeToFullChargeNotifyTimerContext;
+    BatteryTimerContext batPercentRemainingNotifyTimerContext{};
+    BatteryTimerContext batTimeRemainingNotifyTimerContext{};
+    BatteryTimerContext batTimeToFullChargeNotifyTimerContext{};
 };
 
 struct DescriptionStorageModule
 {
-    std::string description;
+    std::string description{};
 };
 
 template <bool used>
@@ -392,7 +392,7 @@ struct BatReplacementDescriptionStorageModule
 template <>
 struct BatReplacementDescriptionStorageModule<true>
 {
-    std::string batReplacementDescription;
+    std::string batReplacementDescription{};
 };
 
 template <bool used>
@@ -402,7 +402,7 @@ struct BatANSIDesignationStorageModule
 template <>
 struct BatANSIDesignationStorageModule<true>
 {
-    std::string batANSIDesignation;
+    std::string batANSIDesignation{};
 };
 
 template <bool used>
@@ -412,7 +412,7 @@ struct BatIECDesignationStorageModule
 template <>
 struct BatIECDesignationStorageModule<true>
 {
-    std::string batIECDesignation;
+    std::string batIECDesignation{};
 };
 
 template <uint32_t optionalAttributeBits>
