@@ -59,6 +59,7 @@ On a real DUT:
     Use --timeout <seconds> in the script-args if wait times are expected to be large.
 '''
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -116,7 +117,9 @@ class TC_ICDB_2_2(ICDBaseTest):
                      "No check-in message is sent."),
             TestStep(5, "TH reads the ICDCounter attribute.",
                      "Verify ICDCounter is unchanged from icd_counter_at_subscription."),
-            TestStep(6, "TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle.", """
+            TestStep(6, "TH waits for DUT to transition to Idle Mode then back to Active Mode. TH writes a new value to the NodeLabel attribute of the BasicInformation cluster.",
+                     "The subscription receives a report for the NodeLabel attribute within MaxInterval."),
+            TestStep(7, "TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle.", """
                      DUT resumed sending check-in messages after the subscription was torn down.
                      Verify ICDCounter is greater than icd_counter_at_subscription."""),
         ]
@@ -201,9 +204,48 @@ class TC_ICDB_2_2(ICDBaseTest):
                              f"Before: {icd_counter_at_subscription}, After: {icd_counter_while_subscribed}")
 
         # *** STEP 6 ***
+        # TH waits for DUT to transition to Idle Mode then back to Active Mode.
+        # TH writes a new value to the NodeLabel attribute of the BasicInformation cluster.
+        self.step(6)
+        await self.wait_for_transition(ICDTransition.ActiveToIdle, active_mode_duration_ms=active_mode_duration_ms)
+        await self.wait_for_transition(ICDTransition.IdleToActive, idle_mode_duration_s=idle_mode_duration_s)
+
+        node_label_subscription = await TH.ReadAttribute(
+            nodeId=self.dut_node_id,
+            attributes=[(0, Clusters.BasicInformation.Attributes.NodeLabel)],
+            reportInterval=(0, idle_mode_duration_s),
+            keepSubscriptions=False,
+            autoResubscribe=False
+        )
+        _, max_interval_s = node_label_subscription.GetReportingIntervalsSeconds()
+        log.info(f"NodeLabel subscription established. Negotiated MaxInterval: {max_interval_s}s")
+
+        report_received = asyncio.Event()
+
+        def on_report_end(transaction):
+            report_received.set()
+
+        node_label_subscription.SetReportEndCallback(on_report_end)
+
+        await TH.WriteAttribute(
+            self.dut_node_id,
+            [(0, Clusters.BasicInformation.Attributes.NodeLabel("TC_ICDB_2_2"))]
+        )
+        log.info("Wrote NodeLabel to 'TC_ICDB_2_2'")
+
+        # The subscription receives a report for the NodeLabel attribute within MaxInterval
+        try:
+            await asyncio.wait_for(report_received.wait(), timeout=max_interval_s + 1)
+            log.info(f"Subscription received report for NodeLabel within MaxInterval ({max_interval_s}s)")
+        except asyncio.TimeoutError:
+            asserts.fail(f"Subscription did not receive report for NodeLabel within MaxInterval ({max_interval_s}s)")
+
+        node_label_subscription.Shutdown()
+
+        # *** STEP 7 ***
         # TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle.
         #   - DUT resumed sending check-in messages after the subscription was torn down.
-        self.step(6)
+        self.step(7)
         subscription.Shutdown()
         log.info("Subscription shut down.")
         await self.wait_for_transition(ICDTransition.FullCycle,
