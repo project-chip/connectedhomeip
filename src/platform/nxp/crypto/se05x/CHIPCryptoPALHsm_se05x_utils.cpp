@@ -175,8 +175,9 @@ CHIP_ERROR se05x_check_object_exists(uint32_t keyid, bool * key_exists)
     return CHIP_NO_ERROR;
 }
 
+
 /* Read object size from se05x */
-CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t * psize)
+CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t *psize)
 {
     smStatus_t smstatus   = SM_NOT_OK;
     SE05x_Result_t exists = kSE05x_Result_NA;
