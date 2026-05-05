@@ -77,4 +77,4 @@ After successful commissioning, you can use `chip-tool` to interact with data mo
 
 ## Troubleshooting
 - **Timeout**: If a command times out, you can increase it with `--timeout <seconds>`.
-- **Configuration Cache**: `chip-tool` caches state in `/tmp/chip_tool_config.ini` (or similar). Deleting these `.ini` files in `/tmp` can resolve stale configuration issues. You can also specify a custom directory with `--storage-directory <path>`.
+- **Configuration Cache**: `chip-tool` caches state in `chip_tool_config.ini` (often in the current directory or `/tmp`). Deleting this file can resolve stale configuration issues. You can also specify a custom directory with `--storage-directory <path>`.
