@@ -84,8 +84,7 @@ private:
     // Command handlers
     std::optional<DataModel::ActionReturnStatus> HandleStartRangingRequest(const DataModel::InvokeRequest & request,
                                                                            TLV::TLVReader & reader, CommandHandler * handler);
-    std::optional<DataModel::ActionReturnStatus> HandleStopRangingRequest(const DataModel::InvokeRequest & request,
-                                                                          TLV::TLVReader & reader, CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleStopRangingRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & reader);
 
     // Session ID generation
     uint8_t GenerateSessionId();

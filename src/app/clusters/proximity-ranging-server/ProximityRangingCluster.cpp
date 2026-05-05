@@ -178,7 +178,7 @@ std::optional<DataModel::ActionReturnStatus> ProximityRangingCluster::InvokeComm
     case Commands::StartRangingRequest::Id:
         return HandleStartRangingRequest(request, input_arguments, handler);
     case Commands::StopRangingRequest::Id:
-        return HandleStopRangingRequest(request, input_arguments, handler);
+        return HandleStopRangingRequest(request, input_arguments);
     default:
         return Status::UnsupportedCommand;
     }
@@ -220,9 +220,8 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-ProximityRangingCluster::HandleStopRangingRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & reader,
-                                                  CommandHandler * handler)
+DataModel::ActionReturnStatus ProximityRangingCluster::HandleStopRangingRequest(const DataModel::InvokeRequest & request,
+                                                                                TLV::TLVReader & reader)
 {
     Commands::StopRangingRequest::DecodableType commandData;
     VerifyOrReturnValue(commandData.Decode(reader) == CHIP_NO_ERROR, Status::InvalidCommand);

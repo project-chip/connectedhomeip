@@ -152,7 +152,7 @@ The `DefaultProximityRangingDriver` connects to the controller via
 -   `Shutdown()`: Removes itself as a listener, nulls the callback
 
 The controller and adapters are static objects with app lifetime. The
-controller's destructor calls `StopAllSessions()` on all adapters during program
+controller's destruction calls `StopAllSessions()` on all adapters during program
 exit.
 
 ## Driver Interface
@@ -160,7 +160,7 @@ exit.
 | Method                     | Description                                           |
 | -------------------------- | ----------------------------------------------------- |
 | `Init(callback)`           | Store callback, register as listener                  |
-| `Shutdown()`               | Unregister as listener, null callback                 |
+| `Shutdown()`               | Remove as listener, null callback                     |
 | `HandleStartRanging()`     | Start a ranging session (synchronous)                 |
 | `HandleStopRanging()`      | Stop a ranging session (synchronous)                  |
 | `GetRangingCapabilities()` | Encode the list of supported capabilities             |
