@@ -69,7 +69,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
 
         if (status == PSA_SUCCESS && PSA_KEY_LIFETIME_IS_VOLATILE(psa_get_key_lifetime(&attributes)))
         {
-            SuccessOrExit(error = Destroy());
+            TEMPORARY_RETURN_IGNORED Destroy();
         }
 
         psa_reset_key_attributes(&attributes);
