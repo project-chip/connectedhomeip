@@ -62,7 +62,10 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
     VerifyOrDie(!metadata->IsExternal());
     VerifyOrDie(metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE ||
                 metadata->attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
-    VerifyOrDie(metadata->defaultValue.ptrToDefaultValue != nullptr);
+    if (metadata->defaultValue.ptrToDefaultValue == nullptr)
+    {
+        return CharSpan();
+    }
 
     size_t bytesForLength = (metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE) ? 1 : 2;
 
