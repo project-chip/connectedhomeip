@@ -434,6 +434,21 @@ class TestCheckHandEdits(unittest.TestCase):
             errors = cam._check_hand_edits([p], Path(self._temp_dir), "main")
         self.assertEqual(errors, [])
 
+    def test_get_base_content_called_with_root_as_cwd(self):
+        # Regression test: _get_base_content must receive root so that git show
+        # runs against the correct repository when --root differs from cwd.
+        fname = "root-cwd-test-alchemy.xml"
+        root = Path(self._temp_dir)
+        p = self._write_xml(_VALID_XML, fname)
+        with (
+            patch("subprocess.run", return_value=self._diff_result([fname])),
+            patch("check_alchemy_metadata._get_base_content",
+                  return_value=_VALID_XML) as mock_get_base,
+        ):
+            cam._check_hand_edits([p], root, "main")
+        # Verify root was threaded through to _get_base_content.
+        mock_get_base.assert_called_once_with("main", fname, root)
+
 
 # ---------------------------------------------------------------------------
 # Entry point (supports --stamp for build system integration)

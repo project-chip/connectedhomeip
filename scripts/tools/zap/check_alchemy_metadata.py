@@ -139,12 +139,13 @@ def _find_alchemy_comment(content: str) -> Optional[str]:
     return None
 
 
-def _get_base_content(git_ref: str, repo_path: str) -> Optional[str]:
+def _get_base_content(git_ref: str, repo_path: str, root: Path) -> Optional[str]:
     """Retrieve file content at *git_ref* via ``git show``, or None."""
     try:
         result = subprocess.run(
             ["git", "show", f"{git_ref}:{repo_path}"],
             capture_output=True, text=True, check=True,
+            cwd=root,
         )
         return result.stdout
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -198,7 +199,7 @@ def _check_hand_edits(
             continue  # No Alchemy block — other checks handle this.
 
         rel = Path(rel_str)
-        old_content = _get_base_content(diff_base, rel_str)
+        old_content = _get_base_content(diff_base, rel_str, root)
         if old_content is None:
             continue  # New file — no base to compare against.
 
@@ -329,10 +330,11 @@ def main() -> int:
         "--check-stale-allowlists",
         action="store_true",
         help=(
-            "Additionally check for stale allowlist entries: files that no "
-            "longer exist on disk, INCOMPLETE_METADATA_ALLOWLIST entries "
-            "whose metadata is now complete, and MANUAL_ALLOWLIST entries "
-            "that now carry the Alchemy marker."
+            "Additionally check for stale allowlist entries (exits 1 on "
+            "any finding): files that no longer exist on disk, "
+            "INCOMPLETE_METADATA_ALLOWLIST entries whose metadata is now "
+            "complete, and MANUAL_ALLOWLIST entries that now carry the "
+            "Alchemy marker."
         ),
     )
     parser.add_argument(
@@ -429,7 +431,7 @@ def main() -> int:
             n_incomplete += 1
 
     if stale_warnings:
-        print("WARNING: stale allowlist entries detected:\n")
+        print("ERROR: stale allowlist entries detected:\n")
         for w in stale_warnings:
             print(f"  {w}")
         print()
