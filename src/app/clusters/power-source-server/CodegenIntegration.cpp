@@ -349,7 +349,8 @@ public:
         LazyRegisteredPowerSourceClusterT & gServer = gServers[clusterInstanceIndex];
         if constexpr (wiredSupported && batterySupported)
         {
-            return std::visit([](auto & server) { return server.IsConstructed() ? &server.Cluster() : nullptr; }, gServer);
+            return std::visit([](auto & server) { return server.IsConstructed() ? static_cast<ServerClusterInterface *>(&server.Cluster()) : nullptr; },
+                              gServer);
         }
         else
         {
