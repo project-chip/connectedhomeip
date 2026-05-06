@@ -666,12 +666,16 @@ template("efr32_sdk") {
     }
 
     if (is_clang) {
-      # -fno-threadsafe-statics and -femulated-tls are needed since clang will try to use TLS,
+      # -femulated-tls are needed since clang will try to use TLS,
       # which is not supported by the EFR32 thus resulting on linking failing on
       # undefined __aeabi_read_tp symbol
       cflags += [
-        "-fno-threadsafe-statics",
         "-femulated-tls",
+        "-Wno-unknown-pragmas", # Temporary until sisdk fix for cland implemented
+        "-Wno-uninitialized", # Temporary until sisdk fix for cland implemented
+        "-Wno-implicit-fallthrough", # Temporary until sisdk fix for cland implemented
+        "-Wno-shorten-64-to-32", # Temporary until sisdk fix for cland implemented
+        "-Wno-parentheses-equality", # Temporary until sisdk fix for cland implemented
       ]
     }
 

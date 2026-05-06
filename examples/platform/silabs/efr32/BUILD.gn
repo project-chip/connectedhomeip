@@ -126,7 +126,7 @@ config("efr32-common-config") {
                                           # manager
       "-lc_nano",  # for C stdlib functions (e.g.snprintf)
       "-lstdc++_nano",  # for C++ stdlib functions (e.g. sprintf)
-      "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
+      "-lgcc", # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
     ]
   }
 }
