@@ -127,11 +127,18 @@ static void Button0PressedHandler(const struct device * dev, struct gpio_callbac
 #endif
 
 #ifdef HAS_BUTTON1
-static void ToggleOnOffWorkHandler(struct k_work * work)
+static void ToggleOnOffCluster(intptr_t arg)
 {
     bool currentValue;
-    OnOffServer::Instance().getOnOffValue(1, &currentValue);
-    OnOffServer::Instance().setOnOffValue(1, !currentValue, false);
+    static_cast<void>(arg);
+    OnOffServer::Instance().getOnOffValue(kLightEndpointId, &currentValue);
+    OnOffServer::Instance().setOnOffValue(kLightEndpointId, !currentValue, false);
+}
+
+static void ToggleOnOffWorkHandler(struct k_work * work)
+{
+    static_cast<void>(work);
+    PlatformMgr().ScheduleWork(ToggleOnOffCluster, 0);
 }
 
 static void Button1PressedHandler(const struct device * dev, struct gpio_callback * cb, uint32_t pins)

@@ -265,7 +265,7 @@ CHIP_ERROR chip::Zephyr::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Error during ThreadStackMgr().InitThreadStack()");
         return err;
     }
-    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+    VerifyOrDie(sThreadNetworkDriver.Init() == CHIP_NO_ERROR);
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::CONFIG_THREAD_DEVICE_TYPE);
     if (err != CHIP_NO_ERROR)
@@ -278,7 +278,7 @@ CHIP_ERROR chip::Zephyr::App::AppTaskBase::Init()
      * Schedule an event to the Matter stack to initialize
      * the ZCL Data Model and start server
      */
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(InitServer, 0);
+    VerifyOrDie(PlatformMgr().ScheduleWork(InitServer, 0) == CHIP_NO_ERROR);
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     sNetworkCommissioningInstance.Init();

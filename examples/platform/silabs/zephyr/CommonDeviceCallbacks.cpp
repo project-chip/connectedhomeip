@@ -82,7 +82,7 @@ void chip::Zephyr::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDev
     case DeviceEventType::kThreadConnectivityChange:
         if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
         {
-            ChipLogProgress(DeviceLayer, "ReStarting Dnssd server for Thread connectivity change");
+            ChipLogProgress(DeviceLayer, "Restarting Dnssd server for Thread connectivity change");
             // Restart DnsSd service when operating as Matter over Thread
             chip::app::DnssdServer::Instance().StartServer();
         }
