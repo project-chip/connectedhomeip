@@ -565,6 +565,142 @@ class IDMBaseTest(MatterBaseTest):
         # If we get here, we got problems as there should always be at least one unsupported attribute
         asserts.fail("No unsupported attributes found - must find at least one unsupported attribute")
 
+    # ========================================================================
+    # Write-to-unsupported-target helpers
+    # ========================================================================
+    #
+    # Background: passing a `ClusterAttributeDescriptor` *class* (not an
+    # instance) to write_single_attribute serializes the class-level default
+    # `value=None` for Optional attributes, producing an empty TLV. The
+    # controller then fails locally in TLVWriter::CopyElement with
+    # CHIP_ERROR_INCORRECT_STATE before the WriteRequest leaves the host, so
+    # the DUT never sees the request and the test fails with a confusing
+    # "Incorrect state" error instead of the expected UNSUPPORTED_* status.
+    #
+    # The helpers below always instantiate the attribute class with a real
+    # value, falling back across `(0, "", b"")` to cover uint/int/str/octet
+    # shapes. Attribute types we still can't encode (lists, structs, etc.)
+    # are skipped rather than raised, since the *value* on the wire doesn't
+    # matter for these tests; only the path does.
+
+    # Fallback values that cover the common scalar attribute shapes (uint,
+    # int, char-string, octet-string). Lists and structs are skipped via
+    # the TypeError/ValueError catch in _try_write_with_fallback_values.
+    _WRITE_FALLBACK_VALUES = (0, "", b"")
+
+    async def _try_write_with_fallback_values(
+        self,
+        endpoint_id: int,
+        attr_class: type[ClusterObjects.ClusterAttributeDescriptor],
+    ) -> Optional[Status]:
+        """Attempt to write `attr_class` on `endpoint_id` using a small set
+        of dummy values. Returns the resulting Status, or None if no value
+        could be serialized for this attribute type.
+        """
+        for test_value in self._WRITE_FALLBACK_VALUES:
+            try:
+                return await self.write_single_attribute(
+                    attribute_value=attr_class(test_value),
+                    endpoint_id=endpoint_id,
+                    expect_success=False,
+                )
+            except (TypeError, ValueError) as e:
+                log.info(
+                    "Attribute %s not serializable with test value %r (%s): %s",
+                    attr_class, test_value, type(e).__name__, e,
+                )
+        return None
+
+    async def write_unsupported_cluster(self, endpoint_id: int = ROOT_NODE_ENDPOINT_ID):
+        """Find a standard cluster the DUT does not host on any endpoint and
+        attempt a write to one of its attributes on `endpoint_id`.
+
+        Asserts that the DUT returns UNSUPPORTED_CLUSTER. Skips the calling
+        step if no unsupported standard cluster exists, or if no attribute
+        on the chosen cluster can be encoded with the fallback value set.
+        """
+        supported_cluster_ids = set()
+        for endpoint_clusters in self.endpoints.values():
+            supported_cluster_ids.update({
+                cluster.id for cluster in endpoint_clusters
+                if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard
+            })
+
+        all_standard_cluster_ids = {
+            cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
+            if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard
+        }
+
+        unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
+        if not unsupported_cluster_ids:
+            self.skip_step("No unsupported standard clusters found to test")
+            return
+
+        # Sort so the chosen cluster is reproducible across runs (set
+        # iteration order is hash-based and varies between processes).
+        unsupported_cluster_id = sorted(unsupported_cluster_ids)[0]
+        cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
+
+        for attr_class in cluster_attributes.values():
+            write_status = await self._try_write_with_fallback_values(
+                endpoint_id=endpoint_id, attr_class=attr_class,
+            )
+            if write_status is None:
+                continue
+            log.info(
+                "Wrote unsupported cluster: cluster_id=0x%04X, attribute=%s, endpoint_id=%s, status=%s",
+                unsupported_cluster_id, attr_class.__name__, endpoint_id, write_status,
+            )
+            asserts.assert_equal(
+                write_status, Status.UnsupportedCluster,
+                f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}",
+            )
+            return
+
+        self.skip_step(
+            f"No attribute on unsupported cluster 0x{unsupported_cluster_id:04X} could be encoded with fallback values",
+        )
+
+    async def write_unsupported_attribute(self):
+        """Find a (endpoint, cluster, attribute) where the attribute is in
+        the spec but missing from the DUT's AttributeList, write to it, and
+        assert that the DUT returns UNSUPPORTED_ATTRIBUTE.
+
+        Skips the calling step if no candidate attribute can be encoded.
+        """
+        candidates: list[tuple[int, int, type[ClusterObjects.ClusterAttributeDescriptor]]] = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            for cluster_type, cluster_data in endpoint.items():
+                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
+                    continue
+
+                all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
+                dut_attrs = set(cluster_data.get(cluster_type.Attributes.AttributeList, []))
+
+                for attr_id in all_attrs - dut_attrs:
+                    if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal:
+                        candidates.append(
+                            (endpoint_id, cluster_type.id, ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][attr_id])
+                        )
+
+        for endpoint_id, cluster_id, candidate_attr in candidates:
+            write_status = await self._try_write_with_fallback_values(
+                endpoint_id=endpoint_id, attr_class=candidate_attr,
+            )
+            if write_status is None:
+                continue
+            log.info(
+                "Wrote unsupported attribute: %s, cluster_id=0x%04X, endpoint_id=%s, status=%s",
+                candidate_attr.__name__, cluster_id, endpoint_id, write_status,
+            )
+            asserts.assert_equal(
+                write_status, Status.UnsupportedAttribute,
+                f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status}",
+            )
+            return
+
+        self.skip_step("No serializable unsupported attribute found to test")
+
     async def read_repeat_attribute(self, endpoint, cluster, attribute, repeat_count):
         """Read the same attribute multiple times and verify consistency.
 
