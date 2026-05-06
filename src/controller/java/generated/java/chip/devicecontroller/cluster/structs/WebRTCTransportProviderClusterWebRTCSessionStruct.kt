@@ -24,7 +24,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WebRTCTransportProviderClusterWebRTCSessionStruct (
+class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val id: UInt,
   val peerNodeID: ULong,
   val peerEndpointID: UInt,
