@@ -264,6 +264,19 @@ enum class AtomicRequestTypeEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
+// Enum for CertificationTypeEnum
+enum class CertificationTypeEnum : uint8_t
+{
+    kDeviceAttestationPKI = 0x00,
+    kOperationalPKI       = 0x01,
+    kVIDSignerPKI         = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for LandmarkTag
 enum class LandmarkTag : uint8_t
 {

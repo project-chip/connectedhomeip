@@ -300,6 +300,16 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
+        class CertificationTypeEnum(MatterIntEnum):
+            kDeviceAttestationPKI = 0x00
+            kOperationalPKI = 0x01
+            kVIDSignerPKI = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
             kAirPurifier = 0x01
@@ -692,12 +702,12 @@ class Globals:
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[Nullable, Globals.Enums.TestGlobalEnum]),
+                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
                     ])
 
             name: 'str' = ""
             myBitmap: 'typing.Union[Nullable, uint]' = NullValue
-            myEnum: 'typing.Union[Nullable, Globals.Enums.TestGlobalEnum]' = NullValue
+            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
 
         @dataclass
         class ViewportStruct(ClusterObject):
@@ -53052,10 +53062,12 @@ class AvAnalysis(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="triggeredZones", Tag=1, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="sourceNodeId", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="triggeredZones", Tag=2, Type=typing.Union[Nullable, typing.List[uint]]),
                     ])
 
             sessionID: uint = 0
+            sourceNodeId: typing.Optional[uint] = None
             triggeredZones: typing.Union[Nullable, typing.List[uint]] = NullValue
 
         @dataclass
@@ -53073,9 +53085,11 @@ class AvAnalysis(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceNodeId", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             sessionID: uint = 0
+            sourceNodeId: typing.Optional[uint] = None
 
         @dataclass
         class PerceivedContext(ClusterEvent):

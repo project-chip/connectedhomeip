@@ -7633,21 +7633,26 @@ public static class ChimeClusterChimeStartedPlayingEvent {
 }
 public static class AvAnalysisClusterAnalysisSessionStartEvent {
   public Integer sessionID;
+  public Optional<Long> sourceNodeId;
   public @Nullable ArrayList<Integer> triggeredZones;
   private static final long SESSION_ID_ID = 0L;
-  private static final long TRIGGERED_ZONES_ID = 1L;
+  private static final long SOURCE_NODE_ID_ID = 1L;
+  private static final long TRIGGERED_ZONES_ID = 2L;
 
   public AvAnalysisClusterAnalysisSessionStartEvent(
     Integer sessionID,
+    Optional<Long> sourceNodeId,
     @Nullable ArrayList<Integer> triggeredZones
   ) {
     this.sessionID = sessionID;
+    this.sourceNodeId = sourceNodeId;
     this.triggeredZones = triggeredZones;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(SESSION_ID_ID, new UIntType(sessionID)));
+    values.add(new StructElement(SOURCE_NODE_ID_ID, sourceNodeId.<BaseTLVType>map((nonOptionalsourceNodeId) -> new UIntType(nonOptionalsourceNodeId)).orElse(new EmptyType())));
     values.add(new StructElement(TRIGGERED_ZONES_ID, triggeredZones != null ? ArrayType.generateArrayType(triggeredZones, (elementtriggeredZones) -> new UIntType(elementtriggeredZones)) : new NullType()));
 
     return new StructType(values);
@@ -7658,12 +7663,18 @@ public static class AvAnalysisClusterAnalysisSessionStartEvent {
       return null;
     }
     Integer sessionID = null;
+    Optional<Long> sourceNodeId = Optional.empty();
     @Nullable ArrayList<Integer> triggeredZones = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SESSION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           sessionID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SOURCE_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sourceNodeId = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == TRIGGERED_ZONES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -7674,6 +7685,7 @@ public static class AvAnalysisClusterAnalysisSessionStartEvent {
     }
     return new AvAnalysisClusterAnalysisSessionStartEvent(
       sessionID,
+      sourceNodeId,
       triggeredZones
     );
   }
@@ -7685,6 +7697,9 @@ public static class AvAnalysisClusterAnalysisSessionStartEvent {
     output.append("\tsessionID: ");
     output.append(sessionID);
     output.append("\n");
+    output.append("\tsourceNodeId: ");
+    output.append(sourceNodeId);
+    output.append("\n");
     output.append("\ttriggeredZones: ");
     output.append(triggeredZones);
     output.append("\n");
@@ -7694,17 +7709,22 @@ public static class AvAnalysisClusterAnalysisSessionStartEvent {
 }
 public static class AvAnalysisClusterAnalysisSessionEndEvent {
   public Integer sessionID;
+  public Optional<Long> sourceNodeId;
   private static final long SESSION_ID_ID = 0L;
+  private static final long SOURCE_NODE_ID_ID = 1L;
 
   public AvAnalysisClusterAnalysisSessionEndEvent(
-    Integer sessionID
+    Integer sessionID,
+    Optional<Long> sourceNodeId
   ) {
     this.sessionID = sessionID;
+    this.sourceNodeId = sourceNodeId;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(SESSION_ID_ID, new UIntType(sessionID)));
+    values.add(new StructElement(SOURCE_NODE_ID_ID, sourceNodeId.<BaseTLVType>map((nonOptionalsourceNodeId) -> new UIntType(nonOptionalsourceNodeId)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7714,16 +7734,23 @@ public static class AvAnalysisClusterAnalysisSessionEndEvent {
       return null;
     }
     Integer sessionID = null;
+    Optional<Long> sourceNodeId = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SESSION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           sessionID = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == SOURCE_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sourceNodeId = Optional.of(castingValue.value(Long.class));
+        }
       }
     }
     return new AvAnalysisClusterAnalysisSessionEndEvent(
-      sessionID
+      sessionID,
+      sourceNodeId
     );
   }
 
@@ -7733,6 +7760,9 @@ public static class AvAnalysisClusterAnalysisSessionEndEvent {
     output.append("AvAnalysisClusterAnalysisSessionEndEvent {\n");
     output.append("\tsessionID: ");
     output.append(sessionID);
+    output.append("\n");
+    output.append("\tsourceNodeId: ");
+    output.append(sourceNodeId);
     output.append("\n");
     output.append("}\n");
     return output.toString();

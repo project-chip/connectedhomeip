@@ -5695,6 +5695,15 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
             value.sessionID = memberValue;
         } while (0);
         do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.sourceNodeId.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNodeId.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.sourceNodeId = memberValue;
+        } while (0);
+        do {
             NSArray * _Nullable memberValue;
             if (cppValue.triggeredZones.IsNull()) {
                 memberValue = nil;
@@ -5734,6 +5743,15 @@ static id _Nullable DecodeEventPayloadForAVAnalysisCluster(EventId aEventId, TLV
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithUnsignedShort:cppValue.sessionID];
             value.sessionID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.sourceNodeId.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.sourceNodeId.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.sourceNodeId = memberValue;
         } while (0);
 
         return value;

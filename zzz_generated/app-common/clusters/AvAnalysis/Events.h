@@ -49,7 +49,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kSessionID      = 0,
-    kTriggeredZones = 1,
+    kSourceNodeId   = 1,
+    kTriggeredZones = 2,
 };
 
 struct Type
@@ -61,6 +62,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t sessionID = static_cast<uint16_t>(0);
+    Optional<chip::NodeId> sourceNodeId;
     DataModel::Nullable<DataModel::List<const uint16_t>> triggeredZones;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -74,6 +76,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AvAnalysis::Id; }
 
     uint16_t sessionID = static_cast<uint16_t>(0);
+    Optional<chip::NodeId> sourceNodeId;
     DataModel::Nullable<DataModel::DecodableList<uint16_t>> triggeredZones;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -84,7 +87,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kSessionID = 0,
+    kSessionID    = 0,
+    kSourceNodeId = 1,
 };
 
 struct Type
@@ -96,6 +100,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t sessionID = static_cast<uint16_t>(0);
+    Optional<chip::NodeId> sourceNodeId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -108,6 +113,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AvAnalysis::Id; }
 
     uint16_t sessionID = static_cast<uint16_t>(0);
+    Optional<chip::NodeId> sourceNodeId;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -12531,6 +12531,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = DataModelLogger::LogValue("SourceNodeId", indent + 1, value.sourceNodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SourceNodeId'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = DataModelLogger::LogValue("TriggeredZones", indent + 1, value.triggeredZones);
         if (err != CHIP_NO_ERROR)
         {
@@ -12551,6 +12559,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SessionID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SourceNodeId", indent + 1, value.sourceNodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SourceNodeId'");
             return err;
         }
     }

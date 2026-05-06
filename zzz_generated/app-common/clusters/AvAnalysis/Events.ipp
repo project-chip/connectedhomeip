@@ -36,6 +36,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSessionID), sessionID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSourceNodeId), sourceNodeId));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kTriggeredZones), triggeredZones));
     return aWriter.EndContainer(outer);
 }
@@ -53,6 +54,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kSessionID))
         {
             err = DataModel::Decode(reader, sessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kSourceNodeId))
+        {
+            err = DataModel::Decode(reader, sourceNodeId);
         }
         else if (__context_tag == to_underlying(Fields::kTriggeredZones))
         {
@@ -72,6 +77,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSessionID), sessionID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSourceNodeId), sourceNodeId));
     return aWriter.EndContainer(outer);
 }
 
@@ -88,6 +94,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kSessionID))
         {
             err = DataModel::Decode(reader, sessionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kSourceNodeId))
+        {
+            err = DataModel::Decode(reader, sourceNodeId);
         }
         else
         {

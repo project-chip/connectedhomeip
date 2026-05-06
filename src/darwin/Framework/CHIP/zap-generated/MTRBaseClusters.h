@@ -18627,6 +18627,12 @@ typedef NS_ENUM(uint8_t, MTRDataTypeAtomicRequestTypeEnum) {
     MTRDataTypeAtomicRequestTypeEnumRollbackWrite MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypeCertificationTypeEnum) {
+    MTRDataTypeCertificationTypeEnumDeviceAttestationPKI MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCertificationTypeEnumOperationalPKI MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCertificationTypeEnumVIDSignerPKI MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
     MTRDataTypeLandmarkTagAirConditioner MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRDataTypeLandmarkTagAirPurifier MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,

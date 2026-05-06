@@ -11893,6 +11893,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sessionID = @(0);
 
+        _sourceNodeId = nil;
+
         _triggeredZones = nil;
     }
     return self;
@@ -11903,6 +11905,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAVAnalysisClusterAnalysisSessionStartEvent alloc] init];
 
     other.sessionID = self.sessionID;
+    other.sourceNodeId = self.sourceNodeId;
     other.triggeredZones = self.triggeredZones;
 
     return other;
@@ -11910,7 +11913,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; triggeredZones:%@; >", NSStringFromClass([self class]), _sessionID, _triggeredZones];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; sourceNodeId:%@; triggeredZones:%@; >", NSStringFromClass([self class]), _sessionID, _sourceNodeId, _triggeredZones];
     return descriptionString;
 }
 
@@ -11922,6 +11925,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _sessionID = @(0);
+
+        _sourceNodeId = nil;
     }
     return self;
 }
@@ -11931,13 +11936,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAVAnalysisClusterAnalysisSessionEndEvent alloc] init];
 
     other.sessionID = self.sessionID;
+    other.sourceNodeId = self.sourceNodeId;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; >", NSStringFromClass([self class]), _sessionID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; sourceNodeId:%@; >", NSStringFromClass([self class]), _sessionID, _sourceNodeId];
     return descriptionString;
 }
 

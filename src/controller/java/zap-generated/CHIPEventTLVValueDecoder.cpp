@@ -10539,6 +10539,24 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
 
+            jobject value_sourceNodeId;
+            if (!cppValue.sourceNodeId.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_sourceNodeId);
+            }
+            else
+            {
+                jobject value_sourceNodeIdInsideOptional;
+                std::string value_sourceNodeIdInsideOptionalClassName     = "java/lang/Long";
+                std::string value_sourceNodeIdInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_sourceNodeIdInsideOptional                 = static_cast<jlong>(cppValue.sourceNodeId.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_sourceNodeIdInsideOptionalClassName.c_str(), value_sourceNodeIdInsideOptionalCtorSignature.c_str(),
+                    jnivalue_sourceNodeIdInsideOptional, value_sourceNodeIdInsideOptional);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_sourceNodeIdInsideOptional,
+                                                                                           value_sourceNodeId);
+            }
+
             jobject value_triggeredZones;
             if (cppValue.triggeredZones.IsNull())
             {
@@ -10574,7 +10592,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jmethodID analysisSessionStartStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(env, analysisSessionStartStructClass, "<init>",
-                                                                "(Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                                "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/ArrayList;)V",
                                                                 &analysisSessionStartStructCtor);
             if (err != CHIP_NO_ERROR || analysisSessionStartStructCtor == nullptr)
             {
@@ -10583,7 +10601,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(analysisSessionStartStructClass, analysisSessionStartStructCtor, value_sessionID,
-                                           value_triggeredZones);
+                                           value_sourceNodeId, value_triggeredZones);
 
             return value;
         }
@@ -10601,6 +10619,24 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
 
+            jobject value_sourceNodeId;
+            if (!cppValue.sourceNodeId.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_sourceNodeId);
+            }
+            else
+            {
+                jobject value_sourceNodeIdInsideOptional;
+                std::string value_sourceNodeIdInsideOptionalClassName     = "java/lang/Long";
+                std::string value_sourceNodeIdInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_sourceNodeIdInsideOptional                 = static_cast<jlong>(cppValue.sourceNodeId.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_sourceNodeIdInsideOptionalClassName.c_str(), value_sourceNodeIdInsideOptionalCtorSignature.c_str(),
+                    jnivalue_sourceNodeIdInsideOptional, value_sourceNodeIdInsideOptional);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_sourceNodeIdInsideOptional,
+                                                                                           value_sourceNodeId);
+            }
+
             jclass analysisSessionEndStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$AvAnalysisClusterAnalysisSessionEndEvent",
@@ -10613,14 +10649,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jmethodID analysisSessionEndStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(env, analysisSessionEndStructClass, "<init>",
-                                                                "(Ljava/lang/Integer;)V", &analysisSessionEndStructCtor);
+                                                                "(Ljava/lang/Integer;Ljava/util/Optional;)V",
+                                                                &analysisSessionEndStructCtor);
             if (err != CHIP_NO_ERROR || analysisSessionEndStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$AvAnalysisClusterAnalysisSessionEndEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(analysisSessionEndStructClass, analysisSessionEndStructCtor, value_sessionID);
+            jobject value =
+                env->NewObject(analysisSessionEndStructClass, analysisSessionEndStructCtor, value_sessionID, value_sourceNodeId);
 
             return value;
         }

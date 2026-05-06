@@ -22626,7 +22626,7 @@ public static class CommodityMeteringClusterMeteredQuantityStruct {
 public static class UnitTestingClusterTestGlobalStruct {
   public String name;
   public @Nullable Long myBitmap;
-  public @Nullable Integer myEnum;
+  public @Nullable Optional<Integer> myEnum;
   private static final long NAME_ID = 0L;
   private static final long MY_BITMAP_ID = 1L;
   private static final long MY_ENUM_ID = 2L;
@@ -22634,7 +22634,7 @@ public static class UnitTestingClusterTestGlobalStruct {
   public UnitTestingClusterTestGlobalStruct(
     String name,
     @Nullable Long myBitmap,
-    @Nullable Integer myEnum
+    @Nullable Optional<Integer> myEnum
   ) {
     this.name = name;
     this.myBitmap = myBitmap;
@@ -22645,7 +22645,7 @@ public static class UnitTestingClusterTestGlobalStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NAME_ID, new StringType(name)));
     values.add(new StructElement(MY_BITMAP_ID, myBitmap != null ? new UIntType(myBitmap) : new NullType()));
-    values.add(new StructElement(MY_ENUM_ID, myEnum != null ? new UIntType(myEnum) : new NullType()));
+    values.add(new StructElement(MY_ENUM_ID, myEnum != null ? myEnum.<BaseTLVType>map((nonOptionalmyEnum) -> new UIntType(nonOptionalmyEnum)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -22656,7 +22656,7 @@ public static class UnitTestingClusterTestGlobalStruct {
     }
     String name = null;
     @Nullable Long myBitmap = null;
-    @Nullable Integer myEnum = null;
+    @Nullable Optional<Integer> myEnum = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -22671,7 +22671,7 @@ public static class UnitTestingClusterTestGlobalStruct {
       } else if (element.contextTagNum() == MY_ENUM_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          myEnum = castingValue.value(Integer.class);
+          myEnum = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
