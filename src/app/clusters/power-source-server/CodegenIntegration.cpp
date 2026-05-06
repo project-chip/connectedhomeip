@@ -90,7 +90,7 @@ CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpo
 }
 
 // templated to be able to use `if constexpr` inside the functions
-template <bool wiredSupported = wiredSupportNeeded, bool batterySupported = batterySupportNeeded,
+template <size_t dynamicEndpointCount = CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT, bool wiredSupported = wiredSupportNeeded, bool batterySupported = batterySupportNeeded,
           uint32_t batteryFeatureBits = kBatteryFeatures.Raw(), class EmberWiredPowerSourceClusterT = EmberWiredPowerSourceCluster,
           class EmberBatteryPowerSourceClusterT     = EmberBatteryPowerSourceCluster,
           class LazyRegisteredWiredSourceClusterT   = LazyRegisteredWiredSourceCluster,
