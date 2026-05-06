@@ -18,9 +18,37 @@
 
 #include "ConcentrationMeasurementCluster.h"
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <lib/core/CHIPError.h>
+#include <clusters/CarbonDioxideConcentrationMeasurement/Metadata.h>
+#include <clusters/CarbonMonoxideConcentrationMeasurement/Metadata.h>
+#include <clusters/FormaldehydeConcentrationMeasurement/Metadata.h>
+#include <clusters/NitrogenDioxideConcentrationMeasurement/Metadata.h>
+#include <clusters/OzoneConcentrationMeasurement/Metadata.h>
+#include <clusters/Pm10ConcentrationMeasurement/Metadata.h>
+#include <clusters/Pm1ConcentrationMeasurement/Metadata.h>
+#include <clusters/Pm25ConcentrationMeasurement/Metadata.h>
+#include <clusters/RadonConcentrationMeasurement/Metadata.h>
+#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
 #include <lib/support/CodeUtils.h>
+
+
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::FormaldehydeConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::OzoneConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::Pm10ConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::Pm1ConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::Pm25ConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::RadonConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::kRevision);
 
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
@@ -76,50 +104,34 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
 {
-    struct NullableFloatAttr
-    {
-        AttributeId id;
-        const DataModel::Nullable<float> & value;
-    };
-    const NullableFloatAttr kNullableFloatAttrs[] = {
-        { MeasuredValue::Id, mMeasuredValue },
-        { MinMeasuredValue::Id, mMinMeasuredValue },
-        { MaxMeasuredValue::Id, mMaxMeasuredValue },
-        { PeakMeasuredValue::Id, mPeakMeasuredValue },
-        { AverageMeasuredValue::Id, mAverageMeasuredValue },
-    };
-    for (const auto & attr : kNullableFloatAttrs)
-    {
-        if (request.path.mAttributeId == attr.id)
-            return encoder.Encode(attr.value);
-    }
-
     switch (request.path.mAttributeId)
     {
+    case MeasuredValue::Id:
+        return encoder.Encode(mMeasuredValue);
+    case MinMeasuredValue::Id:
+        return encoder.Encode(mMinMeasuredValue);
+    case MaxMeasuredValue::Id:
+        return encoder.Encode(mMaxMeasuredValue);
+    case PeakMeasuredValue::Id:
+        return encoder.Encode(mPeakMeasuredValue);
+    case AverageMeasuredValue::Id:
+        return encoder.Encode(mAverageMeasuredValue);
     case MeasurementMedium::Id:
         return encoder.Encode(mMedium);
-
     case Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);
-
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision);
-
     case Uncertainty::Id:
         return encoder.Encode(mUncertainty);
-
     case MeasurementUnit::Id:
         return encoder.Encode(mUnit);
-
     case PeakMeasuredValueWindow::Id:
         return encoder.Encode(mPeakMeasuredValueWindow);
-
     case AverageMeasuredValueWindow::Id:
         return encoder.Encode(mAverageMeasuredValueWindow);
-
     case LevelValue::Id:
         return encoder.Encode(mLevelValue);
-
     default:
         return Status::UnsupportedAttribute;
     }

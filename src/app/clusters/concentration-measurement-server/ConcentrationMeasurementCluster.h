@@ -23,36 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <clusters/CarbonDioxideConcentrationMeasurement/Metadata.h>
-#include <clusters/CarbonMonoxideConcentrationMeasurement/Metadata.h>
-#include <clusters/FormaldehydeConcentrationMeasurement/Metadata.h>
-#include <clusters/NitrogenDioxideConcentrationMeasurement/Metadata.h>
-#include <clusters/OzoneConcentrationMeasurement/Metadata.h>
-#include <clusters/Pm10ConcentrationMeasurement/Metadata.h>
-#include <clusters/Pm1ConcentrationMeasurement/Metadata.h>
-#include <clusters/Pm25ConcentrationMeasurement/Metadata.h>
-#include <clusters/RadonConcentrationMeasurement/Metadata.h>
-#include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
 #include <lib/support/BitFlags.h>
-
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::FormaldehydeConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::OzoneConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::Pm10ConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::Pm1ConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::Pm25ConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::RadonConcentrationMeasurement::kRevision);
-static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
-              chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::kRevision);
 
 namespace chip {
 namespace app {
@@ -90,8 +61,6 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
-    bool HasFeature(Feature f) const { return mFeatures.Has(f); }
-
     // Push a new sensor reading. Validates range, stores, and notifies subscribers.
     // Returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the relevant feature flag was not set at construction.
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> value);
@@ -104,7 +73,8 @@ public:
 private:
     static constexpr uint32_t kWindowMaxSeconds = 604800;
 
-    static bool IsInRange(DataModel::Nullable<float> value, DataModel::Nullable<float> minV, DataModel::Nullable<float> maxV)
+    static bool IsInRange(const DataModel::Nullable<float> & value, const DataModel::Nullable<float> & minV,
+                          const DataModel::Nullable<float> & maxV)
     {
         if (value.IsNull())
             return true;
@@ -114,7 +84,6 @@ private:
             return false;
         return true;
     }
-    static constexpr uint16_t kClusterRevision = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision;
 
     const BitFlags<Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
