@@ -21,7 +21,7 @@ declare_args() {
 toolchain("zephyr") {
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "${zephyr_cc} -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    command = "\"${zephyr_cc}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c \"{{source}}\" -o \"{{output}}\""
     depsformat = "gcc"
     outputs =
         [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
@@ -30,7 +30,7 @@ toolchain("zephyr") {
 
   tool("cxx") {
     depfile = "{{output}}.d"
-    command = "${zephyr_cxx} -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    command = "\"${zephyr_cxx}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c \"{{source}}\" -o \"{{output}}\""
     depsformat = "gcc"
     outputs =
         [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
@@ -39,7 +39,7 @@ toolchain("zephyr") {
 
   tool("asm") {
     depfile = "{{output}}.d"
-    command = "${zephyr_cc} -MMD -MF $depfile {{defines}} {{include_dirs}} {{asmflags}} -c {{source}} -o {{output}}"
+    command = "\"${zephyr_cc}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{asmflags}} -c \"{{source}}\" -o \"{{output}}\""
     depsformat = "gcc"
     outputs =
         [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
@@ -49,7 +49,8 @@ toolchain("zephyr") {
   tool("alink") {
     rspfile = "{{output}}.rsp"
     rspfile_content = "{{inputs}}"
-    command = "rm -f {{output}} && ${zephyr_ar} rcs {{output}} @$rspfile"
+    command =
+        "rm -f \"{{output}}\" && ${zephyr_ar} rcs \"{{output}}\" @$rspfile"
     outputs = [ "{{output_dir}}/{{target_output_name}}{{output_extension}}" ]
     default_output_extension = ".a"
     default_output_dir = "{{root_out_dir}}/lib"
@@ -61,7 +62,7 @@ toolchain("zephyr") {
     outfile = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
     rspfile_content = "{{inputs}}"
-    command = "${zephyr_cxx} {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} {{libs}} -Wl,--end-group"
+    command = "\"${zephyr_cxx}\" {{ldflags}} -o \"$outfile\" -Wl,--start-group @$rspfile {{solibs}} {{libs}} -Wl,--end-group"
     outputs = [ outfile ]
     default_output_dir = "{{root_out_dir}}/bin"
     description = "LINK {{output}}"
@@ -71,7 +72,7 @@ toolchain("zephyr") {
     outfile = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
     rspfile_content = "{{inputs}}"
-    command = "${zephyr_cxx} -shared {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} {{libs}} -Wl,--end-group"
+    command = "\"${zephyr_cxx}\" -shared {{ldflags}} -o \"$outfile\" -Wl,--start-group @$rspfile {{solibs}} {{libs}} -Wl,--end-group"
     outputs = [ outfile ]
     default_output_extension = ".so"
     default_output_dir = "{{root_out_dir}}/lib"
@@ -85,7 +86,7 @@ toolchain("zephyr") {
   }
 
   tool("copy") {
-    command = "cp -af {{source}} {{output}}"
+    command = "cp -af \"{{source}}\" \"{{output}}\""
     description = "COPY {{source}} {{output}}"
   }
 
