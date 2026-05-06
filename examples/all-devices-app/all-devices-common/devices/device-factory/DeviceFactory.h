@@ -147,22 +147,22 @@ private:
         };
         mRegistry["soil-sensor"]        = []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); };
         mRegistry["temperature-sensor"] = []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); };
-        mRegistry["fan"] = [this]() {
+        mRegistry["fan"]                = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
-                .groupDataProvider    = mContext->groupDataProvider,
-                .fabricTable          = mContext->fabricTable,
-                .timerDelegate        = mContext->timerDelegate,
-                .includeOnOffCluster  = true,
+                               .groupDataProvider   = mContext->groupDataProvider,
+                               .fabricTable         = mContext->fabricTable,
+                               .timerDelegate       = mContext->timerDelegate,
+                               .includeOnOffCluster = true,
             });
         };
         mRegistry["fan-no-onoff"] = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
-                .groupDataProvider    = mContext->groupDataProvider,
-                .fabricTable          = mContext->fabricTable,
-                .timerDelegate        = mContext->timerDelegate,
-                .includeOnOffCluster  = false,
+                .groupDataProvider   = mContext->groupDataProvider,
+                .fabricTable         = mContext->fabricTable,
+                .timerDelegate       = mContext->timerDelegate,
+                .includeOnOffCluster = false,
             });
         };
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_LIGHT)
