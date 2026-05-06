@@ -73,7 +73,8 @@ public:
         mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
     {}
 
-    ~Instance()
+    
+   ~Instance()
     {
         if (mRegistered)
         {

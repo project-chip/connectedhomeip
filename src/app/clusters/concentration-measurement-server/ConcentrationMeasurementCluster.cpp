@@ -171,6 +171,23 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetWindow(Feature feature, uint32_t 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ConcentrationMeasurementCluster::SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,
+                                                             DataModel::Nullable<float> value)
+{
+    VerifyOrReturnError(mFeatures.Has(feature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    SetAttributeValue(field, value, id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConcentrationMeasurementCluster::SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value)
+{
+    VerifyOrReturnError(mFeatures.Has(feature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    SetAttributeValue(field, value, id);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)
 {
     return SetNullableFloat(Feature::kNumericMeasurement, mMeasuredValue, MeasuredValue::Id, value);
