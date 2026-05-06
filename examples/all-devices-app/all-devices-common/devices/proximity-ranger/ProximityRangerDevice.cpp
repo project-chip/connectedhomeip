@@ -55,7 +55,8 @@ BitMask<ProximityRanging::Feature> FeatureMapFromAdapters(Span<ProximityRanging:
 
 } // namespace
 
-ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Span<ProximityRanging::RangingAdapter * const> adapters) :
+ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
+                                             Span<ProximityRanging::RangingAdapter * const> adapters) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
     mRangingDriver(sRangingController, FeatureMapFromAdapters(adapters)), mTimerDelegate(timerDelegate)
 {
