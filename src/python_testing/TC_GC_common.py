@@ -321,7 +321,7 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
 
                             if endpoint_id not in operate_only_commands_dict:
                                 operate_only_commands_dict[endpoint_id] = []
-                            
+
                             # In this codebase, all generated ClusterCommand subclasses have defaults for all fields.
                             operate_only_commands_dict[endpoint_id].append(OperateOnlyCommand(
                                 cluster_object=cluster_object, command_object=command_object))
