@@ -17,19 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AvAnalysisClusterContextTriggerStruct (
+class AvAnalysisClusterContextTriggerStruct(
   val context: AvAnalysisClusterSemanticTagStruct,
   val zoneIDs: Optional<List<UInt>>?
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("AvAnalysisClusterContextTriggerStruct {\n")
     append("\tcontext : $context\n")
     append("\tzoneIDs : $zoneIDs\n")
@@ -70,7 +69,7 @@ class AvAnalysisClusterContextTriggerStruct (
             Optional.of(
               buildList<UInt> {
                 tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
-                while(!tlvReader.isEndOfContainer()) {
+                while (!tlvReader.isEndOfContainer()) {
                   add(tlvReader.getUInt(AnonymousTag))
                 }
                 tlvReader.exitContainer()
@@ -83,7 +82,7 @@ class AvAnalysisClusterContextTriggerStruct (
           tlvReader.getNull(ContextSpecificTag(TAG_ZONE_I_DS))
           null
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterContextTriggerStruct(context, zoneIDs)

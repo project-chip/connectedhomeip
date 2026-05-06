@@ -17,11 +17,10 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
@@ -30,7 +29,7 @@ class AvAnalysisClusterAnalysisSessionStartEvent(
   val sourceNodeId: Optional<ULong>,
   val triggeredZones: List<UInt>?
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("AvAnalysisClusterAnalysisSessionStartEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("\tsourceNodeId : $sourceNodeId\n")
@@ -75,9 +74,9 @@ class AvAnalysisClusterAnalysisSessionStartEvent(
         }
       val triggeredZones =
         if (!tlvReader.isNull()) {
-          buildList <UInt> {
+          buildList<UInt> {
             tlvReader.enterArray(ContextSpecificTag(TAG_TRIGGERED_ZONES))
-            while(!tlvReader.isEndOfContainer()) {
+            while (!tlvReader.isEndOfContainer()) {
               this.add(tlvReader.getUInt(AnonymousTag))
             }
             tlvReader.exitContainer()
@@ -86,7 +85,7 @@ class AvAnalysisClusterAnalysisSessionStartEvent(
           tlvReader.getNull(ContextSpecificTag(TAG_TRIGGERED_ZONES))
           null
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterAnalysisSessionStartEvent(sessionID, sourceNodeId, triggeredZones)

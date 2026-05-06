@@ -17,11 +17,9 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
@@ -31,7 +29,7 @@ class AvAnalysisClusterAnalysisStreamStruct(
   val pushAVEndpointID: Optional<UInt>?,
   val analysisStreamState: UInt
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("AvAnalysisClusterAnalysisStreamStruct {\n")
     append("\tanalysisStreamID : $analysisStreamID\n")
     append("\twebRTCEndpointID : $webRTCEndpointID\n")
@@ -97,7 +95,7 @@ class AvAnalysisClusterAnalysisStreamStruct(
           null
         }
       val analysisStreamState = tlvReader.getUInt(ContextSpecificTag(TAG_ANALYSIS_STREAM_STATE))
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterAnalysisStreamStruct(

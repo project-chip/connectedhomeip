@@ -66,22 +66,23 @@ class AvAnalysisClusterContextTriggerStruct(
       val zoneIDs =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZONE_I_DS))) {
-            Optional.of(buildList<UShort> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
-              while(!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUShort(AnonymousTag))
+            Optional.of(
+              buildList<UShort> {
+                tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
+                while(!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUShort(AnonymousTag))
+                }
+                tlvReader.exitContainer()
               }
-              tlvReader.exitContainer()
-            }
-          )
+            )
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_ZONE_I_DS))
+          null
         }
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_ZONE_I_DS))
-        null
-      }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterContextTriggerStruct(context, zoneIDs)

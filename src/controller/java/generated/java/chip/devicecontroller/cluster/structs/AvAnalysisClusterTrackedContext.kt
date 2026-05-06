@@ -17,15 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AvAnalysisClusterTrackedContext (
+class AvAnalysisClusterTrackedContext(
   val identifiedContextID: UInt,
   val identifiedContext: AvAnalysisClusterSemanticTagStruct,
   val previousZone: Optional<UInt>?,
@@ -33,7 +31,7 @@ class AvAnalysisClusterTrackedContext (
   val startTime: ULong,
   val endTime: ULong?
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("AvAnalysisClusterTrackedContext {\n")
     append("\tidentifiedContextID : $identifiedContextID\n")
     append("\tidentifiedContext : $identifiedContext\n")
@@ -88,7 +86,7 @@ class AvAnalysisClusterTrackedContext (
       val identifiedContextID = tlvReader.getUInt(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT_ID))
       val identifiedContext =
         AvAnalysisClusterSemanticTagStruct.fromTlv(
-          ContextSpecificTag(TAG_IDENTIFIED_CONTEXT), 
+          ContextSpecificTag(TAG_IDENTIFIED_CONTEXT),
           tlvReader
         )
       val previousZone =
@@ -101,7 +99,7 @@ class AvAnalysisClusterTrackedContext (
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
           null
-       }
+        }
       val currentZone =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_ZONE))) {
@@ -121,7 +119,7 @@ class AvAnalysisClusterTrackedContext (
           tlvReader.getNull(ContextSpecificTag(TAG_END_TIME))
           null
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterTrackedContext(

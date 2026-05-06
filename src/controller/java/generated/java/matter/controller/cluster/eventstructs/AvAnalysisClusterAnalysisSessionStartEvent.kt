@@ -74,18 +74,18 @@ class AvAnalysisClusterAnalysisSessionStartEvent(
         }
       val triggeredZones =
         if (!tlvReader.isNull()) {
-          buildList <UShort> {
+          buildList<UShort> {
             tlvReader.enterArray(ContextSpecificTag(TAG_TRIGGERED_ZONES))
-            while(!tlvReader.isEndOfContainer()) {
+            while (!tlvReader.isEndOfContainer()) {
               this.add(tlvReader.getUShort(AnonymousTag))
             }
             tlvReader.exitContainer()
           }
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_TRIGGERED_ZONES))
-         null
+          null
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterAnalysisSessionStartEvent(sessionID, sourceNodeId, triggeredZones)

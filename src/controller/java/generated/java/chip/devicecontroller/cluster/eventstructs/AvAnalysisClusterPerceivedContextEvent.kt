@@ -17,11 +17,10 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
@@ -36,7 +35,7 @@ class AvAnalysisClusterPerceivedContextEvent(
   val expiredContexts:
     Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("AvAnalysisClusterPerceivedContextEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("\tsourceNodeId : $sourceNodeId\n")
@@ -102,7 +101,7 @@ class AvAnalysisClusterPerceivedContextEvent(
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
           Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
         } else {
-         Optional.empty()
+          Optional.empty()
         }
       val sourceStartTimestamp =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_START_TIMESTAMP))) {
@@ -113,9 +112,9 @@ class AvAnalysisClusterPerceivedContextEvent(
       val newIdentifiedContexts =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))) {
           Optional.of(
-            buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
+            buildList<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
               tlvReader.enterArray(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 this.add(
                   chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,
@@ -132,9 +131,9 @@ class AvAnalysisClusterPerceivedContextEvent(
       val currentIdentifiedContexts =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))) {
           Optional.of(
-            buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
+            buildList<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
               tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 this.add(
                   chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,
@@ -167,7 +166,7 @@ class AvAnalysisClusterPerceivedContextEvent(
         } else {
           Optional.empty()
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterPerceivedContextEvent(

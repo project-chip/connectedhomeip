@@ -90,12 +90,12 @@ class AvAnalysisClusterAnalysisStreamStruct(
           } else {
             Optional.empty()
           }
-    }    else {
+        } else {
           tlvReader.getNull(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID))
           null
         }
       val analysisStreamState = tlvReader.getUByte(ContextSpecificTag(TAG_ANALYSIS_STREAM_STATE))
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterAnalysisStreamStruct(

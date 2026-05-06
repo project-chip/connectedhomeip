@@ -56,8 +56,9 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     data class Error(val exception: Exception) :
       SupportedAmbientContextsAttributeSubscriptionState()
 
-    object SubscriptionEstablished : SupportedAmbientContextsAttributeSubscriptionState()  
-  }  
+    object SubscriptionEstablished : SupportedAmbientContextsAttributeSubscriptionState()
+  }
+
   class ActiveAmbientContextTriggersAttribute(
     val value: List<AvAnalysisClusterContextTriggerStruct>
   )
@@ -70,20 +71,21 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
       ActiveAmbientContextTriggersAttributeSubscriptionState()
 
     object SubscriptionEstablished : ActiveAmbientContextTriggersAttributeSubscriptionState()
-  }  
+  }
+
   class AnalysisStreamsAttribute(
     val value: List<AvAnalysisClusterAnalysisStreamStruct>?
   )
 
   sealed class AnalysisStreamsAttributeSubscriptionState {
-    data class Success(
-    val value: List<AvAnalysisClusterAnalysisStreamStruct>?
-    ) : AnalysisStreamsAttributeSubscriptionState()
+    data class Success(val value: List<AvAnalysisClusterAnalysisStreamStruct>?) :
+      AnalysisStreamsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : AnalysisStreamsAttributeSubscriptionState()
 
     object SubscriptionEstablished : AnalysisStreamsAttributeSubscriptionState()
-  }  
+  }
+
   class GeneratedCommandListAttribute(
     val value: List<UInt>
   )
@@ -94,7 +96,8 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     data class Error(val exception: Exception) : GeneratedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
-  }  
+  }
+
   class AcceptedCommandListAttribute(
     val value: List<UInt>
   )
@@ -105,7 +108,8 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }  
+  }
+
   class AttributeListAttribute(
     val value: List<UInt>
   )
@@ -116,7 +120,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     data class Error(val exception: Exception) : AttributeListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
-  }  
+  }
 
   suspend fun enableContextTriggers(
     contextTriggers: List<AvAnalysisClusterContextTriggerStruct>?,
@@ -285,7 +289,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun removeAnalysisStream(analysisStreamID: UShort,timedInvokeTimeout: Duration? = null) {
+  suspend fun removeAnalysisStream(analysisStreamID: UShort, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 6u
 
     val tlvWriter = TlvWriter()
@@ -305,11 +309,12 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
-suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAttribute {
-  val ATTRIBUTE_ID: UInt = 0u
 
-  val attributePath = 
-    AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAttribute {
+    val ATTRIBUTE_ID: UInt = 0u
+
+    val attributePath = 
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(
       eventPaths = emptyList(),
@@ -337,7 +342,7 @@ suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAtt
     val decodedValue: List<AvAnalysisClusterSemanticTagStruct> =
       buildList<AvAnalysisClusterSemanticTagStruct> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(AvAnalysisClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
@@ -358,9 +363,9 @@ suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAtt
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -381,8 +386,8 @@ suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAtt
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
-            "Supportedambientcontexts attribute not found in Node State update" 
+          requireNotNull(attributeData) {
+            "Supportedambientcontexts attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -390,7 +395,7 @@ suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAtt
           val decodedValue: List<AvAnalysisClusterSemanticTagStruct> =
             buildList<AvAnalysisClusterSemanticTagStruct> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(AvAnalysisClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
@@ -404,14 +409,15 @@ suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAtt
       }
     }
   }
-suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTriggersAttribute {
-  val ATTRIBUTE_ID: UInt = 1u
 
-  val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTriggersAttribute {
+    val ATTRIBUTE_ID: UInt = 1u
 
-  val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+    val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-  val response = controller.read(readRequest)
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
@@ -425,16 +431,14 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { 
-      "Activeambientcontexttriggers attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Activeambientcontexttriggers attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<AvAnalysisClusterContextTriggerStruct> =
       buildList<AvAnalysisClusterContextTriggerStruct> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(AvAnalysisClusterContextTriggerStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
@@ -523,9 +527,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Maxanalysisstreamcount attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Maxanalysisstreamcount attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -533,7 +535,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       if (tlvReader.isNextTag(AnonymousTag)) {
         tlvReader.getUByte(AnonymousTag)
       } else {
-       null
+        null
       }
 
     return decodedValue
@@ -551,9 +553,9 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -571,8 +573,8 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
             subscriptionState.updateState.successes
-            .filterIsInstance<ReadData.Attribute>()
-            .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
              
           requireNotNull(attributeData) {
             "Maxanalysisstreamcount attribute not found in Node State update"
@@ -595,6 +597,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readCurrentAnalysisStreamCountAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 3u
 
@@ -643,9 +646,9 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -687,6 +690,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readAnalysisStreamsAttribute(): AnalysisStreamsAttribute {
     val ATTRIBUTE_ID: UInt = 4u
 
@@ -709,9 +713,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { 
-      "Analysisstreams attribute not found in response" 
-    }
+    requireNotNull(attributeData) { "Analysisstreams attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -719,7 +721,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       if (tlvReader.isNextTag(AnonymousTag)) {
         buildList<AvAnalysisClusterAnalysisStreamStruct> {
           tlvReader.enterArray(AnonymousTag)
-          while(!tlvReader.isEndOfContainer()) {
+          while (!tlvReader.isEndOfContainer()) {
             add(AvAnalysisClusterAnalysisStreamStruct.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()
@@ -743,9 +745,9 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -765,7 +767,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
+
           requireNotNull(attributeData) {
             "Analysisstreams attribute not found in Node State update"
           }
@@ -776,14 +778,14 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
             if (tlvReader.isNextTag(AnonymousTag)) {
               buildList<AvAnalysisClusterAnalysisStreamStruct> {
                 tlvReader.enterArray(AnonymousTag)
-                while(!tlvReader.isEndOfContainer()) {
+                while (!tlvReader.isEndOfContainer()) {
                   add(AvAnalysisClusterAnalysisStreamStruct.fromTlv(AnonymousTag, tlvReader))
                 }
                 tlvReader.exitContainer()
               }
             } else {
               null
-          }
+            }
 
           decodedValue?.let { emit(AnalysisStreamsAttributeSubscriptionState.Success(it)) }
         }
@@ -793,6 +795,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readTrackingEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 5u
 
@@ -805,7 +808,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")  
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
 
     logger.log(Level.FINE, "Read command succeeded")
@@ -876,9 +879,9 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -915,6 +918,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65528u
 
@@ -937,19 +941,17 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Generatedcommandlist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
-       tlvReader.exitContainer()
+        tlvReader.exitContainer()
       }
 
     return GeneratedCommandListAttribute(decodedValue)
@@ -967,9 +969,9 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -987,8 +989,8 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
             subscriptionState.updateState.successes
-            .filterIsInstance<ReadData.Attribute>()
-            .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
             "Generatedcommandlist attribute not found in Node State update"
@@ -999,7 +1001,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -1013,6 +1015,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65529u
 
@@ -1035,16 +1038,14 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Acceptedcommandlist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -1065,9 +1066,9 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -1097,7 +1098,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -1111,6 +1112,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
     val ATTRIBUTE_ID: UInt = 65531u
 
@@ -1133,16 +1135,14 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Attributelist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Attributelist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -1159,13 +1159,13 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -1186,16 +1186,14 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) {
-            "Attributelist attribute not found in Node State update"
-          }
+          requireNotNull(attributeData) { "Attributelist attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -1209,6 +1207,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readFeatureMapAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 65532u
 
@@ -1216,7 +1215,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -1231,9 +1230,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Featuremap attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Featuremap attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1254,9 +1251,9 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -1273,13 +1270,11 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) {
-            "Featuremap attribute not found in Node State update"
-          }
+          requireNotNull(attributeData) { "Featuremap attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -1293,6 +1288,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       }
     }
   }
+
   suspend fun readClusterRevisionAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 65533u
 
@@ -1300,7 +1296,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -1315,9 +1311,7 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Clusterrevision attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1334,13 +1328,13 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
     val attributePaths =
       listOf(
        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -1357,10 +1351,10 @@ suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTri
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }
-             
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) {
             "Clusterrevision attribute not found in Node State update"
           }

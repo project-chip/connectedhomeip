@@ -97,7 +97,7 @@ class AvAnalysisClusterTrackedContext(
             Optional.empty()
           }
         } else {
-         tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
+          tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
           null
         }
       val currentZone =
@@ -119,7 +119,7 @@ class AvAnalysisClusterTrackedContext(
           tlvReader.getNull(ContextSpecificTag(TAG_END_TIME))
           null
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterTrackedContext(

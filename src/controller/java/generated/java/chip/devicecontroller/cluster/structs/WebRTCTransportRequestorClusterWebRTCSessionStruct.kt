@@ -17,15 +17,14 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WebRTCTransportRequestorClusterWebRTCSessionStruct (
+class WebRTCTransportRequestorClusterWebRTCSessionStruct(
   val id: UInt,
   val peerNodeID: ULong,
   val peerEndpointID: UInt,
@@ -37,7 +36,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct (
   val audioStreams: Optional<List<UInt>>,
   val fabricIndex: UInt
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterWebRTCSessionStruct {\n")
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
@@ -74,7 +73,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct (
         }
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-    } 
+      } 
       put(ContextSpecificTag(TAG_METADATA_ENABLED), metadataEnabled)
       if (videoStreams.isPresent) {
         val optvideoStreams = videoStreams.get()
@@ -90,7 +89,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct (
         for (item in optaudioStreams.iterator()) {
           put(AnonymousTag, item)
         }
-       endArray()
+        endArray()
       }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -146,7 +145,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct (
           Optional.of(
             buildList<UInt> {
               tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -170,7 +169,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct (
           Optional.empty()
         }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return WebRTCTransportRequestorClusterWebRTCSessionStruct(

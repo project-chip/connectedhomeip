@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
-import java.util.Optional
 import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AvAnalysisClusterAnalysisSessionEndEvent(
   val sessionID: UInt,
-  val sourceNodeId: Optional<ULong>) 
-  {
+  val sourceNodeId: Optional<ULong>
+) {
   override fun toString(): String  = buildString {
     append("AvAnalysisClusterAnalysisSessionEndEvent {\n")
     append("\tsessionID : $sessionID\n")
@@ -62,7 +59,7 @@ class AvAnalysisClusterAnalysisSessionEndEvent(
         } else {
           Optional.empty()
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterAnalysisSessionEndEvent(sessionID, sourceNodeId)

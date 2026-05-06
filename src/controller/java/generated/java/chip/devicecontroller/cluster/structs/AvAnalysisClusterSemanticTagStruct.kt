@@ -17,21 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AvAnalysisClusterSemanticTagStruct (
+class AvAnalysisClusterSemanticTagStruct(
   val mfgCode: UInt?,
   val namespaceID: UInt,
   val tag: UInt,
   val label: Optional<String>?
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("AvAnalysisClusterSemanticTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
     append("\tnamespaceID : $namespaceID\n")
@@ -90,7 +88,7 @@ class AvAnalysisClusterSemanticTagStruct (
           tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
           null
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterSemanticTagStruct(mfgCode, namespaceID, tag, label)

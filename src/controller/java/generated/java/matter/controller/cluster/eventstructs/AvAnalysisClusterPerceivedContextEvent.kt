@@ -78,7 +78,7 @@ class AvAnalysisClusterPerceivedContextEvent(
         val optexpiredContexts = expiredContexts.get()
         startArray(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))
         for (item in optexpiredContexts.iterator()) {
-        item.toTlv(AnonymousTag, this)
+          item.toTlv(AnonymousTag, this)
         }
         endArray()
       }
@@ -112,9 +112,9 @@ class AvAnalysisClusterPerceivedContextEvent(
       val newIdentifiedContexts =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))) {
           Optional.of(
-            buildList <matter.controller.cluster.structs.AvAnalysisClusterTrackedContext> {
+            buildList<matter.controller.cluster.structs.AvAnalysisClusterTrackedContext> {
               tlvReader.enterArray(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 this.add(
                   matter.controller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,
@@ -131,9 +131,9 @@ class AvAnalysisClusterPerceivedContextEvent(
       val currentIdentifiedContexts =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))) {
           Optional.of(
-            buildList <matter.controller.cluster.structs.AvAnalysisClusterTrackedContext> {
+            buildList<matter.controller.cluster.structs.AvAnalysisClusterTrackedContext> {
               tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 this.add(
                   matter.controller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,
@@ -150,9 +150,9 @@ class AvAnalysisClusterPerceivedContextEvent(
       val expiredContexts =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))) {
           Optional.of(
-            buildList <matter.controller.cluster.structs.AvAnalysisClusterTrackedContext> {
+            buildList<matter.controller.cluster.structs.AvAnalysisClusterTrackedContext> {
               tlvReader.enterArray(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 this.add(
                   matter.controller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,

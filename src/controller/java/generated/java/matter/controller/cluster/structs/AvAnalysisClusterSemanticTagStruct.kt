@@ -88,7 +88,7 @@ class AvAnalysisClusterSemanticTagStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
           null
         }
-      
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterSemanticTagStruct(mfgCode, namespaceID, tag, label)
