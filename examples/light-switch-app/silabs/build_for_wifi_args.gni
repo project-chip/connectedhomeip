@@ -20,5 +20,4 @@ chip_enable_thread = false
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
 chip_enable_ota_requestor = true
-chip_config_enable_groupcast = true
 app_data_model = "${chip_root}/examples/light-switch-app/light-switch-common"

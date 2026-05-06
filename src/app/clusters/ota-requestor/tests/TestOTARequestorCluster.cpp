@@ -38,6 +38,7 @@
 #include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -75,13 +76,13 @@ public:
         }
     }
 
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
+    std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> GetLastAnnounceCommandPayload() const
     {
         return mLastAnnounceCommandPayload;
     }
 
 private:
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
+    std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> mLastAnnounceCommandPayload;
 };
 
 struct TestOTARequestorCluster : public ::testing::Test
@@ -191,12 +192,38 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     EXPECT_TRUE(result.IsSuccess());
 
     // Check that the payload was decoded correctly.
+    ASSERT_TRUE(otaCommands.GetLastAnnounceCommandPayload().has_value());
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType forwarded_payload =
-        otaCommands.GetLastAnnounceCommandPayload();
+        *otaCommands.GetLastAnnounceCommandPayload();
     EXPECT_EQ(forwarded_payload.providerNodeID, static_cast<NodeId>(1234));
     EXPECT_EQ(forwarded_payload.vendorID, static_cast<VendorId>(4321));
     EXPECT_EQ(forwarded_payload.announcementReason, OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
     EXPECT_EQ(forwarded_payload.endpoint, 5);
+}
+
+TEST_F(TestOTARequestorCluster, UnknownAnnouncementReasonIsRejected)
+{
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Construct the payload with an unknown announcement reason. Sending kUnknownEnumValue is rejected by the encoder, so use an
+    // undefined value instead.
+    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
+    payload.providerNodeID     = 1234;
+    payload.vendorID           = static_cast<VendorId>(4321);
+    payload.announcementReason = static_cast<OtaSoftwareUpdateRequestor::AnnouncementReasonEnum>(99);
+    payload.endpoint           = 5;
+
+    // Invoke the command.
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_EQ(result.status,
+              std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError)));
+
+    // Check that the command wasn't passed on.
+    EXPECT_FALSE(otaCommands.GetLastAnnounceCommandPayload().has_value());
 }
 
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
@@ -220,9 +247,8 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     // Invoke the command.
     auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
     ASSERT_FALSE(result.IsSuccess());
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status, // NOLINT(bugprone-unchecked-optional-access)
-              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status, DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
 }
 
 TEST_F(TestOTARequestorCluster, ReadAttributesTest)
@@ -424,6 +450,7 @@ TEST_F(TestOTARequestorCluster, GenerateVersionAppliedEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateVersionAppliedEvent(event), CHIP_NO_ERROR);
     auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, VersionApplied::Id));
     VersionApplied::DecodableType decodedEvent;
@@ -462,6 +489,7 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     DownloadError::DecodableType decodedEvent;
@@ -476,6 +504,7 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);

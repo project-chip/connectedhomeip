@@ -143,6 +143,7 @@ CodeDrivenClusters:
     - Occupancy Sensing
     - Operational Credentials
     - Power Topology
+    - Pressure Measurement
     - Push AV Stream Transport
     - Relative Humidity Measurement
     - Scenes Management
