@@ -1238,7 +1238,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
