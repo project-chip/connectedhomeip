@@ -76,7 +76,9 @@ void ApplyOnOffToFan(FanControlCluster & fan, bool on)
 
 } // namespace
 
-LoggingFanDevice::LoggingFanDevice(const Context & context) : FanDevice(*this, *this, context) {}
+LoggingFanDevice::LoggingFanDevice(const Context & context) :
+    FanDevice(*this, context.includeOnOffCluster ? static_cast<Clusters::OnOffDelegate *>(this) : nullptr, context)
+{}
 
 LoggingFanDevice::~LoggingFanDevice() {}
 
@@ -206,17 +208,18 @@ void LoggingFanDevice::OnFanDriveStateChanged(const FanControl::FanDriveState & 
             mode, percentCurrent, speedCurrent);
     }
 
-    auto & onOff = OnOffCluster();
-    auto & fan   = FanControlCluster();
+    auto & fan = FanControlCluster();
 
-    if (!onOff.GetOnOff())
+    OnOffCluster * onOff = TryGetOnOffCluster();
+    if (onOff == nullptr)
+    {
+        ApplyOnOffToFan(fan, IsFanSetForOn(newState));
+        return;
+    }
+
+    if (!onOff->GetOnOff())
     {
         ApplyOnOffToFan(fan, false);
-        if (!mOnOffClusterTurnedOff && IsFanSetForOn(newState))
-        {
-            LogErrorOnFailure(onOff.SetOnOff(true));
-            ApplyOnOffToFan(fan, true);
-        }
         return;
     }
 
@@ -249,7 +252,6 @@ void LoggingFanDevice::OnOffStartup(bool on)
 
 void LoggingFanDevice::OnOnOffChanged(bool on)
 {
-    mOnOffClusterTurnedOff = !on;
     ApplyOnOffToFan(FanControlCluster(), on);
     ChipLogProgress(DeviceLayer, "LoggingFanDevice::OnOffChanged() -> %s", on ? "ON" : "OFF");
 }
