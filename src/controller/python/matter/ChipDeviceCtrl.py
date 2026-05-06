@@ -3064,6 +3064,20 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.SetWiFiCredentials(ssid, credentials)
         return await self.ConnectNFC(discriminator, setupPinCode, nodeId)
 
+    async def CommissionNfcEthernet(self, discriminator, setupPinCode, nodeId: int) -> int:
+        '''
+        Commissions an Ethernet device over NFC.
+
+        Args:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeId (int): The node ID of the device.
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
+        '''
+        return await self.ConnectNFC(discriminator, setupPinCode, nodeId)
+
     async def CommissionBleWiFi(self, discriminator, setupPinCode, nodeId: int, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         '''
         Commissions a Wi-Fi device over BLE.
