@@ -1008,6 +1008,9 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
     if (status == Status::Success)
     {
         transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
+
+        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
+                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
     }
 
     handler.AddStatus(commandPath, status);
@@ -1075,6 +1078,9 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
                 }
             }
         }
+
+        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
+                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
     }
     handler.AddStatus(commandPath, status);
 
