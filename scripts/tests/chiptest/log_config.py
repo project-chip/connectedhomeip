@@ -89,7 +89,6 @@ class LogMessageCounter:
         """Context manager to register a user of this counter."""
         with self._users_cond:
             self._users_counter.value += 1
-            self._users_cond.notify_all()
 
         try:
             yield self
