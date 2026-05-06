@@ -299,7 +299,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestAddNetworkCommand)
         req.operationalDataset = ByteSpan();
         auto result            = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        }
     }
 
     // Success: add a valid dataset.
@@ -308,7 +311,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestAddNetworkCommand)
         req.operationalDataset = ByteSpan(kDataset1);
         auto result            = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), IMStatus::Success);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::Success);
+        }
         EXPECT_TRUE(storage.ContainsNetwork(MakeExPanId1()));
     }
 
@@ -318,7 +324,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestAddNetworkCommand)
         req.operationalDataset = ByteSpan(kDataset1);
         auto result            = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), IMStatus::InvalidInState);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::InvalidInState);
+        }
     }
 
     // Success: update accepted when active timestamp is strictly newer.
@@ -327,7 +336,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestAddNetworkCommand)
         req.operationalDataset = ByteSpan(kDataset1Updated);
         auto result            = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), IMStatus::Success);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::Success);
+        }
     }
 
     // ResourceExhausted: fill remaining capacity then add one more new network.
@@ -353,7 +365,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestAddNetworkCommand)
         req.operationalDataset = ByteSpan(kDataset5);
         auto result            = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ResourceExhausted);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ResourceExhausted);
+        }
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -381,7 +396,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestRemoveNetworkCommand)
         req.extendedPanID = ByteSpan(kBadPanId);
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        }
     }
 
     // NotFound: PAN ID not in storage.
@@ -390,7 +408,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestRemoveNetworkCommand)
         req.extendedPanID = ByteSpan(kExPanId2Bytes);
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::NotFound);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::NotFound);
+        }
     }
 
     // ConstraintError: cannot remove the currently preferred network.
@@ -403,7 +424,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestRemoveNetworkCommand)
         req.extendedPanID = ByteSpan(kExPanId1Bytes);
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        }
 
         // Clear preferred so the subsequent remove can succeed.
         DataModel::Nullable<ByteSpan> nullValue;
@@ -417,7 +441,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestRemoveNetworkCommand)
         req.extendedPanID = ByteSpan(kExPanId1Bytes);
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::Success);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::Success);
+        }
         EXPECT_FALSE(storage.ContainsNetwork(MakeExPanId1()));
     }
 
@@ -452,7 +479,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestGetOperationalDatasetCommand)
         req.extendedPanID = ByteSpan(kExPanId1Bytes);
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::UnsupportedAccess);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::UnsupportedAccess);
+        }
 
         // Restore CASE subject descriptor for subsequent tests.
         tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -465,7 +495,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestGetOperationalDatasetCommand)
         req.extendedPanID = ByteSpan(kShortPanId);
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::ConstraintError);
+        }
     }
 
     // NotFound: valid-size PAN ID not in storage.
@@ -474,7 +507,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestGetOperationalDatasetCommand)
         req.extendedPanID = ByteSpan(kExPanId2Bytes);
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::NotFound);
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), IMStatus::NotFound);
+        }
     }
 
     // Success: OperationalDatasetResponse must contain the exact stored bytes.
@@ -484,7 +520,10 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestGetOperationalDatasetCommand)
         auto result       = tester.Invoke(req);
         ASSERT_TRUE(result.IsSuccess());
         ASSERT_TRUE(result.response.has_value());
-        EXPECT_TRUE(result.response->operationalDataset.data_equal(ByteSpan(kDataset1)));
+        if (result.response.has_value())
+        {
+            EXPECT_TRUE(result.response->operationalDataset.data_equal(ByteSpan(kDataset1)));
+        }
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
