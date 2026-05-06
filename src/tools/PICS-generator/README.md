@@ -12,8 +12,10 @@ Note: The tool does relay on what the the device is able to express and for now
 there are areas which the tool can not cover:
 
 -   PICS in base.xml
--   Only mandatory events are marked as supported, since the global attribute
-    with list of events is provisional
+-   Only events with a mandatory conformance (M, or mandatory by a feature or
+    other element) are marked as supported, since the global attribute with the
+    list of events is obsolete/removed. Because of this, event PICS are marked
+    purely from spec conformance and may not match the actual device.
 
 # Setup
 
