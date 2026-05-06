@@ -703,6 +703,7 @@ NetworkCommissioningCluster::HandleReorderNetwork(CommandHandler & handler, cons
                                                   const Commands::ReorderNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(mClusterContext.failSafeContext, handler.GetAccessingFabricIndex());
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
     MutableCharSpan debugText(debugTextBuffer);
