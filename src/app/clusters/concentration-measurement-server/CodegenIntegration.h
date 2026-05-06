@@ -22,8 +22,6 @@
 #include "concentration-measurement-cluster-objects.h"
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/support/CodeUtils.h>
-#include <type_traits>
 
 namespace chip {
 namespace app {
