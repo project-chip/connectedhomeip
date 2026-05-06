@@ -170,7 +170,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.print_step("5b", "TH sends Step command to DUT with Direction set to Increase and Wrap set to True")
         await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True,
-                                    lowest_off=False)
+                                     lowest_off=False)
 
         await asyncio.sleep(1)
 
