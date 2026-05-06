@@ -39,7 +39,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 
@@ -94,7 +94,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(0 /*endpointId*/);
 #endif
@@ -134,7 +134,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {

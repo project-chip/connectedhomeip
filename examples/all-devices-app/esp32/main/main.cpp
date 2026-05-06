@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <ESP32DimmableLightDevice.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -38,6 +39,8 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
+
+#include <app_config/enabled_devices.h>
 
 #include <memory>
 #include <string>
@@ -76,9 +79,7 @@ static const char TAG[] = "all-devices-app";
 
 // NVS key for storing the device type across reboots
 static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespace_ChipConfig, "dev-type" };
-
-static std::string gDeviceType = "contact-sensor";
-
+static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
 
 namespace {
@@ -254,12 +255,18 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    // Default to contact-sensor device type
-    const char * deviceType = gDeviceType.c_str();
-    gConstructedDevice      = DeviceFactory::GetInstance().Create(deviceType);
+    auto & deviceFactory = DeviceFactory::GetInstance();
+
+    // figure out the default
+    if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
+    {
+        gDeviceType = deviceFactory.GetDefaultDevice();
+    }
+    gConstructedDevice = deviceFactory.Create(gDeviceType);
+
     if (gConstructedDevice == nullptr)
     {
-        ESP_LOGE(TAG, "Failed to create device of type: %s", deviceType);
+        ESP_LOGE(TAG, "Failed to create device of type: %s", gDeviceType.c_str());
         return nullptr;
     }
 
@@ -280,6 +287,17 @@ void InitServer(intptr_t context)
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
     });
+
+#if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
+    // Override dimmable-light with ESP32 hardware implementation that drives a real LED
+    DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return std::make_unique<ESP32DimmableLightDevice>(ESP32DimmableLightDevice::Context{
+            .groupDataProvider = gGroupDataProvider,
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .timerDelegate     = gTimerDelegate,
+        });
+    });
+#endif
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();

@@ -46,6 +46,7 @@ source_set("clusters") {
     "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials-server",
+    "pressure-measurement-server",
     "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "scenes-server",
