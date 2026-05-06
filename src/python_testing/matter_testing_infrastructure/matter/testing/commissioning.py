@@ -226,6 +226,10 @@ async def commission_device(
         await commissioning.start()
         return PairingStatus()
 
+    except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+        LOGGER.exception("Commissioning failed")
+        return PairingStatus(exception=e)
+
     except Exception as e:
         # Catch unexpected errors to avoid crashing test infrastructure.
         # These are surfaced as PairingStatus failures instead.
