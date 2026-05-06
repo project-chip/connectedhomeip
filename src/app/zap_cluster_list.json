@@ -307,7 +307,7 @@
         "POWER_SOURCE_CONFIGURATION_CLUSTER": [
             "power-source-configuration-server"
         ],
-        "PRESSURE_MEASUREMENT_CLUSTER": [],
+        "PRESSURE_MEASUREMENT_CLUSTER": ["pressure-measurement-server"],
         "PROXY_CONFIGURATION_CLUSTER": [],
         "PROXY_DISCOVERY_CLUSTER": [],
         "PROXY_VALID_CLUSTER": [],

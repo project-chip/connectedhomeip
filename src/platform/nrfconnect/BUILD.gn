@@ -47,6 +47,7 @@ static_library("nrfconnect") {
     "DiagnosticDataProviderImplNrf.cpp",
     "DiagnosticDataProviderImplNrf.h",
     "ExternalFlashManager.h",
+    "FactoryDataProviderBase.h",
     "FactoryResetTestEventTriggerHandler.cpp",
     "FactoryResetTestEventTriggerHandler.h",
     "InetPlatformConfig.h",
@@ -142,7 +143,10 @@ static_library("nrfconnect") {
   }
 
   if (chip_use_cracen_kmu) {
-    sources += [ "KMUKeyAllocator.h" ]
+    sources += [
+      "KMUKeyAllocator.h",
+      "KMUSessionKeystore.h",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

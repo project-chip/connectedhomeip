@@ -16,178 +16,111 @@
  *
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/ConcreteClusterPath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
-#include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/data-model-provider/MetadataTypes.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
-#include <lib/support/ReadOnlyBuffer.h>
+#include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/OperationalState/Commands.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OperationalState;
-using namespace chip::app::Clusters::MicrowaveOvenControl;
-using namespace chip::app::Clusters::ModeBase;
-using namespace chip::app::Clusters::MicrowaveOvenMode;
-using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace MicrowaveOvenControl {
+namespace chip::app::Clusters {
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-                   BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
-                   Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
-    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
-    mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
+using namespace MicrowaveOvenControl;
+using namespace MicrowaveOvenControl::Attributes;
+using namespace MicrowaveOvenControl::Commands;
+
+namespace {
+
+constexpr uint32_t kDefaultCookTimeSec = 30u;
+constexpr uint32_t kMinCookTimeSec     = 1u;
+constexpr uint8_t kDefaultMinPowerNum  = 10u;
+constexpr uint8_t kDefaultMaxPowerNum  = 100u;
+constexpr uint8_t kDefaultPowerStepNum = 10u;
+
+bool IsCookTimeSecondsInRange(uint32_t cookTimeSec, uint32_t maxCookTimeSec)
 {
-    mDelegate->SetInstance(this);
+    return kMinCookTimeSec <= cookTimeSec && cookTimeSec <= maxCookTimeSec;
 }
 
-Instance::~Instance()
+bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNum, uint8_t maxCookPowerNum)
 {
-    if (mDelegate)
-    {
-        mDelegate->SetInstance(nullptr);
-    }
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    return minCookPowerNum <= powerSettingNum && powerSettingNum <= maxCookPowerNum;
 }
 
-CHIP_ERROR Instance::Init()
+} // namespace
+
+MicrowaveOvenControlCluster::MicrowaveOvenControlCluster(EndpointId endpointId, const Config & config) :
+    DefaultServerCluster({ endpointId, MicrowaveOvenControl::Id }), mFeature(config.feature),
+    mOptionalAttributeSet(config.optionalAttributeSet), mSupportsAddMoreTime(config.supportsAddMoreTime),
+    mIntegrationDelegate(config.integrationDelegate), mAppDelegate(config.appDelegate), mCookTimeSec(kDefaultCookTimeSec)
+{}
+
+CHIP_ERROR MicrowaveOvenControlCluster::Startup(ServerClusterContext & context)
 {
-    // Check if the cluster has been selected in zap
-    VerifyOrReturnError(
-        emberAfContainsServer(mEndpointId, mClusterId), CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId)));
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Exactly one of the PowerAsNumber and PowerInWatts features must be supported, per spec.
-    VerifyOrReturnError(
-        mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts),
-        CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl,
-                     "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts and PowerAsNumber"));
-
-    // Check that the feature bits do not include both PowerAsNumber and PowerInWatts
-    VerifyOrReturnError(
-        !(mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) &&
-          mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)),
-        CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl,
-                     "Microwave Oven Control: feature bits error, feature could not support both PowerAsNumber and PowerInWatts"));
-
-    // Per spec, the PowerNumberLimits feature is only allowed if the PowerAsNumber feature is supported.
-    VerifyOrReturnError(
-        !mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) ||
-            mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber),
-        CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(
-            Zcl,
-            "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber"));
-
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     // If the PowerInWatts feature is supported, get the count of supported watt levels so we can later
     // ensure incoming watt level values are valid.
-    if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
+    if (mFeature.Has(Feature::kPowerInWatts))
     {
         mSupportedWattLevels = GetCountOfSupportedWattLevels();
         VerifyOrReturnError(mSupportedWattLevels > 0, CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl, "Microwave Oven Control: supported watt levels is empty"));
     }
+
     return CHIP_NO_ERROR;
 }
 
-bool Instance::HasFeature(MicrowaveOvenControl::Feature feature) const
-{
-    return mFeature.Has(feature);
-}
-
-uint8_t Instance::GetCountOfSupportedWattLevels() const
+uint8_t MicrowaveOvenControlCluster::GetCountOfSupportedWattLevels() const
 {
     uint8_t wattIndex = 0;
     uint16_t watt     = 0;
-    while (mDelegate->GetWattSettingByIndex(wattIndex, watt) == CHIP_NO_ERROR)
+    while (mAppDelegate.GetWattSettingByIndex(wattIndex, watt) == CHIP_NO_ERROR)
     {
         wattIndex++;
     }
     return wattIndex;
 }
 
-uint32_t Instance::GetCookTimeSec() const
+CHIP_ERROR MicrowaveOvenControlCluster::SetCookTimeSec(uint32_t cookTimeSec)
 {
-    return mCookTimeSec;
+    VerifyOrReturnError(IsCookTimeSecondsInRange(cookTimeSec, mAppDelegate.GetMaxCookTimeSec()),
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    SetAttributeValue(mCookTimeSec, cookTimeSec, CookTime::Id);
+    return CHIP_NO_ERROR;
 }
 
-void Instance::SetCookTimeSec(uint32_t cookTimeSec)
+DataModel::ActionReturnStatus MicrowaveOvenControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                         AttributeValueEncoder & encoder)
 {
-    uint32_t oldCookTimeSec = mCookTimeSec;
-    mCookTimeSec            = cookTimeSec;
-    if (mCookTimeSec != oldCookTimeSec)
+    switch (request.path.mAttributeId)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CookTime::Id);
-    }
-}
-
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    ChipLogDetail(Zcl, "Microwave Oven Control: Reading");
-    switch (aPath.mAttributeId)
-    {
-    case MicrowaveOvenControl::Attributes::CookTime::Id:
-        return aEncoder.Encode(GetCookTimeSec());
-
-    case MicrowaveOvenControl::Attributes::MaxCookTime::Id:
-        return aEncoder.Encode(mDelegate->GetMaxCookTimeSec());
-
-    case MicrowaveOvenControl::Attributes::PowerSetting::Id:
-        VerifyOrReturnError(HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "Microwave Oven Control: can not get PowerSetting number, feature is not supported"));
-
-        return aEncoder.Encode(mDelegate->GetPowerSettingNum());
-
-    case MicrowaveOvenControl::Attributes::MinPower::Id:
-        VerifyOrReturnError(HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "Microwave Oven Control: can not get MinPower number, feature is not supported"));
-
-        return aEncoder.Encode(HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMinPowerNum()
-                                                                                             : kDefaultMinPowerNum);
-
-    case MicrowaveOvenControl::Attributes::MaxPower::Id:
-        VerifyOrReturnError(HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "Microwave Oven Control: can not get MaxPower number, feature is not supported"));
-
-        return aEncoder.Encode(HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMaxPowerNum()
-                                                                                             : kDefaultMaxPowerNum);
-
-    case MicrowaveOvenControl::Attributes::PowerStep::Id:
-        VerifyOrReturnError(HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "Microwave Oven Control: can not get PowerStep number, feature is not supported"));
-
-        return aEncoder.Encode(HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetPowerStepNum()
-                                                                                             : kDefaultPowerStepNum);
-
-    case MicrowaveOvenControl::Attributes::SupportedWatts::Id:
-        VerifyOrReturnError(HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                            ChipLogError(Zcl, "Microwave Oven Control: can not get SuppoertWatts list, feature is not supported"));
-
-        return aEncoder.EncodeList([delegate = mDelegate](const auto & encoder) -> CHIP_ERROR {
-            uint16_t wattRating;
-            uint8_t index  = 0;
-            CHIP_ERROR err = CHIP_NO_ERROR;
-            while ((err = delegate->GetWattSettingByIndex(index, wattRating)) == CHIP_NO_ERROR)
+    case ClusterRevision::Id:
+        return encoder.Encode(MicrowaveOvenControl::kRevision);
+    case CookTime::Id:
+        return encoder.Encode(GetCookTimeSec());
+    case MaxCookTime::Id:
+        return encoder.Encode(mAppDelegate.GetMaxCookTimeSec());
+    case PowerSetting::Id:
+        return encoder.Encode(mAppDelegate.GetPowerSettingNum());
+    case MinPower::Id:
+        return encoder.Encode(mAppDelegate.GetMinPowerNum());
+    case MaxPower::Id:
+        return encoder.Encode(mAppDelegate.GetMaxPowerNum());
+    case PowerStep::Id:
+        return encoder.Encode(mAppDelegate.GetPowerStepNum());
+    case SupportedWatts::Id:
+        return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR {
+            uint16_t wattRating = 0;
+            uint8_t index       = 0;
+            CHIP_ERROR err      = CHIP_NO_ERROR;
+            while ((err = mAppDelegate.GetWattSettingByIndex(index, wattRating)) == CHIP_NO_ERROR)
             {
-                ReturnErrorOnFailure(encoder.Encode(wattRating));
+                ReturnErrorOnFailure(encod.Encode(wattRating));
                 index++;
             }
             if (err == CHIP_ERROR_NOT_FOUND)
@@ -196,207 +129,203 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             }
             return err;
         });
-
-    case MicrowaveOvenControl::Attributes::SelectedWattIndex::Id:
-        VerifyOrReturnError(
-            HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-            ChipLogError(Zcl, "Microwave Oven Control: can not get SelectedWattIndex number, feature is not supported"));
-
-        return aEncoder.Encode(mDelegate->GetCurrentWattIndex());
-
-    case MicrowaveOvenControl::Attributes::WattRating::Id:
-        return aEncoder.Encode(mDelegate->GetWattRating());
-
-    case MicrowaveOvenControl::Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mFeature.Raw());
+    case SelectedWattIndex::Id:
+        return encoder.Encode(mAppDelegate.GetCurrentWattIndex());
+    case WattRating::Id:
+        return encoder.Encode(mAppDelegate.GetWattRating());
+    case FeatureMap::Id:
+        return encoder.Encode(mFeature);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
+}
+
+CHIP_ERROR MicrowaveOvenControlCluster::Attributes(const ConcreteClusterPath & path,
+                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mFeature.Has(Feature::kPowerAsNumber), PowerSetting::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerNumberLimits), MinPower::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerNumberLimits), MaxPower::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerNumberLimits), PowerStep::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerInWatts), SupportedWatts::kMetadataEntry },
+        { mFeature.Has(Feature::kPowerInWatts), SelectedWattIndex::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(WattRating::Id), WattRating::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
+}
+
+std::optional<DataModel::ActionReturnStatus> MicrowaveOvenControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                        TLV::TLVReader & input_arguments,
+                                                                                        CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case Commands::SetCookingParameters::Id: {
+        Commands::SetCookingParameters::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+        return HandleSetCookingParameters(request.path, data);
+    }
+    case Commands::AddMoreTime::Id: {
+        Commands::AddMoreTime::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+        return HandleAddMoreTime(data);
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+CHIP_ERROR MicrowaveOvenControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    ReturnErrorOnFailure(builder.AppendElements({ Commands::SetCookingParameters::kMetadataEntry }));
+
+    if (mSupportsAddMoreTime)
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::AddMoreTime::kMetadataEntry }));
+    }
+
     return CHIP_NO_ERROR;
 }
 
-void Instance::InvokeCommand(HandlerContext & handlerContext)
+std::optional<DataModel::ActionReturnStatus>
+MicrowaveOvenControlCluster::HandleSetCookingParameters(const ConcreteCommandPath & commandPath,
+                                                        const Commands::SetCookingParameters::DecodableType & commandData)
 {
-    ChipLogDetail(Zcl, "Microwave Oven Control: InvokeCommand");
-    switch (handlerContext.mRequestPath.mCommandId)
-    {
-    case Commands::SetCookingParameters::Id:
-        ChipLogDetail(Zcl, "Microwave Oven Control: Entering SetCookingParameters");
+    Status status            = Status::Success;
+    auto & cookMode          = commandData.cookMode;
+    auto & cookTimeSec       = commandData.cookTime;
+    auto & powerSetting      = commandData.powerSetting;
+    auto & wattSettingIndex  = commandData.wattSettingIndex;
+    auto & startAfterSetting = commandData.startAfterSetting;
 
-        CommandHandlerInterface::HandleCommand<Commands::SetCookingParameters::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSetCookingParameters(ctx, req); });
-        break;
-
-    case Commands::AddMoreTime::Id:
-        ChipLogDetail(Zcl, "Microwave Oven Control: Entering AddMoreTime");
-
-        CommandHandlerInterface::HandleCommand<Commands::AddMoreTime::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleAddMoreTime(ctx, req); });
-        break;
-    }
-}
-
-void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req)
-{
-    ChipLogDetail(Zcl, "Microwave Oven Control: HandleSetCookingParameters");
-    Status status = Status::Success;
-    uint8_t opState;
-    uint8_t modeValue;
-    uint8_t reqCookMode;
-    uint32_t reqCookTimeSec;
-    bool reqStartAfterSetting;
-    auto & cookMode          = req.cookMode;
-    auto & cookTimeSec       = req.cookTime;
-    auto & powerSetting      = req.powerSetting;
-    auto & wattSettingIndex  = req.wattSettingIndex;
-    auto & startAfterSetting = req.startAfterSetting;
-
-    opState = mOpStateInstance.GetCurrentOperationalState();
-    VerifyOrExit(opState == to_underlying(OperationalStateEnum::kStopped), status = Status::InvalidInState);
+    uint8_t opState = mIntegrationDelegate.GetCurrentOperationalState();
+    VerifyOrReturnError(opState == to_underlying(OperationalState::OperationalStateEnum::kStopped), Status::InvalidInState);
 
     if (startAfterSetting.HasValue())
     {
-
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
-
-        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
-            ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);
-        auto acceptedCommands = acceptedCommandsList.TakeBuffer();
-
-        bool commandExists =
-            std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [](const DataModel::AcceptedCommandEntry & entry) {
-                return entry.commandId == OperationalState::Commands::Start::Id;
-            }) != acceptedCommands.end();
-
-        VerifyOrExit(
-            commandExists, status = Status::InvalidCommand; ChipLogError(
+        VerifyOrReturnError(
+            mIntegrationDelegate.IsSupportedOperationalStateCommand(commandPath.mEndpointId, OperationalState::Commands::Start::Id),
+            Status::InvalidCommand,
+            ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set cooking parameters, Start command of operational state is not supported"));
     }
-    reqStartAfterSetting = startAfterSetting.ValueOr(false);
+    bool reqStartAfterSetting = startAfterSetting.ValueOr(false);
 
-    modeValue = 0;
-    VerifyOrExit(mMicrowaveOvenModeInstance.GetModeValueByModeTag(to_underlying(MicrowaveOvenMode::ModeTag::kNormal), modeValue) ==
-                     CHIP_NO_ERROR,
-                 status = Status::InvalidCommand;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, Normal mode is not found"));
+    uint8_t modeValue = 0;
+    VerifyOrReturnError(mIntegrationDelegate.GetNormalOperatingMode(modeValue) == CHIP_NO_ERROR, Status::InvalidCommand,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, Normal mode is not found"));
 
-    reqCookMode = cookMode.ValueOr(modeValue);
-    VerifyOrExit(mMicrowaveOvenModeInstance.IsSupportedMode(reqCookMode), status = Status::ConstraintError;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
+    uint8_t reqCookMode = cookMode.ValueOr(modeValue);
+    VerifyOrReturnError(mIntegrationDelegate.IsSupportedMode(reqCookMode), Status::ConstraintError,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
 
-    reqCookTimeSec = cookTimeSec.ValueOr(MicrowaveOvenControl::kDefaultCookTimeSec);
-    VerifyOrExit(IsCookTimeSecondsInRange(reqCookTimeSec, mDelegate->GetMaxCookTimeSec()), status = Status::ConstraintError;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
+    uint32_t reqCookTimeSec = cookTimeSec.ValueOr(kDefaultCookTimeSec);
+    VerifyOrReturnError(IsCookTimeSecondsInRange(reqCookTimeSec, mAppDelegate.GetMaxCookTimeSec()), Status::ConstraintError,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
-    if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
+    if (mFeature.Has(Feature::kPowerAsNumber))
     {
         // if using power as number, check if the param is invalid and set PowerSetting number.
-        uint8_t reqPowerSettingNum;
         uint8_t maxPowerNum  = kDefaultMaxPowerNum;
         uint8_t minPowerNum  = kDefaultMinPowerNum;
         uint8_t powerStepNum = kDefaultPowerStepNum;
-        VerifyOrExit(!wattSettingIndex.HasValue(), status = Status::InvalidCommand; ChipLogError(
-            Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for wattSettingIndex"));
 
-        VerifyOrExit(
-            cookMode.HasValue() || cookTimeSec.HasValue() || powerSetting.HasValue(), status = Status::InvalidCommand;
-            ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
+        VerifyOrReturnError(
+            !wattSettingIndex.HasValue(), Status::InvalidCommand,
+            ChipLogError(Zcl,
+                         "Microwave Oven Control: Failed to set cooking parameters, should have no value for wattSettingIndex"));
 
-        if (HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits))
+        if (mFeature.Has(Feature::kPowerNumberLimits))
         {
-            maxPowerNum  = mDelegate->GetMaxPowerNum();
-            minPowerNum  = mDelegate->GetMinPowerNum();
-            powerStepNum = mDelegate->GetPowerStepNum();
+            maxPowerNum  = mAppDelegate.GetMaxPowerNum();
+            minPowerNum  = mAppDelegate.GetMinPowerNum();
+            powerStepNum = mAppDelegate.GetPowerStepNum();
         }
-        reqPowerSettingNum = powerSetting.ValueOr(maxPowerNum);
-        VerifyOrExit(IsPowerSettingNumberInRange(reqPowerSettingNum, minPowerNum, maxPowerNum), status = Status::ConstraintError;
-                     ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
 
-        VerifyOrExit(
-            (reqPowerSettingNum - minPowerNum) % powerStepNum == 0, status = Status::ConstraintError; ChipLogError(
+        uint8_t reqPowerSettingNum = powerSetting.ValueOr(maxPowerNum);
+        VerifyOrReturnError(
+            IsPowerSettingNumberInRange(reqPowerSettingNum, minPowerNum, maxPowerNum), Status::ConstraintError,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
+
+        VerifyOrReturnError(
+            (reqPowerSettingNum - minPowerNum) % powerStepNum == 0, Status::ConstraintError,
+            ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 
-        // Snapshot PowerSetting before the delegate call so this cluster server can emit the
-        // attribute-change report when the delegate updates its internal value.  The delegate owns
-        // storage for PowerSetting, but reporting is the server's responsibility (mirrors CookTime).
-        uint8_t oldPowerSettingNum = mDelegate->GetPowerSettingNum();
+        // Snapshot PowerSetting before the delegate call so this cluster server can notify that the
+        // attribute changed when the delegate updates its internal value.  The delegate owns storage for
+        // this attribute, but to notify the change is the server's responsibility.
+        uint8_t oldPowerSettingNum = mAppDelegate.GetPowerSettingNum();
 
-        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting,
-                                                               MakeOptional(reqPowerSettingNum), NullOptional);
+        status = mAppDelegate.HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting,
+                                                                 MakeOptional(reqPowerSettingNum), NullOptional);
 
-        if (oldPowerSettingNum != mDelegate->GetPowerSettingNum())
+        if (oldPowerSettingNum != mAppDelegate.GetPowerSettingNum())
         {
-            MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PowerSetting::Id);
+            NotifyAttributeChanged(PowerSetting::Id);
         }
     }
     else
     {
         // if using power in watt, check if the param is invalid and set wattSettingIndex number.
-        uint8_t reqWattSettingIndex;
-        VerifyOrExit(!powerSetting.HasValue(), status = Status::InvalidCommand; ChipLogError(
-            Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for powerSetting "));
-
-        VerifyOrExit(
-            cookMode.HasValue() || cookTimeSec.HasValue() || wattSettingIndex.HasValue(), status = Status::InvalidCommand;
-            ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
+        VerifyOrReturnError(
+            !powerSetting.HasValue(), Status::InvalidCommand,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for powerSetting "));
 
         // count of supported watt levels must greater than 0
-        VerifyOrExit(
-            mSupportedWattLevels > 0,
+        VerifyOrReturnError(
+            mSupportedWattLevels > 0, Status::ConstraintError,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, count of supported watt levels is 0"));
-        uint8_t maxWattSettingIndex = static_cast<uint8_t>(mSupportedWattLevels - 1);
-        reqWattSettingIndex         = wattSettingIndex.ValueOr(maxWattSettingIndex);
-        VerifyOrExit(reqWattSettingIndex <= maxWattSettingIndex, status = Status::ConstraintError;
-                     ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
 
-        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting, NullOptional,
-                                                               MakeOptional(reqWattSettingIndex));
+        uint8_t maxWattSettingIndex = static_cast<uint8_t>(mSupportedWattLevels - 1);
+        uint8_t reqWattSettingIndex = wattSettingIndex.ValueOr(maxWattSettingIndex);
+        VerifyOrReturnError(
+            reqWattSettingIndex <= maxWattSettingIndex, Status::ConstraintError,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
+
+        // Snapshot WattSettingIndex and WattRating before the delegate call so this cluster server can notify that the
+        // attribute changed when the delegate updates its internal value. The delegate owns storage for these attributes,
+        // but to notify the change is the server's responsibility.
+        uint8_t oldWattSettingIndex = mAppDelegate.GetCurrentWattIndex();
+        uint16_t oldWattRating      = mAppDelegate.GetWattRating();
+
+        status = mAppDelegate.HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting, NullOptional,
+                                                                 MakeOptional(reqWattSettingIndex));
+
+        if (oldWattSettingIndex != mAppDelegate.GetCurrentWattIndex())
+        {
+            NotifyAttributeChanged(SelectedWattIndex::Id);
+        }
+        if (oldWattRating != mAppDelegate.GetWattRating())
+        {
+            NotifyAttributeChanged(WattRating::Id);
+        }
     }
 
-exit:
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    return status;
 }
 
-void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+MicrowaveOvenControlCluster::HandleAddMoreTime(const Commands::AddMoreTime::DecodableType & commandData)
 {
-    ChipLogDetail(Zcl, "Microwave Oven Control: HandleAddMoreTime");
-    Status status;
-    uint8_t opState;
-    uint32_t finalCookTimeSec;
-
-    opState = mOpStateInstance.GetCurrentOperationalState();
-    VerifyOrExit(opState != to_underlying(OperationalStateEnum::kError), status = Status::InvalidInState);
+    uint8_t opState = mIntegrationDelegate.GetCurrentOperationalState();
+    VerifyOrReturnError(opState != to_underlying(OperationalState::OperationalStateEnum::kError), Status::InvalidInState);
 
     // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
-    VerifyOrExit(req.timeToAdd + GetCookTimeSec() <= mDelegate->GetMaxCookTimeSec(), status = Status::ConstraintError;
-                 ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
+    VerifyOrReturnError(commandData.timeToAdd <= mAppDelegate.GetMaxCookTimeSec() &&
+                            GetCookTimeSec() <= mAppDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
+                        Status::ConstraintError,
+                        ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
-    finalCookTimeSec = GetCookTimeSec() + req.timeToAdd;
-    status           = mDelegate->HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
-
-exit:
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    uint32_t finalCookTimeSec = GetCookTimeSec() + commandData.timeToAdd;
+    return mAppDelegate.HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
 }
 
-bool IsCookTimeSecondsInRange(uint32_t cookTimeSec, uint32_t maxCookTimeSec)
-{
-    return MicrowaveOvenControl::kMinCookTimeSec <= cookTimeSec && cookTimeSec <= maxCookTimeSec;
-}
-
-bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNum, uint8_t maxCookPowerNum)
-{
-    return minCookPowerNum <= powerSettingNum && powerSettingNum <= maxCookPowerNum;
-}
-
-} // namespace MicrowaveOvenControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-/** @brief Microwave Oven Control Cluster Server Init
- *
- * Server Init
- *
- */
-void MatterMicrowaveOvenControlPluginServerInitCallback() {}
-void MatterMicrowaveOvenControlPluginServerShutdownCallback() {}
+} // namespace chip::app::Clusters
