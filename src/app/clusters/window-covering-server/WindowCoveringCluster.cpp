@@ -88,7 +88,25 @@ Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mFeatureMap(config.mFeatures),
     mOptionalAttributes(config.mOptionalAttributes)
-{}
+{
+    if (mFeatureMap.Has(Feature::kPositionAwareLift))
+    {
+        VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift), AppServer,
+                           "Validation failed: PositionAwareLift requires Lift feature.");
+    }
+
+    if (mFeatureMap.Has(Feature::kPositionAwareTilt))
+    {
+        VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kTilt), AppServer,
+                           "Validation failed: PositionAwareTilt requires Tilt feature.");
+    }
+
+    if (mFeatureMap.Has(Feature::kAbsolutePosition))
+    {
+        VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kPositionAwareLift) || mFeatureMap.Has(Feature::kPositionAwareTilt), AppServer,
+                           "Validation failed: AbsolutePosition requires PositionAwareLift or PositionAwareTilt.");
+    }
+}
 
 CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
 {
@@ -624,7 +642,7 @@ Status WindowCoveringCluster::HandleDownOrClose()
         SetTargetPositionTiltPercent100ths(NPercent100ths(WC_PERCENT100THS_MAX_CLOSED));
     }
 
-    Delegate * delegate = GetDelegate();
+    WindowCoveringDelegate * delegate = GetDelegate();
     if (delegate != nullptr)
     {
         if (HasFeaturePaLift())
@@ -653,7 +671,7 @@ Status WindowCoveringCluster::HandleStopMotion(const Commands::StopMotion::Decod
 
     bool changeTarget = true;
 
-    Delegate * delegate = GetDelegate();
+    WindowCoveringDelegate * delegate = GetDelegate();
     if (delegate != nullptr)
     {
         CHIP_ERROR err = delegate->HandleStopMotion();
@@ -701,7 +719,7 @@ Status WindowCoveringCluster::HandleGoToLiftValue(const Commands::GoToLiftValue:
 
     SetTargetPositionLiftPercent100ths(NPercent100ths(LiftToPercent100ths(GetEndpointId(), liftValue)));
 
-    Delegate * delegate = GetDelegate();
+    WindowCoveringDelegate * delegate = GetDelegate();
     if (delegate != nullptr)
     {
         LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
@@ -728,7 +746,7 @@ Status WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftP
 
     SetTargetPositionLiftPercent100ths(NPercent100ths(percent100ths));
 
-    Delegate * delegate = GetDelegate();
+    WindowCoveringDelegate * delegate = GetDelegate();
     if (delegate != nullptr)
     {
         LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
@@ -755,7 +773,7 @@ Status WindowCoveringCluster::HandleGoToTiltValue(const Commands::GoToTiltValue:
 
     SetTargetPositionTiltPercent100ths(NPercent100ths(TiltToPercent100ths(GetEndpointId(), tiltValue)));
 
-    Delegate * delegate = GetDelegate();
+    WindowCoveringDelegate * delegate = GetDelegate();
     if (delegate != nullptr)
     {
         LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
@@ -782,7 +800,7 @@ Status WindowCoveringCluster::HandleGoToTiltPercentage(const Commands::GoToTiltP
 
     SetTargetPositionTiltPercent100ths(NPercent100ths(percent100ths));
 
-    Delegate * delegate = GetDelegate();
+    WindowCoveringDelegate * delegate = GetDelegate();
     if (delegate != nullptr)
     {
         LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));

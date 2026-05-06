@@ -32,7 +32,7 @@ using namespace chip::Testing;
 
 using chip::Protocols::InteractionModel::Status;
 
-class MockDelegate : public Delegate
+class MockDelegate : public WindowCoveringDelegate
 {
 public:
     CHIP_ERROR HandleMovement(WindowCoveringType type) override
@@ -66,11 +66,13 @@ public:
 WindowCoveringCluster::Config MakeAllFeaturesConfig()
 {
     WindowCoveringCluster::Config config;
-    config.WithPositionAwareLift().WithPositionAwareTilt();
-    config.mOptionalAttributes.Set<Attributes::NumberOfActuationsLift::Id>();
-    config.mOptionalAttributes.Set<Attributes::NumberOfActuationsTilt::Id>();
-    config.mOptionalAttributes.Set<Attributes::CurrentPositionLiftPercentage::Id>();
-    config.mOptionalAttributes.Set<Attributes::CurrentPositionTiltPercentage::Id>();
+    config.WithPositionAwareLift()
+        .WithPositionAwareTilt()
+        .WithOptionalAttributes(WindowCovering::OptionalAttributeSet()
+                                    .Set<Attributes::NumberOfActuationsLift::Id>()
+                                    .Set<Attributes::NumberOfActuationsTilt::Id>()
+                                    .Set<Attributes::CurrentPositionLiftPercentage::Id>()
+                                    .Set<Attributes::CurrentPositionTiltPercentage::Id>());
     return config;
 }
 
@@ -108,8 +110,7 @@ TEST_F(TestWindowCoveringCluster, MandatoryAttributesOnly)
 TEST_F(TestWindowCoveringCluster, AttributesWithLiftOnly)
 {
     WindowCoveringCluster::Config config;
-    config.WithLift();
-    config.mOptionalAttributes.Set<Attributes::NumberOfActuationsLift::Id>();
+    config.WithLift().WithOptionalAttributes(WindowCovering::OptionalAttributeSet().Set<Attributes::NumberOfActuationsLift::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
@@ -127,8 +128,7 @@ TEST_F(TestWindowCoveringCluster, AttributesWithLiftOnly)
 TEST_F(TestWindowCoveringCluster, AttributesWithTiltOnly)
 {
     WindowCoveringCluster::Config config;
-    config.WithTilt();
-    config.mOptionalAttributes.Set<Attributes::NumberOfActuationsTilt::Id>();
+    config.WithTilt().WithOptionalAttributes(WindowCovering::OptionalAttributeSet().Set<Attributes::NumberOfActuationsTilt::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
@@ -146,8 +146,7 @@ TEST_F(TestWindowCoveringCluster, AttributesWithTiltOnly)
 TEST_F(TestWindowCoveringCluster, AttributesWithPaLift)
 {
     WindowCoveringCluster::Config config;
-    config.WithPositionAwareLift();
-    config.mOptionalAttributes.Set<Attributes::CurrentPositionLiftPercentage::Id>();
+    config.WithPositionAwareLift().WithOptionalAttributes(WindowCovering::OptionalAttributeSet().Set<Attributes::CurrentPositionLiftPercentage::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
@@ -171,8 +170,7 @@ TEST_F(TestWindowCoveringCluster, AttributesWithPaLift)
 TEST_F(TestWindowCoveringCluster, AttributesWithPaTilt)
 {
     WindowCoveringCluster::Config config;
-    config.WithPositionAwareTilt();
-    config.mOptionalAttributes.Set<Attributes::CurrentPositionTiltPercentage::Id>();
+    config.WithPositionAwareTilt().WithOptionalAttributes(WindowCovering::OptionalAttributeSet().Set<Attributes::CurrentPositionTiltPercentage::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
@@ -195,8 +193,15 @@ TEST_F(TestWindowCoveringCluster, AttributesWithPaTilt)
 
 TEST_F(TestWindowCoveringCluster, AttributesWithSafetyStatus)
 {
-    WindowCoveringCluster::Config config = MakeAllFeaturesConfig();
-    config.mOptionalAttributes.Set<Attributes::SafetyStatus::Id>();
+    WindowCoveringCluster::Config config;
+    config.WithPositionAwareLift()
+        .WithPositionAwareTilt()
+        .WithOptionalAttributes(WindowCovering::OptionalAttributeSet()
+                                    .Set<Attributes::NumberOfActuationsLift::Id>()
+                                    .Set<Attributes::NumberOfActuationsTilt::Id>()
+                                    .Set<Attributes::CurrentPositionLiftPercentage::Id>()
+                                    .Set<Attributes::CurrentPositionTiltPercentage::Id>()
+                                    .Set<Attributes::SafetyStatus::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -324,7 +329,7 @@ TEST_F(TestWindowCoveringCluster, ReadMandatoryAttributes)
 
     uint32_t featureMap{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-    EXPECT_EQ(featureMap, config.mFeatures.Raw());
+    EXPECT_EQ(featureMap, cluster.GetFeatureMap().Raw());
 
     Type type{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::Type::Id, type), CHIP_NO_ERROR);
@@ -441,8 +446,7 @@ TEST_F(TestWindowCoveringCluster, SetNumberOfActuationsTilt)
 TEST_F(TestWindowCoveringCluster, SetCurrentPositionLiftPercentage)
 {
     WindowCoveringCluster::Config config;
-    config.WithPositionAwareLift();
-    config.mOptionalAttributes.Set<Attributes::CurrentPositionLiftPercentage::Id>();
+    config.WithPositionAwareLift().WithOptionalAttributes(WindowCovering::OptionalAttributeSet().Set<Attributes::CurrentPositionLiftPercentage::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
@@ -468,8 +472,7 @@ TEST_F(TestWindowCoveringCluster, SetCurrentPositionLiftPercentage)
 TEST_F(TestWindowCoveringCluster, SetCurrentPositionTiltPercentage)
 {
     WindowCoveringCluster::Config config;
-    config.WithPositionAwareTilt();
-    config.mOptionalAttributes.Set<Attributes::CurrentPositionTiltPercentage::Id>();
+    config.WithPositionAwareTilt().WithOptionalAttributes(WindowCovering::OptionalAttributeSet().Set<Attributes::CurrentPositionTiltPercentage::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
@@ -575,8 +578,15 @@ TEST_F(TestWindowCoveringCluster, SetOperationalStatusNoOp)
 
 TEST_F(TestWindowCoveringCluster, SetSafetyStatusNoOp)
 {
-    WindowCoveringCluster::Config config = MakeAllFeaturesConfig();
-    config.mOptionalAttributes.Set<Attributes::SafetyStatus::Id>();
+    WindowCoveringCluster::Config config;
+    config.WithPositionAwareLift()
+        .WithPositionAwareTilt()
+        .WithOptionalAttributes(WindowCovering::OptionalAttributeSet()
+                                    .Set<Attributes::NumberOfActuationsLift::Id>()
+                                    .Set<Attributes::NumberOfActuationsTilt::Id>()
+                                    .Set<Attributes::CurrentPositionLiftPercentage::Id>()
+                                    .Set<Attributes::CurrentPositionTiltPercentage::Id>()
+                                    .Set<Attributes::SafetyStatus::Id>());
 
     WindowCoveringCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
