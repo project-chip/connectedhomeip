@@ -150,9 +150,9 @@ class AvAnalysisClusterPerceivedContextEvent(
       val expiredContexts =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))) {
           Optional.of(
-            buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
+            buildList<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
               tlvReader.enterArray(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 this.add(
                   chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,

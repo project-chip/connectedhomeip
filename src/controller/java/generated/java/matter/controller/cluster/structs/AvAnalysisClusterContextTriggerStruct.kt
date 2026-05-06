@@ -69,7 +69,7 @@ class AvAnalysisClusterContextTriggerStruct(
             Optional.of(
               buildList<UShort> {
                 tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
-                while(!tlvReader.isEndOfContainer()) {
+                while (!tlvReader.isEndOfContainer()) {
                   add(tlvReader.getUShort(AnonymousTag))
                 }
                 tlvReader.exitContainer()

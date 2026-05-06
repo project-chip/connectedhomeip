@@ -73,7 +73,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
         }
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      } 
+      }
       put(ContextSpecificTag(TAG_METADATA_ENABLED), metadataEnabled)
       if (videoStreams.isPresent) {
         val optvideoStreams = videoStreams.get()
@@ -159,7 +159,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UInt> {
               tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()

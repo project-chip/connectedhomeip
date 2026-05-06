@@ -27,7 +27,7 @@ class AvAnalysisClusterAnalysisSessionEndEvent(
   val sessionID: UInt,
   val sourceNodeId: Optional<ULong>
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("AvAnalysisClusterAnalysisSessionEndEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("\tsourceNodeId : $sourceNodeId\n")

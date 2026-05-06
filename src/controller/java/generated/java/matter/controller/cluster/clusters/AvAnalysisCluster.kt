@@ -73,9 +73,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : ActiveAmbientContextTriggersAttributeSubscriptionState()
   }
 
-  class AnalysisStreamsAttribute(
-    val value: List<AvAnalysisClusterAnalysisStreamStruct>?
-  )
+  class AnalysisStreamsAttribute(val value: List<AvAnalysisClusterAnalysisStreamStruct>?)
 
   sealed class AnalysisStreamsAttributeSubscriptionState {
     data class Success(val value: List<AvAnalysisClusterAnalysisStreamStruct>?) :
@@ -86,9 +84,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : AnalysisStreamsAttributeSubscriptionState()
   }
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : GeneratedCommandListAttributeSubscriptionState()
@@ -98,9 +94,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
   }
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
   sealed class AcceptedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AcceptedCommandListAttributeSubscriptionState()
@@ -110,9 +104,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AttributeListAttributeSubscriptionState()
@@ -313,13 +305,10 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
   suspend fun readSupportedAmbientContextsAttribute(): SupportedAmbientContextsAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-    val readRequest = ReadRequest(
-      eventPaths = emptyList(),
-      attributePaths = listOf(attributePath)
-    )
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
@@ -413,7 +402,8 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
   suspend fun readActiveAmbientContextTriggersAttribute(): ActiveAmbientContextTriggersAttribute {
     val ATTRIBUTE_ID: UInt = 1u
 
-    val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
@@ -459,9 +449,9 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -491,7 +481,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
           val decodedValue: List<AvAnalysisClusterContextTriggerStruct> =
             buildList<AvAnalysisClusterContextTriggerStruct> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(AvAnalysisClusterContextTriggerStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
@@ -505,6 +495,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
       }
     }
   }
+
   suspend fun readMaxAnalysisStreamCountAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 2u
 
@@ -575,7 +566,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-             
+
           requireNotNull(attributeData) {
             "Maxanalysisstreamcount attribute not found in Node State update"
           }
@@ -666,8 +657,8 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
             subscriptionState.updateState.successes
-            .filterIsInstance<ReadData.Attribute>()
-            .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
             "Currentanalysisstreamcount attribute not found in Node State update"
@@ -766,7 +757,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
             "Analysisstreams attribute not found in Node State update"
@@ -1327,7 +1318,7 @@ class AvAnalysisCluster(private val controller: MatterController, private val en
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
       listOf(
-       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
     val subscribeRequest: SubscribeRequest =
