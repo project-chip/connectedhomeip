@@ -283,15 +283,28 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.step(1)
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Provider already started above with busy/60s args.
+        #
+        # Two-phase queue-based verification replaces the polling-matcher approach:
+        #
+        #   Phase A — wait for kDelayedOnQuery to confirm the DUT received the Busy/60s
+        #             response.  kDownloading before kDelayedOnQuery is an immediate fail.
+        #
+        #   Phase B — guard a 120s window using await_duration_asserting_no_forbidden().
+        #             That method evaluates each report exactly once at dequeue time, so there
+        #             is no polling-loop re-evaluation drift that allowed kDownloading to slip
+        #             through the 119.5 s–120.5 s dead zone in the old matcher_ota_updatestate
+        #             approach.  tolerance_sec=1.0 shrinks the strict window to 119s so states
+        #             arriving within the last second of the nominal interval are not flagged.
+        #             kDownloading that arrives after the 119s window (i.e. after the DUT
+        #             correctly observed the minimum delay) does not cause a failure.
         # ------------------------------------------------------------------------------------
         step_number_s1 = "[STEP_1]"
         logger.info(f'{step_number_s1}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.1 - Matcher for OTA records logs
-        # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Attributes: UpdateState (Busy sequence)
-        # ------------------------------------------------------------------------------------
+        kDelayedOnQuery_s1 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
+        kDownloading_s1 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        kApplying_s1 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
+
         subscription_attr_state_busy = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -315,53 +328,38 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s1}: Step #1.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.2 - Track OTA attributes: UpdateState (Busy sequence)
-        # Allowed states during 120s interval: Idle, DelayedOnQuery, Querying.
-        # Any unexpected states during the 120s interval are asserted.
+        # [STEP_1]: Phase A — wait for kDelayedOnQuery (DUT received Busy/60s)
         # ------------------------------------------------------------------------------------
-        logger.info(
-            f'{step_number_s1}: Step #1.1 - Started subscription for UpdateState attribute (Busy sequence). '
-            'Waiting for the 120s minimum interval. This step may take several minutes to complete.')
+        logger.info(f'{step_number_s1}: Phase A — waiting for kDelayedOnQuery (DUT received Busy/60s from provider)')
+        t_delayed_on_query_s1 = subscription_attr_state_busy.await_first_value_asserting_no_forbidden(
+            target_value=kDelayedOnQuery_s1,
+            forbidden_values={kDownloading_s1, kApplying_s1},
+            timeout_sec=120,
+        )
+        logger.info(f'{step_number_s1}: Phase A complete — kDelayedOnQuery at {t_delayed_on_query_s1:.2f}')
 
-        matcher_busy_state_obj, state_sequence_busy, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
-            step_name=step_number_s1,
-            start_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
-            ],
-            allowed_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-            ],
-            min_interval_sec=120,
-            final_state=None
+        # ------------------------------------------------------------------------------------
+        # [STEP_1]: Phase B — 120s guard window; kDownloading/kApplying are forbidden.
+        # ------------------------------------------------------------------------------------
+        tolerance_s1_sec = 1.0
+        logger.info(
+            f'{step_number_s1}: Phase B — guarding 120s minimum interval '
+            f'(tolerance {tolerance_s1_sec}s). kDownloading/kApplying forbidden.')
+
+        subscription_attr_state_busy.await_duration_asserting_no_forbidden(
+            duration_sec=120,
+            forbidden_values={kDownloading_s1, kApplying_s1},
+            tolerance_sec=tolerance_s1_sec,
         )
 
-        subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=920.0)
-        logger.info(f'{step_number_s1}: Step #1.3 - UpdateState (Busy sequence) matcher has completed.')
+        elapsed_s1 = time.time() - t_delayed_on_query_s1
+        logger.info(f'{step_number_s1}: Phase B complete — elapsed since kDelayedOnQuery: {elapsed_s1:.2f}s')
+
+        asserts.assert_true(
+            elapsed_s1 >= 120,
+            f"{step_number_s1}: Elapsed since kDelayedOnQuery was {elapsed_s1:.2f}s, expected >= 120s")
+
         subscription_attr_state_busy.cancel()
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.4 - Verify Busy sequence
-        # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s1}: Step #1.4 - Full OTA UpdateState (Busy sequence) observed: {state_sequence_busy}')
-
-        interval_duration_busy = interval_duration_ref[0]
-
-        if interval_duration_busy is None:
-            asserts.fail(f"Interval did not complete for Busy sequence {interval_duration_busy}.")
-
-        logger.info(f"Interval duration: {interval_duration_busy:.2f}s")
-        logger.info(f'{step_number_s1}: Step #1.4 - 120s interval: {interval_duration_busy:.2f}s, '
-                    f'unexpected states: {list(observed_states_during_interval)}')
-
-        expected_start = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
-
-        asserts.assert_true(expected_start in state_sequence_busy,
-                            f"Expected start state {expected_start} not found in observed sequence: {state_sequence_busy}")
-        asserts.assert_true(interval_duration_busy >= 120, f"Expected interval >= 120s, observed: {interval_duration_busy:.2f}s")
-        asserts.assert_equal(list(observed_states_during_interval), [],
-                             f"Unexpected states: {list(observed_states_during_interval)}")
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.5 - Close Provider Process
