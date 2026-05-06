@@ -29,6 +29,7 @@ if (chip_build_tests) {
     if (chip_device_platform == "linux" && current_os == "linux") {
       tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
+    tests += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-type-parser/tests" ]
 
     # TV Casting app tests (platform-independent)
     tests +=

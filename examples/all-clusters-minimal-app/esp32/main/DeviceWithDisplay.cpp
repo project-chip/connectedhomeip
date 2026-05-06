@@ -708,14 +708,11 @@ void InitDeviceDisplay()
     // Initialize the screen manager
     ScreenManager::Init();
 
-    // Connect the status LED to VLEDs.
-    int vled1 = ScreenManager::AddVLED(TFT_GREEN);
-    int vled2 = ScreenManager::AddVLED(TFT_RED);
-    statusLED1.SetVLED(vled1, vled2);
-
-    int vled3 = ScreenManager::AddVLED(TFT_CYAN);
-    int vled4 = ScreenManager::AddVLED(TFT_ORANGE);
-    statusLED2.SetVLED(vled3, vled4);
+    // Wire status LEDs to virtual LEDs on display
+    static int sStatusLED1_VLED = ScreenManager::AddVLED(TFT_GREEN);
+    static int sStatusLED2_VLED = ScreenManager::AddVLED(TFT_CYAN);
+    statusLED1.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED1_VLED, state); });
+    statusLED2.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED2_VLED, state); });
 
     bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
     wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
