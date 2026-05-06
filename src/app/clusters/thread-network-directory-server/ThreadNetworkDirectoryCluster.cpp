@@ -89,6 +89,9 @@ DataModel::ActionReturnStatus ThreadNetworkDirectoryCluster::ReadAttribute(const
     case ClusterRevision::Id:
         return encoder.Encode(ThreadNetworkDirectory::kRevision);
 
+    case FeatureMap::Id:
+        return encoder.Encode(static_cast<uint32_t>(0));
+
     default:
         return IMStatus::UnsupportedAttribute;
     }
@@ -186,6 +189,8 @@ std::optional<DataModel::ActionReturnStatus> ThreadNetworkDirectoryCluster::Invo
                                                                                           chip::TLV::TLVReader & input_arguments,
                                                                                           CommandHandler * handler)
 {
+    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    
     switch (request.path.mCommandId)
     {
     case AddNetwork::Id: {
