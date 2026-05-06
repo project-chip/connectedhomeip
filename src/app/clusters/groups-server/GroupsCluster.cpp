@@ -16,10 +16,10 @@
 #include <app/clusters/groups-server/GroupsCluster.h>
 
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <app/clusters/scenes-server/Constants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/GroupKeyManagement/Ids.h>
-#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Metadata.h>

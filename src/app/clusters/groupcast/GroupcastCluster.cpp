@@ -1,7 +1,7 @@
 #include "GroupcastCluster.h"
 #include <access/AccessControl.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/clusters/access-control-server/AccessControlEventHelper.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/Attributes.h>
 #include <clusters/Groupcast/Metadata.h>

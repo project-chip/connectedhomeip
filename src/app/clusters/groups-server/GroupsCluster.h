@@ -59,7 +59,8 @@ private:
     scenes::ScenesIntegrationDelegate * mScenesIntegration;
     IdentifyIntegrationDelegate * mIdentifyIntegration;
 
-    Protocols::InteractionModel::Status AddGroup(GroupId groupID, CharSpan groupName, const chip::Access::SubjectDescriptor & subjectDescriptor);
+    Protocols::InteractionModel::Status AddGroup(GroupId groupID, CharSpan groupName,
+                                                 const chip::Access::SubjectDescriptor & subjectDescriptor);
 };
 
 } // namespace chip::app::Clusters

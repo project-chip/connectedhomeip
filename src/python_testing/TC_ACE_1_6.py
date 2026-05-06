@@ -170,7 +170,7 @@ class TC_ACE_1_6(MatterBaseTest):
             operate_only_commands_dict = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, endpoint_to_search)
             asserts.assert_greater(len(operate_only_commands_dict), 0,
                                    "DUT must have at least 1 non-root endpoint with a cluster with commands requiring operate privilege.")
-            
+
             ep1 = None
             operate_only_command = None
             for ep, cmds in operate_only_commands_dict.items():
@@ -187,8 +187,9 @@ class TC_ACE_1_6(MatterBaseTest):
                 except Exception as e:
                     log.warning(f"Failed to read ServerList for endpoint {ep}: {e}")
                     continue
-            
-            asserts.assert_not_equal(ep1, None, "Could not find an endpoint with both operate privilege commands and Groups cluster.")
+
+            asserts.assert_not_equal(
+                ep1, None, "Could not find an endpoint with both operate privilege commands and Groups cluster.")
 
             log.info(f"Endpoint value for ep~1~ used for test steps with groupcast cluster: {ep1}")
             log.info(
