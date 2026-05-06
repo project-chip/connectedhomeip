@@ -127,7 +127,6 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-
 TEST_F(TestNetworkCommissioningCluster, TestReorderNetworkRequiresFailsafe)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
@@ -139,17 +138,17 @@ TEST_F(TestNetworkCommissioningCluster, TestReorderNetworkRequiresFailsafe)
 
     // The fail-safe is not armed (default state). ReorderNetwork should be rejected.
     Commands::ReorderNetwork::Type request;
-    uint8_t networkId[] = { 0x01, 0x02, 0x03 };
-    request.networkID   = ByteSpan(networkId);
+    uint8_t networkId[]  = { 0x01, 0x02, 0x03 };
+    request.networkID    = ByteSpan(networkId);
     request.networkIndex = 0;
 
     auto result = tester.Invoke(request);
 
     // The command should fail with FailsafeRequired status
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.GetStatusCode(),
-              std::optional(Protocols::InteractionModel::ClusterStatusCode::Of(
-                  Protocols::InteractionModel::Status::FailsafeRequired)));
+    EXPECT_EQ(
+        result.GetStatusCode(),
+        std::optional(Protocols::InteractionModel::ClusterStatusCode::Of(Protocols::InteractionModel::Status::FailsafeRequired)));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
