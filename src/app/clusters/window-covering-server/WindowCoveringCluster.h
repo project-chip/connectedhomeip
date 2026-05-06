@@ -80,8 +80,11 @@ struct AbsoluteLimits
 class WindowCoveringCluster : public DefaultServerCluster
 {
 public:
-    struct Config
+    class Config
     {
+    public:
+        Config() = default;
+
         Config & WithLift()
         {
             mFeatures.Set(Feature::kLift);
@@ -104,12 +107,15 @@ public:
             mFeatures.Set(Feature::kPositionAwareTilt);
             return *this;
         }
-        Config & WithAbsolutePosition()
+
+        Config & WithOptionalAttributes(OptionalAttributeSet optionalAttributes)
         {
-            mFeatures.Set(Feature::kAbsolutePosition);
+            mOptionalAttributes = optionalAttributes;
             return *this;
         }
 
+    private:
+        friend class WindowCoveringCluster;
         BitFlags<Feature> mFeatures;
         OptionalAttributeSet mOptionalAttributes;
     };
@@ -189,6 +195,7 @@ public:
      *         Status::Failure if the PositionAwareTilt feature is not supported.
      */
     Protocols::InteractionModel::Status HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields);
+
     // Setters and Getters
     bool HasFeature(Feature feature) const { return mFeatureMap.Has(feature); }
     bool HasFeaturePaLift() const;
@@ -237,8 +244,8 @@ public:
     void SetSafetyStatus(chip::BitMask<SafetyStatus> status);
     chip::BitMask<SafetyStatus> GetSafetyStatus() const { return mSafetyStatus; }
 
-    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
-    Delegate * GetDelegate() const { return mDelegate; }
+    void SetDelegate(WindowCoveringDelegate * delegate) { mDelegate = delegate; }
+    WindowCoveringDelegate * GetDelegate() const { return mDelegate; }
 
 private:
     /**
@@ -253,12 +260,12 @@ private:
 
     EndpointId GetEndpointId() { return mPath.mEndpointId; }
 
-    Delegate * mDelegate = nullptr;
+    WindowCoveringDelegate * mDelegate = nullptr;
     BitFlags<WindowCovering::Feature> mFeatureMap;
     OptionalAttributeSet mOptionalAttributes;
 
     // Attributes
-    Type mType;
+    Type mType                       = Type::kRollerShade;
     uint16_t mNumberOfActuationsLift = 0;
     uint16_t mNumberOfActuationsTilt = 0;
     chip::BitMask<ConfigStatus> mConfigStatus;
@@ -267,7 +274,7 @@ private:
     NPercent100ths mTargetPositionLiftPercentage100ths;
     NPercent100ths mTargetPositionTiltPercentage100ths;
     chip::BitMask<OperationalStatus> mOperationalStatus;
-    EndProductType mEndProductType;
+    EndProductType mEndProductType = EndProductType::kRollerShade;
     NPercent100ths mCurrentPositionLiftPercentage100ths;
     NPercent100ths mCurrentPositionTiltPercentage100ths;
     chip::BitMask<Mode> mMode;

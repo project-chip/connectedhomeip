@@ -74,8 +74,20 @@ public:
         }
 
         WindowCoveringCluster::Config config;
-        config.mFeatures           = features;
-        config.mOptionalAttributes = optionalAttributes;
+        if (features.Has(Feature::kPositionAwareLift))
+            config.WithPositionAwareLift();
+        else if (features.Has(Feature::kLift))
+            config.WithLift();
+
+        if (features.Has(Feature::kPositionAwareTilt))
+            config.WithPositionAwareTilt();
+        else if (features.Has(Feature::kTilt))
+            config.WithTilt();
+
+        if (features.Has(Feature::kAbsolutePosition))
+            config.WithAbsolutePosition();
+
+        config.WithOptionalAttributes(optionalAttributes);
         gServers[clusterInstanceIndex].Create(endpointId, config);
 
         auto & cluster = gServers[clusterInstanceIndex].Cluster();
@@ -212,7 +224,7 @@ WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId)
     return static_cast<WindowCoveringCluster *>(cluster);
 }
 
-void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate)
+void SetDefaultDelegate(EndpointId endpointId, WindowCoveringDelegate * delegate)
 {
     WindowCoveringCluster * cluster = FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(cluster != nullptr, ChipLogError(Zcl, "Failed to set WindowCovering delegate for endpoint:%u", endpointId));

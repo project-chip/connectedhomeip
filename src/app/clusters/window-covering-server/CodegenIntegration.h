@@ -25,7 +25,7 @@ namespace Clusters {
 namespace WindowCovering {
 WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
-void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate);
+void SetDefaultDelegate(EndpointId endpointId, WindowCoveringDelegate * delegate);
 
 } // namespace WindowCovering
 } // namespace Clusters
