@@ -110,7 +110,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): WebRTCTransportProviderClusterWebRTCSessionStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUInt(ContextSpecificTag(TAG_ID))
