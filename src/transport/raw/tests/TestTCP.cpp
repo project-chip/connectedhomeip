@@ -1048,8 +1048,7 @@ TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
 
     // A message of exactly kMaxTCPMessageSize (kLargeBufMaxSizeWithoutReserve - 4)
     // should be accepted, not rejected.
-    constexpr uint32_t kMaxValidSize =
-        static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
+    constexpr uint32_t kMaxValidSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     EXPECT_TRUE(testData[0].Init((const uint32_t[]){ kMaxValidSize, 0 }));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
