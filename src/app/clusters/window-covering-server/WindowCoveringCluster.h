@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "window-covering-delegate.h"
+#include "WindowCoveringDelegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/af-types.h>
