@@ -190,7 +190,7 @@ std::optional<DataModel::ActionReturnStatus> ThreadNetworkDirectoryCluster::Invo
                                                                                           CommandHandler * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     switch (request.path.mCommandId)
     {
     case AddNetwork::Id: {
