@@ -934,7 +934,7 @@ TEST_F(TestGroupsCluster, TestAuxiliaryAccessUpdatedEvent)
     }
 
     // 5. Call legacy RemoveGroup -> Should generate event because group had HasAuxiliaryACL = true,
-    // so aux acl entires will be removed (or updated)
+    // so aux acl entries will be removed (or updated)
     {
         Groups::Commands::RemoveGroup::Type removeRequest;
         removeRequest.groupID = kGroupId;

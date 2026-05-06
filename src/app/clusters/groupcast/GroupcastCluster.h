@@ -120,8 +120,6 @@ private:
     void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
 
-    void EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor);
-
     GroupcastContext mGroupcastContext;
     const BitFlags<Groupcast::Feature> mFeatures;
     DataModel::Provider * mDataModelProvider = nullptr;

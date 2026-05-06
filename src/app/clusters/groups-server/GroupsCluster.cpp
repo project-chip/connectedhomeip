@@ -18,8 +18,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/scenes-server/Constants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <clusters/AccessControl/Events.h>
 #include <clusters/GroupKeyManagement/Ids.h>
+#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Metadata.h>
@@ -332,7 +332,7 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
 
         if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
         {
-            EmitAuxiliaryAccessUpdated(request.subjectDescriptor);
+            AccessControl::EmitAuxiliaryAccessUpdated(mContext, request.subjectDescriptor);
         }
         return std::nullopt;
     }
@@ -361,7 +361,7 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
 
         if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
         {
-            EmitAuxiliaryAccessUpdated(request.subjectDescriptor);
+            AccessControl::EmitAuxiliaryAccessUpdated(mContext, request.subjectDescriptor);
         }
         return Status::Success;
     }
@@ -430,28 +430,10 @@ Status GroupsCluster::AddGroup(GroupId groupID, CharSpan groupName, const chip::
 
     if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
     {
-        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext, subjectDescriptor);
     }
 
     return Status::Success;
-}
-
-void GroupsCluster::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor)
-{
-    VerifyOrReturn(mContext != nullptr);
-
-    AccessControl::Events::AuxiliaryAccessUpdated::Type event;
-    event.fabricIndex = subjectDescriptor.fabricIndex;
-    if (subjectDescriptor.subject != kUndefinedNodeId)
-    {
-        event.adminNodeID.SetNonNull(subjectDescriptor.subject);
-    }
-    else
-    {
-        event.adminNodeID.SetNull();
-    }
-
-    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace chip::app::Clusters
