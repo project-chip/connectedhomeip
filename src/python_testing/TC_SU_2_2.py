@@ -165,7 +165,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         return ["MCORE.OTA.Requestor"]
 
     def steps_TC_SU_2_2(self) -> list[TestStep]:
-        # Steps are executed in order: 0, 1, 2, 3, 4, 5, 6, 7.
+        # Steps are executed in order: 0, 1, 2, 3, 4, 5, 6.
         #
         # Steps 1, 2, 4 do not trigger an OTA image transfer — the provider is killed immediately
         # after each verification. Step 3 triggers a download after the 180s delay but the
@@ -390,11 +390,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateNotAvailable,
         )
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.1 - Matcher for OTA records logs
-        # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Attributes: UpdateState (updateNotAvailable sequence)
-        # ------------------------------------------------------------------------------------
         subscription_attr_state_updatenotavailable = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -410,61 +405,50 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             keepSubscriptions=False
         )
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command
-        # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s2}: Step #2.0 - Controller sends AnnounceOTAProvider command')
         await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s2}: Step #2.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.2 - Track OTA attributes: UpdateState (updateNotAvailable sequence)
-        # Allowed states during 120s interval: Idle, Querying.
+        # [STEP_2]: Phase A — wait for kQuerying (DUT sent its first QueryImage).
+        # kDownloading/kApplying before kQuerying is an immediate fail.
         # ------------------------------------------------------------------------------------
-        logger.info(
-            f'{step_number_s2}: Step #2.1 - Started subscription for UpdateState attribute '
-            '(updateNotAvailable sequence). '
-            'Waiting for the 120s minimum interval. This step may take several minutes to complete.')
+        kQuerying_s2 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        kDownloading_s2 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        kApplying_s2 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
 
-        matcher_not_available_state_obj, state_sequence_notavailable, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
-            step_name=step_number_s2,
-            start_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-            ],
-            allowed_states=[
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-            ],
-            min_interval_sec=120,
-            final_state=None
+        logger.info(f'{step_number_s2}: Phase A — waiting for kQuerying (first QueryImage sent by DUT)')
+        t_querying_s2 = subscription_attr_state_updatenotavailable.await_first_value_asserting_no_forbidden(
+            target_value=kQuerying_s2,
+            forbidden_values={kDownloading_s2, kApplying_s2},
+            timeout_sec=120,
+        )
+        logger.info(f'{step_number_s2}: Phase A complete — kQuerying at {t_querying_s2:.2f}, 120s guard window starts')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_2]: Phase B — 120s guard window; kDownloading/kApplying are forbidden.
+        # ------------------------------------------------------------------------------------
+        tolerance_s2 = 2.0
+        min_interval_s2 = 120
+
+        logger.info(
+            f'{step_number_s2}: Phase B — guarding {min_interval_s2}s minimum interval '
+            f'(tolerance {tolerance_s2}s). kDownloading/kApplying forbidden.')
+
+        subscription_attr_state_updatenotavailable.await_duration_asserting_no_forbidden(
+            duration_sec=min_interval_s2,
+            forbidden_values={kDownloading_s2, kApplying_s2},
+            tolerance_sec=tolerance_s2,
         )
 
-        subscription_attr_state_updatenotavailable.await_all_expected_report_matches(
-            [matcher_not_available_state_obj], timeout_sec=920.0)
-        logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
+        elapsed_s2 = time.time() - t_querying_s2
+        logger.info(f'{step_number_s2}: Phase B complete — elapsed since kQuerying: {elapsed_s2:.2f}s')
+
+        asserts.assert_true(
+            elapsed_s2 >= min_interval_s2,
+            f"{step_number_s2}: Elapsed since kQuerying was {elapsed_s2:.2f}s, expected >= {min_interval_s2}s")
+
         subscription_attr_state_updatenotavailable.cancel()
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.4 - Verify updateNotAvailable sequence
-        # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s2}: Step #2.4 - Full OTA UpdateState (updateNotAvailable sequence) observed: {state_sequence_notavailable}')
-
-        interval_duration_notavailable = interval_duration_ref[0]
-
-        if interval_duration_notavailable is None:
-            asserts.fail(f"Interval did not complete for updateNotAvailable sequence {interval_duration_notavailable}.")
-
-        logger.info(f'{step_number_s2}: Step #2.4 - 120s interval: {interval_duration_notavailable:.2f}s, '
-                    f'unexpected states: {list(observed_states_during_interval)}')
-
-        expected_start = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-
-        asserts.assert_true(expected_start in state_sequence_notavailable,
-                            f"Expected start state {expected_start} not found in observed sequence: {state_sequence_notavailable}")
-        asserts.assert_true(interval_duration_notavailable >= 120,
-                            f"Expected interval >= 120s, observed: {interval_duration_notavailable:.2f}s")
-        asserts.assert_equal(list(observed_states_during_interval), [],
-                             f"Unexpected states: {list(observed_states_during_interval)}")
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.5 - Close Provider Process
@@ -498,11 +482,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_busy_180,
         )
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_3]: Step #3.1 - Matcher for OTA records logs
-        # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Attributes: UpdateState (Busy, 180s DelayedActionTime)
-        # ------------------------------------------------------------------------------------
         subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -518,102 +497,64 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             keepSubscriptions=False
         )
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_3]: Step #3.0 - Controller sends AnnounceOTAProvider command
-        # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.0 - Controller sends AnnounceOTAProvider command')
         await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s3}: Step #3.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_3]: Phase A — Wait for kDelayedOnQuery.
-        # The provider responds Busy/180s on the first query and then auto-switches to
-        # UpdateAvailable for the next query (see OTAProviderExample.cpp line ~484).
-        # Record the timestamp when kDelayedOnQuery is first seen.
+        # [STEP_3]: Phase A — wait for kDelayedOnQuery (DUT received Busy/180s).
+        # The provider auto-switches to UpdateAvailable after one Busy response.
+        # kDownloading before kDelayedOnQuery is an immediate fail.
         # ------------------------------------------------------------------------------------
+        kDelayedOnQuery_s3 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
+        kDownloading_s3 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        kApplying_s3 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
+
+        logger.info(f'{step_number_s3}: Phase A — waiting for kDelayedOnQuery (DUT received Busy/180s)')
+        t_delayed_on_query_s3 = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
+            target_value=kDelayedOnQuery_s3,
+            forbidden_values={kDownloading_s3, kApplying_s3},
+            timeout_sec=120,
+        )
+        logger.info(f'{step_number_s3}: Phase A complete — kDelayedOnQuery at {t_delayed_on_query_s3:.2f}, 180s guard window starts')
+
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Phase B — 180s guard window; kDownloading/kApplying are forbidden.
+        # After the window elapses, the provider has auto-switched to UpdateAvailable and the
+        # DUT's next query will trigger a download.
+        # ------------------------------------------------------------------------------------
+        tolerance_s3 = 5.0
+        min_interval_s3 = 180
+
         logger.info(
-            f'{step_number_s3}: Step #3.1 (Phase A) - Waiting for kDelayedOnQuery to confirm '
-            'the DUT received the Busy/180s response.')
+            f'{step_number_s3}: Phase B — guarding {min_interval_s3}s DelayedActionTime '
+            f'(tolerance {tolerance_s3}s). kDownloading/kApplying forbidden. This will take ~3 minutes.')
 
-        t_delayed_on_query_s3 = [None]
-        kDelayedOnQuery = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
-
-        def matcher_delayed_s3(report):
-            if report.value == kDelayedOnQuery and t_delayed_on_query_s3[0] is None:
-                t_delayed_on_query_s3[0] = time.time()
-                logger.info(f'{step_number_s3}: kDelayedOnQuery observed at {t_delayed_on_query_s3[0]:.2f}')
-                return True
-            return False
-
-        matcher_delayed_s3_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s3} - Phase A: Wait for kDelayedOnQuery",
-            matcher=matcher_delayed_s3
+        subscription_attr_state_busy_180s.await_duration_asserting_no_forbidden(
+            duration_sec=min_interval_s3,
+            forbidden_values={kDownloading_s3, kApplying_s3},
+            tolerance_sec=tolerance_s3,
         )
 
-        subscription_attr_state_busy_180s.await_all_expected_report_matches(
-            [matcher_delayed_s3_obj], timeout_sec=920.0)
-        logger.info(f'{step_number_s3}: Step #3.2 (Phase A) - kDelayedOnQuery confirmed, 180s delay started.')
+        # ------------------------------------------------------------------------------------
+        # [STEP_3]: Phase C — wait for kDownloading to confirm the DUT re-queried after 180s.
+        # ------------------------------------------------------------------------------------
+        logger.info(f'{step_number_s3}: Phase C — waiting for kDownloading (DUT re-queried after 180s delay)')
+        t_downloading_s3 = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
+            target_value=kDownloading_s3,
+            forbidden_values=set(),
+            timeout_sec=120,
+        )
+
+        elapsed_s3 = t_downloading_s3 - t_delayed_on_query_s3
+        logger.info(f'{step_number_s3}: Phase C complete — elapsed kDelayedOnQuery → kDownloading: {elapsed_s3:.2f}s')
+
+        asserts.assert_true(
+            elapsed_s3 >= min_interval_s3 - tolerance_s3,
+            f"{step_number_s3}: DUT re-queried too soon. "
+            f"Elapsed: {elapsed_s3:.2f}s, expected >= {min_interval_s3 - tolerance_s3}s.")
+
         subscription_attr_state_busy_180s.cancel()
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_3]: Phase B — Wait for kDownloading after the 180s delay expires.
-        # After 180s the provider auto-switched to UpdateAvailable so the next query triggers
-        # a download. Assert the elapsed time since kDelayedOnQuery is >= 180s.
-        # ------------------------------------------------------------------------------------
-        logger.info(
-            f'{step_number_s3}: Step #3.3 (Phase B) - Waiting for kDownloading (after ~180s delay). '
-            'This will take at least 3 minutes.')
-
-        subscription_attr_state_downloading_s3 = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-
-        await subscription_attr_state_downloading_s3.start(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0,
-            max_interval_sec=30,
-            keepSubscriptions=False
-        )
-
-        t_downloading_s3 = [None]
-        kDownloading = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
-
-        def matcher_downloading_s3(report):
-            if report.value == kDownloading and t_downloading_s3[0] is None:
-                t_downloading_s3[0] = time.time()
-                logger.info(f'{step_number_s3}: kDownloading observed at {t_downloading_s3[0]:.2f}')
-                return True
-            return False
-
-        matcher_downloading_s3_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s3} - Phase B: Wait for kDownloading",
-            matcher=matcher_downloading_s3
-        )
-
-        subscription_attr_state_downloading_s3.await_all_expected_report_matches(
-            [matcher_downloading_s3_obj], timeout_sec=250.0)
-        logger.info(f'{step_number_s3}: Step #3.4 (Phase B) - kDownloading confirmed.')
-        subscription_attr_state_downloading_s3.cancel()
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_3]: Step #3.5 - Verify the DUT respected the 180s DelayedActionTime.
-        # ------------------------------------------------------------------------------------
-        asserts.assert_true(t_delayed_on_query_s3[0] is not None,
-                            f"{step_number_s3}: kDelayedOnQuery timestamp was never recorded.")
-        asserts.assert_true(t_downloading_s3[0] is not None,
-                            f"{step_number_s3}: kDownloading timestamp was never recorded.")
-
-        elapsed_s3 = t_downloading_s3[0] - t_delayed_on_query_s3[0]
-        logger.info(f'{step_number_s3}: Step #3.5 - Elapsed since kDelayedOnQuery → kDownloading: '
-                    f'{elapsed_s3:.2f}s (expected >= 180s)')
-        tolerance_sec_s3 = 5.0
-        asserts.assert_true(elapsed_s3 >= 180 - tolerance_sec_s3,
-                            f"{step_number_s3}: DUT re-queried too soon. "
-                            f"Elapsed: {elapsed_s3:.2f}s, expected >= {180 - tolerance_sec_s3}s.")
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.6 - Close Provider Process
