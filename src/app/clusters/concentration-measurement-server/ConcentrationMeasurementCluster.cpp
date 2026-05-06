@@ -69,8 +69,8 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
         uint32_t bits = 0;
         if (mFeatures.Has(Feature::kNumericMeasurement))
             bits |= (1u << Attributes::MeasuredValue::Id) | (1u << Attributes::MinMeasuredValue::Id) |
-                    (1u << Attributes::MaxMeasuredValue::Id) | (1u << Attributes::Uncertainty::Id) |
-                    (1u << Attributes::MeasurementUnit::Id);
+                (1u << Attributes::MaxMeasuredValue::Id) | (1u << Attributes::Uncertainty::Id) |
+                (1u << Attributes::MeasurementUnit::Id);
         if (mFeatures.Has(Feature::kPeakMeasurement))
             bits |= (1u << Attributes::PeakMeasuredValue::Id) | (1u << Attributes::PeakMeasuredValueWindow::Id);
         if (mFeatures.Has(Feature::kAverageMeasurement))
