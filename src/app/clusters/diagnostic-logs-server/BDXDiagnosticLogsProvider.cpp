@@ -198,7 +198,7 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     // Prepare the BDX block to send to the requestor
     TransferSession::BlockData blockData;
     blockData.Data   = buffer.data();
-    blockData.Length  = buffer.size();
+    blockData.Length = buffer.size();
     blockData.IsEof  = isEndOfLog;
 
     err = mTransfer.PrepareBlock(blockData);
