@@ -946,6 +946,28 @@ TEST_F(TestGroupsCluster, TestAuxiliaryAccessUpdatedEvent)
         ASSERT_TRUE(event.has_value());
         EXPECT_EQ(event.value().eventOptions.mPath.mEventId, AccessControl::Events::AuxiliaryAccessUpdated::Id);
     }
+    
+    // 6. Call legacy RemoveAllGroups -> Should remove endpoint and generate event (since HasAuxiliaryACL is true)
+    {
+        // First, Re-create Aux-enabled group and clear events
+        GroupDataProvider::GroupInfo groupInfo(kGroupId, "AuxGroup2", flags);
+        ASSERT_EQ(mGroupDataProvider.SetGroupInfo(kFabricIndex1, groupInfo), CHIP_NO_ERROR);
+        ASSERT_EQ(mGroupDataProvider.AddEndpoint(kFabricIndex1, kGroupId, kTestEndpointId), CHIP_NO_ERROR);
+        mGroupDataProvider.ConsumeAuxAclNotificationNeeded(); // Reset flag
+        while (mClusterTester->GetNextGeneratedEvent().has_value()) {} // Clear any events
+
+        // Remove all groups
+        Groups::Commands::RemoveAllGroups::Type removeAllRequest;
+        auto result = mClusterTester->Invoke<Groups::Commands::RemoveAllGroups::Type>(removeAllRequest);
+        EXPECT_TRUE(result.IsSuccess());
+
+        auto event = mClusterTester->GetNextGeneratedEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, AccessControl::Events::AuxiliaryAccessUpdated::Id);
+
+        // Verify group is removed
+        EXPECT_FALSE(IsGroupInProvider(kFabricIndex1, kGroupId));
+    }
 }
 
 } // namespace
