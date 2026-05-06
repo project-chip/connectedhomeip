@@ -843,7 +843,8 @@ CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader & reader, ui
     {
         SnOffset += kTransferProtocolAckSize;
     }
-    VerifyOrReturnError(SnOffset < reader.OctetsRead() + reader.Remaining(), CHIP_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrReturnError(SnOffset + sizeof(seqNum) <= reader.OctetsRead() + reader.Remaining(),
+                        CHIP_ERROR_MESSAGE_INCOMPLETE);
     pSn    = pHead + SnOffset;
     seqNum = *pSn;
 
@@ -878,7 +879,8 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, Encoding:
         pAct = pHead + kTransferProtocolHeaderFlagsSize;
         SnOffset += kTransferProtocolAckSize;
     }
-    VerifyOrExit(SnOffset < reader.OctetsRead() + reader.Remaining(), err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(SnOffset + sizeof(*pSn) <= reader.OctetsRead() + reader.Remaining(),
+                 err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     pSn = pHead + SnOffset;
     if (pAct == nullptr)
     {
