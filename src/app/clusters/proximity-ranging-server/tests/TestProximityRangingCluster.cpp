@@ -541,6 +541,7 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
     ASSERT_NE(eventInfo, std::nullopt);
+    ASSERT_TRUE(eventInfo.has_value());
 
     Events::RangingResult::DecodableType decodedEvent;
     EXPECT_EQ(eventInfo.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
@@ -564,6 +565,7 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
     ASSERT_NE(eventInfo, std::nullopt);
+    ASSERT_TRUE(eventInfo.has_value());
 
     Events::RangingSessionStatus::DecodableType decodedEvent;
     EXPECT_EQ(eventInfo.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
