@@ -171,7 +171,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     SE05x_CryptoObjectID_t spakeObjectId = se05x_getCryptoObjID();
 #else
     SE05x_CryptoObjectID_t spakeObjectId =
-        (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER) ? kSE05x_CryptoObject_PAKE_TYPE_B : kSE05x_CryptoObject_PAKE_TYPE_A;
+        (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER) ? kSE05x_CryptoObject_PAKE_NFC_COMM : kSE05x_CryptoObject_PAKE_TYPE_A;
     uint8_t list[1024] = {
         0,
     };
