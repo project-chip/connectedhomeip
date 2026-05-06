@@ -74,18 +74,20 @@ class TC_FAN_3_5(MatterBaseTest):
 
     async def send_step_command(self, endpoint,
                                 direction: Clusters.Objects.FanControl.Enums.StepDirectionEnum,
-                                wrap: bool = False,
-                                lowest_off: Optional[bool] = False,
+                                wrap: Optional[bool] = None,
+                                lowest_off: Optional[bool] = None,
                                 expected_status: Status = Status.Success):
-        # lowest_off=None omits the optional field so the DUT applies the spec default (true).
-        step_kwargs = {"direction": direction, "wrap": wrap}
+        # Passing None for optional fields omits them so the DUT applies cluster defaults (Wrap false, LowestOff true).
+        step_kwargs = {"direction": direction}
+        if wrap is not None:
+            step_kwargs["wrap"] = wrap
         if lowest_off is not None:
             step_kwargs["lowestOff"] = lowest_off
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(**step_kwargs), endpoint=endpoint)
+            asserts.assert_equal(expected_status, Status.Success, "Expected command to fail but it succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            pass
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
@@ -167,7 +169,8 @@ class TC_FAN_3_5(MatterBaseTest):
         await asyncio.sleep(1)
 
         self.print_step("5b", "TH sends Step command to DUT with Direction set to Increase and Wrap set to True")
-        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True)
+        await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True,
+                                    lowest_off=False)
 
         await asyncio.sleep(1)
 
