@@ -593,7 +593,8 @@ class IDMBaseTest(MatterBaseTest):
         endpoint_id: int,
         attr_class: type[ClusterObjects.ClusterAttributeDescriptor],
     ) -> Optional[Status]:
-        """Attempt to write `attr_class` on `endpoint_id` using a small set
+        """
+        Attempts to write `attr_class` on `endpoint_id` using a small set
         of dummy values. Returns the resulting Status, or None if no value
         could be serialized for this attribute type.
         """
@@ -662,7 +663,8 @@ class IDMBaseTest(MatterBaseTest):
         )
 
     async def write_unsupported_attribute(self):
-        """Find a (endpoint, cluster, attribute) where the attribute is in
+        """
+        Find a (endpoint, cluster, attribute) where the attribute is in
         the spec but missing from the DUT's AttributeList, write to it, and
         assert that the DUT returns UNSUPPORTED_ATTRIBUTE.
 
@@ -675,9 +677,15 @@ class IDMBaseTest(MatterBaseTest):
                     continue
 
                 all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
-                dut_attrs = set(cluster_data.get(cluster_type.Attributes.AttributeList, []))
+                # AttributeList (0xFFFB) is a mandatory global attribute. If
+                # it's missing from the wildcard read, that's a DUT defect we
+                # want to surface as a KeyError rather than silently treat as
+                # "this cluster has no attributes".
+                dut_attrs = set(cluster_data[cluster_type.Attributes.AttributeList])
 
-                for attr_id in all_attrs - dut_attrs:
+                # Sort by attribute id so the candidate order is reproducible
+                # across runs (set difference iteration is hash-based).
+                for attr_id in sorted(all_attrs - dut_attrs):
                     if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal:
                         candidates.append(
                             (endpoint_id, cluster_type.id, ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][attr_id])
