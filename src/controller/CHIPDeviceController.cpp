@@ -1975,7 +1975,7 @@ CHIP_ERROR DeviceCommissioner::SetUdcListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::FindCommissionableNode(char * instanceName)
+void DeviceCommissioner::FindCommissionableNode(const char * instanceName)
 {
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instanceName);
     TEMPORARY_RETURN_IGNORED DiscoverCommissionableNodes(filter);

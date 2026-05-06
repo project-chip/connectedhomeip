@@ -157,11 +157,11 @@ class NrfConnectBuilder(Builder):
             raise Exception('ZEPHYR_BASE validation failed')
 
     def _prepare_environment(self):
-        # Source the zephyr-env.sh script to set up the environment
-        # The zephyr-env.sh script changes the python environment, so we need to
-        # source the activate.sh script after zephyr-env.sh to ensure that the
+        # Source the zephyrrc to set up the environment
+        # The zephyrrc changes the python environment, so we need to
+        # source the activate.sh script after zephyrrc to ensure that the
         # all python packages and dependencies are available.
-        return 'source "$ZEPHYR_BASE/zephyr-env.sh";\nsource scripts/activate.sh;\n'
+        return 'source "$ZEPHYR_BASE/../.zephyrrc";\nsource scripts/activate.sh;\n'
 
     def _get_build_flags(self):
         flags = []

@@ -37,6 +37,26 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from .target import BuildTarget, TargetPart
 
 
+# IMPORTANT: Keep list in sync with:
+#   - enabled_devices.cmake
+#   - enabled_devices.gni
+#   - enabled_devices_config.h.in
+# in all-devices: examples/all-devices-app/all-devices-common/devices
+_ALL_DEVICES_APP_DEVICES = [
+    # keep-sorted: start
+    'chime',
+    'contact-sensor',
+    'dimmable-light',
+    'occupancy-sensor',
+    'on-off-light',
+    'soil-sensor',
+    'speaker',
+    'temperature-sensor',
+    'water-leak-detector',
+    # keep-sorted: end
+]
+
+
 def BuildHostTestRunnerTarget():
     target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
@@ -156,6 +176,12 @@ def BuildHostTarget():
         TargetPart('closure', app=HostApp.CLOSURE),
     ]
 
+    # Single-device subset builds for all-devices-app.
+    # Each modifier selects exactly one device; the binary is named example-device-app.
+    # Multi-device subsets can be built directly with gn gen --args.
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=HostApp.ALL_DEVICES_APP, all_devices_enabled_devices=[_device]))
+
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
         app_parts.append(TargetPart('darwin-framework-tool',
                          app=HostApp.CHIP_TOOL_DARWIN))
@@ -209,6 +235,7 @@ def BuildHostTarget():
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
     target.AppendModifier('endpoint-unique-id', chip_enable_endpoint_unique_id=True)
+
     target.AppendModifier('unified', unified=True).OnlyIfRe(
         "-(" + "|".join([
             # keep-sorted start
@@ -242,7 +269,7 @@ def BuildEsp32Target():
     ])
 
     # applications
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('all-clusters', app=Esp32App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL),
         TargetPart('all-devices', app=Esp32App.ALL_DEVICES),
@@ -257,9 +284,15 @@ def BuildEsp32Target():
         TargetPart('bridge', app=Esp32App.BRIDGE),
         TargetPart('temperature-measurement',
                    app=Esp32App.TEMPERATURE_MEASUREMENT),
-        TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
         TargetPart('tests', app=Esp32App.TESTS).OnlyIfRe('-qemu-'),
-    ])
+    ]
+    # Single-device subset builds for all-devices-app.
+    # Each modifier selects exactly one device; the binary is named example-device-app.
+    # Multi-device subsets can be built directly with gn gen --args.
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=Esp32App.ALL_DEVICES, all_devices_enabled_devices=[_device]))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
@@ -515,7 +548,6 @@ def BuildNxpTarget():
         TargetPart('rt1060', board=NxpBoard.RT1060),
         TargetPart('rt1170', board=NxpBoard.RT1170),
         TargetPart('rw61x', board=NxpBoard.RW61X),
-        TargetPart('mcxw71', board=NxpBoard.MCXW71),
         TargetPart('mcxw72', board=NxpBoard.MCXW72)
     ])
 
@@ -527,9 +559,9 @@ def BuildNxpTarget():
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('mcxw71|mcxw72'),
-        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('mcxw71|mcxw72'),
-        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('mcxw71|mcxw72'),
+        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('mcxw72'),
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('mcxw72'),
+        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('mcxw72'),
         TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x'),
@@ -539,7 +571,6 @@ def BuildNxpTarget():
     target.AppendModifier(name="factory", enable_factory_data=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor|lock-app')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
-    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('mcxw71-freertos-lighting')
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
@@ -549,7 +580,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="thread", enable_thread=True)
     target.AppendModifier(name="matter-shell", enable_shell=True)
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
-    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71|mcxw72')
+    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw72')
     target.AppendModifier(name="gn", build_system=NxpBuildSystem.GN).OnlyIfRe(
         'thermostat|contact-sensor').OnlyIfRe('rw61x|mcxw72').OnlyIfRe('freertos')
     target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
@@ -560,7 +591,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-progress", log_level=NxpLogLevel.PROGRESS).ExceptIfRe("-log-(all|error|none)")
     target.AppendModifier(name="log-error", log_level=NxpLogLevel.ERROR).ExceptIfRe("-log-(progress|all|none)")
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
-    target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw71|mcxw72")
+    target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw72")
     target.AppendModifier(name="no-ble", disable_ble=True)
     target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
     target.AppendModifier(name="iw610", iw610_transceiver=True).OnlyIfRe('rt1060').OnlyIfRe('evkc').OnlyIfRe('cmake')

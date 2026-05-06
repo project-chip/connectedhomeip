@@ -33,7 +33,7 @@ import typing
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from enum import IntFlag
-from typing import Any, Callable, List, Optional, Type, Union
+from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
 import matter.testing.matchers as matchers
 
@@ -1066,6 +1066,30 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.record_error(test_name=test_name, location=location, problem=type_err_msg)
                 return None
         return attr_ret
+
+    async def poll_until_attributes_in_range(
+            self, cluster: ClusterObjects.Cluster,
+            attribute_bounds: List[Tuple[Type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
+            timeout_sec: int = 1) -> None:
+        """Poll attributes until each value falls within [min_value, max_value].
+
+        Args:
+            cluster: Cluster to read attributes from.
+            attribute_bounds: List of (attribute, min_value, max_value) tuples.
+            timeout_sec: Maximum time to wait for each attribute to be in range.
+
+        Raises:
+            TimeoutError: If any attribute does not reach its expected range before timeout.
+        """
+        for attribute, min_value, max_value in attribute_bounds:
+            deadline = time.monotonic() + timeout_sec
+            value = await self.read_single_attribute_check_success(cluster, attribute)
+            while value < min_value or value > max_value:  # type: ignore[operator]
+                if time.monotonic() >= deadline:
+                    raise TimeoutError(
+                        f"Timeout waiting for {attribute} to be in range [{min_value}, {max_value}], last value: {value}")
+                await asyncio.sleep(0.1)
+                value = await self.read_single_attribute_check_success(cluster, attribute)
 
     async def read_single_attribute_expect_error(
             self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
