@@ -84,9 +84,6 @@ public:
         else if (features.Has(Feature::kTilt))
             config.WithTilt();
 
-        if (features.Has(Feature::kAbsolutePosition))
-            config.WithAbsolutePosition();
-
         config.WithOptionalAttributes(optionalAttributes);
         gServers[clusterInstanceIndex].Create(endpointId, config);
 
