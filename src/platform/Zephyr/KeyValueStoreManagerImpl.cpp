@@ -34,12 +34,27 @@
 #include <zephyr/version.h>
 #endif
 
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <ncs_version.h>
+#endif
+
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+#define USE_SETTINGS_LOAD_ONE
+#define USE_SETTINGS_GET_VAL_LEN
+// nRF Connect SDK 3.3.0 supports Zephyr 4.3.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR > 3 || (NCS_VERSION_MAJOR == 3 && NCS_VERSION_MINOR >= 3)
+#define USE_SETTINGS_LOAD_ONE
+#define USE_SETTINGS_GET_VAL_LEN
+#endif // NCS_VERSION_MAJOR > 3 || (NCS_VERSION_MAJOR == 3 && NCS_VERSION_MINOR >= 3)
+#endif // KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 namespace {
 
-#if KERNEL_VERSION_MAJOR < 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR < 4)
+#ifndef USE_SETTINGS_LOAD_ONE
 struct ReadEntry
 {
     void * destination;           // destination address
@@ -94,7 +109,7 @@ CHIP_ERROR MakeFullKey(char (&fullKey)[SETTINGS_MAX_NAME_LEN + 1], const char * 
     return CHIP_NO_ERROR;
 }
 
-#if KERNEL_VERSION_MAJOR < 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR < 4)
+#ifndef USE_SETTINGS_LOAD_ONE
 int LoadEntryCallback(const char * name, size_t entrySize, settings_read_cb readCb, void * cbArg, void * param)
 {
     ReadEntry & entry = *static_cast<ReadEntry *>(param);
@@ -152,7 +167,7 @@ int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_re
     return 0;
 }
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+#ifdef USE_SETTINGS_LOAD_ONE
 void LoadOneAndVerifyResult(const char * fullkey, void * dest_buf, size_t dest_size, size_t * readSize, CHIP_ERROR * result)
 {
     ssize_t bytesRead = settings_load_one(fullkey, dest_buf, dest_size);
@@ -207,7 +222,7 @@ void KeyValueStoreManagerImpl::Init()
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+#ifdef USE_SETTINGS_LOAD_ONE
     CHIP_ERROR result;
     size_t readSize = 0;
     ssize_t ret     = 0;
@@ -312,7 +327,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     char fullKey[SETTINGS_MAX_NAME_LEN + 1];
     ReturnErrorOnFailure(MakeFullKey(fullKey, key));
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+#ifdef USE_SETTINGS_GET_VAL_LEN
     // settings_get_val_len() returns 0 when the key is missing (not an error code).
     VerifyOrReturnError(settings_get_val_len(fullKey) > 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 #else

@@ -353,10 +353,6 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Clip duration is augmented
         await asyncio.to_thread(time.sleep, initDuration + augDuration + 1)
 
-        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
-        await event_callback.start(self.default_controller,
-                                   self.dut_node_id,
-                                   self.get_endpoint())
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
@@ -377,11 +373,6 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
         await asyncio.to_thread(time.sleep, blindDuration + 1)
-
-        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
-        await event_callback.start(self.default_controller,
-                                   self.dut_node_id,
-                                   self.get_endpoint())
 
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
 
@@ -490,10 +481,6 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # MAX DURATION Check
         #  Triggering 2 motion event -> recording starts -> wait for max duration -> recording stops
         self.step(18)
-        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
-        await event_callback.start(self.default_controller,
-                                   self.dut_node_id,
-                                   self.get_endpoint())
 
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)

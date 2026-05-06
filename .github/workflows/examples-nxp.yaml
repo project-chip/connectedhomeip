@@ -155,6 +155,8 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                        - '**/Zephyr/**'
+                        - '**/zephyr/**'
                       pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'
