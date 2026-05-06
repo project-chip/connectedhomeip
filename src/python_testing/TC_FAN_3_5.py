@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan-no-onoff
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network

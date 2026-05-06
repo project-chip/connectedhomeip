@@ -18,6 +18,7 @@
 #include <clusters/FanControl/Enums.h>
 #include <devices/Types.h>
 #include <devices/fan/FanDevice.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -26,11 +27,13 @@ using chip::BitMask;
 namespace chip {
 namespace app {
 
-FanDevice::FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate & onOffDelegate,
+FanDevice::FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,
                      const Context & context) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFan, 1)),
     mFanDelegate(fanDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(context.timerDelegate), mContext(context)
-{}
+{
+    VerifyOrDie(mContext.includeOnOffCluster == (mOnOffDelegate != nullptr));
+}
 
 CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
@@ -62,15 +65,18 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     // OnOff
-    OnOffCluster::Context onOffContext{ mTimerDelegate };
-
-    mOnOffCluster.Create(endpoint, onOffContext);
-    mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
-    ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
-
+    if (mOnOffDelegate != nullptr)
     {
-        ScopedSceneTable table(mScenesTableProvider);
-        table->RegisterHandler(&mOnOffCluster.Cluster());
+        OnOffCluster::Context onOffContext{ mTimerDelegate };
+
+        mOnOffCluster.Create(endpoint, onOffContext);
+        mOnOffCluster.Cluster().AddDelegate(mOnOffDelegate);
+        ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
+
+        {
+            ScopedSceneTable table(mScenesTableProvider);
+            table->RegisterHandler(&mOnOffCluster.Cluster());
+        }
     }
 
     // Fan
@@ -104,7 +110,7 @@ void FanDevice::Unregister(CodeDrivenDataModelProvider & provider)
             table->UnregisterHandler(&mOnOffCluster.Cluster());
         }
 
-        mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
+        mOnOffCluster.Cluster().RemoveDelegate(mOnOffDelegate);
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
         mOnOffCluster.Destroy();
     }
@@ -134,10 +140,13 @@ Clusters::FanControlCluster & FanDevice::FanControlCluster()
     return mFanControlCluster.Cluster();
 }
 
-Clusters::OnOffCluster & FanDevice::OnOffCluster()
+Clusters::OnOffCluster * FanDevice::TryGetOnOffCluster()
 {
-    VerifyOrDie(mOnOffCluster.IsConstructed());
-    return mOnOffCluster.Cluster();
+    if (!mOnOffCluster.IsConstructed())
+    {
+        return nullptr;
+    }
+    return &mOnOffCluster.Cluster();
 }
 
 } // namespace app

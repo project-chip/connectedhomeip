@@ -24,9 +24,9 @@ namespace app {
 /**
  * @brief An implementation of a Fan Device.
  *
- * This class serves as a simple example. It implements the OnOffDelegate and FanControlDelegate
- * interfaces and logs messages when fan actions occur (On/Off callbacks, step, fan drive state,
- * rock/wind, airflow direction).
+ * This class serves as a simple example. It implements FanControlDelegate and, when
+ * `FanDevice::Context::includeOnOffCluster` is true (default), OnOffDelegate. It logs messages when
+ * fan actions occur (On/Off callbacks, step, fan drive state, rock/wind, airflow direction).
  */
 class LoggingFanDevice : public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate, public FanDevice
 {
@@ -47,9 +47,6 @@ public:
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
-
-private:
-    bool mOnOffClusterTurnedOff = false;
 };
 
 } // namespace app

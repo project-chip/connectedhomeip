@@ -38,9 +38,10 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        bool includeOnOffCluster = true;
     };
 
-    FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate & onOffDelegate, const Context & context);
+    FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate, const Context & context);
 
     ~FanDevice() override = default;
 
@@ -50,7 +51,7 @@ public:
 
     // Accessors for subclasses/implementations to interact with clusters
     Clusters::FanControlCluster & FanControlCluster();
-    Clusters::OnOffCluster & OnOffCluster();
+    Clusters::OnOffCluster * TryGetOnOffCluster();
 
 private:
     class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
@@ -69,7 +70,7 @@ private:
     };
 
     Clusters::FanControl::Delegate & mFanDelegate;
-    Clusters::OnOffDelegate & mOnOffDelegate;
+    Clusters::OnOffDelegate * mOnOffDelegate = nullptr;
     TimerDelegate & mTimerDelegate;
 
     const Context mContext;
