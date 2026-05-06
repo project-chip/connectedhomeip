@@ -30,7 +30,6 @@
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
 #include <lib/support/CodeUtils.h>
 
-
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
               chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::kRevision);
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
