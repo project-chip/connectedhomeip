@@ -82,7 +82,8 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("0", "Commissioning, already done", is_commissioning=True),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. GroupKeySet fields are as follows: GroupKeySetID: 0x01a1, GroupKeySecurityPolicy: TrustFirst (0), EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf, EpochStartTime0: 1110000"),
             TestStep("0b", "If the Groupcast cluster is enabled on the root node, skip this step. Otherwise, TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster."),
-            TestStep("0c", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast LeaveGroup command with GroupID field as 0 to DUT. Otherwise, TH sends a RemoveAllGroups command to DUT."),
+            TestStep("0c", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH reads the Groupcast membership attribute on the DUT."),
+            TestStep("0d", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast LeaveGroup command with GroupID field as 0 to DUT. Otherwise, TH sends a RemoveAllGroups command to DUT."),
             TestStep("1a", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast JoinGroup command with GroupID 1, Endpoints set with the EndpointId, where ColorControl cluster is enabled, and KeySetID 0x01a1 to DUT. Otherwise, TH sends AddGroup command to DUT, with the GroupID field set to 1."),
             TestStep("1b", "TH sends a _RemoveAllScenes_ command to DUT with the _GroupID_ field set to _G~1~_."),
             TestStep("1c", "TH sends a _GetSceneMembership_ command to DUT with the _GroupID_ field set to _G~1~_."),
@@ -175,15 +176,29 @@ class TC_CC_10_1(MatterBaseTest):
             result = await self.TH1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
+        membership = None
         self.step("0c")
         if self.groupcast_enabled:
-            # Check if there are any groups on the DUT.
-            membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
-            if membership:
-                await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
-        else:
-            await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership
+            )
 
+        self.step("0d")
+        if self.groupcast_enabled:
+            if membership:
+                await self.TH1.SendCommand(
+                    self.dut_node_id,
+                    0,
+                    Clusters.Groupcast.Commands.LeaveGroup(groupID=0)
+                )
+        else:
+            await self.TH1.SendCommand(
+                self.dut_node_id,
+                self.matter_test_config.endpoint,
+                Clusters.Groups.Commands.RemoveAllGroups()
+            )
         self.step("1a")
         if self.groupcast_enabled:
             await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
