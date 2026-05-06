@@ -19,7 +19,6 @@
 
 #include "Query.h"
 
-#include <algorithm>
 #include <stdio.h>
 
 namespace mdns {
@@ -152,15 +151,16 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
         return false;
     }
 
-    // Cap record counts to prevent CPU exhaustion from malformed packets.
-    // An mDNS packet is at most ~9000 bytes (jumbo) or typically 1500 bytes;
-    // the smallest possible record is ~12 bytes, so 256 is a generous upper bound.
+    // Reject packets with unreasonable record counts to prevent CPU exhaustion.
+    // An mDNS packet is at most ~9000 bytes; the smallest record is ~12 bytes,
+    // so 256 is a generous upper bound for any single section.
     static constexpr uint16_t kMaxRecordCount = 256;
 
-    const uint16_t queryCount      = std::min(header.GetQueryCount(), kMaxRecordCount);
-    const uint16_t answerCount     = std::min(header.GetAnswerCount(), kMaxRecordCount);
-    const uint16_t authorityCount  = std::min(header.GetAuthorityCount(), kMaxRecordCount);
-    const uint16_t additionalCount = std::min(header.GetAdditionalCount(), kMaxRecordCount);
+    if (header.GetQueryCount() > kMaxRecordCount || header.GetAnswerCount() > kMaxRecordCount ||
+        header.GetAuthorityCount() > kMaxRecordCount || header.GetAdditionalCount() > kMaxRecordCount)
+    {
+        return false;
+    }
 
     delegate->OnHeader(header);
 
@@ -168,7 +168,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
 
     {
         QueryData queryData;
-        for (uint16_t i = 0; i < queryCount; i++)
+        for (uint16_t i = 0; i < header.GetQueryCount(); i++)
         {
             if (!queryData.Parse(packetData, &data))
             {
@@ -181,7 +181,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
 
     {
         ResourceData resourceData;
-        for (uint16_t i = 0; i < answerCount; i++)
+        for (uint16_t i = 0; i < header.GetAnswerCount(); i++)
         {
             if (!resourceData.Parse(packetData, &data))
             {
@@ -191,7 +191,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
             delegate->OnResource(ResourceType::kAnswer, resourceData);
         }
 
-        for (uint16_t i = 0; i < authorityCount; i++)
+        for (uint16_t i = 0; i < header.GetAuthorityCount(); i++)
         {
             if (!resourceData.Parse(packetData, &data))
             {
@@ -201,7 +201,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
             delegate->OnResource(ResourceType::kAuthority, resourceData);
         }
 
-        for (uint16_t i = 0; i < additionalCount; i++)
+        for (uint16_t i = 0; i < header.GetAdditionalCount(); i++)
         {
             if (!resourceData.Parse(packetData, &data))
             {
