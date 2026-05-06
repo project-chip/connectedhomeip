@@ -73,63 +73,56 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
                 AliasedClusters.end()); // NOLINT(bugprone-signed-bitwise)
 }
 
-namespace {
-
-CHIP_ERROR EncodeNullableFloat(AttributeValueEncoder & encoder, const char * member)
-{
-    return encoder.Encode(*reinterpret_cast<const DataModel::Nullable<float> *>(member));
-}
-
-CHIP_ERROR EncodeFloat(AttributeValueEncoder & encoder, const char * member)
-{
-    return encoder.Encode(*reinterpret_cast<const float *>(member));
-}
-
-CHIP_ERROR EncodeMediumEnum(AttributeValueEncoder & encoder, const char * member)
-{
-    return encoder.Encode(*reinterpret_cast<const MeasurementMediumEnum *>(member));
-}
-
-CHIP_ERROR EncodeUnitEnum(AttributeValueEncoder & encoder, const char * member)
-{
-    return encoder.Encode(*reinterpret_cast<const MeasurementUnitEnum *>(member));
-}
-
-CHIP_ERROR EncodeLevelEnum(AttributeValueEncoder & encoder, const char * member)
-{
-    return encoder.Encode(*reinterpret_cast<const LevelValueEnum *>(member));
-}
-
-} // namespace
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Winvalid-offsetof"
-const ConcentrationMeasurementCluster::AttrDispatch ConcentrationMeasurementCluster::kDispatchTable[] = {
-    { MeasuredValue::Id, offsetof(ConcentrationMeasurementCluster, mMeasuredValue), EncodeNullableFloat },
-    { MinMeasuredValue::Id, offsetof(ConcentrationMeasurementCluster, mMinMeasuredValue), EncodeNullableFloat },
-    { MaxMeasuredValue::Id, offsetof(ConcentrationMeasurementCluster, mMaxMeasuredValue), EncodeNullableFloat },
-    { PeakMeasuredValue::Id, offsetof(ConcentrationMeasurementCluster, mPeakMeasuredValue), EncodeNullableFloat },
-    { AverageMeasuredValue::Id, offsetof(ConcentrationMeasurementCluster, mAverageMeasuredValue), EncodeNullableFloat },
-
-    { MeasurementMedium::Id, offsetof(ConcentrationMeasurementCluster, mMedium), EncodeMediumEnum },
-    { MeasurementUnit::Id, offsetof(ConcentrationMeasurementCluster, mUnit), EncodeUnitEnum },
-    { Uncertainty::Id, offsetof(ConcentrationMeasurementCluster, mUncertainty), EncodeFloat },
-    { LevelValue::Id, offsetof(ConcentrationMeasurementCluster, mLevelValue), EncodeLevelEnum },
-};
-#pragma GCC diagnostic pop
-
 DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
 {
-    const AttributeId id = request.path.mAttributeId;
-
-    for (const auto & entry : kDispatchTable)
+    struct NullableFloatAttr
     {
-        if (entry.id == id)
-            return entry.encode(encoder, reinterpret_cast<const char *>(this) + entry.offset);
+        AttributeId id;
+        const DataModel::Nullable<float> & value;
+    };
+    const NullableFloatAttr kNullableFloatAttrs[] = {
+        { MeasuredValue::Id, mMeasuredValue },
+        { MinMeasuredValue::Id, mMinMeasuredValue },
+        { MaxMeasuredValue::Id, mMaxMeasuredValue },
+        { PeakMeasuredValue::Id, mPeakMeasuredValue },
+        { AverageMeasuredValue::Id, mAverageMeasuredValue },
+    };
+    for (const auto & attr : kNullableFloatAttrs)
+    {
+        if (request.path.mAttributeId == attr.id)
+            return encoder.Encode(attr.value);
     }
 
-    return Status::UnsupportedAttribute;
+    switch (request.path.mAttributeId)
+    {
+    case MeasurementMedium::Id:
+        return encoder.Encode(mMedium);
+
+    case Attributes::FeatureMap::Id:
+        return encoder.Encode(mFeatures);
+
+    case Attributes::ClusterRevision::Id:
+        return encoder.Encode(kClusterRevision);
+
+    case Uncertainty::Id:
+        return encoder.Encode(mUncertainty);
+
+    case MeasurementUnit::Id:
+        return encoder.Encode(mUnit);
+
+    case PeakMeasuredValueWindow::Id:
+        return encoder.Encode(mPeakMeasuredValueWindow);
+
+    case AverageMeasuredValueWindow::Id:
+        return encoder.Encode(mAverageMeasuredValueWindow);
+
+    case LevelValue::Id:
+        return encoder.Encode(mLevelValue);
+
+    default:
+        return Status::UnsupportedAttribute;
+    }
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath & path,
@@ -152,23 +145,6 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
     };
     return AttributeListBuilder(builder).Append(chip::Span<const DataModel::AttributeEntry>(kMandatoryAttrs),
                                                 chip::Span<const DataModel::AttributeEntry>(kOptionalAttrs), mOptionalAttributeSet);
-}
-
-CHIP_ERROR ConcentrationMeasurementCluster::SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,
-                                                             DataModel::Nullable<float> value)
-{
-    VerifyOrReturnError(mFeatures.Has(feature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(field, value, id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConcentrationMeasurementCluster::SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value)
-{
-    VerifyOrReturnError(mFeatures.Has(feature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(field, value, id);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,

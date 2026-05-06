@@ -104,10 +104,6 @@ public:
 private:
     static constexpr uint32_t kWindowMaxSeconds = 604800;
 
-    __attribute__((noinline)) CHIP_ERROR SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,
-                                                          DataModel::Nullable<float> value);
-    __attribute__((noinline)) CHIP_ERROR SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value);
-
     static bool IsInRange(DataModel::Nullable<float> value, DataModel::Nullable<float> minV, DataModel::Nullable<float> maxV)
     {
         if (value.IsNull())
@@ -124,23 +120,15 @@ private:
     const BitFlags<Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
 
+    __attribute__((noinline)) CHIP_ERROR SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,
+                                                          DataModel::Nullable<float> value);
+    __attribute__((noinline)) CHIP_ERROR SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value);
+
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;
     DataModel::Nullable<float> mMinMeasuredValue;
     DataModel::Nullable<float> mMaxMeasuredValue;
     float mUncertainty;
-    struct AttrDispatch
-    {
-        AttributeId id;
-        ptrdiff_t offset;
-        CHIP_ERROR (*encode)(AttributeValueEncoder &, const char *);
-    };
-
-    static const AttrDispatch kDispatchTable[];
-
-    __attribute__((noinline)) CHIP_ERROR SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,
-                                                          DataModel::Nullable<float> value);
-    __attribute__((noinline)) CHIP_ERROR SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value);
     DataModel::Nullable<float> mMeasuredValue;
     DataModel::Nullable<float> mPeakMeasuredValue;
     uint32_t mPeakMeasuredValueWindow = 0;
