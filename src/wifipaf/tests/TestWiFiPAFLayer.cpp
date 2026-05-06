@@ -183,9 +183,7 @@ TEST_F(TestWiFiPAFLayer, CheckPafSession)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_NOT_FOUND);
 }
 
-// A 3-byte fragment with flags 0x2B (Ack|MgmtOp|Start) makes SnOffset = 3,
-// which would read past the end of the buffer. Run under ASan to catch a
-// regression of the OOB read.
+// Run under ASan to catch regressions of the heap-buffer-overflow read.
 TEST_F(TestWiFiPAFLayer, GetPktSnRejectsShortFragment)
 {
     WiFiPAFSession sessionInfo = {
@@ -204,6 +202,9 @@ TEST_F(TestWiFiPAFLayer, GetPktSnRejectsShortFragment)
     EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
     newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
 
+    // Flag byte 0x2B sets kFragmentAck and kManagementOpcode, pushing SnOffset
+    // to 3 (header + mgmt-op + ack). With a 3-byte buffer, dereferencing
+    // pHead + 3 is a heap-buffer-overflow read.
     constexpr uint8_t kShortFragmentWithMaxFlags[] = { 0x2B, 0x8F, 0x2B };
     auto packet = System::PacketBufferHandle::NewWithData(kShortFragmentWithMaxFlags, sizeof(kShortFragmentWithMaxFlags));
     ASSERT_FALSE(packet.IsNull());

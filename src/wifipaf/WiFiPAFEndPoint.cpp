@@ -878,6 +878,7 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, Encoding:
         pAct = pHead + kTransferProtocolHeaderFlagsSize;
         SnOffset += kTransferProtocolAckSize;
     }
+    VerifyOrExit(SnOffset < reader.OctetsRead() + reader.Remaining(), err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     pSn = pHead + SnOffset;
     if (pAct == nullptr)
     {
