@@ -637,30 +637,31 @@ class IDMBaseTest(MatterBaseTest):
             self.skip_step("No unsupported standard clusters found to test")
             return
 
-        # Sort so the chosen cluster is reproducible across runs (set
-        # iteration order is hash-based and varies between processes).
-        unsupported_cluster_id = sorted(unsupported_cluster_ids)[0]
-        cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
+        # Sort so iteration order is reproducible across runs (set
+        # iteration is hash-based and varies between processes). Walk every
+        # unsupported cluster, not just the first, so the step doesn't skip
+        # when the first cluster happens to expose only complex types
+        # (lists, structs, etc.) that the fallback values can't encode.
+        for unsupported_cluster_id in sorted(unsupported_cluster_ids):
+            cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
+            for attr_id in sorted(cluster_attributes.keys()):
+                attr_class = cluster_attributes[attr_id]
+                write_status = await self._try_write_with_fallback_values(
+                    endpoint_id=endpoint_id, attr_class=attr_class,
+                )
+                if write_status is None:
+                    continue
+                log.info(
+                    "Wrote unsupported cluster: cluster_id=0x%04X, attribute=%s, endpoint_id=%s, status=%s",
+                    unsupported_cluster_id, attr_class.__name__, endpoint_id, write_status,
+                )
+                asserts.assert_equal(
+                    write_status, Status.UnsupportedCluster,
+                    f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}",
+                )
+                return
 
-        for attr_class in cluster_attributes.values():
-            write_status = await self._try_write_with_fallback_values(
-                endpoint_id=endpoint_id, attr_class=attr_class,
-            )
-            if write_status is None:
-                continue
-            log.info(
-                "Wrote unsupported cluster: cluster_id=0x%04X, attribute=%s, endpoint_id=%s, status=%s",
-                unsupported_cluster_id, attr_class.__name__, endpoint_id, write_status,
-            )
-            asserts.assert_equal(
-                write_status, Status.UnsupportedCluster,
-                f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}",
-            )
-            return
-
-        self.skip_step(
-            f"No attribute on unsupported cluster 0x{unsupported_cluster_id:04X} could be encoded with fallback values",
-        )
+        self.skip_step("No attribute on any unsupported standard cluster could be encoded with fallback values")
 
     async def write_unsupported_attribute(self):
         """
