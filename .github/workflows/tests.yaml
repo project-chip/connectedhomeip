@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v6.0.2
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -634,7 +634,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |
@@ -847,7 +847,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -1116,7 +1116,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -1190,6 +1190,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceTest.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCreateNewController.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDefaultWarnings.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestMatterTestingSupport.py'
@@ -1199,8 +1200,11 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingNamespace.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestStepExtractor.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestTestMetadata.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestFactoryResetRequests.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
+
             - name: Run Tests (individual)
               if: ${{matrix.filter == ''}}
               run: |
@@ -1288,7 +1292,7 @@ jobs:
 
       steps:
           - name: Checkout
-            uses: actions/checkout@v6
+            uses: actions/checkout@v6.0.2
 
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
@@ -1305,7 +1309,7 @@ jobs:
                 require_tests: false
 
           - name: Checkout gh-pages for Allure history
-            uses: actions/checkout@v6
+            uses: actions/checkout@v6.0.2
             with:
                 ref: gh-pages
                 path: gh-pages
@@ -1362,7 +1366,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |

@@ -19,44 +19,45 @@
 #pragma once
 
 #include <Options.h>
+#include <devices/device-type-parser/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
 class AppOptions
 {
 public:
-    /**
-     * @brief Configuration for a single device instance.
-     *
-     * This structure holds the device type string (e.g. "on-off-light") and the
-     * endpoint ID where this device should be instantiated.
-     */
-    struct DeviceConfig
+    struct AppConfig
     {
-        std::string type;
-        chip::EndpointId endpoint;
+        std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
+        bool enableWiFi = false;
+        std::string kvsPath;
+        std::optional<uint16_t> discriminator;
+        std::optional<uint16_t> vendorId;
+        std::optional<uint16_t> productId;
+        std::optional<uint16_t> port;
+        std::optional<uint32_t> interfaceId;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
+    static const AppConfig & GetConfig()
+    {
+        if (mConfig.deviceTypeEntries.empty())
+        {
+            mConfig.deviceTypeEntries.push_back({ "contact-sensor", 1, chip::kInvalidEndpointId });
+        }
+        return mConfig;
+    }
 
-    static const std::vector<DeviceConfig> & GetDeviceConfigs();
-
-    static const char * GetDeviceType() { return GetDeviceConfigs().front().type.c_str(); }
-
-    static chip::EndpointId GetDeviceEndpoint() { return GetDeviceConfigs().front().endpoint; }
-
-    static bool EnableWiFi() { return mEnableWiFi; }
+    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
-    static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
-    static bool ParseDeviceConfig(const char * value, DeviceConfig & config);
-
-    static std::vector<DeviceConfig> mDeviceConfigs;
-    static bool mEnableWiFi;
+    static DeviceTypeParser sParser;
+    static AppConfig mConfig;
 };

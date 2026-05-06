@@ -112,7 +112,16 @@ extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
 #if HARD_FAULT_LOG_ENABLE
 // Identifier used by the various fault handlers to tag the fault type.
 // Note: This is read/written from exception/interrupt context.
-alignas(4) static volatile uint32_t faultId __asm__("faultId") = 0;
+// Referenced from naked asm via "m"(faultId); retain under LTO.
+alignas(4) static volatile uint32_t faultId __asm__("faultId") __attribute__((used)) = 0;
+
+#define SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(tagVar)                                                                               \
+    __asm__ volatile("ldr r0, %1\n\t"                                                                                              \
+                     "str r0, %0\n\t"                                                                                              \
+                     "b.w LogFault_Handler"                                                                                        \
+                     : "=m"(faultId)                                                                                               \
+                     : "m"(tagVar)                                                                                                 \
+                     : "r0", "memory")
 
 /**
  * Log register contents to UART when a hard fault occurs.
@@ -166,68 +175,61 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
  * This function is called by the fault handlers to log the fault details.
  */
 
-extern "C" __attribute__((naked)) void LogFault_Handler(void)
+extern "C" __attribute__((used, naked)) void LogFault_Handler(void)
 {
-    __asm volatile("tst lr, #4       \n"
-                   "ite eq           \n"
-                   "mrseq r0, msp    \n"
-                   "mrsne r0, psp    \n"
-                   "b debugHardfault \n");
+    /* bx + "r"(fn): LTO can place debugHardfault out of b/b.w range; address comes from the compiler. */
+    /* r0 holds SP for debugHardfault (AAPCS); %[dbg] must not use r0—use "h" (r8–r15) and clobber r0. */
+    __asm__ volatile("tst lr, #4\n\t"
+                     "ite eq\n\t"
+                     "mrseq r0, msp\n\t"
+                     "mrsne r0, psp\n\t"
+                     "bx %[dbg]\n"
+                     :
+                     : [dbg] "h"(reinterpret_cast<void (*)(uint32_t *)>(debugHardfault))
+                     : "r0", "memory", "cc");
 }
+alignas(4) static const uint32_t kFaultMagicHard __attribute__((used))  = 0x48415244; // 'HARD'
+alignas(4) static const uint32_t kFaultMagicMpu __attribute__((used))   = 0x4D505546; // 'MPUF'
+alignas(4) static const uint32_t kFaultMagicBus __attribute__((used))   = 0x42555346; // 'BUSF'
+alignas(4) static const uint32_t kFaultMagicUsage __attribute__((used)) = 0x55534654; // 'USFT'
+#if (__CORTEX_M >= 23U)
+alignas(4) static const uint32_t kFaultMagicSecure __attribute__((used)) = 0x53434654; // 'SCFT'
+#endif
+alignas(4) static const uint32_t kFaultMagicDbg __attribute__((used))  = 0x44424D4E; // 'DBMN'
+alignas(4) static const uint32_t kFaultMagicWdog __attribute__((used)) = 0x57444F47; // 'WDOG'
 
 #ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
-extern "C" __attribute__((naked)) void HardFault_Handler(void)
+extern "C" __attribute__((used, naked)) void HardFault_Handler(void)
 {
-    __asm volatile("ldr r0, =0x48415244 \n" // 'HARD'
-                   "ldr r1, =faultId    \n"
-                   "str r0, [r1]        \n"
-                   "b LogFault_Handler  \n");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicHard);
 }
-extern "C" __attribute__((naked)) void mpu_fault_handler(void)
+extern "C" __attribute__((used, naked)) void mpu_fault_handler(void)
 {
-    __asm volatile("ldr r0, =0x4D505546 \n" // 'MPUF'
-                   "ldr r1, =faultId    \n"
-                   "str r0, [r1]        \n"
-                   "b LogFault_Handler  \n");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicMpu);
 }
-extern "C" __attribute__((naked)) void BusFault_Handler(void)
+extern "C" __attribute__((used, naked)) void BusFault_Handler(void)
 {
-    __asm volatile("ldr r0, =0x42555346 \n" // 'BUSF'
-                   "ldr r1, =faultId    \n"
-                   "str r0, [r1]        \n"
-                   "b LogFault_Handler  \n");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicBus);
 }
-extern "C" __attribute__((naked)) void UsageFault_Handler(void)
+extern "C" __attribute__((used, naked)) void UsageFault_Handler(void)
 {
-    __asm volatile("ldr r0, =0x55534654 \n" // 'USFT'
-                   "ldr r1, =faultId    \n"
-                   "str r0, [r1]        \n"
-                   "b LogFault_Handler  \n");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicUsage);
 }
 #if (__CORTEX_M >= 23U)
-extern "C" __attribute__((naked)) void SecureFault_Handler(void)
+extern "C" __attribute__((used, naked)) void SecureFault_Handler(void)
 {
-    __asm volatile("ldr r0, =0x53434654 \n" // 'SCFT'
-                   "ldr r1, =faultId    \n"
-                   "str r0, [r1]        \n"
-                   "b LogFault_Handler  \n");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicSecure);
 }
 #endif // (__CORTEX_M >= 23U)
-extern "C" __attribute__((naked)) void DebugMon_Handler(void)
+extern "C" __attribute__((used, naked)) void DebugMon_Handler(void)
 {
-    __asm volatile("ldr r0, =0x44424D4E \n" // 'DBMN'
-                   "ldr r1, =faultId    \n"
-                   "str r0, [r1]        \n"
-                   "b LogFault_Handler  \n");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicDbg);
 }
 #endif // !SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 
-extern "C" __attribute__((naked)) void WDOG0_IRQHandler(void)
+extern "C" __attribute__((used, naked)) void WDOG0_IRQHandler(void)
 {
-    __asm volatile("ldr r0, =0x57444F47 \n" // 'WDOG'
-                   "ldr r1, =faultId    \n"
-                   "str r0, [r1]        \n"
-                   "b LogFault_Handler  \n");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicWdog);
 }
 
 extern "C" void vApplicationMallocFailedHook(void)

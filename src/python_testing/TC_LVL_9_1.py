@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import TestStep
 
 
 class TC_LVL_9_1(MatterBaseTest):
@@ -197,16 +197,10 @@ class TC_LVL_9_1(MatterBaseTest):
         await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
 
         self.step("5b")
-        current_level = await self.read_single_attribute_check_success(cluster, attributes.CurrentLevel)
-        asserts.assert_equal(current_level, 0x64, "CurrentLevel should be 0x64 after RecallScene 0x02")
+        await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentLevel, 0x64, 0x64)])
 
         self.step("6a")
         await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x01))
 
         self.step("6b")
-        current_level = await self.read_single_attribute_check_success(cluster, attributes.CurrentLevel)
-        asserts.assert_equal(current_level, min_level, "CurrentLevel should equal MinLevel after RecallScene 0x01")
-
-
-if __name__ == "__main__":
-    default_matter_test_main()
+        await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentLevel, min_level, min_level)])

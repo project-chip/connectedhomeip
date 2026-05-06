@@ -593,7 +593,8 @@
             "SupportedWatts",
             "SelectedWattIndex",
             "WattRating",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
