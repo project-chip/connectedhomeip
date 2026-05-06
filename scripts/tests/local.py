@@ -921,6 +921,13 @@ def gen_coverage(flat):
     type=str,
     help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
 )
+@click.option(
+    "--include-nightly",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
+)
 def python_tests(
     test_filter,
     skip,
@@ -934,6 +941,7 @@ def python_tests(
     fail_log_dir,
     override_binary_path,
     app_filter,
+    include_nightly,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -1019,10 +1027,11 @@ def python_tests(
     with open("src/python_testing/test_metadata.yaml") as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
+    nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
     slow_test_duration = {
-        item["name"]: item["duration"] for item in metadata["slow_tests"]
+        item["name"]: item["duration"] for item in metadata["slow_tests"] + metadata["nightly"]
     }
 
     if not os.path.isdir("src/python_testing"):
@@ -1031,6 +1040,8 @@ def python_tests(
     test_scripts = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
+            continue
+        if not include_nightly and os.path.basename(file) in nightly_tests:
             continue
         test_scripts.append(file)
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")

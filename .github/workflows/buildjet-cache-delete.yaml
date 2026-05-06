@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-      - uses: buildjet/cache-delete@v1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: buildjet/cache-delete@7184288b8396c4492a56728c47dd286fbd1e96ae # v1
         with:
           cache_key: ${{ inputs.cache_key }}

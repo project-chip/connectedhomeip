@@ -33,11 +33,11 @@ CHIP_ERROR CodegenChimeCluster::Startup(ServerClusterContext & context)
     // Migrate attributes for this cluster from SafeAttribute to AttributePersistence.
     // This is done at Startup time when the persistence providers are guaranteed to be available.
     SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
-    AttributePersistenceProvider * dstProvider     = &context.attributeStorage;
+    AttributePersistenceProvider & dstProvider     = context.attributeStorage;
 
-    if (srcProvider != nullptr && dstProvider != nullptr)
+    if (srcProvider != nullptr)
     {
-        LogErrorOnFailure(Chime::MigrateChimeServerStorage(mPath.mEndpointId, *srcProvider, *dstProvider));
+        LogErrorOnFailure(Chime::MigrateChimeServerStorage(mPath.mEndpointId, *srcProvider, dstProvider));
     }
 
     return ChimeCluster::Startup(context);

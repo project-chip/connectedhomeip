@@ -31,29 +31,28 @@ namespace JointFabricDatastore {
 // Enum for DatastoreAccessControlEntryAuthModeEnum
 enum class DatastoreAccessControlEntryAuthModeEnum : uint8_t
 {
-    kPase  = 0x01,
-    kCase  = 0x02,
-    kGroup = 0x03,
+    kPase  = 0x00,
+    kCase  = 0x01,
+    kGroup = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    kUnknownEnumValue = 3,
 };
 
 // Enum for DatastoreAccessControlEntryPrivilegeEnum
 enum class DatastoreAccessControlEntryPrivilegeEnum : uint8_t
 {
-    kView       = 0x01,
-    kProxyView  = 0x02,
-    kOperate    = 0x03,
-    kManage     = 0x04,
-    kAdminister = 0x05,
+    kView       = 0x00,
+    kOperate    = 0x02,
+    kManage     = 0x03,
+    kAdminister = 0x04,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    kUnknownEnumValue = 1,
 };
 
 // Enum for DatastoreGroupKeyMulticastPolicyEnum

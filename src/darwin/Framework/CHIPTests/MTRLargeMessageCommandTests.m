@@ -44,7 +44,7 @@ static const uint16_t kTimeoutInSeconds = 3;
 
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
 
-    __auto_type * cluster = [[MTRClusterTLSCertificateManagement alloc] initWithDevice:device endpointID:@(1) queue:queue];
+    __auto_type * cluster = [[MTRClusterTLSCertificateManagement alloc] initWithDevice:device endpointID:@(0) queue:queue];
 
     __auto_type * params = [[MTRTLSCertificateManagementClusterClientCSRParams alloc] init];
     params.nonce = [@"01234567890123456789012345678912" dataUsingEncoding:NSUTF8StringEncoding];

@@ -16,6 +16,7 @@
  */
 #include <devices/Types.h>
 #include <devices/chime/ChimeDevice.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -23,9 +24,9 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-ChimeDevice::ChimeDevice(Clusters::ChimeDelegate & delegate, TimerDelegate & timerDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mDelegate(delegate),
-    mTimerDelegate(timerDelegate)
+ChimeDevice::ChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mTimerDelegate(timerDelegate),
+    mSounds(sounds)
 {}
 
 CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -35,7 +36,7 @@ CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mChimeCluster.Create(endpoint, mDelegate);
+    mChimeCluster.Create(endpoint, *this);
     ReturnErrorOnFailure(provider.AddCluster(mChimeCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
@@ -60,6 +61,46 @@ Clusters::ChimeCluster & ChimeDevice::ChimeCluster()
 {
     VerifyOrDie(mChimeCluster.IsConstructed());
     return mChimeCluster.Cluster();
+}
+
+CHIP_ERROR ChimeDevice::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
+{
+    if (chimeIndex >= mSounds.size())
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    const auto & sound = mSounds[chimeIndex];
+    chimeID            = sound.id;
+    return CopyCharSpanToMutableCharSpan(sound.name, name);
+}
+
+CHIP_ERROR ChimeDevice::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
+{
+    if (chimeIndex >= mSounds.size())
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    chimeID = mSounds[chimeIndex].id;
+    return CHIP_NO_ERROR;
+}
+
+Protocols::InteractionModel::Status ChimeDevice::PlayChimeSound(uint8_t chimeID)
+{
+    CharSpan soundName = "Unknown"_span;
+    for (const auto & sound : mSounds)
+    {
+        if (sound.id == chimeID)
+        {
+            soundName = sound.name;
+            break;
+        }
+    }
+
+    ChipLogProgress(AppServer, "ChimeDevice: Playing sound %s", chip::NullTerminated(soundName).c_str());
+
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace app

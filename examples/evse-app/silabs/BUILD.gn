@@ -133,7 +133,6 @@ silabs_executable("evse-app") {
 
   sources = [
     # Actual application code
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
 
     # EVSE Common, will be moved to evse-common when we have code driven clusters for evse

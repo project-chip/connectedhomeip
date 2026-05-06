@@ -212,14 +212,17 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    # If nightly flag is set that mean only super slow tests are going to run, some of these test may be in the not_automated
-    # section as tests are super slow and they should not run on each PR, only on nightly runs.
+    # If nightly flag is set, only run tests listed under the nightly section.
+    # Otherwise, exclude both not_automated tests and nightly tests from the regular CI run
+    # (nightly tests are reserved for the nightly workflow).
     if nightly and nightly_tests is not None:
         python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
-
-    if not nightly:
-        # Filter out the files matching the excluded patterns
-        python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+    else:
+        python_files = [
+            file for file in all_python_files
+            if os.path.basename(file) not in excluded_patterns
+            and os.path.basename(file) not in nightly_tests
+        ]
 
     if len(python_files) == 0:
         # No files match

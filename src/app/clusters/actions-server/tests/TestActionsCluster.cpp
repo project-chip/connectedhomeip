@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/actions-server/ActionsCluster.h>
@@ -280,15 +281,13 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionSuccess)
     auto result = tester.Invoke(request);
 
     // Verify the command was successful
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
     // Verify the delegate was called
     EXPECT_TRUE(mDelegate.mHandleInstantActionCalled);
     EXPECT_EQ(mDelegate.mLastActionId, 1);
-    // ASSERT_TRUE forces the test to stop evaluating immediately if it fails, preventing the crash
     ASSERT_TRUE(mDelegate.mLastInvokeId.HasValue());
-    EXPECT_EQ(mDelegate.mLastInvokeId.Value(), 12345u); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(mDelegate.mLastInvokeId.Value(), 12345u);
 }
 
 // Test invoking InstantAction command with invalid action ID
@@ -307,8 +306,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionNotFound)
     auto result = tester.Invoke(request);
 
     // Verify the command returned NotFound status
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 // Test invoking InstantAction command when delegate returns failure
@@ -339,8 +337,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionDelegateFailure)
     auto result = tester.Invoke(request);
 
     // Verify the command returned the failure status from delegate
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
 
     // Verify the delegate was still called
     EXPECT_TRUE(mDelegate.mHandleInstantActionCalled);
@@ -370,8 +367,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionUnsupportedCommand)
     auto result = tester.Invoke(request);
 
     // Verify the command returned InvalidCommand status
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 
     // Verify the delegate was NOT called (command was rejected before delegate)
     EXPECT_FALSE(mDelegate.mHandleInstantActionCalled);
