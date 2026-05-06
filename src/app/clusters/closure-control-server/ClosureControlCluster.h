@@ -42,124 +42,95 @@ using OptionalAttributesSet = OptionalAttributeSet<ClosureControl::Attributes::C
 // As per the spec, the maximum allowed CurrentErrorList size is 10.
 constexpr int kCurrentErrorListMaxSize = 10;
 
-/**
- * @brief Structure is used to configure and validate the Cluster configuration.
- *        Validates if the feature map, attributes and commands configuration is valid.
- */
-struct ClusterConformance
-{
-public:
-    BitFlags<Feature> & FeatureMap() { return mFeatureMap; }
-    const BitFlags<Feature> & FeatureMap() const { return mFeatureMap; }
-
-    OptionalAttributesSet & OptionalAttributes() { return mOptionalAttributes; }
-
-    inline bool HasFeature(Feature aFeature) const { return mFeatureMap.Has(aFeature); }
-
-    /**
-     * @brief Function determines if Cluster conformance is valid
-     *
-     *        The function executes these checks in order to validate the conformance
-     *        1. Check if either Positioning or MotionLatching is supported. If neither are enabled, returns false.
-     *        2. If Speed is enabled, checks that Positioning is enabled and Instantaneous is disabled. Returns false otherwise.
-     *        3. If Ventilation, pedestrian or calibration is enabled, Positioning must be enabled. Return false otherwise.
-     *
-     * @return true, the cluster confirmance is valid
-     *         false, otherwise
-     */
-    bool IsValid() const
-    {
-        // Positioning or Matching must be enabled
-        VerifyOrReturnValue(HasFeature(Feature::kPositioning) || HasFeature(Feature::kMotionLatching), false,
-                            ChipLogError(AppServer, "Validation failed: Neither Positioning nor MotionLatching is enabled."));
-
-        // If Speed is enabled, Positioning shall be enabled and Instantaneous shall be disabled.
-        if (HasFeature(Feature::kSpeed))
-        {
-            VerifyOrReturnValue(
-                HasFeature(Feature::kPositioning) && !HasFeature(Feature::kInstantaneous), false,
-                ChipLogError(AppServer, "Validation failed: Speed requires Positioning enabled and Instantaneous disabled."));
-        }
-
-        if (HasFeature(Feature::kVentilation) || HasFeature(Feature::kPedestrian) || HasFeature(Feature::kCalibration))
-        {
-            VerifyOrReturnValue(
-                HasFeature(Feature::kPositioning), false,
-                ChipLogError(AppServer,
-                             "Validation failed: Ventilation, Pedestrian, or Calibration requires Positioning enabled."));
-        }
-
-        return true;
-    }
-
-private:
-    BitFlags<Feature> mFeatureMap;
-    OptionalAttributesSet mOptionalAttributes;
-};
-
-/**
- * @brief Struct to store the current cluster state
- */
-struct ClusterState
-{
-    ClusterState()
-    {
-        // Configure CountdownTime Quiet Reporting strategies
-        // - When it changes from 0 to any other value and vice versa
-        // - When it increases
-        // - When it changes from null to any other value and vice versa (default support)
-        mCountdownTime.policy()
-            .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
-            .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
-    };
-
-    QuieterReportingAttribute<ElapsedS> mCountdownTime{ DataModel::NullNullable };
-    MainStateEnum mMainState                                             = MainStateEnum::kUnknownEnumValue;
-    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
-    DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
-    BitFlags<LatchControlModesBitmap> mLatchControlModes;
-    ClosureErrorEnum mCurrentErrorList[kCurrentErrorListMaxSize] = {};
-
-    // The current error count is used to track the number of errors in the CurrentErrorList.
-    size_t mCurrentErrorCount = 0;
-};
-
-/**
- * @brief Struct to store the cluster initialization parameters
- */
-struct ClusterInitParameters
-{
-    MainStateEnum mMainState                                             = MainStateEnum::kStopped;
-    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
-};
-
-/**
- * @brief Code-driven implementation of the Closure Control cluster.
- *
- * This class integrates the existing ClusterLogic with the DefaultServerCluster
- * interface to provide a code-driven cluster implementation.
- */
 class ClosureControlCluster : public DefaultServerCluster
 {
-
 public:
-    /**
-     * @brief Context structure for injecting dependencies into the cluster.
-     */
-    struct Context
+    struct Config
     {
-        ClosureControlClusterDelegate & delegate;
-        TimerDelegate & timerDelegate;
-        const ClusterConformance & conformance;
-        const ClusterInitParameters & initParams;
+        Config(EndpointId endpoint, ClosureControlClusterDelegate & delegate, TimerDelegate & timerDelegate) :
+            mEndpointId(endpoint), mDelegate(delegate), mTimerDelegate(timerDelegate)
+        {}
+
+        Config & WithPositioning()
+        {
+            mFeatureMap.Set(Feature::kPositioning);
+            return *this;
+        }
+        Config & WithMotionLatching(const BitFlags<LatchControlModesBitmap> & latchControlModes)
+        {
+            mFeatureMap.Set(Feature::kMotionLatching);
+            mLatchControlModes = latchControlModes;
+            return *this;
+        }
+        Config & WithInstantaneous()
+        {
+            mFeatureMap.Set(Feature::kInstantaneous);
+            return *this;
+        }
+        Config & WithSpeed()
+        {
+            mFeatureMap.Set(Feature::kSpeed);
+            return *this;
+        }
+        Config & WithVentilation()
+        {
+            mFeatureMap.Set(Feature::kVentilation);
+            return *this;
+        }
+        Config & WithPedestrian()
+        {
+            mFeatureMap.Set(Feature::kPedestrian);
+            return *this;
+        }
+        Config & WithCalibration()
+        {
+            mFeatureMap.Set(Feature::kCalibration);
+            return *this;
+        }
+        Config & WithProtection()
+        {
+            mFeatureMap.Set(Feature::kProtection);
+            return *this;
+        }
+        Config & WithManuallyOperable()
+        {
+            mFeatureMap.Set(Feature::kManuallyOperable);
+            return *this;
+        }
+        Config & WithCountdownTime(DataModel::Nullable<ElapsedS> initial = DataModel::NullNullable)
+        {
+            mInitialCountdownTime = initial;
+            mOptionalAttributes.Set<ClosureControl::Attributes::CountdownTime::Id>();
+            return *this;
+        }
+        Config & WithInitialMainState(MainStateEnum mainState)
+        {
+            mInitialMainState = mainState;
+            return *this;
+        }
+        Config & WithInitialOverallCurrentState(const DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
+        {
+            mInitialOverallCurrentState = overallCurrentState;
+            return *this;
+        }
+
+        EndpointId mEndpointId;
+        ClosureControlClusterDelegate & mDelegate;
+        TimerDelegate & mTimerDelegate;
+        BitFlags<Feature> mFeatureMap;
+        OptionalAttributesSet mOptionalAttributes;
+        BitFlags<LatchControlModesBitmap> mLatchControlModes;
+        DataModel::Nullable<ElapsedS> mInitialCountdownTime                         = DataModel::NullNullable;
+        MainStateEnum mInitialMainState                                             = MainStateEnum::kStopped;
+        DataModel::Nullable<GenericOverallCurrentState> mInitialOverallCurrentState = DataModel::NullNullable;
     };
 
     /**
-     * Creates a Closure Control Cluster instance.
-     * @param endpointId The endpoint on which this cluster exists.
-     * @param context The context containing injected dependencies.
+     * Creates a Closure Control Cluster instance from a fully-built Config.
+     * @param config The configuration carrying delegate, timer delegate, feature map, optional
+     *               attributes and initial state for this cluster instance.
      */
-    ClosureControlCluster(EndpointId endpointId, const Context & context);
+    ClosureControlCluster(const Config & config);
     ~ClosureControlCluster();
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -174,12 +145,12 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    DataModel::Nullable<ElapsedS> GetCountdownTime() const;
-    MainStateEnum GetMainState() const;
-    DataModel::Nullable<GenericOverallCurrentState> GetOverallCurrentState() const;
-    DataModel::Nullable<GenericOverallTargetState> GetOverallTargetState() const;
-    BitFlags<LatchControlModesBitmap> GetLatchControlModes() const;
-    BitFlags<Feature> GetFeatureMap() const;
+    DataModel::Nullable<ElapsedS> GetCountdownTime() const { return mCountdownTime.value(); }
+    MainStateEnum GetMainState() const { return mMainState; }
+    DataModel::Nullable<GenericOverallCurrentState> GetOverallCurrentState() const { return mOverallCurrentState; }
+    DataModel::Nullable<GenericOverallTargetState> GetOverallTargetState() const { return mOverallTargetState; }
+    BitFlags<LatchControlModesBitmap> GetLatchControlModes() const { return mLatchControlModes; }
+    BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
 
     /**
      * @brief Gets the current error list.
@@ -228,16 +199,6 @@ public:
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetMainState(MainStateEnum mainState);
-
-    /**
-     * @brief Sets the latch control modes for the closure control cluster.
-     *        This method updates the latch control modes using the provided bit flags.
-     *
-     * @param[in] latchControlModes  Reference to a BitFlags object representing the desired latch control modes.
-     *
-     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an appropriate error code on failure.
-     */
-    CHIP_ERROR SetLatchControlModes(const BitFlags<LatchControlModesBitmap> & latchControlModes);
 
     /**
      * @brief Triggers an update to report a new countdown time from application.
@@ -349,8 +310,18 @@ public:
 private:
     ClosureControlClusterDelegate & mDelegate;
     TimerDelegate & mTimerDelegate;
-    ClusterConformance mConformance;
-    ClusterState mState;
+    const BitFlags<Feature> mFeatureMap;
+    const OptionalAttributesSet mOptionalAttributes;
+
+    QuieterReportingAttribute<ElapsedS> mCountdownTime;
+    MainStateEnum mMainState                                             = MainStateEnum::kUnknownEnumValue;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
+    const BitFlags<LatchControlModesBitmap> mLatchControlModes;
+    ClosureErrorEnum mCurrentErrorList[kCurrentErrorListMaxSize] = {};
+
+    // The current error count is used to track the number of errors in the CurrentErrorList.
+    size_t mCurrentErrorCount = 0;
 
     /**
      * @brief Function validates if the requested mainState is supported by the closure.

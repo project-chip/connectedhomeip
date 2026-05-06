@@ -80,11 +80,10 @@ class TestEventTrigger(MatterBaseTest):
     @async_test_body
     async def test_incorrect_key(self):
         dev_ctrl = self.default_controller
-        test_event_triggers_enabled = await self.read_single_attribute(
-            dev_ctrl,
-            self.dut_node_id,
-            endpoint=0,
-            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        test_event_triggers_enabled = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled,
+            endpoint=0
         )
         asserts.assert_true(test_event_triggers_enabled, "This test expects Test Event Triggers are Enabled")
 
@@ -100,11 +99,10 @@ class TestEventTrigger(MatterBaseTest):
     @async_test_body
     async def test_correct_key_valid_code(self):
         dev_ctrl = self.default_controller
-        test_event_triggers_enabled = await self.read_single_attribute(
-            dev_ctrl,
-            self.dut_node_id,
-            endpoint=0,
-            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        test_event_triggers_enabled = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled,
+            endpoint=0
         )
         asserts.assert_true(test_event_triggers_enabled, "This test expects Test Event Triggers are Enabled")
 
@@ -121,11 +119,10 @@ class TestEventTrigger(MatterBaseTest):
     @async_test_body
     async def test_correct_key_invalid_code(self):
         dev_ctrl = self.default_controller
-        test_event_triggers_enabled = await self.read_single_attribute(
-            dev_ctrl,
-            self.dut_node_id,
-            endpoint=0,
-            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        test_event_triggers_enabled = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled,
+            endpoint=0
         )
         asserts.assert_true(test_event_triggers_enabled, "This test expects Test Event Triggers are Enabled")
 
@@ -144,18 +141,21 @@ class TestEventTrigger(MatterBaseTest):
     @async_test_body
     async def test_multiple_command_request_feature_present_if_needed(self):
         dev_ctrl = self.default_controller
-        test_event_triggers_enabled = await self.read_single_attribute(
-            dev_ctrl,
-            self.dut_node_id,
-            endpoint=0,
-            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        test_event_triggers_enabled = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled,
+            endpoint=0
         )
         asserts.assert_true(test_event_triggers_enabled, "This test expects Test Event Triggers are Enabled")
 
-        max_paths_per_invoke = await self.read_single_attribute(self.default_controller, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.BasicInformation.Attributes.MaxPathsPerInvoke)
-        feature_map = await self.read_single_attribute(self.default_controller, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GeneralDiagnostics.Attributes.FeatureMap)
-        accepted_commands = await self.read_single_attribute(self.default_controller, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GeneralDiagnostics.Attributes.AcceptedCommandList)
-        generated_commands = await self.read_single_attribute(self.default_controller, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GeneralDiagnostics.Attributes.GeneratedCommandList)
+        max_paths_per_invoke = await self.read_single_attribute_check_success(
+            cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.MaxPathsPerInvoke, endpoint=0)
+        feature_map = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics, attribute=Clusters.GeneralDiagnostics.Attributes.FeatureMap, endpoint=0)
+        accepted_commands = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics, attribute=Clusters.GeneralDiagnostics.Attributes.AcceptedCommandList, endpoint=0)
+        generated_commands = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics, attribute=Clusters.GeneralDiagnostics.Attributes.GeneratedCommandList, endpoint=0)
 
         has_multiple_paths_per_invoke = max_paths_per_invoke > 1
         has_data_model_test_feature = (feature_map & Clusters.GeneralDiagnostics.Bitmaps.Feature.kDataModelTest) != 0

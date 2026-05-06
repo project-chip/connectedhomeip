@@ -53,17 +53,47 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import matter.clusters as Clusters
+from matter.testing.conformance import optional, otherwise, provisional
 from matter.testing.decorators import async_test_body
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.spec_parsing import XmlFeature
 
 
 class TC_DeviceConformance(DeviceConformanceTests):
+
+    def remove_later_dirty_patch_for_1_6_groupscast_and_onoff(self):
+        acl_id = Clusters.AccessControl.id
+        groups_id = Clusters.Groups.id
+        group_key_management_id = Clusters.GroupKeyManagement.id
+        on_off_id = Clusters.OnOff.id
+        # TODO (#71577): Remove once the parser is updated to correctly parse this conformance
+        if self.xml_clusters[acl_id].revision >= 3:
+            aux_mask = Clusters.AccessControl.Bitmaps.Feature.kAuxiliary
+            self.xml_clusters[acl_id].features[aux_mask] = XmlFeature(code='AUX', name='Auxiliary', conformance=optional())
+            self.xml_clusters[acl_id].feature_map['AUX'] = aux_mask
+        # TODO (#71595): Remove remaining hacks once the DM files for 1.6 are updated.
+        if self.xml_clusters[groups_id].revision == 5:
+            self.xml_clusters[groups_id].revision = 4
+        if self.xml_clusters[group_key_management_id].revision == 3:
+            gcast_mask = Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast
+            self.xml_clusters[group_key_management_id].features[gcast_mask] = XmlFeature(
+                code='GCAST', name='Groupcast', conformance=optional())
+            gcast_adoption_id = Clusters.GroupKeyManagement.Attributes.GroupcastAdoption.attribute_id
+            # Conformance for this attribute needs to be wrapped in provisional as the intent it to let this remain provisional post 1.6
+            current_conformance = self.xml_clusters[group_key_management_id].attributes[gcast_adoption_id].conformance
+            self.xml_clusters[group_key_management_id].attributes[gcast_adoption_id].conformance = otherwise([
+                                                                                                             provisional(), current_conformance])
+        if self.xml_clusters[on_off_id].revision == 7:
+            self.xml_clusters[on_off_id].revision = 6
+
     @async_test_body
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper()
+        self.remove_later_dirty_patch_for_1_6_groupscast_and_onoff()
 
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2

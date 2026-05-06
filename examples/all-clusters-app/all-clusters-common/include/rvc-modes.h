@@ -38,9 +38,9 @@ class RvcRunModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType ModeTagsIdle[1]     = { { .value = to_underlying(ModeTag::kIdle) } };
-    ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(ModeTag::kCleaning) } };
-    ModeTagStructType ModeTagsMapping[1]  = { { .value = to_underlying(ModeTag::kMapping) } };
+    ModeTagStructType ModeTagsIdle[1]     = { { .mfgCode = {}, .value = to_underlying(ModeTag::kIdle) } };
+    ModeTagStructType ModeTagsCleaning[1] = { { .mfgCode = {}, .value = to_underlying(ModeTag::kCleaning) } };
+    ModeTagStructType ModeTagsMapping[1]  = { { .mfgCode = {}, .value = to_underlying(ModeTag::kMapping) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{
@@ -80,10 +80,10 @@ class RvcCleanModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType            = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsVac[1]   = { { .value = to_underlying(ModeTag::kVacuum) } };
-    ModeTagStructType modeTagsMop[1]   = { { .value = to_underlying(ModeTag::kMop) } };
-    ModeTagStructType modeTagsBoost[2] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
-                                           { .value = to_underlying(ModeTag::kDeepClean) } };
+    ModeTagStructType modeTagsVac[1]   = { { .mfgCode = {}, .value = to_underlying(ModeTag::kVacuum) } };
+    ModeTagStructType modeTagsMop[1]   = { { .mfgCode = {}, .value = to_underlying(ModeTag::kMop) } };
+    ModeTagStructType modeTagsBoost[2] = { { .mfgCode = {}, .value = to_underlying(ModeBase::ModeTag::kMax) },
+                                           { .mfgCode = {}, .value = to_underlying(ModeTag::kDeepClean) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{
