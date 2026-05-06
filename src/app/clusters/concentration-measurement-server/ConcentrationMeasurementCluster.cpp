@@ -117,21 +117,21 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
     static constexpr DataModel::AttributeEntry kMandatoryAttrs[] = {
         Attributes::MeasurementMedium::kMetadataEntry,
     };
-    const bool numeric  = mFeatures.Has(Feature::kNumericMeasurement);
-    const bool peak     = mFeatures.Has(Feature::kPeakMeasurement);
-    const bool average  = mFeatures.Has(Feature::kAverageMeasurement);
-    const bool level    = mFeatures.Has(Feature::kLevelIndication);
+    const bool numeric                                                  = mFeatures.Has(Feature::kNumericMeasurement);
+    const bool peak                                                     = mFeatures.Has(Feature::kPeakMeasurement);
+    const bool average                                                  = mFeatures.Has(Feature::kAverageMeasurement);
+    const bool level                                                    = mFeatures.Has(Feature::kLevelIndication);
     const AttributeListBuilder::OptionalAttributeEntry kOptionalAttrs[] = {
         { numeric, Attributes::MeasuredValue::kMetadataEntry },
         { numeric, Attributes::MinMeasuredValue::kMetadataEntry },
         { numeric, Attributes::MaxMeasuredValue::kMetadataEntry },
         { numeric, Attributes::Uncertainty::kMetadataEntry },
         { numeric, Attributes::MeasurementUnit::kMetadataEntry },
-        { peak,    Attributes::PeakMeasuredValue::kMetadataEntry },
-        { peak,    Attributes::PeakMeasuredValueWindow::kMetadataEntry },
+        { peak, Attributes::PeakMeasuredValue::kMetadataEntry },
+        { peak, Attributes::PeakMeasuredValueWindow::kMetadataEntry },
         { average, Attributes::AverageMeasuredValue::kMetadataEntry },
         { average, Attributes::AverageMeasuredValueWindow::kMetadataEntry },
-        { level,   Attributes::LevelValue::kMetadataEntry },
+        { level, Attributes::LevelValue::kMetadataEntry },
     };
     return AttributeListBuilder(builder).Append(chip::Span<const DataModel::AttributeEntry>(kMandatoryAttrs),
                                                 chip::Span<const AttributeListBuilder::OptionalAttributeEntry>(kOptionalAttrs));
