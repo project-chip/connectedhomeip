@@ -47,10 +47,10 @@ class AvAnalysisClusterAnalysisSessionStartEvent(
       }
       if (triggeredZones != null) {
         startArray(ContextSpecificTag(TAG_TRIGGERED_ZONES))
-      for (item in triggeredZones.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+        for (item in triggeredZones.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
       } else {
         putNull(ContextSpecificTag(TAG_TRIGGERED_ZONES))
       }
@@ -63,26 +63,28 @@ class AvAnalysisClusterAnalysisSessionStartEvent(
     private const val TAG_SOURCE_NODE_ID = 1
     private const val TAG_TRIGGERED_ZONES = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AvAnalysisClusterAnalysisSessionStartEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterAnalysisSessionStartEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUShort(ContextSpecificTag(TAG_SESSION_ID))
-      val sourceNodeId = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
-        Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
-      } else {
-        Optional.empty()
-      }
-      val triggeredZones = if (!tlvReader.isNull()) {
-        buildList <UShort> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_TRIGGERED_ZONES))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(tlvReader.getUShort(AnonymousTag))
+      val sourceNodeId =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
+        } else {
+          Optional.empty()
         }
-        tlvReader.exitContainer()
-      }
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_TRIGGERED_ZONES))
-        null
-      }
+      val triggeredZones =
+        if (!tlvReader.isNull()) {
+          buildList <UShort> {
+            tlvReader.enterArray(ContextSpecificTag(TAG_TRIGGERED_ZONES))
+            while(!tlvReader.isEndOfContainer()) {
+              this.add(tlvReader.getUShort(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_TRIGGERED_ZONES))
+         null
+        }
       
       tlvReader.exitContainer()
 

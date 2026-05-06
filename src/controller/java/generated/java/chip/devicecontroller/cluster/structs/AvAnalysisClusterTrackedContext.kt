@@ -18,21 +18,21 @@ package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
 class AvAnalysisClusterTrackedContext (
-    val identifiedContextID: UInt,
-    val identifiedContext: AvAnalysisClusterSemanticTagStruct,
-    val previousZone: Optional<UInt>?,
-    val currentZone: Optional<UInt>?,
-    val startTime: ULong,
-    val endTime: ULong?) {
+  val identifiedContextID: UInt,
+  val identifiedContext: AvAnalysisClusterSemanticTagStruct,
+  val previousZone: Optional<UInt>?,
+  val currentZone: Optional<UInt>?,
+  val startTime: ULong,
+  val endTime: ULong?
+) {
   override fun toString(): String  = buildString {
     append("AvAnalysisClusterTrackedContext {\n")
     append("\tidentifiedContextID : $identifiedContextID\n")
@@ -50,27 +50,27 @@ class AvAnalysisClusterTrackedContext (
       put(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT_ID), identifiedContextID)
       identifiedContext.toTlv(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT), this)
       if (previousZone != null) {
-      if (previousZone.isPresent) {
-      val optpreviousZone = previousZone.get()
-      put(ContextSpecificTag(TAG_PREVIOUS_ZONE), optpreviousZone)
-    }
-    } else {
-      putNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
-    }
+        if (previousZone.isPresent) {
+          val optpreviousZone = previousZone.get()
+          put(ContextSpecificTag(TAG_PREVIOUS_ZONE), optpreviousZone)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
+      }
       if (currentZone != null) {
-      if (currentZone.isPresent) {
-      val optcurrentZone = currentZone.get()
-      put(ContextSpecificTag(TAG_CURRENT_ZONE), optcurrentZone)
-    }
-    } else {
-      putNull(ContextSpecificTag(TAG_CURRENT_ZONE))
-    }
+        if (currentZone.isPresent) {
+          val optcurrentZone = currentZone.get()
+          put(ContextSpecificTag(TAG_CURRENT_ZONE), optcurrentZone)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_ZONE))
+      }
       put(ContextSpecificTag(TAG_START_TIME), startTime)
       if (endTime != null) {
-      put(ContextSpecificTag(TAG_END_TIME), endTime)
-    } else {
-      putNull(ContextSpecificTag(TAG_END_TIME))
-    }
+        put(ContextSpecificTag(TAG_END_TIME), endTime)
+      } else {
+        putNull(ContextSpecificTag(TAG_END_TIME))
+      }
       endStructure()
     }
   }
@@ -83,41 +83,55 @@ class AvAnalysisClusterTrackedContext (
     private const val TAG_START_TIME = 4
     private const val TAG_END_TIME = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AvAnalysisClusterTrackedContext {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterTrackedContext {
       tlvReader.enterStructure(tlvTag)
       val identifiedContextID = tlvReader.getUInt(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT_ID))
-      val identifiedContext = AvAnalysisClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT), tlvReader)
-      val previousZone = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_ZONE))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_ZONE)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
-      null
-    }
-      val currentZone = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_ZONE))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_ZONE)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_ZONE))
-      null
-    }
+      val identifiedContext =
+        AvAnalysisClusterSemanticTagStruct.fromTlv(
+          ContextSpecificTag(TAG_IDENTIFIED_CONTEXT), 
+          tlvReader
+        )
+      val previousZone =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_ZONE))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_ZONE)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
+          null
+       }
+      val currentZone =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_ZONE))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_ZONE)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_ZONE))
+          null
+        }
       val startTime = tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
-      val endTime = if (!tlvReader.isNull()) {
-      tlvReader.getULong(ContextSpecificTag(TAG_END_TIME))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_END_TIME))
-      null
-    }
+      val endTime =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_END_TIME))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_END_TIME))
+          null
+        }
       
       tlvReader.exitContainer()
 
-      return AvAnalysisClusterTrackedContext(identifiedContextID, identifiedContext, previousZone, currentZone, startTime, endTime)
+      return AvAnalysisClusterTrackedContext(
+        identifiedContextID,
+        identifiedContext,
+        previousZone,
+        currentZone,
+        startTime,
+        endTime
+      )
     }
   }
 }

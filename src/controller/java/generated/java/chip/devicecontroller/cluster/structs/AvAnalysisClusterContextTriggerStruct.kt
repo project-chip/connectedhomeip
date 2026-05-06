@@ -18,17 +18,17 @@ package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
 class AvAnalysisClusterContextTriggerStruct (
-    val context: AvAnalysisClusterSemanticTagStruct,
-    val zoneIDs: Optional<List<UInt>>?) {
+  val context: AvAnalysisClusterSemanticTagStruct,
+  val zoneIDs: Optional<List<UInt>>?
+) {
   override fun toString(): String  = buildString {
     append("AvAnalysisClusterContextTriggerStruct {\n")
     append("\tcontext : $context\n")
@@ -41,17 +41,17 @@ class AvAnalysisClusterContextTriggerStruct (
       startStructure(tlvTag)
       context.toTlv(ContextSpecificTag(TAG_CONTEXT), this)
       if (zoneIDs != null) {
-      if (zoneIDs.isPresent) {
-      val optzoneIDs = zoneIDs.get()
-      startArray(ContextSpecificTag(TAG_ZONE_I_DS))
-      for (item in optzoneIDs.iterator()) {
-        put(AnonymousTag, item)
+        if (zoneIDs.isPresent) {
+          val optzoneIDs = zoneIDs.get()
+          startArray(ContextSpecificTag(TAG_ZONE_I_DS))
+          for (item in optzoneIDs.iterator()) {
+            put(AnonymousTag, item)
+          }
+          endArray()
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_ZONE_I_DS))
       }
-      endArray()
-    }
-    } else {
-      putNull(ContextSpecificTag(TAG_ZONE_I_DS))
-    }
       endStructure()
     }
   }
@@ -60,25 +60,29 @@ class AvAnalysisClusterContextTriggerStruct (
     private const val TAG_CONTEXT = 0
     private const val TAG_ZONE_I_DS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AvAnalysisClusterContextTriggerStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterContextTriggerStruct {
       tlvReader.enterStructure(tlvTag)
-      val context = AvAnalysisClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_CONTEXT), tlvReader)
-      val zoneIDs = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZONE_I_DS))) {
-      Optional.of(buildList<UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ZONE_I_DS))
-      null
-    }
+      val context =
+        AvAnalysisClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_CONTEXT), tlvReader)
+      val zoneIDs =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZONE_I_DS))) {
+            Optional.of(
+              buildList<UInt> {
+                tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
+                while(!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUInt(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            )
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ZONE_I_DS))
+          null
+        }
       
       tlvReader.exitContainer()
 

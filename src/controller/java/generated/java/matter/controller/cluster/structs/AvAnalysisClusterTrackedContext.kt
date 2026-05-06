@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -50,17 +49,17 @@ class AvAnalysisClusterTrackedContext(
       identifiedContext.toTlv(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT), this)
       if (previousZone != null) {
         if (previousZone.isPresent) {
-        val optpreviousZone = previousZone.get()
-        put(ContextSpecificTag(TAG_PREVIOUS_ZONE), optpreviousZone)
-      }
+          val optpreviousZone = previousZone.get()
+          put(ContextSpecificTag(TAG_PREVIOUS_ZONE), optpreviousZone)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
       }
       if (currentZone != null) {
         if (currentZone.isPresent) {
-        val optcurrentZone = currentZone.get()
-        put(ContextSpecificTag(TAG_CURRENT_ZONE), optcurrentZone)
-      }
+          val optcurrentZone = currentZone.get()
+          put(ContextSpecificTag(TAG_CURRENT_ZONE), optcurrentZone)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_CURRENT_ZONE))
       }
@@ -85,38 +84,52 @@ class AvAnalysisClusterTrackedContext(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterTrackedContext {
       tlvReader.enterStructure(tlvTag)
       val identifiedContextID = tlvReader.getUShort(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT_ID))
-      val identifiedContext = AvAnalysisClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_IDENTIFIED_CONTEXT), tlvReader)
-      val previousZone = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_ZONE))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PREVIOUS_ZONE)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
-      null
-    }
-      val currentZone = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_ZONE))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_CURRENT_ZONE)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_ZONE))
-      null
-    }
+      val identifiedContext =
+        AvAnalysisClusterSemanticTagStruct.fromTlv(
+          ContextSpecificTag(TAG_IDENTIFIED_CONTEXT),
+          tlvReader
+        )
+      val previousZone =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_ZONE))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PREVIOUS_ZONE)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+         tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_ZONE))
+          null
+        }
+      val currentZone =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_ZONE))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_CURRENT_ZONE)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_ZONE))
+          null
+        }
       val startTime = tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
-      val endTime = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_END_TIME))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_END_TIME))
-      null
-    }
+      val endTime =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_END_TIME))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_END_TIME))
+          null
+        }
       
       tlvReader.exitContainer()
 
-      return AvAnalysisClusterTrackedContext(identifiedContextID, identifiedContext, previousZone, currentZone, startTime, endTime)
+      return AvAnalysisClusterTrackedContext(
+        identifiedContextID,
+        identifiedContext,
+        previousZone,
+        currentZone,
+        startTime,
+        endTime
+      )
     }
   }
 }

@@ -18,21 +18,24 @@ package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AvAnalysisClusterPerceivedContextEvent (
-    val sessionID: UInt,
-    val sourceNodeId: Optional<ULong>,
-    val sourceStartTimestamp: Optional<ULong>,
-    val newIdentifiedContexts: Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>,
-    val currentIdentifiedContexts: Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>,
-    val expiredContexts: Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>) {
+class AvAnalysisClusterPerceivedContextEvent(
+  val sessionID: UInt,
+  val sourceNodeId: Optional<ULong>,
+  val sourceStartTimestamp: Optional<ULong>,
+  val newIdentifiedContexts:
+    Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>,
+  val currentIdentifiedContexts:
+    Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>,
+  val expiredContexts:
+    Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>
+) {
   override fun toString(): String  = buildString {
     append("AvAnalysisClusterPerceivedContextEvent {\n")
     append("\tsessionID : $sessionID\n")
@@ -49,37 +52,37 @@ class AvAnalysisClusterPerceivedContextEvent (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
       if (sourceNodeId.isPresent) {
-      val optsourceNodeId = sourceNodeId.get()
-      put(ContextSpecificTag(TAG_SOURCE_NODE_ID), optsourceNodeId)
-    }
+        val optsourceNodeId = sourceNodeId.get()
+        put(ContextSpecificTag(TAG_SOURCE_NODE_ID), optsourceNodeId)
+      }
       if (sourceStartTimestamp.isPresent) {
-      val optsourceStartTimestamp = sourceStartTimestamp.get()
-      put(ContextSpecificTag(TAG_SOURCE_START_TIMESTAMP), optsourceStartTimestamp)
-    }
+        val optsourceStartTimestamp = sourceStartTimestamp.get()
+        put(ContextSpecificTag(TAG_SOURCE_START_TIMESTAMP), optsourceStartTimestamp)
+      }
       if (newIdentifiedContexts.isPresent) {
-      val optnewIdentifiedContexts = newIdentifiedContexts.get()
-      startArray(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))
-      for (item in optnewIdentifiedContexts.iterator()) {
-        item.toTlv(AnonymousTag, this)
+        val optnewIdentifiedContexts = newIdentifiedContexts.get()
+        startArray(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))
+        for (item in optnewIdentifiedContexts.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
-      endArray()
-    }
       if (currentIdentifiedContexts.isPresent) {
-      val optcurrentIdentifiedContexts = currentIdentifiedContexts.get()
-      startArray(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))
-      for (item in optcurrentIdentifiedContexts.iterator()) {
-        item.toTlv(AnonymousTag, this)
+        val optcurrentIdentifiedContexts = currentIdentifiedContexts.get()
+        startArray(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))
+        for (item in optcurrentIdentifiedContexts.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
-      endArray()
-    }
       if (expiredContexts.isPresent) {
-      val optexpiredContexts = expiredContexts.get()
-      startArray(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))
-      for (item in optexpiredContexts.iterator()) {
-        item.toTlv(AnonymousTag, this)
+        val optexpiredContexts = expiredContexts.get()
+        startArray(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))
+        for (item in optexpiredContexts.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
-      endArray()
-    }
       endStructure()
     }
   }
@@ -92,56 +95,89 @@ class AvAnalysisClusterPerceivedContextEvent (
     private const val TAG_CURRENT_IDENTIFIED_CONTEXTS = 4
     private const val TAG_EXPIRED_CONTEXTS = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AvAnalysisClusterPerceivedContextEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterPerceivedContextEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
-      val sourceNodeId = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
-    } else {
-      Optional.empty()
-    }
-      val sourceStartTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_START_TIMESTAMP))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_START_TIMESTAMP)))
-    } else {
-      Optional.empty()
-    }
-      val newIdentifiedContexts = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))) {
-      Optional.of(buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val currentIdentifiedContexts = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))) {
-      Optional.of(buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val expiredContexts = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))) {
-      Optional.of(buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))
-      while(!tlvReader.isEndOfContainer()) {
-        this.add(chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
+      val sourceNodeId =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
+        } else {
+         Optional.empty()
+        }
+      val sourceStartTimestamp =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_START_TIMESTAMP))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_START_TIMESTAMP)))
+        } else {
+          Optional.empty()
+        }
+      val newIdentifiedContexts =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))) {
+          Optional.of(
+            buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_NEW_IDENTIFIED_CONTEXTS))
+              while(!tlvReader.isEndOfContainer()) {
+                this.add(
+                  chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
+                    AnonymousTag,
+                    tlvReader
+                  )
+                )
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val currentIdentifiedContexts =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))) {
+          Optional.of(
+            buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT_IDENTIFIED_CONTEXTS))
+              while(!tlvReader.isEndOfContainer()) {
+                this.add(
+                  chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
+                    AnonymousTag,
+                    tlvReader
+                  )
+                )
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val expiredContexts =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))) {
+          Optional.of(
+            buildList <chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_EXPIRED_CONTEXTS))
+              while(!tlvReader.isEndOfContainer()) {
+                this.add(
+                  chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
+                    AnonymousTag,
+                    tlvReader
+                  )
+                )
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
       
       tlvReader.exitContainer()
 
-      return AvAnalysisClusterPerceivedContextEvent(sessionID, sourceNodeId, sourceStartTimestamp, newIdentifiedContexts, currentIdentifiedContexts, expiredContexts)
+      return AvAnalysisClusterPerceivedContextEvent(
+        sessionID,
+        sourceNodeId,
+        sourceStartTimestamp,
+        newIdentifiedContexts,
+        currentIdentifiedContexts,
+        expiredContexts
+      )
     }
   }
 }

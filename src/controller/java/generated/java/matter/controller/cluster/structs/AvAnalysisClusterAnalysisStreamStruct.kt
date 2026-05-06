@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -45,17 +44,17 @@ class AvAnalysisClusterAnalysisStreamStruct(
       put(ContextSpecificTag(TAG_ANALYSIS_STREAM_ID), analysisStreamID)
       if (webRTCEndpointID != null) {
         if (webRTCEndpointID.isPresent) {
-        val optwebRTCEndpointID = webRTCEndpointID.get()
-        put(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID), optwebRTCEndpointID)
-      }
+          val optwebRTCEndpointID = webRTCEndpointID.get()
+          put(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID), optwebRTCEndpointID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID))
       }
       if (pushAVEndpointID != null) {
         if (pushAVEndpointID.isPresent) {
-        val optpushAVEndpointID = pushAVEndpointID.get()
-        put(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID), optpushAVEndpointID)
-      }
+          val optpushAVEndpointID = pushAVEndpointID.get()
+          put(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID), optpushAVEndpointID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID))
       }
@@ -73,31 +72,38 @@ class AvAnalysisClusterAnalysisStreamStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterAnalysisStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val analysisStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_ANALYSIS_STREAM_ID))
-      val webRTCEndpointID = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID))
-      null
-    }
-      val pushAVEndpointID = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID))
-      null
-    }
+      val webRTCEndpointID =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_WEB_RTC_ENDPOINT_ID))
+          null
+        }
+      val pushAVEndpointID =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID)))
+          } else {
+            Optional.empty()
+          }
+    }    else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PUSH_AV_ENDPOINT_ID))
+          null
+        }
       val analysisStreamState = tlvReader.getUByte(ContextSpecificTag(TAG_ANALYSIS_STREAM_STATE))
       
       tlvReader.exitContainer()
 
-      return AvAnalysisClusterAnalysisStreamStruct(analysisStreamID, webRTCEndpointID, pushAVEndpointID, analysisStreamState)
+      return AvAnalysisClusterAnalysisStreamStruct(
+        analysisStreamID,
+        webRTCEndpointID,
+        pushAVEndpointID,
+        analysisStreamState
+      )
     }
   }
 }

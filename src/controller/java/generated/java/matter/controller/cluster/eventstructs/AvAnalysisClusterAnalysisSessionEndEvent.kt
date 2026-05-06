@@ -18,7 +18,6 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -51,15 +50,16 @@ class AvAnalysisClusterAnalysisSessionEndEvent(
     private const val TAG_SESSION_ID = 0
     private const val TAG_SOURCE_NODE_ID = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AvAnalysisClusterAnalysisSessionEndEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterAnalysisSessionEndEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUShort(ContextSpecificTag(TAG_SESSION_ID))
-      val sourceNodeId = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
-        Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
-      } else {
-        Optional.empty()
-      }
-      
+      val sourceNodeId =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return AvAnalysisClusterAnalysisSessionEndEvent(sessionID, sourceNodeId)

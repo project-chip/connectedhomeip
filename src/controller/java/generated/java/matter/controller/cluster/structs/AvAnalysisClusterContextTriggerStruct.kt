@@ -41,13 +41,13 @@ class AvAnalysisClusterContextTriggerStruct(
       context.toTlv(ContextSpecificTag(TAG_CONTEXT), this)
       if (zoneIDs != null) {
         if (zoneIDs.isPresent) {
-        val optzoneIDs = zoneIDs.get()
-        startArray(ContextSpecificTag(TAG_ZONE_I_DS))
-      for (item in optzoneIDs.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
-      }
+          val optzoneIDs = zoneIDs.get()
+          startArray(ContextSpecificTag(TAG_ZONE_I_DS))
+          for (item in optzoneIDs.iterator()) {
+            put(AnonymousTag, item)
+          }
+          endArray()
+        }
       } else {
         putNull(ContextSpecificTag(TAG_ZONE_I_DS))
       }
@@ -61,23 +61,26 @@ class AvAnalysisClusterContextTriggerStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterContextTriggerStruct {
       tlvReader.enterStructure(tlvTag)
-      val context = AvAnalysisClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_CONTEXT), tlvReader)
-      val zoneIDs = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZONE_I_DS))) {
-      Optional.of(buildList<UShort> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUShort(AnonymousTag))
+      val context =
+        AvAnalysisClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_CONTEXT), tlvReader)
+      val zoneIDs =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZONE_I_DS))) {
+            Optional.of(buildList<UShort> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_ZONE_I_DS))
+              while(!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUShort(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_ZONE_I_DS))
+        null
       }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ZONE_I_DS))
-      null
-    }
       
       tlvReader.exitContainer()
 

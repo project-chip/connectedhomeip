@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -51,9 +50,9 @@ class AvAnalysisClusterSemanticTagStruct(
       put(ContextSpecificTag(TAG_TAG), tag)
       if (label != null) {
         if (label.isPresent) {
-        val optlabel = label.get()
-        put(ContextSpecificTag(TAG_LABEL), optlabel)
-      }
+          val optlabel = label.get()
+          put(ContextSpecificTag(TAG_LABEL), optlabel)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_LABEL))
       }
@@ -69,24 +68,26 @@ class AvAnalysisClusterSemanticTagStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AvAnalysisClusterSemanticTagStruct {
       tlvReader.enterStructure(tlvTag)
-      val mfgCode = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
-      null
-    }
+      val mfgCode =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
+          null
+        }
       val namespaceID = tlvReader.getUByte(ContextSpecificTag(TAG_NAMESPACE_ID))
       val tag = tlvReader.getUByte(ContextSpecificTag(TAG_TAG))
-      val label = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
-      null
-    }
+      val label =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+            Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
+          null
+        }
       
       tlvReader.exitContainer()
 
