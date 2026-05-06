@@ -408,11 +408,9 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoi
 
         if (messageSize == 0)
         {
-            // Zero-length messages are not valid Matter messages. Reject them to
-            // prevent attackers from holding TCP connection slots indefinitely with
-            // minimal bandwidth (just 4 zero bytes per keepalive probe).
+            // Zero-length messages are not valid Matter messages. Reject to
+            // prevent attackers from holding TCP connection slots indefinitely.
             ChipLogError(Inet, "Received zero-length TCP message, closing connection.");
-            CloseConnectionInternal(*state, CHIP_ERROR_INVALID_MESSAGE_LENGTH, SuppressCallback::No);
             return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
         }
 
