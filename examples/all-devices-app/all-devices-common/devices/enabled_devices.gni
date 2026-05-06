@@ -78,6 +78,10 @@ _available_devices = [
     "water-leak-detector",
     "WATER_LEAK_DETECTOR",
   ],
+  [
+    "proximity-ranger",
+    "PROXIMITY_RANGER",
+  ],
 ]
 
 # Computed output binary name — mirrors the three-way logic in enabled_devices.cmake.

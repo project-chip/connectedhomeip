@@ -18,12 +18,19 @@
 get_filename_component(CHIP_ROOT "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip" REALPATH)
 get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
 
+# Generate app_config/enabled_devices.h from the template.
+# Skipped during ESP-IDF's early component-requirements scan.
+if(NOT CMAKE_BUILD_EARLY_EXPANSION)
+    include(${CMAKE_CURRENT_LIST_DIR}/../../all-devices-common/devices/enabled_devices.cmake)
+endif()
+
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${ALL_DEVICES_COMMON_DIR}"
                       "${CHIP_ROOT}/examples/providers"
                       "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger"
                       "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl"
+                      "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
@@ -57,6 +64,8 @@ set(SRC_DIRS_LIST
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl"
 )

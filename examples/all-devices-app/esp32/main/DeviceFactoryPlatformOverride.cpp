@@ -18,35 +18,23 @@
 #include "Esp32BleRssiRangingAdapter.h"
 
 #include <devices/device-factory/DeviceFactory.h>
-#include <devices/proximity-ranger/DefaultProximityRangingDriver.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
-
-namespace {
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters::ProximityRanging;
-
-Esp32BleRssiRangingAdapter sBleAdapter;
-RangingTechnologyController sRangingController;
-DefaultProximityRangingDriver sRangingDriver{ sRangingController, BitMask<Feature>(Feature::kBleBeaconRssi) };
-
-} // namespace
 
 namespace chip {
 namespace app {
 
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
 {
-    TEMPORARY_RETURN_IGNORED sBleAdapter.Init(storageDelegate);
-    TEMPORARY_RETURN_IGNORED sRangingController.RegisterAdapter(sBleAdapter);
-
-    DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
-        return std::make_unique<ProximityRangerDevice>(ProximityRangerDevice::Context{
-            .timerDelegate = timerDelegate,
-            .driver        = sRangingDriver,
+    if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
+    {
+        static Esp32BleRssiRangingAdapter sBleAdapter;
+        TEMPORARY_RETURN_IGNORED sBleAdapter.Init(storageDelegate);
+        DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
+            static Clusters::ProximityRanging::RangingAdapter * adapters[] = { &sBleAdapter };
+            return std::make_unique<ProximityRangerDevice>(timerDelegate,
+                                                           Span<Clusters::ProximityRanging::RangingAdapter * const>(adapters));
         });
-    });
+    }
 }
 
 } // namespace app

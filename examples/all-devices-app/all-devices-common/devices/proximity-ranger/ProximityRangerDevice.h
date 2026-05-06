@@ -18,8 +18,9 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
-#include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <devices/interface/SingleEndpointDevice.h>
+#include <devices/proximity-ranger/DefaultProximityRangingDriver.h>
+#include <devices/proximity-ranger/RangingAdapter.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -29,13 +30,7 @@ namespace app {
 class ProximityRangerDevice : public SingleEndpointDevice
 {
 public:
-    struct Context
-    {
-        TimerDelegate & timerDelegate;
-        Clusters::ProximityRanging::ProximityRangingDriver & driver;
-    };
-
-    ProximityRangerDevice(const Context & context);
+    ProximityRangerDevice(TimerDelegate & timerDelegate, Span<Clusters::ProximityRanging::RangingAdapter * const> adapters);
     ~ProximityRangerDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -43,7 +38,9 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    const Context mContext;
+    Clusters::ProximityRanging::DefaultProximityRangingDriver mRangingDriver;
+    TimerDelegate & mTimerDelegate;
+
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ProximityRanging::ProximityRangingCluster> mProximityRangingCluster;
 };

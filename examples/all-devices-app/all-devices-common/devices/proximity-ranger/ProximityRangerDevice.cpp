@@ -19,40 +19,80 @@
 
 using namespace chip::app::Clusters;
 
+namespace {
+// Global controller shared across all ProximityRangerDevice instances.
+ProximityRanging::RangingTechnologyController sRangingController;
+} // namespace
+
 namespace chip {
 namespace app {
 
-ProximityRangerDevice::ProximityRangerDevice(const Context & context) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)), mContext(context)
-{}
+namespace {
+
+BitMask<ProximityRanging::Feature> FeatureMapFromAdapters(Span<ProximityRanging::RangingAdapter * const> adapters)
+{
+    BitMask<ProximityRanging::Feature> features;
+    for (auto * adapter : adapters)
+    {
+        switch (adapter->GetTechnology())
+        {
+        case ProximityRanging::RangingTechEnum::kBluetoothChannelSounding:
+            features.Set(ProximityRanging::Feature::kBluetoothChannelSounding);
+            break;
+        case ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging:
+        case ProximityRanging::RangingTechEnum::kWiFiNextGenerationRanging:
+            features.Set(ProximityRanging::Feature::kWiFiUsdProximityDetection);
+            break;
+        case ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging:
+            features.Set(ProximityRanging::Feature::kBleBeaconRssi);
+            break;
+        default:
+            break;
+        }
+    }
+    return features;
+}
+
+} // namespace
+
+ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate, Span<ProximityRanging::RangingAdapter * const> adapters) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
+    mRangingDriver(sRangingController, FeatureMapFromAdapters(adapters)), mTimerDelegate(timerDelegate)
+{
+    // Register each adapter with the shared controller.
+    for (auto * adapter : adapters)
+    {
+        LogErrorOnFailure(sRangingController.RegisterAdapter(*adapter));
+    }
+}
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate));
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Compute optional attributes from driver feature map (code-driven path, not codegen)
-    auto featureFlags = mContext.driver.GetFeatureMap();
-    AttributeSet attrs;
-    if (featureFlags.Has(ProximityRanging::Feature::kWiFiUsdProximityDetection))
+    // Compute optional attributes from driver feature map.
+    auto features = mRangingDriver.GetFeatureMap();
+    ProximityRanging::ProximityRangingCluster::OptionalAttributes optionalAttrs;
+    if (features.Has(ProximityRanging::Feature::kWiFiUsdProximityDetection))
     {
-        attrs.ForceSet<ProximityRanging::Attributes::WiFiDevIK::Id>();
+        optionalAttrs.Set<ProximityRanging::Attributes::WiFiDevIK::Id>();
     }
-    if (featureFlags.Has(ProximityRanging::Feature::kBleBeaconRssi))
+    if (features.Has(ProximityRanging::Feature::kBleBeaconRssi))
     {
-        attrs.ForceSet<ProximityRanging::Attributes::BLEDeviceID::Id>();
+        optionalAttrs.Set<ProximityRanging::Attributes::BLEDeviceID::Id>();
     }
-    if (featureFlags.Has(ProximityRanging::Feature::kBluetoothChannelSounding))
+    if (features.Has(ProximityRanging::Feature::kBluetoothChannelSounding))
     {
-        attrs.ForceSet<ProximityRanging::Attributes::BLTDevIK::Id>();
-        attrs.ForceSet<ProximityRanging::Attributes::BLTCSSecurityLevel::Id>();
-        attrs.ForceSet<ProximityRanging::Attributes::BLTCSModeCapability::Id>();
+        optionalAttrs.Set<ProximityRanging::Attributes::BLTDevIK::Id>();
+        optionalAttrs.Set<ProximityRanging::Attributes::BLTCSSecurityLevel::Id>();
+        optionalAttrs.Set<ProximityRanging::Attributes::BLTCSModeCapability::Id>();
     }
 
-    mProximityRangingCluster.Create(endpoint, ProximityRanging::ProximityRangingCluster::OptionalAttributes(attrs));
-    mProximityRangingCluster.Cluster().SetDriver(&mContext.driver);
+    mProximityRangingCluster.Create(endpoint, optionalAttrs);
+    mProximityRangingCluster.Cluster().SetDriver(&mRangingDriver);
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

@@ -407,9 +407,10 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->resultCode, ResultCodeEnum::kAccepted);
-    EXPECT_FALSE(result.response->sessionID.IsNull());
-    EXPECT_NE(result.response->sessionID.Value(), 0);
+    auto & response = result.response.value();
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kAccepted);
+    EXPECT_FALSE(response.sessionID.IsNull());
+    EXPECT_NE(response.sessionID.Value(), 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -431,7 +432,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingRejected)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(result.response.value().resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -453,8 +454,8 @@ TEST_F(TestProximityRangingCluster, TestStartRangingCapacityExhausted)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->resultCode, ResultCodeEnum::kBusySessionCapacityReached);
-    EXPECT_TRUE(result.response->sessionID.IsNull());
+    EXPECT_EQ(result.response.value().resultCode, ResultCodeEnum::kBusySessionCapacityReached);
+    EXPECT_TRUE(result.response.value().sessionID.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -497,7 +498,7 @@ TEST_F(TestProximityRangingCluster, TestStopRangingNotFound)
     auto result = tester.Invoke(stopReq);
     EXPECT_FALSE(result.IsSuccess());
     ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -519,7 +520,7 @@ TEST_F(TestProximityRangingCluster, TestStopRangingFailure)
     auto result = tester.Invoke(stopReq);
     EXPECT_FALSE(result.IsSuccess());
     ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Protocols::InteractionModel::Status::Failure);
+    EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::Failure);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -542,7 +543,7 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
     ASSERT_NE(eventInfo, std::nullopt);
 
     Events::RangingResult::DecodableType decodedEvent;
-    EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(eventInfo.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.sessionID, 42);
     EXPECT_FALSE(decodedEvent.rangingResultData.distance.IsNull());
     EXPECT_EQ(decodedEvent.rangingResultData.distance.Value(), 500);
@@ -565,7 +566,7 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
     ASSERT_NE(eventInfo, std::nullopt);
 
     Events::RangingSessionStatus::DecodableType decodedEvent;
-    EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(eventInfo.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.sessionID, 7);
     EXPECT_EQ(decodedEvent.status, RangingSessionStatusEnum::kSessionEndTimeReached);
 
