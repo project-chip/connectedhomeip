@@ -27,7 +27,7 @@ class AvAnalysisClusterSemanticTagStruct(
   val mfgCode: UShort?,
   val namespaceID: UByte,
   val tag: UByte,
-  val label: Optional<String>?
+  val label: Optional<String>?,
 ) {
   override fun toString(): String = buildString {
     append("AvAnalysisClusterSemanticTagStruct {\n")

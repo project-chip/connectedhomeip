@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class AvAnalysisClusterContextTriggerStruct(
   val context: AvAnalysisClusterSemanticTagStruct,
-  val zoneIDs: Optional<List<UInt>>?
+  val zoneIDs: Optional<List<UInt>>?,
 ) {
   override fun toString(): String = buildString {
     append("AvAnalysisClusterContextTriggerStruct {\n")

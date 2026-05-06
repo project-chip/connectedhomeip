@@ -27,7 +27,7 @@ class AvAnalysisClusterAnalysisStreamStruct(
   val analysisStreamID: UShort,
   val webRTCEndpointID: Optional<UShort>?,
   val pushAVEndpointID: Optional<UShort>?,
-  val analysisStreamState: UByte
+  val analysisStreamState: UByte,
 ) {
   override fun toString(): String = buildString {
     append("AvAnalysisClusterAnalysisStreamStruct {\n")
@@ -102,7 +102,7 @@ class AvAnalysisClusterAnalysisStreamStruct(
         analysisStreamID,
         webRTCEndpointID,
         pushAVEndpointID,
-        analysisStreamState
+        analysisStreamState,
       )
     }
   }

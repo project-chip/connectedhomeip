@@ -29,7 +29,7 @@ class AvAnalysisClusterTrackedContext(
   val previousZone: Optional<UInt>?,
   val currentZone: Optional<UInt>?,
   val startTime: ULong,
-  val endTime: ULong?
+  val endTime: ULong?,
 ) {
   override fun toString(): String = buildString {
     append("AvAnalysisClusterTrackedContext {\n")
@@ -87,7 +87,7 @@ class AvAnalysisClusterTrackedContext(
       val identifiedContext =
         AvAnalysisClusterSemanticTagStruct.fromTlv(
           ContextSpecificTag(TAG_IDENTIFIED_CONTEXT),
-          tlvReader
+          tlvReader,
         )
       val previousZone =
         if (!tlvReader.isNull()) {
@@ -128,7 +128,7 @@ class AvAnalysisClusterTrackedContext(
         previousZone,
         currentZone,
         startTime,
-        endTime
+        endTime,
       )
     }
   }

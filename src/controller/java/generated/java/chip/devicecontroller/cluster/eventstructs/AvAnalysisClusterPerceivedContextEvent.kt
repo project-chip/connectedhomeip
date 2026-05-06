@@ -33,7 +33,7 @@ class AvAnalysisClusterPerceivedContextEvent(
   val currentIdentifiedContexts:
     Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>,
   val expiredContexts:
-    Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>
+    Optional<List<chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext>>,
 ) {
   override fun toString(): String = buildString {
     append("AvAnalysisClusterPerceivedContextEvent {\n")
@@ -118,7 +118,7 @@ class AvAnalysisClusterPerceivedContextEvent(
                 this.add(
                   chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,
-                    tlvReader
+                    tlvReader,
                   )
                 )
               }
@@ -137,7 +137,7 @@ class AvAnalysisClusterPerceivedContextEvent(
                 this.add(
                   chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,
-                    tlvReader
+                    tlvReader,
                   )
                 )
               }
@@ -156,7 +156,7 @@ class AvAnalysisClusterPerceivedContextEvent(
                 this.add(
                   chip.devicecontroller.cluster.structs.AvAnalysisClusterTrackedContext.fromTlv(
                     AnonymousTag,
-                    tlvReader
+                    tlvReader,
                   )
                 )
               }
@@ -175,7 +175,7 @@ class AvAnalysisClusterPerceivedContextEvent(
         sourceStartTimestamp,
         newIdentifiedContexts,
         currentIdentifiedContexts,
-        expiredContexts
+        expiredContexts,
       )
     }
   }

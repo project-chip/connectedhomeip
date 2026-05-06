@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class AvAnalysisClusterAnalysisSessionStartEvent(
   val sessionID: UInt,
   val sourceNodeId: Optional<ULong>,
-  val triggeredZones: List<UInt>?
+  val triggeredZones: List<UInt>?,
 ) {
   override fun toString(): String = buildString {
     append("AvAnalysisClusterAnalysisSessionStartEvent {\n")
