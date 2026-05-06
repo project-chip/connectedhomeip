@@ -34,7 +34,6 @@ source_set("access-control-event-helper") {
   ]
 
   public_deps = [
-    "${chip_root}/src/access:access",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/AccessControl",
   ]
