@@ -22,6 +22,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <lib/support/BitFlags.h>
 
 namespace chip {
@@ -46,6 +47,12 @@ public:
         DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>();
         float uncertainty                      = 0.0f;
     };
+
+    using OptionalAttributeSet =
+        app::OptionalAttributeSet<Attributes::MeasuredValue::Id, Attributes::MinMeasuredValue::Id, Attributes::MaxMeasuredValue::Id,
+                                  Attributes::Uncertainty::Id, Attributes::MeasurementUnit::Id, Attributes::PeakMeasuredValue::Id,
+                                  Attributes::PeakMeasuredValueWindow::Id, Attributes::AverageMeasuredValue::Id,
+                                  Attributes::AverageMeasuredValueWindow::Id, Attributes::LevelValue::Id>;
 
     ConcentrationMeasurementCluster(EndpointId endpointId, const Config & config);
 
@@ -79,6 +86,7 @@ private:
     }
 
     const BitFlags<Feature> mFeatures;
+    const OptionalAttributeSet mOptionalAttributeSet;
 
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;

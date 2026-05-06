@@ -65,6 +65,20 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
             f.Set(Feature::kNumericMeasurement);
         return f;
     }()),
+    mOptionalAttributeSet([&] {
+        uint32_t bits = 0;
+        if (mFeatures.Has(Feature::kNumericMeasurement))
+            bits |= (1u << Attributes::MeasuredValue::Id) | (1u << Attributes::MinMeasuredValue::Id) |
+                    (1u << Attributes::MaxMeasuredValue::Id) | (1u << Attributes::Uncertainty::Id) |
+                    (1u << Attributes::MeasurementUnit::Id);
+        if (mFeatures.Has(Feature::kPeakMeasurement))
+            bits |= (1u << Attributes::PeakMeasuredValue::Id) | (1u << Attributes::PeakMeasuredValueWindow::Id);
+        if (mFeatures.Has(Feature::kAverageMeasurement))
+            bits |= (1u << Attributes::AverageMeasuredValue::Id) | (1u << Attributes::AverageMeasuredValueWindow::Id);
+        if (mFeatures.Has(Feature::kLevelIndication))
+            bits |= (1u << Attributes::LevelValue::Id);
+        return OptionalAttributeSet(bits);
+    }()),
     mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured), mMaxMeasuredValue(config.maxMeasured),
     mUncertainty(config.uncertainty)
 {
@@ -117,24 +131,20 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
     static constexpr DataModel::AttributeEntry kMandatoryAttrs[] = {
         Attributes::MeasurementMedium::kMetadataEntry,
     };
-    const bool numeric                                                  = mFeatures.Has(Feature::kNumericMeasurement);
-    const bool peak                                                     = mFeatures.Has(Feature::kPeakMeasurement);
-    const bool average                                                  = mFeatures.Has(Feature::kAverageMeasurement);
-    const bool level                                                    = mFeatures.Has(Feature::kLevelIndication);
-    const AttributeListBuilder::OptionalAttributeEntry kOptionalAttrs[] = {
-        { numeric, Attributes::MeasuredValue::kMetadataEntry },
-        { numeric, Attributes::MinMeasuredValue::kMetadataEntry },
-        { numeric, Attributes::MaxMeasuredValue::kMetadataEntry },
-        { numeric, Attributes::Uncertainty::kMetadataEntry },
-        { numeric, Attributes::MeasurementUnit::kMetadataEntry },
-        { peak, Attributes::PeakMeasuredValue::kMetadataEntry },
-        { peak, Attributes::PeakMeasuredValueWindow::kMetadataEntry },
-        { average, Attributes::AverageMeasuredValue::kMetadataEntry },
-        { average, Attributes::AverageMeasuredValueWindow::kMetadataEntry },
-        { level, Attributes::LevelValue::kMetadataEntry },
+    static constexpr DataModel::AttributeEntry kOptionalAttrs[] = {
+        Attributes::MeasuredValue::kMetadataEntry,
+        Attributes::MinMeasuredValue::kMetadataEntry,
+        Attributes::MaxMeasuredValue::kMetadataEntry,
+        Attributes::Uncertainty::kMetadataEntry,
+        Attributes::MeasurementUnit::kMetadataEntry,
+        Attributes::PeakMeasuredValue::kMetadataEntry,
+        Attributes::PeakMeasuredValueWindow::kMetadataEntry,
+        Attributes::AverageMeasuredValue::kMetadataEntry,
+        Attributes::AverageMeasuredValueWindow::kMetadataEntry,
+        Attributes::LevelValue::kMetadataEntry,
     };
     return AttributeListBuilder(builder).Append(chip::Span<const DataModel::AttributeEntry>(kMandatoryAttrs),
-                                                chip::Span<const AttributeListBuilder::OptionalAttributeEntry>(kOptionalAttrs));
+                                                chip::Span<const DataModel::AttributeEntry>(kOptionalAttrs), mOptionalAttributeSet);
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetMeasuredValue(DataModel::Nullable<float> value)
