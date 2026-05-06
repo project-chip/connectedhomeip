@@ -16,6 +16,9 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/ConcreteAttributePath.h>
+#include <app/MessageDef/StatusIB.h>
+#include <app/ReadClient.h>
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -26,6 +29,7 @@
 #include <clusters/TimeSynchronization/Enums.h>
 #include <clusters/TimeSynchronization/Metadata.h>
 #include <clusters/TimeSynchronization/Structs.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace {
 
@@ -53,6 +57,29 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 };
 
 } // namespace
+
+// Defense-in-depth: ReadClient::ProcessAttributeReportIBs already rejects AttributeStatusIB(Success),
+// but verify the cluster's early-return guard handles apData == nullptr in case that invariant
+// is ever loosened.
+TEST_F(TestTimeSynchronizationCluster, OnAttributeDataToleratesNullData)
+{
+    const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+    TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                   TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                   context);
+    ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ReadClient::Callback & callback = timeSynchronization;
+    const StatusIB success{ Protocols::InteractionModel::Status::Success };
+    const StatusIB failure{ Protocols::InteractionModel::Status::Failure };
+
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, UTCTime::Id }, nullptr, success);
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, Granularity::Id }, nullptr, success);
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, UTCTime::Id }, nullptr, failure);
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, ClusterRevision::Id }, nullptr, success);
+
+    timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
 
 TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 {
