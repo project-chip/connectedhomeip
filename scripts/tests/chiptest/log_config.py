@@ -82,7 +82,7 @@ class LogMessageCounter:
     def wait_for_count_or_cancel(self, count: int, timeout: float | None = None) -> bool:
         """Wait until the total message count reaches at least the specified count or until cancelled."""
         with self._cond:
-            return self._cond.wait_for(lambda: self.total >= count or self.cancelled, timeout=timeout)
+            return self._cond.wait_for(lambda: self._counter.value >= count or self.cancelled, timeout=timeout)
 
     @contextlib.contextmanager
     def register_user(self) -> Iterator[Self]:
