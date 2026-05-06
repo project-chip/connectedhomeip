@@ -68,8 +68,8 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
     }
 
     size_t bytesForLength = (metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE) ? 1 : 2;
-
-    size_t size = metadata->size - bytesForLength;
+    size_t size = (metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE ? static_cast<size_t>(metadata->defaultValue.ptrToDefaultValue[0]) : static_cast<size_t>(reinterpret_cast<const uint16_t *>(metadata->defaultValue.ptrToDefaultValue)[0]));
+    
     return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + bytesForLength, size);
 }
 
