@@ -4972,6 +4972,19 @@ TEST_F(TestTLV, CheckGetStringBoundsCheck)
         EXPECT_STREQ(buf, "Hi");
     }
 
+    // Reading with buffer larger than needed should succeed
+    {
+        TLVReader reader;
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        char buf[10];
+        err = reader.GetString(buf, sizeof(buf));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_STREQ(buf, "Hi");
+    }
+
     // Reading with buffer too small by 1 byte should fail
     {
         TLVReader reader;
