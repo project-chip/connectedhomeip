@@ -85,7 +85,7 @@ inline void chipAbort(void)
  *  @param[in]  ...         Statements to execute.
  */
 // clang-format off
-#define AbortWithAction(...) { __VA_ARGS__; chipAbort(); }
+#define AbortWithAction(...) do { __VA_ARGS__; chipAbort(); } while (false)
 // clang-format on
 
 /**

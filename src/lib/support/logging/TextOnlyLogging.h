@@ -36,7 +36,7 @@
 
 #include <lib/core/CHIPConfig.h>
 
-#include <lib/support/AssertBase.h>
+#include <lib/support/Assertions.h>
 #include <lib/support/Compiler.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>

@@ -19,7 +19,7 @@
 
 #include <cctype>
 #include <cstdio>
-#include <lib/support/AssertBase.h>
+#include <lib/support/Assertions.h>
 
 #include "BufferWriter.h"
 

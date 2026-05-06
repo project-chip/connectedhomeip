@@ -75,8 +75,9 @@ source_set("attributes") {
   ]
 }
 
-source_set("assert_base") {
-  sources = [ "AssertBase.h" ]
+source_set("assertions") {
+  sources = [ "Assertions.h" ]
+  public_deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
 }
 
 source_set("safeint") {
@@ -141,7 +142,7 @@ source_set("memory") {
   public_deps = [ "${chip_root}/src/lib/core:error" ]
 
   deps = [
-    ":assert_base",
+    ":assertions",
     ":safeint",
     "${chip_root}/src/lib/core:chip_config_header",
   ]
@@ -154,7 +155,7 @@ source_set("text_only_logging") {
   ]
 
   public_deps = [
-    ":assert_base",
+    ":assertions",
     ":attributes",
     ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
@@ -171,14 +172,14 @@ source_set("text_only_logging") {
   ]
 }
 
-source_set("verifymacros") {
+source_set("codeutils") {
   sources = [
     "CodeUtils.h",
     "ObjectDump.h",
   ]
 
   public_deps = [
-    ":assert_base",
+    ":assertions",
     ":attributes",
     ":text_only_logging",
     "${chip_root}/src/lib/core:chip_config_header",
@@ -190,7 +191,7 @@ source_set("span") {
   sources = [ "Span.h" ]
 
   public_deps = [
-    ":verifymacros",
+    ":codeutils",
     "${chip_root}/src/lib/core:types",
   ]
 }
@@ -346,9 +347,10 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":assert_base",
+    ":assertions",
     ":attributes",
     ":chip_version_header",
+    ":codeutils",
     ":fixedbuffer",
     ":logging_constants",
     ":memory",
@@ -356,7 +358,6 @@ static_library("support") {
     ":span",
     ":text_only_logging",
     ":type-traits",
-    ":verifymacros",
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:encoding",

@@ -24,7 +24,7 @@
  */
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/AssertBase.h>
+#include <lib/support/Assertions.h>
 #include <lib/support/CHIPMem.h>
 
 #include <stdlib.h>

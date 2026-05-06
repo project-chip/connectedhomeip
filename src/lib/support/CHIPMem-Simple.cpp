@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#include <lib/support/AssertBase.h>
+#include <lib/support/Assertions.h>
 #include <system/SystemMutex.h>
 
 namespace chip {

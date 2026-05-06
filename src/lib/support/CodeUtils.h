@@ -29,7 +29,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
-#include <lib/support/AssertBase.h>
+#include <lib/support/Assertions.h>
 #include <lib/support/ObjectDump.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <memory>
