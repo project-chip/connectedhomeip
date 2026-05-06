@@ -253,5 +253,6 @@ class TC_FAN_3_5(MatterBaseTest):
         asserts.assert_equal(speed_current, 0,
                              "SpeedCurrent did not wrap to 0 when LowestOff was omitted (expected spec default true)")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
