@@ -27,10 +27,12 @@ import matter.tlv.TlvWriter
 import java.util.Optional
 
 class AvAnalysisClusterAnalysisSessionEndEvent (
-    val sessionID: UInt) {
+    val sessionID: UInt,
+    val sourceNodeId: Optional<ULong>) {
   override fun toString(): String  = buildString {
     append("AvAnalysisClusterAnalysisSessionEndEvent {\n")
     append("\tsessionID : $sessionID\n")
+    append("\tsourceNodeId : $sourceNodeId\n")
     append("}\n")
   }
 
@@ -38,20 +40,30 @@ class AvAnalysisClusterAnalysisSessionEndEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
+      if (sourceNodeId.isPresent) {
+      val optsourceNodeId = sourceNodeId.get()
+      put(ContextSpecificTag(TAG_SOURCE_NODE_ID), optsourceNodeId)
+    }
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_SESSION_ID = 0
+    private const val TAG_SOURCE_NODE_ID = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AvAnalysisClusterAnalysisSessionEndEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
+      val sourceNodeId = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
+    } else {
+      Optional.empty()
+    }
       
       tlvReader.exitContainer()
 
-      return AvAnalysisClusterAnalysisSessionEndEvent(sessionID)
+      return AvAnalysisClusterAnalysisSessionEndEvent(sessionID, sourceNodeId)
     }
   }
 }

@@ -28,10 +28,12 @@ import java.util.Optional
 
 class AvAnalysisClusterAnalysisSessionStartEvent (
     val sessionID: UInt,
+    val sourceNodeId: Optional<ULong>,
     val triggeredZones: List<UInt>?) {
   override fun toString(): String  = buildString {
     append("AvAnalysisClusterAnalysisSessionStartEvent {\n")
     append("\tsessionID : $sessionID\n")
+    append("\tsourceNodeId : $sourceNodeId\n")
     append("\ttriggeredZones : $triggeredZones\n")
     append("}\n")
   }
@@ -40,6 +42,10 @@ class AvAnalysisClusterAnalysisSessionStartEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
+      if (sourceNodeId.isPresent) {
+      val optsourceNodeId = sourceNodeId.get()
+      put(ContextSpecificTag(TAG_SOURCE_NODE_ID), optsourceNodeId)
+    }
       if (triggeredZones != null) {
       startArray(ContextSpecificTag(TAG_TRIGGERED_ZONES))
       for (item in triggeredZones.iterator()) {
@@ -55,11 +61,17 @@ class AvAnalysisClusterAnalysisSessionStartEvent (
 
   companion object {
     private const val TAG_SESSION_ID = 0
-    private const val TAG_TRIGGERED_ZONES = 1
+    private const val TAG_SOURCE_NODE_ID = 1
+    private const val TAG_TRIGGERED_ZONES = 2
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AvAnalysisClusterAnalysisSessionStartEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
+      val sourceNodeId = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_NODE_ID))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE_ID)))
+    } else {
+      Optional.empty()
+    }
       val triggeredZones = if (!tlvReader.isNull()) {
       buildList <UInt> {
       tlvReader.enterArray(ContextSpecificTag(TAG_TRIGGERED_ZONES))
@@ -75,7 +87,7 @@ class AvAnalysisClusterAnalysisSessionStartEvent (
       
       tlvReader.exitContainer()
 
-      return AvAnalysisClusterAnalysisSessionStartEvent(sessionID, triggeredZones)
+      return AvAnalysisClusterAnalysisSessionStartEvent(sessionID, sourceNodeId, triggeredZones)
     }
   }
 }
