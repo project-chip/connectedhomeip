@@ -14,12 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "DarwinBleRssiRangingAdapter.h"
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixChimeDevice.h>
+#include <app_config/enabled_devices.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
-
-#include "DarwinBleRssiRangingAdapter.h"
 
 namespace chip {
 namespace app {

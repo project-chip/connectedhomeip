@@ -16,28 +16,27 @@
 #
 
 get_filename_component(CHIP_ROOT "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip" REALPATH)
-get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
 
-# Generate app_config/enabled_devices.h from the template.
-# Skipped during ESP-IDF's early component-requirements scan.
-if(NOT CMAKE_BUILD_EARLY_EXPANSION)
-    include(${CMAKE_CURRENT_LIST_DIR}/../../all-devices-common/devices/enabled_devices.cmake)
-endif()
+# ALL_DEVICES_COMMON_DIR is derived from CMAKE_CURRENT_LIST_DIR (this file's own
+# directory) rather than from CHIP_ROOT.  During IDF's component requirements phase
+# cmake processes this file with CMAKE_SOURCE_DIR set to the build directory, so
+# CHIP_ROOT resolves to a non-existent build-tree path.  CMAKE_CURRENT_LIST_DIR
+# always points to the actual source location of this file.
+get_filename_component(ALL_DEVICES_COMMON_DIR "${CMAKE_CURRENT_LIST_DIR}/../../all-devices-common" REALPATH)
+
+include("${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake")
 
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${ALL_DEVICES_COMMON_DIR}"
                       "${CHIP_ROOT}/examples/providers"
-                      "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger"
-                      "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl"
-                      "${CMAKE_CURRENT_BINARY_DIR}"
+                      "${CMAKE_CURRENT_BINARY_DIR}"  # for generated app_config/enabled_devices.h
 )
 
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
 set(APP_TOPLEVEL_EXTRA_SRCS
     "${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp"
     "${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp"
-    "${CHIP_ROOT}/src/app/clusters/proximity-ranging-server/ProximityRangingCluster.cpp"
 )
 
 set(SRC_DIRS_LIST
@@ -49,25 +48,7 @@ set(SRC_DIRS_LIST
     "${CHIP_ROOT}/src/app/server"
     "${CHIP_ROOT}/src/app/persistence"
     "${CHIP_ROOT}/src/app/server-cluster"
-
-    # all-devices-common device modules
-    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/chime"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light"
-    "${ALL_DEVICES_COMMON_DIR}/devices/root-node"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl"
+    ${ALL_DEVICES_DEVICE_SRCDIRS}
 )
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
