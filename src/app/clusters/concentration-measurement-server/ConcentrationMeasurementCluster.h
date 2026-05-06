@@ -114,15 +114,10 @@ private:
             return false;
         return true;
     }
-    static constexpr uint16_t kClusterRevision =
-        static_cast<uint16_t>(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision);
+    static constexpr uint16_t kClusterRevision = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision;
 
     const BitFlags<Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
-
-    __attribute__((noinline)) CHIP_ERROR SetNullableFloat(Feature feature, DataModel::Nullable<float> & field, AttributeId id,
-                                                          DataModel::Nullable<float> value);
-    __attribute__((noinline)) CHIP_ERROR SetWindow(Feature feature, uint32_t & field, AttributeId id, uint32_t value);
 
     MeasurementMediumEnum mMedium;
     MeasurementUnitEnum mUnit;
