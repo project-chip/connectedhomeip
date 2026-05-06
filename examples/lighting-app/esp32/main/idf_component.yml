@@ -1,6 +1,4 @@
 dependencies:
-    espressif/led_strip: "^3.0.0"
-
     espressif/esp_insights:
         version: "^1.2.4"
         require: public

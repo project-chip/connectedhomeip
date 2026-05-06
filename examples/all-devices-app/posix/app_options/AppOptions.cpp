@@ -40,6 +40,19 @@ constexpr uint16_t kOptionInterfaceId   = 0xffd8;
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
 
+const AppOptions::AppConfig & AppOptions::GetConfig()
+{
+    if (mConfig.deviceTypeEntries.empty())
+    {
+        mConfig.deviceTypeEntries.push_back({
+            .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
+            .endpoint = 1,
+            .parentId = chip::kInvalidEndpointId,
+        });
+    }
+    return mConfig;
+}
+
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
 {
