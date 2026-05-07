@@ -17,6 +17,5 @@
 
 #pragma once
 
-// Note: This file exists for backwards compatibility only.
 // New code should directly use FanControlCluster.h instead.
 #include <app/clusters/fan-control-server/FanControlCluster.h>
