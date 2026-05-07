@@ -57,6 +57,10 @@ _NETCOMM_FEATURE_BIT_WIFI = 0
 _NETCOMM_FEATURE_BIT_THREAD = 1
 _NETCOMM_FEATURE_BIT_ETHERNET = 2
 
+# Aggregator device type ID (see data_model/.../device_types/Aggregator.xml).
+# Endpoints with this device type identify the device as a Bridge.
+_AGGREGATOR_DEVICE_TYPE_ID = 0x000E
+
 
 @dataclass
 class _BasePicsFacts:
@@ -66,6 +70,11 @@ class _BasePicsFacts:
     supports_wifi_5g: bool = False
     supports_thread: bool = False
     supports_ethernet: bool = False
+    is_server: bool = False
+    is_bridge: bool = False
+    is_ota_requestor: bool = False
+    is_ota_provider: bool = False
+    has_groups_on_multiple_endpoints: bool = False
 
 
 def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
@@ -122,6 +131,21 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
     # one of WIFI/THR would leave the spec's M condition unsatisfied.
     if wifi_marked or facts.supports_thread:
         auto_marked["MCORE.COM.WIRELESS"] = True
+
+    if facts.is_server:
+        auto_marked["MCORE.IDM.S"] = True
+
+    if facts.is_bridge:
+        auto_marked["MCORE.BRIDGE"] = True
+
+    if facts.is_ota_requestor:
+        auto_marked["MCORE.OTA.Requestor"] = True
+
+    if facts.is_ota_provider:
+        auto_marked["MCORE.OTA.Provider"] = True
+
+    if facts.has_groups_on_multiple_endpoints:
+        auto_marked["MCORE.G.MULTIENDPOINT"] = True
 
     parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
     tree = ET.parse(template_path, parser)
@@ -345,9 +369,15 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
     # console.print(partsList)
 
     # If we got this far the DUT was successfully commissioned, so the
-    # commissionee role bit is always true. The transport bits get filled in
-    # below when we hit the Network Commissioning cluster on any endpoint.
-    base_pics_facts = _BasePicsFacts(is_commissionee=True)
+    # commissionee role bit is always true. is_server is also unconditionally
+    # true: every Matter device that has a Descriptor cluster (which we just
+    # read) is a server. The transport bits get filled in below when we hit
+    # the Network Commissioning cluster on any endpoint.
+    base_pics_facts = _BasePicsFacts(is_commissionee=True, is_server=True)
+
+    # Counts how many endpoints expose the Groups cluster. Used to derive
+    # MCORE.G.MULTIENDPOINT after the parts list walk.
+    groups_endpoint_count = 0
 
     for endpoint in partsList:
         # Test step 2 - Map each available endpoint
@@ -364,10 +394,20 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
         for deviceTypeData in deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
             console.print(f"Device Type: {deviceTypeData.deviceType}")
+            if deviceTypeData.deviceType == _AGGREGATOR_DEVICE_TYPE_ID:
+                base_pics_facts.is_bridge = True
 
         # Read server list
         serverListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.ServerList)])
         serverList = serverListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
+
+        # MCORE base/MCORE auto-marks driven by cluster presence on this endpoint.
+        if Clusters.Groups.id in serverList:
+            groups_endpoint_count += 1
+        if Clusters.OtaSoftwareUpdateRequestor.id in serverList:
+            base_pics_facts.is_ota_requestor = True
+        if Clusters.OtaSoftwareUpdateProvider.id in serverList:
+            base_pics_facts.is_ota_provider = True
 
         for server in serverList:
             featurePicsList = []
@@ -518,6 +558,9 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             console.print(f"{clusterName} - {clusterPICS}")
 
             GenerateDevicePicsXmlFiles(clusterName, clusterPICS, [], [], [], [], endpointOutputPathStr)
+
+    if groups_endpoint_count >= 2:
+        base_pics_facts.has_groups_on_multiple_endpoints = True
 
     # Base/MCORE PICS are per-device, not per-endpoint, so this runs once after
     # the parts list walk completes and writes Base.xml at the device root.
