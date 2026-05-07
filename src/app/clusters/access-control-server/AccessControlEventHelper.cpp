@@ -24,7 +24,8 @@ namespace app {
 namespace Clusters {
 namespace AccessControl {
 
-void EmitAuxiliaryAccessUpdated(DataModel::EventsGenerator & eventsGenerator, const chip::Access::SubjectDescriptor & subjectDescriptor)
+void EmitAuxiliaryAccessUpdated(DataModel::EventsGenerator & eventsGenerator,
+                                const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     Events::AuxiliaryAccessUpdated::Type event;
     event.fabricIndex = subjectDescriptor.fabricIndex;

@@ -25,20 +25,20 @@ namespace app {
 namespace Clusters {
 namespace AccessControl {
 
-
 /**
  * @brief Emits the AuxiliaryAccessUpdated event for the Access Control cluster.
  *
  * This function is used by clusters to emit AuxiliaryAccessUpdated events. This event needs
  * to be emitted whenever there is a change to auxiliary ACL entries on the access control cluster.
- * This can be caused from operations in a variety of clusters (groups, groupcast, etc.). 
- * This function helps to separate the event logic from the access control cluster directly so it 
+ * This can be caused from operations in a variety of clusters (groups, groupcast, etc.).
+ * This function helps to separate the event logic from the access control cluster directly so it
  * can be called wherever needed.
  *
  * @param eventsGenerator The generator used to emit the event.
  * @param subjectDescriptor The subject descriptor associated with the change.
  */
-void EmitAuxiliaryAccessUpdated(DataModel::EventsGenerator & eventsGenerator, const chip::Access::SubjectDescriptor & subjectDescriptor);
+void EmitAuxiliaryAccessUpdated(DataModel::EventsGenerator & eventsGenerator,
+                                const chip::Access::SubjectDescriptor & subjectDescriptor);
 
 } // namespace AccessControl
 } // namespace Clusters
