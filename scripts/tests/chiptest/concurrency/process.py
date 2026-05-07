@@ -343,12 +343,20 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
             # Initialize.
             log.debug("Initializing")
             with contextlib.ExitStack() as stack:
-                self._proc_init(stack)
-                self.state.phase = ProcessPhase.READY
-                log.debug("Initialized successfully")
+                try:
+                    self._proc_init(stack)
+                    self.state.phase = ProcessPhase.READY
+                    log.debug("Initialized successfully")
+                except BaseException as e:
+                    e.add_note("Failure during process initialization")
+                    raise
 
                 # Perform work.
-                self._proc_work()
+                try:
+                    self._proc_work()
+                except BaseException as e:
+                    e.add_note("Failure during process work")
+                    raise
         except QueueCancelled:
             log.warning("Received a cancel event")
         except EndOfQueue:
