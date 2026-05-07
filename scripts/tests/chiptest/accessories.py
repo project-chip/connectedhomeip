@@ -121,6 +121,8 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
             self.join(timeout=self._stop_timeout_sec)
             if self.is_alive():
                 log.error("XMLRPC Server thread failed to stop")
+            self.server_close()
+
             log.debug("XMLRPC Server thread stopped")
 
 
