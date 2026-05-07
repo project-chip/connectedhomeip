@@ -77,27 +77,30 @@ def build_expected_instance_name(compressed_fabric_id: int, node_id: int) -> str
 
 
 def create_mock_attribute_result(fabric_count: int):
-    """Create a mock ReadAttribute result with CommissionedFabrics == fabric_count.
+    """Create a mock ReadAttribute result with TrustedRootCertificates.
 
     OperationalCredentials is node-scoped and always on endpoint 0.
+    The fabric count is derived from len(TrustedRootCertificates).
     """
     try:
         import matter.clusters as Clusters
         return {
             0: {
                 Clusters.OperationalCredentials: {
-                    Clusters.OperationalCredentials.Attributes.CommissionedFabrics: fabric_count
+                    Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: [
+                        b'root_cert' for _ in range(fabric_count)
+                    ]
                 }
             }
         }
     except ImportError:
         mock_opcreds = MagicMock()
         mock_opcreds_attrs = MagicMock()
-        mock_opcreds_attrs.CommissionedFabrics = fabric_count
+        mock_opcreds_attrs.TrustedRootCertificates = [b'root_cert' for _ in range(fabric_count)]
         return {
             0: {
                 mock_opcreds: {
-                    mock_opcreds_attrs: fabric_count
+                    mock_opcreds_attrs: [b'root_cert' for _ in range(fabric_count)]
                 }
             }
         }
