@@ -139,32 +139,7 @@ private:
                 };
                 return std::make_unique<ChimeDevice>(mContext->timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
             });
-        };
-        mRegistry["speaker"] = [this]() {
-            VerifyOrDie(mContext.has_value());
-            return std::make_unique<LoggingSpeakerDevice>(
-                LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
-        };
-        mRegistry["soil-sensor"]        = []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); };
-        mRegistry["temperature-sensor"] = []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); };
-        mRegistry["fan"] = [this]() {
-            VerifyOrDie(mContext.has_value());
-            return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
-                .groupDataProvider    = mContext->groupDataProvider,
-                .fabricTable          = mContext->fabricTable,
-                .timerDelegate        = mContext->timerDelegate,
-                .includeOnOffCluster  = true,
-            });
-        };
-        mRegistry["fan-no-onoff"] = [this]() {
-            VerifyOrDie(mContext.has_value());
-            return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
-                .groupDataProvider    = mContext->groupDataProvider,
-                .fabricTable          = mContext->fabricTable,
-                .timerDelegate        = mContext->timerDelegate,
-                .includeOnOffCluster  = false,
-            });
-        };
+        }
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_LIGHT)
         {
             RegisterCreator("dimmable-light", [this]() {
@@ -202,6 +177,27 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_FAN)
+        {
+            RegisterCreator("fan", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                    .groupDataProvider   = mContext->groupDataProvider,
+                    .fabricTable         = mContext->fabricTable,
+                    .timerDelegate       = mContext->timerDelegate,
+                    .includeOnOffCluster = true,
+                });
+            });
+            RegisterCreator("fan-no-onoff", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                    .groupDataProvider   = mContext->groupDataProvider,
+                    .fabricTable         = mContext->fabricTable,
+                    .timerDelegate       = mContext->timerDelegate,
+                    .includeOnOffCluster = false,
+                });
+            });
         }
 
         // at least one device type MUST be enabled

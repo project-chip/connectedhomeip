@@ -37,6 +37,8 @@ set(ALL_DEVICES_DEVICE_SRCDIRS
     "${ALL_DEVICES_COMMON_DIR}/devices/chime"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan"
+    "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"
@@ -79,6 +81,7 @@ foreach(_key
         chime
         contact-sensor
         dimmable-light
+        fan
         occupancy-sensor
         on-off-light
         soil-sensor

@@ -47,6 +47,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'chime',
     'contact-sensor',
     'dimmable-light',
+    'fan',
     'occupancy-sensor',
     'on-off-light',
     'soil-sensor',
