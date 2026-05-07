@@ -314,7 +314,8 @@ CHIP_ERROR AppTask::InitLock()
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
 
-    sUnlatchTimer = xTimerCreate("UnlatchTimer", pdMS_TO_TICKS(UNLATCH_TIME_MS), pdFALSE, (void *) 0, &CustomerAppTask::UnlatchCallback);
+    sUnlatchTimer =
+        xTimerCreate("UnlatchTimer", pdMS_TO_TICKS(UNLATCH_TIME_MS), pdFALSE, (void *) 0, &CustomerAppTask::UnlatchCallback);
 
     // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED

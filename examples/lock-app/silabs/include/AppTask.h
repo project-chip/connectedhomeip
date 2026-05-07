@@ -352,8 +352,8 @@ private:
     };
 
     // ---- Lock-domain bring-up / state machine ----
-    CHIP_ERROR InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                              LockParam lockParam, chip::PersistentStorageDelegate * storage);
+    CHIP_ERROR InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam,
+                              chip::PersistentStorageDelegate * storage);
 
     bool MigrateLockConfig(const LockParam & params);
 
