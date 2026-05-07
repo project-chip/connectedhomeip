@@ -67,8 +67,8 @@ discriminator. Example log:
 [DL]   Setup Discriminator: 3840 (0xF00)
 ```
 
-> [!NOTE]
-> The discriminator value `3840` (0xF00) is the standard default for many Matter examples when not explicitly configured.
+> [!NOTE] The discriminator value `3840` (0xF00) is the standard default for
+> many Matter examples when not explicitly configured.
 
 ### 2. Commissioning (Pairing)
 
@@ -102,12 +102,15 @@ same host):
     chip-tool pairing code <node_id> <pairing_code_or_qrcode>
     ```
 -   **Direct IP and Port** (useful if mDNS resolution fails):
+
     ```bash
     chip-tool pairing already-discovered <node_id> <setup_pin> <device_ip> <device_port>
     ```
 
-    > [!CAUTION]
-    > If you encounter attestation failures in simulated environments, you may need to add `--bypass-attestation-verifier true` to the command. Use this flag ONLY for local simulated testing when you explicitly accept the security tradeoff of bypassing device attestation.
+    > [!CAUTION] If you encounter attestation failures in simulated
+    > environments, you may need to add `--bypass-attestation-verifier true` to
+    > the command. Use this flag ONLY for local simulated testing when you
+    > explicitly accept the security tradeoff of bypassing device attestation.
 
 ### 3. Interacting with Clusters
 
@@ -130,7 +133,9 @@ model clusters.
 
 ## Using Chip-Tool Help
 
-`chip-tool` has a built-in help system that allows you to discover available clusters and commands. Running any command without all required parameters will show a help screen.
+`chip-tool` has a built-in help system that allows you to discover available
+clusters and commands. Running any command without all required parameters will
+show a help screen.
 
 -   **List available clusters**:
     ```bash
@@ -144,9 +149,11 @@ model clusters.
     ```bash
     chip-tool basicinformation read
     ```
-    This will show what attributes can be read from the `basicinformation` cluster.
+    This will show what attributes can be read from the `basicinformation`
+    cluster.
 
-This interactive help is useful for exploring the data model and finding the exact syntax needed.
+This interactive help is useful for exploring the data model and finding the
+exact syntax needed.
 
 ## Troubleshooting
 
