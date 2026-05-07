@@ -85,7 +85,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
 
         log.warning("No timed write attributes found on device")
         return None, None
-      
+
     @property
     def default_timeout(self) -> int:
         return 300
