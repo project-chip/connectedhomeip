@@ -98,13 +98,13 @@ class EventSubscriptionHandler:
         LOGGER.info(f"[EventSubscriptionHandler] Received event: {header}")
         self._q.put(event_result)
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30, keepSubscriptions: bool = True, autoResubscribe: bool = False) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         urgent = True
         self._subscription = await dev_ctrl.ReadEvent(node_id,
                                                       events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
                                                           min_interval_sec, max_interval_sec),
-                                                      fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
+                                                      fabricFiltered=fabric_filtered, keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe)
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
@@ -285,24 +285,82 @@ class AttributeSubscriptionHandler:
                     self._attribute_report_counts[path.AttributeType] += 1
                     self._attribute_reports[path.AttributeType].append(value)
 
-    def wait_for_attribute_report(self, timeout_sec: float = 10):
+    def wait_next_report(self, timeout_sec: float = 10.0) -> AttributeValue:
         """
-        Blocks and waits for a single attribute report to arrive in the queue.
+        Wait for the next attribute report (any attribute in this subscription) and return it.
 
-        This method dequeues one report, validates it and return its value.
+        This is the lowest-level blocking wait that does NOT enforce expected_attribute matching.
+        Useful for wildcard / cluster-mode subscriptions where multiple attributes may arrive.
         """
-
         try:
-            item = self._q.get(block=True, timeout=timeout_sec)
-            attribute_value = item.value
-            LOGGER.info(
-                f"[AttributeSubscriptionHandler] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")
+            item: AttributeValue = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
             asserts.fail(
-                f"[AttributeSubscriptionHandler] Failed to receive a report for the {self._expected_attribute} attribute change")
+                f"[AttributeSubscriptionHandler] Timeout waiting for attribute report after {timeout_sec:.1f}s"
+            )
+        return item
 
-        asserts.assert_equal(item.attribute, self._expected_attribute,
-                             f"[AttributeSubscriptionHandler] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}")
+    def wait_for_attribute_report(self, timeout_sec: float = 10.0) -> AttributeValue:
+        """
+        Backward-compatible: Wait for one attribute report and (if expected_attribute was provided)
+        validate it matches. Returns the full AttributeValue item for callers that need the value.
+        """
+        item = self.wait_next_report(timeout_sec=timeout_sec)
+
+        LOGGER.info(
+            "[AttributeSubscriptionHandler] Got attribute subscription report. "
+            f"Attribute {item.attribute}. Updated value: {item.value}."
+        )
+
+        if self._expected_attribute is not None:
+            asserts.assert_equal(
+                item.attribute,
+                self._expected_attribute,
+                f"[AttributeSubscriptionHandler] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}",
+            )
+
+        return item
+
+    def wait_all_final_values_reported_persisted(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+        """Expect that every predicate in `expected_matchers` matches, when run against all the incoming reports until timeout.
+
+        Waits for all `timeout_sec` seconds.
+
+        Verify the matcher does not change the expected attribute report during the timeout.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        # Matchers are true as we expect them to be true during all the report time.
+        report_matches: dict[int, bool] = {idx: True for idx, _ in enumerate(expected_matchers)}
+
+        for matcher in expected_matchers:
+            LOGGER.info(
+                f"--> Matcher waiting: {matcher.description}")
+        LOGGER.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, matcher in enumerate(expected_matchers):
+                for attribute, reports in all_reports.items():
+                    for report in reports:
+                        # if one the report does not match, terminate the check.
+                        if not matcher.matches(report) and report_matches[expected_idx]:
+                            asserts.fail(f"Unexpected report value {report.value} found within the timeframe {timeout_sec}")
+                        if matcher.matches(report) and report_matches[expected_idx]:
+                            report_matches[expected_idx] = True
+                            # LOGGER.info(f"  --> Expected value still the same. : {matcher.description}")
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        if all(report_matches.values()):
+            LOGGER.info(f"Found all expected matchers did match in the period of time {timeout_sec:.1f}.")
+            return
 
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.

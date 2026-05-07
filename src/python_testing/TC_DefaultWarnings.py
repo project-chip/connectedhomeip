@@ -35,14 +35,13 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from test_testing.DefaultChecker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAULT_INJECTION, FLAG_FIXED_LABEL_DEFAULT_VALUES,
-                                         FLAG_FIXED_LABEL_EMPTY, FLAG_PRODUCT_NAME, FLAG_SAMPLE_MEI, FLAG_UNIT_TESTING,
-                                         FLAG_VENDOR_ID, FLAG_VENDOR_NAME, DefaultChecker)
 
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.default_checker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAULT_INJECTION, FLAG_FIXED_LABEL_DEFAULT_VALUES,
+                                            FLAG_FIXED_LABEL_EMPTY, FLAG_PRODUCT_NAME, FLAG_SAMPLE_MEI, FLAG_UNIT_TESTING,
+                                            FLAG_VENDOR_ID, FLAG_VENDOR_NAME, DefaultChecker)
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_DefaultChecker(BasicCompositionTests, DefaultChecker):

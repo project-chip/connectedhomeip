@@ -113,6 +113,7 @@ source_set("arg_parser") {
 
 source_set("numeric-primitives") {
   sources = [
+    "PopCount.h",
     "attribute-storage-null-handling.h",
     "odd-sized-integers.h",
   ]
@@ -198,6 +199,10 @@ source_set("span") {
   ]
 }
 
+source_set("fixedbuffer") {
+  sources = [ "FixedBuffer.h" ]
+}
+
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
@@ -247,6 +252,8 @@ static_library("support") {
     "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
+    "Base85.cpp",
+    "Base85.h",
     "BitFlags.h",
     "BitMask.h",
     "BufferReader.cpp",
@@ -295,7 +302,7 @@ static_library("support") {
     "SafePointerCast.h",
     "SafeString.h",
     "Scoped.h",
-    "ScopedBuffer.h",
+    "ScopedMemoryBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
     "SpanSearchValue.h",
@@ -305,6 +312,8 @@ static_library("support") {
     "StringBuilder.h",
     "StringSplitter.h",
     "TemporaryFileStream.h",
+    "ThreadDiscoveryCode.cpp",
+    "ThreadDiscoveryCode.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
@@ -343,6 +352,7 @@ static_library("support") {
   public_deps = [
     ":attributes",
     ":chip_version_header",
+    ":fixedbuffer",
     ":logging_constants",
     ":memory",
     ":safeint",
@@ -351,6 +361,7 @@ static_library("support") {
     ":type-traits",
     ":verifymacros",
     ":verifymacros_no_logging",
+    "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:error",
@@ -418,6 +429,7 @@ pw_static_library("pw_tests_wrapper") {
     "$dir_pw_unit_test",
     "$dir_pw_unit_test:logging",
     "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/system",
   ]
   sources = [
     "UnitTest.cpp",

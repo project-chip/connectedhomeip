@@ -103,7 +103,7 @@ private:
     WiFiPAFSession mSessionInfo;
     SequenceNumber_t mRxAck;
 #define PAFTP_REORDER_QUEUE_SIZE PAF_MAX_RECEIVE_WINDOW_SIZE
-    System::PacketBuffer * ReorderQueue[PAFTP_REORDER_QUEUE_SIZE];
+    PacketBufferHandle ReorderQueue[PAFTP_REORDER_QUEUE_SIZE] = {};
     uint8_t ItemsInReorderQueue;
 
     enum class ConnectionStateFlag : uint8_t

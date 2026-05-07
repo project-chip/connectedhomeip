@@ -33,7 +33,7 @@ chip_build_tests = false
 openthread_external_mbedtls = mbedtls_target
 
 openthread_core_config_platform_check_file =
-    "bl616-openthread-core-bl-config-check.h"
+    "bl616-openthread-core-config-check.h"
 openthread_project_include_dirs =
     [ "${chip_root}/src/platform/bouffalolab/BL616" ]
 openthread_external_platform =

@@ -103,6 +103,11 @@ private:
 
     // Encodes all Installed Chime Sounds
     CHIP_ERROR EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    DataModel::ActionReturnStatus HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath,
+                                                       const Chime::Commands::PlayChimeSound::DecodableType & commandData);
+
+    void GenerateChimeStartedPlayingEvent(const uint8_t chimeID);
 };
 
 /** @brief
@@ -148,8 +153,9 @@ public:
      * @brief Delegate should implement a handler to play the currently active chime sound.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
+     * @param chimeID the identifier for the chime to be played
      */
-    virtual Protocols::InteractionModel::Status PlayChimeSound() = 0;
+    virtual Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) = 0;
 
 protected:
     friend class ChimeCluster;

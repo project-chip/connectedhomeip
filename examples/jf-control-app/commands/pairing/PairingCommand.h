@@ -31,8 +31,10 @@
 
 #include <optional>
 
-using namespace ::chip;
-using namespace ::chip::Credentials;
+using ::chip::ByteSpan;
+using ::chip::NodeId;
+using ::chip::VendorId;
+using ::chip::Credentials::CertificateKeyId;
 
 using JCMDeviceCommissioner            = chip::Controller::JCM::DeviceCommissioner;
 using JCMTrustVerificationStateMachine = chip::Credentials::JCM::TrustVerificationStateMachine;
@@ -265,9 +267,10 @@ public:
 
     /////////// JCMTrustVerificationDelegate /////////
     void OnProgressUpdate(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationStage stage,
-                          JCMTrustVerificationInfo & info, JCMTrustVerificationError error);
-    void OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info);
-    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId, ByteSpan & globallyTrustedRoot);
+                          JCMTrustVerificationInfo & info, JCMTrustVerificationError error) override;
+    void OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info) override;
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                              ByteSpan & globallyTrustedRoot) override;
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

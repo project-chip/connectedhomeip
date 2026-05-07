@@ -92,7 +92,7 @@ following command to list supports options.
 The output with `bouffalolab` started likes below:
 
 ```
-bouffalolab-{bl602dk,bl704ldk,bl706dk,bl602-night-light,bl706-night-light,bl602-iot-matter-v1,xt-zb6-devkit}-{light,contact-sensor}-{ethernet,wifi,thread,thread-ftd,thread-mtd}-{easyflash,littlefs}[-shell][-mfd][-rotating_device_id][-rpc][-cdc]
+bouffalolab-{bl602-night-light,bl602dk,bl616dk,bl704ldk,bl706-night-light,bl706dk}-{contact-sensor,light}-{ethernet,thread,thread-ftd,thread-mtd,wifi}-{easyflash,littlefs}[-cdc][-coredump][-memmonitor][-mfd][-mot][-rotating_device_id][-rpc][-shell]
 ```
 
 -   supported board options, select one of the following options to build
@@ -104,8 +104,6 @@ bouffalolab-{bl602dk,bl704ldk,bl706dk,bl602-night-light,bl706-night-light,bl602-
 
     -   `-bl602-night-light`
     -   `-bl706-night-light`
-    -   `-bl602-iot-matter-v1`
-    -   `-xt-zb6-devkit`
 
 -   supported example options, select one of the following options to build
 
@@ -131,8 +129,9 @@ bouffalolab-{bl602dk,bl704ldk,bl706dk,bl602-night-light,bl706-night-light,bl602-
 
     -   `-easyflash`, specifies to use `easyflash` for flash access.
 
-        > `littlefs` has different format with `easyflash`, please uses
-        > `-easyflash` for your in-field production
+        > `littlefs` uses a different format than `easyflash` and they are not
+        > compatible. Please use the `-easyflash` flag if existing in-field
+        > devices were already deployed with `easyflash`.
 
 -   `-rotating_device_id`, enable rotating device id
 
@@ -170,6 +169,15 @@ Taking lighting app with `littlefs` supported as example :
     ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-wifi-littlefs build
     ```
 
+-   BL706 with Wi-Fi
+
+    ```
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet-littlefs build
+    ```
+
+    > This BL706 + BL602 Wi-Fi solution: BL602 runs WLAN part and BL706 runs
+    > TCP/IP stack which uses SPI for communication between these two parts.
+
 -   BL616 with Thread
 
     ```
@@ -194,14 +202,11 @@ Taking lighting app with `littlefs` supported as example :
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet-littlefs build
     ```
 
--   BL706 with Wi-Fi
+-   BL616 with Ethernet
 
     ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet-littlefs build
+    ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-ethernet-littlefs build
     ```
-
-    > This BL706 + BL602 Wi-Fi solution: BL602 runs WLAN part and BL706 runs
-    > TCP/IP stack which uses SPI for communication between these two parts.
 
 # Partition table
 

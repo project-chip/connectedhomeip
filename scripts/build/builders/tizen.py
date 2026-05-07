@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import logging
 import os
 from collections import namedtuple
@@ -20,6 +21,8 @@ from xml.etree import ElementTree as ET
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
+
+log = logging.getLogger(__name__)
 
 Board = namedtuple('Board', ['target_cpu'])
 App = namedtuple('App', ['name', 'source', 'outputs'])
@@ -102,15 +105,13 @@ class TizenBuilder(GnBuilder):
         self.extra_gn_options = []
 
         if self.app.is_tpk:
-            try:
+            with contextlib.suppress(FileNotFoundError):
                 # Try to load Tizen application XML manifest. We have to use
                 # try/except here, because of TestBuilder test. This test runs
                 # in a fake build root /TEST/BUILD/ROOT which obviously does
                 # not have Tizen manifest file.
                 self.app.parse_manifest(
                     os.path.join(self.root, "tizen-manifest.xml"))
-            except FileNotFoundError:
-                pass
 
         if app == TizenApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
@@ -123,7 +124,7 @@ class TizenBuilder(GnBuilder):
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
         if not enable_thread:
-            self.extra_gn_options.append('chip_enable_openthread=false')
+            self.extra_gn_options.append('chip_enable_thread=false')
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
         if use_asan:
@@ -213,16 +214,19 @@ class TizenBuilder(GnBuilder):
         else:
             raise Exception("CPU architecture is not supported")
 
-        return self.extra_gn_options + [
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        args.extend([
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.value.target_cpu,
             'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
             'tizen_sdk_sysroot="%s"' % sysroot,
-        ]
+        ])
+        return args
 
     def _bundle(self):
         if self.app.is_tpk:
-            logging.info('Packaging %s', self.output_dir)
+            log.info('Packaging %s', self.output_dir)
             cmd = ['ninja', '-C', self.output_dir, self.app.value.name + ':tpk']
             self._Execute(cmd, title='Packaging ' + self.identifier)
 

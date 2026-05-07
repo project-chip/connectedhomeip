@@ -19,6 +19,8 @@ from enum import Enum, auto
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
 
 class NrfApp(Enum):
     ALL_CLUSTERS = auto()
@@ -148,18 +150,18 @@ class NrfConnectBuilder(Builder):
             self._Execute(
                 ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
         except Exception:
-            logging.exception('Failed to validate ZEPHYR_BASE status')
-            logging.error(
+            log.exception('Failed to validate ZEPHYR_BASE status')
+            log.error(
                 'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
 
             raise Exception('ZEPHYR_BASE validation failed')
 
     def _prepare_environment(self):
-        # Source the zephyr-env.sh script to set up the environment
-        # The zephyr-env.sh script changes the python environment, so we need to
-        # source the activate.sh script after zephyr-env.sh to ensure that the
+        # Source the zephyrrc to set up the environment
+        # The zephyrrc changes the python environment, so we need to
+        # source the activate.sh script after zephyrrc to ensure that the
         # all python packages and dependencies are available.
-        return 'source "$ZEPHYR_BASE/zephyr-env.sh";\nsource scripts/activate.sh;\n'
+        return 'source "$ZEPHYR_BASE/../.zephyrrc";\nsource scripts/activate.sh;\n'
 
     def _get_build_flags(self):
         flags = []
@@ -198,7 +200,7 @@ class NrfConnectBuilder(Builder):
                           title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling NrfConnect at %s', self.output_dir)
+        log.info('Compiling NrfConnect at %s', self.output_dir)
 
         cmd = self._prepare_environment()
         cmd += f'ninja -C {self.output_dir}'
@@ -216,7 +218,7 @@ class NrfConnectBuilder(Builder):
                           title='Run Tests ' + self.identifier)
 
     def _bundle(self):
-        logging.info(f'Generating flashbundle at {self.output_dir}')
+        log.info(f'Generating flashbundle at {self.output_dir}')
 
         self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)

@@ -20,6 +20,7 @@
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/NullObject.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -33,8 +34,6 @@
 
 namespace chip {
 namespace Testing {
-
-constexpr FabricIndex kTestFabricIndex = static_cast<FabricIndex>(151);
 
 // Mock class that simulates CommandHandler behavior for unit testing, allowing capture and
 // verification of responses and statuses without real network interactions.
@@ -77,7 +76,7 @@ public:
     void AddStatus(const app::ConcreteCommandPath & aRequestCommandPath,
                    const Protocols::InteractionModel::ClusterStatusCode & aStatus, const char * context = nullptr) override;
 
-    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
+    FabricIndex GetAccessingFabricIndex() const override { return mSubjectDescriptor.fabricIndex; }
 
     // Encodes and stores response data, returning error if encoding fails (fallible version for robust test handling).
     CHIP_ERROR AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
@@ -89,7 +88,7 @@ public:
 
     bool IsTimedInvoke() const override { return false; }
     void FlushAcksRightAwayOnSlowCommand() override {}
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return Access::SubjectDescriptor{}; }
+    Access::SubjectDescriptor GetSubjectDescriptor() const override { return mSubjectDescriptor; }
     Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
 
     // Helper methods to extract response data
@@ -136,12 +135,13 @@ public:
     }
 
     // Configuration methods
-    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+    void SetFabricIndex(FabricIndex fabricIndex) { mSubjectDescriptor.fabricIndex = fabricIndex; }
+    void SetSubjectDescriptor(const Access::SubjectDescriptor & subjectDescriptor) { mSubjectDescriptor = subjectDescriptor; }
 
 private:
     std::vector<ResponseRecord> mResponses;
     std::vector<StatusRecord> mStatuses;
-    FabricIndex mFabricIndex = kTestFabricIndex; // Default to a clearly test-only fabric index.
+    Access::SubjectDescriptor mSubjectDescriptor = kAdminSubjectDescriptor; // Default to a clearly test-only subject descriptor.
 };
 
 } // namespace Testing

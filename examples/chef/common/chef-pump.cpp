@@ -19,9 +19,13 @@
 #include "chef-pump.h"
 #include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/flow-measurement-server/CodegenIntegration.h>
+#include <app/clusters/pressure-measurement-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -79,7 +83,8 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     if (epIndex < kTemperatureMeasurementCount)
     {
         auto updatedTemperature = onOff ? TemperatureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
-        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedTemperature);
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(endpointId, updatedTemperature));
+
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -87,18 +92,17 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexPressureMeasurement(endpointId);
     if (epIndex < kPressureMeasurementCount)
     {
-        auto updatedPressure = onOff ? PressureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
-        PressureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedPressure);
-        MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
-                                               PressureMeasurement::Attributes::MeasuredValue::Id);
+        // Use null when off: spec says null indicates unknown measurement, and 0 may violate MinMeasuredValue constraint.
+        auto updatedPressure = onOff ? PressureRangeMax[epIndex] : DataModel::Nullable<int16_t>();
+        LogErrorOnFailure(PressureMeasurement::SetMeasuredValue(endpointId, updatedPressure));
     }
 
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
-        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : chip::app::DataModel::Nullable<uint16_t>(0);
-        FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
-        MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
+        // Use null when off: spec says null indicates unknown measurement, and 0 may violate MinMeasuredValue constraint.
+        auto updatedFlow = onOff ? FlowRangeMax[epIndex] : DataModel::Nullable<uint16_t>();
+        LogErrorOnFailure(FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow));
     }
 
     DataModel::Nullable<int16_t> capacity = onOff ? DataModel::Nullable<int16_t>(kMaxCapacity) : DataModel::Nullable<int16_t>(0);
@@ -147,7 +151,8 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     {
         DataModel::Nullable<int16_t> updatedTemperature =
             LevelToSetpoint(level, TemperatureRangeMin[epIndex], TemperatureRangeMax[epIndex]);
-        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedTemperature);
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(endpointId, updatedTemperature));
+
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -156,17 +161,14 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     if (epIndex < kPressureMeasurementCount)
     {
         DataModel::Nullable<int16_t> updatedPressure = LevelToSetpoint(level, PressureRangeMin[epIndex], PressureRangeMax[epIndex]);
-        PressureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedPressure);
-        MatterReportingAttributeChangeCallback(endpointId, PressureMeasurement::Id,
-                                               PressureMeasurement::Attributes::MeasuredValue::Id);
+        LogErrorOnFailure(PressureMeasurement::SetMeasuredValue(endpointId, updatedPressure));
     }
 
     epIndex = getIndexFlowMeasurement(endpointId);
     if (epIndex < kFlowMeasurementCount)
     {
         DataModel::Nullable<uint16_t> updatedFlow = LevelToSetpoint(level, FlowRangeMin[epIndex], FlowRangeMax[epIndex]);
-        FlowMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedFlow);
-        MatterReportingAttributeChangeCallback(endpointId, FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
+        LogErrorOnFailure(FlowMeasurement::SetMeasuredValue(endpointId, updatedFlow));
     }
 
     DataModel::Nullable<int16_t> capacity =
@@ -270,7 +272,7 @@ void init()
             continue;
         }
 
-        if (!chef::DeviceTypes::EndpointHasDeviceType(endpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (!chef::DeviceTypes::EndpointHasDeviceType(endpointId, Device::kPumpDeviceTypeId))
         {
             continue;
         }
@@ -280,8 +282,10 @@ void init()
         epIndex = getIndexTemperatureMeasurement(endpointId);
         if (epIndex < kTemperatureMeasurementCount)
         {
-            VerifyOrDieWithMsg(TemperatureMeasurement::Attributes::MeasuredValue::SetNull(endpointId) == Status::Success,
-                               DeviceLayer, "Failed to initialize Temperature Measured Value to NULL for Endpoint: %d", endpointId);
+            DataModel::Nullable<int16_t> temp;
+            CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValue(endpointId, temp);
+            VerifyOrDieWithMsg(err == CHIP_NO_ERROR, DeviceLayer,
+                               "Failed to initialize Temperature Measured Value to NULL for Endpoint: %d", endpointId);
             if (TemperatureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, TemperatureRangeMin[epIndex]) !=
                     Status::Success ||
                 TemperatureRangeMin[epIndex].IsNull())
@@ -299,8 +303,8 @@ void init()
         epIndex = getIndexPressureMeasurement(endpointId);
         if (epIndex < kPressureMeasurementCount)
         {
-            VerifyOrDieWithMsg(PressureMeasurement::Attributes::MeasuredValue::SetNull(endpointId) == Status::Success, DeviceLayer,
-                               "Failed to initialize Pressure Measured Value to NULL for Endpoint: %d", endpointId);
+            VerifyOrDieWithMsg(PressureMeasurement::SetMeasuredValue(endpointId, DataModel::Nullable<int16_t>()) == CHIP_NO_ERROR,
+                               DeviceLayer, "Failed to initialize Pressure Measured Value to NULL for Endpoint: %d", endpointId);
             if (PressureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, PressureRangeMin[epIndex]) != Status::Success ||
                 PressureRangeMin[epIndex].IsNull())
             {
@@ -316,8 +320,8 @@ void init()
         epIndex = getIndexFlowMeasurement(endpointId);
         if (epIndex < kFlowMeasurementCount)
         {
-            VerifyOrDieWithMsg(FlowMeasurement::Attributes::MeasuredValue::SetNull(endpointId) == Status::Success, DeviceLayer,
-                               "Failed to initialize Flow Measured Value to NULL for Endpoint: %d", endpointId);
+            VerifyOrDieWithMsg(FlowMeasurement::SetMeasuredValue(endpointId, DataModel::Nullable<uint16_t>()) == CHIP_NO_ERROR,
+                               DeviceLayer, "Failed to initialize Flow Measured Value to NULL for Endpoint: %d", endpointId);
             if (FlowMeasurement::Attributes::MinMeasuredValue::Get(endpointId, FlowRangeMin[epIndex]) != Status::Success ||
                 FlowRangeMin[epIndex].IsNull())
             {

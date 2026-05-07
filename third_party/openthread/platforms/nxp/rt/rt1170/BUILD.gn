@@ -42,7 +42,7 @@ config("openthread_rt1170_config") {
   ]
   defines = [ "OT_PLAT_SPINEL_OVER_SPI" ]
 
-  if (chip_enable_wifi && chip_enable_openthread) {
+  if (chip_enable_wifi && chip_enable_thread) {
     defines += [
       "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
       "OPENTHREAD_CONFIG_COMMISSIONER_ENABLE=1",
@@ -114,7 +114,7 @@ source_set("libopenthread-rt1170") {
     "${openthread_root}/src/lib/url/url.cpp",
   ]
 
-  if (chip_enable_wifi && chip_enable_openthread) {
+  if (chip_enable_wifi && chip_enable_thread) {
     sources += [
       "${openthread_nxp_root}/src/common/br/border_agent.c",
       "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",

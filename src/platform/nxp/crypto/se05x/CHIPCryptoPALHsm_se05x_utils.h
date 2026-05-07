@@ -19,20 +19,22 @@
 
 #include <string.h>
 
-#include <CHIPCryptoPAL_se05x.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 #include <type_traits>
 
-#include <CHIPCryptoPALHsm_se05x_config.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h>
 #include <system/SystemMutex.h>
 
 /* se05x includes */
 #include "ex_sss_boot.h"
-#include "fsl_sss_api.h"
+#include "se051h_nfc_comm_prov.h"
+#include "se05x_host_gpio.h"
+#include "sss/inc/fsl_sss_api.h"
 #include <fsl_sss_se05x_apis.h>
 #include <se05x_APDU.h>
 
@@ -79,11 +81,18 @@ extern "C" {
 CHIP_ERROR se05x_session_open(void);
 
 /**
- * @brief Check if key exists in se05x.
- * @param[in] Key id of the key to be checked.
+ * @brief Close session to se05x secure element.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_check_object_exists(uint32_t keyid);
+CHIP_ERROR se05x_close_session(void);
+
+/**
+ * @brief Check if key exists in se05x.
+ * @param[in] Key id of the key to be checked.
+ * @param[out] key_exists boolean true if the key id presents.
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_check_object_exists(uint32_t keyid, bool * key_exists);
 
 /**
  * @brief Delete the key in se05x.
@@ -131,6 +140,16 @@ CHIP_ERROR se05x_set_certificate(uint32_t keyId, const uint8_t * buf, size_t buf
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR se05x_set_binary_data(uint32_t keyId, const uint8_t * buf, size_t buflen);
+
+/**
+ * @brief Set EC key in se05x.
+ * The Key is stored with Persistent option.
+ * @param[in] keyid - Key id of the object.
+ * @param[in] buf - Buffer containing Key data.
+ * @param[in] buflen - Buffer length.
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_set_ec_key(uint32_t keyId, const uint8_t * buf, size_t buflen);
 
 /**
  * @brief Perform internal sign in se05x (only on SE051H).

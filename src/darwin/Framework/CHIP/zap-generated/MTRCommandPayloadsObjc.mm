@@ -10023,6 +10023,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
+        encodableStruct.groupKeySet.groupKeyMulticastPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeyMulticastPolicy)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -10259,6 +10260,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime2.Value()];
         }
+        self.groupKeySet.groupKeyMulticastPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.groupKeySet.groupKeyMulticastPolicy)];
     }
     return CHIP_NO_ERROR;
 }
@@ -15592,13 +15594,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _endpoints = [NSArray array];
 
-        _keyID = @(0);
+        _keySetID = @(0);
 
         _key = nil;
 
-        _gracePeriod = nil;
-
         _useAuxiliaryACL = nil;
+
+        _replaceEndpoints = nil;
+
+        _mcastAddrPolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15611,10 +15615,11 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.keyID = self.keyID;
+    other.keySetID = self.keySetID;
     other.key = self.key;
-    other.gracePeriod = self.gracePeriod;
     other.useAuxiliaryACL = self.useAuxiliaryACL;
+    other.replaceEndpoints = self.replaceEndpoints;
+    other.mcastAddrPolicy = self.mcastAddrPolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15623,7 +15628,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; key:%@; gracePeriod:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, [_key base64EncodedStringWithOptions:0], _gracePeriod, _useAuxiliaryACL];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; key:%@; useAuxiliaryACL:%@; replaceEndpoints:%@; mcastAddrPolicy:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, [_key base64EncodedStringWithOptions:0], _useAuxiliaryACL, _replaceEndpoints, _mcastAddrPolicy];
     return descriptionString;
 }
 
@@ -15664,7 +15669,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        encodableStruct.keyID = self.keyID.unsignedIntValue;
+        encodableStruct.keySetID = self.keySetID.unsignedShortValue;
     }
     {
         if (self.key != nil) {
@@ -15673,15 +15678,21 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        if (self.gracePeriod != nil) {
-            auto & definedValue_0 = encodableStruct.gracePeriod.Emplace();
-            definedValue_0 = self.gracePeriod.unsignedIntValue;
-        }
-    }
-    {
         if (self.useAuxiliaryACL != nil) {
             auto & definedValue_0 = encodableStruct.useAuxiliaryACL.Emplace();
             definedValue_0 = self.useAuxiliaryACL.boolValue;
+        }
+    }
+    {
+        if (self.replaceEndpoints != nil) {
+            auto & definedValue_0 = encodableStruct.replaceEndpoints.Emplace();
+            definedValue_0 = self.replaceEndpoints.boolValue;
+        }
+    }
+    {
+        if (self.mcastAddrPolicy != nil) {
+            auto & definedValue_0 = encodableStruct.mcastAddrPolicy.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mcastAddrPolicy.unsignedCharValue);
         }
     }
 
@@ -15840,9 +15851,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupID = @(0);
 
-        _endpoints = nil;
-
-        _listTooLarge = nil;
+        _endpoints = [NSArray array];
     }
     return self;
 }
@@ -15853,14 +15862,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.listTooLarge = self.listTooLarge;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; listTooLarge:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _listTooLarge];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; >", NSStringFromClass([self class]), _groupID, _endpoints];
     return descriptionString;
 }
 
@@ -15924,31 +15932,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
     }
     {
-        if (decodableStruct.endpoints.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = decodableStruct.endpoints.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedShort:entry_1];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-                self.endpoints = array_1;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.endpoints.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
             }
-        } else {
-            self.endpoints = nil;
-        }
-    }
-    {
-        if (decodableStruct.listTooLarge.HasValue()) {
-            self.listTooLarge = [NSNumber numberWithBool:decodableStruct.listTooLarge.Value()];
-        } else {
-            self.listTooLarge = nil;
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.endpoints = array_0;
         }
     }
     return CHIP_NO_ERROR;
@@ -15963,11 +15960,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupID = @(0);
 
-        _keyID = @(0);
+        _keySetID = @(0);
 
         _key = nil;
-
-        _gracePeriod = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15979,9 +15974,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTRGroupcastClusterUpdateGroupKeyParams alloc] init];
 
     other.groupID = self.groupID;
-    other.keyID = self.keyID;
+    other.keySetID = self.keySetID;
     other.key = self.key;
-    other.gracePeriod = self.gracePeriod;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15990,7 +15984,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; keyID:%@; key:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupID, _keyID, [_key base64EncodedStringWithOptions:0], _gracePeriod];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; keySetID:%@; key:%@; >", NSStringFromClass([self class]), _groupID, _keySetID, [_key base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -16006,98 +16000,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
     {
-        encodableStruct.keyID = self.keyID.unsignedIntValue;
+        encodableStruct.keySetID = self.keySetID.unsignedShortValue;
     }
     {
         if (self.key != nil) {
             auto & definedValue_0 = encodableStruct.key.Emplace();
             definedValue_0 = AsByteSpan(self.key);
         }
-    }
-    {
-        if (self.gracePeriod != nil) {
-            auto & definedValue_0 = encodableStruct.gracePeriod.Emplace();
-            definedValue_0 = self.gracePeriod.unsignedIntValue;
-        }
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRGroupcastClusterExpireGracePeriodParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRGroupcastClusterExpireGracePeriodParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRGroupcastClusterExpireGracePeriodParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16183,6 +16092,94 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         encodableStruct.useAuxiliaryACL = self.useAuxiliaryACL.boolValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRGroupcastClusterGroupcastTestingParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _testOperation = @(0);
+
+        _durationSeconds = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRGroupcastClusterGroupcastTestingParams alloc] init];
+
+    other.testOperation = self.testOperation;
+    other.durationSeconds = self.durationSeconds;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: testOperation:%@; durationSeconds:%@; >", NSStringFromClass([self class]), _testOperation, _durationSeconds];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRGroupcastClusterGroupcastTestingParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Groupcast::Commands::GroupcastTesting::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.testOperation = static_cast<std::remove_reference_t<decltype(encodableStruct.testOperation)>>(self.testOperation.unsignedCharValue);
+    }
+    {
+        if (self.durationSeconds != nil) {
+            auto & definedValue_0 = encodableStruct.durationSeconds.Emplace();
+            definedValue_0 = self.durationSeconds.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -25085,6 +25082,133 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 }
 @end
 
+@implementation MTRHumidistatClusterSetSettingsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userSetpoint = nil;
+
+        _mode = nil;
+
+        _mistType = nil;
+
+        _continuous = nil;
+
+        _sleep = nil;
+
+        _optimal = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRHumidistatClusterSetSettingsParams alloc] init];
+
+    other.userSetpoint = self.userSetpoint;
+    other.mode = self.mode;
+    other.mistType = self.mistType;
+    other.continuous = self.continuous;
+    other.sleep = self.sleep;
+    other.optimal = self.optimal;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userSetpoint:%@; mode:%@; mistType:%@; continuous:%@; sleep:%@; optimal:%@; >", NSStringFromClass([self class]), _userSetpoint, _mode, _mistType, _continuous, _sleep, _optimal];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRHumidistatClusterSetSettingsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Humidistat::Commands::SetSettings::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.userSetpoint != nil) {
+            auto & definedValue_0 = encodableStruct.userSetpoint.Emplace();
+            definedValue_0 = self.userSetpoint.unsignedCharValue;
+        }
+    }
+    {
+        if (self.mode != nil) {
+            auto & definedValue_0 = encodableStruct.mode.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mode.unsignedCharValue);
+        }
+    }
+    {
+        if (self.mistType != nil) {
+            auto & definedValue_0 = encodableStruct.mistType.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mistType.unsignedCharValue);
+        }
+    }
+    {
+        if (self.continuous != nil) {
+            auto & definedValue_0 = encodableStruct.continuous.Emplace();
+            definedValue_0 = self.continuous.boolValue;
+        }
+    }
+    {
+        if (self.sleep != nil) {
+            auto & definedValue_0 = encodableStruct.sleep.Emplace();
+            definedValue_0 = self.sleep.boolValue;
+        }
+    }
+    {
+        if (self.optimal != nil) {
+            auto & definedValue_0 = encodableStruct.optimal.Emplace();
+            definedValue_0 = self.optimal.boolValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRColorControlClusterMoveToHueParams
 - (instancetype)init
 {
@@ -27028,6 +27152,1053 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     return decodedObj;
 }
+@end
+
+@implementation MTRProximityRangingClusterStartRangingRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _technology = @(0);
+
+        _wiFiRangingDeviceRoleConfig = nil;
+
+        _bleRangingDeviceRoleConfig = nil;
+
+        _bltChannelSoundingDeviceRoleConfig = nil;
+
+        _frequencyBand = nil;
+
+        _bandwidth = nil;
+
+        _securityMode = @(0);
+
+        _trigger = [MTRProximityRangingClusterRangingTriggerConditionStruct new];
+
+        _reportingCondition = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRProximityRangingClusterStartRangingRequestParams alloc] init];
+
+    other.technology = self.technology;
+    other.wiFiRangingDeviceRoleConfig = self.wiFiRangingDeviceRoleConfig;
+    other.bleRangingDeviceRoleConfig = self.bleRangingDeviceRoleConfig;
+    other.bltChannelSoundingDeviceRoleConfig = self.bltChannelSoundingDeviceRoleConfig;
+    other.frequencyBand = self.frequencyBand;
+    other.bandwidth = self.bandwidth;
+    other.securityMode = self.securityMode;
+    other.trigger = self.trigger;
+    other.reportingCondition = self.reportingCondition;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; wiFiRangingDeviceRoleConfig:%@; bleRangingDeviceRoleConfig:%@; bltChannelSoundingDeviceRoleConfig:%@; frequencyBand:%@; bandwidth:%@; securityMode:%@; trigger:%@; reportingCondition:%@; >", NSStringFromClass([self class]), _technology, _wiFiRangingDeviceRoleConfig, _bleRangingDeviceRoleConfig, _bltChannelSoundingDeviceRoleConfig, _frequencyBand, _bandwidth, _securityMode, _trigger, _reportingCondition];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterStartRangingRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.technology = static_cast<std::remove_reference_t<decltype(encodableStruct.technology)>>(self.technology.unsignedCharValue);
+    }
+    {
+        if (self.wiFiRangingDeviceRoleConfig != nil) {
+            auto & definedValue_0 = encodableStruct.wiFiRangingDeviceRoleConfig.Emplace();
+            definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.wiFiRangingDeviceRoleConfig.role.unsignedCharValue);
+            definedValue_0.peerWiFiDevIK = AsByteSpan(self.wiFiRangingDeviceRoleConfig.peerWiFiDevIK);
+            if (self.wiFiRangingDeviceRoleConfig.pmk != nil) {
+                auto & definedValue_2 = definedValue_0.pmk.Emplace();
+                definedValue_2 = AsByteSpan(self.wiFiRangingDeviceRoleConfig.pmk);
+            }
+        }
+    }
+    {
+        if (self.bleRangingDeviceRoleConfig != nil) {
+            auto & definedValue_0 = encodableStruct.BLERangingDeviceRoleConfig.Emplace();
+            definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.bleRangingDeviceRoleConfig.role.unsignedCharValue);
+            definedValue_0.peerBLEDeviceID = self.bleRangingDeviceRoleConfig.peerBLEDeviceID.unsignedLongLongValue;
+        }
+    }
+    {
+        if (self.bltChannelSoundingDeviceRoleConfig != nil) {
+            auto & definedValue_0 = encodableStruct.BLTChannelSoundingDeviceRoleConfig.Emplace();
+            definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.bltChannelSoundingDeviceRoleConfig.role.unsignedCharValue);
+            definedValue_0.peerBLTDevIK = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.peerBLTDevIK);
+            if (self.bltChannelSoundingDeviceRoleConfig.bltcsMode != nil) {
+                auto & definedValue_2 = definedValue_0.BLTCSMode.Emplace();
+                definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsMode.unsignedCharValue);
+            }
+            if (self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel != nil) {
+                auto & definedValue_2 = definedValue_0.BLTCSSecurityLevel.Emplace();
+                definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel.unsignedCharValue);
+            }
+            if (self.bltChannelSoundingDeviceRoleConfig.ltk != nil) {
+                auto & definedValue_2 = definedValue_0.ltk.Emplace();
+                definedValue_2 = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.ltk);
+            }
+        }
+    }
+    {
+        if (self.frequencyBand != nil) {
+            auto & definedValue_0 = encodableStruct.frequencyBand.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.frequencyBand.unsignedShortValue);
+        }
+    }
+    {
+        if (self.bandwidth != nil) {
+            auto & definedValue_0 = encodableStruct.bandwidth.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.bandwidth.unsignedIntValue);
+        }
+    }
+    {
+        encodableStruct.securityMode = static_cast<std::remove_reference_t<decltype(encodableStruct.securityMode)>>(self.securityMode.unsignedCharValue);
+    }
+    {
+        encodableStruct.trigger.startTime = self.trigger.startTime.unsignedIntValue;
+        encodableStruct.trigger.endTime = self.trigger.endTime.unsignedIntValue;
+        if (self.trigger.rangingInstanceInterval != nil) {
+            auto & definedValue_1 = encodableStruct.trigger.rangingInstanceInterval.Emplace();
+            definedValue_1 = self.trigger.rangingInstanceInterval.unsignedIntValue;
+        }
+    }
+    {
+        if (self.reportingCondition != nil) {
+            auto & definedValue_0 = encodableStruct.reportingCondition.Emplace();
+            if (self.reportingCondition.minDistanceCondition != nil) {
+                auto & definedValue_2 = definedValue_0.minDistanceCondition.Emplace();
+                definedValue_2 = self.reportingCondition.minDistanceCondition.unsignedShortValue;
+            }
+            if (self.reportingCondition.maxDistanceCondition != nil) {
+                auto & definedValue_2 = definedValue_0.maxDistanceCondition.Emplace();
+                definedValue_2 = self.reportingCondition.maxDistanceCondition.unsignedShortValue;
+            }
+            if (self.reportingCondition.errorMarginCondition != nil) {
+                auto & definedValue_2 = definedValue_0.errorMarginCondition.Emplace();
+                definedValue_2 = self.reportingCondition.errorMarginCondition.unsignedShortValue;
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRProximityRangingClusterStartRangingResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _resultCode = @(0);
+
+        _sessionID = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRProximityRangingClusterStartRangingResponseParams alloc] init];
+
+    other.resultCode = self.resultCode;
+    other.sessionID = self.sessionID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resultCode:%@; sessionID:%@; >", NSStringFromClass([self class]), _resultCode, _sessionID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterStartRangingResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct
+{
+    {
+        self.resultCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.resultCode)];
+    }
+    {
+        if (decodableStruct.sessionID.IsNull()) {
+            self.sessionID = nil;
+        } else {
+            self.sessionID = [NSNumber numberWithUnsignedChar:decodableStruct.sessionID.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterStopRangingRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sessionID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRProximityRangingClusterStopRangingRequestParams alloc] init];
+
+    other.sessionID = self.sessionID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; >", NSStringFromClass([self class]), _sessionID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterStopRangingRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.sessionID = self.sessionID.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterAddClientParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIdentity = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterAddClientParams alloc] init];
+
+    other.clientIdentity = self.clientIdentity;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIdentity:%@; >", NSStringFromClass([self class]), [_clientIdentity base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterAddClientParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.clientIdentity = AsByteSpan(self.clientIdentity);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterAddClientResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterAddClientResponseParams alloc] init];
+
+    other.clientIndex = self.clientIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; >", NSStringFromClass([self class]), _clientIndex];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterAddClientResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct
+{
+    {
+        self.clientIndex = [NSNumber numberWithUnsignedShort:decodableStruct.clientIndex];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterRemoveClientParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIndex = nil;
+
+        _clientIdentifier = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterRemoveClientParams alloc] init];
+
+    other.clientIndex = self.clientIndex;
+    other.clientIdentifier = self.clientIdentifier;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; clientIdentifier:%@; >", NSStringFromClass([self class]), _clientIndex, [_clientIdentifier base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterRemoveClientParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.clientIndex != nil) {
+            auto & definedValue_0 = encodableStruct.clientIndex.Emplace();
+            definedValue_0 = self.clientIndex.unsignedShortValue;
+        }
+    }
+    {
+        if (self.clientIdentifier != nil) {
+            auto & definedValue_0 = encodableStruct.clientIdentifier.Emplace();
+            definedValue_0 = AsByteSpan(self.clientIdentifier);
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkIdentityIndex = nil;
+
+        _networkIdentityType = nil;
+
+        _identifier = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterQueryIdentityParams alloc] init];
+
+    other.networkIdentityIndex = self.networkIdentityIndex;
+    other.networkIdentityType = self.networkIdentityType;
+    other.identifier = self.identifier;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkIdentityIndex:%@; networkIdentityType:%@; identifier:%@; >", NSStringFromClass([self class]), _networkIdentityIndex, _networkIdentityType, [_identifier base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.networkIdentityIndex != nil) {
+            auto & definedValue_0 = encodableStruct.networkIdentityIndex.Emplace();
+            definedValue_0 = self.networkIdentityIndex.unsignedShortValue;
+        }
+    }
+    {
+        if (self.networkIdentityType != nil) {
+            auto & definedValue_0 = encodableStruct.networkIdentityType.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.networkIdentityType.unsignedCharValue);
+        }
+    }
+    {
+        if (self.identifier != nil) {
+            auto & definedValue_0 = encodableStruct.identifier.Emplace();
+            definedValue_0 = AsByteSpan(self.identifier);
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _identity = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterQueryIdentityResponseParams alloc] init];
+
+    other.identity = self.identity;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: identity:%@; >", NSStringFromClass([self class]), [_identity base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
+{
+    {
+        self.identity = AsData(decodableStruct.identity);
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterImportAdminSecretParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkAdministratorSharedSecret = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterImportAdminSecretParams alloc] init];
+
+    other.networkAdministratorSharedSecret = self.networkAdministratorSharedSecret;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkAdministratorSharedSecret:%@; >", NSStringFromClass([self class]), [_networkAdministratorSharedSecret base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterImportAdminSecretParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.networkAdministratorSharedSecret = AsByteSpan(self.networkAdministratorSharedSecret);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterExportAdminSecretParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkAdministratorSharedSecret = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams alloc] init];
+
+    other.networkAdministratorSharedSecret = self.networkAdministratorSharedSecret;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkAdministratorSharedSecret:%@; >", NSStringFromClass([self class]), [_networkAdministratorSharedSecret base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct
+{
+    {
+        self.networkAdministratorSharedSecret = AsData(decodableStruct.networkAdministratorSharedSecret);
+    }
+    return CHIP_NO_ERROR;
+}
+
 @end
 
 @implementation MTRWiFiNetworkManagementClusterNetworkPassphraseRequestParams
@@ -36805,6 +37976,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _metadataEnabled = nil;
 
         _sFrameConfig = nil;
+
+        _videoStreams = nil;
+
+        _audioStreams = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -36823,6 +37998,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.iceTransportPolicy = self.iceTransportPolicy;
     other.metadataEnabled = self.metadataEnabled;
     other.sFrameConfig = self.sFrameConfig;
+    other.videoStreams = self.videoStreams;
+    other.audioStreams = self.audioStreams;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -36831,7 +38008,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; sFrameConfig:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled, _sFrameConfig];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; sFrameConfig:%@; videoStreams:%@; audioStreams:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled, _sFrameConfig, _videoStreams, _audioStreams];
     return descriptionString;
 }
 
@@ -36951,6 +38128,62 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
             definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
             definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
+        }
+    }
+    {
+        if (self.videoStreams != nil) {
+            auto & definedValue_0 = encodableStruct.videoStreams.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.videoStreams.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.videoStreams.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.videoStreams.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.videoStreams[i_1], NSNumber);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.videoStreams[i_1], NSStringFromClass(NSNumber.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1] = element_1.unsignedShortValue;
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.videoStreams.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+    {
+        if (self.audioStreams != nil) {
+            auto & definedValue_0 = encodableStruct.audioStreams.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.audioStreams.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.audioStreams.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.audioStreams.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.audioStreams[i_1], NSNumber);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.audioStreams[i_1], NSStringFromClass(NSNumber.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1] = element_1.unsignedShortValue;
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.audioStreams.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
         }
     }
 
@@ -37139,6 +38372,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _metadataEnabled = nil;
 
         _sFrameConfig = nil;
+
+        _videoStreams = nil;
+
+        _audioStreams = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -37159,6 +38396,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.iceTransportPolicy = self.iceTransportPolicy;
     other.metadataEnabled = self.metadataEnabled;
     other.sFrameConfig = self.sFrameConfig;
+    other.videoStreams = self.videoStreams;
+    other.audioStreams = self.audioStreams;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -37167,7 +38406,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; sFrameConfig:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled, _sFrameConfig];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataEnabled:%@; sFrameConfig:%@; videoStreams:%@; audioStreams:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataEnabled, _sFrameConfig, _videoStreams, _audioStreams];
     return descriptionString;
 }
 
@@ -37298,6 +38537,62 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
             definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
             definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
+        }
+    }
+    {
+        if (self.videoStreams != nil) {
+            auto & definedValue_0 = encodableStruct.videoStreams.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.videoStreams.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.videoStreams.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.videoStreams.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.videoStreams[i_1], NSNumber);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.videoStreams[i_1], NSStringFromClass(NSNumber.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1] = element_1.unsignedShortValue;
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.videoStreams.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+    {
+        if (self.audioStreams != nil) {
+            auto & definedValue_0 = encodableStruct.audioStreams.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.audioStreams.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.audioStreams.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.audioStreams.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.audioStreams[i_1], NSNumber);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.audioStreams[i_1], NSStringFromClass(NSNumber.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1] = element_1.unsignedShortValue;
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.audioStreams.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
         }
     }
 
@@ -38339,6 +39634,60 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & definedValue_1 = encodableStruct.transportOptions.expiryTime.Emplace();
             definedValue_1 = self.transportOptions.expiryTime.unsignedIntValue;
         }
+        if (self.transportOptions.videoStreams != nil) {
+            auto & definedValue_1 = encodableStruct.transportOptions.videoStreams.Emplace();
+            {
+                using ListType_2 = std::remove_reference_t<decltype(definedValue_1)>;
+                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                if (self.transportOptions.videoStreams.count != 0) {
+                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.transportOptions.videoStreams.count);
+                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_2);
+                    for (size_t i_2 = 0; i_2 < self.transportOptions.videoStreams.count; ++i_2) {
+                        auto element_2 = MTR_SAFE_CAST(self.transportOptions.videoStreams[i_2], MTRPushAVStreamTransportClusterVideoStreamStruct);
+                        if (!element_2) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.videoStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterVideoStreamStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_2->mList[i_2].videoStreamName = AsCharSpan(element_2.videoStreamName);
+                        listHolder_2->mList[i_2].videoStreamID = element_2.videoStreamID.unsignedShortValue;
+                    }
+                    definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.videoStreams.count);
+                } else {
+                    definedValue_1 = ListType_2();
+                }
+            }
+        }
+        if (self.transportOptions.audioStreams != nil) {
+            auto & definedValue_1 = encodableStruct.transportOptions.audioStreams.Emplace();
+            {
+                using ListType_2 = std::remove_reference_t<decltype(definedValue_1)>;
+                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                if (self.transportOptions.audioStreams.count != 0) {
+                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.transportOptions.audioStreams.count);
+                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_2);
+                    for (size_t i_2 = 0; i_2 < self.transportOptions.audioStreams.count; ++i_2) {
+                        auto element_2 = MTR_SAFE_CAST(self.transportOptions.audioStreams[i_2], MTRPushAVStreamTransportClusterAudioStreamStruct);
+                        if (!element_2) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.audioStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterAudioStreamStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_2->mList[i_2].audioStreamName = AsCharSpan(element_2.audioStreamName);
+                        listHolder_2->mList[i_2].audioStreamID = element_2.audioStreamID.unsignedShortValue;
+                    }
+                    definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.audioStreams.count);
+                } else {
+                    definedValue_1 = ListType_2();
+                }
+            }
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -38586,6 +39935,56 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.expiryTime = nil;
             }
+            if (decodableStruct.transportConfiguration.transportOptions.Value().videoStreams.HasValue()) {
+                { // Scope for our temporary variables
+                    auto * array_4 = [NSMutableArray new];
+                    auto iter_4 = decodableStruct.transportConfiguration.transportOptions.Value().videoStreams.Value().begin();
+                    while (iter_4.Next()) {
+                        auto & entry_4 = iter_4.GetValue();
+                        MTRPushAVStreamTransportClusterVideoStreamStruct * newElement_4;
+                        newElement_4 = [MTRPushAVStreamTransportClusterVideoStreamStruct new];
+                        newElement_4.videoStreamName = AsString(entry_4.videoStreamName);
+                        if (newElement_4.videoStreamName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+                        newElement_4.videoStreamID = [NSNumber numberWithUnsignedShort:entry_4.videoStreamID];
+                        [array_4 addObject:newElement_4];
+                    }
+                    CHIP_ERROR err = iter_4.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    self.transportConfiguration.transportOptions.videoStreams = array_4;
+                }
+            } else {
+                self.transportConfiguration.transportOptions.videoStreams = nil;
+            }
+            if (decodableStruct.transportConfiguration.transportOptions.Value().audioStreams.HasValue()) {
+                { // Scope for our temporary variables
+                    auto * array_4 = [NSMutableArray new];
+                    auto iter_4 = decodableStruct.transportConfiguration.transportOptions.Value().audioStreams.Value().begin();
+                    while (iter_4.Next()) {
+                        auto & entry_4 = iter_4.GetValue();
+                        MTRPushAVStreamTransportClusterAudioStreamStruct * newElement_4;
+                        newElement_4 = [MTRPushAVStreamTransportClusterAudioStreamStruct new];
+                        newElement_4.audioStreamName = AsString(entry_4.audioStreamName);
+                        if (newElement_4.audioStreamName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+                        newElement_4.audioStreamID = [NSNumber numberWithUnsignedShort:entry_4.audioStreamID];
+                        [array_4 addObject:newElement_4];
+                    }
+                    CHIP_ERROR err = iter_4.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    self.transportConfiguration.transportOptions.audioStreams = array_4;
+                }
+            } else {
+                self.transportConfiguration.transportOptions.audioStreams = nil;
+            }
         } else {
             self.transportConfiguration.transportOptions = nil;
         }
@@ -38826,6 +40225,60 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         if (self.transportOptions.expiryTime != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.expiryTime.Emplace();
             definedValue_1 = self.transportOptions.expiryTime.unsignedIntValue;
+        }
+        if (self.transportOptions.videoStreams != nil) {
+            auto & definedValue_1 = encodableStruct.transportOptions.videoStreams.Emplace();
+            {
+                using ListType_2 = std::remove_reference_t<decltype(definedValue_1)>;
+                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                if (self.transportOptions.videoStreams.count != 0) {
+                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.transportOptions.videoStreams.count);
+                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_2);
+                    for (size_t i_2 = 0; i_2 < self.transportOptions.videoStreams.count; ++i_2) {
+                        auto element_2 = MTR_SAFE_CAST(self.transportOptions.videoStreams[i_2], MTRPushAVStreamTransportClusterVideoStreamStruct);
+                        if (!element_2) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.videoStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterVideoStreamStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_2->mList[i_2].videoStreamName = AsCharSpan(element_2.videoStreamName);
+                        listHolder_2->mList[i_2].videoStreamID = element_2.videoStreamID.unsignedShortValue;
+                    }
+                    definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.videoStreams.count);
+                } else {
+                    definedValue_1 = ListType_2();
+                }
+            }
+        }
+        if (self.transportOptions.audioStreams != nil) {
+            auto & definedValue_1 = encodableStruct.transportOptions.audioStreams.Emplace();
+            {
+                using ListType_2 = std::remove_reference_t<decltype(definedValue_1)>;
+                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                if (self.transportOptions.audioStreams.count != 0) {
+                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.transportOptions.audioStreams.count);
+                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_2);
+                    for (size_t i_2 = 0; i_2 < self.transportOptions.audioStreams.count; ++i_2) {
+                        auto element_2 = MTR_SAFE_CAST(self.transportOptions.audioStreams[i_2], MTRPushAVStreamTransportClusterAudioStreamStruct);
+                        if (!element_2) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.audioStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterAudioStreamStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_2->mList[i_2].audioStreamName = AsCharSpan(element_2.audioStreamName);
+                        listHolder_2->mList[i_2].audioStreamID = element_2.audioStreamID.unsignedShortValue;
+                    }
+                    definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.audioStreams.count);
+                } else {
+                    definedValue_1 = ListType_2();
+                }
+            }
         }
     }
 
@@ -39360,6 +40813,56 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.expiryTime = nil;
                     }
+                    if (entry_0.transportOptions.Value().videoStreams.HasValue()) {
+                        { // Scope for our temporary variables
+                            auto * array_5 = [NSMutableArray new];
+                            auto iter_5 = entry_0.transportOptions.Value().videoStreams.Value().begin();
+                            while (iter_5.Next()) {
+                                auto & entry_5 = iter_5.GetValue();
+                                MTRPushAVStreamTransportClusterVideoStreamStruct * newElement_5;
+                                newElement_5 = [MTRPushAVStreamTransportClusterVideoStreamStruct new];
+                                newElement_5.videoStreamName = AsString(entry_5.videoStreamName);
+                                if (newElement_5.videoStreamName == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                                newElement_5.videoStreamID = [NSNumber numberWithUnsignedShort:entry_5.videoStreamID];
+                                [array_5 addObject:newElement_5];
+                            }
+                            CHIP_ERROR err = iter_5.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                return err;
+                            }
+                            newElement_0.transportOptions.videoStreams = array_5;
+                        }
+                    } else {
+                        newElement_0.transportOptions.videoStreams = nil;
+                    }
+                    if (entry_0.transportOptions.Value().audioStreams.HasValue()) {
+                        { // Scope for our temporary variables
+                            auto * array_5 = [NSMutableArray new];
+                            auto iter_5 = entry_0.transportOptions.Value().audioStreams.Value().begin();
+                            while (iter_5.Next()) {
+                                auto & entry_5 = iter_5.GetValue();
+                                MTRPushAVStreamTransportClusterAudioStreamStruct * newElement_5;
+                                newElement_5 = [MTRPushAVStreamTransportClusterAudioStreamStruct new];
+                                newElement_5.audioStreamName = AsString(entry_5.audioStreamName);
+                                if (newElement_5.audioStreamName == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                                newElement_5.audioStreamID = [NSNumber numberWithUnsignedShort:entry_5.audioStreamID];
+                                [array_5 addObject:newElement_5];
+                            }
+                            CHIP_ERROR err = iter_5.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                return err;
+                            }
+                            newElement_0.transportOptions.audioStreams = array_5;
+                        }
+                    } else {
+                        newElement_0.transportOptions.audioStreams = nil;
+                    }
                 } else {
                     newElement_0.transportOptions = nil;
                 }
@@ -39382,6 +40885,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _chimeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -39392,6 +40897,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRChimeClusterPlayChimeSoundParams alloc] init];
 
+    other.chimeID = self.chimeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -39400,7 +40906,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; >", NSStringFromClass([self class]), _chimeID];
     return descriptionString;
 }
 
@@ -39412,6 +40918,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     chip::app::Clusters::Chime::Commands::PlayChimeSound::Type encodableStruct;
     ListFreer listFreer;
+    {
+        if (self.chimeID != nil) {
+            auto & definedValue_0 = encodableStruct.chimeID.Emplace();
+            definedValue_0 = self.chimeID.unsignedCharValue;
+        }
+    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
@@ -40671,7 +42183,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupCATVersion = nil;
 
-        _groupPermission = @(0);
+        _groupPermission = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -40744,7 +42256,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        encodableStruct.groupPermission = static_cast<std::remove_reference_t<decltype(encodableStruct.groupPermission)>>(self.groupPermission.unsignedCharValue);
+        if (self.groupPermission == nil) {
+            encodableStruct.groupPermission.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.groupPermission.SetNonNull();
+            nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(self.groupPermission.unsignedCharValue);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -40966,7 +42483,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _nodeID = nil;
+        _nodeID = @(0);
 
         _friendlyName = nil;
 
@@ -41005,27 +42522,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::JointFabricDatastore::Commands::UpdateAdmin::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.nodeID == nil) {
-            encodableStruct.nodeID.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.nodeID.SetNonNull();
-            nonNullValue_0 = self.nodeID.unsignedLongLongValue;
+        encodableStruct.nodeID = self.nodeID.unsignedLongLongValue;
+    }
+    {
+        if (self.friendlyName != nil) {
+            auto & definedValue_0 = encodableStruct.friendlyName.Emplace();
+            definedValue_0 = AsCharSpan(self.friendlyName);
         }
     }
     {
-        if (self.friendlyName == nil) {
-            encodableStruct.friendlyName.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.friendlyName.SetNonNull();
-            nonNullValue_0 = AsCharSpan(self.friendlyName);
-        }
-    }
-    {
-        if (self.icac == nil) {
-            encodableStruct.icac.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.icac.SetNonNull();
-            nonNullValue_0 = AsByteSpan(self.icac);
+        if (self.icac != nil) {
+            auto & definedValue_0 = encodableStruct.icac.Emplace();
+            definedValue_0 = AsByteSpan(self.icac);
         }
     }
 
@@ -42266,7 +43774,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _icaccsr = [NSData data];
+        _statusCode = @(0);
+
+        _icaccsr = nil;
     }
     return self;
 }
@@ -42275,6 +43785,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRJointFabricAdministratorClusterICACCSRResponseParams alloc] init];
 
+    other.statusCode = self.statusCode;
     other.icaccsr = self.icaccsr;
 
     return other;
@@ -42282,7 +43793,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: icaccsr:%@; >", NSStringFromClass([self class]), [_icaccsr base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; icaccsr:%@; >", NSStringFromClass([self class]), _statusCode, [_icaccsr base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -42343,7 +43854,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType &)decodableStruct
 {
     {
-        self.icaccsr = AsData(decodableStruct.icaccsr);
+        self.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.statusCode)];
+    }
+    {
+        if (decodableStruct.icaccsr.HasValue()) {
+            self.icaccsr = AsData(decodableStruct.icaccsr.Value());
+        } else {
+            self.icaccsr = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }

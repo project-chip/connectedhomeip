@@ -15,6 +15,5 @@
 #
 mainmenu "Matter NXP Thermostat Example Application"
 
-rsource "../../../../config/nxp/chip-module/Kconfig.features"
-rsource "../../../../config/nxp/chip-module/Kconfig.defaults"
+rsource "../../../../config/zephyr/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

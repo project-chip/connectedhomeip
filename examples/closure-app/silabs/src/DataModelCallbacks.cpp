@@ -31,7 +31,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/closure-control-server/closure-control-server.h>
+#include <app/clusters/closure-control-server/CodegenIntegration.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters::ClosureControl;

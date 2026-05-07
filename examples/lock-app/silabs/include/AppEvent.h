@@ -26,7 +26,6 @@ struct AppEvent : public BaseAppEvent
     enum AppEventTypes
     {
         kEventType_Lock = BaseAppEvent::kEventType_Max + 1,
-        kEventType_Install,
     };
 
     union

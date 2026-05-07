@@ -139,7 +139,7 @@ class CredentialProvider:
     async def get_commissionee_credentials(self, request: GetCommissioneeCredentialsRequest) -> GetCommissioneeCredentialsResponse:
         ''' Returns certifications and infomations for the commissioning.
         '''
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class ExampleCredentialProvider:

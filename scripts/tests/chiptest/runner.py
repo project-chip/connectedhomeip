@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import logging
 import os
-import pathlib
 import pty
 import queue
 import re
@@ -24,14 +23,18 @@ import shlex
 import subprocess
 import threading
 from contextlib import suppress
-from dataclasses import dataclass, replace
-from enum import StrEnum
 from typing import IO, TYPE_CHECKING, Any, Protocol
+
+import python_path
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture
 
 log = logging.getLogger(__name__)
+
+with python_path.PythonPath('../../../src/python_testing/matter_testing_infrastructure', relative_to=__file__):
+    # Import all symbols used downstream not only those we use ourselves
+    from matter.testing.tasks import SubprocessInfo, SubprocessKind  # noqa: F401
 
 
 class LogPipe(threading.Thread):
@@ -136,32 +139,6 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class SubprocessKind(StrEnum):
-    APP = 'app'
-    TOOL = 'tool'
-    RPC = 'rpc'
-
-
-@dataclass
-class SubprocessInfo:
-    kind: SubprocessKind
-    path: pathlib.Path
-    wrapper: tuple[str, ...] = ()
-    args: tuple[str, ...] = ()
-
-    def __post_init__(self):
-        self.path = pathlib.Path(self.path)
-
-    def with_args(self, *args: str):
-        return replace(self, args=self.args + tuple(args))
-
-    def wrap_with(self, *args: str):
-        return replace(self, wrapper=tuple(args) + self.wrapper)
-
-    def to_cmd(self) -> list[str]:
-        return list(self.wrapper) + [str(self.path)] + list(self.args)
-
-
 class Executor:
     CLEANUP_TIMEOUT_S = 5
 
@@ -225,12 +202,8 @@ class Runner:
         cmd = subproc.to_cmd()
         log.info('RunSubprocess starting application %s', " ".join(cmd))
 
-        outpipe = LogPipe(
-            logging.DEBUG, capture_delegate=self.capture_delegate,
-            name=name + ' OUT')
-        errpipe = LogPipe(
-            logging.INFO, capture_delegate=self.capture_delegate,
-            name=name + ' ERR')
+        outpipe = LogPipe(logging.DEBUG, capture_delegate=self.capture_delegate, name=name + ' STDOUT')
+        errpipe = LogPipe(logging.INFO, capture_delegate=self.capture_delegate, name=name + ' STDERR')
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)

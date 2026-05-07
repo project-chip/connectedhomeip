@@ -75,10 +75,11 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
-        response.channel  = result->channel;
-        response.rssi     = result->rssi;
-        response.ssidLen  = result->ssid_length;
-        response.wiFiBand = ConvertBandEnum(result->band);
+        response.channel         = result->channel;
+        response.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        response.signal.strength = result->rssi;
+        response.ssidLen         = result->ssid_length;
+        response.wiFiBand        = ConvertBandEnum(result->band);
         memcpy(response.ssid, result->ssid, result->ssid_length);
         // TODO: MAC/BSSID is not filled by the Wi-Fi driver
         memcpy(response.bssid, result->mac, result->mac_length);
@@ -183,7 +184,7 @@ void WiFiManager::SuppEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEv
 {
     if (mgmtEvent == NET_EVENT_SUPPLICANT_NOT_READY)
     {
-        SystemLayer().ScheduleLambda([] {
+        SystemLayer().ScheduleLambda([]() -> void {
             if (Instance().mWiFiState == WIFI_STATE_COMPLETED)
             {
                 Instance().mReconnect = true;
@@ -193,12 +194,21 @@ void WiFiManager::SuppEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEv
     }
     else if (mgmtEvent == NET_EVENT_SUPPLICANT_READY)
     {
-        SystemLayer().ScheduleLambda([] {
+        SystemLayer().ScheduleLambda([]() -> void {
             if (Instance().mWantedNetwork.IsConfigured() && Instance().mReconnect)
             {
                 Instance().mReconnect = false;
-                Instance().SetLowPowerMode(Instance().mWiFiPsEnabled);
-                Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+                CHIP_ERROR err        = Instance().SetLowPowerMode(Instance().mWiFiPsEnabled);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "SetLowPowerMode failed: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+                CHIP_ERROR scanErr =
+                    Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+                if (scanErr != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "WiFi recovery scan failed: %" CHIP_ERROR_FORMAT, scanErr.Format());
+                }
             }
         });
     }
@@ -365,7 +375,7 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t le
         // In case there are many networks with the same SSID choose the one with the best RSSI
         if (scanResult->rssi > Instance().mWiFiParams.mRssi)
         {
-            Instance().ClearStationProvisioningData();
+            TEMPORARY_RETURN_IGNORED Instance().ClearStationProvisioningData();
             Instance().mWiFiParams.mParams.ssid_length = static_cast<uint8_t>(Instance().mWantedNetwork.ssidLen);
             Instance().mWiFiParams.mParams.ssid        = Instance().mWantedNetwork.ssid;
             // Fallback to the WIFI_SECURITY_TYPE_PSK if the security is unknown
@@ -487,7 +497,7 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
     // Validate that input data size matches the expected one.
     VerifyOrReturn(length == sizeof(wifi_status));
 
-    CHIP_ERROR err = SystemLayer().ScheduleLambda([capturedData = data.get()] {
+    CHIP_ERROR err = SystemLayer().ScheduleLambda([capturedData = data.get()]() -> void {
         Platform::UniquePtr<uint8_t> safePtr(capturedData);
         uint8_t * rawData           = safePtr.get();
         const wifi_status * status  = reinterpret_cast<const wifi_status *>(rawData);
@@ -563,7 +573,11 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
             }
         }
         // cleanup the provisioning data as it is configured per each connect request
-        Instance().ClearStationProvisioningData();
+        CHIP_ERROR clearErr = Instance().ClearStationProvisioningData();
+        if (clearErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ClearStationProvisioningData failed: %" CHIP_ERROR_FORMAT, clearErr.Format());
+        }
     });
 
     if (CHIP_NO_ERROR == err)
@@ -631,7 +645,7 @@ void WiFiManager::NotifyDisconnected(uint16_t reason)
 
 void WiFiManager::IPv6AddressChangeHandler(const void * data)
 {
-    const in6_addr * addr = reinterpret_cast<const in6_addr *>(data);
+    const InetUtils::ZephyrIn6Addr * addr = reinterpret_cast<const InetUtils::ZephyrIn6Addr *>(data);
 
     // Filter out link-local addresses that are not routable outside of a local network.
     if (!net_ipv6_is_ll_addr(addr))
@@ -677,7 +691,11 @@ void WiFiManager::Recover(System::Layer *, void *)
         return;
     }
 
-    Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+    CHIP_ERROR scanErr = Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+    if (scanErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Connection recovery scan failed: %" CHIP_ERROR_FORMAT, scanErr.Format());
+    }
 }
 
 void WiFiManager::ResetRecoveryTime()

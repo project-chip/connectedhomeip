@@ -34,8 +34,6 @@ static constexpr size_t kPrivateKeyBlobLength  = Crypto::kP256_PrivateKey_Length
 
 uint32_t FactoryDataProvider::kFactoryDataMaxSize = 0x800;
 
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
-
 FactoryDataProviderImpl::FactoryDataProviderImpl()
 {
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
@@ -354,10 +352,13 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 #endif // CHIP_USE_PLAIN_DAC_KEY
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
-    return FactoryDataProviderImpl::sInstance;
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

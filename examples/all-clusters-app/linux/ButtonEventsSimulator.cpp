@@ -34,6 +34,8 @@
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 
+#include <app/clusters/switch-server/switch-server.h>
+
 namespace chip {
 namespace app {
 
@@ -41,113 +43,80 @@ namespace {
 
 void SetButtonPosition(EndpointId endpointId, uint8_t position)
 {
-    Clusters::Switch::Attributes::CurrentPosition::Set(endpointId, position);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    LogErrorOnFailure(switchCluster->SetCurrentPosition(position));
 }
 
 void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)
 {
-    Clusters::Switch::Events::InitialPress::Type event{ newPosition };
-    EventNumber eventNumber = 0;
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
 
-    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to log InitialPress event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Logged InitialPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
-                        static_cast<unsigned>(endpointId));
-    }
+    auto event = switchCluster->OnInitialPress(newPosition);
+    VerifyOrReturn(event.has_value());
+
+    ChipLogProgress(NotSpecified, "Logged InitialPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
+                    static_cast<unsigned>(endpointId));
 }
 
 void EmitLongPress(EndpointId endpointId, uint8_t newPosition)
 {
-    Clusters::Switch::Events::LongPress::Type event{ newPosition };
-    EventNumber eventNumber = 0;
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
 
-    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to log LongPress event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Logged LongPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
-                        static_cast<unsigned>(endpointId));
-    }
+    auto event = switchCluster->OnLongPress(newPosition);
+    VerifyOrReturn(event.has_value());
+
+    ChipLogProgress(NotSpecified, "Logged LongPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
+                    static_cast<unsigned>(endpointId));
 }
 
 void EmitLongRelease(EndpointId endpointId, uint8_t previousPosition)
 {
-    Clusters::Switch::Events::LongRelease::Type event{};
-    event.previousPosition  = previousPosition;
-    EventNumber eventNumber = 0;
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
 
-    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to log LongRelease event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Logged LongRelease on Endpoint %u", static_cast<unsigned>(endpointId));
-    }
+    auto event = switchCluster->OnLongRelease(previousPosition);
+    VerifyOrReturn(event.has_value());
+
+    ChipLogProgress(NotSpecified, "Logged LongRelease on Endpoint %u", static_cast<unsigned>(endpointId));
 }
 
 void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
 {
-    Clusters::Switch::Events::MultiPressComplete::Type event{};
-    event.previousPosition            = previousPosition;
-    event.totalNumberOfPressesCounted = count;
-    EventNumber eventNumber           = 0;
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
 
-    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to log MultiPressComplete event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Logged MultiPressComplete(count=%u) on Endpoint %u", static_cast<unsigned>(count),
-                        static_cast<unsigned>(endpointId));
-    }
+    auto event = switchCluster->OnMultiPressComplete(previousPosition, count);
+    VerifyOrReturn(event.has_value());
+
+    ChipLogProgress(NotSpecified, "Logged MultiPressComplete(count=%u) on Endpoint %u", static_cast<unsigned>(count),
+                    static_cast<unsigned>(endpointId));
 }
 
 void EmitShortRelease(EndpointId endpointId, uint8_t previousPosition)
 {
-    Clusters::Switch::Events::ShortRelease::Type event{};
-    event.previousPosition  = previousPosition;
-    EventNumber eventNumber = 0;
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
 
-    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to log ShortRelease event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Logged ShortRelease on Endpoint %u", static_cast<unsigned>(endpointId));
-    }
+    auto event = switchCluster->OnShortRelease(previousPosition);
+    VerifyOrReturn(event.has_value());
+
+    ChipLogProgress(NotSpecified, "Logged ShortRelease on Endpoint %u", static_cast<unsigned>(endpointId));
 }
 
 void EmitMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count)
 {
-    Clusters::Switch::Events::MultiPressOngoing::Type event{};
-    event.newPosition                   = newPosition;
-    event.currentNumberOfPressesCounted = count;
-    EventNumber eventNumber             = 0;
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
 
-    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to log MultiPressOngoing event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Logged MultiPressOngoing on Endpoint %u position %u, count %u",
-                        static_cast<unsigned>(endpointId), newPosition, count);
-    }
+    auto event = switchCluster->OnMultiPressOngoing(newPosition, count);
+    VerifyOrReturn(event.has_value());
+
+    ChipLogProgress(NotSpecified, "Logged MultiPressOngoing on Endpoint %u position %u, count %u",
+                    static_cast<unsigned>(endpointId), static_cast<unsigned>(newPosition), static_cast<unsigned>(count));
 }
 
 } // namespace

@@ -20,19 +20,24 @@ from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
 
 class Esp32Board(Enum):
     DevKitC = auto()
     M5Stack = auto()
     C3DevKit = auto()
+    P4FunctionEV = auto()
     QEMU = auto()
 
 
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     ENERGY_GATEWAY = auto()
-    ENERGY_MANAGEMENT = auto()
+    EVSE = auto()
+    WATER_HEATER = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
@@ -46,12 +51,16 @@ class Esp32App(Enum):
     def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'examples/all-clusters-app'
+        if self == Esp32App.ALL_DEVICES:
+            return 'examples/all-devices-app'
         if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'examples/all-clusters-minimal-app'
         if self == Esp32App.ENERGY_GATEWAY:
             return 'examples/energy-gateway-app'
-        if self == Esp32App.ENERGY_MANAGEMENT:
-            return 'examples/energy-management-app'
+        if self == Esp32App.EVSE:
+            return 'examples/evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'examples/water-heater-app'
         if self == Esp32App.LIGHT:
             return 'examples/lighting-app'
         if self == Esp32App.LOCK:
@@ -76,10 +85,14 @@ class Esp32App(Enum):
             return 'chip-all-clusters-app'
         if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'chip-all-clusters-minimal-app'
+        if self == Esp32App.ALL_DEVICES:
+            return 'all-devices-app'
         if self == Esp32App.ENERGY_GATEWAY:
             return 'chip-energy-gateway-app'
-        if self == Esp32App.ENERGY_MANAGEMENT:
-            return 'chip-energy-management-app'
+        if self == Esp32App.EVSE:
+            return 'chip-evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'matter-water-heater-app'
         if self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         if self == Esp32App.LOCK:
@@ -98,10 +111,12 @@ class Esp32App(Enum):
             return None
         raise Exception('Unknown app type: %r' % self)
 
-    @property
-    def FlashBundleName(self):
+    def FlashBundleName(self, is_all_devices_selective):
         if not self.AppNamePrefix:
             return None
+
+        if self == Esp32App.ALL_DEVICES and is_all_devices_selective:
+            return 'example-device-app.flashbundle.txt'
 
         return self.AppNamePrefix + '.flashbundle.txt'
 
@@ -110,6 +125,8 @@ class Esp32App(Enum):
             return self == Esp32App.TESTS
         if board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
+        if board == Esp32Board.P4FunctionEV:
+            return self == Esp32App.ALL_CLUSTERS
         return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
@@ -126,7 +143,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
-    if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit:
+    if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit or board == Esp32Board.P4FunctionEV:
         return 'sdkconfig{}.defaults'.format(rpc)
     if board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
@@ -153,6 +170,7 @@ class Esp32Builder(Builder):
                  enable_rpcs: bool = False,
                  enable_ipv4: bool = True,
                  enable_insights_trace: bool = False,
+                 all_devices_enabled_devices=None,
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
@@ -160,6 +178,7 @@ class Esp32Builder(Builder):
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
         self.enable_insights_trace = enable_insights_trace
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
 
         if not app.IsCompatible(board):
             raise Exception(
@@ -175,12 +194,16 @@ class Esp32Builder(Builder):
     def TargetName(self):
         if self.board == Esp32Board.C3DevKit:
             return 'esp32c3'
+        if self.board == Esp32Board.P4FunctionEV:
+            return 'esp32p4'
         return 'esp32'
 
     @property
     def TargetFileName(self) -> Optional[str]:
         if self.board == Esp32Board.C3DevKit:
             return 'sdkconfig.defaults.esp32c3'
+        if self.board == Esp32Board.P4FunctionEV:
+            return 'sdkconfig.defaults.esp32p4'
         return None
 
     @property
@@ -223,13 +246,17 @@ class Esp32Builder(Builder):
 
         # pre-requisite
         self._Execute(
-            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_ENABLE_ESP_INSIGHTS_TRACE=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
 
         cmake_flags = []
 
         if self.options.pregen_dir:
             cmake_flags.append(
                 f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        if self.all_devices_enabled_devices:
+            cmake_flags.append(
+                f"-DALL_DEVICES_ENABLED_DEVICES={shlex.quote(';'.join(self.all_devices_enabled_devices))}")
 
         cmake_args = ['-C', self.ExamplePath, '-B',
                       shlex.quote(self.output_dir)] + cmake_flags
@@ -244,7 +271,7 @@ class Esp32Builder(Builder):
         self._IdfEnvExecute(cmd)
 
     def _build(self):
-        logging.info('Compiling Esp32 at %s', self.output_dir)
+        log.info('Compiling Esp32 at %s', self.output_dir)
 
         # Unfortunately sdkconfig is sticky and needs reset on every build
         self._Execute(
@@ -264,6 +291,13 @@ class Esp32Builder(Builder):
 
         self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
 
+    def _AllDevicesOutputName(self):
+        """Return the binary base name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            # this builder does not support altering the name
+            return 'example-device-app'
+        return 'all-devices-app'
+
     def build_outputs(self):
         if self.app == Esp32App.TESTS:
             # Include the runnable image names as artifacts
@@ -275,13 +309,15 @@ class Esp32Builder(Builder):
         extensions = ["elf"]
         if self.options.enable_link_map_file:
             extensions.append("map")
+        app_name = self._AllDevicesOutputName() if self.app == Esp32App.ALL_DEVICES else self.app.AppNamePrefix
         for ext in extensions:
-            name = f"{self.app.AppNamePrefix}.{ext}"
+            name = f"{app_name}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
     def bundle_outputs(self):
-        if not self.app.FlashBundleName:
+        flash_bundle_name = self.app.FlashBundleName(self.all_devices_enabled_devices)
+        if not flash_bundle_name:
             return
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+        with open(os.path.join(self.output_dir, flash_bundle_name)) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):
                 yield BuilderOutput(os.path.join(self.output_dir, line), line)

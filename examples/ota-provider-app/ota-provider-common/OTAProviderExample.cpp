@@ -49,6 +49,15 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
+namespace {
+OTAProviderExample gOtaProvider;
+}
+
+OTAProviderExample & GetOtaProviderExample()
+{
+    return gOtaProvider;
+}
+
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kOtaHeaderMaxSize   = 1024;
@@ -78,7 +87,6 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 
 OTAProviderExample::OTAProviderExample()
 {
-    memset(mOTAFilePath, 0, sizeof(mOTAFilePath));
     memset(mImageUri, 0, sizeof(mImageUri));
     mIgnoreQueryImageCount     = 0;
     mIgnoreApplyUpdateCount    = 0;
@@ -93,16 +101,30 @@ OTAProviderExample::OTAProviderExample()
     mCandidates.clear();
 }
 
+// Called when a single OTA image file is provided directly (not via candidates/image list)
 void OTAProviderExample::SetOTAFilePath(const char * path)
 {
     if (path != nullptr)
     {
-        chip::Platform::CopyString(mOTAFilePath, path);
+        mFileDesignatorMap.clear();
+        mSelectedFileDesignator = MapFileToDesignator(path);
+        // BdxOtaSender needs its own copy to resolve designators during transfer
+        mBdxOtaSender.SetFileDesignatorMap(mFileDesignatorMap);
     }
     else
     {
-        memset(mOTAFilePath, 0, sizeof(mOTAFilePath));
+        mFileDesignatorMap.clear();
+        mSelectedFileDesignator.clear();
+        // Keep BdxOtaSender's internal map in sync when clearing the path
+        mBdxOtaSender.SetFileDesignatorMap(mFileDesignatorMap);
     }
+}
+
+std::string OTAProviderExample::MapFileToDesignator(const std::string & newFilePath)
+{
+    std::string designator         = std::to_string(mFileDesignatorMap.size());
+    mFileDesignatorMap[designator] = newFilePath;
+    return designator;
 }
 
 void OTAProviderExample::SetImageUri(const char * imageUri)
@@ -110,19 +132,21 @@ void OTAProviderExample::SetImageUri(const char * imageUri)
     if (imageUri != nullptr)
     {
         chip::Platform::CopyString(mImageUri, imageUri);
+        mImageUriIsSupplied = true;
     }
     else
     {
         memset(mImageUri, 0, sizeof(mImageUri));
+        mImageUriIsSupplied = false;
     }
 }
 
 void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates)
 {
     mCandidates = std::move(candidates);
-
+    mFileDesignatorMap.clear();
     // Validate that each candidate matches the info in the image header
-    for (auto candidate : mCandidates)
+    for (auto & candidate : mCandidates)
     {
         OTAImageHeaderParser parser;
         OTAImageHeader header;
@@ -144,7 +168,11 @@ void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::Device
             VerifyOrDie(candidate.maxApplicableSoftwareVersion == header.mMaxApplicableVersion.Value());
         }
         parser.Clear();
+
+        // Generate a file designator for this candidate's OTA file
+        candidate.otaFileDesignator = MapFileToDesignator(candidate.otaURL);
     }
+    mBdxOtaSender.SetFileDesignatorMap(mFileDesignatorMap);
 }
 
 static bool CompareSoftwareVersions(const OTAProviderExample::DeviceSoftwareVersionModel & a,
@@ -159,7 +187,7 @@ bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, co
 {
     bool candidateFound = false;
     std::sort(mCandidates.begin(), mCandidates.end(), CompareSoftwareVersions);
-    for (auto candidate : mCandidates)
+    for (const auto & candidate : mCandidates)
     {
         // VendorID and ProductID will be the primary key when querying
         // the DCL servers. If not we can add the vendor/product ID checks here.
@@ -198,7 +226,7 @@ bool OTAProviderExample::ParseOTAHeader(OTAImageHeaderParser & parser, const cha
     uint8_t otaFileContent[kOtaHeaderMaxSize];
     ByteSpan buffer(otaFileContent);
 
-    std::ifstream otaFile(otaFilePath, std::ifstream::in);
+    std::ifstream otaFile(otaFilePath, std::ifstream::in | std::ios::binary);
     if (!otaFile.is_open() || !otaFile.good())
     {
         ChipLogError(SoftwareUpdate, "Error opening OTA image file: %s", otaFilePath);
@@ -255,8 +283,18 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         if (strlen(mImageUri) == 0)
         {
             // Only supporting BDX protocol for now
+
+            // Validate the selected file designator before building the URI
+            if (mFileDesignatorMap.find(mSelectedFileDesignator) == mFileDesignatorMap.cend())
+            {
+                ChipLogError(SoftwareUpdate, "Invalid file designator: %s", mSelectedFileDesignator.c_str());
+                commandObj->AddStatus(commandPath, Status::Failure);
+                return;
+            }
+
+            chip::CharSpan fileDesignatorSpan = chip::CharSpan::fromCharString(mSelectedFileDesignator.c_str());
             MutableCharSpan uri(mImageUri);
-            CHIP_ERROR error = chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
+            CHIP_ERROR error = chip::bdx::MakeURI(nodeId, fileDesignatorSpan, uri);
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Cannot generate URI");
@@ -322,10 +360,44 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     commandObj->AddResponse(commandPath, response);
 }
 
+void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & commandData)
+{
+    mVendorId                 = commandData.vendorID;
+    mProductId                = commandData.productID;
+    mHardwareVersion          = commandData.hardwareVersion.ValueOr(0);
+    mRequestorSoftwareVersion = commandData.softwareVersion;
+    mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
+
+    chip::CharSpan loc = commandData.location.Value();
+    if (loc.size() >= sizeof(mLocation))
+    {
+        ChipLogError(AppServer, "Location too long (%u)", static_cast<unsigned>(loc.size()));
+        return;
+    }
+
+    Platform::CopyString(mLocation, sizeof(mLocation), commandData.location.Value());
+
+    size_t i  = 0;
+    auto iter = commandData.protocolsSupported.begin();
+    while (iter.Next())
+    {
+        if (i >= MATTER_ARRAY_SIZE(mProtocolsSupported))
+        {
+            ChipLogError(AppServer, "protocolsSupported overflow: received more than %u entries, truncating",
+                         static_cast<unsigned>(MATTER_ARRAY_SIZE(mProtocolsSupported)));
+            break;
+        }
+        mProtocolsSupported[i++] = iter.GetValue();
+    }
+    kProtocolsSupportedCount = i;
+}
+
 void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const QueryImage::DecodableType & commandData)
 {
     bool requestorCanConsent = commandData.requestorCanConsent.ValueOr(false);
+
+    SaveCommandSnapshot(commandData);
 
     if (mIgnoreQueryImageCount > 0)
     {
@@ -348,19 +420,36 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
                 // This assumes all candidates have passed verification so the values are safe to use
                 mSoftwareVersion = candidate.softwareVersion;
                 memcpy(mSoftwareVersionString, candidate.softwareVersionString, strlen(candidate.softwareVersionString));
-                SetOTAFilePath(candidate.otaURL);
+                mSelectedFileDesignator = candidate.otaFileDesignator;
+            }
+            else
+            {
+                // None of the candidates matched
+                mQueryImageStatus = OTAQueryStatus::kNotAvailable;
+                mSelectedFileDesignator.clear();
             }
         }
-        else if (strlen(mOTAFilePath) > 0) // If OTA file is directly provided
+        else if (mFileDesignatorMap.size() == 1) // If OTA file is directly provided
         {
             // Parse the header and set version info based on the header
             OTAImageHeaderParser parser;
             OTAImageHeader header;
-            VerifyOrDie(ParseOTAHeader(parser, mOTAFilePath, header) == true);
+            auto entry = mFileDesignatorMap.begin();
+            VerifyOrDie(ParseOTAHeader(parser, entry->second.c_str(), header) == true);
             VerifyOrDie(sizeof(mSoftwareVersionString) > header.mSoftwareVersionString.size());
             mSoftwareVersion = header.mSoftwareVersion;
             memcpy(mSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
             parser.Clear();
+
+            // Select the only available file path
+            mSelectedFileDesignator = entry->first;
+        }
+
+        // Reset the ImageURI if it is not supplied by the user since it may contain file designators that are not relevant for
+        // every ImageQuery
+        if (!mImageUriIsSupplied)
+        {
+            memset(mImageUri, 0, sizeof(mImageUri));
         }
 
         // If mUserConsentNeeded (set by the CLI) is true and requestor is capable of taking user consent
@@ -438,4 +527,14 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
 
     commandObj->AddStatus(commandPath, Status::Success);
+}
+
+const char * OTAProviderExample::GetFilePathForDesignator(const char * designator) const
+{
+    const auto it = mFileDesignatorMap.find(designator);
+    if (it == mFileDesignatorMap.cend())
+    {
+        return nullptr;
+    }
+    return it->second.c_str();
 }

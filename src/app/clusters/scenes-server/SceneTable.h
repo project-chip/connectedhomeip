@@ -28,11 +28,15 @@
 namespace chip {
 namespace scenes {
 
-// Storage index for scenes in nvm
-typedef app::Storage::Data::EntryIndex SceneIndex;
+static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
+static_assert(kMaxScenesPerEndpoint >= 16, "Per spec, kMaxScenesPerEndpoint must be at least 16");
 
-typedef uint32_t TransitionTimeMs;
-typedef uint32_t SceneTransitionTime;
+static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
+
+// Storage index for scenes in nvm
+using SceneIndex          = app::Storage::Data::EntryIndex;
+using TransitionTimeMs    = uint32_t;
+using SceneTransitionTime = uint32_t;
 
 inline constexpr GroupId kGlobalGroupSceneId = 0x0000;
 inline constexpr SceneId kUndefinedSceneId   = 0xff;
@@ -226,6 +230,9 @@ public:
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel) = 0;
     virtual void Finish()                                                                              = 0;
+
+    // Table size
+    virtual uint16_t GetTableSize() const = 0;
 
     // Global scene count
     virtual CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count)                         = 0;

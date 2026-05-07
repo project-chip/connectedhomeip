@@ -73,7 +73,7 @@ void FailSafeContext::FailSafeTimerExpired()
     }
 
     ChipLogProgress(FailSafe, "Fail-safe timer expired");
-    ScheduleFailSafeCleanup(mFabricIndex, mAddNocCommandHasBeenInvoked, mUpdateNocCommandHasBeenInvoked);
+    ScheduleFailSafeCleanup(mFabricIndex, AddNocCommandHasBeenInvoked(), UpdateNocCommandHasBeenInvoked());
 }
 
 void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked)
@@ -90,8 +90,8 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
                                .fabricIndex                               = fabricIndex,
                                .addNocCommandHasBeenInvoked               = addNocCommandInvoked,
                                .updateNocCommandHasBeenInvoked            = updateNocCommandInvoked,
-                               .updateTermsAndConditionsHasBeenInvoked    = mUpdateTermsAndConditionsHasBeenInvoked,
-                               .setVidVerificationStatementHasBeenInvoked = mSetVidVerificationStatementHasBeenInvoked,
+                               .updateTermsAndConditionsHasBeenInvoked    = UpdateTermsAndConditionsHasBeenInvoked(),
+                               .setVidVerificationStatementHasBeenInvoked = HasSetVidVerificationStatementHasBeenInvoked(),
                            } };
     CHIP_ERROR status = PlatformMgr().PostEvent(&event);
 

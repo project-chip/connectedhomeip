@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ static_library("nrfconnect") {
     "DiagnosticDataProviderImplNrf.cpp",
     "DiagnosticDataProviderImplNrf.h",
     "ExternalFlashManager.h",
+    "FactoryDataProviderBase.h",
     "FactoryResetTestEventTriggerHandler.cpp",
     "FactoryResetTestEventTriggerHandler.h",
     "InetPlatformConfig.h",
@@ -85,14 +86,14 @@ static_library("nrfconnect") {
     ]
   }
 
-  if (chip_enable_openthread || chip_enable_wifi) {
+  if (chip_enable_thread || chip_enable_wifi) {
     sources += [
       "../Zephyr/InetUtils.cpp",
       "../Zephyr/InetUtils.h",
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
       "../Zephyr/ThreadStackManagerImpl.cpp",
@@ -134,6 +135,7 @@ static_library("nrfconnect") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_malloc_sys_heap) {
@@ -141,7 +143,10 @@ static_library("nrfconnect") {
   }
 
   if (chip_use_cracen_kmu) {
-    sources += [ "KMUKeyAllocator.h" ]
+    sources += [
+      "KMUKeyAllocator.h",
+      "KMUSessionKeystore.h",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

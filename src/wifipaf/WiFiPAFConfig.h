@@ -97,9 +97,19 @@
 #define PAF_MAX_RECEIVE_WINDOW_SIZE 6
 #endif
 
-#if (PAF_MAX_RECEIVE_WINDOW_SIZE < 3)
-#error "PAF_MAX_RECEIVE_WINDOW_SIZE must be greater than 2 for PAF transport protocol stability."
+/**
+ * Minimum receive window for stability requirement
+ * The protocol in specification allows a minimum receive window of 2, since a peer must stop
+ * sending when the remote window has only one open slot left. To reduce the frequency of
+ * exception-handling cases, we raise the minimum to 3.
+ */
+#ifndef PAF_MIN_RECEIVE_WINDOW_SIZE
+#define PAF_MIN_RECEIVE_WINDOW_SIZE 3
 #endif
+
+static_assert(
+    PAF_MAX_RECEIVE_WINDOW_SIZE >= PAF_MIN_RECEIVE_WINDOW_SIZE,
+    "PAF_MAX_RECEIVE_WINDOW_SIZE must not be smaller than PAF_MIN_RECEIVE_WINDOW_SIZE for PAF transport protocol stability.");
 
 /**
  * @def PAFTP_CONN_RSP_TIMEOUT_MS

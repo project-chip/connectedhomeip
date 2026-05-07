@@ -31,7 +31,6 @@ Matter example applications are supported on the following NXP platforms :
 | RW61x        | [Matter NXP Guide for RW61x platform](./nxp_rw61x_guide.md)   |
 | RT1170       | [Matter NXP Guide for RT1170 platform](./nxp_rt1170_guide.md) |
 | RT1060       | [Matter NXP Guide for RT1060 platform](./nxp_rt1060_guide.md) |
-| MCXW71       | [Matter NXP Guide for MCXW71 platform](./nxp_mcxw71_guide.md) |
 | MCXW72       | [Matter NXP Guide for MCXW72 platform](./nxp_mcxw72_guide.md) |
 
 <a name="building"></a>
@@ -215,8 +214,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d <build_directory> -b <b
 
 It is also supported to provide Kconfig symbols in the build command line with
 `-DCONFIG_<symbol>=<value>`. For example, adding to the build command line
-`-DCONFIG_CHIP_DEVICE_DISCRIMINATOR=3841` will set the discriminator Kconfig
-`CONFIG_CHIP_DEVICE_DISCRIMINATOR` to `3841`.
+`-DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF01` will set the discriminator Kconfig
+`CONFIG_CHIP_DEVICE_DISCRIMINATOR` to `0xF01` (3841 in decimal).
 
 ###### CMake Build with Secure Element
 
@@ -253,7 +252,7 @@ _gn gen_ command when building an application.
 | GN argument                                                                               | Description                                                                                                                                                                                                                                                                                                                                              |
 | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `chip_enable_wifi=true`                                                                   | Enable Wi-Fi in the application.                                                                                                                                                                                                                                                                                                                         |
-| `chip_enable_openthread=true`                                                             | Enable OpenThread in the application.                                                                                                                                                                                                                                                                                                                    |
+| `chip_enable_thread=true`                                                                 | Enable Thread in the application.                                                                                                                                                                                                                                                                                                                        |
 | `chip_enable_ble=false`                                                                   | This argument is used to disable BLE in the application. Note that BLE is enabled by default.                                                                                                                                                                                                                                                            |
 | `chip_enable_secondary_nwk_if=true` and `chip_device_config_thread_network_endpoint_id=2` | These arguments can be added to enable the [secondary network commissioning interface](./nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface). Note that this is only supported when building the Matter over Wifi + OpenThread Border Router configuration. Note that is only supported on the on the thermostat application for now. |
 | `nxp_enable_matter_cli=true`                                                              | This argument enables the [Matter-CLI](./nxp_examples_freertos_platforms.md#testing-the-example-application-with-matter-cli-enabled).                                                                                                                                                                                                                    |

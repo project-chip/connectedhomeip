@@ -20,6 +20,7 @@
     <string name="camera_unavailable_alert_subtitle">Error launching camera to scan the QR code.</string>
     <string name="camera_unavailable_alert_exit">Exit</string>
     <string name="input_address_btn_text">Input device address</string>
+    <string name="enable_lit_commissioning_text">Enable LIT Commissioning</string>
 
     <string name="scan_qr_code_btn_text">Scan QR Code</string>
     <string name="provision_wifi_credentials_btn_text">Provision CHIP device with Wi-Fi</string>

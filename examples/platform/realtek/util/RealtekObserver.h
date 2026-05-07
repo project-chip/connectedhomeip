@@ -31,7 +31,7 @@ public:
         ChipLogProgress(DeviceLayer, "Realtek Observer: Fabric 0x%x has been Removed", fabricIndex);
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            (void) chip::DeviceLayer::PlatformMgr().ScheduleWork(
                 [](intptr_t) { chip::DeviceLayer::ConfigurationMgr().InitiateFactoryReset(); });
         }
     }

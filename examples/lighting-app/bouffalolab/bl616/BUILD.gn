@@ -54,6 +54,10 @@ declare_args() {
   board = "BL616DK"
   module_type = "BL616"
   baudrate = 2000000
+
+  app_ver_x = 2
+  app_ver_y = 1
+  app_ver_z = 0
 }
 
 bouffalo_sdk("sdk") {
@@ -72,7 +76,17 @@ bouffalo_sdk("sdk") {
     "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_seconds}",
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "CHIP_UART_BAUDRATE=${baudrate}",
+    "APP_VER_X=${app_ver_x}",
+    "APP_VER_Y=${app_ver_y}",
+    "APP_VER_Z=${app_ver_z}",
   ]
+
+  if (chip_enable_ethernet) {
+    include_dirs += [ "${example_dir}/bl616/ethernet" ]
+  } else if (chip_enable_wifi) {
+    include_dirs += [ "${example_dir}/bl616/wifi" ]
+  }
+  defines += [ "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}" ]
 
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
   if (chip_enable_pw_rpc) {
@@ -89,7 +103,7 @@ bouffalo_sdk("sdk") {
 }
 
 chip_data_model("bouffalolab-lighting") {
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
   } else if (chip_enable_wifi) {
     zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
@@ -121,12 +135,7 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BOOT_PIN_RESET=2" ]
   }
 
-  if (enable_lwip_pbuf_ram) {
-    defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
-  }
-
   defines += [ "BL616DK" ]
-
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${example_dir}/common/AppTask.cpp",
@@ -173,7 +182,7 @@ bouffalolab_executable("lighting_app") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     import("//build_overrides/openthread.gni")
 
     deps += [
@@ -235,7 +244,7 @@ bouffalolab_executable("lighting_app") {
       "${examples_plat_dir}/common/rpc/pw_sys_io:pw_sys_io",
     ]
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       deps += [
         "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
         "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",

@@ -5,5 +5,4 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-// Nothing here for now, but leaving this file in place in case we need to add
-// something.
+{{> placeholder_comment}}

@@ -46,7 +46,7 @@ CHIP_ERROR OccupancySensorDevice::Register(chip::EndpointId endpoint, CodeDriven
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void OccupancySensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void OccupancySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
     if (mOccupancySensingCluster.IsConstructed())

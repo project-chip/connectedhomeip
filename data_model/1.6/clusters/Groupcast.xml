@@ -1,0 +1,385 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0065" name="Groupcast Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial release, replacing functionality previously in Groups and Group Key Management clusters and addressing issues with application of those clusters (TCR 11433)"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0065" name="Groupcast">
+      <provisionalConform/>
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="GC" scope="Node"/>
+  <features>
+    <feature bit="0" code="LN" name="Listener" summary="Supports joining a multicast group of nodes as a listener.">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="SD" name="Sender" summary="Supports sending multicast message to a targeted group of nodes.">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="PGA" name="PerGroup" summary="Supports PerGroup multicast addresses.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="GroupcastTestResultEnum">
+      <item value="0" name="Success" summary="There was no failure">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="GeneralError" summary="Other error during processing not otherwise covered">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="MessageReplay" summary="Message counter was &lt;= counter from last received">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="FailedAuth" summary="Message authentication failed">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="NoAvailableKey" summary="No key was found to process the message">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="SendFailure" summary="Issue with attempting to send a multicast IPv6 message">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="GroupcastTestingEnum">
+      <item value="0" name="DisableTesting" summary="Disable all test event generation">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="EnableListenerTesting" summary="Enable Listener test event generation">
+        <mandatoryConform>
+          <feature name="LN"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="EnableSenderTesting" summary="Enable Sender test event generation">
+        <mandatoryConform>
+          <feature name="SD"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="MulticastAddrPolicyEnum">
+      <item value="0" name="IanaAddr" summary="Indicates group uses the IANA-assigned multicast address (default)">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="PerGroup" summary="Group uses multicast address scoped to Fabric ID and Group ID">
+        <mandatoryConform>
+          <feature name="PGA"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <struct name="MembershipStruct">
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="Endpoints" type="list">
+        <entry type="endpoint-no"/>
+        <mandatoryConform>
+          <feature name="LN"/>
+        </mandatoryConform>
+        <constraint>
+          <maxCount value="255"/>
+        </constraint>
+      </field>
+      <field id="2" name="KeySetID" type="uint16">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="HasAuxiliaryACL" type="bool">
+        <mandatoryConform>
+          <feature name="LN"/>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="McastAddrPolicy" type="MulticastAddrPolicyEnum" default="0">
+        <mandatoryConform/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="Membership" type="list">
+      <entry type="MembershipStruct"/>
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="MaxMembershipCount" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <constraint>
+        <min value="10"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="MaxMcastAddrCount" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="UsedMcastAddrCount" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0004" name="FabricUnderTest" type="fabric-idx">
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="JoinGroup" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="Endpoints" type="list">
+        <entry type="endpoint-no"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="KeySetID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Key" type="octstr">
+        <optionalConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="4" name="UseAuxiliaryACL" type="bool">
+        <optionalConform>
+          <feature name="LN"/>
+        </optionalConform>
+      </field>
+      <field id="5" name="ReplaceEndpoints" type="bool">
+        <optionalConform>
+          <feature name="LN"/>
+        </optionalConform>
+      </field>
+      <field id="6" name="McastAddrPolicy" type="MulticastAddrPolicyEnum">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x01" name="LeaveGroup" direction="commandToServer" response="LeaveGroupResponse">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Endpoints" type="list">
+        <entry type="endpoint-no"/>
+        <optionalConform/>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="20"/>
+          </countBetween>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="LeaveGroupResponse" direction="responseFromServer">
+      <access fabricScoped="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Endpoints" type="list">
+        <entry type="endpoint-no"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="20"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="UpdateGroupKey" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="KeySetID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Key" type="octstr">
+        <optionalConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="ConfigureAuxiliaryACL" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="LN"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="UseAuxiliaryACL" type="bool">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x05" name="GroupcastTesting" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="TestOperation" type="GroupcastTestingEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DurationSeconds" type="uint16" default="60">
+        <optionalConform/>
+        <constraint>
+          <between>
+            <from value="10"/>
+            <to value="1200"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="GroupcastTesting" priority="info">
+      <access readPrivilege="admin" fabricSensitive="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="SourceIpAddress" type="ipv6adr">
+        <optionalConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="1" name="DestinationIpAddress" type="ipv6adr">
+        <optionalConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="2" name="GroupID" type="group-id">
+        <optionalConform/>
+      </field>
+      <field id="3" name="EndpointID" type="endpoint-id">
+        <optionalConform/>
+      </field>
+      <field id="4" name="ClusterID" type="cluster-id">
+        <optionalConform/>
+      </field>
+      <field id="5" name="ElementID" type="uint32">
+        <optionalConform/>
+      </field>
+      <field id="6" name="AccessAllowed" type="bool">
+        <optionalConform/>
+      </field>
+      <field id="7" name="GroupcastTestResult" type="GroupcastTestResultEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

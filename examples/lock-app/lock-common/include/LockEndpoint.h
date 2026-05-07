@@ -62,8 +62,9 @@ public:
         }
         DoorLockServer::Instance().SetDoorState(endpointId, mDoorState);
         DoorLockServer::Instance().SetLockState(endpointId, mLockState);
-        TEMPORARY_RETURN_IGNORED chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier,
-                                                              sizeof(mAliroReaderGroupSubIdentifier));
+        VerifyOrDieWithMsg(chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier)) ==
+                               CHIP_NO_ERROR,
+                           NotSpecified, "Failed to generate Aliro reader group sub-identifier");
     }
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
