@@ -824,11 +824,10 @@ SequenceNumber_t WiFiPAFEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t las
 
 CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader & reader, uint8_t * pHead, SequenceNumber_t & seqNum)
 {
-    CHIP_ERROR err;
     BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
     size_t SnOffset = 0;
     SequenceNumber_t * pSn;
-    err = reader.Read8(rx_flags.RawStorage()).StatusCode();
+    ReturnErrorOnFailure(reader.Read8(rx_flags.RawStorage()).StatusCode());
     if (rx_flags.Has(WiFiPAFTP::HeaderFlags::kHankshake))
     {
         // Handkshake message => No ack/sn
@@ -844,6 +843,7 @@ CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader & reader, ui
     {
         SnOffset += kTransferProtocolAckSize;
     }
+    VerifyOrReturnError(SnOffset + sizeof(seqNum) <= reader.OctetsRead() + reader.Remaining(), CHIP_ERROR_MESSAGE_INCOMPLETE);
     pSn    = pHead + SnOffset;
     seqNum = *pSn;
 
@@ -878,6 +878,7 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, Encoding:
         pAct = pHead + kTransferProtocolHeaderFlagsSize;
         SnOffset += kTransferProtocolAckSize;
     }
+    VerifyOrExit(SnOffset + sizeof(*pSn) <= reader.OctetsRead() + reader.Remaining(), err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     pSn = pHead + SnOffset;
     if (pAct == nullptr)
     {
