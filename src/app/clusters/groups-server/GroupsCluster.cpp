@@ -15,6 +15,7 @@
  */
 #include <app/clusters/groups-server/GroupsCluster.h>
 
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/scenes-server/Constants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/GroupKeyManagement/Ids.h>
@@ -45,15 +46,18 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip::app::Clusters {
 namespace {
 
-constexpr AttributePathParams kGroupKeyGroupTableAttributePath{ kRootEndpointId, GroupKeyManagement::Id,
-                                                                GroupKeyManagement::Attributes::GroupTable::Id };
+[[maybe_unused]] constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast = 4;
 
 void NotifyGroupTableChanged(ServerClusterContext * context)
 {
     // TODO: This seems a bit coupled: we are notifying in this cluster that ANOTHER cluster
     //       has changed. We should support only one cluster or another really...
     VerifyOrReturn(context != nullptr);
-    context->interactionContext.dataModelChangeListener.MarkDirty(kGroupKeyGroupTableAttributePath);
+
+    const ConcreteAttributePath kGroupKeyGroupTableAttributePath{ kRootEndpointId, GroupKeyManagement::Id,
+                                                                  GroupKeyManagement::Attributes::GroupTable::Id };
+
+    context->provider.NotifyAttributeChanged(kGroupKeyGroupTableAttributePath, DataModel::AttributeChangeType::kReportable);
 }
 
 class AutoReleaseIterator
@@ -213,7 +217,7 @@ DataModel::ActionReturnStatus GroupsCluster::ReadAttribute(const DataModel::Read
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
-        return encoder.Encode(kRevision);
+        return encoder.Encode(mGroupDataProvider.IsGroupcastEnabled() ? kRevision : kGroupsClusterRevisionBeforeGroupcast);
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);

@@ -156,7 +156,8 @@ class IMXBuilder(GnBuilder):
                 except NameError:
                     raise Exception('ARCH and/or CROSS_COMPILE are not found in the SDK environment setup script.')
 
-        args = [
+        args = super().GnBuildArgs()
+        args.extend([
             'treat_warnings_as_errors=false',
             'target_os="linux"',
             'target_cpu="%s"' % target_cpu,
@@ -171,7 +172,7 @@ class IMXBuilder(GnBuilder):
                                                                              cxx),
             'target_ar="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s-ar"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
                                                                                cross_compile),
-        ]
+        ])
 
         if self.release:
             args.append('is_debug=false')

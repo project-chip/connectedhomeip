@@ -75,8 +75,7 @@
         "Test_TC_LVL_4_1",
         "Test_TC_LVL_5_1",
         "Test_TC_LVL_6_1",
-        "Test_TC_LVL_7_1",
-        "Test_TC_LVL_9_1"
+        "Test_TC_LVL_7_1"
     ],
     "LocalizationConfiguration": [],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
@@ -139,8 +138,7 @@
         "Test_TC_OO_2_1",
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4",
-        "Test_TC_OO_2_6",
-        "Test_TC_OO_2_7"
+        "Test_TC_OO_2_6"
     ],
     "PowerSource": ["Test_TC_PS_2_1"],
     "PowerTopology": ["Test_TC_PWRTL_1_1"],

@@ -47,16 +47,15 @@ private:
     };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[4] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Manual"),
-                                                 .mode     = kModeManual,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsManual) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Auto-scheduled"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Manual"_span, .mode = kModeManual, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsManual) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Auto-scheduled"_span,
                                                  .mode     = kModeTimeOfUse,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUse) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Solar"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Solar"_span,
                                                  .mode     = kModeSolarCharging,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsSolarCharging) },
-        detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Auto-scheduled with Solar charging"),
+        detail::Structs::ModeOptionStruct::Type{ .label = "Auto-scheduled with Solar charging"_span,
                                                  .mode  = kModeTimeOfUseAndSolarCharging,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUseAndSolarCharging) },

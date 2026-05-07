@@ -29,6 +29,70 @@ using namespace chip::DeviceLayer::Internal;
 namespace {
 static constexpr uint32_t kDACPrivateKeySize = 32;
 static constexpr uint32_t kDACPublicKeySize  = 65;
+
+/**
+ * @brief Get the manufacturing date or suffix from the ESP32 config.
+ *
+ * @Note: The manufacturing date is stored in the format YYYY-MM-DD<vendor info> or YYYYMMDD<vendor info>.
+ * To retrieve only the manufacturing date, pass nullptr for vendorSuffixSpan.
+ * To retrieve only the vendor suffix, pass a non-empty MutableCharSpan for vendorSuffixSpan and nullptr for year, month, and day.
+ * @param year The year to store the manufacturing date.
+ * @param month The month to store the manufacturing date.
+ * @param day The day to store the manufacturing date.
+ * @param vendorSuffixSpan The vendor suffix to store the manufacturing date. @Note: It not guaranteed to be null terminated and
+ * should be treated as a raw string.
+ * @return CHIP_ERROR indicating the success or failure of the operation.
+ */
+inline CHIP_ERROR GetManufacturingDateOrSuffix(uint16_t * year, uint8_t * month, uint8_t * day, MutableCharSpan * vendorSuffixSpan)
+{
+    constexpr size_t kMaxManufacturingDateLength  = 18; // (10 + 8) for YYYY-MM-DD<vendor info> or (8 + 8) for YYYYMMDD<vendor info>
+    constexpr size_t kMaxDateLength               = 8;  // YYYYMMDD
+    char dateStr[kMaxManufacturingDateLength + 1] = {};
+    size_t readDateLen                            = kMaxManufacturingDateLength;
+    ReturnErrorOnFailure(
+        ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), readDateLen));
+    VerifyOrReturnError(readDateLen >= kMaxDateLength && readDateLen <= kMaxManufacturingDateLength, CHIP_ERROR_INTERNAL);
+    size_t index = 4;
+    if (dateStr[index] == '-')
+        index++;
+    size_t monthIdx = index;
+    index += 2;
+    if (dateStr[index] == '-')
+        index++;
+    size_t dayIdx = index;
+    index += 2;
+
+    if (year && month && day)
+    {
+        char buf[5];
+        memcpy(buf, dateStr, 4);
+        buf[4] = '\0';
+        *year  = static_cast<uint16_t>(strtoul(buf, nullptr, 10));
+        memcpy(buf, dateStr + monthIdx, 2);
+        buf[2] = '\0';
+        *month = static_cast<uint8_t>(strtoul(buf, nullptr, 10));
+        memcpy(buf, dateStr + dayIdx, 2);
+        buf[2] = '\0';
+        *day   = static_cast<uint8_t>(strtoul(buf, nullptr, 10));
+    }
+
+    if (vendorSuffixSpan)
+    {
+        size_t suffixLen = readDateLen - index;
+        if (suffixLen > 0)
+        {
+            VerifyOrReturnError(suffixLen <= vendorSuffixSpan->size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+            vendorSuffixSpan->reduce_size(suffixLen);
+            memcpy(vendorSuffixSpan->data(), dateStr + index, suffixLen);
+        }
+        else
+        {
+            vendorSuffixSpan->reduce_size(0);
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 CHIP_ERROR ESP32FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
@@ -234,7 +298,12 @@ CHIP_ERROR ESP32FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 
 CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
+    return GetManufacturingDateOrSuffix(&year, &month, &day, nullptr);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDateSuffix(MutableCharSpan & vendorInfoSpan)
+{
+    return GetManufacturingDateOrSuffix(nullptr, nullptr, nullptr, &vendorInfoSpan);
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)

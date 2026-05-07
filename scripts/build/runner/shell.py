@@ -19,6 +19,15 @@ import threading
 
 from .command_dedup import CommandDedup
 
+log = logging.getLogger(__name__)
+
+
+class SubcommandException(Exception):
+    def __init__(self, command, returncode) -> None:
+        self.command = command
+        self.returncode = returncode
+        super().__init__('Command %r failed: %d' % (command, returncode))
+
 
 class LogPipe(threading.Thread):
 
@@ -41,7 +50,7 @@ class LogPipe(threading.Thread):
     def run(self):
         """Run the thread, logging everything."""
         for line in iter(self.pipeReader.readline, ''):
-            logging.log(self.level, line.strip('\n'))
+            log.log(self.level, line.strip('\n'))
 
         self.pipeReader.close()
 
@@ -60,13 +69,14 @@ class ShellRunner:
     def StartCommandExecution(self):
         pass
 
-    def Run(self, cmd, title=None, dedup=False):
+    def Run(self, cmd, title=None, dedup=False, quiet=False):
 
-        if title:
-            logging.info(title)
+        if title and not quiet:
+            log.info(title)
 
-        if dedup & self.deduplicator.is_duplicate(cmd):
-            logging.info("Skipping duplicate command...")
+        if dedup and self.deduplicator.is_duplicate(cmd):
+            if not quiet:
+                log.info("Skipping duplicate command...")
             return
 
         outpipe = LogPipe(logging.INFO)
@@ -78,5 +88,6 @@ class ShellRunner:
             errpipe.close()
             code = s.wait()
             if code != 0:
-                raise Exception('Command %r failed: %d' % (cmd, code))
-            logging.info('Command %r completed', cmd)
+                raise SubcommandException(cmd, code)
+            if not quiet:
+                log.info('Command %r completed', cmd)

@@ -1012,14 +1012,18 @@ JointFabricDatastore::UpdateGroupKeySetEntry(
 
 CHIP_ERROR
 JointFabricDatastore::AddAdmin(
-    Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & adminId)
+    const Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & adminId)
 {
     VerifyOrReturnError(IsAdminEntryPresent(adminId.nodeID) == false, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mAdminEntries.size() < kMaxAdminNodes, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(SetAdminEntryWithOwnedStorage(adminId.nodeID, adminId.friendlyName, adminId.icac, adminId));
+    Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type entryToStore;
+    entryToStore.nodeID   = adminId.nodeID;
+    entryToStore.vendorID = adminId.vendorID;
 
-    mAdminEntries.push_back(adminId);
+    ReturnErrorOnFailure(SetAdminEntryWithOwnedStorage(adminId.nodeID, adminId.friendlyName, adminId.icac, entryToStore));
+
+    mAdminEntries.push_back(entryToStore);
 
     return CHIP_NO_ERROR;
 }
@@ -1261,14 +1265,16 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
         }
         mGroupInformationEntries[index].groupCATVersion = commandData.groupCATVersion;
     }
-    if (commandData.groupPermission != Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kUnknownEnumValue)
+    if (commandData.groupPermission.IsNull() == false &&
+        commandData.groupPermission.Value() !=
+            Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kUnknownEnumValue)
     {
-        if (mGroupInformationEntries[index].groupPermission != commandData.groupPermission)
+        if (mGroupInformationEntries[index].groupPermission != commandData.groupPermission.Value())
         {
             anyGroupCATFieldUpdated = true;
         }
         // If the groupPermission is not set to kUnknownEnumValue, update it
-        mGroupInformationEntries[index].groupPermission = commandData.groupPermission;
+        mGroupInformationEntries[index].groupPermission = commandData.groupPermission.Value();
     }
 
     if (anyGroupCATFieldUpdated)

@@ -22,34 +22,34 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AmbientContextSensingClusterAmbientContextDetectEndedEvent(val startEventNumber: ULong) {
+class AmbientContextSensingClusterAmbientContextDetectEndedEvent(val eventStartTime: ULong) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextDetectEndedEvent {\n")
-    append("\tstartEventNumber : $startEventNumber\n")
+    append("\teventStartTime : $eventStartTime\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_START_EVENT_NUMBER), startEventNumber)
+      put(ContextSpecificTag(TAG_EVENT_START_TIME), eventStartTime)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_START_EVENT_NUMBER = 0
+    private const val TAG_EVENT_START_TIME = 0
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader,
     ): AmbientContextSensingClusterAmbientContextDetectEndedEvent {
       tlvReader.enterStructure(tlvTag)
-      val startEventNumber = tlvReader.getULong(ContextSpecificTag(TAG_START_EVENT_NUMBER))
+      val eventStartTime = tlvReader.getULong(ContextSpecificTag(TAG_EVENT_START_TIME))
 
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterAmbientContextDetectEndedEvent(startEventNumber)
+      return AmbientContextSensingClusterAmbientContextDetectEndedEvent(eventStartTime)
     }
   }
 }

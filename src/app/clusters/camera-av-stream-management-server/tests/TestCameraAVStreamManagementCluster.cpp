@@ -1580,4 +1580,152 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand_NoStreamA
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
+TEST_F(TestCameraAVStreamManagementCluster, TestUpdateVideoStreamRefCount)
+{
+    using AllocateRequest  = Commands::VideoStreamAllocate::Type;
+    using AllocateResponse = Commands::VideoStreamAllocateResponse::DecodableType;
+
+    mVideoStreams.clear();
+
+    // First, allocate a stream
+    AllocateRequest allocRequest;
+    allocRequest.streamUsage      = StreamUsageEnum::kLiveView;
+    allocRequest.videoCodec       = VideoCodecEnum::kH264;
+    allocRequest.minFrameRate     = 30;
+    allocRequest.maxFrameRate     = 120;
+    allocRequest.minResolution    = { 640, 480 };
+    allocRequest.maxResolution    = { 1280, 720 };
+    allocRequest.minBitRate       = 10000;
+    allocRequest.maxBitRate       = 10000;
+    allocRequest.keyFrameInterval = 4;
+    allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->videoStreamID;
+    EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
+
+    // Read initial referenceCount
+    Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+    auto it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    uint8_t initialRefCount = it.GetValue().referenceCount;
+
+    // Increment
+    EXPECT_EQ(mServer.UpdateVideoStreamRefCount(streamId, true), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+    it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, static_cast<uint8_t>(initialRefCount + 1));
+
+    // Decrement back
+    EXPECT_EQ(mServer.UpdateVideoStreamRefCount(streamId, false), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+    it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, initialRefCount);
+
+    // Non-existent stream ID
+    EXPECT_EQ(mServer.UpdateVideoStreamRefCount(999, true), CHIP_ERROR_NOT_FOUND);
+
+    // Already back at zero after the round-trip, so decrement should fail
+    EXPECT_EQ(mServer.UpdateVideoStreamRefCount(streamId, false), CHIP_ERROR_INVALID_INTEGER_VALUE);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestUpdateAudioStreamRefCount)
+{
+    using AllocateRequest  = Commands::AudioStreamAllocate::Type;
+    using AllocateResponse = Commands::AudioStreamAllocateResponse::DecodableType;
+
+    mAudioStreams.clear();
+
+    AllocateRequest allocRequest;
+    allocRequest.streamUsage  = StreamUsageEnum::kLiveView;
+    allocRequest.audioCodec   = AudioCodecEnum::kOpus;
+    allocRequest.channelCount = 2;
+    allocRequest.sampleRate   = 48000;
+    allocRequest.bitRate      = 128000;
+    allocRequest.bitDepth     = 24;
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->audioStreamID;
+    EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 1u);
+
+    Attributes::AllocatedAudioStreams::TypeInfo::DecodableType allocatedAudioStreams;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedAudioStreams::Id, allocatedAudioStreams), CHIP_NO_ERROR);
+    auto it = allocatedAudioStreams.begin();
+    ASSERT_TRUE(it.Next());
+    uint8_t initialRefCount = it.GetValue().referenceCount;
+
+    // Increment and verify
+    EXPECT_EQ(mServer.UpdateAudioStreamRefCount(streamId, true), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedAudioStreams::Id, allocatedAudioStreams), CHIP_NO_ERROR);
+    it = allocatedAudioStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, static_cast<uint8_t>(initialRefCount + 1));
+
+    // Decrement and verify
+    EXPECT_EQ(mServer.UpdateAudioStreamRefCount(streamId, false), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedAudioStreams::Id, allocatedAudioStreams), CHIP_NO_ERROR);
+    it = allocatedAudioStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, initialRefCount);
+
+    // Non-existent stream
+    EXPECT_EQ(mServer.UpdateAudioStreamRefCount(999, true), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestUpdateSnapshotStreamRefCount)
+{
+    using AllocateRequest  = Commands::SnapshotStreamAllocate::Type;
+    using AllocateResponse = Commands::SnapshotStreamAllocateResponse::DecodableType;
+
+    mSnapshotStreams.clear();
+
+    AllocateRequest allocRequest;
+    allocRequest.imageCodec       = ImageCodecEnum::kJpeg;
+    allocRequest.maxFrameRate     = 30;
+    allocRequest.minResolution    = { 640, 480 };
+    allocRequest.maxResolution    = { 1280, 720 };
+    allocRequest.quality          = 80;
+    allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->snapshotStreamID;
+    EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
+
+    Attributes::AllocatedSnapshotStreams::TypeInfo::DecodableType allocatedSnapshotStreams;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedSnapshotStreams::Id, allocatedSnapshotStreams), CHIP_NO_ERROR);
+    auto it = allocatedSnapshotStreams.begin();
+    ASSERT_TRUE(it.Next());
+    uint8_t initialRefCount = it.GetValue().referenceCount;
+
+    EXPECT_EQ(mServer.UpdateSnapshotStreamRefCount(streamId, true), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedSnapshotStreams::Id, allocatedSnapshotStreams), CHIP_NO_ERROR);
+    it = allocatedSnapshotStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, static_cast<uint8_t>(initialRefCount + 1));
+
+    EXPECT_EQ(mServer.UpdateSnapshotStreamRefCount(streamId, false), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedSnapshotStreams::Id, allocatedSnapshotStreams), CHIP_NO_ERROR);
+    it = allocatedSnapshotStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, initialRefCount);
+
+    // Non-existent ID
+    EXPECT_EQ(mServer.UpdateSnapshotStreamRefCount(999, true), CHIP_ERROR_NOT_FOUND);
+}
+
 } // namespace

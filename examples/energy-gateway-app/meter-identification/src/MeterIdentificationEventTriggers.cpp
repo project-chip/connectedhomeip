@@ -54,15 +54,15 @@ private:
 
     const DataPresets_s TestsDataPresets[kMaxPresetItems] = {
         { .meterType         = DataModel::MakeNullable(MeterTypeEnum::kUtility),
-          .pointOfDelivery   = DataModel::MakeNullable(CharSpan::fromCharString("Test delivery point")),
-          .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("TST-123456789")),
-          .protocolVersion   = DataModel::MakeNullable(CharSpan::fromCharString("1.2.3")),
+          .pointOfDelivery   = DataModel::MakeNullable("Test delivery point"_span),
+          .meterSerialNumber = DataModel::MakeNullable("TST-123456789"_span),
+          .protocolVersion   = DataModel::MakeNullable("1.2.3"_span),
           .powerThreshold    = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
               { Optional<int64_t>(2400000), Optional<int64_t>(120), Globals::PowerThresholdSourceEnum::kContract })) },
         { .meterType         = DataModel::MakeNullable(MeterTypeEnum::kPrivate),
-          .pointOfDelivery   = DataModel::MakeNullable(CharSpan::fromCharString("New delivery point")),
-          .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("NEW-987654321")),
-          .protocolVersion   = DataModel::MakeNullable(CharSpan::fromCharString("3.4.5")),
+          .pointOfDelivery   = DataModel::MakeNullable("New delivery point"_span),
+          .meterSerialNumber = DataModel::MakeNullable("NEW-987654321"_span),
+          .protocolVersion   = DataModel::MakeNullable("3.4.5"_span),
           .powerThreshold    = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
               { Optional<int64_t>(4800000), Optional<int64_t>(240), Globals::PowerThresholdSourceEnum::kRegulator })) }
     };

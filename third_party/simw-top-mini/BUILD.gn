@@ -43,6 +43,7 @@ config("se05x_config") {
   # defines += ["FLOW_VERBOSE"]
 
   include_dirs = [
+    "repo/sss",
     "repo/sss/inc",
     "repo/sss/port/default",
     "repo/sss/ex/src",

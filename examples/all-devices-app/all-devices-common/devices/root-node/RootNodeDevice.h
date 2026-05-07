@@ -88,7 +88,9 @@ private:
         mAdministratorCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;
     LazyRegisteredServerCluster<Clusters::GroupKeyManagementCluster> mGroupKeyManagementCluster;
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     LazyRegisteredServerCluster<Clusters::GroupcastCluster> mGroupcastCluster;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
