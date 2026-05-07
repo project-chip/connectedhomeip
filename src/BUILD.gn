@@ -107,6 +107,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/temperature-control-server/tests",
       "${chip_root}/src/app/clusters/temperature-measurement-server/tests",
       "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/thread-network-directory-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/clusters/time-synchronization-server/tests",
       "${chip_root}/src/app/clusters/tls-certificate-management-server/tests",

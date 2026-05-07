@@ -54,6 +54,7 @@ source_set("clusters") {
     "soil-measurement-server",
     "temperature-control-server",
     "temperature-measurement-server",
+    "thread-network-directory-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
     "webrtc-transport-provider-server",

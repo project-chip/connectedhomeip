@@ -16,9 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/DefaultThreadNetworkDirectoryStorage.cpp"
-    "${CLUSTER_DIR}/DefaultThreadNetworkDirectoryStorage.h"
-    "${CLUSTER_DIR}/ThreadNetworkDirectoryStorage.h"
-    "${CLUSTER_DIR}/ThreadNetworkDirectoryCluster.cpp"
-    "${CLUSTER_DIR}/ThreadNetworkDirectoryCluster.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

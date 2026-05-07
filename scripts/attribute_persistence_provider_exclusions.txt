@@ -36,12 +36,15 @@ src/app/clusters/chime-server/MigrateChimeServerStorage.h
 src/app/clusters/unit-localization-server/CodegenIntegration.cpp
 src/app/clusters/unit-localization-server/MigrateUnitLocalizationServerStorage.cpp
 src/app/clusters/unit-localization-server/MigrateUnitLocalizationServerStorage.h
+# BooleanStateConfiguration migration
+src/app/clusters/boolean-state-configuration-server/CodegenIntegration.cpp
+src/app/clusters/boolean-state-configuration-server/MigrateBooleanStateConfigurationStorage.cpp
+src/app/clusters/boolean-state-configuration-server/MigrateBooleanStateConfigurationStorage.h
 
 # Cluster server implementations that currently use SafeAttributePersistenceProvider
-src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.cpp
-src/app/clusters/boolean-state-configuration-server/tests/TestBooleanStateConfigurationCluster.cpp
 src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h
 src/app/clusters/mode-base-server/mode-base-server.cpp
 src/app/clusters/resource-monitoring-server/ResourceMonitoringCluster.cpp
 src/app/clusters/resource-monitoring-server/tests/TestResourceMonitoringCluster.cpp
-src/app/clusters/thread-network-directory-server/thread-network-directory-server.cpp
+src/app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.cpp
+src/app/clusters/thread-network-directory-server/tests/TestThreadNetworkDirectoryCluster.cpp

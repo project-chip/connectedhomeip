@@ -1,6 +1,7 @@
-/**
+/*
  *
  *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,5 +17,19 @@
  */
 
 #pragma once
-// This include is used to keep backwards compatibility.
-#include <app/clusters/thread-network-directory-server/CodegenIntegration.h>
+
+#include <app/persistence/AttributePersistenceMigration.h>
+#include <app/util/basic-types.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace BooleanStateConfiguration {
+
+CHIP_ERROR MigrateBooleanStateConfigurationStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
+                                                   AttributePersistenceProvider & dstProvider);
+
+} // namespace BooleanStateConfiguration
+} // namespace Clusters
+} // namespace app
+} // namespace chip
