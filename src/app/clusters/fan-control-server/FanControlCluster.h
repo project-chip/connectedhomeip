@@ -159,16 +159,11 @@ private:
     bool SupportsAirflowDirection() const { return mOptionalAttributes.IsSet(FanControl::Attributes::AirflowDirection::Id); }
 
     void CommitFanModeOffState();
-    void ApplyFanModeOffSideEffects();
-    void ApplyFanModeAutoSideEffects();
 
-    // Mandatory attribute side effects when FanMode becomes kLow, kMedium, or kHigh.
-    // PercentSetting is set to 33%, 66%, or 100% respectively; when MultiSpeed is supported,
-    // SpeedSetting is set to 1, the rounded midpoint of 1..SpeedMax, or SpeedMax.
-    // PercentCurrent and SpeedCurrent are updated to match the derived settings.
-    void ApplyFanModeLowSideEffects();
-    void ApplyFanModeMediumSideEffects();
-    void ApplyFanModeHighSideEffects();
+    // Updates PercentSetting / PercentCurrent (and Speed* when MultiSpeed is supported) for the
+    // given FanMode: Off clears to 0, Low/Medium/High set fixed percentages 33/66/100 and matching
+    // speeds, Auto nulls settings while syncing current values from prior settings.
+    void ApplyFanModeSideEffects(FanControl::FanModeEnum fanMode);
 
     void ApplyPercentSettingChanged();
     void ApplySpeedSettingChanged();
