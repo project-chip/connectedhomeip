@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import dataclasses
 import enum
 import functools
@@ -342,12 +343,13 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
 
             # Initialize.
             log.debug("Initializing")
-            self._proc_init()
-            self.state.phase = ProcessPhase.READY
-            log.debug("Initialized successfully")
+            with contextlib.ExitStack() as stack:
+                self._proc_init(stack)
+                self.state.phase = ProcessPhase.READY
+                log.debug("Initialized successfully")
 
-            # Perform work.
-            self._proc_work()
+                # Perform work.
+                self._proc_work()
         except QueueCancelled:
             log.warning("Received a cancel event")
         except EndOfQueue:
@@ -358,27 +360,15 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
             log.error("Process failed with an exception: %r", e)
             self.state.exception = e
         finally:
-            log.debug("Cleaning up")
-            try:
-                self._proc_cleanup()
-                log.debug("Process finished cleanly")
-            except BaseException as cleanup_exc:
-                log.error("Cleanup failed: %r", cleanup_exc)
-                op_exc = self.state.exception
-                self.state.exception = cleanup_exc  # Save to the state to annotate and thus prepare for propagation to the parent.
-
-                # In case of an exception during cleanup, we want to preserve the original exception if it exists.
-                if op_exc is not None:
-                    self.state.exception = BaseExceptionGroup("Failed to cleanup process after previous failure",
-                                                              [op_exc, self.state.exception])
-            finally:
-                self.state.phase = ProcessPhase.CLOSED
+            self.state.phase = ProcessPhase.CLOSED
 
     @abstractmethod
-    def _proc_init(self):
+    def _proc_init(self, exit_stack: contextlib.ExitStack) -> None:
         """Initialize subprocess resources before work begins.
 
         Allocate long-lived resources here and store them on `self` so they can be released in `_proc_cleanup()`.
+
+        The resources that need cleanup should be registered in the provided `ExitStack`.
         """
 
     def _proc_work(self) -> None:
@@ -389,11 +379,3 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
         `state.phase` between `READY` and `WORKING` as appropriate.
         """
         self._work_queue.wait_for_cancelled()
-
-    @abstractmethod
-    def _proc_cleanup(self):
-        """
-        Release resources created by `_proc_init()`.
-
-        This hook is always called, including after exceptions.
-        """
