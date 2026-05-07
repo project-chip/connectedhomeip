@@ -220,9 +220,11 @@ struct TestGroupcastCluster : public ::testing::Test
     ScopedAttributeChangeListenerRegistration mScopedListenerRegistration; // RAII registration
 
     chip::Groupcast::Testing mTesting;
-    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl, mTesting },
+    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl,
+                                               mTesting },
                                              BitFlags<Feature>{ Feature::kSender } };
-    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl, mTesting },
+    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl,
+                                                 mTesting },
                                                BitFlags<Feature>{ Feature::kListener, Feature::kPerGroup } };
 
     TestGroupcastCluster() : mScopedListenerRegistration(customDataModel, mTestContext) {}
