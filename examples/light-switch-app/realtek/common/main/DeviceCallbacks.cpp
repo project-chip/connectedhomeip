@@ -40,6 +40,8 @@
 #include <assert.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h>
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <ota/OTAInitializer.h>
@@ -265,4 +267,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
                                         value);
     }
+}
+
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    ChipLogProgress(NotSpecified, "Setting log provider.");
+
+    auto & logProvider = DiagnosticLogs::LogProvider::GetInstance();
+    DiagnosticLogs::DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
