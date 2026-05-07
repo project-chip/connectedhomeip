@@ -106,7 +106,8 @@ public:
     // overriding `AppTaskImpl<>::DM*Impl()` in `CustomerAppTask`.
     // ---------------------------------------------------------------------
 
-    bool DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
+    bool DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId,
+                                     const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                      const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                                      const chip::Optional<chip::ByteSpan> & pinCode,
                                      chip::app::Clusters::DoorLock::OperationErrorEnum & err);
@@ -124,8 +125,8 @@ public:
     bool DMDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential);
     bool DMDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
-                                 chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                 CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData);
+                                 chip::FabricIndex modifier, DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                                 const chip::ByteSpan & credentialData);
 
     bool DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
     bool DMDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,

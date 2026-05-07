@@ -191,9 +191,8 @@ bool MigrateCredentials(chip::EndpointId endpoint_id, const SilabsDoorLock::Lock
                 {
                     uint8_t * data = creds_data_buffer + (type_idx * kSingleTypeCredsSize + cred_idx * Legacy::kMaxCredentialSize);
                     const chip::ByteSpan data_span(data, info.credentialData.size());
-                    success = AppTask::GetAppTask().DMDoorLockSetCredential(endpoint_id, cred_idx, info.createdBy,
-                                                                            info.lastModifiedBy, info.status, info.credentialType,
-                                                                            data_span);
+                    success = AppTask::GetAppTask().DMDoorLockSetCredential(
+                        endpoint_id, cred_idx, info.createdBy, info.lastModifiedBy, info.status, info.credentialType, data_span);
                 }
             }
         }
@@ -235,7 +234,7 @@ bool MigrateUsers(chip::EndpointId endpoint_id, const SilabsDoorLock::LockInitPa
         user_creds_count = user_creds_size / kSingleUserCredsSize;
         VerifyOrExit(params.numberOfUsers == user_creds_count, success = false);
         all_user_creds = (Legacy::CredentialStruct *) user_creds_buffer;
-        new_creds      = (CredentialStruct *) chip::Platform::MemoryAlloc(params.numberOfCredentialsPerUser * sizeof(CredentialStruct));
+        new_creds = (CredentialStruct *) chip::Platform::MemoryAlloc(params.numberOfCredentialsPerUser * sizeof(CredentialStruct));
         VerifyOrExit(nullptr != new_creds, success = false);
         VerifyOrExit(params.numberOfUsers == user_creds_count, success = false);
     }
@@ -282,10 +281,9 @@ bool MigrateUsers(chip::EndpointId endpoint_id, const SilabsDoorLock::LockInitPa
             new_creds[i].credentialType  = creds[i].credentialType;
             new_creds[i].credentialIndex = creds[i].credentialIndex;
         }
-        success = AppTask::GetAppTask().DMDoorLockSetUser(endpoint_id, 1 + user_idx, info.createdBy, info.lastModifiedBy,
-                                                          chip::CharSpan(name, info.userName.size()), info.userUniqueId,
-                                                          info.userStatus, info.userType, info.credentialRule, new_creds,
-                                                          info.credentials.size());
+        success = AppTask::GetAppTask().DMDoorLockSetUser(
+            endpoint_id, 1 + user_idx, info.createdBy, info.lastModifiedBy, chip::CharSpan(name, info.userName.size()),
+            info.userUniqueId, info.userStatus, info.userType, info.credentialRule, new_creds, info.credentials.size());
     }
 
     TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_UserCredentials);
@@ -400,10 +398,9 @@ bool MigrateSchedules(chip::EndpointId endpoint_id, const SilabsDoorLock::LockIn
             if (DlScheduleStatus::kOccupied == info.status)
             {
                 VerifyOrExit(DlStatus::kSuccess ==
-                                 AppTask::GetAppTask().DMDoorLockSetHolidaySchedule(endpoint_id, 1 + sched_idx, info.status,
-                                                                                    info.schedule.localStartTime,
-                                                                                    info.schedule.localEndTime,
-                                                                                    info.schedule.operatingMode),
+                                 AppTask::GetAppTask().DMDoorLockSetHolidaySchedule(
+                                     endpoint_id, 1 + sched_idx, info.status, info.schedule.localStartTime,
+                                     info.schedule.localEndTime, info.schedule.operatingMode),
                              success = false);
             }
         }
