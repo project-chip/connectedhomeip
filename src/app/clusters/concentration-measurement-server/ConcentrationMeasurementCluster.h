@@ -73,6 +73,10 @@ public:
 private:
     static constexpr uint32_t kWindowMaxSeconds = 604800;
 
+    CHIP_ERROR SetNullableFloatValue(DataModel::Nullable<float> value, Feature requiredFeature,
+                                     DataModel::Nullable<float> & storage, AttributeId attr);
+    CHIP_ERROR SetWindowValue(uint32_t value, Feature requiredFeature, uint32_t & storage, AttributeId attr);
+
     static bool IsInRange(const DataModel::Nullable<float> & value, const DataModel::Nullable<float> & minV,
                           const DataModel::Nullable<float> & maxV)
     {
