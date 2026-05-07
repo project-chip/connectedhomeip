@@ -19,7 +19,7 @@ repos:
           - id: keep-sorted
 
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: 41d2daf392fbf43341a77f24a9c6481a4b66af98 # v0.9.10
+      rev: 45ef068da5f21267bb2a7ec4a623092959f09ce5 # v0.14.14
       hooks:
           - id: ruff
             args: [--fix-only]
