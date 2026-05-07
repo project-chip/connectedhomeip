@@ -30,11 +30,10 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl, discovery
-from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 
-from .commissioning_types import PaseParams
+from .commissioning_types import CustomCommissioningParameters
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -94,19 +93,6 @@ class CommissioningInfo:
     tc_user_response_to_simulate: Optional[int] = None
     thread_ba_host: Optional[str] = None
     thread_ba_port: Optional[int] = None
-
-
-@dataclass
-class CustomCommissioningParameters:
-    """
-    A custom data class that encapsulates commissioning parameters with an additional random discriminator.
-
-    Attributes:
-        commissioningParameters (CommissioningParameters): The underlying commissioning parameters.
-        randomDiscriminator (int): A randomly generated value used to uniquely identify or distinguish instances during commissioning processes.
-    """
-    commissioningParameters: CommissioningParameters
-    randomDiscriminator: int
 
 
 class PairingStatus:
@@ -490,17 +476,17 @@ async def _is_device_commissionable_via_dnssd(
         return False
 
 
-async def _establish_pase_or_case_session(
+async def establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    pase_params: Optional[PaseParams] = None
+    commissioning_params: Optional[CustomCommissioningParameters] = None
 ) -> EstablishedSessionKind:
     """
     Establish a session to the device by trying PASE and CASE in parallel.
 
     This is used as a fallback when DNS-SD check doesn't find the device operational.
     The device might be:
-    - Not commissioned (PASE will succeed if pase_params provided)
+    - Not commissioned (PASE will succeed if pairing credentials are provided)
     - Commissioned but DNS-SD failed for some reason (CASE will succeed)
 
     Whichever connection succeeds first is used; the other is cancelled.
@@ -508,8 +494,10 @@ async def _establish_pase_or_case_session(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID for the session
-        pase_params: Optional parameters for PASE establishment.
-                    If not provided, only CASE will be attempted.
+        commissioning_params: Optional :class:`CustomCommissioningParameters` with setup or
+            commissioning-window data for ``FindOrEstablishPASESession``. If omitted or
+            :meth:`CustomCommissioningParameters.resolve_setup_code` returns None, only CASE
+            is attempted.
 
     Returns:
         Whether the active session is PASE or CASE. CASE implies an operational
@@ -521,8 +509,8 @@ async def _establish_pase_or_case_session(
     task_list = []
 
     # Add PASE task if we have parameters
-    if pase_params is not None:
-        setup_code = pase_params.resolve_setup_code(dev_ctrl)
+    if commissioning_params is not None:
+        setup_code = commissioning_params.resolve_setup_code(dev_ctrl)
 
         if setup_code:
             LOGGER.info(f"Creating PASE task for node {node_id}")
@@ -641,7 +629,7 @@ async def is_commissioned(
 async def get_commissioned_fabric_count(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    pase_params: Optional[PaseParams] = None
+    commissioning_params: Optional[CustomCommissioningParameters] = None
 ) -> int:
     """
     Get the number of commissioned fabrics on a device.
@@ -653,7 +641,9 @@ async def get_commissioned_fabric_count(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
+        commissioning_params: Optional :class:`CustomCommissioningParameters` used when the device
+            is not seen as operational on this fabric via DNS-SD but may still be reachable
+            for a parallel PASE/CASE attempt before reading ``TrustedRootCertificates``.
 
     Returns:
         Number of commissioned fabrics (count of trusted root certificates).
@@ -661,7 +651,7 @@ async def get_commissioned_fabric_count(
 
     Raises:
         ChipStackError: If unable to read the TrustedRootCertificates attribute
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        ValueError: If device is not operational via DNS-SD and ``commissioning_params`` is omitted
         RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
     """
     try:
@@ -676,21 +666,22 @@ async def get_commissioned_fabric_count(
                 nodeId=node_id,
                 attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
-        elif pase_params is not None:
+        elif commissioning_params is not None:
             # Device not operational on this fabric via DNS-SD - could be:
             # 1. Not commissioned at all (factory fresh) - PASE will work
             # 2. Commissioned but DNS-SD failed - CASE will work
             # Try both in parallel for fastest response
             LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
-            await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
+            await establish_pase_or_case_session(dev_ctrl, node_id, commissioning_params)
             result = await dev_ctrl.ReadAttribute(
                 nodeId=node_id,
                 attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
         else:
-            # No PASE params and not operational - can't proceed without risking long timeout
+            # No pairing credentials and not operational - can't proceed without risking long timeout
             raise ValueError(
-                f"Device {node_id} is not operational on this fabric and no PASE parameters provided. "
+                f"Device {node_id} is not operational on this fabric and no CustomCommissioningParameters "
+                "(pairing or commissioning-window data) were provided. "
                 "Cannot get fabric count without risking long connection timeout."
             )
 

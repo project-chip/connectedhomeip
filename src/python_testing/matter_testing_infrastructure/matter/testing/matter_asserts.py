@@ -6,7 +6,7 @@ from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
 
-from matter.testing.commissioning_types import PaseParams
+from matter.testing.commissioning_types import CustomCommissioningParameters
 
 T = TypeVar('T')
 
@@ -378,7 +378,7 @@ async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,
     description: str = "Device",
-    pase_params: Optional[PaseParams] = None
+    commissioning_params: Optional[CustomCommissioningParameters] = None
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -395,13 +395,14 @@ async def assert_factory_fresh(
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
-        pase_params: Optional parameters for establishing PASE if needed.
-                    See get_commissioned_fabric_count() for format details.
+        commissioning_params: Optional :class:`CustomCommissioningParameters` for the parallel PASE path
+            when DNS-SD does not see the device on this fabric. Same contract as
+            :func:`matter.testing.commissioning.get_commissioned_fabric_count`.
 
     Raises:
         AssertionError: If device has any commissioned fabrics
         ChipStackError: If unable to read the TrustedRootCertificates attribute
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        ValueError: If device is not operational via DNS-SD and ``commissioning_params`` is omitted
         RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
@@ -409,12 +410,12 @@ async def assert_factory_fresh(
         await assert_factory_fresh(controller, node_id=1234, description="DUT")
 
         # Verify factory-fresh device (establishes PASE if needed)
-        pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_factory_fresh(controller, node_id=1234, description="DUT", pase_params=pase_params)
+        commissioning_params = CustomCommissioningParameters(discriminator=1234, passcode=20202021)
+        await assert_factory_fresh(controller, node_id=1234, description="DUT", commissioning_params=commissioning_params)
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 
-    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, commissioning_params=commissioning_params)
     asserts.assert_equal(
         fabric_count,
         0,
@@ -429,7 +430,7 @@ async def assert_fabric_count(
     node_id: int,
     expected_count: int,
     description: str = "Device",
-    pase_params: Optional[PaseParams] = None
+    commissioning_params: Optional[CustomCommissioningParameters] = None
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.
@@ -448,13 +449,13 @@ async def assert_fabric_count(
         node_id: Node ID of the device to check
         expected_count: Expected number of commissioned fabrics
         description: User-defined description for error messages (default: "Device")
-        pase_params: Optional parameters for establishing PASE if needed.
-                    Same as for get_commissioned_fabric_count().
+        commissioning_params: Optional :class:`CustomCommissioningParameters`; same contract as
+            :func:`matter.testing.commissioning.get_commissioned_fabric_count`.
 
     Raises:
         AssertionError: If actual fabric count doesn't match expected count
         ChipStackError: If unable to read the TrustedRootCertificates attribute
-        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        ValueError: If device is not operational via DNS-SD and ``commissioning_params`` is omitted
         RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
@@ -462,12 +463,12 @@ async def assert_fabric_count(
         await assert_fabric_count(controller, node_id=1234, expected_count=1, description="DUT")
 
         # Verify factory-fresh device has 0 fabrics (establishes PASE if needed)
-        pase_params = PaseParams(discriminator=1234, passcode=20202021)
-        await assert_fabric_count(controller, node_id=1234, expected_count=0, description="DUT", pase_params=pase_params)
+        commissioning_params = CustomCommissioningParameters(discriminator=1234, passcode=20202021)
+        await assert_fabric_count(controller, node_id=1234, expected_count=0, description="DUT", commissioning_params=commissioning_params)
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 
-    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, commissioning_params=commissioning_params)
     asserts.assert_equal(
         actual_count,
         expected_count,

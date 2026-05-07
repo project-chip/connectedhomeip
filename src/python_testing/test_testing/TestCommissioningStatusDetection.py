@@ -20,9 +20,10 @@ Unit tests for commissioning status detection functions in commissioning.py.
 
 Tests cover:
 - DNS-SD discovery (_is_device_operational_via_dnssd)
-- Parallel session establishment (_establish_pase_or_case_session)
+- Parallel session establishment (establish_pase_or_case_session)
 - is_commissioned() integration scenarios
 - get_commissioned_fabric_count() integration scenarios
+- CustomCommissioningParameters.resolve_setup_code (ECM + standalone pairing)
 
 Scenarios include factory fresh devices, devices commissioned on the current fabric,
 and devices commissioned on other fabrics.
@@ -384,11 +385,11 @@ async def test_parallel_session_pase_wins():
     mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail_slow
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         if session_kind != commissioning.EstablishedSessionKind.PASE:
             return f"Expected PASE session, got {session_kind}"
     except Exception as e:
@@ -422,11 +423,11 @@ async def test_parallel_session_case_wins():
     mock_controller.FindOrEstablishPASESession = pase_slow
     mock_controller.GetConnectedDevice = case_success
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         if session_kind != commissioning.EstablishedSessionKind.CASE:
             return f"Expected CASE session, got {session_kind}"
     except Exception as e:
@@ -463,11 +464,11 @@ async def test_parallel_session_first_fails_second_succeeds():
     mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         if session_kind != commissioning.EstablishedSessionKind.PASE:
             return f"Expected PASE after CASE failed first, got {session_kind}"
     except Exception as e:
@@ -501,11 +502,11 @@ async def test_parallel_session_both_fail():
     mock_controller.FindOrEstablishPASESession = pase_fail_fast
     mock_controller.GetConnectedDevice = case_fail_slow
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         return "Should have raised RuntimeError when both fail"
     except RuntimeError as e:
         error_msg = str(e)
@@ -517,9 +518,9 @@ async def test_parallel_session_both_fail():
     return None
 
 
-async def test_parallel_session_no_pase_params():
+async def test_parallel_session_no_commissioning_params():
     """
-    Test: No PASE params provided, only CASE attempted.
+    Test: No CustomCommissioningParameters (``commissioning_params`` is None); only CASE attempted.
 
     Scenario: Caller doesn't have commissioning credentials.
     Expected: Only CASE is attempted (may succeed or fail).
@@ -540,7 +541,7 @@ async def test_parallel_session_no_pase_params():
     mock_controller.GetConnectedDevice = case_success
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, None)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, None)
         if session_kind != commissioning.EstablishedSessionKind.CASE:
             return f"CASE-only path should yield CASE, got {session_kind}"
         if not case_called:
@@ -708,7 +709,7 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
 
         mock_dnssd.return_value = False
         mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE
@@ -721,10 +722,10 @@ async def test_get_fabric_count_scenario1_factory_fresh():
             }
         })
 
-        pase_params = commissioning.PaseParams(
+        commissioning_params = commissioning.CustomCommissioningParameters(
             setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
         result = await commissioning.get_commissioned_fabric_count(
-            mock_controller, TEST_NODE_ID, pase_params=pase_params
+            mock_controller, TEST_NODE_ID, commissioning_params=commissioning_params
         )
 
         if result != 0:
@@ -732,9 +733,9 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     return None
 
 
-async def test_get_fabric_count_not_operational_no_pase_params():
+async def test_get_fabric_count_not_operational_no_commissioning_params():
     """
-    Test: Device not operational via DNS-SD and no PASE params provided.
+    Test: Device not operational via DNS-SD and no CustomCommissioningParameters provided.
 
     Value: Ensures ValueError is raised to prevent timeout.
     """
@@ -746,11 +747,85 @@ async def test_get_fabric_count_not_operational_no_pase_params():
         mock_dnssd.return_value = False
 
         try:
-            await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID, pase_params=None)
-            return "Expected ValueError when not operational and no PASE params"
+            await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID, commissioning_params=None)
+            return "Expected ValueError when not operational and no CustomCommissioningParameters"
         except ValueError as e:
             if "not operational on this fabric" not in str(e):
                 return f"Unexpected error message: {e}"
+    return None
+
+
+# =============================================================================
+# CATEGORY E: CustomCommissioningParameters.resolve_setup_code
+# =============================================================================
+
+
+async def test_commissioning_credentials_setup_code_only():
+    """Standalone pairing: explicit setup_code is returned unchanged."""
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    creds = CustomCommissioningParameters(setup_code="MT:EXPLICIT")
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:EXPLICIT":
+        return f"Expected MT:EXPLICIT, got {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_discriminator_passcode():
+    """Standalone pairing: discriminator + passcode uses controller CreateManualCode."""
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    creds = CustomCommissioningParameters(discriminator=1234, passcode=99999998)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:YNJV7VSC00KA0648G00":
+        return f"Unexpected resolved code: {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_sdk_qr_precedence():
+    """ECM shape: setupQRCode on commissioningParameters wins over manual/pin."""
+    from types import SimpleNamespace
+
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    cp = SimpleNamespace(setupQRCode="MT:FROMQR", setupManualCode="ignored", setupPinCode=0)
+    creds = CustomCommissioningParameters(commissioningParameters=cp, randomDiscriminator=111)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:FROMQR":
+        return f"Expected QR from SDK params, got {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_sdk_manual_when_no_qr():
+    """ECM shape: setupManualCode used when QR empty."""
+    from types import SimpleNamespace
+
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    cp = SimpleNamespace(setupQRCode="", setupManualCode="12345678901", setupPinCode=0)
+    creds = CustomCommissioningParameters(commissioningParameters=cp, randomDiscriminator=222)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "12345678901":
+        return f"Expected manual string, got {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_sdk_pin_with_random_discriminator():
+    """ECM shape: empty QR/manual falls back to CreateManualCode(randomDiscriminator, setupPinCode)."""
+    from types import SimpleNamespace
+
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    cp = SimpleNamespace(setupQRCode="", setupManualCode="", setupPinCode=TEST_PASSCODE)
+    creds = CustomCommissioningParameters(commissioningParameters=cp, randomDiscriminator=TEST_DISCRIMINATOR)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:YNJV7VSC00KA0648G00":
+        return f"Expected synthesized manual code, got {got!r}"
     return None
 
 
@@ -775,7 +850,7 @@ def main():
         ("B2. Parallel: CASE wins race", test_parallel_session_case_wins),
         ("B3. Parallel: first fails, second succeeds", test_parallel_session_first_fails_second_succeeds),
         ("B4. Parallel: both fail", test_parallel_session_both_fail),
-        ("B5. Parallel: no PASE params (CASE only)", test_parallel_session_no_pase_params),
+        ("B5. Parallel: no credentials (CASE only)", test_parallel_session_no_commissioning_params),
 
         # Category C: is_commissioned() Tests
         ("C1. is_commissioned: operational shortcircuit",
@@ -790,7 +865,14 @@ def main():
         # Category D: get_commissioned_fabric_count() Tests
         ("D1. get_fabric_count: SCENARIO 2 - operational", test_get_fabric_count_scenario2_operational),
         ("D2. get_fabric_count: SCENARIO 1 - factory fresh", test_get_fabric_count_scenario1_factory_fresh),
-        ("D3. get_fabric_count: not operational, no PASE params", test_get_fabric_count_not_operational_no_pase_params),
+        ("D3. get_fabric_count: not operational, no credentials", test_get_fabric_count_not_operational_no_commissioning_params),
+
+        # Category E: CustomCommissioningParameters
+        ("E1. CustomCommissioningParameters: setup_code only", test_commissioning_credentials_setup_code_only),
+        ("E2. CustomCommissioningParameters: discriminator + passcode", test_commissioning_credentials_discriminator_passcode),
+        ("E3. CustomCommissioningParameters: SDK QR precedence", test_commissioning_credentials_sdk_qr_precedence),
+        ("E4. CustomCommissioningParameters: SDK manual when no QR", test_commissioning_credentials_sdk_manual_when_no_qr),
+        ("E5. CustomCommissioningParameters: SDK pin + random discriminator", test_commissioning_credentials_sdk_pin_with_random_discriminator),
     ]
 
     print("\n" + "=" * 70)

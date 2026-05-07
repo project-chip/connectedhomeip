@@ -18,10 +18,10 @@
 """Lightweight commissioning-related types (no controller / cluster imports).
 
 
-This module provides common data structures for commissioning procedures that
-are intentionally decoupled from heavy dependencies such as `matter.clusters`
-or the `ChipDeviceController`. That keeps Pigweed-isolated tests
-(e.g. ``test_matter_asserts``) working when the full ``matter`` package is not
+This module provides :class:`CustomCommissioningParameters` and other common
+data structures for commissioning procedures that are intentionally decoupled
+from heavy dependencies such as `matter.clusters` or the `ChipDeviceController`.
+That keeps Pigweed-isolated tests (e.g. ``test_matter_asserts``) working when the full ``matter`` package is not
 on ``sys.path``.
 """
 
@@ -32,25 +32,55 @@ from typing import Any, Optional
 
 
 @dataclass
-class PaseParams:
+class CustomCommissioningParameters:
     """
-    Optional credentials for establishing a PASE session.
+    Wraps commissioning-window output from the SDK plus optional standalone pairing data.
 
-    Used when a secure connection via operational certificates (CASE) is unavailable, typically during initial commissioning. Provide either the ``setup_code`` or both the ``discriminator`` and ``passcode``.
+    For the **administrator commissioning window** path, this matches the historical
+    shape: ``OpenCommissioningWindow`` returns ``CommissioningParameters`` and tests
+    pair it with ``randomDiscriminator`` for ``CommissionOnNetwork`` discovery.
+
+    For **standalone PASE** (e.g. composition tests with ``first_setup_code`` only),
+    use ``setup_code`` and/or ``discriminator`` + ``passcode``; leave the ECM fields
+    unset. Use :meth:`resolve_setup_code` for the string passed to
+    ``FindOrEstablishPASESession``.
 
     Attributes:
-        setup_code: The full QR or manual pairing code string.
-        discriminator: The device's long or short discriminator.
-        passcode: The setup PIN code (passcode).
+        commissioningParameters (Optional[Any]):
+            SDK commissioning parameters from ``OpenCommissioningWindow`` for the ECM path;
+            otherwise None.
+        randomDiscriminator (Optional[int]):
+            Long discriminator used with ``CommissionOnNetwork`` when using the ECM path;
+            otherwise None.
+        setup_code (Optional[str]): QR or manual pairing code string for PASE-only flows.
+        discriminator (Optional[int]): With ``passcode``, used to build a manual code when
+            ``setup_code`` is not set and ECM fields are not used.
+        passcode (Optional[int]): With ``discriminator``, for manual code synthesis.
     """
+
+    commissioningParameters: Optional[Any] = None
+    randomDiscriminator: Optional[int] = None
     setup_code: Optional[str] = None
     discriminator: Optional[int] = None
     passcode: Optional[int] = None
 
     def resolve_setup_code(self, dev_ctrl: Any) -> Optional[str]:
-        """Resolve manual pairing code via the controller when needed."""
+        """Return a setup string for PASE, or None if credentials are incomplete."""
         if self.setup_code:
             return self.setup_code
+
+        cp = self.commissioningParameters
+        if cp is not None:
+            qr = getattr(cp, "setupQRCode", None) or ""
+            if qr:
+                return str(qr)
+            manual = getattr(cp, "setupManualCode", None) or ""
+            if manual:
+                return str(manual)
+            pin = getattr(cp, "setupPinCode", None)
+            if pin is not None and self.randomDiscriminator is not None:
+                return dev_ctrl.CreateManualCode(self.randomDiscriminator, pin)
+
         if self.passcode is not None and self.discriminator is not None:
             return dev_ctrl.CreateManualCode(self.discriminator, self.passcode)
         return None
