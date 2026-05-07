@@ -324,6 +324,9 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 #endif
     }
 
+    // If already done, will do nothing
+    ConnectivityMgrImpl().StartWiFiManagement();
+
     int status = wlan_scan_with_opt(wlan_scan_param);
     if (status != WM_SUCCESS)
     {
