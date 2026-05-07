@@ -148,7 +148,7 @@ CHIP_ERROR ConcentrationMeasurementCluster::Attributes(const ConcreteClusterPath
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetNullableFloatValue(DataModel::Nullable<float> value, Feature requiredFeature,
-                                                                    DataModel::Nullable<float> & storage, AttributeId attr)
+                                                                  DataModel::Nullable<float> & storage, AttributeId attr)
 {
     VerifyOrReturnError(mFeatures.Has(requiredFeature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(IsInRange(value, mMinMeasuredValue, mMaxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -172,7 +172,7 @@ CHIP_ERROR ConcentrationMeasurementCluster::SetAverageMeasuredValue(DataModel::N
 }
 
 CHIP_ERROR ConcentrationMeasurementCluster::SetWindowValue(uint32_t value, Feature requiredFeature, uint32_t & storage,
-                                                            AttributeId attr)
+                                                           AttributeId attr)
 {
     VerifyOrReturnError(mFeatures.Has(requiredFeature), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(value <= kWindowMaxSeconds, CHIP_IM_GLOBAL_STATUS(ConstraintError));
