@@ -97,6 +97,7 @@ class NFCReader:
             ValueError: If the NDEF message is empty, contains no records, or does
                 not contain a URI record.
             UnicodeDecodeError: If the URI payload cannot be decoded.
+            ndef.DecodeError: If the NDEF message is malformed.
         """
         with NFCConnection(self) as connection:
             # Perform NDEF file system navigation sequence
