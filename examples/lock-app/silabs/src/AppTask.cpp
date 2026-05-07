@@ -75,21 +75,15 @@ using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace SilabsDoorLock;
-using namespace SilabsDoorLock::LockInitParams;
 using chip::app::DataModel::MakeNullable;
 
 namespace {
 
-using namespace SilabsDoorLock::Storage;
 using namespace SilabsDoorLockConfig::ResourceRanges;
 
-static constexpr uint16_t LockUserInfoSize        = sizeof(LockUserInfo);
-static constexpr uint16_t LockCredentialInfoSize  = sizeof(LockCredentialInfo);
-static constexpr uint16_t CredentialStructSize    = sizeof(CredentialStruct);
-static constexpr uint16_t WeekDayScheduleInfoSize = sizeof(WeekDayScheduleInfo);
-static constexpr uint16_t YearDayScheduleInfoSize = sizeof(YearDayScheduleInfo);
-static constexpr uint16_t HolidayScheduleInfoSize = sizeof(HolidayScheduleInfo);
+// `CredentialStruct` is the spec/cluster type from `door-lock-server.h`; the
+// AppTask-nested `*Size` constants live with their record types in `AppTask.h`.
+static constexpr uint16_t CredentialStructSize = sizeof(CredentialStruct);
 
 LEDWidget sLockLED;
 TimerHandle_t sUnlatchTimer;
@@ -183,13 +177,6 @@ const char * LockStateToString(chip::app::Clusters::DoorLock::DlLockState lockSt
         break;
     }
     return "Unknown";
-}
-
-void UnlatchTimerCallback(TimerHandle_t xTimer)
-{
-    (void) xTimer;
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::UnlockAfterUnlatch,
-                                                                           reinterpret_cast<intptr_t>(nullptr));
 }
 
 void CancelUnlatchTimer(void)
@@ -327,7 +314,7 @@ CHIP_ERROR AppTask::InitLock()
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
 
-    sUnlatchTimer = xTimerCreate("UnlatchTimer", pdMS_TO_TICKS(UNLATCH_TIME_MS), pdFALSE, (void *) 0, UnlatchTimerCallback);
+    sUnlatchTimer = xTimerCreate("UnlatchTimer", pdMS_TO_TICKS(UNLATCH_TIME_MS), pdFALSE, (void *) 0, &CustomerAppTask::UnlatchCallback);
 
     // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
@@ -749,7 +736,7 @@ void AppTask::TimerEventHandler(void * timerCbArg)
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = lock;
-    event.Handler            = &AppTask::ActuatorMovementTimerEventHandler;
+    event.Handler            = &CustomerAppTask::ActuatorMovementEventHandler;
     AppTask::GetAppTask().PostEvent(&event);
 }
 void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
@@ -775,7 +762,14 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
     self.InitiateLockAction(AppEvent::kEventType_Lock, LockAction::kUnlock);
 }
 
-void AppTask::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
+void AppTask::UnlatchCallback(TimerHandle_t xTimer)
+{
+    (void) xTimer;
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::UnlockAfterUnlatch,
+                                                                           reinterpret_cast<intptr_t>(nullptr));
+}
+
+void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 {
     LockAction actionCompleted = LockAction::kInvalid;
 

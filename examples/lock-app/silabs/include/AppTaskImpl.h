@@ -52,6 +52,18 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockButtonActionHandlerImpl, aEvent);
     }
 
+    // FreeRTOS timer-task callback (unlatch timer expiry). Optional override: *Impl().
+    static void UnlatchCallback(TimerHandle_t xTimer)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlatchCallbackImpl, xTimer);
+    }
+
+    // AppTask-thread event handler (queued actuator-movement timer event). Optional override: *Impl().
+    static void ActuatorMovementEventHandler(AppEvent * aEvent)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ActuatorMovementEventHandlerImpl, aEvent);
+    }
+
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -182,6 +194,10 @@ private:
     void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction) { AppTask::ButtonEventHandler(button, btnAction); }
 
     void LockButtonActionHandlerImpl(AppEvent * aEvent) { AppTask::LockButtonActionHandler(aEvent); }
+
+    void UnlatchCallbackImpl(TimerHandle_t xTimer) { AppTask::UnlatchCallback(xTimer); }
+
+    void ActuatorMovementEventHandlerImpl(AppEvent * aEvent) { AppTask::ActuatorMovementEventHandler(aEvent); }
 
     void DMPostAttributeChangeCallbackImpl(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                            uint8_t * value)

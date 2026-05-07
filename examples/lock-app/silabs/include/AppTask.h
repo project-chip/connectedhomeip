@@ -26,7 +26,8 @@
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include "SilabsLockTypes.h"
+#include "CHIPProjectConfig.h"
+#include <FreeRTOS.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <ble/Ble.h>
@@ -36,6 +37,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <timers.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -65,6 +67,57 @@ public:
     static AppTask & GetAppTask();
 
     // ---------------------------------------------------------------------
+    // Lock-init parameters (cluster resource limits read at AppInit).
+    // Customers can use these from `InitLockImpl()` overrides to customize
+    // resource limits without reaching into the door-lock cluster directly.
+    // ---------------------------------------------------------------------
+
+    /** Cluster resource limits captured from ZAP attributes at AppInit time. */
+    struct LockParam
+    {
+        uint16_t numberOfUsers                  = 0;
+        uint8_t numberOfCredentialsPerUser      = 0;
+        uint8_t numberOfWeekdaySchedulesPerUser = 0;
+        uint8_t numberOfYeardaySchedulesPerUser = 0;
+        uint8_t numberOfHolidaySchedules        = 0;
+    };
+
+    /** Fluent builder for `LockParam`. */
+    class ParamBuilder
+    {
+    public:
+        ParamBuilder & SetNumberOfUsers(uint16_t numberOfUsers)
+        {
+            lockParam_.numberOfUsers = numberOfUsers;
+            return *this;
+        }
+        ParamBuilder & SetNumberOfCredentialsPerUser(uint8_t numberOfCredentialsPerUser)
+        {
+            lockParam_.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
+            return *this;
+        }
+        ParamBuilder & SetNumberOfWeekdaySchedulesPerUser(uint8_t numberOfWeekdaySchedulesPerUser)
+        {
+            lockParam_.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
+            return *this;
+        }
+        ParamBuilder & SetNumberOfYeardaySchedulesPerUser(uint8_t numberOfYeardaySchedulesPerUser)
+        {
+            lockParam_.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
+            return *this;
+        }
+        ParamBuilder & SetNumberOfHolidaySchedules(uint8_t numberOfHolidaySchedules)
+        {
+            lockParam_.numberOfHolidaySchedules = numberOfHolidaySchedules;
+            return *this;
+        }
+        LockParam GetLockParam() { return lockParam_; }
+
+    private:
+        LockParam lockParam_;
+    };
+
+    // ---------------------------------------------------------------------
     // Customer-facing entry points.
     // Overridable in `CustomerAppTask` via `AppTaskImpl<>::*Impl()` hooks.
     // ---------------------------------------------------------------------
@@ -89,6 +142,20 @@ public:
      *        `NextState()` and drives `InitiateLockAction`.
      */
     static void LockButtonActionHandler(AppEvent * aEvent);
+
+    /**
+     * @brief FreeRTOS unlatch-timer expiry callback. Runs in the timer task,
+     *        schedules `UnlockAfterUnlatch` onto the Matter platform thread.
+     */
+    static void UnlatchCallback(TimerHandle_t xTimer);
+
+    /**
+     * @brief AppTask-thread handler for a queued actuator-movement timer event
+     *        (`kEventType_Timer`, posted by `TimerEventHandler` when the lock
+     *        actuator timer fires). Advances `mLockActuatorState` and pushes
+     *        the resulting cluster state.
+     */
+    static void ActuatorMovementEventHandler(AppEvent * aEvent);
 
     /**
      * @brief DoorLock-cluster post-attribute-change callback.
@@ -177,6 +244,63 @@ public:
     static void UnlockAfterUnlatch(intptr_t context = 0);
 
 protected:
+    // ---------------------------------------------------------------------
+    // Persistent-storage record layouts.
+    //
+    // These are protected (not public) because they are on-disk binary
+    // record types — only consumed by `AppTask::DM*` storage round-trips.
+    // Customer overrides that use `mStorage` can reference them via the
+    // `AppTask` base class; the rest of the codebase has no reason to.
+    // ---------------------------------------------------------------------
+
+    struct WeekDayScheduleInfo
+    {
+        DlScheduleStatus status;
+        EmberAfPluginDoorLockWeekDaySchedule schedule;
+    };
+
+    struct YearDayScheduleInfo
+    {
+        DlScheduleStatus status;
+        EmberAfPluginDoorLockYearDaySchedule schedule;
+    };
+
+    struct HolidayScheduleInfo
+    {
+        DlScheduleStatus status;
+        EmberAfPluginDoorLockHolidaySchedule schedule;
+    };
+
+    struct LockUserInfo
+    {
+        char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
+        size_t userNameSize;
+        uint32_t userUniqueId;
+        UserStatusEnum userStatus;
+        UserTypeEnum userType;
+        CredentialRuleEnum credentialRule;
+        chip::EndpointId endpointId;
+        chip::FabricIndex createdBy;
+        chip::FabricIndex lastModifiedBy;
+        uint16_t currentCredentialCount;
+    };
+
+    struct LockCredentialInfo
+    {
+        DlCredentialStatus status;
+        CredentialTypeEnum credentialType;
+        chip::FabricIndex createdBy;
+        chip::FabricIndex lastModifiedBy;
+        uint8_t credentialData[SilabsDoorLockConfig::ResourceRanges::kMaxCredentialSize];
+        size_t credentialDataSize;
+    };
+
+    static constexpr uint16_t LockUserInfoSize        = sizeof(LockUserInfo);
+    static constexpr uint16_t LockCredentialInfoSize  = sizeof(LockCredentialInfo);
+    static constexpr uint16_t WeekDayScheduleInfoSize = sizeof(WeekDayScheduleInfo);
+    static constexpr uint16_t YearDayScheduleInfoSize = sizeof(YearDayScheduleInfo);
+    static constexpr uint16_t HolidayScheduleInfoSize = sizeof(HolidayScheduleInfo);
+
     /** Override of `BaseApplication::AppInit()`. */
     CHIP_ERROR AppInit() override;
 
@@ -228,14 +352,13 @@ private:
 
     // ---- Lock-domain bring-up / state machine ----
     CHIP_ERROR InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                              SilabsDoorLock::LockInitParams::LockParam lockParam, chip::PersistentStorageDelegate * storage);
+                              LockParam lockParam, chip::PersistentStorageDelegate * storage);
 
-    bool MigrateLockConfig(const SilabsDoorLock::LockInitParams::LockParam & params);
+    bool MigrateLockConfig(const LockParam & params);
 
     bool NextState();
 
     static void TimerEventHandler(void * timerCbArg);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
     static void UpdateClusterState(intptr_t context);
 
     // ---- PIN validation / cluster state push ----
@@ -253,6 +376,6 @@ private:
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
     osTimerId_t mLockTimer               = nullptr;
 
-    SilabsDoorLock::LockInitParams::LockParam mLockParams;
+    LockParam mLockParams;
     chip::PersistentStorageDelegate * mStorage = nullptr;
 };

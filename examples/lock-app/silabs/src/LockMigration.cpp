@@ -142,7 +142,7 @@ bool IsMigrationNeeded()
         VerifyKey(Legacy::kConfigKey_YearDaySchedules) || VerifyKey(Legacy::kConfigKey_HolidaySchedules);
 }
 
-bool MigrateCredentials(chip::EndpointId endpoint_id, const SilabsDoorLock::LockInitParams::LockParam & params)
+bool MigrateCredentials(chip::EndpointId endpoint_id, const AppTask::LockParam & params)
 {
     const size_t kSingleTypeCredsSize = params.numberOfCredentialsPerUser * Legacy::kMaxCredentialSize;
     uint8_t * creds_data_buffer       = nullptr;
@@ -207,7 +207,7 @@ exit:
     return success;
 }
 
-bool MigrateUsers(chip::EndpointId endpoint_id, const SilabsDoorLock::LockInitParams::LockParam & params)
+bool MigrateUsers(chip::EndpointId endpoint_id, const AppTask::LockParam & params)
 {
     const size_t kSingleUserCredsSize                  = sizeof(Legacy::CredentialStruct) * params.numberOfCredentialsPerUser;
     Legacy::CredentialStruct * all_user_creds          = nullptr;
@@ -299,7 +299,7 @@ exit:
     return success;
 }
 
-bool MigrateSchedules(chip::EndpointId endpoint_id, const SilabsDoorLock::LockInitParams::LockParam & params)
+bool MigrateSchedules(chip::EndpointId endpoint_id, const AppTask::LockParam & params)
 {
     Legacy::WeekDaysScheduleInfo * week_schedules = nullptr;
     Legacy::YearDayScheduleInfo * year_schedules  = nullptr;
@@ -421,7 +421,7 @@ exit:
 
 } // namespace
 
-bool AppTask::MigrateLockConfig(const SilabsDoorLock::LockInitParams::LockParam & params)
+bool AppTask::MigrateLockConfig(const LockParam & params)
 {
     if (IsMigrationNeeded())
     {
