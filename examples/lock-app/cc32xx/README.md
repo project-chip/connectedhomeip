@@ -89,7 +89,6 @@ Ninja to build the executable.
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
-
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc32xx
     $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.13.0\""
