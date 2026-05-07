@@ -166,6 +166,15 @@ not_automated:
           onboarding data security requirements)
     - name: TC_GC_common.py
       reason: Shared code for TC_GC, not a standalone test.
+    # Items below MUST be fixed eventually.
+    - name: TC_MCORE_FS_1_4.py
+      reason:
+          Very flaky in CI.
+          https://github.com/project-chip/connectedhomeip/issues/71932
+    - name: TC_PAVST_2_13.py
+      reason:
+          Used to be flaky, now it seems to deadlock and tests are cancelled.
+          https://github.com/project-chip/connectedhomeip/issues/71808
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
