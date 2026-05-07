@@ -37,9 +37,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from python_path import PythonPath
 
-# Add the python_testing directory to path so mdns_discovery module can be found
-with PythonPath('..', relative_to=__file__):
-    import mdns_discovery.mdns_discovery  # noqa: F401
+# Do not import mdns_discovery at module import time. Some unit-test
+# environments intentionally lack the real mdns_discovery/zeroconf
+# dependency, and tests should import it only after any sys.modules-based
+# mocking has been installed.
 
 # Test constants
 TEST_NODE_ID = 1234

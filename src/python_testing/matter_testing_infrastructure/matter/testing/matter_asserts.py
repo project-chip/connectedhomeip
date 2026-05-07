@@ -406,10 +406,10 @@ async def assert_factory_fresh(
         RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
-        # Verify device is factory reset before running test
+        # Verify a device that is already operational on this fabric via DNS-SD/CASE
         await assert_factory_fresh(controller, node_id=1234, description="DUT")
 
-        # Verify factory-fresh device (establishes PASE if needed)
+        # Verify a factory-fresh device that is not yet operational (establishes PASE)
         commissioning_params = CustomCommissioningParameters(discriminator=1234, passcode=20202021)
         await assert_factory_fresh(controller, node_id=1234, description="DUT", commissioning_params=commissioning_params)
     """
