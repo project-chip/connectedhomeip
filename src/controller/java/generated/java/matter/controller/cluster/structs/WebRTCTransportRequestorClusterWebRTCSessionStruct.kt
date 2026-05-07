@@ -78,10 +78,10 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
       if (videoStreams.isPresent) {
         val optvideoStreams = videoStreams.get()
         startArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-      for (item in optvideoStreams.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+        for (item in optvideoStreams.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
       }
       if (audioStreams.isPresent) {
         val optaudioStreams = audioStreams.get()
@@ -145,7 +145,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UShort> {
               tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -159,7 +159,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UShort> {
               tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
