@@ -181,6 +181,34 @@ void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId
         break;
     }
     }
+
+    ClampFanDriveCurrentWhenOff();
+}
+
+void AirPurifierManager::ClampFanDriveCurrentWhenOff()
+{
+    if (mOnOffClusterOn)
+    {
+        return;
+    }
+
+    FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+    if (cluster == nullptr)
+    {
+        return;
+    }
+
+    if (!cluster->SetPercentCurrent(static_cast<chip::Percent>(0)))
+    {
+        ChipLogError(NotSpecified, "AirPurifierManager::ClampFanDriveCurrentWhenOff: SetPercentCurrent failed");
+    }
+    if (cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        if (!cluster->SetSpeedCurrent(0))
+        {
+            ChipLogError(NotSpecified, "AirPurifierManager::ClampFanDriveCurrentWhenOff: SetSpeedCurrent failed");
+        }
+    }
 }
 
 void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

@@ -171,6 +171,8 @@ private:
     void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
 
     void HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+
+    void ClampFanDriveCurrentWhenOff();
 };
 
 } // namespace Clusters
