@@ -905,7 +905,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
     // Neither Listener, nor Sender
     {
-        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl });
+        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl, mTesting });
         chip::Testing::ClusterTester tester(cluster);
         tester.SetFabricIndex(kTestFabricIndex);
         tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -1437,7 +1437,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     // Create a Listener and Sender capable group with 1 endpoint.
     // Remove the endpoint from the group. Verify that the group still exists for Sender.
     app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate,
-                                                         mAccessControl },
+                                                         mAccessControl, mTesting },
                                                        BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
     ASSERT_EQ(ListenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
     chip::Testing::ClusterTester listenerAndSenderTester(ListenerAndSender);
