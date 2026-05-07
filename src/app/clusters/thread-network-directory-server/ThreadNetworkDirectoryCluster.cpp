@@ -190,7 +190,7 @@ std::optional<DataModel::ActionReturnStatus> ThreadNetworkDirectoryCluster::Invo
                                                                                           CommandHandler * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     switch (request.path.mCommandId)
     {
     case AddNetwork::Id: {
@@ -213,7 +213,8 @@ std::optional<DataModel::ActionReturnStatus> ThreadNetworkDirectoryCluster::Invo
     }
 }
 
-DataModel::ActionReturnStatus ThreadNetworkDirectoryCluster::HandleAddNetworkRequest(const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req)
+DataModel::ActionReturnStatus
+ThreadNetworkDirectoryCluster::HandleAddNetworkRequest(const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req)
 {
     OperationalDatasetView dataset;
     ByteSpan extendedPanIdSpan;
@@ -233,7 +234,7 @@ DataModel::ActionReturnStatus ThreadNetworkDirectoryCluster::HandleAddNetworkReq
     // "It SHALL contain at least the following sub-TLVs: Active Timestamp, Channel, Channel Mask,
     // Extended PAN ID, Network Key, Network Mesh-Local Prefix, Network Name, PAN ID, PKSc, and Security Policy."
     CHIP_ERROR err;
-    auto status          = IMStatus::ConstraintError;
+    auto status = IMStatus::ConstraintError;
     SuccessOrExit(err = dataset.Init(req.operationalDataset));
     SuccessOrExit(err = dataset.GetExtendedPanIdAsByteSpan(extendedPanIdSpan));
     SuccessOrExit(err = dataset.GetActiveTimestamp(activeTimestamp));

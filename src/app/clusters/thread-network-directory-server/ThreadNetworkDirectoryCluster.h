@@ -58,10 +58,12 @@ private:
 
     // Command handling helpers
     DataModel::ActionReturnStatus HandleAddNetworkRequest(const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req);
-    DataModel::ActionReturnStatus HandleRemoveNetworkRequest(const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus> HandleOperationalDatasetRequest(CommandHandler & handler,
-                                         const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req,
-                                         const chip::app::ConcreteCommandPath & commandPath);
+    DataModel::ActionReturnStatus
+    HandleRemoveNetworkRequest(const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleOperationalDatasetRequest(CommandHandler & handler,
+                                    const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req,
+                                    const chip::app::ConcreteCommandPath & commandPath);
 
     ThreadNetworkDirectoryStorage & mStorage;
 };
