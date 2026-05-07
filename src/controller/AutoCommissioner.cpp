@@ -468,7 +468,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
-        // skip network setup for Matter over Ethernet devices, which defined ETH feature in Network Commissioning cluster on 
+        // skip network setup for Matter over Ethernet devices, which defined ETH feature in Network Commissioning cluster on
         // Root Node endpoint for commissioning.
         if (mNeedsNetworkSetup && mDeviceCommissioningInfo.network.eth.endpoint != kRootEndpointId)
         {
