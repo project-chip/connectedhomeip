@@ -93,6 +93,10 @@
 #include <app-common/zap-generated/callback.h>
 #endif
 
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+#include "CustomerAppTask.h"
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -1036,3 +1040,12 @@ bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
 }
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
+    CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
+}
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
