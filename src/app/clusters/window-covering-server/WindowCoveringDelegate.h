@@ -70,6 +70,9 @@ protected:
     EndpointId mEndpoint = 0;
 };
 
+// alias for backwards compatibility
+using Delegate = WindowCoveringDelegate;
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
