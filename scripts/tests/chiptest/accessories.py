@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import dataclasses
 import filecmp
 import functools
@@ -23,7 +24,6 @@ import multiprocessing
 import subprocess
 import sys
 import threading
-import contextlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
@@ -70,6 +70,7 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
       `self._rsp_queue`.
     - `_call()` reads that response and re-raises exceptions so XML-RPC receives the original failure.
     """
+
     def _call(self, name: str, *args: Any) -> bool:
         log.debug("Call: %s%r", name, args)
         self._work_queue.put(XmlRpcFuncCall(name, args))
