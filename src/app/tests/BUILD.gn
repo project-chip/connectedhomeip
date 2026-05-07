@@ -120,9 +120,9 @@ source_set("operational-state-test-srcs") {
 
 source_set("thread-border-router-management-test-srcs") {
   sources = [
-    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
-    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
-    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.cpp",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h",
 
     # Sources needed because codegen integration of general commissioning provides general commissioning instance
     "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
