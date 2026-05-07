@@ -70,7 +70,7 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 
     if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
     {
-        ::chip::Groupcast::GetTesting().SetDelegate(this);
+        mGroupcastContext.testing.SetDelegate(this);
     }
 
     return CHIP_NO_ERROR;
@@ -80,7 +80,7 @@ void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
     {
-        ::chip::Groupcast::GetTesting().SetDelegate(nullptr);
+        mGroupcastContext.testing.SetDelegate(nullptr);
     }
 
     mGroupcastTestingTimer.Cancel();
@@ -92,19 +92,17 @@ void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 
 void GroupcastCluster::FlushGroupcastTestingEvent()
 {
-    auto & testing = ::chip::Groupcast::GetTesting();
-    VerifyOrReturn(testing.IsEnabled());
+    VerifyOrReturn(mGroupcastContext.testing.IsEnabled());
 
     Clusters::Groupcast::Events::GroupcastTesting::Type event;
 
     // Convert to event type
-    testing.ToEventType(event);
+    mGroupcastContext.testing.ToEventType(event);
 
     // Generate event on Root Endpoint (Endpoint 0)
-    DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
-    eventGenerator.GenerateEvent(event, kRootEndpointId);
-    eventGenerator.ScheduleUrgentEventDeliverySync();
-    testing.Clear();
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    mContext->interactionContext.eventsGenerator.ScheduleUrgentEventDeliverySync();
+    mGroupcastContext.testing.Clear();
 }
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -125,7 +123,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::UsedMcastAddrCount::Id:
         return ReadUsedMcastAddrCount(request.path.mEndpointId, encoder);
     case Groupcast::Attributes::FabricUnderTest::Id:
-        return encoder.Encode(chip::Groupcast::GetTesting().GetFabricIndex());
+        return encoder.Encode(mGroupcastContext.testing.GetFabricIndex());
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
@@ -209,7 +207,7 @@ CHIP_ERROR GroupcastCluster::GeneratedCommands(const ConcreteClusterPath & path,
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
-    FabricIndex fabricUnderTest = chip::Groupcast::GetTesting().GetFabricIndex();
+    FabricIndex fabricUnderTest = mGroupcastContext.testing.GetFabricIndex();
     VerifyOrReturnError(fabricUnderTest == kUndefinedFabricIndex || fabricUnderTest == fabricIndex, Status::ConstraintError);
 
     if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
@@ -241,14 +239,13 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 
 void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
 {
-    auto & testing = chip::Groupcast::GetTesting();
-    if (fabricUnderTest != testing.GetFabricIndex())
+    if (fabricUnderTest != mGroupcastContext.testing.GetFabricIndex())
     {
-        testing.Clear();
-        testing.SetFabricIndex(fabricUnderTest);
+        mGroupcastContext.testing.Clear();
+        mGroupcastContext.testing.SetFabricIndex(fabricUnderTest);
         NotifyAttributeChanged(Groupcast::Attributes::FabricUnderTest::Id);
     }
-    testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
+    mGroupcastContext.testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
 }
 
 // MembershipChangedTimer implementation

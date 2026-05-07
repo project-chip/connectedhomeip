@@ -61,6 +61,7 @@ public:
                 .groupDataProvider = *groupDataProvider,
                 .timerDelegate     = sTimerDelegate,
                 .accessControl     = Server::GetInstance().GetAccessControl(),
+                .testing           = chip::Groupcast::GetTesting(),
             },
             BitFlags<Clusters::Groupcast::Feature>(featureMap));
         return gServer.Registration();

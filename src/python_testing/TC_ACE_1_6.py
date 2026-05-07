@@ -323,24 +323,16 @@ class TC_ACE_1_6(MatterBaseTest):
 
         acl_entries = [acl_admin, acl_group]
         if gc_on_root:
-            groupcast_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            acl_groupcast_groupkey_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[th1_nodeid],
-                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groupcast.id)]
+                targets=[
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groupcast.id),
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.GroupKeyManagement.id),
+                ]
             )
-
-            # This is needed for testing effects on groupcast when group keys are edited
-            acl_groupkey = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[th1_nodeid],
-                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                    endpoint=0, cluster=Clusters.GroupKeyManagement.id)]
-            )
-
-            acl_entries.append(groupcast_admin)
-            acl_entries.append(acl_groupkey)
+            acl_entries.append(acl_groupcast_groupkey_admin)
 
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl_entries))])
 
@@ -448,10 +440,11 @@ class TC_ACE_1_6(MatterBaseTest):
             # previous steps.
             event_data = event_sub.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
-                previous_event_filter,
-                current_event_filter,
+                current_event_filter_func=current_event_filter,
+                previous_event_filter_func=previous_event_filter,
                 timeout_sec=30
             )
+
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)

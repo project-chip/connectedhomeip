@@ -227,6 +227,7 @@ void ApplicationInit()
             .groupDataProvider = *Credentials::GetGroupDataProvider(),
             .timerDelegate     = sTimerDelegate,
             .accessControl     = Server::GetInstance().GetAccessControl(),
+            .testing           = chip::Groupcast::GetTesting(),
         },
         BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender,
                                                Clusters::Groupcast::Feature::kPerGroup));
