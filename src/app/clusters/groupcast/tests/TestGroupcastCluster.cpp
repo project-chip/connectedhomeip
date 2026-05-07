@@ -328,7 +328,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs)
     tester.SetFabricIndex(kTestFabricIndex);
     tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
-    // Admin privilege, and valid arguments (including key) : JoinGroup should work.
+    // Admin privilege, and valid arguments (including key) : JoinGroup should work
     {
         Commands::JoinGroup::Type joinGroupCmd;
         joinGroupCmd.groupID         = kGroup1;
