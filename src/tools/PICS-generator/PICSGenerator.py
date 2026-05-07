@@ -159,7 +159,7 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
             header += line
             line = inputFile.readline()
         outputFile.write(header.encode())
-        tree.write(outputFile)
+        tree.write(outputFile, encoding='utf-8', xml_declaration=False)
 
     console.print(f"[blue]Wrote Base.xml: {output_file_path}")
 
@@ -333,7 +333,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         outputFile.write(xmlHeader.encode())
 
         # Write the PICS XML data
-        tree.write(outputFile)
+        tree.write(outputFile, encoding='utf-8', xml_declaration=False)
 
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
