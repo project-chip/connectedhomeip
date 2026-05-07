@@ -58,17 +58,22 @@ BitMask<ProximityRanging::Feature> FeatureMapFromAdapters(Span<ProximityRanging:
 ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
                                              Span<ProximityRanging::RangingAdapter * const> adapters) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
-    mRangingDriver(sRangingController, FeatureMapFromAdapters(adapters)), mTimerDelegate(timerDelegate)
-{
-    // Register each adapter with the shared controller.
-    for (auto * adapter : adapters)
-    {
-        LogErrorOnFailure(sRangingController.RegisterAdapter(*adapter));
-    }
-}
+    mRangingDriver(sRangingController, FeatureMapFromAdapters(adapters)), mTimerDelegate(timerDelegate), mAdapters(adapters)
+{}
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
+    // Register adapters with the shared controller, skipping any already registered.
+    for (auto * adapter : mAdapters)
+    {
+        VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        CHIP_ERROR err = sRangingController.RegisterAdapter(*adapter);
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_DUPLICATE_KEY_ID)
+        {
+            return err;
+        }
+    }
+
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -113,6 +118,15 @@ void ProximityRangerDevice::Unregister(CodeDrivenDataModelProvider & provider)
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
+    }
+
+    // Unregister adapters from the shared controller.
+    for (auto * adapter : mAdapters)
+    {
+        if (adapter != nullptr)
+        {
+            LogErrorOnFailure(sRangingController.UnregisterAdapter(*adapter));
+        }
     }
 }
 

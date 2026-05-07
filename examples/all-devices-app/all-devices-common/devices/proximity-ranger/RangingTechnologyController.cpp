@@ -37,22 +37,19 @@ RangingTechnologyController::~RangingTechnologyController()
     }
 }
 
-void RangingTechnologyController::AddListener(Listener * listener)
+CHIP_ERROR RangingTechnologyController::AddListener(Listener * listener)
 {
-    VerifyOrReturn(listener != nullptr);
+    VerifyOrReturnError(listener != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     for (size_t i = 0; i < mListenerCount; i++)
     {
         if (mListeners[i] == listener)
         {
-            return;
+            return CHIP_NO_ERROR;
         }
     }
-    if (mListenerCount >= kMaxListeners)
-    {
-        ChipLogError(AppServer, "RangingTechnologyController: max listeners reached, cannot add");
-        return;
-    }
+    VerifyOrReturnError(mListenerCount < kMaxListeners, CHIP_ERROR_NO_MEMORY);
     mListeners[mListenerCount++] = listener;
+    return CHIP_NO_ERROR;
 }
 
 void RangingTechnologyController::RemoveListener(Listener * listener)
@@ -80,6 +77,44 @@ CHIP_ERROR RangingTechnologyController::RegisterAdapter(RangingAdapter & adapter
     adapter.SetCallback(this);
     OnAttributeChanged(Attributes::RangingCapabilities::Id);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RangingTechnologyController::UnregisterAdapter(RangingAdapter & adapter)
+{
+    for (size_t i = 0; i < mAdapterCount; i++)
+    {
+        if (mAdapters[i] != &adapter)
+        {
+            continue;
+        }
+
+        // Stop all sessions owned by this adapter
+        adapter.StopAllSessions();
+        adapter.SetCallback(nullptr);
+
+        // Remove sessions tracked by this adapter
+        for (auto it = mSessions.begin(); it != mSessions.end();)
+        {
+            if (it->adapter == &adapter)
+            {
+                it = mSessions.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        // Compact the adapter array
+        mAdapters[i]             = mAdapters[--mAdapterCount];
+        mAdapters[mAdapterCount] = nullptr;
+
+        OnAttributeChanged(Attributes::RangingCapabilities::Id);
+        OnAttributeChanged(Attributes::SessionIDList::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR RangingTechnologyController::GetRangingCapabilities(AttributeValueEncoder & encoder)

@@ -64,8 +64,11 @@ public:
     /**
      * Add a listener that receives async results from adapters.
      * Multiple listeners are supported for multi-endpoint configurations.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if null,
+     *         CHIP_ERROR_NO_MEMORY if max listeners reached.
      */
-    void AddListener(Listener * listener);
+    CHIP_ERROR AddListener(Listener * listener);
 
     /**
      * Remove a previously added listener.
@@ -74,11 +77,22 @@ public:
 
     /**
      * Register a technology adapter. Only one adapter per technology is allowed.
+     * The controller holds a non-owning reference; the adapter must outlive the
+     * controller or be explicitly unregistered before destruction.
      *
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_NO_MEMORY if full,
      *         CHIP_ERROR_DUPLICATE_KEY_ID if technology already registered.
      */
     CHIP_ERROR RegisterAdapter(RangingAdapter & adapter);
+
+    /**
+     * Unregister a previously registered adapter. Stops all sessions owned by
+     * the adapter and removes it from the registry. Must be called before the
+     * adapter is destroyed if the controller is still alive.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_FOUND if not registered.
+     */
+    CHIP_ERROR UnregisterAdapter(RangingAdapter & adapter);
 
     /**
      * Encode the capabilities from all registered adapters.

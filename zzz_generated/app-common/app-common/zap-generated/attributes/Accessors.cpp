@@ -26020,7 +26020,7 @@ namespace Attributes {
 
 namespace WiFiDevIK {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[16 + 1];
     Protocols::InteractionModel::Status status =
@@ -26042,7 +26042,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSp
 
 namespace BLEDeviceID {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
 {
     using Traits = NumericAttributeTraits<uint64_t>;
     Traits::StorageType temp;
@@ -26062,7 +26062,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint64_t * value)
 
 namespace BLTDevIK {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[16 + 1];
     Protocols::InteractionModel::Status status =
@@ -26084,7 +26084,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSp
 
 namespace BLTCSSecurityLevel {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>;
     Traits::StorageType temp;
@@ -26104,7 +26105,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace BLTCSModeCapability {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>;
     Traits::StorageType temp;
@@ -26124,7 +26125,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -26144,7 +26145,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;

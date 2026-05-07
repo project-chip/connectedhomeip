@@ -29,11 +29,10 @@ CHIP_ERROR BleRssiRangingAdapter::Init(chip::PersistentStorageDelegate * store)
 
     if (mpStore != nullptr)
     {
-        uint8_t buf[sizeof(uint64_t)];
-        uint16_t size = sizeof(buf);
-        if (mpStore->SyncGetKeyValue(kBleDeviceIdKeyName, buf, size) == CHIP_NO_ERROR && size == sizeof(buf))
+        uint16_t size = sizeof(mBleDeviceId);
+        if (mpStore->SyncGetKeyValue(kBleDeviceIdKeyName, &mBleDeviceId, size) != CHIP_NO_ERROR || size != sizeof(mBleDeviceId))
         {
-            mBleDeviceId = chip::Encoding::BigEndian::Get64(buf);
+            mBleDeviceId = kInvalidBleDeviceId;
         }
     }
 
@@ -90,9 +89,8 @@ CHIP_ERROR BleRssiRangingAdapter::GenerateBleDeviceId()
 
             if (mpStore != nullptr)
             {
-                uint8_t buf[sizeof(uint64_t)];
-                chip::Encoding::BigEndian::Put64(buf, mBleDeviceId);
-                (void) mpStore->SyncSetKeyValue(kBleDeviceIdKeyName, buf, sizeof(buf));
+                // Fallthrough if no storage delegate registered
+                LogErrorOnFailure(mpStore->SyncSetKeyValue(kBleDeviceIdKeyName, &mBleDeviceId, sizeof(mBleDeviceId)));
             }
             return CHIP_NO_ERROR;
         }

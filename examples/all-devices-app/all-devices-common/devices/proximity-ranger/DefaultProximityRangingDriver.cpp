@@ -27,7 +27,7 @@ namespace ProximityRanging {
 CHIP_ERROR DefaultProximityRangingDriver::Init(Callback & callback)
 {
     mCallback = &callback;
-    mController.AddListener(this);
+    ReturnErrorOnFailure(mController.AddListener(this));
     return CHIP_NO_ERROR;
 }
 

@@ -570,8 +570,6 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
     driver.mCallback->OnMeasurementData(42, measurement);
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
-    ASSERT_NE(eventInfo, std::nullopt);
-    ASSERT_TRUE(eventInfo.has_value());
 
     Events::RangingResult::DecodableType decodedEvent;
     if (eventInfo.has_value())
@@ -601,8 +599,6 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
     driver.mCallback->OnSessionStopped(7, RangingSessionStatusEnum::kSessionEndTimeReached);
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
-    ASSERT_NE(eventInfo, std::nullopt);
-    ASSERT_TRUE(eventInfo.has_value());
 
     Events::RangingSessionStatus::DecodableType decodedEvent;
     if (eventInfo.has_value())

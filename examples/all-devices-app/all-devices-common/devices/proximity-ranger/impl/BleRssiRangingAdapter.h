@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include "../RangingAdapter.h"
 #include <ble/Ble.h>
+#include <devices/proximity-ranger/RangingAdapter.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Span.h>
 
@@ -91,7 +91,7 @@ public:
     }
 
 protected:
-    uint64_t mBleDeviceId                     = 0;
+    uint64_t mBleDeviceId                     = kInvalidBleDeviceId;
     chip::PersistentStorageDelegate * mpStore = nullptr;
 
 private:

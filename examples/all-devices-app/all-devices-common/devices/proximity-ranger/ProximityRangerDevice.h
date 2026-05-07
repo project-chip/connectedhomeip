@@ -40,6 +40,7 @@ public:
 private:
     Clusters::ProximityRanging::DefaultProximityRangingDriver mRangingDriver;
     TimerDelegate & mTimerDelegate;
+    Span<Clusters::ProximityRanging::RangingAdapter * const> mAdapters; // Backing array must outlive this device
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ProximityRanging::ProximityRangingCluster> mProximityRangingCluster;
