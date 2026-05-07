@@ -905,7 +905,8 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
     // Neither Listener, nor Sender
     {
-        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl, mTesting });
+        app::Clusters::GroupcastCluster cluster(
+            { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl, mTesting });
         chip::Testing::ClusterTester tester(cluster);
         tester.SetFabricIndex(kTestFabricIndex);
         tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
