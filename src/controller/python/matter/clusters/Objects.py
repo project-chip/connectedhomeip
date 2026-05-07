@@ -27930,6 +27930,15 @@ class DoorLock(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 11
 
+        class StatusCodeEnum(MatterIntEnum):
+            kDuplicate = 0x02
+            kOccupied = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
         class UserStatusEnum(MatterIntEnum):
             kAvailable = 0x00
             kOccupiedEnabled = 0x01

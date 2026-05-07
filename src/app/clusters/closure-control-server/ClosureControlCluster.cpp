@@ -230,23 +230,29 @@ CHIP_ERROR ClosureControlCluster::SetCountdownTime(const DataModel::Nullable<Ela
     VerifyOrReturnError(mFeatureMap.Has(Feature::kPositioning) && !mFeatureMap.Has(Feature::kInstantaneous),
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    auto now       = mTimerDelegate.GetCurrentMonotonicTimestamp();
-    bool markDirty = false;
+    VerifyOrReturnError(mDelegate.OnCountdownTimeChanged(countdownTime), CHIP_ERROR_INCORRECT_STATE);
 
     // When fromDelegate=true (delegate updates), we rely on the QuieterReportingAttribute policies
     // to determine if reporting is needed (increment, change to/from zero, null changes).
     // When fromDelegate=false (MainState change), we force reporting since the tracked operation changed.
-
+    auto now       = mTimerDelegate.GetCurrentMonotonicTimestamp();
     auto predicate = [fromDelegate](const decltype(mCountdownTime)::SufficientChangePredicateCandidate &) -> bool {
         // Force reporting when the tracked operation changes due to MainState change
         return !fromDelegate;
     };
-    VerifyOrReturnError(mDelegate.OnCountdownTimeChanged(countdownTime), CHIP_ERROR_INCORRECT_STATE);
-    markDirty = (mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
 
-    if (markDirty)
+    auto previousValue = mCountdownTime.value();
+    auto markDirty     = (mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+
+    // The reporting decision is made only after evaluation. This means there is a difference between
+    // one call to 'SetCountdownTime(x)' and repeated calls to 'SetCountdownTime(x)'
+    // (as repeated calls may eventually report).
+    //
+    // Here we report only if reportable or value actually changed.
+    if (markDirty || (previousValue != countdownTime))
     {
-        NotifyAttributeChanged(Attributes::CountdownTime::Id);
+        NotifyAttributeChanged(Attributes::CountdownTime::Id,
+                               markDirty ? DataModel::AttributeChangeType::kReportable : DataModel::AttributeChangeType::kQuiet);
     }
 
     return CHIP_NO_ERROR;
