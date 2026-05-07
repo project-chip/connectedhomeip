@@ -73,6 +73,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/problem_notices.py",
     "matter/testing/runner.py",
     "matter/testing/spec_parsing.py",
+    "matter/testing/step_extractor.py",
     "matter/testing/taglist_and_topology_test.py",
     "matter/testing/tasks.py",
     "matter/testing/timeoperations.py",

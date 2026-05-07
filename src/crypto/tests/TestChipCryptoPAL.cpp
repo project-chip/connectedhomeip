@@ -1560,7 +1560,7 @@ TEST_F(TestChipCryptoPAL, TestAddEntropySources)
     EXPECT_EQ(DRBG_get_bytes(buffer, sizeof(buffer)), CHIP_NO_ERROR);
     for (int i = 0; i < 5000 * 2; i++)
     {
-        (void) DRBG_get_bytes(buffer, sizeof(buffer));
+        EXPECT_SUCCESS(DRBG_get_bytes(buffer, sizeof(buffer)));
     }
     EXPECT_GT(gs_test_entropy_source_called, test_entropy_source_call_count);
 }

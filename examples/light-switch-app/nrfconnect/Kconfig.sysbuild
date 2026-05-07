@@ -20,11 +20,11 @@ config NRF_DEFAULT_IPC_RADIO
 
 # Enable IEEE802.15.4 serialization to network core
 config NETCORE_IPC_RADIO_IEEE802154
-	default y if (SOC_SERIES_NRF53X) && !WIFI_NRF700X
+	default y if (SOC_SERIES_NRF53) && !WIFI_NRF700X
 
 # Enable Bluetooth serialization to network core
 config NETCORE_IPC_RADIO_BT_HCI_IPC
-	default y if SOC_SERIES_NRF53X
+	default y if SOC_SERIES_NRF53
 
 #### Bootloader
 choice BOOTLOADER
@@ -44,7 +44,7 @@ config PM_EXTERNAL_FLASH_MCUBOOT_SECONDARY
 	default y
 
 #### DFU network core configuration
-if SOC_SERIES_NRF53X
+if SOC_SERIES_NRF53
 
 config MCUBOOT_UPDATEABLE_IMAGES
 	default 2
@@ -66,7 +66,7 @@ config NETCORE_APP_UPDATE
 config DFU_MULTI_IMAGE_PACKAGE_NET
 	default y
 
-endif # SOC_SERIES_NRF53X
+endif # SOC_SERIES_NRF53
 
 if BOARD_NRF54L15DK
 

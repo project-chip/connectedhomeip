@@ -342,24 +342,6 @@ sl_status_t SiWxPlatformInit(void)
     status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status)));
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#ifdef ENABLE_CHIP_SHELL
-#ifdef RTE_UULP_GPIO_1_PIN
-    // While using the matter shell with a Low Power Build, GPIO 1 is used to check the UULP PIN 1 status
-    // since UART doesn't act as a wakeup source in the UULP mode.
-
-    // Configuring the NPS GPIO 1
-    RSI_NPSSGPIO_SetPinMux(RTE_UULP_GPIO_1_PIN, 0);
-
-    // Configure the NPSS GPIO direction to input
-    RSI_NPSSGPIO_SetDir(RTE_UULP_GPIO_1_PIN, 1);
-
-    // Enable the REN
-    RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
-#endif // RTE_UULP_GPIO_1_PIN
-#endif // ENABLE_CHIP_SHELL
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SLI_SI91X_MCU_INTERFACE
 
     sl_wifi_firmware_version_t version = { 0 };

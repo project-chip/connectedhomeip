@@ -231,6 +231,17 @@ async def commission_device(
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "nfc-ethernet":
+        try:
+            await dev_ctrl.CommissionNfcEthernet(
+                info.filter_value,
+                info.passcode,
+                node_id,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "thread-meshcop":
         try:
             asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
