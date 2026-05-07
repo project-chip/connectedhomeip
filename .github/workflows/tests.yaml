@@ -1307,6 +1307,7 @@ jobs:
                 report_paths: junit-results/**/*.xml
                 detailed_summary: true
                 require_tests: false
+                annotate_only: true
 
           - name: Checkout gh-pages for Allure history
             uses: actions/checkout@v6.0.2
