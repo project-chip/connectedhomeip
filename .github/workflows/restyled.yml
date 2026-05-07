@@ -14,10 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: restyled-io/actions/setup@30f44939e2f6dcdf9e4d547c367ed35c154c5253 # v4
+      - uses: restyled-io/actions/setup@f31a2185676c560a98c4f9e0185e9bfe8ec3eaf9 # v4
 
       - id: restyler
-        uses: restyled-io/actions/run@30f44939e2f6dcdf9e4d547c367ed35c154c5253 # v4
+        uses: restyled-io/actions/run@f31a2185676c560a98c4f9e0185e9bfe8ec3eaf9 # v4
 
       - name: Save restyle patch
         if: ${{ steps.restyler.outputs.git-patch }}

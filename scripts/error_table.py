@@ -102,7 +102,7 @@ class ErrorCodeLoader:
 
 def get_section_title(section: str) -> tuple[str, str]:
     markdown_title = f"{section} errors"
-    anchor_name = f'#{markdown_title.lower().replace(" ","-").replace(".","-")}'
+    anchor_name = f'#{markdown_title.lower().replace(" ", "-").replace(".", "-")}'
 
     return markdown_title, anchor_name
 
