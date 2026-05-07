@@ -60,12 +60,6 @@ _NETCOMM_FEATURE_BIT_ETHERNET = 2
 
 @dataclass
 class _BasePicsFacts:
-    """Per-device facts the tool can derive at runtime to fill in Base.xml.
-
-    Anything that needs human judgement (DD.* onboarding payload, BLE
-    transport, controller/commissioner role, UI/factory reset) is intentionally
-    NOT here -- those stay at the template default so the reviewer fills them in.
-    """
     is_commissionee: bool = False
     supports_wifi: bool = False
     supports_wifi_2g4: bool = False
@@ -75,7 +69,8 @@ class _BasePicsFacts:
 
 
 def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
-    """Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
+    """
+    Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
 
     Returns None if item_number is missing or doesn't end in '.E<hex>'.
     """
@@ -88,7 +83,8 @@ def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
 
 
 def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
-    """Auto-mark the base/MCORE PICS we can derive from the DUT.
+    """
+    Auto-mark the base/MCORE PICS we can derive from the DUT.
 
     Only flips items with a deterministic protocol readback. Everything else
     is left at the template default (false) so the reviewer knows to look at it.
@@ -204,7 +200,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         return
 
     # Usage PICS
-    # console.print(clusterPicsCode)
     usageNode = root.find('usage')
     for picsItem in usageNode:
         itemNumberElement = picsItem.find('itemNumber')
@@ -214,7 +209,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         if itemNumberElement.text == f"{clusterPicsCode}":
             console.print("Found usage PICS value in XML template ✅")
             supportElement = picsItem.find('support')
-            # console.print(f"Support: {supportElement.text}")
             supportElement.text = "true"
 
             # Since usage PICS (server or client) is not a list, we can break out when a match is found,
