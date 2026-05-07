@@ -114,8 +114,8 @@ public:
     }
 
     bool DMDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
-                                 chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                 CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
+                                 chip::FabricIndex modifier, DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                                 const chip::ByteSpan & credentialData)
     {
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, DMDoorLockSetCredentialImpl, endpointId, credentialIndex, creator,
                                     modifier, credentialStatus, credentialType, credentialData);
@@ -130,8 +130,8 @@ public:
                            const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                            CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
     {
-        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, DMDoorLockSetUserImpl, endpointId, userIndex, creator, modifier,
-                                    userName, uniqueId, userStatus, usertype, credentialRule, credentials, totalCredentials);
+        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, DMDoorLockSetUserImpl, endpointId, userIndex, creator, modifier, userName,
+                                    uniqueId, userStatus, usertype, credentialRule, credentials, totalCredentials);
     }
 
     DlStatus DMDoorLockGetWeekDaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
@@ -268,11 +268,11 @@ private:
     }
 
     DlStatus DMDoorLockSetWeekDayScheduleImpl(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                              DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
-                                              uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+                                              DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                              uint8_t endHour, uint8_t endMinute)
     {
-        return AppTask::DMDoorLockSetWeekDaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour,
-                                                     startMinute, endHour, endMinute);
+        return AppTask::DMDoorLockSetWeekDaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute,
+                                                     endHour, endMinute);
     }
 
     DlStatus DMDoorLockGetYearDayScheduleImpl(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
@@ -296,8 +296,7 @@ private:
     DlStatus DMDoorLockSetHolidayScheduleImpl(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
                                               uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
     {
-        return AppTask::DMDoorLockSetHolidaySchedule(endpointId, holidayIndex, status, localStartTime, localEndTime,
-                                                     operatingMode);
+        return AppTask::DMDoorLockSetHolidaySchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
     }
 
     void DMDoorLockOnAutoRelockImpl(chip::EndpointId endpointId) { AppTask::DMDoorLockOnAutoRelock(endpointId); }
