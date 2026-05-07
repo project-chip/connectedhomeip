@@ -554,13 +554,14 @@ def run_tests_no_exit(
                         LOGGER.warning("Could not pre-populate global wildcard via CASE")
 
             # Populate XML data model
-            try:
-                spec_version = stored_global_wildcard.attributes[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
-                dm_directory = dm_from_spec_version(spec_version)
-                data_model = build_xml_data_model(dm_directory)
-                test_config.user_params["data_model"] = global_stash.stash_globally(data_model)
-            except Exception:
-                LOGGER.warning("Could not populate data model from device spec version")
+            if stored_global_wildcard:
+                try:
+                    spec_version = stored_global_wildcard.attributes[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+                    dm_directory = dm_from_spec_version(spec_version)
+                    data_model = build_xml_data_model(dm_directory)
+                    test_config.user_params["data_model"] = global_stash.stash_globally(data_model)
+                except Exception:
+                    LOGGER.warning("Could not populate data model from device spec version")
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
