@@ -38,7 +38,7 @@ import click
 import coloredlogs
 from colorama import Fore, Style
 
-from matter.testing.metadata import Metadata
+from matter.testing.metadata import Metadata, MetadataReader
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
