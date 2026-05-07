@@ -340,10 +340,9 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
             # Initialize global logger in the subprocess.
             self._config.log_config.set_fmt()
 
-            # Initialize.
-            log.debug("Initializing")
             with contextlib.ExitStack() as stack:
                 try:
+                    log.debug("Initializing")
                     self._proc_init(stack)
                     self.state.phase = ProcessPhase.READY
                     log.debug("Initialized successfully")
@@ -351,7 +350,6 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
                     e.add_note("Failure during process initialization")
                     raise
 
-                # Perform work.
                 try:
                     self._proc_work()
                 except BaseException as e:
