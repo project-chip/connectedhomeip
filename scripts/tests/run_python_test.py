@@ -200,8 +200,8 @@ class IpPacketCaptureManager():
                                                                              'src',
                                                                              'controller',
                                                                              'python',
-                                                                             'test',
-                                                                             'test_scripts',
+                                                                             'tests',
+                                                                             'scripts',
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
@@ -219,22 +219,18 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
          app_filter):
-    if load_from_env:
-        reader = MetadataReader(load_from_env)
-        runs = reader.parse_script(script)
-    else:
-        runs = [
-            Metadata(
-                py_script_path=script,
-                run="cmd-run",
-                app=app,
-                app_args=app_args,
-                app_ready_pattern=app_ready_pattern,
-                app_stdin_pipe=app_stdin_pipe,
-                script_args=script_args,
-                script_gdb=script_gdb,
-            )
-        ]
+    runs = [
+        Metadata(
+            py_script_path=script,
+            run="cmd-run",
+            app="out/linux-x64-camera-controller/chip-camera-controller",
+            app_args="interactive server",
+            app_ready_pattern=None,
+            app_stdin_pipe=None,
+            script_args=script_args,
+            script_gdb=script_gdb,
+        )
+    ]
 
     if not runs:
         raise click.ClickException(
@@ -265,7 +261,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     for run in runs:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
-                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
+                  run.app_stdin_pipe, script, run.script_args or "", run.script_gdb, ip_packet_capture,
                   ip_packet_capture_dir, run.quiet, run.run)
 
 
