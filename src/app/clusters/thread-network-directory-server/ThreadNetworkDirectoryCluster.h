@@ -57,12 +57,9 @@ private:
     CHIP_ERROR WritePreferredExtendedPanId(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
     // Command handling helpers
-    void HandleAddNetworkRequest(CommandHandler & handler, const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req,
-                                 const chip::app::ConcreteCommandPath & commandPath);
-    void HandleRemoveNetworkRequest(CommandHandler & handler,
-                                    const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req,
-                                    const chip::app::ConcreteCommandPath & commandPath);
-    void HandleOperationalDatasetRequest(CommandHandler & handler,
+    DataModel::ActionReturnStatus HandleAddNetworkRequest(const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req);
+    DataModel::ActionReturnStatus HandleRemoveNetworkRequest(const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleOperationalDatasetRequest(CommandHandler & handler,
                                          const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req,
                                          const chip::app::ConcreteCommandPath & commandPath);
 

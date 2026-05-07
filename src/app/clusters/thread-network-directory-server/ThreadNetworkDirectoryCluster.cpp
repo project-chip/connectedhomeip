@@ -170,7 +170,7 @@ CHIP_ERROR ThreadNetworkDirectoryCluster::ReadThreadNetworks(const ConcreteDataA
             char networkName[kSizeNetworkName + 1];
             ThreadNetworkStruct::Type network;
 
-            TEMPORARY_RETURN_IGNORED dataset.Init(datasetSpan);
+            SuccessOrExit(err = dataset.Init(datasetSpan));
             SuccessOrExit(err = dataset.GetExtendedPanIdAsByteSpan(network.extendedPanID));
             SuccessOrExit(err = dataset.GetNetworkName(networkName));
             network.networkName = CharSpan::fromCharString(networkName);
@@ -190,37 +190,30 @@ std::optional<DataModel::ActionReturnStatus> ThreadNetworkDirectoryCluster::Invo
                                                                                           CommandHandler * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
+    
     switch (request.path.mCommandId)
     {
     case AddNetwork::Id: {
         ThreadNetworkDirectory::Commands::AddNetwork::DecodableType addNetworkReq;
         ReturnErrorOnFailure(addNetworkReq.Decode(input_arguments));
-        HandleAddNetworkRequest(*handler, addNetworkReq, request.path);
-        break;
+        return HandleAddNetworkRequest(addNetworkReq);
     }
     case RemoveNetwork::Id: {
         ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType removeNetworkReq;
         ReturnErrorOnFailure(removeNetworkReq.Decode(input_arguments));
-        HandleRemoveNetworkRequest(*handler, removeNetworkReq, request.path);
-        break;
+        return HandleRemoveNetworkRequest(removeNetworkReq);
     }
     case GetOperationalDataset::Id: {
         ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType getOpDataset;
         ReturnErrorOnFailure(getOpDataset.Decode(input_arguments));
-        HandleOperationalDatasetRequest(*handler, getOpDataset, request.path);
-        break;
+        return HandleOperationalDatasetRequest(*handler, getOpDataset, request.path);
     }
     default:
         return IMStatus::UnsupportedCommand;
     }
-
-    return std::nullopt;
 }
 
-void ThreadNetworkDirectoryCluster::HandleAddNetworkRequest(CommandHandler & ctx,
-                                                            const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req,
-                                                            const chip::app::ConcreteCommandPath & commandPath)
+DataModel::ActionReturnStatus ThreadNetworkDirectoryCluster::HandleAddNetworkRequest(const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req)
 {
     OperationalDatasetView dataset;
     ByteSpan extendedPanIdSpan;
@@ -241,18 +234,17 @@ void ThreadNetworkDirectoryCluster::HandleAddNetworkRequest(CommandHandler & ctx
     // Extended PAN ID, Network Key, Network Mesh-Local Prefix, Network Name, PAN ID, PKSc, and Security Policy."
     CHIP_ERROR err;
     auto status          = IMStatus::ConstraintError;
-    const char * context = nullptr;
-    SuccessOrExitAction(err = dataset.Init(req.operationalDataset), context = "OperationalDataset");
-    SuccessOrExitAction(err = dataset.GetExtendedPanIdAsByteSpan(extendedPanIdSpan), context = "ExtendedPanID");
-    SuccessOrExitAction(err = dataset.GetActiveTimestamp(activeTimestamp), context = "ActiveTimestamp");
-    SuccessOrExitAction(err = dataset.GetChannel(unused.channel), context = "Channel");
-    SuccessOrExitAction(err = dataset.GetChannelMask(unusedSpan), context = "ChannelMask");
-    SuccessOrExitAction(err = dataset.GetMasterKey(unused.masterKey), context = "NetworkKey");
-    SuccessOrExitAction(err = dataset.GetMeshLocalPrefix(unused.meshLocalPrefix), context = "MeshLocalPrefix");
-    SuccessOrExitAction(err = dataset.GetNetworkName(unused.networkName), context = "NetworkName");
-    SuccessOrExitAction(err = dataset.GetPanId(unused.panId), context = "PanID");
-    SuccessOrExitAction(err = dataset.GetPSKc(unused.pksc), context = "PKSc");
-    SuccessOrExitAction(err = dataset.GetSecurityPolicy(unused.securityPolicy), context = "SecurityContext");
+    SuccessOrExit(err = dataset.Init(req.operationalDataset));
+    SuccessOrExit(err = dataset.GetExtendedPanIdAsByteSpan(extendedPanIdSpan));
+    SuccessOrExit(err = dataset.GetActiveTimestamp(activeTimestamp));
+    SuccessOrExit(err = dataset.GetChannel(unused.channel));
+    SuccessOrExit(err = dataset.GetChannelMask(unusedSpan));
+    SuccessOrExit(err = dataset.GetMasterKey(unused.masterKey));
+    SuccessOrExit(err = dataset.GetMeshLocalPrefix(unused.meshLocalPrefix));
+    SuccessOrExit(err = dataset.GetNetworkName(unused.networkName));
+    SuccessOrExit(err = dataset.GetPanId(unused.panId));
+    SuccessOrExit(err = dataset.GetPSKc(unused.pksc));
+    SuccessOrExit(err = dataset.GetSecurityPolicy(unused.securityPolicy));
 
     status = IMStatus::Failure;
 
@@ -270,34 +262,29 @@ void ThreadNetworkDirectoryCluster::HandleAddNetworkRequest(CommandHandler & ctx
             SuccessOrExit(err = dataset.GetActiveTimestamp(existingActiveTimestamp));
             if (activeTimestamp <= existingActiveTimestamp)
             {
-                ctx.AddStatus(commandPath, IMStatus::InvalidInState, "ActiveTimestamp");
-                return;
+                return IMStatus::InvalidInState;
             }
         }
     }
 
     SuccessOrExit(err = mStorage.AddOrUpdateNetwork(ExtendedPanId(extendedPanIdSpan), req.operationalDataset));
 
-    ctx.AddStatus(commandPath, IMStatus::Success);
-    MatterReportingAttributeChangeCallback(mPath.mEndpointId, ThreadNetworkDirectory::Id, ThreadNetworks::Id);
-    return;
+    NotifyAttributeChanged(ThreadNetworks::Id);
+    return IMStatus::Success;
 
 exit:
     ChipLogError(Zcl, "AddNetwork: %" CHIP_ERROR_FORMAT, err.Format());
-    ctx.AddStatus(commandPath, (status == IMStatus::Failure && err == CHIP_ERROR_NO_MEMORY) ? IMStatus::ResourceExhausted : status,
-                  context);
+    return (status == IMStatus::Failure && err == CHIP_ERROR_NO_MEMORY) ? IMStatus::ResourceExhausted : status;
 }
 
-void ThreadNetworkDirectoryCluster::HandleRemoveNetworkRequest(
-    CommandHandler & handler, const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req,
-    const chip::app::ConcreteCommandPath & commandPath)
+DataModel::ActionReturnStatus ThreadNetworkDirectoryCluster::HandleRemoveNetworkRequest(
+    const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req)
 {
     CHIP_ERROR err;
 
     if (req.extendedPanID.size() != ExtendedPanId::size())
     {
-        handler.AddStatus(commandPath, IMStatus::ConstraintError);
-        return;
+        return IMStatus::ConstraintError;
     }
     ExtendedPanId exPanId(req.extendedPanID);
 
@@ -308,22 +295,20 @@ void ThreadNetworkDirectoryCluster::HandleRemoveNetworkRequest(
     if (preferredExPanId.has_value() && preferredExPanId.value() == exPanId)
     {
         ChipLogError(Zcl, "RemoveNetwork: Rejecting removal of preferred PAN");
-        handler.AddStatus(commandPath, IMStatus::ConstraintError);
-        return;
+        return IMStatus::ConstraintError;
     }
 
     SuccessOrExit(err = mStorage.RemoveNetwork(exPanId));
 
-    handler.AddStatus(commandPath, IMStatus::Success);
-    MatterReportingAttributeChangeCallback(mPath.mEndpointId, ThreadNetworkDirectory::Id, ThreadNetworks::Id);
-    return;
+    NotifyAttributeChanged(ThreadNetworks::Id);
+    return IMStatus::Success;
 
 exit:
     ChipLogError(Zcl, "RemoveNetwork: %" CHIP_ERROR_FORMAT, err.Format());
-    handler.AddStatus(commandPath, (err == CHIP_ERROR_NOT_FOUND) ? IMStatus::NotFound : IMStatus::Failure);
+    return (err == CHIP_ERROR_NOT_FOUND) ? IMStatus::NotFound : IMStatus::Failure;
 }
 
-void ThreadNetworkDirectoryCluster::HandleOperationalDatasetRequest(
+std::optional<DataModel::ActionReturnStatus> ThreadNetworkDirectoryCluster::HandleOperationalDatasetRequest(
     CommandHandler & handler, const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req,
     const chip::app::ConcreteCommandPath & commandPath)
 {
@@ -331,14 +316,12 @@ void ThreadNetworkDirectoryCluster::HandleOperationalDatasetRequest(
 
     if (handler.GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
     {
-        handler.AddStatus(commandPath, IMStatus::UnsupportedAccess);
-        return;
+        return IMStatus::UnsupportedAccess;
     }
 
     if (req.extendedPanID.size() != ExtendedPanId::size())
     {
-        handler.AddStatus(commandPath, IMStatus::ConstraintError);
-        return;
+        return IMStatus::ConstraintError;
     }
 
     uint8_t datasetBuffer[kSizeOperationalDataset];
@@ -347,10 +330,10 @@ void ThreadNetworkDirectoryCluster::HandleOperationalDatasetRequest(
     SuccessOrExit(err = mStorage.GetNetworkDataset(ExtendedPanId(req.extendedPanID), datasetSpan));
     response.operationalDataset = datasetSpan;
     handler.AddResponse(commandPath, response);
-    return;
+    return std::nullopt;
 exit:
     ChipLogError(Zcl, "GetOperationalDataset: %" CHIP_ERROR_FORMAT, err.Format());
-    handler.AddStatus(commandPath, (err == CHIP_ERROR_NOT_FOUND) ? IMStatus::NotFound : IMStatus::Failure);
+    return (err == CHIP_ERROR_NOT_FOUND) ? IMStatus::NotFound : IMStatus::Failure;
 }
 
 } // namespace Clusters
