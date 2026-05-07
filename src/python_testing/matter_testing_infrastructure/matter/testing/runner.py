@@ -47,6 +47,7 @@ from matter.testing.defaults import TestingDefaults
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
+from matter.testing.spec_parsing import build_xml_data_model, dm_from_spec_version
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -489,6 +490,7 @@ def run_tests_no_exit(
                                     node_id,
                                     [
                                         (Clusters.Descriptor),
+                                        (Clusters.BasicInformation),
                                         Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
                                         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
                                         Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
@@ -516,6 +518,7 @@ def run_tests_no_exit(
                                         node_id,
                                         [
                                             (Clusters.Descriptor),
+                                            (Clusters.BasicInformation),
                                             Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
                                             Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
                                             Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
@@ -537,6 +540,7 @@ def run_tests_no_exit(
                                     node_id,
                                     [
                                         (Clusters.Descriptor),
+                                        (Clusters.BasicInformation),
                                         Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
                                         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
                                         Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
@@ -548,6 +552,15 @@ def run_tests_no_exit(
                         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                     except Exception:
                         LOGGER.warning("Could not pre-populate global wildcard via CASE")
+
+            # Populate XML data model
+            try:
+                spec_version = stored_global_wildcard.attributes[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+                dm_directory = dm_from_spec_version(spec_version)
+                data_model = build_xml_data_model(dm_directory)
+                test_config.user_params["data_model"] = global_stash.stash_globally(data_model)
+            except Exception:
+                LOGGER.warning("Could not populate data model from device spec version")
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:

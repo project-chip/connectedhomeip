@@ -1691,3 +1691,30 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
     return version_to_dm[specification_version]
+
+
+@dataclass
+class XmlDataModel:
+    clusters: dict[uint, XmlCluster]
+    device_types: dict[int, XmlDeviceType]
+    namespaces: dict[int, XmlNamespace]
+    global_data_types: dict[str, dict[str, XmlDataType]]
+    problems: list[ProblemNotice]
+
+
+def build_xml_data_model(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> XmlDataModel:
+    """Build the full data model from XML files: clusters, device types, namespaces, and global data types."""
+    clusters, problems = build_xml_clusters(data_model_directory)
+    device_types, dt_problems = build_xml_device_types(data_model_directory, cluster_definition_xml=clusters)
+    namespaces, ns_problems = build_xml_namespaces(data_model_directory)
+    global_data_types, gdt_problems = build_xml_global_data_types(data_model_directory)
+
+    all_problems = problems + dt_problems + ns_problems + gdt_problems
+
+    return XmlDataModel(
+        clusters=clusters,
+        device_types=device_types,
+        namespaces=namespaces,
+        global_data_types=global_data_types,
+        problems=all_problems,
+    )
