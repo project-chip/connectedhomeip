@@ -124,8 +124,9 @@ class NFCReader:
                     #     [identifier code (1 byte)] + [URI string]
                     # There is currently no prefix officially registered for Matter so the on-boarding data string
                     # is fully in the URI string.
-                    log.info("NFC Onboarding data: %s", record.uri)
-                    return record.uri
+                    # Warning: NDEF URI parser is converting the URI to lower case
+                    log.info("NFC Onboarding data: %s", record.uri.upper())
+                    return record.uri.upper()
 
             raise ValueError("No NDEF URI record found in message")
 
