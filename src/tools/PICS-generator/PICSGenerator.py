@@ -93,8 +93,8 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
     Only flips items with a deterministic protocol readback. Everything else
     is left at the template default (false) so the reviewer knows to look at it.
     """
-    template_path = f"{xmlTemplatePathStr}{_BASE_PICS_TEMPLATE_FILENAME}"
-    if not os.path.exists(template_path):
+    template_path = Path(xmlTemplatePathStr) / _BASE_PICS_TEMPLATE_FILENAME
+    if not template_path.exists():
         console.print(f"[red]Base PICS template ({_BASE_PICS_TEMPLATE_FILENAME}) not found in {xmlTemplatePathStr}; skipping ❌")
         return
 
