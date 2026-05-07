@@ -339,6 +339,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs)
         joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
 
         auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
     }
 
