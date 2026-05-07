@@ -245,7 +245,7 @@ void WebRTCProviderClient::HandleAnswerReceived(uint16_t webRTCSessionId)
 void WebRTCProviderClient::OnResponse(CommandSender * client, const ConcreteCommandPath & path, const StatusIB & status,
                                       TLV::TLVReader * data)
 {
-    ChipLogProgress(Camera, "WebRTCProviderClient: OnResponse received for cluster: 0x%" PRIx32 " command: 0x%" PRIx32,
+    ChipLogProgress(Camera, "WebRTCProviderClient: $$$ OnResponse received for cluster: 0x%" PRIx32 " command: 0x%" PRIx32,
                     path.mClusterId, path.mCommandId);
 
     CHIP_ERROR error = status.ToChipError();
@@ -487,11 +487,23 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
 
     mCurrentSessionId = value.webRTCSessionID;
 
-    // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID.Value() =
-        value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
-    session.audioStreamID.Value() =
-        value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    if (value.videoStreamID.HasValue())
+    {
+        session.videoStreamID.SetValue(value.videoStreamID.Value());
+    }
+    else
+    {
+        session.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
+    }
+    
+    if (value.audioStreamID.HasValue())
+    {
+        session.audioStreamID.SetValue(value.audioStreamID.Value());
+    }
+    else
+    {
+        session.audioStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
+    }
 
     if (mRequestorServer == nullptr)
     {

@@ -75,7 +75,7 @@ PyChipError WebRTCTransportProviderClient::SendCommand(void * appContext, uint16
 void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                                                const chip::app::StatusIB & status, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(Camera, "WebRTCTransportProviderClient: OnResponse received for cluster: 0x%" PRIx32 " command: 0x%" PRIx32,
+    ChipLogProgress(Camera, "WebRTCTransportProviderClient: ### OnResponse received for cluster: 0x%" PRIx32 " command: 0x%" PRIx32,
                     path.mClusterId, path.mCommandId);
 
     CHIP_ERROR error = status.ToChipError();
@@ -326,11 +326,23 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     session.peerEndpointID = mEndpointId;
     session.streamUsage    = mCurrentStreamUsage;
 
-    // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID.Value() =
-        value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
-    session.audioStreamID.Value() =
-        value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    if (value.videoStreamID.HasValue())
+    {
+        session.videoStreamID.SetValue(value.videoStreamID.Value());
+    }
+    else
+    {
+        session.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
+    }
+    
+    if (value.audioStreamID.HasValue())
+    {
+        session.audioStreamID.SetValue(value.audioStreamID.Value());
+    }
+    else
+    {
+        session.audioStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
+    }
 
     WebRTCTransportRequestorManager::Instance().UpsertSession(session);
 }
