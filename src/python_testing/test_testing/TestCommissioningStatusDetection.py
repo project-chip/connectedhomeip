@@ -35,8 +35,6 @@ import sys
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from python_path import PythonPath
-
 # Do not import mdns_discovery at module import time. Some unit-test
 # environments intentionally lack the real mdns_discovery/zeroconf
 # dependency, and tests should import it only after any sys.modules-based
