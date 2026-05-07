@@ -46,7 +46,8 @@ def str_changes(element, added, removed, change_ids, old, new):
     if change_ids:
         ret.append(f'\t{element} changed:')
     for change_id in change_ids:
-        name = old[change_id].name if old[change_id].name == new[change_id].name else f'{new[change_id].name} (previously {old[change_id].name})'
+        name = old[change_id].name if old[change_id].name == new[
+            change_id].name else f'{new[change_id].name} (previously {old[change_id].name})'
         ret.append(f'\t\t{name}')
         ret.append(f'\t\t\t{old[change_id]}')
         ret.append(f'\t\t\t{new[change_id]}')
@@ -55,7 +56,8 @@ def str_changes(element, added, removed, change_ids, old, new):
 
 def str_element_changes(element, old, new):
     added, removed, same_ids = get_changes(old, new)
-    change_ids = [change_id for change_id in same_ids if old[change_id] != new[change_id] or str(old[change_id].conformance) != str(new[change_id].conformance)]
+    change_ids = [change_id for change_id in same_ids if old[change_id] != new[change_id]
+                  or str(old[change_id].conformance) != str(new[change_id].conformance)]
     return str_changes(element, added, removed, change_ids, old, new)
 
 
