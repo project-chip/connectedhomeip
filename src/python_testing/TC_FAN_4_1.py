@@ -28,7 +28,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --int-arg pixit_fan_start_time:1
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
