@@ -35,13 +35,13 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Dnssd.h>
 #include <assert.h>
+#include <diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h>
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <ota/OTAInitializer.h>

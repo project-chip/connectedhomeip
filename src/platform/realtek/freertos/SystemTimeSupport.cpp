@@ -25,8 +25,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/realtek/freertos/SystemTimeSupport.h>
 #include <lib/support/TimeUtils.h>
+#include <platform/realtek/freertos/SystemTimeSupport.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
