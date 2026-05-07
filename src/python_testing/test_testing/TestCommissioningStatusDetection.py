@@ -872,7 +872,8 @@ def main():
         ("E2. CustomCommissioningParameters: discriminator + passcode", test_commissioning_credentials_discriminator_passcode),
         ("E3. CustomCommissioningParameters: SDK QR precedence", test_commissioning_credentials_sdk_qr_precedence),
         ("E4. CustomCommissioningParameters: SDK manual when no QR", test_commissioning_credentials_sdk_manual_when_no_qr),
-        ("E5. CustomCommissioningParameters: SDK pin + random discriminator", test_commissioning_credentials_sdk_pin_with_random_discriminator),
+        ("E5. CustomCommissioningParameters: SDK pin + random discriminator",
+         test_commissioning_credentials_sdk_pin_with_random_discriminator),
     ]
 
     print("\n" + "=" * 70)
