@@ -205,7 +205,7 @@ def cmd_generate(context):
     'targets',
     help=('Lists the targets that can be used with the build and gen commands'))
 @click.option(
-    '--format',
+    '--format', 'format_type',
     default='summary',
     type=click.Choice(['summary', 'expanded', 'json', 'completion'], case_sensitive=False),
     help="""
@@ -219,15 +219,15 @@ def cmd_generate(context):
         """)
 @click.argument('COMPLETION-PREFIX', default='')
 @click.pass_context
-def cmd_targets(context, format, completion_prefix):
-    if format == 'expanded':
+def cmd_targets(context, format_type, completion_prefix):
+    if format_type == 'expanded':
         build.target.report_rejected_parts = False
         for target in build.targets.BUILD_TARGETS:
             for s in target.AllVariants():
                 print(s)
-    elif format == 'json':
+    elif format_type == 'json':
         print(json.dumps([target.ToDict() for target in build.targets.BUILD_TARGETS], indent=4))
-    elif format == 'completion':
+    elif format_type == 'completion':
         build.target.report_rejected_parts = False
         for target in build.targets.BUILD_TARGETS:
             for s in target.CompletionStrings(completion_prefix):

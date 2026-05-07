@@ -90,7 +90,7 @@ class TestsFinder:
         paths = []
 
         for name in test_names:
-            for root, dir, files in os.walk(self.__test_directory):
+            for root, _, files in os.walk(self.__test_directory):
                 if name in files:
                     paths.append(os.path.join(root, name))
                 elif (name + _YAML_FILE_EXTENSION) in files:
