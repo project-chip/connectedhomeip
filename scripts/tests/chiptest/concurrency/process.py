@@ -342,25 +342,28 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
 
             with contextlib.ExitStack() as stack:
                 try:
-                    log.debug("Initializing")
-                    self._proc_init(stack)
-                    self.state.phase = ProcessPhase.READY
-                    log.debug("Initialized successfully")
-                except BaseException as e:
-                    e.add_note("Failure during process initialization")
-                    raise
+                    try:
+                        log.debug("Initializing")
+                        self._proc_init(stack)
+                        self.state.phase = ProcessPhase.READY
+                        log.debug("Initialized successfully")
+                    except BaseException as e:
+                        e.add_note("Failure during process initialization")
+                        raise
 
-                try:
-                    self._proc_work()
-                except BaseException as e:
-                    e.add_note("Failure during process work")
-                    raise
-        except QueueCancelled:
-            log.warning("Received a cancel event")
-        except EndOfQueue:
-            log.debug("Received end of work signal")
-        except KeyboardInterrupt:
-            log.debug("Caught an interrupt")
+                    try:
+                        self._proc_work()
+                    except BaseException as e:
+                        e.add_note("Failure during process work")
+                        raise
+
+                # Capture exceptions that are not errors.
+                except QueueCancelled:
+                    log.warning("Received a cancel event")
+                except EndOfQueue:
+                    log.debug("Received end of work signal")
+                except KeyboardInterrupt:
+                    log.debug("Caught an interrupt")
         except BaseException as e:
             log.error("Process failed with an exception: %r", e)
             self.state.exception = e
