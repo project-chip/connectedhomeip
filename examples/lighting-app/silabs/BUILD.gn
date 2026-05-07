@@ -78,6 +78,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/freertos_config",
     ]
 
@@ -106,6 +107,7 @@ if (wifi_soc) {
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
       "${examples_common_plat_dir}/freertos_config",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/rgb_led",
     ]
 
@@ -131,9 +133,8 @@ silabs_executable("lighting_app") {
   }
 
   sources = [
+    "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
     "src/AppTask.cpp",
-    "src/DataModelCallbacks.cpp",
-    "src/LightingManager.cpp",
   ]
 
   deps = [

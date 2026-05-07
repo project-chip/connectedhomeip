@@ -737,7 +737,7 @@ class AsyncReadTransaction:
 
     def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
-            eventType = _EventIndex.get(str(path), None)
+            eventType = _EventIndex.get(str(path))
             eventValue = None
 
             if data:
