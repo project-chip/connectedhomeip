@@ -332,7 +332,7 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
 
         if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
         {
-            AccessControl::EmitAuxiliaryAccessUpdated(mContext, request.subjectDescriptor);
+            AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, request.subjectDescriptor);
         }
         return std::nullopt;
     }
@@ -361,7 +361,7 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
 
         if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
         {
-            AccessControl::EmitAuxiliaryAccessUpdated(mContext, request.subjectDescriptor);
+            AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, request.subjectDescriptor);
         }
         return Status::Success;
     }
@@ -430,7 +430,7 @@ Status GroupsCluster::AddGroup(GroupId groupID, CharSpan groupName, const chip::
 
     if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
     {
-        AccessControl::EmitAuxiliaryAccessUpdated(mContext, subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;

@@ -505,7 +505,7 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        AccessControl::EmitAuxiliaryAccessUpdated(mContext, subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -593,7 +593,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::Config
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        AccessControl::EmitAuxiliaryAccessUpdated(mContext, subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -710,7 +710,7 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
     }
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        AccessControl::EmitAuxiliaryAccessUpdated(mContext, subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;

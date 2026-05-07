@@ -24,10 +24,8 @@ namespace app {
 namespace Clusters {
 namespace AccessControl {
 
-void EmitAuxiliaryAccessUpdated(ServerClusterContext * context, const chip::Access::SubjectDescriptor & subjectDescriptor)
+void EmitAuxiliaryAccessUpdated(DataModel::EventsGenerator & eventsGenerator, const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
-    VerifyOrReturn(context != nullptr);
-
     Events::AuxiliaryAccessUpdated::Type event;
     event.fabricIndex = subjectDescriptor.fabricIndex;
     if (subjectDescriptor.subject != kUndefinedNodeId)
@@ -39,7 +37,7 @@ void EmitAuxiliaryAccessUpdated(ServerClusterContext * context, const chip::Acce
         event.adminNodeID.SetNull();
     }
 
-    (void) context->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    (void) eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace AccessControl
