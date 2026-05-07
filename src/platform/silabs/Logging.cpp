@@ -10,7 +10,14 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+// Quick fix for SLCP projects in which
+// we combine generic OT components with Matter
+// Set this define to 0 in your .slcp to prevent double definition of otPlatLog
+#ifndef SL_MATTER_FORWARD_OT_LOGS
+#define SL_MATTER_FORWARD_OT_LOGS 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS
 #include <openthread/platform/logging.h>
 #endif
 
@@ -109,7 +116,8 @@ size_t AddTimeStampAndPrefixStr(char * logBuffer, const char * prefix, size_t ma
     {
         return 0; // Likely a snprintf error
     }
-    return snprintf(logBuffer + timestampLen, maxSize - timestampLen, "%s", prefix);
+    int chWritten = snprintf(logBuffer + timestampLen, maxSize - timestampLen, "%s", prefix);
+    return (chWritten > 0) ? static_cast<size_t>(chWritten) + timestampLen : timestampLen;
 }
 size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
 {
@@ -124,7 +132,8 @@ size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
     uint8_t minutes = totalSeconds % 60;
     uint32_t hours  = totalSeconds / 60;
 
-    return snprintf(buffer, maxSize, "[%04lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    int chWritten = snprintf(buffer, maxSize, "[%04lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    return (chWritten > 0) ? static_cast<size_t>(chWritten) : 0;
 }
 
 void HandleLog(const char * module, LogCategory category, const char * aFormat, va_list v)
@@ -135,17 +144,22 @@ void HandleLog(const char * module, LogCategory category, const char * aFormat, 
                   kTimeStampStringSize + kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
 
     size_t prefixLen = 0;
-    size_t moduleLen = strlen(module);
-    if ((moduleLen > 0) && (moduleLen < CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
-    {
-        // Prepend module name if available
-        prefixLen = snprintf(formattedMsg, sizeof(formattedMsg), "[%s] ", module);
-    }
-
 #if !SILABS_LOG_OUT_UART
     prefixLen += chip::Logging::Platform::AddTimeStampAndPrefixStr(
         formattedMsg, reinterpret_cast<const char *>(GetCategoryString(category)), CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
 #endif // SILABS_LOG_OUT_UART
+
+    size_t moduleLen = strlen(module);
+    if (moduleLen > 0)
+    {
+        // Prepend module name if available
+        int moduleNameLen = snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "[%s] ", module);
+        if (moduleNameLen > 0)
+        {
+            prefixLen += static_cast<size_t>(moduleNameLen);
+        }
+    }
+
     if (prefixLen >= sizeof formattedMsg)
     {
         prefixLen = sizeof formattedMsg - 1; // prevent overflow
@@ -183,21 +197,15 @@ static void PrintLog(const char * msg)
     if (sLogInitialized)
     {
         size_t sz;
-        sz = strlen(msg);
-
+        sz                   = strlen(msg);
+        const char * newline = "\r\n";
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
         PigweedLogger::putString(msg, sz);
-#endif // PW_RPC_ENABLED
+        PigweedLogger::putString(newline, 2);
+#else
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
-
-#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
-        const char * newline = "\r\n";
-        sz                   = strlen(newline);
-#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
-        PigweedLogger::putString(newline, sz);
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, 2);
 #endif // PW_RPC_ENABLED
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
-#endif
     }
 }
 #endif // !SILABS_LOG_OUT_UART
@@ -301,7 +309,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 /**
  * Platform logging function for OpenThread
  */
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     (void) aLogRegion;
@@ -337,4 +345,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 #endif // SILABS_LOG_ENABLED
     va_end(v);
 }
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS

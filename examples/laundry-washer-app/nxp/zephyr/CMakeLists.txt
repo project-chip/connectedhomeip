@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -119,7 +119,6 @@ endif()
 target_sources(app
     PRIVATE
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
-    ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
     ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/laundry-washer-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-controls-delegate-impl.cpp

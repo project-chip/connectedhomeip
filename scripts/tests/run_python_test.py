@@ -18,6 +18,7 @@ import contextlib
 import dataclasses
 import datetime
 import enum
+import getpass
 import glob
 import io
 import logging
@@ -47,6 +48,7 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
+TAG_PROCESS_MON = f"[{Fore.GREEN}MON {Style.RESET_ALL}]".encode()
 TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
 TAG_PROCESS_TEST = f"[{Fore.GREEN}TEST{Style.RESET_ALL}]".encode()
 TAG_STDOUT = f"[{Fore.YELLOW}STDOUT{Style.RESET_ALL}]".encode()
@@ -68,6 +70,10 @@ def process_chip_output(line: bytes, is_stderr: bool, process_tag: bytes = b"") 
     timestamp, line = chip_output_extract_timestamp(line)
     timestamp = datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')
     return f"[{timestamp}]".encode() + process_tag + (TAG_STDERR if is_stderr else TAG_STDOUT) + line
+
+
+def process_mon_output(line, is_stderr):
+    return process_chip_output(line, is_stderr, TAG_PROCESS_MON)
 
 
 def process_chip_app_output(line, is_stderr):
@@ -150,6 +156,33 @@ class AppProcessManager:
         return self.app_process
 
 
+class IpPacketCaptureManager():
+    def __init__(self, dump_filename: pathlib.Path):
+        self.tcpdump_process = None
+        self.dump_filename = dump_filename
+        self.interface = 'any'
+        self.keep_dumpfile = True
+
+    def start(self):
+        # Create directory for dump files
+        self.dump_filename.parent.mkdir(parents=True, exist_ok=True)
+
+        cmd = ['tcpdump', '-qn', '-i', self.interface, '-w', str(self.dump_filename), '-Z', getpass.getuser()]
+        if os.getuid() != 0:
+            cmd = ['sudo', '-n'] + cmd
+        self.tcpdump_process = Subprocess(cmd[0], *cmd[1:], output_cb=process_mon_output)
+
+        self.tcpdump_process.start()
+
+    def stop(self):
+        if self.tcpdump_process:
+            self.tcpdump_process.terminate()
+            self.tcpdump_process = None
+        if not self.keep_dumpfile:
+            log.info("Deleting capture file '%s'", self.dump_filename)
+            self.dump_filename.unlink(missing_ok=True)
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -178,10 +211,14 @@ class AppProcessManager:
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
 @click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
+@click.option("--ip-packet-capture/--no-ip-packet-capture", is_flag=True, default=False, help="Enable IP packet capture.")
+@click.option("--ip-packet-capture-dir", type=click.Path(file_okay=False, writable=True, path_type=pathlib.Path),
+              default=pathlib.Path.cwd() / "out/ip_packet_captures", help="Storage for capture files.")
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env, run, app_filter):
+         script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
+         app_filter):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -228,12 +265,14 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     for run in runs:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
-                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, run.quiet)
+                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
+                  ip_packet_capture_dir, run.quiet, run.run)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-              script_gdb: bool, quiet: bool):
+              script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
+              quiet: bool, run_name: str):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -241,6 +280,14 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     # Generate unique test run ID to avoid conflicts in concurrent test runs
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
+
+    script_name = pathlib.Path(script).name.removesuffix('.py')
+    tcpdump_capture_filename = ip_packet_capture_dir / f"tcpdump_{script_name}-{os.getpid()}-{run_name}.pcap"
+
+    tcpdump = IpPacketCaptureManager(pathlib.Path(tcpdump_capture_filename))
+
+    if ip_packet_capture:
+        tcpdump.start()
 
     # Remove app config and storage if factory reset is requested
     if factory_reset or factory_reset_app_only:
@@ -328,6 +375,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # We expect both app and test script should exit with 0
         exit_code = test_script_exit_code or app_exit_code
 
+        if tcpdump and exit_code == 0:
+            # Delete packet captures from successful runs
+            tcpdump.keep_dumpfile = False
+
         if quiet:
             if exit_code:
                 sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
@@ -345,6 +396,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if restart_monitor_thread and restart_monitor_thread.is_alive():
             log.info("Stopping app restart monitor thread")
             restart_monitor_thread.join(2.0)
+
+        tcpdump.stop()
 
         # Clean up any leftover flag files if they exist - ensure this always executes
         log.info("Cleaning up flag files")

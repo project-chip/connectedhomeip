@@ -804,6 +804,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2267,12 +2268,12 @@ endpoint 1 {
 
   server cluster CommissionerControl {
     emits event CommissioningRequestResult;
-    ram      attribute supportedDeviceCategories default = 0;
+    callback attribute supportedDeviceCategories;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RequestCommissioningApproval;
     handle command CommissionNode;

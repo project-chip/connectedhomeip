@@ -36,7 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/SessionParameters.h>
 #include <platform/PlatformManager.h>
@@ -360,9 +360,17 @@ CASESession::~CASESession()
 
 void CASESession::OnSessionReleased()
 {
-    // Call into our super-class before we clear our state.
-    PairingSession::OnSessionReleased();
+    // Clear our own state first, then call the base class.
+    //
+    // PairingSession::OnSessionReleased() may destroy this object, so we have to do any cleanup
+    // that involves our state before calling it.
+    //
+    // Historically the order was reversed because PairingSession::OnSessionReleased
+    // used mSessionManager->SystemLayer() to schedule work, and Clear() nulls
+    // mSessionManager.  That dependency has been removed: the base class now uses
+    // DeviceLayer::SystemLayer(), which is a global and survives Clear().
     Clear();
+    PairingSession::OnSessionReleased();
 }
 
 void CASESession::Clear()

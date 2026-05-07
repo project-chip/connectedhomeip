@@ -42,7 +42,7 @@
 
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 

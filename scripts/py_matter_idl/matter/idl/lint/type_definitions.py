@@ -156,7 +156,7 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         On error returns None and _lint_errors is updated internlly
         """
         if not self._idl:
-            raise MissingIdlError()
+            raise MissingIdlError
 
         cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
@@ -173,7 +173,7 @@ class ClusterValidationRule(ErrorAccumulatingRule):
 
     def _LintImpl(self):
         if not self._idl:
-            raise MissingIdlError()
+            raise MissingIdlError
 
         for endpoint in self._idl.endpoints:
             cluster_codes = set()
@@ -238,7 +238,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         On error returns None and _lint_errors is updated internlly
         """
         if not self._idl:
-            raise MissingIdlError()
+            raise MissingIdlError
 
         cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
@@ -255,7 +255,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
 
     def _LintImpl(self):
         if not self._idl:
-            raise MissingIdlError()
+            raise MissingIdlError
 
         for endpoint in self._idl.endpoints:
 
@@ -358,7 +358,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
 
     def _LintImpl(self):
         if not self._idl:
-            raise MissingIdlError()
+            raise MissingIdlError
 
         for cluster in self._idl.clusters:
             if cluster.code not in self._mandatory_commands:

@@ -39,7 +39,7 @@ void DishwasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Comma
     if (gDishwasherModeInstance->GetFailTransition())
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Mode change not allowed due to device state"));
+        response.statusText.SetValue("Mode change not allowed due to device state"_span);
         return;
     }
 

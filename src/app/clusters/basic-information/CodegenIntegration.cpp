@@ -46,9 +46,9 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
 
 LazyRegisteredServerCluster<BasicInformationCluster> gServer;
 
-void LegacyOnlyDisableUniqueIdAttr(BasicInformationCluster::OptionalAttributesSet & attributeSet)
+void LegacyOnlyDisableUniqueIdAttr(BasicInformationOptionalAttributesSet & attributeSet)
 {
-    attributeSet.Set<BasicInformation::Attributes::UniqueID::Id>(false);
+    attributeSet.template Set<BasicInformation::Attributes::UniqueID::Id>(false);
 }
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -58,26 +58,21 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
 
-        BasicInformationCluster::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
+        BasicInformationOptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
 
         DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
         VerifyOrDie(provider != nullptr);
 
-        BasicInformationCluster::Context context = {
-            .deviceInstanceInfoProvider = *provider,
-            .configurationManager       = DeviceLayer::ConfigurationMgr(),
-            .platformManager            = DeviceLayer::PlatformMgr(),
-            .subscriptionsPerFabric     = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric()
-        };
-        gServer.Create(optionalAttributeSet, context);
+        gServer.Create(optionalAttributeSet, *provider, DeviceLayer::ConfigurationMgr(), DeviceLayer::PlatformMgr(),
+                       InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
-        // This disabling of the unique id attribute is here only for test purposes. The uniqe id attribute
+        // This disabling of the unique id attribute is here only for test purposes. The unique id attribute
         // is mandatory, but was optional in previous versions. It is forced to be enabled in the basic information
         // constructor, but for apps following an old spec version, it is possible for it to be disabled. This is needed
         // for the lighting-app-data-mode-no-unique-id example app with the MCORE_FS_1_3 test.
         if (!optionalAttributeSet.IsSet(BasicInformation::Attributes::UniqueID::Id))
         {
-            LegacyOnlyDisableUniqueIdAttr(gServer.Cluster().OptionalAttributes());
+            LegacyOnlyDisableUniqueIdAttr(gServer.Cluster().GetOptionalAttributes());
         }
 
         return gServer.Registration();
