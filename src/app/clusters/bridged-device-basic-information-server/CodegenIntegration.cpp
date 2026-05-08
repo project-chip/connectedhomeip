@@ -44,7 +44,7 @@ void ReachableChanged(EndpointId endpointId)
     bool reachable = false;
     if (Status::Success != Attributes::Reachable::GetDefault(endpointId, &reachable))
     {
-        ChipLogError(Zcl, "ReachabledChanged: Failed to get Reachable value");
+        ChipLogError(Zcl, "ReachableChanged: Failed to get Reachable value");
     }
 
     Events::ReachableChanged::Type event{ reachable };
