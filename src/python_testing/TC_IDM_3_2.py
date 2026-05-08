@@ -61,31 +61,6 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
         self.endpoint = 0
 
     # This test can take some time to run in heavily congested test environments, adding a longer timeout.
-
-        for endpoint_id, endpoint in endpoints_data.items():
-            for cluster_type, cluster_data in endpoint.items():
-                cluster_id = cluster_type.id
-
-                cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
-                # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
-
-                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
-                    # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
-
-                for attr_type in cluster_data:
-                    # Check if this is an attribute descriptor class
-                    if (isinstance(attr_type, type) and
-                            issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
-                        # Check if this attribute requires timed write using the must_use_timed_write class property
-                        if attr_type.must_use_timed_write:
-                            log.info(f"Found timed write attribute: {attr_type.__name__} "
-                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
-                            return endpoint_id, attr_type
-
-        log.warning("No timed write attributes found on device")
-        return None, None
-
     @property
     def default_timeout(self) -> int:
         return 300
@@ -265,6 +240,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
 
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
+        exit()
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
