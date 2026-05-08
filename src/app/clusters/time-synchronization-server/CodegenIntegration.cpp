@@ -80,7 +80,7 @@ public:
         NTPServerAvailable::TypeInfo::Type ntpServerAvailable = false;
         if (featureMap.Has(Feature::kNTPServer))
         {
-            VerifyOrDie(SupportsDNSResolve::GetDefault(endpointId, &ntpServerAvailable) == Status::Success);
+            VerifyOrDie(NTPServerAvailable::GetDefault(endpointId, &ntpServerAvailable) == Status::Success);
         }
 
         TimeSynchronizationCluster::StartupConfiguration startupConfiguration = { .supportsDNSResolve = supportsDNSResolve,

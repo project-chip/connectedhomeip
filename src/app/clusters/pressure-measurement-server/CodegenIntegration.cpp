@@ -82,9 +82,15 @@ public:
             DataModel::Nullable<int16_t> maxScaledValue;
             int8_t scale = 0;
 
-            MinScaledValue::GetDefault(endpointId, minScaledValue);
-            MaxScaledValue::GetDefault(endpointId, maxScaledValue);
-            Scale::GetDefault(endpointId, &scale);
+            if (MinScaledValue::GetDefault(endpointId, minScaledValue) != Status::Success)
+            {
+                minScaledValue.SetNull();
+            }
+            if (MaxScaledValue::GetDefault(endpointId, maxScaledValue) != Status::Success)
+            {
+                maxScaledValue.SetNull();
+            }
+            VerifyOrDie(Scale::GetDefault(endpointId, &scale) == Status::Success);
 
             config.WithExtendedFeature(minScaledValue, maxScaledValue, scale);
 
