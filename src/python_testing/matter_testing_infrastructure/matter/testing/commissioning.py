@@ -718,5 +718,3 @@ async def get_commissioned_fabric_count(
     except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
         LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
         raise
-
-
