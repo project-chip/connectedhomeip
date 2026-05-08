@@ -1001,8 +1001,8 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
     if (mtu > 0) // If one or both device knows connection's MTU...
     {
         uint16_t negotiated_size = (mtu > 3) ? static_cast<uint16_t>(mtu - 3) : 0;
-        uint16_t clamped_size = std::min(negotiated_size, BtpEngine::sMaxFragmentSize);
-        resp.mFragmentSize    = (clamped_size > BtpEngine::sMinFragmentSize) ? clamped_size : BtpEngine::sMinFragmentSize;
+        uint16_t clamped_size    = std::min(negotiated_size, BtpEngine::sMaxFragmentSize);
+        resp.mFragmentSize       = (clamped_size > BtpEngine::sMinFragmentSize) ? clamped_size : BtpEngine::sMinFragmentSize;
     }
     else // Else, if neither device knows MTU...
     {
