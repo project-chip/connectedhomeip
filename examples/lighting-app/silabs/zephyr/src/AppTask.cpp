@@ -138,7 +138,7 @@ static void ToggleOnOffCluster(intptr_t arg)
 static void ToggleOnOffWorkHandler(struct k_work * work)
 {
     static_cast<void>(work);
-    PlatformMgr().ScheduleWork(ToggleOnOffCluster, 0);
+    RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork(ToggleOnOffCluster, 0);
 }
 
 static void Button1PressedHandler(const struct device * dev, struct gpio_callback * cb, uint32_t pins)
