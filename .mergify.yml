@@ -47,6 +47,7 @@ pull_request_rules:
     - name: Backport to v1.6-sve-branch
       conditions:
           - merged
+          - base=master
           - label="request-backport-sve"
       actions:
           backport:
@@ -56,6 +57,7 @@ pull_request_rules:
     - name: Backport to supported branches
       conditions:
           - merged
+          - base=master
           - label="request-backport-supported"
       actions:
           backport:
