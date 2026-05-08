@@ -24,6 +24,7 @@
 #include <app/EventLogging.h>
 
 #include <app/util/basic-types.h>
+#include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
@@ -52,6 +53,12 @@ void ReachableChanged(EndpointId endpointId)
 }
 
 } // anonymous namespace
+
+// BridgedDeviceBasicInformationCluster instances are created and registered
+// per-device by the application; no centralized registration is needed here.
+void MatterBridgedDeviceBasicInformationClusterInitCallback(EndpointId endpointId) {}
+
+void MatterBridgedDeviceBasicInformationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType) {}
 
 void MatterBridgedDeviceBasicInformationClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
