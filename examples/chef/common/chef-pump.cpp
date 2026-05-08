@@ -305,12 +305,14 @@ void init()
         {
             VerifyOrDieWithMsg(PressureMeasurement::SetMeasuredValue(endpointId, DataModel::Nullable<int16_t>()) == CHIP_NO_ERROR,
                                DeviceLayer, "Failed to initialize Pressure Measured Value to NULL for Endpoint: %d", endpointId);
-            if (PressureMeasurement::Attributes::MinMeasuredValue::GetDefault(endpointId, PressureRangeMin[epIndex]) != Status::Success ||
+            if (PressureMeasurement::Attributes::MinMeasuredValue::GetDefault(endpointId, PressureRangeMin[epIndex]) !=
+                    Status::Success ||
                 PressureRangeMin[epIndex].IsNull())
             {
                 PressureRangeMin[epIndex].SetNonNull(kDefaultMinPressure);
             }
-            if (PressureMeasurement::Attributes::MaxMeasuredValue::GetDefault(endpointId, PressureRangeMax[epIndex]) != Status::Success ||
+            if (PressureMeasurement::Attributes::MaxMeasuredValue::GetDefault(endpointId, PressureRangeMax[epIndex]) !=
+                    Status::Success ||
                 PressureRangeMax[epIndex].IsNull())
             {
                 PressureRangeMax[epIndex].SetNonNull(kDefaultMaxPressure);

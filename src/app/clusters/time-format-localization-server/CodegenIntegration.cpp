@@ -52,7 +52,8 @@ void FetchDefaults(BitFlags<TimeFormatLocalization::Feature> featureMap, TimeFor
     defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
     if (featureMap.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
-        if (TimeFormatLocalization::Attributes::ActiveCalendarType::GetDefault(kRootEndpointId, &defaultCalendarType) != Status::Success)
+        if (TimeFormatLocalization::Attributes::ActiveCalendarType::GetDefault(kRootEndpointId, &defaultCalendarType) !=
+            Status::Success)
         {
             CodegenInitError("Failed to get ActiveCalendarType for endpoint %u", kRootEndpointId);
             defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
