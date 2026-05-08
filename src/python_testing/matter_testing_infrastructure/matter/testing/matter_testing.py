@@ -302,13 +302,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         await self.async_teardown_test()
 
         # If setup_test could not read the ACL, the DUT was unreachable at test
-        # start — skip DUT cleanup to avoid a slow network discovery attempt.
+        # start, skip DUT cleanup to avoid a slow network discovery attempt.
         dut_reachable = self._original_acl is not None
         if dut_reachable:
             try:
                 await self._populate_wildcard()
             except Exception as e:  # DUT may be unreachable or mid-reboot; skip all DUT cleanup rather than failing the test
-                LOGGER.warning(f"[CLN] could not populate wildcard, DUT is unreachable — skipping all DUT cleanup: {e}")
+                LOGGER.warning(f"[CLN] could not populate wildcard, DUT is unreachable, skipping all DUT cleanup: {e}")
                 dut_reachable = False
 
         if dut_reachable:
@@ -336,7 +336,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             if self.cleanup_config.unregister_icd_clients:
                 await self._unregister_icd_clients()
 
-        # Controller cleanup (runs regardless — no DUT connection needed)
+        # Controller cleanup (runs regardless, no DUT connection needed)
         if self.cleanup_config.shutdown_extra_controllers:
             self._shutdown_extra_controllers()
 
@@ -614,7 +614,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
 
         Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
-        TlsClientManagement via ServerList — no extra network read needed.
+        TlsClientManagement via ServerList, no extra network read needed.
         """
         tls_cluster_id = Clusters.TlsClientManagement.id
         found_any = False
@@ -646,7 +646,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             except Exception as e:  # DUT may be unreachable or TLS endpoint may have already been removed
                 LOGGER.warning(f"[CLN] TLS endpoint cleanup failed on endpoint {endpoint_id}: {e}")
         if not found_any:
-            LOGGER.info("[CLN] TlsClientManagement cluster not present on any endpoint — skipping TLS endpoint cleanup")
+            LOGGER.info("[CLN] TlsClientManagement cluster not present on any endpoint, skipping TLS endpoint cleanup")
 
     async def _close_commissioning_windows(self) -> None:
         """Sends RevokeCommissioning to close any open commissioning window on the DUT.
@@ -826,7 +826,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # For runner-commissioned tests commissioning_method is set; for in-test
         # commissioning the flag is set by commission_devices() on success.
         # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
-        # on the fabric — an operational read there would send CASE Sigma1 to an
+        # on the fabric, an operational read there would send CASE Sigma1 to an
         # uncommissioned device, triggering unexpected DUT behaviour.
         dut_expected = (
             not self.is_commissioning
@@ -861,7 +861,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         already opened a run_until_complete on the event loop. Calling
         run_until_complete again on the same running loop raises RuntimeError. In that
         case this method detects the running loop and returns without scheduling
-        cleanup — the @async_test_body wrapper runs _run_framework_cleanup itself
+        cleanup, the @async_test_body wrapper runs _run_framework_cleanup itself
         inside the already-open coroutine and sets _framework_cleanup_done.
         """
         if self._framework_cleanup_done:
@@ -872,7 +872,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         except RuntimeError:
             running = None
         if running is self.event_loop:
-            # Re-entered from inside @async_test_body — decorator handles cleanup.
+            # Re-entered from inside @async_test_body, decorator handles cleanup.
             return
         self.event_loop.run_until_complete(self._run_framework_cleanup())
         self._framework_cleanup_done = True
