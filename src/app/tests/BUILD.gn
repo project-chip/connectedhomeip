@@ -221,7 +221,6 @@ chip_test_suite("tests") {
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
-    "TestThreadBorderRouterManagementCluster.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",

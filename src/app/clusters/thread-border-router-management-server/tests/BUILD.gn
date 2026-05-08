@@ -14,18 +14,23 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("thread-border-router-management-server") {
-  sources = [
-    "ThreadBorderRouterManagementCluster.cpp",
-    "ThreadBorderRouterManagementCluster.h",
-    "ThreadBorderRouterManagementDelegate.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "TestThreadBorderRouterManagementCluster"
+
+  test_sources = [ "TestThreadBorderRouterManagementCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/zzz_generated/app-common/clusters/ThreadBorderRouterManagement",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/support",
   ]
 }
