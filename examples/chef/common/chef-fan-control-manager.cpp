@@ -130,8 +130,8 @@ void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newStat
     if (!mHandlingFanDriveDelegate)
     {
         mHandlingFanDriveDelegate = true;
-        mPercentCurrent = newState.percentCurrent;
-        mSpeedCurrent   = newState.speedCurrent;
+        mPercentCurrent           = newState.percentCurrent;
+        mSpeedCurrent             = newState.speedCurrent;
 
         FanModeWriteCallback(newState.mode);
         SetPercentCurrent(newState.percentSetting.ValueOr(0));
