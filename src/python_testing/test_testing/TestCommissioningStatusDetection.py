@@ -693,7 +693,13 @@ async def test_get_fabric_count_scenario2_operational():
             }
         })
 
-        result = await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
+        result = await commissioning.get_commissioned_fabric_count(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=5.0
+        )
+
+        mock_dnssd.assert_called_once_with(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=5.0
+        )
 
         if result != 2:
             return f"Expected fabric count 2, got {result}"

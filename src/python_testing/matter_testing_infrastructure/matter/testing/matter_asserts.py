@@ -413,6 +413,9 @@ async def assert_factory_fresh(
         commissioning_params = CustomCommissioningParameters(discriminator=1234, passcode=20202021)
         await assert_factory_fresh(controller, node_id=1234, description="DUT", commissioning_params=commissioning_params)
     """
+    # Import here (not at module level) to avoid pulling in commissioning.py's heavy
+    # dependencies (matter.clusters, ChipDeviceCtrl, mdns_discovery) which would cause
+    # ModuleNotFoundError in Pigweed-isolated unit tests (test_matter_asserts).
     from matter.testing.commissioning import get_commissioned_fabric_count
 
     fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, commissioning_params=commissioning_params)
@@ -466,6 +469,9 @@ async def assert_fabric_count(
         commissioning_params = CustomCommissioningParameters(discriminator=1234, passcode=20202021)
         await assert_fabric_count(controller, node_id=1234, expected_count=0, description="DUT", commissioning_params=commissioning_params)
     """
+    # Import here (not at module level) to avoid pulling in commissioning.py's heavy
+    # dependencies (matter.clusters, ChipDeviceCtrl, mdns_discovery) which would cause
+    # ModuleNotFoundError in Pigweed-isolated unit tests (test_matter_asserts).
     from matter.testing.commissioning import get_commissioned_fabric_count
 
     actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, commissioning_params=commissioning_params)

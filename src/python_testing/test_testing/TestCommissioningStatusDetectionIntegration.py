@@ -190,17 +190,11 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
 
         LOGGER.info("Checking DNS-SD for commissioned device")
 
-        # Retry a few times for flaky mDNS
-        is_operational = False
-        for attempt in range(3):
-            is_operational = await _is_device_operational_via_dnssd(
-                self.default_controller,
-                self.th_server_local_nodeid
-            )
-            if is_operational:
-                break
-            LOGGER.info(f"DNS-SD check attempt {attempt + 1} returned False, retrying...")
-            await asyncio.sleep(2)
+        # Retries are handled internally by _is_device_operational_via_dnssd
+        is_operational = await _is_device_operational_via_dnssd(
+            self.default_controller,
+            self.th_server_local_nodeid
+        )
 
         asserts.assert_true(
             is_operational,

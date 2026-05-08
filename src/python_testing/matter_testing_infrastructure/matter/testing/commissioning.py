@@ -390,7 +390,9 @@ class EstablishedSessionKind(str, Enum):
 async def _is_device_operational_via_dnssd(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC,
+    max_retries: int = 3,
+    retry_delay_sec: float = 2.0
 ) -> bool:
     """
     Check if a device is advertising as operational on this fabric via DNS-SD.
@@ -399,10 +401,14 @@ async def _is_device_operational_via_dnssd(
     commissioned. Devices advertise operational services on _matter._tcp.local.
     with instance name format: {compressed_fabric_id}-{node_id}
 
+    Retries internally to handle flaky mDNS propagation.
+
     Args:
         dev_ctrl: The chip device controller instance (used to get compressed fabric ID)
         node_id: Node ID of the device to check
-        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
+        discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
+        max_retries: Number of discovery attempts before giving up (default 3)
+        retry_delay_sec: Delay between retry attempts in seconds (default 2.0)
 
     Returns:
         True if device is advertising as operational on this fabric, False otherwise
@@ -416,18 +422,23 @@ async def _is_device_operational_via_dnssd(
 
         LOGGER.info(f"Checking DNS-SD for operational service: {expected_instance_name}")
 
-        # Discover operational services
-        mdns = MdnsDiscovery()
-        services = await mdns.get_operational_services(
-            discovery_timeout_sec=discovery_timeout_sec,
-            log_output=False
-        )
+        for attempt in range(max_retries):
+            # Discover operational services
+            mdns = MdnsDiscovery()
+            services = await mdns.get_operational_services(
+                discovery_timeout_sec=discovery_timeout_sec,
+                log_output=False
+            )
 
-        # Check if our expected instance is in the discovered services
-        for service in services:
-            if service.instance_name == expected_instance_name:
-                LOGGER.info(f"Device {node_id} found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
-                return True
+            # Check if our expected instance is in the discovered services
+            for service in services:
+                if service.instance_name == expected_instance_name:
+                    LOGGER.info(f"Device {node_id} found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
+                    return True
+
+            if attempt < max_retries - 1:
+                LOGGER.info(f"DNS-SD attempt {attempt + 1}/{max_retries} did not find device, retrying...")
+                await asyncio.sleep(retry_delay_sec)
 
         LOGGER.info(f"Device {node_id} not found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
         return False
@@ -578,7 +589,8 @@ async def establish_pase_or_case_session(
 
 async def is_commissioned(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
-    node_id: int
+    node_id: int,
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
 ) -> bool:
     """
     Check if the device is commissioned on the current fabric (Controller's fabric).
@@ -597,20 +609,25 @@ async def is_commissioned(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
+        discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
 
     Returns:
         True if the device is confirmed to be commissioned on this fabric, False otherwise.
     """
     try:
         # Step 1: Fast DNS-SD check — is the device operational on this fabric?
-        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
+        is_operational = await _is_device_operational_via_dnssd(
+            dev_ctrl, node_id, discovery_timeout_sec=discovery_timeout_sec
+        )
 
         if is_operational:
             LOGGER.info(f"Device {node_id} is operational via DNS-SD - confirmed commissioned")
             return True
 
         # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
-        is_commissionable = await _is_device_commissionable_via_dnssd()
+        is_commissionable = await _is_device_commissionable_via_dnssd(
+            discovery_timeout_sec=discovery_timeout_sec
+        )
 
         if is_commissionable:
             LOGGER.info(f"Device {node_id} is commissionable via DNS-SD (pairing window open) - not commissioned")
@@ -629,7 +646,8 @@ async def is_commissioned(
 async def get_commissioned_fabric_count(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    commissioning_params: Optional[CustomCommissioningParameters] = None
+    commissioning_params: Optional[CustomCommissioningParameters] = None,
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
 ) -> int:
     """
     Get the number of commissioned fabrics on a device.
@@ -644,6 +662,7 @@ async def get_commissioned_fabric_count(
         commissioning_params: Optional :class:`CustomCommissioningParameters` used when the device
             is not seen as operational on this fabric via DNS-SD but may still be reachable
             for a parallel PASE/CASE attempt before reading ``TrustedRootCertificates``.
+        discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
 
     Returns:
         Number of commissioned fabrics (count of trusted root certificates).
@@ -657,7 +676,9 @@ async def get_commissioned_fabric_count(
     try:
         # Fast DNS-SD check to determine if device is operational on this fabric
         # This avoids the long CASE timeout if device is not commissioned
-        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
+        is_operational = await _is_device_operational_via_dnssd(
+            dev_ctrl, node_id, discovery_timeout_sec=discovery_timeout_sec
+        )
 
         if is_operational:
             # Device is operational on this fabric - use CASE
@@ -697,3 +718,5 @@ async def get_commissioned_fabric_count(
     except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
         LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
         raise
+
+
