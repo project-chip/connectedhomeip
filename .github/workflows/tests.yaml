@@ -376,20 +376,10 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Setup Environment
-<<<<<<< HEAD
-              # coreutils for stdbuf
-              run: brew install coreutils
-=======
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |
                 brew install coreutils
                 echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
-            - name: Install ccache
-              run: |
-                brew install ccache
-            - name: Verify ccache installation
-              run: which ccache
->>>>>>> adb9376903 ([CI Fix] use the correct stdbuf in CI darwin tests (#71753))
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
