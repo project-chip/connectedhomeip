@@ -664,4 +664,27 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
     EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
 }
 
+TEST_F(TestBtpEngine, EnforcesMinFragmentSize)
+{
+    // Default is 20.
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), 20);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), 20);
+
+    // Set to a value smaller than sMinFragmentSize (which is 6).
+    mBtpEngine.SetTxFragmentSize(3);
+    mBtpEngine.SetRxFragmentSize(3);
+
+    // Verify that it is clamped to sMinFragmentSize.
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), BtpEngine::sMinFragmentSize);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), BtpEngine::sMinFragmentSize);
+
+    // Set to a value larger than sMinFragmentSize.
+    mBtpEngine.SetTxFragmentSize(10);
+    mBtpEngine.SetRxFragmentSize(10);
+
+    // Verify that it is set correctly.
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), 10);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), 10);
+}
+
 } // namespace

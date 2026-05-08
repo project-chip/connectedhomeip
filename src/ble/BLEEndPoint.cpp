@@ -1000,8 +1000,9 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
     // Select fragment size for connection based on ATT MTU.
     if (mtu > 0) // If one or both device knows connection's MTU...
     {
-        resp.mFragmentSize =
-            std::min(static_cast<uint16_t>(mtu - 3), BtpEngine::sMaxFragmentSize); // Reserve 3 bytes of MTU for ATT header.
+        uint16_t negotiated_size = (mtu > 3) ? static_cast<uint16_t>(mtu - 3) : 0;
+        uint16_t clamped_size = std::min(negotiated_size, BtpEngine::sMaxFragmentSize);
+        resp.mFragmentSize    = (clamped_size > BtpEngine::sMinFragmentSize) ? clamped_size : BtpEngine::sMinFragmentSize;
     }
     else // Else, if neither device knows MTU...
     {
@@ -1056,7 +1057,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle &&
     // Decode BTP capabilities response.
     ReturnErrorOnFailure(BleTransportCapabilitiesResponseMessage::Decode(data, resp));
 
-    VerifyOrReturnError(resp.mFragmentSize > 0, BLE_ERROR_INVALID_FRAGMENT_SIZE);
+    VerifyOrReturnError(resp.mFragmentSize >= BtpEngine::sMinFragmentSize, BLE_ERROR_INVALID_FRAGMENT_SIZE);
 
     ChipLogProgress(Ble, "peripheral chose BTP version %d; central expected between %d and %d", resp.mSelectedProtocolVersion,
                     CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);

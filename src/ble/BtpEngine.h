@@ -87,12 +87,13 @@ public:
 
     static const uint16_t sDefaultFragmentSize;
     static const uint16_t sMaxFragmentSize;
+    static const uint16_t sMinFragmentSize;
 
     // Public functions:
     CHIP_ERROR Init(void * an_app_state, bool expect_first_ack);
 
-    inline void SetTxFragmentSize(uint16_t size) { mTxFragmentSize = size; }
-    inline void SetRxFragmentSize(uint16_t size) { mRxFragmentSize = size; }
+    inline void SetTxFragmentSize(uint16_t size) { mTxFragmentSize = (size > sMinFragmentSize) ? size : sMinFragmentSize; }
+    inline void SetRxFragmentSize(uint16_t size) { mRxFragmentSize = (size > sMinFragmentSize) ? size : sMinFragmentSize; }
 
     uint16_t GetRxFragmentSize() const { return mRxFragmentSize; }
     uint16_t GetTxFragmentSize() const { return mTxFragmentSize; }
