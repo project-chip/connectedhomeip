@@ -348,7 +348,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Args:
             controller: The controller that was created.
         """
-        if not getattr(controller, '_is_default_controller', False):
+        if not getattr(controller, '_is_default_controller', False) and not getattr(controller, '_skip_cleanup_tracking', False)):
+           self._extra_controllers.append(controller)  
 
             # Track controller for shutdown in teardown_class
             self._extra_controllers.append(controller)
