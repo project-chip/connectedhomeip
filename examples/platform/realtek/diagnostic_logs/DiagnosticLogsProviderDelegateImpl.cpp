@@ -46,7 +46,12 @@ CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & out
 
     bool unusedOutIsEndOfLog;
     err = CollectLog(sessionHandle, outBuffer, unusedOutIsEndOfLog);
-    VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
+    if (err != CHIP_NO_ERROR)
+    {
+        EndLogCollection(sessionHandle);
+        outBuffer.reduce_size(0);
+        return err;
+    }
 
     err = EndLogCollection(sessionHandle);
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
@@ -71,20 +76,14 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     VerifyOrReturnError(diagData, CHIP_ERROR_NO_MEMORY);
 
     err = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), diagData, diagSize);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err);
-
-    MutableByteSpan * mutableSpan = reinterpret_cast<MutableByteSpan *>(calloc(1, sizeof(MutableByteSpan)));
-    VerifyOrReturnValue(mutableSpan, CHIP_ERROR_NO_MEMORY, free(diagData));
-
-    *mutableSpan = MutableByteSpan(diagData, diagSize);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err, free(diagData));
 
     mLogSessionHandle++;
     // If the session handle rolls over to UINT16_MAX which is invalid, reset to 0.
     VerifyOrDo(mLogSessionHandle != kInvalidLogSessionHandle, mLogSessionHandle = 0);
 
     outHandle                          = mLogSessionHandle;
-    mSessionSpanMap[mLogSessionHandle] = mutableSpan;
-    mSessionDiagMap[mLogSessionHandle] = diagData;
+    mSessionSpanMap[mLogSessionHandle] = MutableByteSpan(diagData, diagSize);
 
     return CHIP_NO_ERROR;
 }
@@ -94,11 +93,8 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionSpanMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    free(mSessionDiagMap[sessionHandle]);
-    free(mSessionSpanMap[sessionHandle]);
-
+    free(mSessionSpanMap[sessionHandle].data());
     mSessionSpanMap.erase(sessionHandle);
-    mSessionDiagMap.erase(sessionHandle);
 
     return CHIP_NO_ERROR;
 }
@@ -108,20 +104,20 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionSpanMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    MutableByteSpan * mutableSpan = mSessionSpanMap[sessionHandle];
-    auto diagSize                 = mutableSpan->size();
+    MutableByteSpan & mutableSpan = mSessionSpanMap[sessionHandle];
+    auto diagSize                 = mutableSpan.size();
     auto count                    = std::min(diagSize, outBuffer.size());
 
     VerifyOrReturnError(CanCastTo<off_t>(count), CHIP_ERROR_INVALID_ARGUMENT, outBuffer.reduce_size(0));
 
-    ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(mutableSpan->data(), count), outBuffer));
+    ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(mutableSpan.data(), count), outBuffer));
 
     outIsEndOfLog = diagSize == count;
 
     if (!outIsEndOfLog)
     {
         // reduce the span after reading count bytes
-        *mutableSpan = mutableSpan->SubSpan(count);
+        mutableSpan = mutableSpan.SubSpan(count);
     }
 
     return CHIP_NO_ERROR;
@@ -157,8 +153,7 @@ StorageKeyName LogProvider::GetKeyForIntent(IntentEnum intent) const
     case IntentEnum::kCrashLogs:
         return GetKeyDiagCrashLog();
     case IntentEnum::kUnknownEnumValue:
-        // It should never happen.
-        chipDie();
+        break;
     }
 
     return key;

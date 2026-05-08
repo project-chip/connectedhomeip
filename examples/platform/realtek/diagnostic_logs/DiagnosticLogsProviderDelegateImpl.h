@@ -65,9 +65,7 @@ private:
     LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
 
-    // This tracks the ByteSpan for each session
-    std::map<LogSessionHandle, MutableByteSpan *> mSessionSpanMap;
-    std::map<LogSessionHandle, uint8_t *> mSessionDiagMap;
+    std::map<LogSessionHandle, MutableByteSpan> mSessionSpanMap;
     LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
 
     StorageKeyName GetKeyForIntent(IntentEnum intent) const;
