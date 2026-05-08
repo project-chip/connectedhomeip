@@ -1,1 +1,1 @@
-192 : [nrfconnect] Update nRF Connect SDK version to 3.3.0
+194 : [crosscompile] Add armhf sysroot, update aarch64 sysroot to build-2026.05.07
