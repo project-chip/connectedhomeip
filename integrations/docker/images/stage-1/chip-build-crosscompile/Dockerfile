@@ -15,22 +15,17 @@ WORKDIR /opt
 # Unpack the sysroots, while also removing some rather large items in them that
 # are generally not required for compilation
 RUN set -x \
+  && SYSROOT_VERSION="build-2026.05.07" \
   && git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools \
   # TODO: Remove experimental solution to create the sysroot file in cross-compile image
-  && printf 'experimental/matter/sysroot/ubuntu-24.04-aarch64 version:build-2026.05.07\nexperimental/matter/sysroot/ubuntu-24.04-armhf version:build-2026.05.07\n' > ensure_file.txt \
+  && echo "experimental/matter/sysroot/ubuntu-24.04-aarch64 version:${SYSROOT_VERSION}" > ensure_file.txt \
+  && echo "experimental/matter/sysroot/ubuntu-24.04-armhf version:${SYSROOT_VERSION}" >> ensure_file.txt \
   && ./depot_tools/cipd ensure -ensure-file ensure_file.txt -root ./ \
-  && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/usr/lib/firmware \
-  && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/usr/lib/git-core \
-  && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/usr/lib/modules \
-  && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/lib/firmware \
-  && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/lib/git-core \
-  && rm -rf /opt/ubuntu-24.04-aarch64-sysroot/lib/modules \
-  && rm -rf /opt/ubuntu-24.04-armhf-sysroot/usr/lib/firmware \
-  && rm -rf /opt/ubuntu-24.04-armhf-sysroot/usr/lib/git-core \
-  && rm -rf /opt/ubuntu-24.04-armhf-sysroot/usr/lib/modules \
-  && rm -rf /opt/ubuntu-24.04-armhf-sysroot/lib/firmware \
-  && rm -rf /opt/ubuntu-24.04-armhf-sysroot/lib/git-core \
-  && rm -rf /opt/ubuntu-24.04-armhf-sysroot/lib/modules \
+  && for arch in aarch64 armhf; do \
+       for d in usr/lib/firmware usr/lib/git-core usr/lib/modules lib/firmware lib/git-core lib/modules; do \
+         rm -rf "/opt/ubuntu-24.04-${arch}-sysroot/${d}"; \
+       done; \
+     done \
   && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}
