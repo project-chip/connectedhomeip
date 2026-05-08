@@ -73,7 +73,7 @@ void LightingApp::DeviceCallbacks::PostAttributeChangeCallback(chip::EndpointId 
     }
     else
     {
-        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
     }
 }
 
