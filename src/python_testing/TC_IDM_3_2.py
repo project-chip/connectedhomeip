@@ -240,7 +240,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
 
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
-        exit()
+
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
