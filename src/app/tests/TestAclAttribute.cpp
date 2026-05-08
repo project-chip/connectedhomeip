@@ -28,7 +28,6 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/MessageDef/WriteResponseMessage.h>
 #include <app/WriteClient.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
@@ -582,20 +581,20 @@ namespace {
 // Simulates the writer losing privilege between the ReplaceAll and AppendItem AttributeDataIBs of a legacy-encoded ACL list write:
 // allows the first two Check() calls (kView pre-check + actual write privilege for the first AttributeDataIB), then revokes the
 // writer's privilege.
-class WriterRevokedAfterFirstWriteDelegate : public AccessControl::Delegate
+class WriterRevokedAfterFirstAttributeDataIBDelegate : public AccessControl::Delegate
 {
 public:
     CHIP_ERROR Check(const SubjectDescriptor &, const chip::Access::RequestPath &, Privilege) override
     {
         static constexpr uint8_t kChecksPerWrite = 2;
 
+        mCheckCount++;
         if (mWriterRevoked)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        mAllowedChecks++;
-        if (mAllowedChecks == kChecksPerWrite)
+        if (mCheckCount == kChecksPerWrite)
         {
             // First AttributeDataIB has been fully checked; simulate writer losing privilege that the following call to
             // WriteHandler::CheckWriteAccess (without the WriteHandler cache) would deny.
@@ -604,8 +603,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    uint8_t mAllowedChecks = 0;
-    bool mWriterRevoked    = false;
+    uint8_t mCheckCount = 0;
+    bool mWriterRevoked = false;
 };
 
 } // namespace
@@ -620,12 +619,11 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
 {
     using namespace Protocols::InteractionModel;
 
-    WriterRevokedAfterFirstWriteDelegate aclDelegate;
+    WriterRevokedAfterFirstAttributeDataIBDelegate aclDelegate;
     Access::GetAccessControl().Finish();
     EXPECT_SUCCESS(Access::GetAccessControl().Init(&aclDelegate, gDeviceTypeResolver));
 
     auto * engine = InteractionModelEngine::GetInstance();
-    EXPECT_SUCCESS(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()));
 
     TestWriteClientCallback callback;
     WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -662,7 +660,7 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
     // Last AttributeStatusIB is the AppendItem; cache (mLastSuccessfullyWrittenPath) makes its re-check pass.
     EXPECT_EQ(callback.mStatus.mStatus, Status::Success);
 
-    EXPECT_EQ(aclDelegate.mAllowedChecks, 2);
+    EXPECT_EQ(aclDelegate.mCheckCount, 2);
     EXPECT_TRUE(aclDelegate.mWriterRevoked);
 
     Access::GetAccessControl().Finish();
