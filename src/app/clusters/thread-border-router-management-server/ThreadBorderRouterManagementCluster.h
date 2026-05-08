@@ -24,19 +24,32 @@
 namespace chip::app::Clusters {
 namespace ThreadBorderRouterManagement {
 
+class Delegate;
+
 class ThreadBorderRouterManagementCluster : public DefaultServerCluster
 {
 public:
-    struct Config
+    class Config
     {
-        constexpr Config(EndpointId endpoint) : endpointId(endpoint) {}
-        EndpointId endpointId;
+    public:
+        Config(Delegate & delegate) : mDelegate(delegate) {}
+
+    private:
+        friend class ThreadBorderRouterManagementCluster;
+        Delegate & mDelegate;
     };
 
-    ThreadBorderRouterManagementCluster(const Config & config) : DefaultServerCluster({ config.endpointId, ThreadBorderRouterManagement::Id }) {}
+    ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
+        DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate)
+    {}
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
+
+protected:
+    Delegate & mDelegate;
 };
 
 } // namespace ThreadBorderRouterManagement
