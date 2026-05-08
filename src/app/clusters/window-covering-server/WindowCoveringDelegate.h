@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/window-covering-server/window-covering-delegate.h>
-
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -28,10 +26,18 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
+// Window Covering Type
+enum class WindowCoveringType : uint8_t
+{
+    Lift     = 0x00, // window coverings that lift up and down or slide left to right
+    Tilt     = 0x01, // window coverings with vertical or horizontal strips
+    Reserved = 0x02, // dont use
+};
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the WindowCovering Cluster.
  */
-class ChefDelegate : public WindowCoveringDelegate
+class WindowCoveringDelegate
 {
 public:
     /**
@@ -44,7 +50,7 @@ public:
      *   @return CHIP_NO_ERROR On success.
      *   @return Other Value indicating it failed to adjust window covering position.
      */
-    CHIP_ERROR HandleMovement(WindowCoveringType type);
+    virtual CHIP_ERROR HandleMovement(WindowCoveringType type) = 0;
 
     /**
      * @brief
@@ -54,17 +60,20 @@ public:
      *   @return Other Value indicating it failed to stop any adjusting to the physical tilt and lift/slide that is currently
      * occurring..
      */
-    CHIP_ERROR HandleStopMotion();
+    virtual CHIP_ERROR HandleStopMotion() = 0;
 
-    ~ChefDelegate() = default;
-    ChefDelegate()  = default;
+    virtual ~WindowCoveringDelegate() = default;
+
+    void SetEndpoint(chip::EndpointId endpoint) { mEndpoint = endpoint; }
+
+protected:
+    EndpointId mEndpoint = 0;
 };
+
+// alias for backwards compatibility
+using Delegate = WindowCoveringDelegate;
 
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-namespace ChefWindowCovering {
-void InitChefWindowCoveringCluster();
-} // namespace ChefWindowCovering

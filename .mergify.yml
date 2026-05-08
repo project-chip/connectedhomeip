@@ -1,44 +1,99 @@
 pull_request_rules:
-  - name: Label conflicting pull requests
-    description: Add a label to a pull request with conflict to spot it easily
-    conditions:
-      - conflict
-      - '-closed'
-    actions:
-      label:
-        toggle:
+    - name: Label conflicting pull requests
+      description: Add a label to a pull request with conflict to spot it easily
+      conditions:
           - conflict
-  # WARNING: If the rule name below is changed, you must also update the
-  # condition `check-failure~=Automatic merge on PullApprove` to match the new name.
-  - name: Automatic merge on PullApprove
-    conditions:
-      - or:
-          - check-success=pullapprove
-          - label="fast track"
-      - '#approved-reviews-by>=1'
-      - '#review-threads-unresolved=0'
-      - '-draft'
-      - label!=docker
-      # Workaround for Mergify deadlock due to using "#check-failure=0":
-      # Mergify’s own action check can appear as failed/cancelled if conditions stop matching;
-      # and GitHub keeps those historic failures forever. Since `#check-failure=0` counts ALL
-      # failures (including historic ones), this would cause a deadlock and block merges indefinitely.
-      # We whitelist only this self-check so merges aren’t deadlocked, while all other failures still block.
-      - or:
-          - '#check-failure=0'
-          - and:
-              - '#check-failure=1'
-              # WARNING: This must match the rule name defined above.
-              # If the rule name changes, update this condition accordingly.
-              - check-failure~=Automatic merge on PullApprove
-      - '#check-pending=0'
-      - check-success~=Build
-      - or:
-          - check-success=pullapprove
-          - check-skipped=pullapprove
-          - check-neutral=pullapprove
-    actions:
-      merge:
-        method: squash
+          - "-closed"
+      actions:
+          label:
+              toggle:
+                  - conflict
+    # WARNING: If the rule name below is changed, you must also update the
+    # condition `check-failure~=Automatic merge on PullApprove` to match the new name.
+    - name: Automatic merge on PullApprove
+      conditions:
+          - or:
+                - check-success=pullapprove
+                - label="fast track"
+          - "#approved-reviews-by>=1"
+          - "#review-threads-unresolved=0"
+          - "-draft"
+          - label!=docker
+          # Workaround for Mergify deadlock due to using "#check-failure=0":
+          # Mergify's own action check can appear as failed/cancelled if conditions stop matching;
+          # and GitHub keeps those historic failures forever. Since `#check-failure=0` counts ALL
+          # failures (including historic ones), this would cause a deadlock and block merges indefinitely.
+          # We whitelist only this self-check so merges aren't deadlocked, while all other failures still block.
+          - or:
+                - "#check-failure=0"
+                - and:
+                      - "#check-failure=1"
+                      # WARNING: This must match the rule name defined above.
+                      # If the rule name changes, update this condition accordingly.
+                      - check-failure~=Automatic merge on PullApprove
+          - "#check-pending=0"
+          - check-success~=Build
+          - or:
+                - check-success=pullapprove
+                - check-skipped=pullapprove
+                - check-neutral=pullapprove
+      actions:
+          merge:
+              method: squash
+
+    # Backport rules - cherry-pick the squashed master commit after merge.
+    # Apply label request-backport-sve or request-backport-supported on the master PR
+    # (before or after merge) to trigger the corresponding backport.
+    - name: Backport to v1.6-sve-branch
+      conditions:
+          - merged
+          - base=master
+          - label="request-backport-sve"
+      actions:
+          backport:
+              branches:
+                  - v1.6-sve-branch
+
+    - name: Backport to supported branches
+      conditions:
+          - merged
+          - base=master
+          - label="request-backport-supported"
+      actions:
+          backport:
+              branches:
+                  - v1.5-branch
+                  - v1.4.2-branch
+
+    # Auto-merge backport PRs when CI is green and there are no conflicts.
+    # Mergify automatically labels backport PRs it creates as backport-{target-branch}.
+    # If a cherry-pick has conflicts or CI fails, the PR is left open for manual resolution.
+    # WARNING: If the rule name below is changed, you must also update the
+    # condition `check-failure~=Auto-merge clean backport PRs` to match the new name.
+    - name: Auto-merge clean backport PRs
+      conditions:
+          - or:
+                - label="backport-v1.6-sve-branch"
+                - label="backport-v1.5-branch"
+                - label="backport-v1.4.2-branch"
+          - author=mergify[bot]
+          - "-conflict"
+          - "-draft"
+          # Same deadlock workaround as above: allow exactly 1 failure if it is
+          # this rule's own self-check (which Mergify marks failed when conditions
+          # stop matching, and GitHub retains that historic failure forever).
+          - or:
+                - "#check-failure=0"
+                - and:
+                      - "#check-failure=1"
+                      # WARNING: This must match the rule name defined above.
+                      # If the rule name changes, update this condition accordingly.
+                      - check-failure~=Auto-merge clean backport PRs
+          - "#check-pending=0"
+          - check-success~=Build
+      actions:
+          merge:
+              method: squash
+
 merge_protections_settings:
-  reporting_method: check-runs
+    reporting_method: check-runs
