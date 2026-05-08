@@ -56,9 +56,10 @@ from matter.testing.runner import default_matter_test_main
 
 class TC_DRLK_2_3(MatterBaseTest, DRLK_COMMON):
 
-    def teardown_test(self):
-        self.event_loop.run_until_complete(self.teardown())
-        super().teardown_test()
+    @async_test_body
+    async def teardown_test(self):
+        await self.teardown()
+        return super().teardown_test()
 
     def setup_class(self):
         return super().setup_class()

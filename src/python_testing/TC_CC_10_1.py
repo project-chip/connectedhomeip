@@ -133,16 +133,15 @@ class TC_CC_10_1(MatterBaseTest):
     async def setup_test(self):
         super().setup_test()
 
-    def teardown_test(self):
-        async def _cleanup():
-            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
-            asserts.assert_equal(result.status, Status.Success, "Remove All Scenes failed on status")
-            asserts.assert_equal(result.groupID, self.kGroup1, "Remove All Scenes failed on groupID")
-            if self.groupcast_enabled:
-                await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
-            else:
-                await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
-        self.event_loop.run_until_complete(_cleanup())
+    @async_test_body
+    async def teardown_test(self):
+        result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
+        asserts.assert_equal(result.status, Status.Success, "Remove All Scenes failed on status")
+        asserts.assert_equal(result.groupID, self.kGroup1, "Remove All Scenes failed on groupID")
+        if self.groupcast_enabled:
+            await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        else:
+            await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
         super().teardown_test()
 
     @async_test_body

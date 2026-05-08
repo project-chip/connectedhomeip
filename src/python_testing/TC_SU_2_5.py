@@ -79,10 +79,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     ota_image_download_timeout = None
     requestor_node_id = None
 
-    def teardown_test(self):
-        async def _cleanup():
-            await self.clear_ota_providers(self.controller, self.requestor_node_id)
-        self.event_loop.run_until_complete(_cleanup())
+    @async_test_body
+    async def teardown_test(self):
+        await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
         self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
         super().teardown_test()
