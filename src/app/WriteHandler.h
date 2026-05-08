@@ -216,6 +216,8 @@ private:
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
     DataModel::Provider * mDataModelProvider = nullptr;
+
+    // Required for legacy-encoded ACL list writes; lets CheckWriteAccess skip the re-check on repeated same-path writes
     std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
 
     // This may be a "fake" pointer or a real delegate pointer, depending
