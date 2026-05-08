@@ -156,12 +156,10 @@ class AccessChecker(BasicCompositionTests):
         super().setup_test()
         self.success = True
 
-    def teardown_test(self):
-        async def _cleanup():
-            await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
-                (0, Clusters.AccessControl.Attributes.Acl(self.default_acl))])
-        self.event_loop.run_until_complete(_cleanup())
-        super().teardown_test()
+    @async_test_body
+    async def teardown_test(self):
+        await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
+            (0, Clusters.AccessControl.Attributes.Acl(self.default_acl))])
 
     async def _setup_acl(self, privilege: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]):
         if privilege is None:
