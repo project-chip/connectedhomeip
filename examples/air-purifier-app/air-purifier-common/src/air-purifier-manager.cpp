@@ -392,7 +392,10 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     }
     if (FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpointId); cluster != nullptr)
     {
-        LogErrorOnFailure(cluster->SetFanMode(fanMode).GetUnderlyingError());
+        if (cluster->GetFanMode() != fanMode)
+        {
+            LogErrorOnFailure(cluster->SetFanMode(fanMode).GetUnderlyingError());
+        }
     }
 }
 

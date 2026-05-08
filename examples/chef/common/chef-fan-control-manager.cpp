@@ -141,7 +141,11 @@ void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newStat
         {
             DataModel::Nullable<uint8_t> speed = fc->GetSpeedSetting();
             SetSpeedCurrent(speed.ValueOr(0));
-            LogErrorOnFailure(fc->SetFanMode(SpeedToFanMode(mSpeedCurrent)).GetUnderlyingError());
+            const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
+            if (fc->GetFanMode() != derivedMode)
+            {
+                LogErrorOnFailure(fc->SetFanMode(derivedMode).GetUnderlyingError());
+            }
         }
 
         mHandlingFanDriveDelegate = false;
@@ -195,7 +199,11 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         // Determine if the speed change should also change the fan mode
         if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
         {
-            LogErrorOnFailure(fc->SetFanMode(SpeedToFanMode(mSpeedCurrent)).GetUnderlyingError());
+            const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
+            if (fc->GetFanMode() != derivedMode)
+            {
+                LogErrorOnFailure(fc->SetFanMode(derivedMode).GetUnderlyingError());
+            }
         }
         break;
     }
