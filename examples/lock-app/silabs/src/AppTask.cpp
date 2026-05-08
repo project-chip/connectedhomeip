@@ -532,8 +532,8 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
                                         chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
                                         CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
 {
-    return appInstance().DMDoorLockSetCredential(endpointId, credentialIndex, creator, modifier, credentialStatus,
-                                                                 credentialType, credentialData);
+    return appInstance().DMDoorLockSetCredential(endpointId, credentialIndex, creator, modifier, credentialStatus, credentialType,
+                                                 credentialData);
 }
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -546,8 +546,8 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
                                   UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
                                   const CredentialStruct * credentials, size_t totalCredentials)
 {
-    return appInstance().DMDoorLockSetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus,
-                                                           usertype, credentialRule, credentials, totalCredentials);
+    return appInstance().DMDoorLockSetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype,
+                                           credentialRule, credentials, totalCredentials);
 }
 
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
@@ -572,22 +572,21 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t w
                                           DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute)
 {
-    return appInstance().DMDoorLockSetWeekDaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask,
-                                                                      startHour, startMinute, endHour, endMinute);
+    return appInstance().DMDoorLockSetWeekDaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute,
+                                                      endHour, endMinute);
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
-    return appInstance().DMDoorLockSetYearDaySchedule(endpointId, yearDayIndex, userIndex, status, localStartTime,
-                                                                      localEndTime);
+    return appInstance().DMDoorLockSetYearDaySchedule(endpointId, yearDayIndex, userIndex, status, localStartTime, localEndTime);
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
                                           uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
-    return appInstance().DMDoorLockSetHolidaySchedule(endpointId, holidayIndex, status, localStartTime,
-                                                                      localEndTime, operatingMode);
+    return appInstance().DMDoorLockSetHolidaySchedule(endpointId, holidayIndex, status, localStartTime, localEndTime,
+                                                      operatingMode);
 }
 
 void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
