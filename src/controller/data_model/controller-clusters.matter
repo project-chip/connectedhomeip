@@ -11334,18 +11334,18 @@ provisional cluster AvAnalysis = 1367 {
     nullable epoch_s endTime = 5;
   }
 
-  info event AnalysisSessionStart = 0 {
+  provisional info event AnalysisSessionStart = 0 {
     int16u sessionID = 0;
     optional node_id sourceNodeId = 1;
     nullable int16u triggeredZones[] = 2;
   }
 
-  info event AnalysisSessionEnd = 1 {
+  provisional info event AnalysisSessionEnd = 1 {
     int16u sessionID = 0;
     optional node_id sourceNodeId = 1;
   }
 
-  info event PerceivedContext = 2 {
+  provisional info event PerceivedContext = 2 {
     int16u sessionID = 0;
     optional node_id sourceNodeId = 1;
     optional epoch_us sourceStartTimestamp = 2;
@@ -12870,4 +12870,3 @@ cluster SampleMei = 4294048800 {
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
-
