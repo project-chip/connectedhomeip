@@ -86,6 +86,9 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
 
     # ============================================================================
     # TC-ICDB-2.1
+    # Verify that after client registration, ICD state machine enters check-in state
+    # and periodically sends check-in message if there is no active subscription
+    # session presences.
     # ============================================================================
 
     def desc_TC_ICDB_2_1(self) -> str:
@@ -201,6 +204,10 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
 
     # ============================================================================
     # TC-ICDB-2.2
+    # Verify that after client registration and subscription request, the ICD state
+    # machine enters the subscribed state, periodically sends subscription reports,
+    # and stops sending check-in messages for the duration of the subscription.
+    # After the subscription is torn down, the DUT resumes sending check-in messages.
     # ============================================================================
 
     def desc_TC_ICDB_2_2(self) -> str:
