@@ -205,6 +205,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Set to True by commission_devices() on success; gates the per-test ACL read in
         # setup_test so unit tests (which never commission) incur zero network overhead.
         self._dut_confirmed_available = False
+        # Set to True once _run_framework_cleanup has been awaited for the current test.
+        self._framework_cleanup_done = False
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -279,6 +281,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._log_execution_parameters_summary()
         super().teardown_class()
 
+    async def async_teardown_test(self) -> None:
+        """Override to add async per-test teardown without @async_test_body boilerplate.
+
+        Called from _run_framework_cleanup before any framework cleanup runs,
+        so the DUT and all controllers are still fully available.
+        """
+        pass
+
     async def _run_framework_cleanup(self) -> None:
         """Runs all enabled cleanup steps at the end of each test method.
 
@@ -289,6 +299,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Wildcard attributes are pre-fetched once so all cluster-presence checks within
         a single cleanup pass share the same read.
         """
+        await self.async_teardown_test()
+
         # If setup_test could not read the ACL, the DUT was unreachable at test
         # start — skip DUT cleanup to avoid a slow network discovery attempt.
         dut_reachable = self._original_acl is not None
@@ -839,11 +851,29 @@ class MatterBaseTest(base_test.BaseTestClass):
         Called by the Mobly framework after every test_ method, ensuring the DUT is
         restored to a known-clean state before the next test runs.
 
-        Test authors may overwrite this method to add custom per-test teardown.
-        Implementations should call super().teardown_test() at the end so that
-        framework cleanup always runs.
+        Test authors may override this method or async_teardown_test to add custom
+        per-test teardown. Call super().teardown_test() so that framework cleanup runs.
+
+        Re-entrancy: when a subclass decorates teardown_test with @async_test_body and
+        calls super().teardown_test() from within the coroutine, the decorator has
+        already opened a run_until_complete on the event loop. Calling
+        run_until_complete again on the same running loop raises RuntimeError. In that
+        case this method detects the running loop and returns without scheduling
+        cleanup — the @async_test_body wrapper runs _run_framework_cleanup itself
+        inside the already-open coroutine and sets _framework_cleanup_done.
         """
+        if self._framework_cleanup_done:
+            super().teardown_test()
+            return
+        try:
+            running = asyncio.get_running_loop()
+        except RuntimeError:
+            running = None
+        if running is self.event_loop:
+            # Re-entered from inside @async_test_body — decorator handles cleanup.
+            return
         self.event_loop.run_until_complete(self._run_framework_cleanup())
+        self._framework_cleanup_done = True
         super().teardown_test()
 
     def on_fail(self, record):
