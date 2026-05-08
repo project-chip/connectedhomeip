@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 # This is the equivalent to app_config_dependent_sources.gni
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/AirQualityCluster.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/air-quality-server.h"
 )

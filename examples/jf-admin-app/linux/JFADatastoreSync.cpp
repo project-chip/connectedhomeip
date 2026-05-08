@@ -133,7 +133,7 @@ public:
                     // Invoke Groups:AddGroup on the device's endpoint
                     chip::app::Clusters::Groups::Commands::AddGroup::Type addGroup;
                     addGroup.groupID   = cbContext->objectToWrite.groupID;
-                    addGroup.groupName = chip::CharSpan::fromCharString("GroupName");
+                    addGroup.groupName = "GroupName"_span;
 
                     chip::Controller::ClusterBase groupsCluster(exchangeMgr, sessionHandle, cbContext->objectToWrite.endpointID);
 

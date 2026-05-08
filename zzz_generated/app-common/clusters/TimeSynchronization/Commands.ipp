@@ -66,7 +66,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetUTCTime.
+} // namespace SetUTCTime
 namespace SetTrustedTimeSource {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -94,7 +94,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTrustedTimeSource.
+} // namespace SetTrustedTimeSource
 namespace SetTimeZone {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -122,7 +122,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTimeZone.
+} // namespace SetTimeZone
 namespace SetTimeZoneResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -150,7 +150,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTimeZoneResponse.
+} // namespace SetTimeZoneResponse
 namespace SetDSTOffset {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -178,7 +178,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetDSTOffset.
+} // namespace SetDSTOffset
 namespace SetDefaultNTP {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -206,7 +206,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetDefaultNTP.
+} // namespace SetDefaultNTP
 } // namespace Commands
 } // namespace TimeSynchronization
 } // namespace Clusters

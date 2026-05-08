@@ -270,6 +270,7 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
 
 void PushAVTransport::InitializeRecorder()
 {
+    std::lock_guard<std::mutex> lock(mRecorderMutex);
     if (mRecorder.get() == nullptr)
     {
         mSessionStartedTimestamp = std::chrono::system_clock::time_point();
@@ -292,6 +293,11 @@ PushAVTransport::~PushAVTransport()
 {
     mCanSendVideo = false;
     mCanSendAudio = false;
+
+    if (mRecorder)
+    {
+        mRecorder->mDeinitializeRecorder = true;
+    }
 
     mRecorder.reset();
     mUploader.reset();
@@ -388,6 +394,11 @@ bool PushAVTransport::HandleTriggerDetected()
     // Use the current motion detected duration which represents when this recording session will end
     mBlindStartTime = mClipInfo.mActivationTime + std::chrono::seconds(mClipInfo.mMotionDetectedDurationS);
 
+    if (mRecorder.get() == nullptr && mTransportStatus == TransportStatusEnum::kActive)
+    {
+        InitializeRecorder();
+    }
+
     if (mRecorder.get() != nullptr)
     {
         mRecorder->mClipInfo.mMotionDetectedDurationS = mClipInfo.mMotionDetectedDurationS;
@@ -413,7 +424,7 @@ void PushAVTransport::StartRecordingAndStreaming()
     mRecorder->Start();
     mStreaming = true;
     UpdateSendFlags();
-    if (IsStreaming() && (mTransportTriggerType != TransportTriggerTypeEnum::kCommand))
+    if (IsStreaming())
     {
         ChipLogDetail(Camera, "Ready to stream");
         GeneratePushTransportBeginEvent();
@@ -422,8 +433,13 @@ void PushAVTransport::StartRecordingAndStreaming()
 
 void PushAVTransport::GeneratePushTransportBeginEvent()
 {
+    ChipLogProgress(
+        Camera, "GeneratePushTransportBeginEvent: connectionID=%u, triggerType=%u, mCurrentActivationByManualTrigger=%s",
+        mConnectionID, static_cast<uint16_t>(mTransportTriggerType), mCurrentActivationByManualTrigger ? "true" : "false");
+
     if (mPushAvStreamTransportServer != nullptr)
     {
+        ChipLogProgress(Camera, "GeneratePushTransportBeginEvent: Calling NotifyTransportStarted for connection %u", mConnectionID);
         // mActivationReason is optional - if not set, it defaults to empty value
         mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, mTransportTriggerType, mActivationReason);
     }
@@ -631,7 +647,10 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         ChipLogProgress(Camera, "PushAVTransport transport status change requested to inactive");
         mStreaming = false; // Stop streaming
         UpdateSendFlags();
-        mRecorder.reset();
+        {
+            std::lock_guard<std::mutex> lock(mRecorderMutex);
+            mRecorder.reset();
+        }
         ChipLogProgress(Camera, "Recorder destruction done");
         // Clear activationTime for manual triggers when setting status to inactive
         if (mCurrentActivationByManualTrigger)
@@ -666,11 +685,11 @@ bool PushAVTransport::CanSendPacketsToRecorder()
 
     CheckAndUpdateSession();
 
-    if (mRecorder->mDeinitializeRecorder.load())
+    std::lock_guard<std::mutex> lock(mRecorderMutex);
+    if (mRecorder && mRecorder->mDeinitializeRecorder.load())
     {
         ChipLogProgress(Camera, "Current clip is completed, Next clip will start on trigger");
         mRecorder.reset(); // Redundant cleanup to make sure no dangling pointer left
-        InitializeRecorder();
         mStreaming = false;
         UpdateSendFlags();
         return false;
@@ -758,7 +777,10 @@ CHIP_ERROR PushAVTransport::ModifyPushTransport(const TransportOptionsStorage & 
     {
         mStreaming = false;
         UpdateSendFlags();
-        mRecorder.reset();
+        {
+            std::lock_guard<std::mutex> lock(mRecorderMutex);
+            mRecorder.reset();
+        }
         InitializeRecorder();
     }
     return CHIP_NO_ERROR;
@@ -798,7 +820,10 @@ void PushAVTransport::CheckAndUpdateSession()
                         mConnectionID, mSessionNumber, kMaxSessionDurationMinutes, mClipInfo.mTrackName.c_str());
         mStreaming = false;
         UpdateSendFlags();
-        mRecorder.reset();
+        {
+            std::lock_guard<std::mutex> lock(mRecorderMutex);
+            mRecorder.reset();
+        }
 
         InitializeRecorder();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() -

@@ -32,12 +32,13 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_provider_port:5541
-#       --timeout 600
+#       --timeout 2100
 #     factory-reset: true
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
@@ -288,9 +289,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_1]: Step #1.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number}: Step #1.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-
-        logger.info(f'{step_number}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number}: Step #1.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.2 - Track OTA attributes: UpdateState and UpdateStateProgress
@@ -431,8 +431,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s2}: Step #2.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info(f'{step_number_s2}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number_s2}: Step #2.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.2 - Track OTA attributes: UpdateState (Busy sequence)
@@ -553,8 +553,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_3]: Step #3.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info(f'{step_number_s3}: Step #3.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number_s3}: Step #3.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.2 - Track OTA attributes: UpdateState (updateNotAvailable sequence)
@@ -676,8 +676,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_4]: Step #4.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info(f'{step_number_s4}: Step #4.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number_s4}: Step #4.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.4 - Track OTA attributes: UpdateState (Busy,  180s DelayedActionTime sequence)
@@ -800,8 +800,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
 
         logger.info(f'{step_number_s6}: Step #6.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info(f'{step_number_s6}: Step #6.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number_s6}: Step #6.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.2 matcher function to track OTA StateTransition event (should stay Idle if UpdateAvailable version is same or lower)
@@ -907,8 +907,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_7]: Step #7.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s7}: Step #7.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-        logger.info(f'{step_number_s7}: Step #7.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
+        await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        logger.info(f'{step_number_s7}: Step #7.0 - sent cmd AnnounceOTAProvider.')
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.2 -  Track OTA StateTransition event: should stay Idle due to invalid BDX ImageURI in UpdateAvailable.

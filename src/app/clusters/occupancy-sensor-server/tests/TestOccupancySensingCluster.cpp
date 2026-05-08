@@ -209,6 +209,35 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeAttribute)
     EXPECT_EQ(clusterNoHoldTime.SetHoldTime(10), Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
 
+TEST_F(TestOccupancySensingCluster, TestAliasAttributeNotifications)
+{
+    chip::Testing::TestServerClusterContext context;
+    constexpr uint16_t kHoldTime                                               = 100;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                   .holdTimeMax     = 200,
+                                                                                   .holdTimeDefault = kHoldTime };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate)
+                                         .WithFeatures(Feature::kPassiveInfrared)
+                                         .WithDeprecatedAttributes(true) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    // 1. Verify that PIROccupiedToUnoccupiedDelay is NOT dirty initially
+    EXPECT_FALSE(
+        context.ChangeListener().IsDirty({ kTestEndpointId, OccupancySensing::Id, Attributes::PIROccupiedToUnoccupiedDelay::Id }));
+
+    // 2. Write to PIROccupiedToUnoccupiedDelay via tester (which calls WriteAttribute)
+    EXPECT_EQ(tester.WriteAttribute(Attributes::PIROccupiedToUnoccupiedDelay::Id, static_cast<uint16_t>(150)), CHIP_NO_ERROR);
+
+    // 3. Verify that PIROccupiedToUnoccupiedDelay IS dirty now
+    EXPECT_TRUE(
+        context.ChangeListener().IsDirty({ kTestEndpointId, OccupancySensing::Id, Attributes::PIROccupiedToUnoccupiedDelay::Id }));
+
+    // 4. Verify that HoldTime IS also dirty (since it is the primary attribute updated)
+    EXPECT_TRUE(context.ChangeListener().IsDirty({ kTestEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }));
+}
+
 TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
 {
     chip::Testing::TestServerClusterContext context;

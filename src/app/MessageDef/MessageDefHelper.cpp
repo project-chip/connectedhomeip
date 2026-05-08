@@ -22,14 +22,18 @@
  */
 
 #include "MessageDefHelper.h"
+
 #include <algorithm>
 #include <app/AppConfig.h>
 #include <app/SpecificationDefinedRevisions.h>
 #include <app/util/basic-types.h>
-#include <inttypes.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <stdarg.h>
-#include <stdio.h>
+
+#include <cinttypes>
+#include <cstdarg>
+#include <cstdio>
 
 namespace chip {
 namespace app {
@@ -99,8 +103,18 @@ void DecreaseDepth()
 #endif
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
+
 CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLabel)
 {
+    // do not allow fully unbounded recursion.
+    constexpr int kMaxRecursionDepth = 100;
+
+    if (aDepth > kMaxRecursionDepth)
+    {
+        PRETTY_PRINT("!!! RECURSION LIMIT REACHED !!!");
+        return CHIP_ERROR_RECURSION_DEPTH_LIMIT;
+    }
+
     if (aDepth == 0)
     {
         PRETTY_PRINT("%s = ", aLabel);
@@ -173,12 +187,13 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
     }
 
     case TLV::kTLVType_UTF8String: {
-        char value_s[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        chip::Platform::ScopedMemoryBuffer<char> value_s;
+        VerifyOrReturnError(!value_s.Alloc(CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE).IsNull(), CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_DETAIL_LOGGING
         uint32_t readerLen = aReader.GetLength();
 #endif // CHIP_DETAIL_LOGGING
-        CHIP_ERROR err = aReader.GetString(value_s, sizeof(value_s));
+        CHIP_ERROR err = aReader.GetString(value_s.Get(), CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
 
         if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -187,31 +202,22 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
         }
         else
         {
-            PRETTY_PRINT_SAMELINE("\"%s\" (%" PRIu32 " chars), ", value_s, readerLen);
+            PRETTY_PRINT_SAMELINE("\"%s\" (%" PRIu32 " chars), ", value_s.Get(), readerLen);
         }
         break;
     }
 
     case TLV::kTLVType_ByteString: {
-        uint8_t value_b[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-        uint32_t len, readerLen;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> value_b;
+        VerifyOrReturnError(!value_b.Alloc(CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE).IsNull(), CHIP_ERROR_NO_MEMORY);
 
-        readerLen = aReader.GetLength();
+        uint32_t readerLen = aReader.GetLength();
 
-        CHIP_ERROR err = aReader.GetBytes(value_b, sizeof(value_b));
+        CHIP_ERROR err = aReader.GetBytes(value_b.Get(), CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
 
         PRETTY_PRINT_SAMELINE("[");
         PRETTY_PRINT("\t\t");
-
-        if (readerLen < sizeof(value_b))
-        {
-            len = readerLen;
-        }
-        else
-        {
-            len = sizeof(value_b);
-        }
 
         if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
@@ -219,6 +225,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
         }
         else
         {
+            const uint32_t len = std::min(readerLen, static_cast<uint32_t>(CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE));
             for (size_t i = 0; i < len; i++)
             {
                 PRETTY_PRINT_SAMELINE("0x%02x, ", value_b[i]);

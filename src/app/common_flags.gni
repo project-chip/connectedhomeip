@@ -41,4 +41,16 @@ declare_args() {
 
   # Flag that controls whether the camera server is enabled
   matter_enable_camera_server = false
+
+  # Disable matter groupcast by default, this should be enabled on an
+  # application/platform specific layer
+  chip_config_enable_groupcast = false
+
+  # Optional path to a replacement cluster-objects.cpp source file.
+  # When set, the cluster-objects static library compiles this file instead
+  # of the full generated cluster-objects.cpp, allowing applications to
+  # include only the cluster implementations they actually need.
+  # The replacement file must provide the same translation-unit contract
+  # (i.e. include the necessary .ipp files and the shared/Structs.ipp).
+  chip_cluster_objects_source_override = ""
 }

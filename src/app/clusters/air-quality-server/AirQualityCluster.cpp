@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,114 +16,85 @@
  *    limitations under the License.
  */
 
-#include "app-common/zap-generated/ids/Clusters.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/air-quality-server/AirQualityCluster.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using chip::Protocols::InteractionModel::Status;
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/AirQuality/Metadata.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace AirQuality {
 
-Instance::Instance(EndpointId aEndpointId, BitMask<Feature> aFeature) :
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature)
+using AirQuality::AirQualityEnum;
+using AirQuality::Feature;
+
+AirQualityCluster::AirQualityCluster(EndpointId endpointId, BitFlags<Feature> features) :
+    DefaultServerCluster({ endpointId, AirQuality::Id }), mFeature(features)
 {}
 
-Instance::~Instance()
+DataModel::ActionReturnStatus AirQualityCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                               AttributeValueEncoder & encoder)
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    switch (request.path.mAttributeId)
+    {
+    case AirQuality::Attributes::AirQuality::Id:
+        return encoder.Encode(mAirQuality);
+    case AirQuality::Attributes::ClusterRevision::Id:
+        return encoder.Encode(AirQuality::kRevision);
+    case AirQuality::Attributes::FeatureMap::Id:
+        return encoder.Encode(mFeature.Raw());
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
 }
 
-CHIP_ERROR Instance::Init()
+CHIP_ERROR AirQualityCluster::Attributes(const ConcreteClusterPath & path,
+                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // Check if the cluster has been selected in zap
-    VerifyOrDie(emberAfContainsServer(mEndpointId, Id) == true);
-
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-
-    return CHIP_NO_ERROR;
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(AirQuality::Attributes::kMandatoryMetadata), {});
 }
 
-bool Instance::HasFeature(Feature aFeature) const
+bool AirQualityCluster::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);
 }
 
-Protocols::InteractionModel::Status Instance::UpdateAirQuality(AirQualityEnum aNewAirQuality)
+Protocols::InteractionModel::Status AirQualityCluster::SetAirQuality(AirQualityEnum aNewAirQuality)
 {
-    // Check that the value in is valid according to the enabled features.
+    using Status = Protocols::InteractionModel::Status;
+    // Check that the value is valid according to the enabled features.
     switch (aNewAirQuality)
     {
-    case AirQualityEnum::kFair: {
-        if (!HasFeature(Feature::kFair))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
-    case AirQualityEnum::kModerate: {
-        if (!HasFeature(Feature::kModerate))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
-    case AirQualityEnum::kVeryPoor: {
-        if (!HasFeature(Feature::kVeryPoor))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
-    case AirQualityEnum::kExtremelyPoor: {
-        if (!HasFeature(Feature::kExtremelyPoor))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
+    case AirQualityEnum::kFair:
+        VerifyOrReturnError(HasFeature(Feature::kFair), Status::ConstraintError);
+        break;
+    case AirQualityEnum::kModerate:
+        VerifyOrReturnError(HasFeature(Feature::kModerate), Status::ConstraintError);
+        break;
+    case AirQualityEnum::kVeryPoor:
+        VerifyOrReturnError(HasFeature(Feature::kVeryPoor), Status::ConstraintError);
+        break;
+    case AirQualityEnum::kExtremelyPoor:
+        VerifyOrReturnError(HasFeature(Feature::kExtremelyPoor), Status::ConstraintError);
+        break;
     case AirQualityEnum::kUnknown:
     case AirQualityEnum::kGood:
     case AirQualityEnum::kPoor:
         break;
-    default: {
-        return Protocols::InteractionModel::Status::InvalidValue;
-    }
+    default:
+        return Status::InvalidValue;
     }
 
-    mAirQuality = aNewAirQuality;
-    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, Id, Attributes::AirQuality::Id));
-    return Protocols::InteractionModel::Status::Success;
+    SetAttributeValue(mAirQuality, aNewAirQuality, AirQuality::Attributes::AirQuality::Id);
+    return Status::Success;
 }
 
-AirQualityEnum Instance::GetAirQuality()
+AirQualityEnum AirQualityCluster::GetAirQuality() const
 {
     return mAirQuality;
 }
 
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::AirQuality::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mAirQuality));
-        break;
-    case Attributes::FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-
-} // namespace AirQuality
 } // namespace Clusters
 } // namespace app
 } // namespace chip

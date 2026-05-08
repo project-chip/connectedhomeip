@@ -379,4 +379,47 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteSameId)
     ASSERT_EQ(storedKeySet.epoch_keys[0].start_time, kStartTime + kStartTimeOffset);
 }
 
+class MockGroupDataProvider : public Credentials::GroupDataProviderImpl
+{
+public:
+    MockGroupDataProvider() : GroupDataProviderImpl() {}
+    ~MockGroupDataProvider() override = default;
+
+    // Always returns nullptr to simulate iterator pool exhaustion.
+    GroupKeyIterator * IterateGroupKeys(FabricIndex fabric_index) override { return nullptr; }
+};
+
+// When IterateGroupKeys returns nullptr, WriteGroupKeyMap (AppendItem path) must detect
+// this and return CHIP_ERROR_NO_MEMORY rather than dereferencing a null pointer.
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeIteratorExhausted)
+{
+    MockGroupDataProvider mockGroupDataProvider;
+
+    auto * storage = &mTestContext.StorageDelegate();
+    mockGroupDataProvider.SetStorageDelegate(storage);
+    mockGroupDataProvider.SetSessionKeystore(&mMockKeystore);
+    ASSERT_EQ(mockGroupDataProvider.Init(), CHIP_NO_ERROR);
+    Credentials::SetGroupDataProvider(&mockGroupDataProvider);
+
+    // Sanity check: Ensure the mock is working as intended and IterateGroupKeys returns nullptr.
+    ASSERT_EQ(mockGroupDataProvider.IterateGroupKeys(kTestFabricIndex), nullptr);
+
+    // An AppendItem write triggers the IterateGroupKeys call inside WriteGroupKeyMap. Thus, we use ClearAllThenAppendItems and we
+    // do not test ReplaceAll since it does not call IterateGroupKeys.
+    // With the mock returning nullptr (to simulate ObjectPool exhaustion), the code must return CHIP_ERROR_NO_MEMORY instead of
+    // crashing with a null-pointer dereference.
+    auto keys        = TestHelpers::CreateGroupKeyMapList(1, kTestFabricIndex);
+    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mockGroupDataProvider } };
+    ClusterTester tester2{ mockCluster };
+
+    CHIP_ERROR err = tester2
+                         .WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite,
+                                         ListWritingPattern::ClearAllThenAppendItems)
+                         .GetUnderlyingError();
+
+    EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
+}
+
 } // namespace

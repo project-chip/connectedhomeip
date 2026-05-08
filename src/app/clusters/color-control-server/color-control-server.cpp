@@ -1511,7 +1511,6 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
 
     uint16_t currentHue = 0;
-    DirectionEnum direction;
     if (isEnhanced)
     {
         Attributes::EnhancedCurrentHue::Get(endpoint, &currentHue);
@@ -1524,6 +1523,7 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
     }
 
     // Convert the ShortestDistance/LongestDistance moveDirection values into Up/Down.
+    DirectionEnum direction = moveDirection;
     switch (moveDirection)
     {
     case DirectionEnum::kShortest:
@@ -1550,7 +1550,6 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
         break;
     case DirectionEnum::kUp:
     case DirectionEnum::kDown:
-        direction = moveDirection;
         break;
     case DirectionEnum::kUnknownEnumValue:
         return Status::InvalidCommand;

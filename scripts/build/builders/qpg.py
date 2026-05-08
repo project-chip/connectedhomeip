@@ -103,7 +103,8 @@ class QpgBuilder(GnBuilder):
         self.update_image = update_image
 
     def GnBuildArgs(self):
-        args = ['qpg_target_ic=\"%s\"' % (self.board.QpgBoardName)]
+        args = super().GnBuildArgs()
+        args.append('qpg_target_ic=\"%s\"' % (self.board.QpgBoardName))
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
         if self.update_image:

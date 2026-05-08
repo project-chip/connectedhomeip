@@ -16,6 +16,7 @@ function _matter_build_examples() {
     "--log-level[Determines the verbosity of script output]:log_level:(debug info warn fatal)" \
     "--verbose[Pass verbose flag to ninja]" \
     "*--target[Define a build target]:target:_matter_build_targets" \
+    "--build-profile[Specify the build profile]:build_profile:(default debug debug-optimized release release-size)" \
     "--enable-link-map-file[Enable generation of link map files]" \
     "--enable-flashbundle[Also generate the flashbundles for the app]" \
     "--repo[Path to the root of the CHIP SDK repository checkout]:directory:_files -/" \

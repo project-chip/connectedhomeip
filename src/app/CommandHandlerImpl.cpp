@@ -34,6 +34,7 @@
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <protocols/secure_channel/Constants.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
@@ -525,6 +526,15 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                       mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
+        // Groupcast Testing
+        auto & testing = Groupcast::GetTesting();
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
+        {
+            testing.SetGroupID(groupId);
+            testing.SetEndpointID(mapping.endpoint_id);
+            testing.SetClusterID(clusterId);
+            testing.SetElementID(static_cast<uint32_t>(commandId));
+        }
 
         {
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();

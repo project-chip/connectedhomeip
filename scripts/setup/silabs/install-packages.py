@@ -43,7 +43,7 @@ def get_platform_vars():
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.0.1-{platform_name}-x64.zip"
+    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.1.1-{platform_name}-x64.zip"
     return platform_name, slt_cli_url
 
 
@@ -83,16 +83,12 @@ def parse_version_from_slt(file_path):
     if match:
         version_str = match.group(1)
         if "." in version_str:
-            version = version_str.split("@")[0].strip()
-            # TODO: Remove this override once a GA SiSDK release is available.
-            if version == "2025.12.1-alpha":
-                version = "2025.12.0"
-            return version
+            return version_str.split("@")[0].strip()
     return None
 
 
 def version_tuple(version_str):
-    """Convert version string to tuple of integers for comparison (e.g. 2025.12.1-alpha -> (2025, 12, 1))."""
+    """Convert version string to tuple of integers for comparison (e.g. 2025.12.2 -> (2025, 12, 2))."""
     if not version_str:
         return ()
     main = version_str.split("-")[0].split("+")[0]
@@ -221,7 +217,7 @@ def download_slt_cli():
 
 def update_slt_cli(slt_cli_path):
     """Update SLT CLI to latest version."""
-    update_cmd = [slt_cli_path, "update", "--self"]
+    update_cmd = [slt_cli_path, "update", "--self", "--non-interactive"]
     try:
         logger.info("Updating SLT CLI to latest version...")
         subprocess.run(update_cmd, check=True)
@@ -233,26 +229,26 @@ def update_slt_cli(slt_cli_path):
 
 
 def get_pkg_manifest_paths():
-    """Return paths to sisdk-pkg.lock and wiseconnect-pkg.slt from chip-build-efr32 files-slt."""
+    """Return paths to sisdk-pkg.slt and wiseconnect-pkg.slt from chip-build-efr32 files-slt."""
     repo_root = get_repo_root()
     files_slt_dir = os.path.join(
         repo_root, "integrations", "docker", "images", "stage-2", "chip-build-efr32", "files-slt"
     )
     return [
         os.path.join(files_slt_dir, "wiseconnect-pkg.slt"),
-        os.path.join(files_slt_dir, "sisdk-pkg.lock"),
+        os.path.join(files_slt_dir, "sisdk-pkg.slt"),
     ]
 
 
 def install_sdk_packages(slt_cli_path):
-    """Install packages from sisdk-pkg.lock and wiseconnect-pkg.slt."""
+    """Install packages from sisdk-pkg.slt and wiseconnect-pkg.slt."""
     for pkg_path in get_pkg_manifest_paths():
         if not os.path.isfile(pkg_path):
             logger.error("Package manifest not found at %s", pkg_path)
             sys.exit(1)
 
     for pkg_path in get_pkg_manifest_paths():
-        install_cmd = [slt_cli_path, "install", "-f", pkg_path]
+        install_cmd = [slt_cli_path, "install", "-f", pkg_path, "--non-interactive"]
         try:
             logger.info("Installing packages from %s...", os.path.basename(pkg_path))
             subprocess.run(install_cmd, check=True)
@@ -266,15 +262,36 @@ def slt_where(slt_cli_path, package):
     """Run 'slt where <package>' and return the path, or None if not found."""
     try:
         result = subprocess.run(
-            [slt_cli_path, "where", package],
+            [slt_cli_path, "where", "--non-interactive", package],
             capture_output=True,
             text=True,
             check=False,
         )
         if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
-    except (subprocess.SubprocessError, FileNotFoundError):
-        pass
+            # SLT may print interactive prompts to stdout before the actual path.
+            # The path may be on its own line or appended after a prompt
+            # (e.g. "[y/n]?/home/..."). Scan from the bottom to find it.
+            for line in reversed(result.stdout.strip().splitlines()):
+                line = line.strip()
+                if line.startswith("/"):
+                    return line
+                # Handle path concatenated after interactive prompt (e.g. "[y/n]?/path" or "[y/n]? /path")
+                q_idx = line.rfind("?")
+                if q_idx != -1:
+                    after = line[q_idx + 1:].lstrip()
+                    if after.startswith("/"):
+                        return after
+            logger.error(
+                "Could not find an absolute path in 'slt where %s' output:\n%s",
+                package, result.stdout.strip(),
+            )
+        else:
+            logger.error(
+                "'slt where %s' failed (exit code %s): %s",
+                package, result.returncode, (result.stderr or result.stdout or "").strip(),
+            )
+    except (subprocess.SubprocessError, FileNotFoundError) as e:
+        logger.error("Failed to run 'slt where %s': %s", package, e)
     return None
 
 
@@ -366,8 +383,11 @@ def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
 
     def create_symlink(target_path, link_name):
         if not target_path or not os.path.isdir(target_path):
-            logger.warning("Target path does not exist or is not a directory: %s", target_path)
-            return
+            logger.error(
+                "Cannot create symlink: target path does not exist or is not a directory: %s",
+                target_path,
+            )
+            sys.exit(1)
         link_path = os.path.join(silabs_dir, link_name)
         try:
             os.makedirs(silabs_dir, exist_ok=True)
@@ -376,15 +396,20 @@ def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
                     current = os.path.realpath(link_path)
                     if os.path.realpath(target_path) == current:
                         logger.info("Symlink already up to date: %s", link_path)
-                        return
+                        return  # No error; skip create
                     os.remove(link_path)
                 else:
-                    logger.warning("Path exists and is not a symlink, skipping: %s", link_path)
-                    return
+                    logger.error(
+                        "Cannot create symlink: %s already exists and is not a symlink. "
+                        "Remove it manually and re-run.",
+                        link_path,
+                    )
+                    sys.exit(1)
             os.symlink(target_path, link_path)
             logger.info("Created symlink %s -> %s", link_path, target_path)
         except OSError as e:
-            logger.warning("Could not create symlink %s: %s", link_path, e)
+            logger.error("Could not create symlink %s -> %s: %s", link_path, target_path, e)
+            sys.exit(1)
 
     create_symlink(simplicity_sdk_path, "simplicity_sdk")
     create_symlink(wiseconnect_path, "wifi_sdk")
@@ -458,8 +483,9 @@ def setup_slt_environment(verbose=False):
     repo_root = get_repo_root()
     check_silabs_not_submodules(repo_root)
 
-    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2025.12.1-alpha")
-    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect")
+    # Using exact version to avoid ambiguity when multiple versions are installed.
+    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2025.12.2")
+    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect/4.0.1")
     create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path)
 
     versions = get_installed_sdk_versions(repo_root)

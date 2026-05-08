@@ -240,6 +240,12 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // Tracks whether ConnectNetworkResponse was already sent from HandleConnectNetwork()
+    // on the PASE/BLE path. OnResult() uses this to avoid sending a duplicate response
+    // after the attach callback, and the flag is reset at command start / fail-safe expiry.
+    bool mConnectNetworkResponseSentEarly = false;
+#endif
     Context mClusterContext;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);

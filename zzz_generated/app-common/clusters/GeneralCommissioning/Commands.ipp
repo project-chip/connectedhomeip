@@ -61,7 +61,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ArmFailSafe.
+} // namespace ArmFailSafe
 namespace ArmFailSafeResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -94,7 +94,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ArmFailSafeResponse.
+} // namespace ArmFailSafeResponse
 namespace SetRegulatoryConfig {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -132,7 +132,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetRegulatoryConfig.
+} // namespace SetRegulatoryConfig
 namespace SetRegulatoryConfigResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -165,7 +165,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetRegulatoryConfigResponse.
+} // namespace SetRegulatoryConfigResponse
 namespace CommissioningComplete {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -187,7 +187,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CommissioningComplete.
+} // namespace CommissioningComplete
 namespace CommissioningCompleteResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -220,7 +220,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CommissioningCompleteResponse.
+} // namespace CommissioningCompleteResponse
 namespace SetTCAcknowledgements {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -253,7 +253,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTCAcknowledgements.
+} // namespace SetTCAcknowledgements
 namespace SetTCAcknowledgementsResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -281,7 +281,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTCAcknowledgementsResponse.
+} // namespace SetTCAcknowledgementsResponse
 } // namespace Commands
 } // namespace GeneralCommissioning
 } // namespace Clusters

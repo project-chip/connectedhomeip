@@ -24,6 +24,18 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+/**
+ * A ChimeCluster subclass that performs storage migration during Startup.
+ * This ensures the persistence providers are available when migration runs.
+ */
+class CodegenChimeCluster : public ChimeCluster
+{
+public:
+    using ChimeCluster::ChimeCluster;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+};
+
 class ChimeServer
 {
 public:
@@ -76,7 +88,7 @@ public:
     static constexpr uint8_t kMaxChimeSoundNameSize = ChimeCluster::kMaxChimeSoundNameSize;
 
     // The Code Driven ChimeCluster instance (lazy-initialized)
-    chip::app::LazyRegisteredServerCluster<ChimeCluster> mCluster;
+    chip::app::LazyRegisteredServerCluster<CodegenChimeCluster> mCluster;
 
 private:
     EndpointId mEndpointId;

@@ -18,6 +18,7 @@
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Base85.h>
 #include <lib/support/CHIPMemString.h>
 
 #include <stdio.h>
@@ -205,6 +206,33 @@ public:
     {
         return StorageKeyName::Formatted("g/tnd/n/%08" PRIx32 "%08" PRIx32, // some platforms can't format uint64
                                          static_cast<uint32_t>(extendedPanId >> 32), static_cast<uint32_t>(extendedPanId));
+    }
+
+    // Network Identity Management
+
+    static StorageKeyName NetworkIdentityManagementAdministratorSecret() { return StorageKeyName::FromConst("g/nim/nass"); }
+
+    static StorageKeyName NetworkIdentityManagementNetworkIdentityIndex() { return StorageKeyName::FromConst("g/nim/ni"); }
+
+    static StorageKeyName NetworkIdentityManagementNetworkIdentity(uint16_t niIndex)
+    {
+        return StorageKeyName::Formatted("g/nim/n/%04x", niIndex);
+    }
+
+    static StorageKeyName NetworkIdentityManagementClientIndex() { return StorageKeyName::FromConst("g/nim/ci"); }
+
+    static StorageKeyName NetworkIdentityManagementClient(uint16_t clientIndex)
+    {
+        return StorageKeyName::Formatted("g/nim/c/%04x", clientIndex);
+    }
+
+    // Client identifier mapping: g/nim/@<base85-encoded identifier> = 7 + 25 = 32 chars
+    // Uses FixedByteSpan<20> directly to avoid pulling in CHIPCert.h for CertificateKeyId.
+    static StorageKeyName NetworkIdentityManagementClientIdentifierMapping(FixedByteSpan<20> identifier)
+    {
+        char base85[Base85EncodedLength(identifier.size())];
+        SuccessOrDie(BytesToBase85(identifier.data(), identifier.size(), base85, sizeof(base85)));
+        return StorageKeyName::Formatted("g/nim/@%.*s", static_cast<int>(sizeof(base85)), base85);
     }
 
     // OTA

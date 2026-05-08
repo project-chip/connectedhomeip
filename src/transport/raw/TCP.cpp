@@ -315,9 +315,9 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
     activeConnection->mAppState        = appState;
     activeConnection->mConnectionState = TCPState::kConnecting;
 
-    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
-
     mUsedEndPointCount++;
+
+    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
 
     // Set the return value of the peer connection state to the allocated
     // connection.
