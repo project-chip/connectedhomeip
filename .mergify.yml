@@ -74,6 +74,7 @@ pull_request_rules:
           - label="backport-v1.6-sve-branch"
           - label="backport-v1.5-branch"
           - label="backport-v1.4.2-branch"
+      - author=mergify[bot]
       - '-conflict'
       - '-draft'
       # Same deadlock workaround as above: allow exactly 1 failure if it is
