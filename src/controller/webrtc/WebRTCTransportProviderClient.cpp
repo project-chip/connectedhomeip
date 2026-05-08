@@ -373,7 +373,7 @@ void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader da
     {
         session.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
     }
-    
+
     if (value.audioStreamID.HasValue())
     {
         session.audioStreamID.SetValue(value.audioStreamID.Value());
