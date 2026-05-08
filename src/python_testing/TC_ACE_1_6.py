@@ -167,7 +167,8 @@ class TC_ACE_1_6(MatterBaseTest):
         else:
             # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later. This is an endpoint that must have at least
             # one cluster with a command that has operate priviliege.
-            operate_only_command_list = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, self.get_endpoint())
+            endpoint_to_search = self.get_endpoint() or None
+            operate_only_command_list = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, endpoint_to_search)
             asserts.assert_greater(len(operate_only_command_list), 0,
                                    "DUT must have at least 1 non-root endpoint with a cluster with commands requiring operate privilege.")
             operate_only_command = operate_only_command_list[0]
