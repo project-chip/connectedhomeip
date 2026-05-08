@@ -17,6 +17,8 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <optional>
+
 #include <app/clusters/humidistat-server/HumidistatCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -74,11 +76,11 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                             {
                                                 Mode::kMetadataEntry,
                                                 SystemState::kMetadataEntry,
-                                                TargetSetpoint::kMetadataEntry,
                                                 UserSetpoint::kMetadataEntry,
                                                 MinSetpoint::kMetadataEntry,
                                                 MaxSetpoint::kMetadataEntry,
                                                 Step::kMetadataEntry,
+                                                TargetSetpoint::kMetadataEntry,
                                                 MistType::kMetadataEntry,
                                             }));
     }
@@ -99,8 +101,8 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                                 UserSetpoint::kMetadataEntry,
                                                 MinSetpoint::kMetadataEntry,
                                                 MaxSetpoint::kMetadataEntry,
-                                                TargetSetpoint::kMetadataEntry,
                                                 Step::kMetadataEntry,
+                                                TargetSetpoint::kMetadataEntry,
                                             }));
     }
 
@@ -117,11 +119,11 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                             {
                                                 Mode::kMetadataEntry,
                                                 SystemState::kMetadataEntry,
-                                                TargetSetpoint::kMetadataEntry,
                                                 UserSetpoint::kMetadataEntry,
                                                 MinSetpoint::kMetadataEntry,
                                                 MaxSetpoint::kMetadataEntry,
                                                 Step::kMetadataEntry,
+                                                TargetSetpoint::kMetadataEntry,
                                                 Optimal::kMetadataEntry,
                                             }));
     }
@@ -160,7 +162,7 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                             }));
     }
 
-    // Suppport sleep alone - only attributes relevant to sleep should be present.
+    // Support sleep alone - only attributes relevant to sleep should be present.
     {
         const BitFlags<Feature> features;
 
@@ -229,7 +231,8 @@ TEST_F(TestHumidistatCluster, ReadAttributes)
     config.sleep          = true;
     config.optimal        = false;
 
-    const BitFlags<Feature> features{ Feature::kSensor, Feature::kHumidifier, Feature::kContinuous, Feature::kOptimal };
+    const BitFlags<Feature> features{ Feature::kSensor,    Feature::kHumidifier, Feature::kContinuous,
+                                      Feature::kOptimal, Feature::kColdMist,    Feature::kWarmMist };
 
     HumidistatCluster::OptionalAttributeSet optionalAttrs;
     optionalAttrs.Set<Sleep::Id>().Set<TargetSetpoint::Id>();
@@ -495,9 +498,10 @@ TEST_F(TestHumidistatCluster, SetSettingsMistTypeValidation)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Setting ColdMist should succeed
+    // Setting ColdMist should succeed when mode is Humidifier
     {
         Commands::SetSettings::Type request;
+        request.mode.SetValue(ModeEnum::kHumidifier);
         request.mistType.SetValue(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold));
         auto result = tester.Invoke(request);
         EXPECT_TRUE(result.IsSuccess());
@@ -660,6 +664,310 @@ TEST_F(TestHumidistatCluster, SetTargetSetpoint)
     // Out of range — expect ConstraintError
     EXPECT_EQ(cluster.SetTargetSetpoint(90), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     EXPECT_EQ(cluster.GetTargetSetpoint(), 60); // unchanged
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Fake delegate for testing callback behavior
+class FakeHumidistatDelegate : public HumidistatDelegate
+{
+public:
+    void OnModeChanged(Humidistat::ModeEnum newMode) override
+    {
+        modeChangedCount++;
+        lastMode = newMode;
+    }
+
+    void OnSystemStateChanged(Humidistat::SystemStateEnum newSystemState) override
+    {
+        systemStateChangedCount++;
+        lastSystemState = newSystemState;
+    }
+
+    void OnUserSetpointChanged(chip::Percent newUserSetpoint) override
+    {
+        userSetpointChangedCount++;
+        lastUserSetpoint = newUserSetpoint;
+    }
+
+    void OnTargetSetpointChanged(chip::Percent newTargetSetpoint) override
+    {
+        targetSetpointChangedCount++;
+        lastTargetSetpoint = newTargetSetpoint;
+    }
+
+    void OnMistTypeChanged(chip::BitMask<Humidistat::MistTypeBitmap> newMistType) override
+    {
+        mistTypeChangedCount++;
+        lastMistType = newMistType;
+    }
+
+    void OnContinuousChanged(bool newContinuous) override
+    {
+        continuousChangedCount++;
+        lastContinuous = newContinuous;
+    }
+
+    void OnSleepChanged(bool newSleep) override
+    {
+        sleepChangedCount++;
+        lastSleep = newSleep;
+    }
+
+    void OnOptimalChanged(bool newOptimal) override
+    {
+        optimalChangedCount++;
+        lastOptimal = newOptimal;
+    }
+
+    int modeChangedCount                = 0;
+    int systemStateChangedCount         = 0;
+    int userSetpointChangedCount        = 0;
+    int targetSetpointChangedCount      = 0;
+    int mistTypeChangedCount            = 0;
+    int continuousChangedCount          = 0;
+    int sleepChangedCount               = 0;
+    int optimalChangedCount             = 0;
+
+    std::optional<Humidistat::ModeEnum> lastMode;
+    std::optional<Humidistat::SystemStateEnum> lastSystemState;
+    std::optional<chip::Percent> lastUserSetpoint;
+    std::optional<chip::Percent> lastTargetSetpoint;
+    std::optional<chip::BitMask<Humidistat::MistTypeBitmap>> lastMistType;
+    std::optional<bool> lastContinuous;
+    std::optional<bool> lastSleep;
+    std::optional<bool> lastOptimal;
+};
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnModeChanged)
+{
+    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetMode(ModeEnum::kHumidifier);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMode(), ModeEnum::kHumidifier);
+    EXPECT_EQ(delegate.modeChangedCount, 1);
+    ASSERT_TRUE(delegate.lastMode.has_value());
+    EXPECT_EQ(delegate.lastMode.value(), ModeEnum::kHumidifier);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnSystemStateChanged)
+{
+    const BitFlags<Feature> features{ Feature::kHumidifier };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetSystemState(SystemStateEnum::kHumidifying);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetSystemState(), SystemStateEnum::kHumidifying);
+    EXPECT_EQ(delegate.systemStateChangedCount, 1);
+    ASSERT_TRUE(delegate.lastSystemState.has_value());
+    EXPECT_EQ(delegate.lastSystemState.value(), SystemStateEnum::kHumidifying);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnUserSetpointChanged)
+{
+    HumidistatCluster::StartupConfiguration config;
+    config.minSetpoint  = 20;
+    config.maxSetpoint  = 80;
+    config.step         = 10;
+    config.userSetpoint = 50;
+
+    const BitFlags<Feature> features{ Feature::kSensor };
+    HumidistatCluster cluster(kTestEndpointId, features, {}, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetUserSetpoint(60);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetUserSetpoint(), 60);
+    EXPECT_EQ(delegate.userSetpointChangedCount, 1);
+    ASSERT_TRUE(delegate.lastUserSetpoint.has_value());
+    EXPECT_EQ(delegate.lastUserSetpoint.value(), 60);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnTargetSetpointChanged)
+{
+    HumidistatCluster::StartupConfiguration config;
+    config.minSetpoint    = 20;
+    config.maxSetpoint    = 80;
+    config.step           = 10;
+    config.userSetpoint   = 50;
+    config.targetSetpoint = 50;
+
+    const BitFlags<Feature> features{ Feature::kSensor };
+    HumidistatCluster cluster(kTestEndpointId, features, {}, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetTargetSetpoint(70);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetTargetSetpoint(), 70);
+    EXPECT_EQ(delegate.targetSetpointChangedCount, 1);
+    ASSERT_TRUE(delegate.lastTargetSetpoint.has_value());
+    EXPECT_EQ(delegate.lastTargetSetpoint.value(), 70);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnMistTypeChanged)
+{
+    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kColdMist };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    // SetMode to Humidifier first so MistType can be set
+    ASSERT_EQ(cluster.SetMode(ModeEnum::kHumidifier), CHIP_NO_ERROR);
+
+    const auto expectedMistType = chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold);
+
+    CHIP_ERROR err = cluster.SetMistType(expectedMistType);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMistType().Raw(), expectedMistType.Raw());
+    EXPECT_EQ(delegate.mistTypeChangedCount, 1);
+    ASSERT_TRUE(delegate.lastMistType.has_value());
+    EXPECT_EQ(delegate.lastMistType.value().Raw(), expectedMistType.Raw());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnContinuousChanged)
+{
+    const BitFlags<Feature> features{ Feature::kContinuous };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetContinuous(true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster.GetContinuous());
+    EXPECT_EQ(delegate.continuousChangedCount, 1);
+    ASSERT_TRUE(delegate.lastContinuous.has_value());
+    EXPECT_TRUE(delegate.lastContinuous.value());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnSleepChanged)
+{
+    const BitFlags<Feature> features{};
+    HumidistatCluster::OptionalAttributeSet optionalAttrs;
+    optionalAttrs.Set<Sleep::Id>();
+
+    HumidistatCluster cluster(kTestEndpointId, features, optionalAttrs, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetSleep(true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster.GetSleep());
+    EXPECT_EQ(delegate.sleepChangedCount, 1);
+    ASSERT_TRUE(delegate.lastSleep.has_value());
+    EXPECT_TRUE(delegate.lastSleep.value());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnOptimalChanged)
+{
+    const BitFlags<Feature> features{ Feature::kOptimal };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetOptimal(true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster.GetOptimal());
+    EXPECT_EQ(delegate.optimalChangedCount, 1);
+    ASSERT_TRUE(delegate.lastOptimal.has_value());
+    EXPECT_TRUE(delegate.lastOptimal.value());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_NullptrSafe)
+{
+    const BitFlags<Feature> features{ Feature::kHumidifier };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // No delegate set (implicitly nullptr) — should not crash
+    CHIP_ERROR err = cluster.SetMode(ModeEnum::kHumidifier);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMode(), ModeEnum::kHumidifier);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_SetDelegateTwice)
+{
+    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate1;
+    FakeHumidistatDelegate delegate2;
+
+    // Set first delegate
+    cluster.SetDelegate(&delegate1);
+
+    // Replace delegate with second one
+    cluster.SetDelegate(&delegate2);
+
+    // Only delegate2 should be called
+    CHIP_ERROR err = cluster.SetMode(ModeEnum::kHumidifier);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(delegate1.modeChangedCount, 0);
+    EXPECT_EQ(delegate2.modeChangedCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_NoCallOnNoChange)
+{
+    const BitFlags<Feature> features{ Feature::kHumidifier };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    // First call: value changes
+    CHIP_ERROR err1 = cluster.SetMode(ModeEnum::kHumidifier);
+    EXPECT_EQ(err1, CHIP_NO_ERROR);
+
+    // Second call: no change (no-op)
+    CHIP_ERROR err2 = cluster.SetMode(ModeEnum::kHumidifier);
+    EXPECT_EQ(err2, CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.modeChangedCount, 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

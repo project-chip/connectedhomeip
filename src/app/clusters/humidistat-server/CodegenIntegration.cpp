@@ -47,7 +47,17 @@ public:
         using chip::Protocols::InteractionModel::Status;
 
         BitFlags<Humidistat::Feature> features(featureMap);
-        HumidistatCluster::OptionalAttributeSet optionalAttributes(optionalAttributeBits);
+
+        // Sanitize optional attributes: only truly optional attributes per spec should pass through.
+        // TargetSetpoint is optional only when SENSOR is present; otherwise it's invalid.
+        // Sleep is always optional. All other "optional" attributes are actually feature-forced.
+        uint32_t validOptionalBits = optionalAttributeBits;
+        if (!features.Has(Feature::kSensor))
+        {
+            validOptionalBits &= ~(1u << TargetSetpoint::Id);
+        }
+
+        HumidistatCluster::OptionalAttributeSet optionalAttributes(validOptionalBits);
         HumidistatCluster::StartupConfiguration config;
 
         if (features.Has(Feature::kSensor))
@@ -57,45 +67,26 @@ public:
             VerifyOrDie(Step::Get(endpointId, &config.step) == Status::Success);
 
             chip::Percent percentVal{};
-            if (UserSetpoint::Get(endpointId, &percentVal) == Status::Success)
-            {
-                config.userSetpoint = percentVal;
-            }
+            VerifyOrDie(UserSetpoint::Get(endpointId, &percentVal) == Status::Success);
+            config.userSetpoint = percentVal;
+
             if (TargetSetpoint::Get(endpointId, &percentVal) == Status::Success)
             {
                 config.targetSetpoint = percentVal;
             }
         }
 
-        {
-            ModeEnum modeVal{};
-            if (Mode::Get(endpointId, &modeVal) == Status::Success)
-            {
-                config.mode = modeVal;
-            }
-
-            SystemStateEnum systemStateVal{};
-            if (SystemState::Get(endpointId, &systemStateVal) == Status::Success)
-            {
-                config.systemState = systemStateVal;
-            }
-        }
+        VerifyOrDie(Mode::Get(endpointId, &config.mode) == Status::Success);
+        VerifyOrDie(SystemState::Get(endpointId, &config.systemState) == Status::Success);
 
         if (features.Has(Feature::kHumidifier))
         {
-            chip::BitMask<MistTypeBitmap> mistVal{};
-            if (MistType::Get(endpointId, &mistVal) == Status::Success)
-            {
-                config.mistType = mistVal;
-            }
+            VerifyOrDie(MistType::Get(endpointId, &config.mistType) == Status::Success);
         }
 
         if (features.Has(Feature::kContinuous))
         {
-            if (Continuous::Get(endpointId, &config.continuous) != Status::Success)
-            {
-                config.continuous = false;
-            }
+            VerifyOrDie(Continuous::Get(endpointId, &config.continuous) == Status::Success);
         }
 
         if (optionalAttributes.IsSet(Sleep::Id))
@@ -108,10 +99,10 @@ public:
 
         if (features.Has(Feature::kOptimal))
         {
-            if (Optimal::Get(endpointId, &config.optimal) != Status::Success)
-            {
-                config.optimal = false;
-            }
+            VerifyOrDie(Optimal::Get(endpointId, &config.optimal) == Status::Success);
+            chip::Percent percentVal{};
+            VerifyOrDie(TargetSetpoint::Get(endpointId, &percentVal) == Status::Success);
+            config.targetSetpoint = percentVal;
         }
 
         gServers[clusterInstanceIndex].Create(endpointId, features, optionalAttributes, config);

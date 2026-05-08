@@ -8363,7 +8363,7 @@ endpoint 1 {
     ram      attribute maxSetpoint default = 60;
     ram      attribute step default = 5;
     ram      attribute targetSetpoint default = 0;
-    ram      attribute mistType;
+    ram      attribute mistType default = 0;
     ram      attribute continuous default = 0;
     ram      attribute sleep default = 0;
     ram      attribute optimal default = 0;
@@ -8371,7 +8371,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 511;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command SetSettings;
   }
