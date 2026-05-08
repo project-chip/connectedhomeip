@@ -343,7 +343,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     def _on_new_controller_created(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
         """Hook set and fired by FabricAdmin for every NewController() call.
 
-        Skips the default controller.
+        Skips the default controller and any controller that opts out of per-test
+        cleanup tracking by setting _skip_cleanup_tracking = True. Use the opt-out
+        for class-scoped controllers that must outlive individual tests.
 
         Args:
             controller: The controller that was created.
