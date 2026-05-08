@@ -430,10 +430,23 @@ void WebRTCProviderClient::HandleSolicitOfferResponse(TLV::TLVReader & data)
     mCurrentSessionId = value.webRTCSessionID;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID.Value() =
-        value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
-    session.audioStreamID.Value() =
-        value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    if (value.videoStreamID.HasValue())
+    {
+        session.videoStreamID.SetValue(value.videoStreamID.Value());
+    }
+    else
+    {
+        session.videoStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
+    }
+    
+    if (value.audioStreamID.HasValue())
+    {
+        session.audioStreamID.SetValue(value.audioStreamID.Value());
+    }
+    else
+    {
+        session.audioStreamID.SetValue(DataModel::MakeNullable<uint16_t>());
+    }
 
     // If DeferredOffer == FALSE these fields MUST be valid
     if (!value.deferredOffer)
