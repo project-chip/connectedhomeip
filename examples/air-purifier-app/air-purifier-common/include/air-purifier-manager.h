@@ -91,6 +91,8 @@ public:
      */
     Protocols::InteractionModel::Status HandleStep(FanControl::StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
+    void OnFanDriveStateChanged(const FanControl::FanDriveState & newState) override;
+
     /**
      * @brief Callback that thermostat manager calls when the heating state changes
      */

@@ -149,6 +149,12 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     return cluster->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 
+void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
+{
+    (void) newState;
+    ClampFanDriveCurrentWhenOff();
+}
+
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
     switch (attributeId)
