@@ -72,8 +72,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     AttributePersistence attrPersistence{ mContext->attributeStorage };
 
     const auto defaultMode = mMode;
-    if (!attrPersistence.LoadNativeEndianValue<ModeEnum>(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id), mMode, defaultMode))
+    if (!attrPersistence.LoadNativeEndianValue<ModeEnum>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id), mMode,
+                                                         defaultMode))
     {
         ChipLogDetail(Zcl, "Humidistat: Unable to load Mode attribute, using default");
     }
@@ -108,8 +108,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     {
         auto rawMistType              = mMistType.Raw();
         const auto defaultRawMistType = rawMistType;
-        if (!attrPersistence.LoadNativeEndianValue<uint8_t>(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), rawMistType, defaultRawMistType))
+        if (!attrPersistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
+                                                            rawMistType, defaultRawMistType))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load MistType attribute, using default");
         }
@@ -119,8 +119,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     if (mFeatures.Has(Feature::kContinuous))
     {
         const auto defaultContinuous = mContinuous;
-        if (!attrPersistence.LoadNativeEndianValue<bool>(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Continuous::Id), mContinuous, defaultContinuous))
+        if (!attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Continuous::Id),
+                                                         mContinuous, defaultContinuous))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load Continuous attribute, using default");
         }
@@ -129,8 +129,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     if (mOptionalAttributes.IsSet(Sleep::Id))
     {
         const auto defaultSleep = mSleep;
-        if (!attrPersistence.LoadNativeEndianValue<bool>(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id), mSleep, defaultSleep))
+        if (!attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id),
+                                                         mSleep, defaultSleep))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load Sleep attribute, using default");
         }
@@ -139,8 +139,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     if (mFeatures.Has(Feature::kOptimal))
     {
         const auto defaultOptimal = mOptimal;
-        if (!attrPersistence.LoadNativeEndianValue<bool>(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Optimal::Id), mOptimal, defaultOptimal))
+        if (!attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Optimal::Id),
+                                                         mOptimal, defaultOptimal))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load Optimal attribute, using default");
         }
@@ -209,8 +209,7 @@ HumidistatCluster::FullOptionalAttributeSet HumidistatCluster::ComputeActiveOpti
         active.ForceSet<Step::Id>();
     }
 
-    if (mFeatures.Has(Feature::kSensor) &&
-        (mFeatures.Has(Feature::kOptimal) || mOptionalAttributes.IsSet(TargetSetpoint::Id)))
+    if (mFeatures.Has(Feature::kSensor) && (mFeatures.Has(Feature::kOptimal) || mOptionalAttributes.IsSet(TargetSetpoint::Id)))
     {
         active.ForceSet<TargetSetpoint::Id>();
     }
@@ -242,9 +241,8 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
     }
     if (IsStarted())
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id),
-            { reinterpret_cast<const uint8_t *>(&mMode), sizeof(mMode) }));
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id),
+                                                                { reinterpret_cast<const uint8_t *>(&mMode), sizeof(mMode) }));
     }
 
     // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
@@ -265,9 +263,9 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
     }
     if (IsStarted())
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, SystemState::Id),
-            { reinterpret_cast<const uint8_t *>(&mSystemState), sizeof(mSystemState) }));
+        LogErrorOnFailure(
+            mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, SystemState::Id),
+                                                  { reinterpret_cast<const uint8_t *>(&mSystemState), sizeof(mSystemState) }));
     }
     return CHIP_NO_ERROR;
 }
@@ -312,9 +310,9 @@ CHIP_ERROR HumidistatCluster::SetUserSetpoint(chip::Percent userSetpoint)
     }
     if (IsStarted())
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, UserSetpoint::Id),
-            { reinterpret_cast<const uint8_t *>(&mUserSetpoint), sizeof(mUserSetpoint) }));
+        LogErrorOnFailure(
+            mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, UserSetpoint::Id),
+                                                  { reinterpret_cast<const uint8_t *>(&mUserSetpoint), sizeof(mUserSetpoint) }));
     }
     return CHIP_NO_ERROR;
 }
@@ -329,9 +327,9 @@ CHIP_ERROR HumidistatCluster::SetMistType(chip::BitMask<Humidistat::MistTypeBitm
     }
     if (IsStarted())
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
-            { reinterpret_cast<const uint8_t *>(&mMistType), sizeof(mMistType) }));
+        LogErrorOnFailure(
+            mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
+                                                  { reinterpret_cast<const uint8_t *>(&mMistType), sizeof(mMistType) }));
     }
     return CHIP_NO_ERROR;
 }
@@ -353,9 +351,9 @@ CHIP_ERROR HumidistatCluster::SetContinuous(bool continuous)
     }
     if (IsStarted())
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Continuous::Id),
-            { reinterpret_cast<const uint8_t *>(&mContinuous), sizeof(mContinuous) }));
+        LogErrorOnFailure(
+            mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Continuous::Id),
+                                                  { reinterpret_cast<const uint8_t *>(&mContinuous), sizeof(mContinuous) }));
     }
     return CHIP_NO_ERROR;
 }
@@ -369,9 +367,8 @@ CHIP_ERROR HumidistatCluster::SetSleep(bool sleep)
     }
     if (IsStarted())
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id),
-            { reinterpret_cast<const uint8_t *>(&mSleep), sizeof(mSleep) }));
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id),
+                                                                { reinterpret_cast<const uint8_t *>(&mSleep), sizeof(mSleep) }));
     }
     return CHIP_NO_ERROR;
 }
@@ -385,9 +382,9 @@ CHIP_ERROR HumidistatCluster::SetOptimal(bool optimal)
     }
     if (IsStarted())
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Optimal::Id),
-            { reinterpret_cast<const uint8_t *>(&mOptimal), sizeof(mOptimal) }));
+        LogErrorOnFailure(
+            mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Optimal::Id),
+                                                  { reinterpret_cast<const uint8_t *>(&mOptimal), sizeof(mOptimal) }));
     }
     return CHIP_NO_ERROR;
 }
@@ -396,15 +393,9 @@ CHIP_ERROR HumidistatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     static constexpr DataModel::AttributeEntry kOptionalEntries[] = {
-        UserSetpoint::kMetadataEntry,
-        MinSetpoint::kMetadataEntry,
-        MaxSetpoint::kMetadataEntry,
-        Step::kMetadataEntry,
-        TargetSetpoint::kMetadataEntry,
-        MistType::kMetadataEntry,
-        Continuous::kMetadataEntry,
-        Sleep::kMetadataEntry,
-        Optimal::kMetadataEntry,
+        UserSetpoint::kMetadataEntry, MinSetpoint::kMetadataEntry,    MaxSetpoint::kMetadataEntry,
+        Step::kMetadataEntry,         TargetSetpoint::kMetadataEntry, MistType::kMetadataEntry,
+        Continuous::kMetadataEntry,   Sleep::kMetadataEntry,          Optimal::kMetadataEntry,
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -470,8 +461,8 @@ DataModel::ActionReturnStatus HumidistatCluster::ReadAttribute(const DataModel::
 }
 
 std::optional<DataModel::ActionReturnStatus> HumidistatCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                               chip::TLV::TLVReader & input_arguments,
-                                                                               CommandHandler * handler)
+                                                                              chip::TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {

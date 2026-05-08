@@ -17,10 +17,10 @@
 
 #include "CodegenIntegration.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/humidistat-server/HumidistatCluster.h>
 #include <app/static-cluster-config/Humidistat.h>
 #include <app/util/attribute-storage.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 

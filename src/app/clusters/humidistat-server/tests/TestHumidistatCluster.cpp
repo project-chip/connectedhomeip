@@ -59,13 +59,14 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                                 SystemState::kMetadataEntry,
                                             }));
     }
-    
-    // Supports only Humidifier mode with sensor - only attributes relevant to that mode should be present, including optional TargetSetpoint.
+
+    // Supports only Humidifier mode with sensor - only attributes relevant to that mode should be present, including optional
+    // TargetSetpoint.
     {
         const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kSensor };
 
-         HumidistatCluster::OptionalAttributeSet optionalAttrs;
-         optionalAttrs.Set<TargetSetpoint::Id>();
+        HumidistatCluster::OptionalAttributeSet optionalAttrs;
+        optionalAttrs.Set<TargetSetpoint::Id>();
 
         HumidistatCluster cluster(kTestEndpointId, features, optionalAttrs);
 
@@ -77,7 +78,7 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                                 UserSetpoint::kMetadataEntry,
                                                 MinSetpoint::kMetadataEntry,
                                                 MaxSetpoint::kMetadataEntry,
-                                                Step::kMetadataEntry,   
+                                                Step::kMetadataEntry,
                                                 MistType::kMetadataEntry,
                                             }));
     }
@@ -103,7 +104,7 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                             }));
     }
 
-    //Support optimal with sensor - only attributes relevant to optimal should be present, including optional TargetSetpoint.
+    // Support optimal with sensor - only attributes relevant to optimal should be present, including optional TargetSetpoint.
     {
         const BitFlags<Feature> features{ Feature::kOptimal, Feature::kSensor };
 
@@ -120,12 +121,13 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                                 UserSetpoint::kMetadataEntry,
                                                 MinSetpoint::kMetadataEntry,
                                                 MaxSetpoint::kMetadataEntry,
-                                                Step::kMetadataEntry,   
+                                                Step::kMetadataEntry,
                                                 Optimal::kMetadataEntry,
                                             }));
     }
 
-    // Support sensor alone without optional TargetSetpoint - only attributes relevant to sensor should be present, excluding optional TargetSetpoint.
+    // Support sensor alone without optional TargetSetpoint - only attributes relevant to sensor should be present, excluding
+    // optional TargetSetpoint.
     {
         const BitFlags<Feature> features{ Feature::kSensor };
 
@@ -555,8 +557,8 @@ TEST_F(TestHumidistatCluster, SetSettingsModeFailStopsProcessing)
     auto result = tester.Invoke(request);
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::ConstraintError)));
-    EXPECT_EQ(cluster.GetMode(), ModeEnum::kOff);        // unchanged
-    EXPECT_EQ(cluster.GetUserSetpoint(), 50);             // unchanged — not processed
+    EXPECT_EQ(cluster.GetMode(), ModeEnum::kOff); // unchanged
+    EXPECT_EQ(cluster.GetUserSetpoint(), 50);     // unchanged — not processed
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
