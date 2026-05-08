@@ -46,6 +46,7 @@ public:
 
     void Init();
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+    void OnFanDriveStateChanged(const FanDriveState & newState) override;
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
@@ -80,6 +81,8 @@ private:
     void SetPercentCurrent(uint8_t aNewPercentCurrent);
     void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
     static FanControl::FanModeEnum SpeedToFanMode(uint8_t speed);
+
+    bool mHandlingFanDriveDelegate = false;
 };
 
 static std::unique_ptr<ChefFanControlManager> mFanControlManager;
@@ -120,6 +123,29 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     }
 
     return cluster->SetSpeedSetting(MakeNullable(newSpeedSetting)).GetStatusCode().GetStatus();
+}
+
+void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newState)
+{
+    if (!mHandlingFanDriveDelegate)
+    {
+        mHandlingFanDriveDelegate = true;
+        mPercentCurrent = newState.percentCurrent;
+        mSpeedCurrent   = newState.speedCurrent;
+
+        FanModeWriteCallback(newState.mode);
+        SetPercentCurrent(newState.percentSetting.ValueOr(0));
+
+        if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
+            fc != nullptr && fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+        {
+            DataModel::Nullable<uint8_t> speed = fc->GetSpeedSetting();
+            SetSpeedCurrent(speed.ValueOr(0));
+            LogErrorOnFailure(fc->SetFanMode(SpeedToFanMode(mSpeedCurrent)).GetUnderlyingError());
+        }
+
+        mHandlingFanDriveDelegate = false;
+    }
 }
 
 void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

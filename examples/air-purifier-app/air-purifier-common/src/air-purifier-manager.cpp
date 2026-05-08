@@ -151,7 +151,33 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
 void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
-    (void) newState;
+    if (!mHandlingFanDriveDelegate)
+    {
+        mHandlingFanDriveDelegate = true;
+
+        if (mOnOffClusterOn)
+        {
+            FanModeWriteCallback(newState.mode);
+
+            if (!newState.percentSetting.IsNull())
+            {
+                PercentSettingWriteCallback(newState.percentSetting.Value());
+            }
+
+            FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+            if (cluster != nullptr && cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+            {
+                DataModel::Nullable<uint8_t> speed = cluster->GetSpeedSetting();
+                if (!speed.IsNull())
+                {
+                    SpeedSettingWriteCallback(speed.Value());
+                }
+            }
+        }
+
+        mHandlingFanDriveDelegate = false;
+    }
+
     ClampFanDriveCurrentWhenOff();
 }
 

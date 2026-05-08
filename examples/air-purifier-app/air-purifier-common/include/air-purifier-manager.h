@@ -120,6 +120,9 @@ private:
     // This gets initialized properly in the init function from the On/Off cluster
     bool mOnOffClusterOn = true;
 
+    /// Suppresses re-entrant FanControl app reactions when delegate callbacks update the cluster.
+    bool mHandlingFanDriveDelegate = false;
+
     // Fan Mode Limits
     static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
     static constexpr int FAN_MODE_LOW_UPPER_BOUND    = 3;
