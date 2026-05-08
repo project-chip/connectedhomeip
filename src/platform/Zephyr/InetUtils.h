@@ -23,22 +23,35 @@
 #include <zephyr/version.h>
 #endif
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <ncs_version.h>
+#endif
+
+#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+#define INET_UTILS_USE_NET_IN6_ADDR
+// nRF Connect SDK 3.3.0 supports Zephyr 4.3.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR > 3 || (NCS_VERSION_MAJOR == 3 && NCS_VERSION_MINOR >= 3)
+#define INET_UTILS_USE_NET_IN6_ADDR
+#endif // NCS_VERSION_MAJOR > 3 || (NCS_VERSION_MAJOR == 3 && NCS_VERSION_MINOR >= 3)
+#endif // KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 4)
+
+#ifdef INET_UTILS_USE_NET_IN6_ADDR
 struct net_in6_addr;
 #else
 struct in6_addr;
-#endif
+#endif // INET_UTILS_USE_NET_IN6_ADDR
 struct net_if;
 
 namespace chip {
 namespace DeviceLayer {
 namespace InetUtils {
 
-#if KERNEL_VERSION_MAJOR > 4 || (KERNEL_VERSION_MAJOR == 4 && KERNEL_VERSION_MINOR >= 3)
+#ifdef INET_UTILS_USE_NET_IN6_ADDR
 using ZephyrIn6Addr = ::net_in6_addr;
 #else
 using ZephyrIn6Addr = ::in6_addr;
-#endif
+#endif // INET_UTILS_USE_NET_IN6_ADDR
 
 ZephyrIn6Addr ToZephyrAddr(const Inet::IPAddress & address);
 net_if * GetInterface(Inet::InterfaceId ifaceId = Inet::InterfaceId::Null());

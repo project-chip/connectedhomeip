@@ -69,6 +69,7 @@ class TC_GC_2_6(MatterBaseTest):
             TestStep(7, "On F2, join group G1 generating a new key. TH2 sends command JoinGroup (GroupID=G1, Endpoints='see notes', KeySetID=K1, Key=InputKey1)"),
             TestStep(8, "On F2, iteratively Join groups using a new GroupId and assigning KeySetID K1 every time until the total group count combining all DUT groups on both fabrics = M_max. TH2 sends command JoinGroup (GroupID=Gi, Endpoints='see notes', KeySetID=K1)"),
             TestStep(9, "On F2, attempt to join 1 additional group. TH2 sends command JoinGroup (GroupID=Gi+1, Endpoints='see notes', KeySetID=K1)"),
+            TestStep(10, "Cleanup: Remove F2"),
         ]
 
     def pics_TC_GC_2_6(self) -> list[str]:
@@ -93,7 +94,8 @@ class TC_GC_2_6(MatterBaseTest):
         self.discriminatorTH2 = random.randint(0, 4095)
         # Create TH2 controller
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+        fabric_index_2 = self.th1.fabricId + 1
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=fabric_index_2)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
         # Open commissioning window on TH1
@@ -204,6 +206,15 @@ class TC_GC_2_6(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ResourceExhausted,
                                  f"Send JoinGroup command error should be {Status.ResourceExhausted} instead of {e.status}")
+
+        self.step(10)
+        # Use TH1 to remove TH2's fabric
+        logger.info(f"Cleaning up: Removing TH2 fabric at index {self.th2.fabricId}")
+        await self.th1.SendCommand(
+            nodeId=self.dut_node_id,
+            endpoint=0,
+            payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=self.th2.fabricId)
+        )
 
 
 if __name__ == "__main__":

@@ -712,7 +712,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  readonly attribute optional char_string<32> endpointUniqueID = 5;
+  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -846,7 +846,7 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+  provisional fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
     nullable node_id adminNodeID = 0;
     fabric_idx fabricIndex = 254;
   }
@@ -858,7 +858,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1144,8 +1144,8 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
-  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  readonly attribute optional int32u configurationVersion = 24;
+  provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  provisional readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2678,8 +2678,8 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute boolean reachable = 17;
   readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
-  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  readonly attribute optional int32u configurationVersion = 24;
+  provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  provisional readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3000,7 +3000,7 @@ cluster GroupKeyManagement = 63 {
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
+  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4433,7 +4433,7 @@ provisional cluster Groupcast = 101 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) GroupcastTesting = 0 {
+  provisional fabric_sensitive info event access(read: administer) GroupcastTesting = 0 {
     optional octet_string sourceIpAddress = 0;
     optional octet_string destinationIpAddress = 1;
     optional group_id groupID = 2;
@@ -4445,11 +4445,11 @@ provisional cluster Groupcast = 101 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute MembershipStruct membership[] = 0;
-  readonly attribute int16u maxMembershipCount = 1;
-  readonly attribute int16u maxMcastAddrCount = 2;
-  readonly attribute int16u usedMcastAddrCount = 3;
-  readonly attribute fabric_idx fabricUnderTest = 4;
+  provisional readonly attribute MembershipStruct membership[] = 0;
+  provisional readonly attribute int16u maxMembershipCount = 1;
+  provisional readonly attribute int16u maxMcastAddrCount = 2;
+  provisional readonly attribute int16u usedMcastAddrCount = 3;
+  provisional readonly attribute fabric_idx fabricUnderTest = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8883,28 +8883,28 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
-  info event AmbientContextDetectStarted = 0 {
+  provisional info event AmbientContextDetectStarted = 0 {
     optional AmbientContextTypeStruct ambientContextDetected = 0;
     optional boolean objectCountReached = 1;
     optional int16u objectCount = 2;
   }
 
-  info event AmbientContextDetectEnded = 1 {
+  provisional info event AmbientContextDetectEnded = 1 {
     posix_ms eventStartTime = 0;
   }
 
-  readonly attribute optional boolean humanActivityDetected = 0;
-  readonly attribute optional boolean objectIdentified = 1;
-  readonly attribute optional boolean audioContextDetected = 2;
-  readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
-  readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
-  readonly attribute optional boolean objectCountReached = 5;
-  attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
-  readonly attribute optional int16u objectCount = 7;
-  attribute int8u simultaneousDetectionLimit = 8;
-  attribute access(write: manage) int16u holdTime = 9;
-  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
-  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
+  provisional readonly attribute optional boolean humanActivityDetected = 0;
+  provisional readonly attribute optional boolean objectIdentified = 1;
+  provisional readonly attribute optional boolean audioContextDetected = 2;
+  provisional readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
+  provisional readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
+  provisional readonly attribute optional boolean objectCountReached = 5;
+  provisional attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
+  provisional readonly attribute optional int16u objectCount = 7;
+  provisional attribute int8u simultaneousDetectionLimit = 8;
+  provisional attribute access(write: manage) int16u holdTime = 9;
+  provisional readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
+  provisional readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11265,7 +11265,7 @@ cluster Chime = 1366 {
     char_string<48> name = 1;
   }
 
-  info event ChimeStartedPlaying = 0 {
+  provisional info event ChimeStartedPlaying = 0 {
     int8u chimeID = 0;
   }
 
@@ -11669,20 +11669,20 @@ provisional cluster JointFabricDatastore = 1874 {
     DatastoreGroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
-  readonly attribute access(read: administer) long_octet_string<400> anchorRootCA = 0;
-  readonly attribute access(read: administer) node_id anchorNodeID = 1;
-  readonly attribute access(read: administer) vendor_id anchorVendorID = 2;
-  readonly attribute access(read: administer) char_string<32> friendlyName = 3;
-  readonly attribute access(read: administer) DatastoreGroupKeySetStruct groupKeySetList[] = 4;
-  readonly attribute access(read: administer) DatastoreGroupInformationEntryStruct groupList[] = 5;
-  readonly attribute access(read: administer) DatastoreNodeInformationEntryStruct nodeList[] = 6;
-  readonly attribute access(read: administer) DatastoreAdministratorInformationEntryStruct adminList[] = 7;
-  readonly attribute access(read: administer) DatastoreStatusEntryStruct status = 8;
-  readonly attribute access(read: administer) DatastoreEndpointGroupIDEntryStruct endpointGroupIDList[] = 9;
-  readonly attribute access(read: administer) DatastoreEndpointBindingEntryStruct endpointBindingList[] = 10;
-  readonly attribute access(read: administer) DatastoreNodeKeySetEntryStruct nodeKeySetList[] = 11;
-  readonly attribute access(read: administer) DatastoreACLEntryStruct nodeACLList[] = 12;
-  readonly attribute access(read: administer) DatastoreEndpointEntryStruct nodeEndpointList[] = 13;
+  provisional readonly attribute access(read: administer) long_octet_string<400> anchorRootCA = 0;
+  provisional readonly attribute access(read: administer) node_id anchorNodeID = 1;
+  provisional readonly attribute access(read: administer) vendor_id anchorVendorID = 2;
+  provisional readonly attribute access(read: administer) char_string<32> friendlyName = 3;
+  provisional readonly attribute access(read: administer) DatastoreGroupKeySetStruct groupKeySetList[] = 4;
+  provisional readonly attribute access(read: administer) DatastoreGroupInformationEntryStruct groupList[] = 5;
+  provisional readonly attribute access(read: administer) DatastoreNodeInformationEntryStruct nodeList[] = 6;
+  provisional readonly attribute access(read: administer) DatastoreAdministratorInformationEntryStruct adminList[] = 7;
+  provisional readonly attribute access(read: administer) DatastoreStatusEntryStruct status = 8;
+  provisional readonly attribute access(read: administer) DatastoreEndpointGroupIDEntryStruct endpointGroupIDList[] = 9;
+  provisional readonly attribute access(read: administer) DatastoreEndpointBindingEntryStruct endpointBindingList[] = 10;
+  provisional readonly attribute access(read: administer) DatastoreNodeKeySetEntryStruct nodeKeySetList[] = 11;
+  provisional readonly attribute access(read: administer) DatastoreACLEntryStruct nodeACLList[] = 12;
+  provisional readonly attribute access(read: administer) DatastoreEndpointEntryStruct nodeEndpointList[] = 13;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11865,7 +11865,7 @@ provisional cluster JointFabricAdministrator = 1875 {
     kTransferAnchorStatusNoUserConsent = 2;
   }
 
-  readonly attribute access(read: administer) nullable fabric_idx administratorFabricIndex = 0;
+  provisional readonly attribute access(read: administer) nullable fabric_idx administratorFabricIndex = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
+#include <app/clusters/boolean-state-configuration-server/MigrateBooleanStateConfigurationStorage.h>
 #include <app/static-cluster-config/BooleanStateConfiguration.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -31,12 +33,36 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
 namespace {
 
+/**
+ * A BooleanStateConfigurationCluster subclass that performs storage migration during Startup.
+ * This ensures the persistence providers are available when migration runs.
+ */
+class CodegenBooleanStateConfigurationCluster : public chip::app::Clusters::BooleanStateConfigurationCluster
+{
+public:
+    using BooleanStateConfigurationCluster::BooleanStateConfigurationCluster;
+
+    CHIP_ERROR Startup(chip::app::ServerClusterContext & context) override
+    {
+        chip::app::SafeAttributePersistenceProvider * srcProvider = chip::app::GetSafeAttributePersistenceProvider();
+        chip::app::AttributePersistenceProvider & dstProvider     = context.attributeStorage;
+
+        if (srcProvider != nullptr)
+        {
+            LogErrorOnFailure(
+                BooleanStateConfiguration::MigrateBooleanStateConfigurationStorage(mPath.mEndpointId, *srcProvider, dstProvider));
+        }
+
+        return BooleanStateConfigurationCluster::Startup(context);
+    }
+};
+
 constexpr size_t kBooleanStateConfigurationFixedClusterCount =
     BooleanStateConfiguration::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kBooleanStateConfigurationMaxClusterCount =
     kBooleanStateConfigurationFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<BooleanStateConfigurationCluster> gServers[kBooleanStateConfigurationMaxClusterCount];
+LazyRegisteredServerCluster<CodegenBooleanStateConfigurationCluster> gServers[kBooleanStateConfigurationMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
