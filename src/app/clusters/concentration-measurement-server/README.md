@@ -28,22 +28,27 @@ and binary-size overhead of the older template-based approach.
 
 ### 1. Instantiate the cluster
 
+Populate a `Config` struct and pass it to the constructor. All fixed sensor
+characteristics (`medium`, `unit`, `minMeasured`, `maxMeasured`, `uncertainty`)
+live in the config and cannot be changed after construction.
+
 ```cpp
 #include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
-ConcentrationMeasurementCluster gCO2Cluster(
-    /* endpointId   = */ 1,
-    /* clusterId    = */ chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id,
-    /* features     = */ chip::BitFlags<Feature>(Feature::kNumericMeasurement,
-                                                 Feature::kLevelIndication),
-    /* medium       = */ MeasurementMediumEnum::kAir,
-    /* unit         = */ MeasurementUnitEnum::kPpm,
-    /* minMeasured  = */ chip::app::DataModel::MakeNullable(0.0f),
-    /* maxMeasured  = */ chip::app::DataModel::MakeNullable(5000.0f));
+ConcentrationMeasurementCluster::Config gCO2Config{
+    /* clusterId  = */ chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id,
+    /* features   = */ chip::BitFlags<Feature>(Feature::kNumericMeasurement,
+                                               Feature::kLevelIndication),
+    /* medium     = */ MeasurementMediumEnum::kAir,
+    /* unit       = */ MeasurementUnitEnum::kPpm,
+    /* minMeasured = */ chip::app::DataModel::MakeNullable(0.0f),
+    /* maxMeasured = */ chip::app::DataModel::MakeNullable(5000.0f),
+};
 
+ConcentrationMeasurementCluster gCO2Cluster(/* endpointId = */ 1, gCO2Config);
 chip::app::ServerClusterRegistration gCO2Registration(gCO2Cluster);
 ```
 
@@ -92,7 +97,14 @@ feature flag was not set at construction, and
 | `kMediumLevel`        | sub-flag of `kLevelIndication`, no extra attributes                                       |
 | `kCriticalLevel`      | sub-flag of `kLevelIndication`, no extra attributes                                       |
 
-`MeasurementMedium`, `FeatureMap`, and `ClusterRevision` are always present. See
+`MeasurementMedium`, `FeatureMap`, and `ClusterRevision` are always present.
+
+`kPeakMeasurement` and `kAverageMeasurement` imply `kNumericMeasurement` —
+the constructor sets `kNumericMeasurement` automatically when either is
+requested. `kMediumLevel` and `kCriticalLevel` imply `kLevelIndication`
+similarly.
+
+See
 [examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h](../../../../examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h)
 and the corresponding `.cpp` for a full working example.
 
@@ -103,33 +115,48 @@ and the corresponding `.cpp` for a full working example.
 `CodegenIntegration.h` provides a compatibility shim for applications that used
 the original template-based API. It defines:
 
-```
+```cpp
 template <bool NumericMeasurementEnabled, bool LevelIndicationEnabled,
           bool MediumLevelEnabled,        bool CriticalLevelEnabled,
           bool PeakMeasurementEnabled,    bool AverageMeasurementEnabled>
 class Instance { ... };
 ```
 
-Internally, `Instance<>` owns a `ConcentrationMeasurementCluster` and a
-`ServerClusterRegistration`. At construction it translates the six boolean
-template parameters into a `BitFlags<Feature>` and forwards everything to the
-underlying cluster. The template booleans are therefore a compile-time view into
-the same runtime feature map that `ConcentrationMeasurementCluster` uses.
+Internally, `Instance<>` owns a `ConcentrationMeasurementCluster` (via
+`LazyRegisteredServerCluster`) and a `ServerClusterRegistration`. At
+construction it translates the six boolean template parameters into a
+`BitFlags<Feature>` and stores them in a `Config`. The cluster itself is not
+created until `Init()` is called.
 
-**`Init()`** — calls
-`CodegenDataModelProvider::Instance().Registry().Register(registration)` and
-remembers that registration succeeded so the destructor can unregister cleanly.
-This preserves the original `Init()`-based ZAP callback pattern; no call-site
+**Constructors** — two overloads exist:
+
+```cpp
+// Level-indication only (no MeasurementUnit parameter).
+Instance(EndpointId, ClusterId, MeasurementMediumEnum);
+
+// Numeric measurement (MeasurementUnit required).
+Instance(EndpointId, ClusterId, MeasurementMediumEnum, MeasurementUnitEnum);
+```
+
+**Pre-init setters** — `SetMinMeasuredValue()`, `SetMaxMeasuredValue()`, and
+`SetUncertainty()` configure the `Config` and **must be called before
+`Init()`**. They return `CHIP_ERROR_INCORRECT_STATE` if called after `Init()`.
+
+**`Init()`** — constructs the underlying cluster from the stored `Config`,
+calls
+`CodegenDataModelProvider::Instance().Registry().Register(registration)`, and
+remembers that registration so the destructor can unregister cleanly. This
+preserves the original `Init()`-based ZAP callback pattern; no call-site
 changes are needed.
 
 **`Set*()` methods** — each method is guarded by `std::enable_if_t` on the
-matching boolean template parameter, so calling e.g. `SetPeakMeasuredValue()` on
-an instance where `PeakMeasurementEnabled = false` is a **compile-time error**,
-not a runtime one. Internally they forward to the corresponding
+matching boolean template parameter, so calling e.g. `SetPeakMeasuredValue()`
+on an instance where `PeakMeasurementEnabled = false` is a **compile-time
+error**, not a runtime one. Internally they forward to the corresponding
 `ConcentrationMeasurementCluster::Set*()`.
 
-**`Registration()`** — returns the `ServerClusterRegistration` directly, so new
-code that prefers explicit registration (rather than `Init()`) can also use
+**`Registration()`** — returns the `ServerClusterRegistration` directly, so
+new code that prefers explicit registration (rather than `Init()`) can also use
 `Instance<>` without the `CodegenDataModelProvider` dependency:
 
 ```cpp
@@ -137,17 +164,10 @@ registry.Register(gMyInstance.Registration());
 ```
 
 The old header `concentration-measurement-server.h` simply re-exports
-`CodegenIntegration.h`, so existing `#include` sites continue to compile without
-any changes.
-
-### Recommended usage (new code)
-
-Instantiate `ConcentrationMeasurementCluster` directly and register it via
-`registry.Register()`, as shown in the **Usage** section above.
+`CodegenIntegration.h`, so existing `#include` sites continue to compile
+without any changes.
 
 ### Legacy usage
-
-Previously, applications used the template-based `Instance<>`:
 
 ```cpp
 // concentration-measurement-server.h re-exports CodegenIntegration.h.
@@ -166,6 +186,11 @@ Instance<true, true, false, false, true, false> gCO2Instance(
 
 void ApplicationInit()
 {
+    // Optional: configure fixed sensor characteristics before Init().
+    gCO2Instance.SetMinMeasuredValue(chip::app::DataModel::MakeNullable(0.0f));
+    gCO2Instance.SetMaxMeasuredValue(chip::app::DataModel::MakeNullable(5000.0f));
+    gCO2Instance.SetUncertainty(0.5f);
+
     // Registers with CodegenDataModelProvider internally.
     // Equivalent to: registry.Register(gCO2Instance.Registration())
     gCO2Instance.Init();
@@ -179,20 +204,9 @@ gCO2Instance.SetPeakMeasuredValue(chip::app::DataModel::MakeNullable(450.0f));
 // gCO2Instance.SetAverageMeasuredValue(...);
 ```
 
-This pattern still compiles and works unchanged. `Init()` calls
-`CodegenDataModelProvider::Instance().Registry().Register()` internally, and all
-`Set*()` methods forward directly to the underlying
-`ConcentrationMeasurementCluster`.
+This pattern still compiles and works unchanged.
 
-## Migrating from the Template-Based API
+### Recommended usage (new code)
 
-1. Replace the `Instance<...>` declaration with
-   `ConcentrationMeasurementCluster` and a `ServerClusterRegistration`.
-2. Build the feature set with `BitFlags<Feature>` instead of template booleans.
-3. Move fixed sensor characteristics (`medium`, `unit`, `minMeasured`,
-   `maxMeasured`, `uncertainty`) from `SetMin/MaxMeasuredValue()` calls into the
-   constructor.
-4. Replace `instance.Init()` with an explicit `registry.Register(registration)`
-   call in your application init.
-5. All `Set*()` call sites are unchanged — method names and signatures are
-   identical.
+Instantiate `ConcentrationMeasurementCluster` directly with a `Config` and
+register it via `registry.Register()`, as shown in the **Usage** section above.
