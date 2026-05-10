@@ -99,10 +99,9 @@ feature flag was not set at construction, and
 
 `MeasurementMedium`, `FeatureMap`, and `ClusterRevision` are always present.
 
-`kPeakMeasurement` and `kAverageMeasurement` imply `kNumericMeasurement` —
-the constructor sets `kNumericMeasurement` automatically when either is
-requested. `kMediumLevel` and `kCriticalLevel` imply `kLevelIndication`
-similarly.
+`kPeakMeasurement` and `kAverageMeasurement` imply `kNumericMeasurement` — the
+constructor sets `kNumericMeasurement` automatically when either is requested.
+`kMediumLevel` and `kCriticalLevel` imply `kLevelIndication` similarly.
 
 See
 [examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h](../../../../examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h)
@@ -142,21 +141,20 @@ Instance(EndpointId, ClusterId, MeasurementMediumEnum, MeasurementUnitEnum);
 `SetUncertainty()` configure the `Config` and **must be called before
 `Init()`**. They return `CHIP_ERROR_INCORRECT_STATE` if called after `Init()`.
 
-**`Init()`** — constructs the underlying cluster from the stored `Config`,
-calls
+**`Init()`** — constructs the underlying cluster from the stored `Config`, calls
 `CodegenDataModelProvider::Instance().Registry().Register(registration)`, and
 remembers that registration so the destructor can unregister cleanly. This
-preserves the original `Init()`-based ZAP callback pattern; no call-site
-changes are needed.
+preserves the original `Init()`-based ZAP callback pattern; no call-site changes
+are needed.
 
 **`Set*()` methods** — each method is guarded by `std::enable_if_t` on the
-matching boolean template parameter, so calling e.g. `SetPeakMeasuredValue()`
-on an instance where `PeakMeasurementEnabled = false` is a **compile-time
-error**, not a runtime one. Internally they forward to the corresponding
+matching boolean template parameter, so calling e.g. `SetPeakMeasuredValue()` on
+an instance where `PeakMeasurementEnabled = false` is a **compile-time error**,
+not a runtime one. Internally they forward to the corresponding
 `ConcentrationMeasurementCluster::Set*()`.
 
-**`Registration()`** — returns the `ServerClusterRegistration` directly, so
-new code that prefers explicit registration (rather than `Init()`) can also use
+**`Registration()`** — returns the `ServerClusterRegistration` directly, so new
+code that prefers explicit registration (rather than `Init()`) can also use
 `Instance<>` without the `CodegenDataModelProvider` dependency:
 
 ```cpp
@@ -164,8 +162,8 @@ registry.Register(gMyInstance.Registration());
 ```
 
 The old header `concentration-measurement-server.h` simply re-exports
-`CodegenIntegration.h`, so existing `#include` sites continue to compile
-without any changes.
+`CodegenIntegration.h`, so existing `#include` sites continue to compile without
+any changes.
 
 ### Legacy usage
 
