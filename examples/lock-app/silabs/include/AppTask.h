@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <algorithm>
 #include <cstring>
 
 #include "AppEvent.h"
@@ -340,8 +341,9 @@ private:
 
             if (pin.HasValue())
             {
-                memcpy(mPinBuffer, pin.Value().data(), pin.Value().size());
-                mPinLength = static_cast<uint8_t>(pin.Value().size());
+                const size_t copyLen = std::min(pin.Value().size(), static_cast<size_t>(kMaxPinLength));
+                memcpy(mPinBuffer, pin.Value().data(), copyLen);
+                mPinLength = static_cast<uint8_t>(copyLen);
             }
             else
             {
