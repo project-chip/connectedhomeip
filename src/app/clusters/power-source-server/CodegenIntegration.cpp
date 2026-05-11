@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/ember-strings.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -53,26 +54,25 @@ using LazyRegisteredPowerSourceCluster = std::conditional_t<
     std::conditional_t<batterySupportNeeded, LazyRegisteredBatterySourceCluster, std::monostate>>;
 
 LazyRegisteredPowerSourceCluster gServers[kPowerSourceMaxClusterCount];
-std::array<StringAttributeStorageModule<kAllAttributes.Raw()>, CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> gStringAttributeStorage;
+
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+StringAttributeStorageModule<kAllAttributes.Raw()> gStringAttributeStorage[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
 
 CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpointId, AttributeId attributeId)
 {
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpointId, PowerSource::Id, attributeId);
     VerifyOrDie(metadata != nullptr);
     VerifyOrDie(!metadata->IsExternal());
-    VerifyOrDie(metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE ||
-                metadata->attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+    VerifyOrDie(metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (metadata->defaultValue.ptrToDefaultValue == nullptr)
     {
         return CharSpan();
     }
 
-    size_t bytesForLength = (metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE) ? 1 : 2;
-    size_t size           = (metadata->attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE
-                                 ? static_cast<size_t>(metadata->defaultValue.ptrToDefaultValue[0])
-                                 : static_cast<size_t>(reinterpret_cast<const uint16_t *>(metadata->defaultValue.ptrToDefaultValue)[0]));
+    auto length = emberAfStringLength(metadata->defaultValue.ptrToDefaultValue);
 
-    return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + bytesForLength, size);
+    return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + 1, length);
 }
 
 template <size_t maxLength, class GetAccessor>
@@ -90,7 +90,7 @@ CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpo
 }
 
 // templated to be able to use `if constexpr` inside the functions
-template <size_t dynamicEndpointCount = CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT, bool wiredSupported = wiredSupportNeeded, bool batterySupported = batterySupportNeeded,
+template <bool wiredSupported = wiredSupportNeeded, bool batterySupported = batterySupportNeeded,
           uint32_t batteryFeatureBits = kBatteryFeatures.Raw(), class EmberWiredPowerSourceClusterT = EmberWiredPowerSourceCluster,
           class EmberBatteryPowerSourceClusterT     = EmberBatteryPowerSourceCluster,
           class LazyRegisteredWiredSourceClusterT   = LazyRegisteredWiredSourceCluster,
@@ -120,12 +120,8 @@ public:
             Zcl, "CreateRegistration called with invalid feature map");
 
         CharSpan description{};
-        if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
-        {
-            // for fixed endpoints
-            description = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, Description::Id);
-        }
-        else
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+        if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
         {
             // for dynamic endpoints
             description = GetCharStringDefaultValueFromEmber<Description::TypeInfo::MaxLength()>(
@@ -134,6 +130,12 @@ public:
                 // compile.
                 static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
                     .description);
+        }
+        else
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+        {
+            // for fixed endpoints
+            description = GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, Description::Id);
         }
 
 #define SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                   \
@@ -228,13 +230,8 @@ public:
                     if (features.Has(Feature::kReplaceable))
                     {
                         CharSpan replacementDescription{};
-                        if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
-                        {
-                            // for fixed endpoints
-                            replacementDescription =
-                                GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatReplacementDescription::Id);
-                        }
-                        else
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                        if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
                         {
                             // for dynamic endpoints
                             replacementDescription =
@@ -246,6 +243,13 @@ public:
                                         gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
                                         .batReplacementDescription);
                         }
+                        else
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                        {
+                            // for fixed endpoints
+                            replacementDescription =
+                                GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatReplacementDescription::Id);
+                        }
 
                         uint8_t quantity;
                         VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
@@ -256,13 +260,8 @@ public:
 
                         if constexpr (EmberBatteryPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(BatANSIDesignation::Id))
                         {
-                            if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
-                            {
-                                // for fixed endpoints
-                                config.batANSIDesignation =
-                                    GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatANSIDesignation::Id);
-                            }
-                            else
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                            if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
                             {
                                 // for dynamic endpoints
                                 config.batANSIDesignation =
@@ -274,17 +273,19 @@ public:
                                             gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
                                             .batANSIDesignation);
                             }
+                            else
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                            {
+                                // for fixed endpoints
+                                config.batANSIDesignation =
+                                    GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatANSIDesignation::Id);
+                            }
                         }
 
                         if constexpr (EmberBatteryPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(BatIECDesignation::Id))
                         {
-                            if (clusterInstanceIndex < kPowerSourceFixedClusterCount)
-                            {
-                                // for fixed endpoints
-                                config.batIECDesignation =
-                                    GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatIECDesignation::Id);
-                            }
-                            else
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                            if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
                             {
                                 // for dynamic endpoints
                                 config.batIECDesignation =
@@ -295,6 +296,13 @@ public:
                                         static_cast<StringStorageModuleT &>(
                                             gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
                                             .batIECDesignation);
+                            }
+                            else
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+                            {
+                                // for fixed endpoints
+                                config.batIECDesignation =
+                                    GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, BatIECDesignation::Id);
                             }
                         }
 
