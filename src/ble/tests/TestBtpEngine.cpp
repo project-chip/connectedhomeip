@@ -687,7 +687,7 @@ TEST_F(TestBtpEngine, EnforcesMinFragmentSize)
     mBtpEngine.SetRxFragmentSize(aboveMinFragmentSize);
 
     // Verify that it is set correctly.
-    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), aboveMinFragmentSize;
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), aboveMinFragmentSize);
     EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), aboveMinFragmentSize);
 
     // Set to a value larger than sMaxFragmentSize.
