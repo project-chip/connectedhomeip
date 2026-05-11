@@ -140,10 +140,10 @@ class TC_CNET_4_24(MatterBaseTest):
 
     Usage:
         rm -rf /tmp/chip_kvs
-        python src/python_testing/TC_CNET_4_24.py \
-            --in-test-commissioning-method ble-thread \
-            --discriminator <discriminator> \
-            --passcode <passcode> \
+        python src/python_testing/TC_CNET_4_24.py \\
+            --in-test-commissioning-method ble-thread \\
+            --discriminator <discriminator> \\
+            --passcode <passcode> \\
             --thread-dataset-hex <dataset_hex>
     """
 
@@ -319,6 +319,17 @@ class TC_CNET_4_24(MatterBaseTest):
         except Exception as e:
             asserts.fail(f"Failed to establish PASE session over BLE: {e}")
 
+        # Log SupportsConcurrentConnection to characterize DUT behavior
+        try:
+            supports_concurrent = await self.read_single_attribute(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=endpoint,
+                attribute=cgen.Attributes.SupportsConcurrentConnection)
+            logger.info(f" --- SupportsConcurrentConnection = {supports_concurrent}")
+        except Exception as e:
+            logger.warning(f" --- Could not read SupportsConcurrentConnection: {e}")
+
         # Arm fail-safe for 300 seconds
         logger.info(" --- Arming fail-safe to 300 seconds")
         arm_failsafe_response = await self.send_single_cmd(
@@ -397,8 +408,7 @@ class TC_CNET_4_24(MatterBaseTest):
 
         # Step 4: Read LastNetworkingStatus — expect kNetworkNotFound
         self.step(4)
-        await self._read_last_networking_status(
-            endpoint, expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
+        await self._read_last_networking_status(endpoint, expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound)
 
         # Step 5: Read Networks — verify incorrect Extended PAN ID is stored
         self.step(5)
@@ -452,12 +462,9 @@ class TC_CNET_4_24(MatterBaseTest):
         # Wait for Thread to attempt connection and update status
         await asyncio.sleep(40)
 
-        # Step 10: Read LastNetworkingStatus — expect kAuthFailure or kUnknownError
+        # Step 10: Read LastNetworkingStatus — expect kAuthFailure
         self.step(10)
-        await self._read_last_networking_status(
-            endpoint, valid_statuses=[
-                cnet.Enums.NetworkCommissioningStatusEnum.kUnknownError,
-                cnet.Enums.NetworkCommissioningStatusEnum.kSuccess])
+        await self._read_last_networking_status(endpoint, expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure)
 
         # Step 11: AddOrUpdateThreadNetwork with correct dataset
         self.step(11)
