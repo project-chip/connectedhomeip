@@ -1001,7 +1001,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
     if (mtu > 0) // If one or both device knows connection's MTU...
     {
         resp.mFragmentSize = std::clamp(std::max(mtu, 3) - 3, // ensure no undeflow
-                                        BtpEngine::sMinFragmentSize, BtpEngine::sMaxFragmentSize, );
+                                        BtpEngine::sMinFragmentSize, BtpEngine::sMaxFragmentSize);
     }
     else // Else, if neither device knows MTU...
     {
