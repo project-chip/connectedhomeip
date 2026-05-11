@@ -1057,6 +1057,11 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
         // Perform privacy deobfuscation, if applicable.
         uint8_t * privacyHeader = partialPacketHeader.PrivacyHeader(msgCopy->Start());
         size_t privacyLength    = partialPacketHeader.PrivacyHeaderLength();
+
+        // Bounds check: we decrypt in place a privacy header located inside the packet.
+        // Validate that we are still within the packet as the length is based on header flags.
+        VerifyOrReturnValue(privacyHeader + privacyLength <= msgCopy->Start() + msgCopy->DataLength(), false);
+
         if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, partialPacketHeader, mac))
         {
             return false;
@@ -1338,17 +1343,26 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
 {
     // Mark the corresponding secure sessions for eviction
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
+        if (session->GetTCPConnection() == conn)
         {
-            SessionHandle handle(*session);
-            // Notify the SessionConnection delegate of the connection
-            // closure.
-            if (mConnDelegate != nullptr)
+            bool isActive = session->IsActiveSession();
+
+            if (isActive)
             {
-                mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                // Notify the SessionConnection delegate of the connection
+                // closure before session eviction detaches holders and
+                // releases exchanges.
+                if (mConnDelegate != nullptr)
+                {
+                    SessionHandle handle(*session);
+                    mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                }
             }
 
-            // Mark session for eviction.
+            // Explicitly release the TCP connection handle to ensure the transport resource is reclaimed immediately.
+            session->ReleaseTCPConnection();
+
+            // Mark session for eviction regardless of its current state (Active, Defunct, or Establishing).
             session->MarkForEviction();
         }
 

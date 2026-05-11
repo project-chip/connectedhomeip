@@ -4229,6 +4229,64 @@ static BOOL AttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster(At
     }
     }
 }
+static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Humidistat;
+    switch (aAttributeId) {
+    case Attributes::Mode::Id: {
+        return YES;
+    }
+    case Attributes::SystemState::Id: {
+        return YES;
+    }
+    case Attributes::UserSetpoint::Id: {
+        return YES;
+    }
+    case Attributes::MinSetpoint::Id: {
+        return YES;
+    }
+    case Attributes::MaxSetpoint::Id: {
+        return YES;
+    }
+    case Attributes::Step::Id: {
+        return YES;
+    }
+    case Attributes::TargetSetpoint::Id: {
+        return YES;
+    }
+    case Attributes::MistType::Id: {
+        return YES;
+    }
+    case Attributes::Continuous::Id: {
+        return YES;
+    }
+    case Attributes::Sleep::Id: {
+        return YES;
+    }
+    case Attributes::Optimal::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known Humidistat attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInColorControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ColorControl;
@@ -4473,6 +4531,40 @@ static BOOL AttributeIsSpecifiedInBallastConfigurationCluster(AttributeId aAttri
     }
     default: {
         // Not a known BallastConfiguration attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInDynamicLightingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DynamicLighting;
+    switch (aAttributeId) {
+    case Attributes::AvailableEffects::Id: {
+        return YES;
+    }
+    case Attributes::CurrentEffectID::Id: {
+        return YES;
+    }
+    case Attributes::CurrentSpeed::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known DynamicLighting attribute.
         return NO;
     }
     }
@@ -5418,6 +5510,86 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     }
     default: {
         // Not a known AmbientContextSensing attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ProximityRanging;
+    switch (aAttributeId) {
+    case Attributes::RangingCapabilities::Id: {
+        return YES;
+    }
+    case Attributes::WiFiDevIK::Id: {
+        return YES;
+    }
+    case Attributes::BLEDeviceID::Id: {
+        return YES;
+    }
+    case Attributes::BLTDevIK::Id: {
+        return YES;
+    }
+    case Attributes::BLTCSSecurityLevel::Id: {
+        return YES;
+    }
+    case Attributes::BLTCSModeCapability::Id: {
+        return YES;
+    }
+    case Attributes::SessionIDList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ProximityRanging attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInNetworkIdentityManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aAttributeId) {
+    case Attributes::ActiveNetworkIdentities::Id: {
+        return YES;
+    }
+    case Attributes::Clients::Id: {
+        return YES;
+    }
+    case Attributes::ClientTableSize::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known NetworkIdentityManagement attribute.
         return NO;
     }
     }
@@ -7345,11 +7517,17 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ThermostatUserInterfaceConfiguration::Id: {
         return AttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster(aAttributeId);
     }
+    case Clusters::Humidistat::Id: {
+        return AttributeIsSpecifiedInHumidistatCluster(aAttributeId);
+    }
     case Clusters::ColorControl::Id: {
         return AttributeIsSpecifiedInColorControlCluster(aAttributeId);
     }
     case Clusters::BallastConfiguration::Id: {
         return AttributeIsSpecifiedInBallastConfigurationCluster(aAttributeId);
+    }
+    case Clusters::DynamicLighting::Id: {
+        return AttributeIsSpecifiedInDynamicLightingCluster(aAttributeId);
     }
     case Clusters::IlluminanceMeasurement::Id: {
         return AttributeIsSpecifiedInIlluminanceMeasurementCluster(aAttributeId);
@@ -7404,6 +7582,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::AmbientContextSensing::Id: {
         return AttributeIsSpecifiedInAmbientContextSensingCluster(aAttributeId);
+    }
+    case Clusters::ProximityRanging::Id: {
+        return AttributeIsSpecifiedInProximityRangingCluster(aAttributeId);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return AttributeIsSpecifiedInNetworkIdentityManagementCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);

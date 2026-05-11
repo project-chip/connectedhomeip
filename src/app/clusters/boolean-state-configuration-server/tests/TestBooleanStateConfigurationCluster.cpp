@@ -15,8 +15,6 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -97,21 +95,6 @@ StartupConfigurationBuilder DefaultConfig()
 {
     return {};
 }
-
-class ScopedSafeAttributePersistence
-{
-public:
-    ScopedSafeAttributePersistence(TestServerClusterContext & context) : mOldPersistence(app::GetSafeAttributePersistenceProvider())
-    {
-        VerifyOrDie(mPersistence.Init(&context.StorageDelegate()) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistence);
-    }
-    ~ScopedSafeAttributePersistence() { app::SetSafeAttributePersistenceProvider(mOldPersistence); }
-
-private:
-    app::SafeAttributePersistenceProvider * mOldPersistence;
-    app::DefaultSafeAttributePersistenceProvider mPersistence;
-};
 
 TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
 {
@@ -262,7 +245,6 @@ TEST_F(TestBooleanStateConfigurationCluster, TestFeatureMap)
 TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
 {
     TestServerClusterContext context;
-    ScopedSafeAttributePersistence persistence(context);
 
     // supportedSensitivityLevels is clamped to [2, 10]
     {
@@ -333,7 +315,6 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
 TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
 {
     TestServerClusterContext context;
-    ScopedSafeAttributePersistence persistence(context);
 
     // 1. Create a cluster, write a value.
     {
@@ -408,7 +389,6 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
 TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
 {
     TestServerClusterContext context;
-    ScopedSafeAttributePersistence persistence(context);
 
     // 1. Create a cluster, set a value for AlarmsEnabled, which should be persisted.
     {
@@ -579,7 +559,6 @@ private:
 TEST_F(TestBooleanStateConfigurationCluster, TestTypeSafeDelegateCallbacks)
 {
     TestServerClusterContext context;
-    ScopedSafeAttributePersistence persistence(context);
     TestDelegate delegate;
 
     // Test CurrentSensitivityLevel callback via WriteAttribute

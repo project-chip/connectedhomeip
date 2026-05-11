@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/silabs/tests/args.gni")
+import("${chip_root}/src/platform/silabs/tests/tests.gni")
 
 declare_args() {
   # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model.
@@ -133,9 +133,6 @@ if (is_si917_board) {
   } else {
     silabs_mcu = "SiWG917M111MGTBA"
   }
-
-  assert(!sl_enable_si70xx_sensor,
-         "${silabs_board} does not support the si90xx sensor!")
 
   # EFR32 MG24 series ----------
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {

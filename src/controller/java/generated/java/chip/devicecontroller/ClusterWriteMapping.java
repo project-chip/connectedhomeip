@@ -2356,6 +2356,8 @@ public class ClusterWriteMapping {
     );
     writeThermostatUserInterfaceConfigurationInteractionInfo.put("writeScheduleProgrammingVisibilityAttribute", writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityAttributeInteractionInfo);
     writeAttributeMap.put("thermostatUserInterfaceConfiguration", writeThermostatUserInterfaceConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeHumidistatInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("humidistat", writeHumidistatInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControloptionsCommandParameterInfo =
@@ -2624,6 +2626,30 @@ public class ClusterWriteMapping {
     );
     writeBallastConfigurationInteractionInfo.put("writeLampBurnHoursTripPointAttribute", writeBallastConfigurationLampBurnHoursTripPointAttributeInteractionInfo);
     writeAttributeMap.put("ballastConfiguration", writeBallastConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeDynamicLightingInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeDynamicLightingCurrentSpeedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo dynamicLightingcurrentSpeedCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeDynamicLightingCurrentSpeedCommandParams.put(
+        "value",
+        dynamicLightingcurrentSpeedCommandParameterInfo
+    );
+    InteractionInfo writeDynamicLightingCurrentSpeedAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DynamicLightingCluster) cluster).writeCurrentSpeedAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeDynamicLightingCurrentSpeedCommandParams
+    );
+    writeDynamicLightingInteractionInfo.put("writeCurrentSpeedAttribute", writeDynamicLightingCurrentSpeedAttributeInteractionInfo);
+    writeAttributeMap.put("dynamicLighting", writeDynamicLightingInteractionInfo);
     Map<String, InteractionInfo> writeIlluminanceMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("illuminanceMeasurement", writeIlluminanceMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeTemperatureMeasurementInteractionInfo = new LinkedHashMap<>();
@@ -2924,6 +2950,10 @@ public class ClusterWriteMapping {
     );
     writeAmbientContextSensingInteractionInfo.put("writeHoldTimeAttribute", writeAmbientContextSensingHoldTimeAttributeInteractionInfo);
     writeAttributeMap.put("ambientContextSensing", writeAmbientContextSensingInteractionInfo);
+    Map<String, InteractionInfo> writeProximityRangingInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proximityRanging", writeProximityRangingInteractionInfo);
+    Map<String, InteractionInfo> writeNetworkIdentityManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("networkIdentityManagement", writeNetworkIdentityManagementInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wiFiNetworkManagement", writeWiFiNetworkManagementInteractionInfo);
     Map<String, InteractionInfo> writeThreadBorderRouterManagementInteractionInfo = new LinkedHashMap<>();

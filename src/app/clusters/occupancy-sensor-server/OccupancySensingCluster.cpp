@@ -104,7 +104,11 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    if (mHoldTimeDelegate)
+    // The spec forbids 0 as a HoldTime value. mHoldTime is zero-initialized for safety, so return error when hold time is
+    // supported.
+    VerifyOrReturnError(!IsHoldTimeEnabled() || mHoldTime != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (IsHoldTimeEnabled())
     {
         AttributePersistence persistence(context.attributeStorage);
         uint16_t storedHoldTime;
@@ -167,7 +171,7 @@ DataModel::ActionReturnStatus OccupancySensingCluster::WriteAttribute(const Data
     case Attributes::PIROccupiedToUnoccupiedDelay::Id:
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
-        if (!mHoldTimeDelegate)
+        if (!IsHoldTimeEnabled())
         {
             return Protocols::InteractionModel::Status::UnsupportedAttribute;
         }
@@ -186,13 +190,13 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { mHoldTimeDelegate != nullptr, Attributes::HoldTime::kMetadataEntry },
-        { mHoldTimeDelegate != nullptr, Attributes::HoldTimeLimits::kMetadataEntry },
-        { mHoldTimeDelegate != nullptr && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
+        { IsHoldTimeEnabled(), Attributes::HoldTime::kMetadataEntry },
+        { IsHoldTimeEnabled(), Attributes::HoldTimeLimits::kMetadataEntry },
+        { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
           Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHoldTimeDelegate != nullptr && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
+        { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
           Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHoldTimeDelegate != nullptr && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPhysicalContact),
+        { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPhysicalContact),
           Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
     };
 
@@ -201,7 +205,7 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
 
 DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t holdTime)
 {
-    VerifyOrReturnError(mHoldTimeDelegate, Protocols::InteractionModel::Status::UnsupportedAttribute);
+    VerifyOrReturnError(IsHoldTimeEnabled(), Protocols::InteractionModel::Status::UnsupportedAttribute);
     VerifyOrReturnError(holdTime >= mHoldTimeLimits.holdTimeMin, Protocols::InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(holdTime <= mHoldTimeLimits.holdTimeMax, Protocols::InteractionModel::Status::ConstraintError);
 

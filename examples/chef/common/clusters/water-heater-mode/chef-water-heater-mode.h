@@ -40,10 +40,10 @@ static const detail::Structs::ModeTagStruct::Type modeTagsOff[]    = { { .value 
 static const detail::Structs::ModeTagStruct::Type modeTagsManual[] = { { .value = to_underlying(ModeTag::kManual) } };
 
 static const detail::Structs::ModeOptionStruct::Type kModeOptions[] = {
-    detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Off"),
+    detail::Structs::ModeOptionStruct::Type{ .label    = "Off"_span,
                                              .mode     = ModeOff,
                                              .modeTags = DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsOff) },
-    detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Manual"),
+    detail::Structs::ModeOptionStruct::Type{ .label = "Manual"_span,
                                              .mode  = ModeManual,
                                              .modeTags =
                                                  DataModel::List<const detail::Structs::ModeTagStruct::Type>(modeTagsManual) },

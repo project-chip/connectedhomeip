@@ -37,7 +37,7 @@ namespace {{asUpperCamelCase label}} {
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
 {{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterType this}} value)
+Protocols::InteractionModel::Status Get{{#if (isInConfigList parent.name "CodeDrivenClusters")}}Default{{/if}}(EndpointId endpoint, {{accessorGetterType this}} value)
 {
     {{~#if (isString type)}}
     {{#if isNullable}}
