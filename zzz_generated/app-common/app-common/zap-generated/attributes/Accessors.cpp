@@ -1978,7 +1978,7 @@ namespace Attributes {
 
 namespace Status {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>;
     Traits::StorageType temp;
@@ -1998,7 +1998,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace Order {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -2018,7 +2018,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace Description {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[60 + 1];
     Protocols::InteractionModel::Status status =
@@ -2040,7 +2040,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSp
 
 namespace WiredAssessedInputVoltage {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2063,7 +2063,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace WiredAssessedInputFrequency {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -2086,7 +2086,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace WiredCurrentType {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>;
     Traits::StorageType temp;
@@ -2106,7 +2106,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace WiredAssessedCurrent {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2129,7 +2129,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace WiredNominalVoltage {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2149,7 +2149,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 
 namespace WiredMaximumCurrent {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2169,7 +2169,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 
 namespace WiredPresent {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -2189,7 +2189,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace BatVoltage {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2212,7 +2212,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace BatPercentRemaining {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -2235,7 +2235,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace BatTimeRemaining {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2258,7 +2258,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace BatChargeLevel {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevelEnum>;
     Traits::StorageType temp;
@@ -2278,7 +2278,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace BatReplacementNeeded {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -2298,7 +2298,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace BatReplaceability {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>;
     Traits::StorageType temp;
@@ -2318,7 +2318,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace BatPresent {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -2338,7 +2338,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace BatReplacementDescription {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[60 + 1];
     Protocols::InteractionModel::Status status =
@@ -2360,7 +2360,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSp
 
 namespace BatCommonDesignation {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::PowerSource::BatCommonDesignationEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>;
     Traits::StorageType temp;
@@ -2380,7 +2381,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace BatANSIDesignation {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[20 + 1];
     Protocols::InteractionModel::Status status =
@@ -2402,7 +2403,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSp
 
 namespace BatIECDesignation {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[20 + 1];
     Protocols::InteractionModel::Status status =
@@ -2424,7 +2425,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSp
 
 namespace BatApprovedChemistry {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::PowerSource::BatApprovedChemistryEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>;
     Traits::StorageType temp;
@@ -2444,7 +2446,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace BatCapacity {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2464,7 +2466,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 
 namespace BatQuantity {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -2484,7 +2486,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace BatChargeState {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeStateEnum>;
     Traits::StorageType temp;
@@ -2504,7 +2506,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace BatTimeToFullCharge {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2527,7 +2529,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace BatFunctionalWhileCharging {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
@@ -2547,7 +2549,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 
 namespace BatChargingCurrent {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -2570,7 +2572,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;

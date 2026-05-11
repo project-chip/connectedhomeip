@@ -75,9 +75,10 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
     return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + 1, length);
 }
 
-template <size_t maxLength, class GetAccessor>
+template <class GetAccessor>
 CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpointId, std::string & storage)
 {
+    static constexpr size_t maxLength = 60; // maximum length of a string attribute in the PowerSource cluster.
     char buffer[maxLength];
     MutableCharSpan span(buffer);
     if (getter(endpointId, span) != Protocols::InteractionModel::Status::Success)
@@ -125,7 +126,7 @@ public:
         {
             // for dynamic endpoints
             description = GetCharStringDefaultValueFromEmber<Description::TypeInfo::MaxLength()>(
-                Description::Get, endpointId,
+                Description::GetDefault, endpointId,
                 // this static cast does nothing, it is here to make the code template dependent on class template, so the code will
                 // compile.
                 static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
@@ -141,7 +142,7 @@ public:
 #define SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                   \
     if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
     {                                                                                                                              \
-        if (attr_type val{}; attr_name::Get(endpointId, &val) == InteractionModel::Status::Success)                                \
+        if (attr_type val{}; attr_name::GetDefault(endpointId, &val) == InteractionModel::Status::Success)                                \
         {                                                                                                                          \
             config.config_field_name = val;                                                                                        \
         }                                                                                                                          \
@@ -150,7 +151,7 @@ public:
 #define SetNullableAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                           \
     if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
     {                                                                                                                              \
-        if (DataModel::Nullable<attr_type> val{}; attr_name::Get(endpointId, val) == InteractionModel::Status::Success)            \
+        if (DataModel::Nullable<attr_type> val{}; attr_name::GetDefault(endpointId, val) == InteractionModel::Status::Success)            \
         {                                                                                                                          \
             if (!val.IsNull())                                                                                                     \
             {                                                                                                                      \
@@ -164,13 +165,13 @@ public:
             if (features.Has(Feature::kWired))
             {
                 typename EmberWiredPowerSourceClusterT::WiredCurrentTypeEnum currentType;
-                VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
+                VerifyOrDie(WiredCurrentType::GetDefault(endpointId, &currentType) == InteractionModel::Status::Success);
 
                 typename EmberWiredPowerSourceClusterT::ConfigType config(endpointId, description, currentType);
                 if constexpr (EmberWiredPowerSourceClusterT::supportedOptionalAttributeSet.IsSet(WiredAssessedInputVoltage::Id))
                 {
                     if (DataModel::Nullable<uint32_t> val{};
-                        WiredAssessedInputVoltage::Get(endpointId, val) == InteractionModel::Status::Success)
+                        WiredAssessedInputVoltage::GetDefault(endpointId, val) == InteractionModel::Status::Success)
                     {
                         if (!val.IsNull())
                         {
@@ -212,7 +213,7 @@ public:
                 typename EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum replaceability =
                     EmberBatteryPowerSourceClusterT::BatReplaceabilityEnum::kUnspecified;
                 // try to read, if fails, default will be used
-                BatReplaceability::Get(endpointId, &replaceability);
+                BatReplaceability::GetDefault(endpointId, &replaceability);
 
                 typename EmberBatteryPowerSourceClusterT::ConfigType config(endpointId, description, replaceability,
                                                                             gTimerDelegate);
@@ -236,7 +237,7 @@ public:
                             // for dynamic endpoints
                             replacementDescription =
                                 GetCharStringDefaultValueFromEmber<BatReplacementDescription::TypeInfo::MaxLength()>(
-                                    BatReplacementDescription::Get, endpointId,
+                                    BatReplacementDescription::GetDefault, endpointId,
                                     // this static cast does nothing, it is here to make the code template dependent on class
                                     // template, so the code will compile.
                                     static_cast<StringStorageModuleT &>(
@@ -252,7 +253,7 @@ public:
                         }
 
                         uint8_t quantity;
-                        VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
+                        VerifyOrDie(BatQuantity::GetDefault(endpointId, &quantity) == InteractionModel::Status::Success);
                         config.MakeReplaceable(replacementDescription, quantity);
 
                         SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatCommonDesignationEnum,
@@ -266,7 +267,7 @@ public:
                                 // for dynamic endpoints
                                 config.batANSIDesignation =
                                     GetCharStringDefaultValueFromEmber<BatANSIDesignation::TypeInfo::MaxLength()>(
-                                        BatANSIDesignation::Get, endpointId,
+                                        BatANSIDesignation::GetDefault, endpointId,
                                         // this static cast does nothing, it is here to make the code template dependent on class
                                         // template, so the code will compile.
                                         static_cast<StringStorageModuleT &>(
@@ -290,7 +291,7 @@ public:
                                 // for dynamic endpoints
                                 config.batIECDesignation =
                                     GetCharStringDefaultValueFromEmber<BatIECDesignation::TypeInfo::MaxLength()>(
-                                        BatIECDesignation::Get, endpointId,
+                                        BatIECDesignation::GetDefault, endpointId,
                                         // this static cast does nothing, it is here to make the code template dependent on class
                                         // template, so the code will compile.
                                         static_cast<StringStorageModuleT &>(
@@ -393,7 +394,7 @@ public:
 void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
 {
     uint32_t featureBits{};
-    FeatureMap::Get(endpointId, &featureBits);
+    FeatureMap::GetDefault(endpointId, &featureBits);
     BitFlags<Feature> features(featureBits);
     VerifyOrDieWithMsg(features.HasAny(Feature::kWired, Feature::kBattery), Zcl,
                        "Empty feature map for PowerSource cluster on endpoint %d", endpointId);
