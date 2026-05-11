@@ -61,6 +61,7 @@ void ProximityRangingCluster::Shutdown(ClusterShutdownType shutdownType)
 DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
+    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     switch (request.path.mAttributeId)
     {
     case Attributes::RangingCapabilities::Id:
@@ -113,10 +114,6 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
         Span<uint8_t> sessionIds(buf, kMaxActiveSessions);
         CHIP_ERROR err = mDriver->GetActiveSessionIds(sessionIds);
         VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
-        if (sessionIds.empty())
-        {
-            return encoder.EncodeNull();
-        }
         return encoder.EncodeList([&sessionIds](const auto & listEncoder) -> CHIP_ERROR {
             for (size_t i = 0; i < sessionIds.size(); i++)
             {
@@ -188,6 +185,7 @@ std::optional<DataModel::ActionReturnStatus>
 ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & reader,
                                                    CommandHandler * handler)
 {
+    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Commands::StartRangingRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(reader));
 
@@ -201,8 +199,8 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
     }
     else
     {
-        resultCode          = mDriver->HandleStartRanging(sessionId, commandData);
-        response.resultCode = resultCode;
+        // Driver is responsible for validating configurations of request and returning response accordingly
+        resultCode = mDriver->HandleStartRanging(sessionId, commandData);
     }
 
     response.resultCode = resultCode;
@@ -223,13 +221,15 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
 DataModel::ActionReturnStatus ProximityRangingCluster::HandleStopRangingRequest(const DataModel::InvokeRequest & request,
                                                                                 TLV::TLVReader & reader)
 {
+    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Commands::StopRangingRequest::DecodableType commandData;
     VerifyOrReturnValue(commandData.Decode(reader) == CHIP_NO_ERROR, Status::InvalidCommand);
 
     CHIP_ERROR err = mDriver->HandleStopRanging(commandData.sessionID);
     if (err == CHIP_ERROR_NOT_FOUND)
     {
-        return Status::NotFound;
+        // If SessionID does not match any active ranging session, the Server SHALL response with the status code INVALID_IN_STATE
+        return Status::InvalidInState;
     }
     if (err != CHIP_NO_ERROR)
     {
@@ -261,7 +261,8 @@ void ProximityRangingCluster::OnSessionStopped(uint8_t sessionId, RangingSession
 
 uint8_t ProximityRangingCluster::GenerateSessionId()
 {
-    uint8_t buf[kMaxActiveSessions];
+    VerifyOrReturnValue(mDriver != nullptr, kInvalidSessionId);
+    uint8_t buf[kMaxActiveSessions] = { 0 };
     Span<uint8_t> activeSessions(buf);
     if (mDriver->GetActiveSessionIds(activeSessions) != CHIP_NO_ERROR)
     {

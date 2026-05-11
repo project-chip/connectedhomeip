@@ -95,6 +95,7 @@ CHIP_ERROR BleRssiRangingAdapter::GenerateBleDeviceId()
             return CHIP_NO_ERROR;
         }
     }
+    ChipLogError(DeviceLayer, "GenerateBleDeviceId failed generation after 3 attempts");
     return CHIP_ERROR_INTERNAL;
 }
 
@@ -102,7 +103,7 @@ uint64_t BleRssiRangingAdapter::GetBleDeviceId()
 {
     if (mBleDeviceId == kInvalidBleDeviceId)
     {
-        (void) GenerateBleDeviceId();
+        RETURN_SAFELY_IGNORED GenerateBleDeviceId();
     }
     return mBleDeviceId;
 }

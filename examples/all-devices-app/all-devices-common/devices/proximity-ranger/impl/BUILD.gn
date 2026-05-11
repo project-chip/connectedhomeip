@@ -25,6 +25,5 @@ source_set("ble-rssi") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform",
   ]
 }
