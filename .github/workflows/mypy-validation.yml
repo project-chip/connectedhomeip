@@ -99,6 +99,7 @@ jobs:
             src/python_testing/matter_testing_infrastructure/matter/testing/runner.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/choice_conformance.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/commissioning.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/matter_asserts.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/decorators.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/basic_composition.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/conformance.py \
