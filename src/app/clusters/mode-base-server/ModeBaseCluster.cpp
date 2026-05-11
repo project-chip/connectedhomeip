@@ -44,6 +44,10 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
+// A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
+// todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
+static IntrusiveList<Instance> gModeBaseAliasesInstances;
+
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
     AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
@@ -178,7 +182,7 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mCurrentMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -199,7 +203,7 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mStartUpMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -220,7 +224,7 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mOnMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;

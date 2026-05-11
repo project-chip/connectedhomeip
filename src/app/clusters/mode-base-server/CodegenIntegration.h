@@ -181,10 +181,6 @@ private:
     CHIP_ERROR EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
-// A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
-// todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
-static IntrusiveList<Instance> gModeBaseAliasesInstances;
-
 // This does not return a reference to const IntrusiveList, because the caller might need
 // to change the state of the instances in the list and const IntrusiveList only allows
 // access to const Instance.
