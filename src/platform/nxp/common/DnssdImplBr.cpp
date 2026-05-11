@@ -363,7 +363,7 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
             otServiceData.mHostName = service->mHostName;
         }
 
-        VerifyOrReturnError(service->mSubTypeSize <= UINT16_MAX, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(service->mSubTypeSize <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
 
         otServiceData.mServiceInstance     = service->mName;
         otServiceData.mServiceType         = serviceType;

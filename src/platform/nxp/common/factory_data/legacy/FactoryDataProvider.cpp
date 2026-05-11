@@ -522,8 +522,8 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
 {
     uint8_t productFinish = 0;
-    uint16_t length = 0;
-    auto err        = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
+    uint16_t length       = 0;
+    auto err              = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
@@ -533,7 +533,7 @@ CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation
 
 CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
 {
-    uint8_t color = 0;
+    uint8_t color   = 0;
     uint16_t length = 0;
     auto err        = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
