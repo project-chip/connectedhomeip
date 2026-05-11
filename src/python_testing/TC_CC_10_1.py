@@ -304,15 +304,7 @@ class TC_CC_10_1(MatterBaseTest):
         if self.pics_guard(self.check_pics("CC.S.F04")):
             CTmax = round(CTtarget * (1 + kTempTolerance))
             CTmin = round(CTtarget * (1 - kTempTolerance))
-<<<<<<< HEAD
-            result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.ColorTemperatureMireds)])
-            asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster][attributes.ColorTemperatureMireds], CTmax,
-                                      "ColorTemperatureMireds is not less than or equal to %d" % CTmax)
-            asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.ColorTemperatureMireds], CTmin,
-                                         "ColorTemperatureMireds is not greater than or equal to %d" % CTmin)
-=======
             await self.poll_until_attributes_in_range(cluster, [(attributes.ColorTemperatureMireds, CTmin, CTmax)])
->>>>>>> dc484be91e ([Scenes] TC-CC-10-1 & TC-LVL-9-1 timing fix (#71826))
         self.step("4c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
