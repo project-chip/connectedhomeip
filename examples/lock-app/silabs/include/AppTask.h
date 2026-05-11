@@ -159,6 +159,16 @@ public:
     static void ActuatorMovementEventHandler(AppEvent * aEvent);
 
     /**
+     * @brief AppTask-thread handler for a queued lock-action event
+     *        (`kEventType_Lock`, posted by `PostLockActionEvent` from the
+     *        Matter / DoorLock cluster-callback thread, or from the FreeRTOS
+     *        unlatch-timer trampoline). Calls `InitiateLockAction()` so that
+     *        all transitions of `mLockActuatorState` are serialized on the
+     *        AppTask event loop.
+     */
+    static void LockActionEventHandler(AppEvent * aEvent);
+
+    /**
      * @brief DoorLock-cluster post-attribute-change callback.
      *        Routes e.g. `LockState` updates to telemetry / UI side-effects.
      */
@@ -219,12 +229,6 @@ public:
 
     void DMDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
-    // ---------------------------------------------------------------------
-    // Lock-domain actuator API. `InitiateLockAction` is invoked from the
-    // `DM*` defaults above and from `LockMigration.cpp` when seeding state
-    // from the legacy NVM3 layout.
-    // ---------------------------------------------------------------------
-
     /** Door-lock actuator / cluster actions. */
     enum class LockAction : uint8_t
     {
@@ -243,7 +247,7 @@ public:
      *        the unlatch FreeRTOS timer helper (anonymous namespace, no
      *        private-member access).
      */
-    static void UnlockAfterUnlatch(intptr_t context = 0);
+    static void UnlockAfterUnlatch(intptr_t context);
 
 protected:
     // ---------------------------------------------------------------------
@@ -362,7 +366,10 @@ private:
     bool NextState();
 
     static void TimerEventHandler(void * timerCbArg);
+
     static void UpdateClusterState(intptr_t context);
+
+    static void PostLockActionEvent(int32_t actor, LockAction action);
 
     // ---- PIN validation / cluster state push ----
     bool Unlock(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
@@ -375,7 +382,8 @@ private:
 
     // ---- State ----
     UnlatchContext mUnlatchContext;
-    chip::EndpointId mCurrentEndpointId  = chip::kInvalidEndpointId;
+    chip::EndpointId mCurrentEndpointId = chip::kInvalidEndpointId;
+
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
     osTimerId_t mLockTimer               = nullptr;
 

@@ -240,7 +240,9 @@ CHIP_ERROR AppTask::AppInit()
         appError(err);
     }
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+    DlLockState bootState = appInstance().NextState() ? DlLockState::kUnlocked : DlLockState::kLocked;
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        UpdateClusterState, static_cast<intptr_t>(chip::to_underlying(bootState)));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -389,6 +391,31 @@ void AppTask::LockButtonActionHandler(AppEvent * aEvent)
     }
 }
 
+void AppTask::PostLockActionEvent(int32_t actor, LockAction action)
+{
+    AppEvent event         = {};
+    event.Type             = AppEvent::kEventType_Lock;
+    event.LockEvent.Actor  = actor;
+    event.LockEvent.Action = static_cast<uint8_t>(action);
+    event.Handler          = &CustomerAppTask::LockActionEventHandler;
+    appInstance().PostEvent(&event);
+}
+
+void AppTask::LockActionEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type != AppEvent::kEventType_Lock)
+    {
+        ChipLogError(NotSpecified, "LockActionEventHandler: unexpected event type %u", aEvent->Type);
+        return;
+    }
+
+    const LockAction action = static_cast<LockAction>(aEvent->LockEvent.Action);
+    if (!appInstance().InitiateLockAction(aEvent->LockEvent.Actor, action))
+    {
+        SILABS_LOG("Action is already in progress or active.");
+    }
+}
+
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
@@ -409,10 +436,9 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 
 void AppTask::UpdateClusterState(intptr_t context)
 {
-    bool unlocked        = appInstance().NextState();
-    DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
+    using DlLockStateUnderlying = std::underlying_type_t<DlLockState>;
+    DlLockState newState        = static_cast<DlLockState>(static_cast<DlLockStateUnderlying>(context));
 
-    // write the new lock value
     Protocols::InteractionModel::Status status = DoorLockServer::Instance().SetLockState(1, newState)
         ? Protocols::InteractionModel::Status::Success
         : Protocols::InteractionModel::Status::Failure;
@@ -454,7 +480,9 @@ bool AppTask::DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nul
     bool status = SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kLocked, pinCode, err);
     if (status == true)
     {
-        InitiateLockAction(AppEvent::kEventType_Lock, AppTask::LockAction::kLock);
+        // Marshal the actuator transition onto the AppTask thread so that
+        // mLockActuatorState is only ever touched from a single thread.
+        PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kLock);
     }
     return status;
 }
@@ -469,11 +497,11 @@ bool AppTask::DMDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const N
     {
         if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
         {
-            InitiateLockAction(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlatch);
+            PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlatch);
         }
         else
         {
-            InitiateLockAction(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+            PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
         }
     }
     return status;
@@ -487,14 +515,14 @@ bool AppTask::DMDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const N
     bool status = Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
     if (status == true)
     {
-        InitiateLockAction(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+        PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
     }
     return status;
 }
 
 void AppTask::DMDoorLockOnAutoRelock(chip::EndpointId /*endpointId*/)
 {
-    InitiateLockAction(AppEvent::kEventType_Lock, AppTask::LockAction::kLock);
+    PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kLock);
 }
 
 // emberAfPluginDoorLock* — weak DoorLock plugin callbacks. CRTP forwarders
@@ -657,11 +685,14 @@ CHIP_ERROR AppTask::InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clu
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-    if (state.Value() == DlLockState::kUnlocked)
+    if (!state.IsNull() && state.Value() == DlLockState::kUnlocked)
+    {
         mLockActuatorState = LockActuatorState::kUnlockCompleted;
+    }
     else
+    {
         mLockActuatorState = LockActuatorState::kLockCompleted;
-
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -705,8 +736,6 @@ bool AppTask::InitiateLockAction(int32_t aActor, LockAction aAction)
 
         mLockActuatorState = new_state;
 
-        // Inlined legacy ActionInitiated callback body: update LED/LCD and flag
-        // button-driven actions for later cluster-state sync.
         if (aAction == LockAction::kUnlock || aAction == LockAction::kLock)
         {
             bool locked = (aAction == LockAction::kLock);
@@ -765,7 +794,7 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
         SILABS_LOG("Failed to update the lock state after Unlatch");
     }
 
-    self.InitiateLockAction(AppEvent::kEventType_Lock, LockAction::kUnlock);
+    PostLockActionEvent(AppEvent::kEventType_Lock, LockAction::kUnlock);
 }
 
 void AppTask::UnlatchCallback(TimerHandle_t xTimer)
@@ -799,7 +828,6 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 
     if (actionCompleted != LockAction::kInvalid)
     {
-        // Inlined legacy ActionCompleted callback body.
         if (actionCompleted == LockAction::kLock)
         {
             SILABS_LOG("Lock Action has been completed");
@@ -816,8 +844,23 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 
         if (lock->mSyncClusterToButtonAction)
         {
-            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
-                                                                                   reinterpret_cast<intptr_t>(nullptr));
+            DlLockState clusterState = DlLockState::kLocked;
+            bool emit                = false;
+            if (actionCompleted == LockAction::kLock)
+            {
+                clusterState = DlLockState::kLocked;
+                emit         = true;
+            }
+            else if (actionCompleted == LockAction::kUnlock)
+            {
+                clusterState = DlLockState::kUnlocked;
+                emit         = true;
+            }
+            if (emit)
+            {
+                TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                    UpdateClusterState, static_cast<intptr_t>(chip::to_underlying(clusterState)));
+            }
             lock->mSyncClusterToButtonAction = false;
         }
     }
@@ -828,27 +871,12 @@ bool AppTask::Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricInd
 {
     if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
     {
-        // TODO: Our current implementation does not support multiple endpoint. This needs to be fixed in the future.
+        // TODO: Our current implementation does not support multiple endpoints. This needs to be fixed in the future.
         if (endpointId != mUnlatchContext.mEndpointId)
         {
-            // If we get a request to unlock on a different endpoint while the current endpoint is in the middle of an action,
-            // we return false for now. This needs to be fixed in the future.
-            if (mLockActuatorState != LockActuatorState::kUnlockCompleted &&
-                mLockActuatorState != LockActuatorState::kLockCompleted)
-            {
-                ChipLogError(Zcl, "Cannot unlock while unlatch on another endpoint is in progress on another endpoint");
-                return false;
-            }
-            else
-            {
-                mUnlatchContext.Update(endpointId, fabricIdx, nodeId, pin, err);
-                return SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pin, err);
-            }
+            mUnlatchContext.Update(endpointId, fabricIdx, nodeId, pin, err);
         }
-        else
-        {
-            return SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pin, err);
-        }
+        return SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pin, err);
     }
     return SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
@@ -990,7 +1018,7 @@ bool AppTask::DMDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex,
         return false;
     }
 
-    LockUserInfo userInStorage;
+    LockUserInfo userInStorage = {};
 
     memmove(userInStorage.userName, userName.data(), userName.size());
     userInStorage.userNameSize           = userName.size();
@@ -1109,7 +1137,7 @@ bool AppTask::DMDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cred
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    LockCredentialInfo credentialInStorage;
+    LockCredentialInfo credentialInStorage = {};
 
     credentialInStorage.status             = credentialStatus;
     credentialInStorage.credentialType     = credentialType;
@@ -1193,7 +1221,7 @@ DlStatus AppTask::DMDoorLockSetWeekDaySchedule(chip::EndpointId endpointId, uint
                                                uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
 
-    WeekDayScheduleInfo weekDayScheduleInStorage;
+    WeekDayScheduleInfo weekDayScheduleInStorage = {};
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
@@ -1281,7 +1309,7 @@ DlStatus AppTask::DMDoorLockSetYearDaySchedule(chip::EndpointId endpointId, uint
                                                DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
 
-    YearDayScheduleInfo yearDayScheduleInStorage;
+    YearDayScheduleInfo yearDayScheduleInStorage = {};
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
@@ -1363,7 +1391,7 @@ DlStatus AppTask::DMDoorLockSetHolidaySchedule(chip::EndpointId endpointId, uint
                                                uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
 
-    HolidayScheduleInfo holidayScheduleInStorage;
+    HolidayScheduleInfo holidayScheduleInStorage = {};
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 

@@ -64,6 +64,13 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ActuatorMovementEventHandlerImpl, aEvent);
     }
 
+    // AppTask-thread event handler (queued lock-action event posted from the Matter / DoorLock
+    // cluster-callback thread or from the FreeRTOS unlatch-timer trampoline). Optional override: *Impl().
+    static void LockActionEventHandler(AppEvent * aEvent)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockActionEventHandlerImpl, aEvent);
+    }
+
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -198,6 +205,8 @@ private:
     void UnlatchCallbackImpl(TimerHandle_t xTimer) { AppTask::UnlatchCallback(xTimer); }
 
     void ActuatorMovementEventHandlerImpl(AppEvent * aEvent) { AppTask::ActuatorMovementEventHandler(aEvent); }
+
+    void LockActionEventHandlerImpl(AppEvent * aEvent) { AppTask::LockActionEventHandler(aEvent); }
 
     void DMPostAttributeChangeCallbackImpl(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                            uint8_t * value)
