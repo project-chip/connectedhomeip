@@ -336,7 +336,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
            ensures that the process phase is set to CLOSED at the end.
         2. The middle block filters out expected exceptions related to normal process shutdown (like `QueueCancelled`), so that they
            are not treated as errors in scope of the exit stack.
-        3. The innermost blocks around `_proc_init()` and `_proc_work()` enriche the exceptions with additional context about the
+        3. The innermost blocks around `_proc_init()` and `_proc_work()` enrich the exceptions with additional context about the
            failure stage.
         """
         try:
