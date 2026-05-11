@@ -56,17 +56,15 @@ CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefReq
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
                              bool aSuppressResponse, bool aAllowLargePayload) :
-    mExchangeCtx(*this),
-    mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest),
-    mAllowLargePayload(aAllowLargePayload)
+    mExchangeCtx(*this), mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
+    mTimedRequest(aIsTimedRequest), mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
 }
 
 CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messaging::ExchangeManager * apExchangeMgr,
                              bool aIsTimedRequest, bool aSuppressResponse, bool aAllowLargePayload) :
-    mExchangeCtx(*this),
-    mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
+    mExchangeCtx(*this), mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
     mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true), mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
@@ -201,9 +199,22 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
-    MoveToState(State::AwaitingResponse);
+    SendMessageFlags sendFlags = SendMessageFlags::kNone;
+    if (!mSuppressResponse)
+    {
+        sendFlags = SendMessageFlags::kExpectResponse;
+    }
+
+    ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), sendFlags));
+
+    if (mSuppressResponse)
+    {
+        Close();
+    }
+    else
+    {
+        MoveToState(State::AwaitingResponse);
+    }
 
     return CHIP_NO_ERROR;
 }

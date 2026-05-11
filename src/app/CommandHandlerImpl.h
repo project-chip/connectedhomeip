@@ -261,6 +261,11 @@ public:
      */
     bool IsGroupRequest() { return mGroupRequest; }
 
+    /**
+     * Check wheher the SuppressResponse flag is set.
+     */
+    bool IsResponseSuppressed() { return mSuppressResponse; }
+
 protected:
     // Lifetime management for CommandHandler::Handle
 
