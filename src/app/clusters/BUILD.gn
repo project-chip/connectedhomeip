@@ -49,6 +49,7 @@ source_set("clusters") {
     "pressure-measurement-server",
     "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
+    "resource-monitoring-server",
     "scenes-server",
     "software-diagnostics-server",
     "soil-measurement-server",
