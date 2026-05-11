@@ -153,8 +153,25 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id)
     {
-        AttributePersistence persistence{ mContext->attributeStorage };
-        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mDefaultOpenDuration);
+        DataModel::Nullable<uint32_t> value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+
+        // DefaultOpenDuration has a constraint: min value = 1 (when not null)
+        if (!value.IsNull() && value.Value() < 1)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        // Avoid rewriting storage if unchanged
+        VerifyOrReturnValue(value != mDefaultOpenDuration, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+        mDefaultOpenDuration = value;
+
+        // Persist using AttributePersistence nullable storage representation.
+        NumericAttributeTraits<uint32_t>::StorageType storageValue;
+        NullableToStorage(mDefaultOpenDuration, storageValue);
+        return mContext->attributeStorage.WriteValue(request.path,
+                                                     { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
     }
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id)
@@ -440,11 +457,12 @@ void ValveConfigurationAndControlCluster::HandleUpdateRemainingDurationInternal(
 void ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration)
 {
     System::Clock::Milliseconds64 now = System::SystemClock().GetMonotonicMilliseconds64();
-    AttributeDirtyState dirtyState    = mRemainingDuration.SetValue(remainingDuration, now);
-    if (dirtyState == AttributeDirtyState::kMustReport)
-    {
-        NotifyAttributeChanged(Attributes::RemainingDuration::Id);
-    }
+    VerifyOrReturn(mRemainingDuration.value() != remainingDuration);
+
+    auto changeLevel = mRemainingDuration.SetValue(remainingDuration, now);
+    NotifyAttributeChanged(Attributes::RemainingDuration::Id,
+                           changeLevel == AttributeDirtyState::kMustReport ? DataModel::AttributeChangeType::kReportable
+                                                                           : DataModel::AttributeChangeType::kQuiet);
 }
 
 // Function to handle the StateChange that also allows to generate an event if needed.

@@ -17,8 +17,10 @@
 import enum
 import functools
 import logging
+import multiprocessing
 import os
 import random
+import shlex
 import sys
 import time
 import warnings
@@ -29,13 +31,13 @@ from typing import Any, Protocol
 import chiptest
 import click
 from chiptest.accessories import AppsRegister
+from chiptest.concurrency.work_queue import CancellableQueue
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.log_config import LOG_LEVELS, LogConfig
+from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.status import PeriodicStatusThread
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
-from chiptest.work_queue import CancellableQueue
 from chiptest.worker import TaskQueueT, WorkerThread
 from chipyaml.paths_finder import PathsFinder
 
@@ -113,6 +115,10 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     type=click.Choice(LOG_LEVELS, case_sensitive=False),
     help='Set the verbosity of logger during test execution. Use --log-level if not defined')
 @click.option(
+    '--log-level-rpc',
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger for RPC-related logging. Use --log-level if not defined')
+@click.option(
     '--target',
     default=['all'],
     multiple=True,
@@ -179,13 +185,13 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, log_level_tests: str | None, target: str, target_glob: str, target_skip_glob: str,
-         log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: TestRunTime,
-         chip_tool: Path | None) -> None:
+def main(context: click.Context, log_level: str, log_level_tests: str | None, log_level_rpc: str | None, target: str,
+         target_glob: str, target_skip_glob: str, log_timestamps: bool, root: str, internal_inside_unshare: bool,
+         include_tags: tuple[TestTag, ...], exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str],
+         runner: TestRunTime, chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_config = LogConfig(log_level, log_level_tests if log_level_tests is not None else log_level, log_timestamps)
+    log_config = LogConfig(log_level, log_level_tests or log_level, log_level_rpc or log_level, log_timestamps)
     log_config.set_fmt()
 
     if sys.platform == "linux":
@@ -533,116 +539,125 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     task_queue: TaskQueueT = CancellableQueue()
     errors: list[BaseException] = []
 
-    try:
-        # Initialize result thread first so that it's closed last.
-        to_terminate.append(result_thread := ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file))
+    with (multiprocessing.Manager() as mp_manager,
+          LogMessageCounter(mp_manager) as log_msg_counter):
+        prev_counter = context.obj.log_config.filter.msg_counter
+        try:
+            context.obj.log_config.filter.msg_counter = log_msg_counter
 
-        if sys.platform == 'linux':
-            app_name = 'wlx-app' if wifi_required else 'eth-app'
-            tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
+            # Initialize result thread first so that it's closed last.
+            to_terminate.append(result_thread := ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file))
 
-            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
-                index=0,
-                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                app_link_up=not wifi_required,
-                add_ula=not thread_required,
-                # Change the app link name so the interface will be recognized as WiFi or Ethernet
-                # depending on the commissioning method used.
-                app_link_name=app_name, tool_link_name=tool_name))
+            mgmt_ns_wrapper: str | None = None
+            if sys.platform == 'linux':
+                app_name = 'wlx-app' if wifi_required else 'eth-app'
+                tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
 
-            match commissioning_method:
-                case CommissioningMethod.BLE_WIFI:
-                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                    to_terminate.append(chiptest.linux.BluetoothMock())
-                    to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
-                    ble_controller_app = 0   # Bind app to the first BLE controller
-                    ble_controller_tool = 1  # Bind tool to the second BLE controller
-                case CommissioningMethod.BLE_THREAD:
-                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                    to_terminate.append(chiptest.linux.BluetoothMock())
-                    to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                    ble_controller_app = 0   # Bind app to the first BLE controller
-                    ble_controller_tool = 1  # Bind tool to the second BLE controller
-                case CommissioningMethod.THREAD_MESHCOP:
-                    to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                    thread_ba_host = tbr.get_border_agent_host()
-                    thread_ba_port = tbr.get_border_agent_port()
-                case CommissioningMethod.WIFIPAF_WIFI:
-                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                    to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
+                to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
+                    index=0,
+                    # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+                    app_link_up=not wifi_required,
+                    add_ula=not thread_required,
+                    # Change the app link name so the interface will be recognized as WiFi or Ethernet
+                    # depending on the commissioning method used.
+                    app_link_name=app_name, tool_link_name=tool_name))
+                mgmt_ns_wrapper = shlex.join(ns.mgmt_ns.netns_cmd_wrapper)
 
-            to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
-        elif sys.platform == 'darwin':
-            to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
-        else:
-            log.warning("No platform-specific executor for '%s'", sys.platform)
-            to_terminate.append(executor := Executor())
+                match commissioning_method:
+                    case CommissioningMethod.BLE_WIFI:
+                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                        to_terminate.append(chiptest.linux.BluetoothMock())
+                        to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
+                        ble_controller_app = 0   # Bind app to the first BLE controller
+                        ble_controller_tool = 1  # Bind tool to the second BLE controller
+                    case CommissioningMethod.BLE_THREAD:
+                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                        to_terminate.append(chiptest.linux.BluetoothMock())
+                        to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        ble_controller_app = 0   # Bind app to the first BLE controller
+                        ble_controller_tool = 1  # Bind tool to the second BLE controller
+                    case CommissioningMethod.THREAD_MESHCOP:
+                        to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        thread_ba_host = tbr.get_border_agent_host()
+                        thread_ba_port = tbr.get_border_agent_port()
+                    case CommissioningMethod.WIFIPAF_WIFI:
+                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                        to_terminate.append(chiptest.linux.WpaSupplicantMock(
+                            [app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
 
-        runner = chiptest.runner.Runner(executor=executor)
+                to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
+            elif sys.platform == 'darwin':
+                to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
+            else:
+                log.warning("No platform-specific executor for '%s'", sys.platform)
+                to_terminate.append(executor := Executor())
 
-        to_terminate.append(apps_register := AppsRegister())
-        apps_register.init()
+            runner = chiptest.runner.Runner(executor=executor)
 
-        to_terminate.append(status_thread := PeriodicStatusThread(run_summary, context.obj.log_config.filter.msg_counter,
-                                                                  periodicity=periodic_status))
-        status_thread.start()
+            to_terminate.append(apps_register := AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
+            apps_register.init()
 
-        # Initialize the worker thread last, to ensure it's terminated first.
-        to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
+            status_thread = PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status)
+            status_thread.start()
 
-        # Schedule all tests.
-        log.info("Each test will be executed %d times", iterations)
-        for i in range(1, iterations + 1):
-            log.info("Scheduling iteration %d", i)
-            for test in context.obj.tests:
-                log.debug("Enqueuing test %s", test.name)
-                task_queue.put(functools.partial(
-                    TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
-                        test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
-                        test_runtime=context.obj.runtime,
-                        ble_controller_app=ble_controller_app,
-                        ble_controller_tool=ble_controller_tool,
-                        op_network='Thread' if thread_required else 'WiFi',
-                        thread_ba_host=thread_ba_host,
-                        thread_ba_port=thread_ba_port,
-                        wifipaf_wifi=commissioning_method == CommissioningMethod.WIFIPAF_WIFI)))
+            # Initialize the worker thread last, to ensure it's terminated first.
+            to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
 
-            # If this is the last iteration schedule finalization event by closing the task queue.
-            if i == iterations:
-                task_queue.close()
+            # Schedule all tests.
+            log.info("Each test will be executed %d times", iterations)
+            for i in range(1, iterations + 1):
+                log.info("Scheduling iteration %d", i)
+                for test in context.obj.tests:
+                    log.debug("Enqueuing test %s", test.name)
+                    task_queue.put(functools.partial(
+                        TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
+                            test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
+                            test_runtime=context.obj.runtime,
+                            ble_controller_app=ble_controller_app,
+                            ble_controller_tool=ble_controller_tool,
+                            op_network='Thread' if thread_required else 'WiFi',
+                            thread_ba_host=thread_ba_host,
+                            thread_ba_port=thread_ba_port,
+                            wifipaf_wifi=commissioning_method == CommissioningMethod.WIFIPAF_WIFI)))
 
-        log.info("All jobs scheduled")
+                # If this is the last iteration schedule finalization event by closing the task queue.
+                if i == iterations:
+                    task_queue.close()
 
-        # Start worker and result threads.
-        result_thread.start()
-        worker_thread.start()
+            log.info("All jobs scheduled")
 
-        # Wait for exception or completion.
-        while True:
-            # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
-            if (exception := result_thread.exception or worker_thread.exception) is not None:
-                raise exception
+            # Start worker and result threads.
+            result_thread.start()
+            worker_thread.start()
 
-            # If the worker thread has finished processing all tasks, finalize the result processing.
-            if not worker_thread.is_alive():
-                result_thread.result_queue.close()
+            # Wait for exception or completion.
+            while True:
+                # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
+                if (exception := result_thread.exception or worker_thread.exception) is not None:
+                    raise exception
 
-            # Wait for the result thread to finish after closing the result queue to capture any exceptions.
-            if not result_thread.is_alive():
-                break
+                # If the worker thread has finished processing all tasks, finalize the result processing.
+                if not worker_thread.is_alive():
+                    result_thread.result_queue.close()
 
-            time.sleep(0.5)
-    except BaseException as e:
-        errors.append(e)
-    finally:
-        for item in reversed(to_terminate):
-            item_name = item.__class__.__name__
-            try:
-                log.info("Cleaning up %s", item_name)
-                item.terminate()
-            except Exception as e:
-                log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
-                errors.append(e)
+                # Wait for the result thread to finish after closing the result queue to capture any exceptions.
+                if not result_thread.is_alive():
+                    break
+
+                time.sleep(0.5)
+        except BaseException as e:
+            errors.append(e)
+        finally:
+            for item in reversed(to_terminate):
+                item_name = item.__class__.__name__
+                try:
+                    log.info("Cleaning up %s", item_name)
+                    item.terminate()
+                except Exception as e:
+                    log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
+                    errors.append(e)
+
+            context.obj.log_config.filter.msg_counter = prev_counter
 
     # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
     # encountered during execution and cleanup.

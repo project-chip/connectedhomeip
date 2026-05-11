@@ -3,7 +3,7 @@ description: Bootstrap cache (deprecated)
 runs:
   using: "composite"
   steps:
-    - uses: Wandalen/wretry.action@v1.4.10
+    - uses: Wandalen/wretry.action@1a10d4835a1506f513ad8e7488aeb474ab20055c # v1.4.10
       name: Bootstrap cache
       continue-on-error: true
       with:

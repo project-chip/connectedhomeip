@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/AppConfig.h>
-#include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegatePointers.h>
@@ -131,13 +130,6 @@ public:
         return !IsFree() && mExchangeCtx.Get() == apExchangeContext;
     }
 
-    void CacheACLCheckResult(const AttributeAccessToken & aToken) { mACLCheckCache.SetValue(aToken); }
-
-    bool ACLCheckCacheHit(const AttributeAccessToken & aToken)
-    {
-        return mACLCheckCache.HasValue() && mACLCheckCache.Value() == aToken;
-    }
-
     bool IsCurrentlyProcessingWritePath(const ConcreteAttributePath & aPath)
     {
         return mProcessingAttributePath.HasValue() && mProcessingAttributePath.Value() == aPath;
@@ -213,9 +205,14 @@ private:
     Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
-    Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
     DataModel::Provider * mDataModelProvider = nullptr;
+
+    // Required for legacy-encoded ACL list writes; lets CheckWriteAccess skip the re-check on repeated same-path writes
+    // Legacy-encoded ACL list write produces, in one WriteRequestMessage:
+    //   #1 ReplaceAll([])  — empties ACL, removing the writer's own admin entry
+    //   #2 AppendItem(item) — same path; its ACL re-check would be denied if not for
+    //                          mLastSuccessfullyWrittenPath cache.
     std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
 
     // This may be a "fake" pointer or a real delegate pointer, depending

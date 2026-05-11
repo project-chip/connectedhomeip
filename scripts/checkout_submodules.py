@@ -22,6 +22,20 @@ import os
 import subprocess
 from collections import namedtuple
 
+
+class PlatformAction(argparse.Action):
+    """Expand comma- or space-separated platform tokens and validate against ALL_PLATFORMS."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        items = []
+        for value in values:
+            for item in value.split(','):
+                item = item.strip()
+                if item:
+                    items.append(item)
+        setattr(namespace, self.dest, items)
+
+
 log = logging.getLogger(__name__)
 
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -156,8 +170,9 @@ def main():
                         help='Allow global git options to be modified if necessary, e.g. safe.directory')
     parser.add_argument('--shallow', action='store_true',
                         help='Fetch submodules without history')
-    parser.add_argument('--platform', nargs='+', choices=ALL_PLATFORMS, default=[],
-                        help='Process submodules for specific platforms only')
+    parser.add_argument('--platform', nargs='+', default=[], action=PlatformAction,
+                        metavar='{' + ','.join(sorted(ALL_PLATFORMS)) + '}',
+                        help='Process submodules for specific platforms only (space- or comma-separated).')
     parser.add_argument('--force', action='store_true',
                         help='Perform action despite of warnings')
     parser.add_argument('--deinit-unmatched', action='store_true',
@@ -169,7 +184,15 @@ def main():
     args = parser.parse_args()
 
     modules = list(load_module_info())
+
+    invalid = [p for p in args.platform if p not in ALL_PLATFORMS]
+    if invalid:
+        invalid_display = ', '.join(sorted(set(invalid)))
+        valid_choices = ', '.join(sorted(ALL_PLATFORMS))
+        parser.error(f"Invalid platform(s): {invalid_display}. Valid choices: {valid_choices}")
+
     selected_platforms = set(args.platform)
+
     selected_modules = [
         m for m in modules if module_matches_platforms(m, selected_platforms)]
     unmatched_modules = [m for m in modules if not module_matches_platforms(
