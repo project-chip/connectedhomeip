@@ -294,7 +294,7 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             env_key="LIGHTING_APP_NO_UNIQUE_ID",
             cli_key="lighting",
             target=f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-wifi-{suffix}",
-            binary="chip-lighting-app",
+            binary="chip-lighting-data-model-no-unique-id-app",
         )
     )
 

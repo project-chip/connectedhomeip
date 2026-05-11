@@ -48,12 +48,12 @@ public:
 
         PressureMeasurementCluster::Config config;
 
-        if (MinMeasuredValue::Get(endpointId, config.minMeasuredValue) != Status::Success)
+        if (MinMeasuredValue::GetDefault(endpointId, config.minMeasuredValue) != Status::Success)
         {
             config.minMeasuredValue.SetNull();
         }
 
-        if (MaxMeasuredValue::Get(endpointId, config.maxMeasuredValue) != Status::Success)
+        if (MaxMeasuredValue::GetDefault(endpointId, config.maxMeasuredValue) != Status::Success)
         {
             config.maxMeasuredValue.SetNull();
         }
@@ -70,7 +70,7 @@ public:
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             uint16_t tolerance{};
-            VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
             config.WithTolerance(tolerance);
         }
 
@@ -82,16 +82,16 @@ public:
             DataModel::Nullable<int16_t> maxScaledValue;
             int8_t scale = 0;
 
-            MinScaledValue::Get(endpointId, minScaledValue);
-            MaxScaledValue::Get(endpointId, maxScaledValue);
-            Scale::Get(endpointId, &scale);
+            VerifyOrDie(MinScaledValue::GetDefault(endpointId, minScaledValue) == Status::Success);
+            VerifyOrDie(MaxScaledValue::GetDefault(endpointId, maxScaledValue) == Status::Success);
+            VerifyOrDie(Scale::GetDefault(endpointId, &scale) == Status::Success);
 
             config.WithExtendedFeature(minScaledValue, maxScaledValue, scale);
 
             if (optionalAttributeSet.IsSet(ScaledTolerance::Id))
             {
                 uint16_t scaledTolerance{};
-                VerifyOrDie(ScaledTolerance::Get(endpointId, &scaledTolerance) == Status::Success);
+                VerifyOrDie(ScaledTolerance::GetDefault(endpointId, &scaledTolerance) == Status::Success);
                 config.WithScaledTolerance(scaledTolerance);
             }
         }

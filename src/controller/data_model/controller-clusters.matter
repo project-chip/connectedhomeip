@@ -8110,6 +8110,65 @@ provisional cluster BallastConfiguration = 769 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides a means to activate and control dynamic lighting effects on a light. */
+provisional cluster DynamicLighting = 773 {
+  revision 1;
+
+  enum EffectColorModeEnum : enum8 {
+    kLevel = 0;
+    kXY = 1 [spec_name = "XY"];
+    kXYAndLevel = 2;
+    kHS = 3 [spec_name = "HS"];
+    kHSAndLevel = 4;
+    kEHUE = 5 [spec_name = "EHUE"];
+    kEHUEAndLevel = 6;
+  }
+
+  enum EffectSourceEnum : enum8 {
+    kInternal = 0;
+    kSoundBased = 1;
+  }
+
+  struct EffectColorStruct {
+    nullable int8u level = 0;
+    nullable int16u x = 1;
+    nullable int16u y = 2;
+    nullable int8u hue = 3;
+    nullable int16u enhancedHue = 4;
+    nullable int8u saturation = 5;
+  }
+
+  struct EffectStruct {
+    int16u effectID = 0;
+    EffectSourceEnum source = 1;
+    char_string<32> label = 2;
+    int16u maxSpeed = 3;
+    int16u defaultSpeed = 4;
+    boolean supportsColorPalette = 5;
+  }
+
+  readonly attribute EffectStruct availableEffects[] = 0;
+  readonly attribute nullable int16u currentEffectID = 1;
+  attribute nullable int16u currentSpeed = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct StartEffectRequest {
+    int16u effectID = 0;
+    int16u speed = 1;
+    nullable EffectColorModeEnum colorMode = 2;
+    nullable EffectColorStruct colorPalette[] = 3;
+  }
+
+  /** This command will start the specified effect. */
+  command StartEffect(StartEffectRequest): DefaultSuccess = 0;
+  /** This command will stop the current effect. */
+  command StopEffect(): DefaultSuccess = 1;
+}
+
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
   revision 3;
