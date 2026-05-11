@@ -905,7 +905,8 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
 
     if (framerate < allocatedStream.minFrameRate || framerate > allocatedStream.maxFrameRate)
     {
-        ChipLogError(Camera, "Requested frame rate %u is out of range [%u, %u]", framerate, allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
+        ChipLogError(Camera, "Requested frame rate %u is out of range [%u, %u]", framerate, allocatedStream.minFrameRate,
+                     allocatedStream.maxFrameRate);
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
