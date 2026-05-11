@@ -80,9 +80,9 @@ Davis, CA 95616, USA
     <feature bit="3" code="PDC" name="PerDeviceCredentials" summary="Wi-Fi Per-Device Credentials">
       <otherwiseConform>
         <provisionalConform/>
-        <mandatoryConform>
+        <optionalConform>
           <feature name="WI"/>
-        </mandatoryConform>
+        </optionalConform>
       </otherwiseConform>
     </feature>
   </features>

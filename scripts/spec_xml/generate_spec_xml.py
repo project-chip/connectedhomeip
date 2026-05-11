@@ -380,7 +380,7 @@ def dump_json_ids(output_dir):
     device_types, _ = build_xml_device_types(Path(device_types_output_dir))
 
     def write_json(elements: dict, path: str) -> None:
-        json_dict = {id: c.name for id, c in sorted(elements.items())}
+        json_dict = {element_id: c.name for element_id, c in sorted(elements.items())}
 
         with open(path, "wt+") as outfile:
             json.dump(json_dict, outfile, indent=4)
@@ -407,45 +407,45 @@ def dump_ids_from_data_model_dirs():
     data_model_dirs = [d for d in os.listdir(data_model_path) if os.path.isdir(os.path.join(data_model_path, d))]
     # Don't include master right now - it's in progress, not official
     data_model_dirs = sorted([d for d in data_model_dirs if 'master' not in d])
-    for dir in data_model_dirs:
-        clusters, _ = build_xml_clusters(Path(os.path.join(data_model_path, dir, 'clusters')))
-        device_types, _ = build_xml_device_types(Path(os.path.join(data_model_path, dir, 'device_types')))
+    for data_model_dir in data_model_dirs:
+        clusters, _ = build_xml_clusters(Path(os.path.join(data_model_path, data_model_dir, 'clusters')))
+        device_types, _ = build_xml_device_types(Path(os.path.join(data_model_path, data_model_dir, 'device_types')))
 
         def cluster_support_str(c):
             return "P" if c.is_provisional else "C"
 
-        version_clusters[dir] = {id: cluster_support_str(c) for id, c in clusters.items()}
+        version_clusters[data_model_dir] = {k: cluster_support_str(c) for k, c in clusters.items()}
 
         # Update the PICS Codes
-        for id, c in clusters.items():
-            if id not in pics_code_clusters:
-                pics_code_clusters[id] = c.pics
-            elif pics_code_clusters[id] != c.pics:
-                log.warning("PICS Code is inconsistent among different versions of the spec for cluster ID #%s!", id)
+        for k, c in clusters.items():
+            if k not in pics_code_clusters:
+                pics_code_clusters[k] = c.pics
+            elif pics_code_clusters[k] != c.pics:
+                log.warning("PICS Code is inconsistent among different versions of the spec for cluster ID #%s!", k)
 
         # Device types don't currently have provisional markings in the spec
         # But a device type can't be certified if it has mandatory clusters that are provisional
         # TODO: create provisional
 
         def device_type_support_str(d):
-            log.info("checking device type for '%s' for '%s'", d.name, dir)
-            dt_server_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
+            log.info("checking device type for '%s' for '%s'", d.name, data_model_dir)
+            dt_server_mandatory = [k for k, requirement in d.server_clusters.items() if requirement.conformance(
                 EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.MANDATORY]
             server_provisional = [clusters[c].name for c in dt_server_mandatory if clusters[c].is_provisional]
-            dt_client_mandatory = [id for id, requirement in d.client_clusters.items(
+            dt_client_mandatory = [k for k, requirement in d.client_clusters.items(
             ) if requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.MANDATORY]
             client_provisional = [clusters[c].name for c in dt_client_mandatory if clusters[c].is_provisional]
             if server_provisional or client_provisional:
                 log.info("Found provisional mandatory clusters server:'%s' "
                          "client: '%s' in device type '%s' for revision '%s'",
-                         server_provisional, client_provisional, d.name, dir)
+                         server_provisional, client_provisional, d.name, data_model_dir)
                 return "P"
             return "C"
 
-        version_device_types[dir] = {id: device_type_support_str(d) for id, d in device_types.items()}
+        version_device_types[data_model_dir] = {k: device_type_support_str(d) for k, d in device_types.items()}
 
-        all_clusters.update({id: c.name for id, c in clusters.items()})
-        all_device_types.update({id: d.name for id, d in device_types.items()})
+        all_clusters.update({k: c.name for k, c in clusters.items()})
+        all_device_types.update({k: d.name for k, d in device_types.items()})
 
     def print_out_ids(filename: Path,
                       spec_section: str,
@@ -493,32 +493,32 @@ def dump_ids_from_data_model_dirs():
             hashes += f'{"-" * pics_code_len}|'
 
         version_len: dict[str, int] = {}
-        for dir in supported:
-            tag_path = os.path.join(paths.get_data_model_path(), dir, 'spec_tag')
+        for version_dir in supported:
+            tag_path = os.path.join(paths.get_data_model_path(), version_dir, 'spec_tag')
             try:
                 with open(tag_path, "r") as tag_file:
                     version = tag_file.read().strip()
             except FileNotFoundError:
-                version = dir
+                version = version_dir
             title += f'{version}|'
-            version_len[dir] = len(version)
-            hashes += f'{"-" * version_len[dir]}|'
+            version_len[version_dir] = len(version)
+            hashes += f'{"-" * version_len[version_dir]}|'
         table_header = f'{title}\n{hashes}\n'
 
         lines = []
-        for id, name in sorted(id_to_name.items()):
-            hex_id = f'0x{id:04X}'
-            line = f'|{id:<{dec_len}}|{hex_id:<{hex_len}}|{name:<{name_len}}|'
+        for element_id, name in sorted(id_to_name.items()):
+            hex_id = f'0x{element_id:04X}'
+            line = f'|{element_id:<{dec_len}}|{hex_id:<{hex_len}}|{name:<{name_len}}|'
 
             # Add PICS code (only for clusters)
             if pics_codes is not None:
-                line += f'{pics_codes[id]:<{pics_code_len}}|'
+                line += f'{pics_codes[element_id]:<{pics_code_len}}|'
 
-            for dir in supported:
+            for version_dir in supported:
                 try:
-                    line += f'{supported[dir][id]:<{version_len[dir]}}|'
+                    line += f'{supported[version_dir][element_id]:<{version_len[version_dir]}}|'
                 except KeyError:
-                    line += f'{" " * version_len[dir]}|'
+                    line += f'{" " * version_len[version_dir]}|'
             lines.append(line)
 
         with open(filename, 'w') as fout:

@@ -91,7 +91,7 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 #endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
     // Use thread-safe strerror_r when available
-#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+#if defined(_GNU_SOURCE) && !defined(__ANDROID__) && !defined(__Fuchsia__) && !defined(__MUSL__)
     // GNU version returns char*
     const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
     if (s != nullptr)

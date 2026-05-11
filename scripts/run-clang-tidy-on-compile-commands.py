@@ -399,11 +399,9 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
     help="Determines the verbosity of script output.",
 )
 @click.option(
-    "--no-log-timestamps",
-    default=False,
-    is_flag=True,
-    help="Skip timestaps in log output",
-)
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     "--export-fixes",
     default=None,
@@ -429,14 +427,12 @@ def main(
     file_include_regex,
     file_exclude_regex,
     log_level,
-    no_log_timestamps,
+    log_timestamps,
     export_fixes,
     checks,
     file_list_file,
 ):
-    log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
-    if no_log_timestamps:
-        log_fmt = "%(levelname)-7s %(message)s"
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if not compile_database:

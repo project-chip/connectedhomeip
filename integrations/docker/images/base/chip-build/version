@@ -1,1 +1,1 @@
-186 : [Ameba] Update Docker image for C++ macro conflict resolution
+194 : [crosscompile] Add armhf sysroot, update aarch64 sysroot to build-2026.05.07

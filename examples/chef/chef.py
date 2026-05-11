@@ -43,9 +43,6 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
-    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
-    "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
-    "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -542,7 +539,7 @@ def main() -> int:
         shell.run_cmd(
             f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
         shell.run_cmd(
-            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/../.zephyrrc')
         # QUIRK:
         # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
         # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH

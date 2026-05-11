@@ -39,12 +39,12 @@
 #include "ZigbeeCallbacks.h"
 #endif // SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 
-#if !SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_SI91X_MCU_INTERFACE) && !SLI_SI91X_MCU_INTERFACE
 extern "C" {
 #include "btl_interface.h"
 #include "btl_reset_info.h"
 }
-#endif // !SLI_SI91X_MCU_INTERFACE
+#endif // defined (SLI_SI91X_MCU_INTERFACE) && !SLI_SI91X_MCU_INTERFACE
 
 namespace chip {
 namespace DeviceLayer {
@@ -315,11 +315,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    error = WifiInterface::GetInstance().TriggerDisconnection();
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format());
-    }
+    WifiInterface::GetInstance().TriggerDisconnection();
 
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
     WifiInterface::GetInstance().ClearWifiCredentials();

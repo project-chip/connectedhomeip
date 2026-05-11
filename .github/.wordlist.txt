@@ -72,6 +72,7 @@ approver
 appspot
 appwrite
 aps
+ARD
 arg
 argc
 args
@@ -80,10 +81,6 @@ armeabi
 armino
 ARMmbed
 armv
-ARD
-SCL
-SDA
-VCC
 ASAN
 asdk
 ASR
@@ -93,6 +90,7 @@ ASYNC
 AsyncZeroconfServiceTypes
 ATL
 ATLs
+atomicity
 atomics
 att
 attId
@@ -160,6 +158,7 @@ blocklist
 blockquote
 bluetoothd
 bluez
+Bonjour
 BOOL
 booleans
 BooleanState
@@ -210,6 +209,7 @@ CCXML
 CDEEDC
 CDVersionNumber
 ced
+centric
 cfg
 CFLAGS
 cgit
@@ -246,6 +246,7 @@ ChlorodibromomethaneConcentrationMeasurement
 ChloroformConcentrationMeasurement
 chmod
 chown
+chroot
 chrpath
 CIPD
 CircleCI
@@ -290,6 +291,7 @@ commissionables
 commissionee
 CommissioningFlow
 commondatastorage
+Compat
 CONF
 CONFIG
 ConfigDescription
@@ -339,8 +341,8 @@ cstdint
 csu
 csv
 ctl
-CTS
 ctrl
+CTS
 ctypes
 CurrentHue
 CurrentLevel
@@ -427,6 +429,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+Devkit
 DevKitC
 DevKitM
 devtype
@@ -480,6 +483,7 @@ downcasting
 DownloadProtocolEnum
 Doxygen
 dpkg
+drawables
 dropdown
 dryrun
 DS
@@ -554,6 +558,7 @@ EvalFrameDefault
 EVB
 EventLogging
 evk
+EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
@@ -591,8 +596,10 @@ FFFFFFFFFFFF0102
 FFmpeg
 Fi
 filepath
+filesystems
 fini
 FixedLabel
+fixups
 flashdebug
 FlowMeasurement
 FluorideConcentrationMeasurement
@@ -602,18 +609,20 @@ formatter
 formatters
 FOTA
 framerate
+FRDM
 FreeRTOS
 FreeRTOSConfig
-FRDM
 FS
 fsl
 fstab
 fsync
 ftd
+ftr
 fullclean
 fuzzer
 fuzzers
 fuzztest
+fvisibility
 FW
 Fxx
 gbl
@@ -696,7 +705,6 @@ hostname
 hotfixes
 href
 hsm
-HSM
 HTTPS
 Humidistat
 HW
@@ -746,6 +754,7 @@ ini
 init
 InitArgs
 inlined
+inlining
 InputLoop
 installDebug
 instantiation
@@ -792,6 +801,7 @@ jpg
 jre
 js
 json
+jsoncpp
 JTAG
 Jupyter
 jupyterlab
@@ -841,6 +851,7 @@ libglib
 libical
 libncurses
 libreadline
+libs
 libsdl
 libshell
 libssl
@@ -867,8 +878,8 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
-lookups
 LogEvent
+lookups
 loopback
 LowPower
 LPC
@@ -948,6 +959,7 @@ middleware
 MIMXRT
 minApplicableSoftwareVersion
 Minicom
+minifyEnabled
 MinInterval
 MinIntervalFloorSeconds
 minLength
@@ -1071,8 +1083,8 @@ optionMask
 optionOverride
 optionsMask
 optionsOverride
-orgs
 Orchestrator
+orgs
 OSS
 OTA
 OTADownloader
@@ -1120,6 +1132,7 @@ params
 PartNumber
 PASE
 Passcode
+passcodes
 passRetained
 passwd
 Pausable
@@ -1170,6 +1183,7 @@ PowerSource
 PowerSourceConfiguration
 pre
 PrebuiltDataModelDirectory
+prepends
 preprocessor
 Presetup
 PressureMeasurement
@@ -1248,7 +1262,6 @@ rebase
 recommand
 recommanded
 Reconnection
-reconnection
 reconnections
 recurse
 refrigeratoralarm
@@ -1282,6 +1295,7 @@ riscv
 rloc
 rmw
 rnd
+Robolectric
 rodata
 Rollershade
 rootfs
@@ -1321,10 +1335,12 @@ scalability
 scalable
 schema
 schemas
+SCL
 scm
 sco
 scp
 ScriptBinding
+SDA
 SDB
 SDC
 SDHC
@@ -1371,6 +1387,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+simw
 SiWx
 sizedb
 sl
@@ -1408,6 +1425,7 @@ StartScan
 startsWith
 StatusCode
 stderr
+stdlib
 stdout
 sterm
 stlink
@@ -1442,6 +1460,7 @@ svg
 SVR
 SWD
 SWU
+symlink
 symlinks
 sysbuild
 sysconfdir
@@ -1449,6 +1468,7 @@ SysConfig
 sysctl
 sysdeps
 SYSROOT
+sysroots
 systemctl
 systemd
 systemdsystemunitdir
@@ -1575,8 +1595,10 @@ Unicast
 UniFlash
 UnitLocalization
 unittest
+unlinking
 unpair
 unprovisioned
+unreferenced
 unregistration
 Unsecure
 Unselect
@@ -1606,6 +1628,7 @@ UUID
 ux
 valgrind
 validator
+VCC
 vcom
 VCP
 Vectorcall
@@ -1671,6 +1694,7 @@ xcd
 Xcode
 xcodebuild
 xcodeproj
+Xcode's
 xcworkspace
 xd
 xds
@@ -1715,9 +1739,10 @@ zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject
-zhengyaohan
 Zeroconf
+zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
 zsdk
+ZXing

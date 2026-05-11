@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/basic-information/CodegenIntegration.h>
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
@@ -69,7 +70,7 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
     // This is why the cluster does not provide a getter for this attribute.
     // We read this via ember (i.e. defaults that were set during codegen startup)
-    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
+    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::GetDefault(endpointId, &numPositions);
 
     return numPositions;
 }
@@ -547,13 +548,14 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateConfigurationVersionChange")
     {
-        uint32_t configurationVersion = 0;
-        TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetConfigurationVersion(configurationVersion);
-        configurationVersion++;
-
-        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
+        Clusters::BasicInformationCluster * cluster = Clusters::BasicInformation::GetClusterInstance();
+        if (cluster == nullptr)
         {
-            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
+            ChipLogError(NotSpecified, "No basic information cluster available. Invalid state.");
+        }
+        else
+        {
+            LogErrorOnFailure(cluster->IncreaseConfigurationVersion());
         }
     }
     else if (name == "SetSimulatedSoilMoisture")

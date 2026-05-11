@@ -110,30 +110,52 @@ class TestGroupKeyManagementCluster : public ::testing::Test
 
 ```
 
-### Writing Attributes (Lists & Structs)
+### Writing Attributes (Structs)
 
-The tester handles complex types like Lists and Structs automatically.
+The tester handles complex types like Structs automatically, with the exception
+of lists.
 
 ```cpp
-TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 {
-    // Create a vector of Structs
-    std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> keys;
+    ...
 
-    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key;
-    key.groupId = 0x1234;
-    key.groupKeySetID = 1;
-    key.fabricIndex = kTestFabricIndex;
-    keys.push_back(key);
+    // Write a valid new value
+    Attributes::Viewport::TypeInfo::Type newViewport = { 0, 0, 1280, 720 };
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::Viewport::Id, newViewport), CHIP_NO_ERROR);
 
-    // Wrap in DataModel::List
-    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+}
+```
 
-    // Write the attribute
-    // The tester automatically handles EncodeForWrite for fabric-scoped attributes
-    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
+### Writing List Attributes
 
-    ASSERT_EQ(err, CHIP_NO_ERROR);
+-   There are two main patterns used to write list attributes, and cluster
+    servers usually support both of them.
+-   For that reason, ClusterTester provides a `WriteAttribute` overload for
+    lists that takes a `ListWritingPattern`
+-   Tests for list attributes should exercise both patterns to ensure future
+    proofing. One way of doing that could be through a range-for loop as in the
+    example below.
+
+```cpp
+TEST_F(TestUserLabelCluster, WriteValidLabelListTest)
+{
+    // Repeating the testcase twice, once for each List Writing Pattern
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        ClusterTester tester(userLabel);
+        Structs::LabelStruct::Type labels[] = {
+            { .label = "room"_span, .value = "bedroom 2"_span },
+            { .label = "orientation"_span, .value = "North"_span },
+        };
+
+        // Wrap in DataModel::List
+        auto listToWrite = DataModel::List(labels);
+
+        // Write the attribute
+        // The tester automatically handles EncodeForWrite for fabric-scoped attributes
+        ASSERT_EQ(tester.WriteAttribute(LabelList::Id, listToWrite, listWritingPattern), CHIP_NO_ERROR);
+    }
 }
 
 ```
@@ -199,9 +221,14 @@ TLV data for you.
 The `Invoke` wrapper simplifies the distinction between Status responses and
 Data responses.
 
--   **Unified Result**: It returns an `InvokeResult` that acts as a single
-    container for both success/failure status and the decoded response payload
-    (if the command returns data).
+-   **Unified Result**: It returns an `InvokeResult<ResponseType>` that holds
+    both the status and the decoded response payload (if the command returns
+    data).
+-   **`IsSuccess()`**: Returns true if the status is a success and, for commands
+    that return data, a response is present.
+-   **`GetStatusCode()`**: Returns `std::optional<ClusterStatusCode>` — a
+    convenience method that lets tests check the status code with a single
+    `EXPECT_EQ()` without a prior `ASSERT_TRUE(status.has_value())`.
 -   **Synchronous execution**: The helper is designed for unit tests where
     command execution is expected to be synchronous.
 
@@ -216,12 +243,14 @@ as emitting an event or marking an attribute as "dirty" (ready for reporting).
 // 1. Perform action (e.g. write attribute)
 tester.WriteAttribute(MyAttribute::Id, newValue);
 
-// 2. Check the event generator from the underlying context
+// 2. Pop the next event from the queue
 auto event = tester.GetNextGeneratedEvent();
-if (event.has_value()) {
-   // Decode event data...
-}
+ASSERT_TRUE(event.has_value());
 
+// 3. Decode the event payload using the spec-generated decodable type
+MyCluster::Events::MyEvent::DecodableType eventData;
+ASSERT_EQ(event->GetEventData(eventData), CHIP_NO_ERROR);
+// ... verify eventData fields ...
 ```
 
 **Verifying Dirty Attributes:**
@@ -230,9 +259,9 @@ if (event.has_value()) {
 // 1. Perform action
 tester.Invoke(myCommand);
 
-// 2. Inspect the dirty list
-auto & dirtyList = tester.GetDirtyList();
-bool markedDirty = std::any_of(dirtyList.begin(), dirtyList.end(),
-    [](const auto & path){ return path.mAttributeId == MyAttribute::Id; });
+// 2. Check if a specific attribute was marked dirty
+EXPECT_TRUE(tester.IsAttributeDirty(MyAttribute::Id));
 
+// Or inspect the full dirty path list if needed
+auto & dirtyList = tester.GetDirtyList();
 ```

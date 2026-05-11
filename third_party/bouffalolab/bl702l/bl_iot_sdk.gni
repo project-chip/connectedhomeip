@@ -21,7 +21,6 @@ import("${chip_root}/src/lib/lib.gni")
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
-  enable_lwip_pbuf_ram = false
   enable_pds = false
   enable_debug_coredump = false
   coredump_binary_id = 0
@@ -41,9 +40,9 @@ template("bl_iot_sdk") {
     defines = [
       "__FILENAME__=strrchr(__FILE__,'/')?strrchr(__FILE__,'/')+1:__FILE__",
       "ARCH_RISCV",
+      "BL702L=BL702L",
       "BUILD_ROM_CODE=1",
       "BFLB_USE_HAL_DRIVER=1",
-      "BL702L=BL702L",
       "CFG_COMPONENT_BLOG_ENABLE=0",
     ]
 
@@ -58,6 +57,7 @@ template("bl_iot_sdk") {
 
     cflags = [ "-Wundef" ]
     cflags_c = [
+      "-Wno-sign-compare",
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
     ]
@@ -74,11 +74,7 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_soc") {
-    defines = [
-      "CFG_CPP_ENABLE",
-      "SYS_APP_TASK_STACK_SIZE=1024",
-      "SYS_APP_TASK_PRIORITY=15",
-    ]
+    defines = [ "CFG_CPP_ENABLE" ]
 
     sources = [
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l/evb/src/boot/gcc/start.S",
@@ -89,20 +85,9 @@ template("bl_iot_sdk") {
 
     libs = [ "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_rf/lib/libbl702l_rf.a" ]
 
-    cflags_c = [
-      "-Wno-format-truncation",
-      "-Wno-unused-variable",
-    ]
-
-    configs += [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_BSP_Driver",
-      ":${sdk_target_name}_config_hosal",
-      ":${sdk_target_name}_config_fs",
-      ":${sdk_target_name}_config_stage",
-      ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_config_freertos",
-    ]
+    cflags_c = [ "-Wno-format-truncation" ]
+    configs += [ ":${sdk_target_name}_config" ]
+    configs += [ ":${sdk_target_name}_config_freertos" ]
     public_configs = [ ":${sdk_target_name}_config_soc" ]
   }
 
@@ -130,22 +115,19 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_i2c.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_pwm.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_pwm_sc.c",
-      "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_romapi_patch.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_sec_dbg.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_sec_eng.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_spi.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_tzc_sec.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/MCU_Common/ring_buffer/ring_buffer.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/bl702l_romapi_patch.c",
     ]
-    sources += [ "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/MCU_Common/ring_buffer/ring_buffer.c" ]
+
     configs += [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_freertos",
     ]
     public_configs = [ ":${sdk_target_name}_config_BSP_Driver" ]
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-unused-variable",
-    ]
   }
 
   config("${sdk_target_name}_config_freertos") {
@@ -177,15 +159,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_freertos/timers.c",
     ]
 
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-old-style-declaration",
-    ]
-
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_freertos",
-    ]
+    cflags_c = [ "-Wno-old-style-declaration" ]
+    configs += [ ":${sdk_target_name}_config" ]
+    public_configs = [ ":${sdk_target_name}_config_freertos" ]
   }
 
   config("${sdk_target_name}_config_hosal") {
@@ -207,6 +183,10 @@ template("bl_iot_sdk") {
       defines += [ "CFG_BLE_ENABLE" ]
     }
 
+    if (defined(invoker.enable_pds) && invoker.enable_pds) {
+      defines += [ "CFG_PDS_ENABLE" ]
+    }
+
     if (defined(invoker.enable_debug_coredump) &&
         invoker.enable_debug_coredump) {
       defines += [ "SYS_ENABLE_COREDUMP" ]
@@ -224,6 +204,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_ir.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_irq.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_kys.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_pds.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_psram.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_psram_sp.S",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_pwm.c",
@@ -238,6 +219,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hal_boot2.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hal_button.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hal_gpio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hal_pds.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hal_sys.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hal_tcal.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hosal_adc.c",
@@ -253,35 +235,21 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hosal_timer.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hosal_uart.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hosal_wdg.c",
-    ]
-
-    sources += [
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
     ]
 
-    sources += [
-      "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/bl_pds.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/bl702l_hal/hal_pds.c",
-    ]
-
     cflags_c = [
-      "-Wno-unused-variable",
-      "-Wno-sign-compare",
-      "-Wno-enum-conversion",
-      "-Wno-old-style-declaration",
-      "-Wno-stringop-overflow",
       "-Wno-format-truncation",
       "-Wno-shadow",
     ]
 
     configs += [
-      ":${sdk_target_name}_config_soc",
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_BSP_Driver",
       ":${sdk_target_name}_config_stage",
       ":${sdk_target_name}_config_sys",
-      ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
@@ -291,10 +259,7 @@ template("bl_iot_sdk") {
       configs += [ ":${sdk_target_name}_config_ble" ]
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_hosal",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_hosal" ]
   }
 
   config("${sdk_target_name}_config_fs") {
@@ -313,21 +278,15 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/fs/vfs/src/vfs_inode.c",
       "${bl_iot_sdk_root}/components/fs/vfs/src/vfs_register.c",
     ]
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-builtin-declaration-mismatch",
-    ]
+
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_config_stage",
-      ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_fs",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_fs" ]
   }
 
   source_set("${sdk_target_name}_libc") {
@@ -395,18 +354,8 @@ template("bl_iot_sdk") {
       defines += [ "BFLB_COREDUMP_BINARY_ID=${invoker.coredump_binary_id}" ]
       sources +=
           [ "${bl_iot_sdk_root}/components/stage/coredump/bl_coredump.c" ]
+      cflags_c = [ "-Wno-type-limits" ]
     }
-
-    cflags_c = [ "-Wno-sign-compare" ]
-    configs += [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_BSP_Driver",
-      ":${sdk_target_name}_config_fs",
-      ":${sdk_target_name}_config_sys",
-      ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_config_freertos",
-      ":${sdk_target_name}_config_hosal",
-    ]
 
     if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
         invoker.bouffalo_sdk_component_easyflash_enabled) {
@@ -429,6 +378,16 @@ template("bl_iot_sdk") {
       ]
     }
 
+    configs += [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_fs",
+      ":${sdk_target_name}_config_sys",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+
     public_configs = [ ":${sdk_target_name}_config_stage" ]
   }
 
@@ -443,17 +402,18 @@ template("bl_iot_sdk") {
 
   source_set("${sdk_target_name}_sys") {
     include_dirs = [ "${bl_iot_sdk_root}/components/sys/bltime/include" ]
-    sources = [ "${bl_iot_sdk_root}/components/sys/blmtd/bl_mtd.c" ]
+    sources = [
+      "${bl_iot_sdk_root}/components/sys/blmtd/bl_mtd.c",
+      "${bl_iot_sdk_root}/components/sys/bltime/bl_sys_time.c",
+    ]
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_BSP_Driver",
       ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_sys",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_sys" ]
   }
 
   config("${sdk_target_name}_config_utils") {
@@ -482,27 +442,20 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/utils/src/utils_tlv_bl.c",
     ]
 
-    cflags_c = [
-      "-Wno-shadow",
-      "-Wno-sign-compare",
-      "-Wno-incompatible-pointer-types",
-    ]
+    cflags_c = [ "-Wno-shadow" ]
+
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_hosal",
-      ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_utils",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_utils" ]
   }
 
   config("${sdk_target_name}_config_mbedtls") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/include",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/port",
-      "${chip_root}/src/platform/bouffalolab/BL702L",
     ]
 
     defines = [ "MBEDTLS_CONFIG_FILE=\"bl702l-chip-mbedtls-config.h\"" ]
@@ -575,19 +528,13 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509write_csr.c",
     ]
 
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-implicit-function-declaration",
-    ]
     configs += [
+      ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_BSP_Driver",
       ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_mbedtls",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_mbedtls" ]
   }
 
   config("${sdk_target_name}_config_ble") {
@@ -606,19 +553,16 @@ template("bl_iot_sdk") {
     ]
 
     defines = [
-      "BUILD_ROM_CODE",
+      "CONFIG_BT_CONN=1",
+      "CONFIG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BT_PERIPHERAL",
       "CFG_BLE_ENABLE",
       "BFLB_BLE",
       "CFG_BLE",
       "CFG_IOT_SDK",
-      "CFG_CON=1",
-      "CFG_BLE_TX_BUFF_DATA=2",
-      "CONFIG_BT_PERIPHERAL",
-      "CONFIG_BT_BROADCASTER",
-      "CFG_EM_HEAP_DISABLE",
-      "CONFIG_BT_CONN",
-      "CONFIG_BT_HCI_VS_EVT_USER",
-      "CONFIG_BT_ASSERT",
+
+      "CONFIG_CON=1",
+      "CONFIG_BT_L2CAP_DYNAMIC_CHANNEL",
       "CONFIG_BT_GATT_CLIENT",
     ]
 
@@ -633,7 +577,7 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_ble") {
-    libs = [ "${bl_iot_sdk_root}/components/network/ble/btblecontroller_702l_m0s1p/lib/libbtblecontroller_702l_m0s1p.a" ]
+    libs = [ "${bl_iot_sdk_root}/components/network/ble/btblecontroller_bl702l_m0s1p/lib/libbtblecontroller_bl702l_m0s1p.a" ]
     if (defined(invoker.enable_pds) && invoker.enable_pds) {
       libs += [ "${bl_iot_sdk_root}/components/network/ble/btble_pds/lib/libbtble_pds.a" ]
     }
@@ -666,6 +610,11 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/port/bl_port.c",
     ]
 
+    cflags_c = [
+      "-Wno-type-limits",
+      "-Wno-misleading-indentation",
+    ]
+
     configs += [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_BSP_Driver",
@@ -674,35 +623,19 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_freertos",
     ]
     public_configs = [ ":${sdk_target_name}_config_ble" ]
-
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-unused-but-set-variable",
-      "-Wno-misleading-indentation",
-      "-Wno-format",
-      "-Wno-format-nonliteral",
-      "-Wno-format-security",
-      "-Wno-unused-function",
-      "-Wno-incompatible-pointer-types",
-      "-Wno-discarded-qualifiers",
-      "-Wno-address-of-packed-member",
-
-      "-Wno-type-limits",
-      "-Wno-shadow",
-      "-Wno-unused-variable",
-    ]
   }
 
   config("${sdk_target_name}_config_openthread_port") {
     defines = [
       "OT_FREERTOS_ENABLE=1",
       "CONFIG_LMAC154_LOG=0",
+      "NXSPI_OPENTHREAD_RADIO=0",
     ]
 
     include_dirs = [
-      "${bl_iot_sdk_root}/components/network/lmac154/lmac154/include",
       "${openthread_root}/src/core",
       "${openthread_root}/examples/platforms",
+      "${bl_iot_sdk_root}/components/network/lmac154/lmac154/include",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/include",
       "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include",
     ]
@@ -742,8 +675,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lmac154/lmac154_bl702l/lib/liblmac154_bl702l.a",
       "${bl_iot_sdk_root}/components/network/thread/openthread_utils_bl702l/lib/libopenthread_utils_bl702l.a",
     ]
-
-    cflags_c = [ "-Wno-sign-compare" ]
 
     configs += [
       ":${sdk_target_name}_config",

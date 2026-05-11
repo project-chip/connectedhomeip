@@ -21,23 +21,20 @@
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
-#include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalPowerMeasurementDelegateImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementAppCmdLineOptions.h>
-#include <PowerTopologyDelegate.h>
+#include <PowerTopologyDelegateImpl.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 
 using namespace chip;
 using namespace chip::app;

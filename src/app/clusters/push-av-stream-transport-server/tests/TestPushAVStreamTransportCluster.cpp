@@ -36,7 +36,7 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
@@ -90,17 +90,6 @@ protected:
     chip::Testing::ClusterTester mClusterTester;
 };
 
-static void CheckLogState(EventManagement & aLogMgmt, size_t expectedNumEvents, PriorityLevel aPriority)
-{
-    TLV::TLVReader reader;
-    size_t elementCount;
-    CircularEventBufferWrapper bufWrapper;
-    EXPECT_EQ(aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper), CHIP_NO_ERROR);
-
-    EXPECT_EQ(TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
-
-    EXPECT_EQ(elementCount, expectedNumEvents);
-}
 } // namespace app
 } // namespace chip
 
@@ -752,13 +741,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     ConcreteAttributePath path(1, Clusters::PushAvStreamTransport::Id,
                                Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
-    DataModel::ReadAttributeRequest request;
-    request.path = path;
-    request.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
-    DataVersion dataVersion(0);
     Access::SubjectDescriptor subjectDescriptor;
     FabricIndex peerFabricIndex   = 1;
     subjectDescriptor.fabricIndex = peerFabricIndex;
+
+    DataModel::ReadAttributeRequest request(path, subjectDescriptor);
+    request.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
+    DataVersion dataVersion(0);
     AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion, true);
 
     // Read the CurrentConnections attribute using the cluster's Read function
@@ -1571,10 +1560,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     triggerCommandData.activationReason = TriggerActivationReasonEnum::kUserInitiated;
 
     mServer.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
-
-    EventManagement & logMgmt = EventManagement::GetInstance();
-
-    CheckLogState(logMgmt, 1, PriorityLevel::Info);
 }
 
 } // namespace PushAvStreamTransport

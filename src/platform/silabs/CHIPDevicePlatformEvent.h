@@ -25,6 +25,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/silabs/CHIPDevicePlatformConfig.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/silabs/wifi/WifiInterface.h> //nogncheck
 #endif

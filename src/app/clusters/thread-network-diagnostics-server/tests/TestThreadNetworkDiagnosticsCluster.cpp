@@ -379,3 +379,26 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
         threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
+
+TEST_F(TestThreadNetworkDiagnosticsCluster, FaultAndConnectionStatusChangeTest)
+{
+    ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
+    ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // Call OnConnectionStatusChanged to ensure the logging path executes safely in tests
+    threadNetworkDiagnostics.OnConnectionStatusChanged(ConnectionStatusEnum::kConnected);
+    threadNetworkDiagnostics.OnConnectionStatusChanged(ConnectionStatusEnum::kNotConnected);
+
+    // Call OnNetworkFaultChanged to ensure formatting executes safely
+    chip::DeviceLayer::GeneralFaults<chip::DeviceLayer::kMaxNetworkFaults> previous;
+    chip::DeviceLayer::GeneralFaults<chip::DeviceLayer::kMaxNetworkFaults> current;
+
+    // No faults
+    threadNetworkDiagnostics.OnNetworkFaultChanged(previous, current);
+
+    // Add a fault and test again
+    ASSERT_EQ(current.add(to_underlying(NetworkFaultEnum::kNetworkJammed)), CHIP_NO_ERROR);
+    threadNetworkDiagnostics.OnNetworkFaultChanged(previous, current);
+
+    threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
