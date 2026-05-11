@@ -13563,6 +13563,98 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readDynamicLightingInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readDynamicLightingAvailableEffectsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingAvailableEffectsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readAvailableEffectsAttribute(
+              (ChipClusters.DynamicLightingCluster.AvailableEffectsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDynamicLightingClusterAvailableEffectsAttributeCallback(),
+          readDynamicLightingAvailableEffectsCommandParams
+        );
+        result.put("readAvailableEffectsAttribute", readDynamicLightingAvailableEffectsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDynamicLightingCurrentEffectIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingCurrentEffectIDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readCurrentEffectIDAttribute(
+              (ChipClusters.DynamicLightingCluster.CurrentEffectIDAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDynamicLightingClusterCurrentEffectIDAttributeCallback(),
+          readDynamicLightingCurrentEffectIDCommandParams
+        );
+        result.put("readCurrentEffectIDAttribute", readDynamicLightingCurrentEffectIDAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDynamicLightingCurrentSpeedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingCurrentSpeedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readCurrentSpeedAttribute(
+              (ChipClusters.DynamicLightingCluster.CurrentSpeedAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDynamicLightingClusterCurrentSpeedAttributeCallback(),
+          readDynamicLightingCurrentSpeedCommandParams
+        );
+        result.put("readCurrentSpeedAttribute", readDynamicLightingCurrentSpeedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDynamicLightingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.DynamicLightingCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDynamicLightingClusterGeneratedCommandListAttributeCallback(),
+          readDynamicLightingGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readDynamicLightingGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDynamicLightingAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.DynamicLightingCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDynamicLightingClusterAcceptedCommandListAttributeCallback(),
+          readDynamicLightingAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readDynamicLightingAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDynamicLightingAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.DynamicLightingCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDynamicLightingClusterAttributeListAttributeCallback(),
+          readDynamicLightingAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readDynamicLightingAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDynamicLightingFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readDynamicLightingFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readDynamicLightingFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDynamicLightingClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDynamicLightingClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DynamicLightingCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDynamicLightingClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readDynamicLightingClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readIlluminanceMeasurementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readIlluminanceMeasurementMeasuredValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIlluminanceMeasurementMeasuredValueAttributeInteractionInfo = new InteractionInfo(
@@ -21471,6 +21563,7 @@ public class ClusterReadMapping {
             put("humidistat", readHumidistatInteractionInfo());
             put("colorControl", readColorControlInteractionInfo());
             put("ballastConfiguration", readBallastConfigurationInteractionInfo());
+            put("dynamicLighting", readDynamicLightingInteractionInfo());
             put("illuminanceMeasurement", readIlluminanceMeasurementInteractionInfo());
             put("temperatureMeasurement", readTemperatureMeasurementInteractionInfo());
             put("pressureMeasurement", readPressureMeasurementInteractionInfo());

@@ -40,6 +40,10 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#ifdef SL_MATTER_ENABLE_AWS
+#include "MatterAws.h"
+#endif // SL_MATTER_ENABLE_AWS
+
 #include <app/ConcreteAttributePath.h>
 
 #include <assert.h>

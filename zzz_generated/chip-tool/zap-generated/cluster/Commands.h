@@ -125,6 +125,7 @@
 | Humidistat                                                          | 0x0205 |
 | ColorControl                                                        | 0x0300 |
 | BallastConfiguration                                                | 0x0301 |
+| DynamicLighting                                                     | 0x0305 |
 | IlluminanceMeasurement                                              | 0x0400 |
 | TemperatureMeasurement                                              | 0x0402 |
 | PressureMeasurement                                                 | 0x0403 |
@@ -11239,6 +11240,106 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster DynamicLighting                                             | 0x0305 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * StartEffect                                                       |   0x00 |
+| * StopEffect                                                        |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * AvailableEffects                                                  | 0x0000 |
+| * CurrentEffectID                                                   | 0x0001 |
+| * CurrentSpeed                                                      | 0x0002 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command StartEffect
+ */
+class DynamicLightingStartEffect : public ClusterCommand
+{
+public:
+    DynamicLightingStartEffect(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("start-effect", credsIssuerConfig), mComplex_ColorPalette(&mRequest.colorPalette)
+    {
+        AddArgument("EffectID", 0, UINT16_MAX, &mRequest.effectID);
+        AddArgument("Speed", 0, UINT16_MAX, &mRequest.speed);
+        AddArgument("ColorMode", 0, UINT8_MAX, &mRequest.colorMode);
+        AddArgument("ColorPalette", &mComplex_ColorPalette);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DynamicLighting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DynamicLighting::Commands::StartEffect::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DynamicLighting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DynamicLighting::Commands::StartEffect::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DynamicLighting::Commands::StartEffect::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::Type>>>
+        mComplex_ColorPalette;
+};
+
+/*
+ * Command StopEffect
+ */
+class DynamicLightingStopEffect : public ClusterCommand
+{
+public:
+    DynamicLightingStopEffect(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-effect", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DynamicLighting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DynamicLighting::Commands::StopEffect::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DynamicLighting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DynamicLighting::Commands::StopEffect::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DynamicLighting::Commands::StopEffect::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster IlluminanceMeasurement                                      | 0x0400 |
@@ -28306,6 +28407,69 @@ void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCo
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterDynamicLighting(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::DynamicLighting;
+
+    const char * clusterName = "DynamicLighting";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),         //
+        make_unique<DynamicLightingStartEffect>(credsIssuerConfig), //
+        make_unique<DynamicLightingStopEffect>(credsIssuerConfig),  //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "available-effects", Attributes::AvailableEffects::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "current-effect-id", Attributes::CurrentEffectID::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "current-speed", Attributes::CurrentSpeed::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::DynamicLighting::Structs::EffectStruct::Type>>>(
+            Id, "available-effects", Attributes::AvailableEffects::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "current-effect-id", 0, UINT16_MAX,
+                                                                              Attributes::CurrentEffectID::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
+            Id, "current-speed", 0, UINT16_MAX, Attributes::CurrentSpeed::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "available-effects", Attributes::AvailableEffects::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "current-effect-id", Attributes::CurrentEffectID::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "current-speed", Attributes::CurrentSpeed::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterIlluminanceMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::IlluminanceMeasurement;
@@ -33433,6 +33597,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterHumidistat(commands, credsIssuerConfig);
     registerClusterColorControl(commands, credsIssuerConfig);
     registerClusterBallastConfiguration(commands, credsIssuerConfig);
+    registerClusterDynamicLighting(commands, credsIssuerConfig);
     registerClusterIlluminanceMeasurement(commands, credsIssuerConfig);
     registerClusterTemperatureMeasurement(commands, credsIssuerConfig);
     registerClusterPressureMeasurement(commands, credsIssuerConfig);

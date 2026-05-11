@@ -349,12 +349,12 @@ class LintRulesTransformer(Transformer):
         return Discard
 
     @v_args(inline=True)
-    def required_server_cluster(self, id):
-        return ServerClusterRequirement(ClusterActionEnum.REQUIRE, id)
+    def required_server_cluster(self, cluster_id):
+        return ServerClusterRequirement(ClusterActionEnum.REQUIRE, cluster_id)
 
     @v_args(inline=True)
-    def rejected_server_cluster(self, id):
-        return ServerClusterRequirement(ClusterActionEnum.REJECT, id)
+    def rejected_server_cluster(self, cluster_id):
+        return ServerClusterRequirement(ClusterActionEnum.REJECT, cluster_id)
 
     @v_args(inline=True)
     def denylist_cluster_attribute(self, cluster_id, attribute_id):
