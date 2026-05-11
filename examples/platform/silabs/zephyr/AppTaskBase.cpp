@@ -335,7 +335,7 @@ void chip::Zephyr::App::AppTaskBase::StartCommissioning(intptr_t arg)
     }
     else
     {
-        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        RETURN_SAFELY_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
 }
 

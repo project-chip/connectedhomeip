@@ -56,7 +56,7 @@ target_sources(app
     ${ZEPHYR_PLATFORM_COMMON}/AppTaskZephyr.cpp
     ${ZEPHYR_PLATFORM_COMMON}/CHIPDeviceManager.cpp
     ${ZEPHYR_PLATFORM_COMMON}/CommonDeviceCallbacks.cpp
-    ${ZEPHYR_PLATFORM_COMMON}/ZclCallbacks.cpp
+    ${ZEPHYR_PLATFORM_COMMON}/DataModelCallbacks.cpp
 )
 
 # TODO Implement OTA support
