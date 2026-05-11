@@ -31,6 +31,7 @@
 #error "Please include <ble/Ble.h> instead!"
 #endif
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 
