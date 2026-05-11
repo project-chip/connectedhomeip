@@ -59,6 +59,7 @@
 #include <clusters/DishwasherAlarm/CommandIds.h>
 #include <clusters/DishwasherMode/CommandIds.h>
 #include <clusters/DoorLock/CommandIds.h>
+#include <clusters/DynamicLighting/CommandIds.h>
 #include <clusters/EcosystemInformation/CommandIds.h>
 #include <clusters/ElectricalEnergyMeasurement/CommandIds.h>
 #include <clusters/ElectricalGridConditions/CommandIds.h>

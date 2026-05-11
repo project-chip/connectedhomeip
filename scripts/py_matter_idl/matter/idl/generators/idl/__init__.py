@@ -195,7 +195,7 @@ class IdlGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="MatterIdl.jinja",
             output_file_name="idl.matter",
-            vars={
+            template_vars={
                 'idl': self.idl
             }
         )

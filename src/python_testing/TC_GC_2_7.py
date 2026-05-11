@@ -79,6 +79,7 @@ class TC_GC_2_7(MatterBaseTest):
             TestStep(8, "On F1, iteratively Join additional PerGroup groups using a new GroupID every time until A_max groups have been joined. JoinGroup (GroupID=Gn, Endpoints='see notes', KeySetID=K1, McastAddrPolicy=PerGroup)"),
             TestStep(9, "TH awaits subscription report of new UsedMcastAddrCount within max interval. (value == A_max)"),
             TestStep(10, "Attempt to join 1 additional PerGroup group beyond A_max"),
+            TestStep(11, "Cleanup: Remove F2"),
         ]
 
     def pics_TC_GC_2_7(self) -> list[str]:
@@ -184,6 +185,7 @@ class TC_GC_2_7(MatterBaseTest):
 
         f2_current_group_count = 0
         self.step("6a")
+        fabric_index_2 = None
         if A_max < math.floor(M_max / 2):
             self.mark_step_range_skipped("6b", "7b")
         else:
@@ -192,7 +194,8 @@ class TC_GC_2_7(MatterBaseTest):
             self.discriminatorTH2 = random.randint(0, 4095)
             # Create TH2 controller
             th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-            th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+            fabric_index_2 = self.th1.fabricId + 1
+            th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=fabric_index_2)
             self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
             # Open commissioning window on TH1
@@ -266,6 +269,18 @@ class TC_GC_2_7(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ResourceExhausted,
                                  f"Send JoinGroup command error should be {Status.ResourceExhausted} instead of {e.status}")
+
+        if fabric_index_2 is None:
+            self.skip_step(11)
+        else:
+            self.step(11)
+            # Use TH1 to remove TH2's fabric
+            logger.info(f"Cleaning up: Removing TH2 fabric at index {self.th2.fabricId}")
+            await self.th1.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=0,
+                payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=self.th2.fabricId)
+            )
 
 
 if __name__ == "__main__":
