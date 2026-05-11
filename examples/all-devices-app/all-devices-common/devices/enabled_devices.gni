@@ -1,0 +1,114 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Authoritative device-selection configuration for the GN (POSIX) build.
+# Parallel to all-devices-common/devices/enabled_devices.cmake for the CMake build.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+declare_args() {
+  # List of device types to enable. Empty list (default) means all devices.
+  # Use the factory registry key for each device: "contact-sensor", "on-off-light", etc.
+  all_devices_enabled_devices = []
+
+  # Output binary name override. Empty string (default) means auto-computed:
+  #   all devices enabled  →  "all-devices-app"
+  #   subset selected      →  "example-device-app"
+  # Any non-empty value is used as-is regardless of the device list.
+  all_devices_app_name = ""
+}
+
+# Private helper — only used within this file.
+_all_devices_all_enabled = all_devices_enabled_devices == []
+
+# Devices available: list of "config name" and "define suffix"
+#
+# Added define suffix because gn has no "to uppercase" method beyond executing a script
+# and exec_script seemed excessive.
+#
+# IMPORTANT:
+#   - Keep list in sync with enabled_devices.cmake
+#   - Remember to also update enabled_devices_config.h.in
+#   - Update scripts/build/build/targets.py to include the new device
+_available_devices = [
+  [
+    "chime",
+    "CHIME",
+  ],
+  [
+    "contact-sensor",
+    "CONTACT_SENSOR",
+  ],
+  [
+    "dimmable-light",
+    "DIMMABLE_LIGHT",
+  ],
+  [
+    "occupancy-sensor",
+    "OCCUPANCY_SENSOR",
+  ],
+  [
+    "on-off-light",
+    "ON_OFF_LIGHT",
+  ],
+  [
+    "soil-sensor",
+    "SOIL_SENSOR",
+  ],
+  [
+    "speaker",
+    "SPEAKER",
+  ],
+  [
+    "temperature-sensor",
+    "TEMPERATURE_SENSOR",
+  ],
+  [
+    "water-leak-detector",
+    "WATER_LEAK_DETECTOR",
+  ],
+]
+
+# Computed output binary name — mirrors the three-way logic in enabled_devices.cmake.
+# Exported (no leading underscore) so that posix/BUILD.gn can use it as output_name.
+if (all_devices_app_name != "") {
+  all_devices_computed_name = all_devices_app_name
+} else if (all_devices_enabled_devices == []) {
+  all_devices_computed_name = "all-devices-app"
+} else {
+  all_devices_computed_name = "example-device-app"
+}
+
+template("enabled_devices_buildconfig_header") {
+  buildconfig_header(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "header",
+                             "header_dir",
+                           ])
+
+    defines = []
+
+    foreach(_available_device, _available_devices) {
+      _enabled = _all_devices_all_enabled
+      foreach(_device, all_devices_enabled_devices) {
+        if (_device == _available_device[0]) {
+          _enabled = true
+        }
+      }
+      _name = _available_device[1]
+      defines += [ "ALL_DEVICES_ENABLE_${_name}=${_enabled}" ]
+    }
+  }
+}

@@ -23,22 +23,33 @@
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
 class AppOptions
 {
 public:
+    struct AppConfig
+    {
+        std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
+        bool enableWiFi = false;
+        std::string kvsPath;
+        std::optional<uint16_t> discriminator;
+        std::optional<uint16_t> vendorId;
+        std::optional<uint16_t> productId;
+        std::optional<uint16_t> port;
+        std::optional<uint32_t> interfaceId;
+    };
+
     static chip::ArgParser::OptionSet * GetOptions();
-
-    static bool EnableWiFi() { return mEnableWiFi; }
-
-    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries();
+    static const AppConfig & GetConfig();
+    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
     static DeviceTypeParser sParser;
-    static bool mEnableWiFi;
+    static AppConfig mConfig;
 };

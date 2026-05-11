@@ -113,11 +113,11 @@ CHIP_ERROR DeviceTypeParser::ParseSingleDeviceString(const char * value)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    mDeviceConfigs.push_back(std::move(entry));
+    mDeviceTypeEntries.push_back(std::move(entry));
     return CHIP_NO_ERROR;
 }
 
 const std::vector<DeviceTypeParser::Entry> & DeviceTypeParser::GetDeviceTypeEntries()
 {
-    return mDeviceConfigs;
+    return mDeviceTypeEntries;
 }

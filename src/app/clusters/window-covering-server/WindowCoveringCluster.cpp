@@ -51,9 +51,9 @@ static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "W
 
 WindowCoverAttrAccess gAttrAccess;
 
-Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
+WindowCoveringDelegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
 
-Delegate * GetDelegate(EndpointId endpoint)
+WindowCoveringDelegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
@@ -606,7 +606,7 @@ Status GetMotionLockStatus(chip::EndpointId endpoint)
     return Status::Success;
 }
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDefaultDelegate(EndpointId endpoint, WindowCoveringDelegate * delegate)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
@@ -658,7 +658,7 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
     }
 
-    Delegate * delegate = GetDelegate(endpoint);
+    WindowCoveringDelegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
         if (HasFeature(endpoint, Feature::kPositionAwareLift))
@@ -709,7 +709,7 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     }
     commandObj->AddStatus(commandPath, Status::Success);
 
-    Delegate * delegate = GetDelegate(endpoint);
+    WindowCoveringDelegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
         if (HasFeature(endpoint, Feature::kPositionAwareLift))
@@ -751,7 +751,7 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
 
     bool changeTarget = true;
 
-    Delegate * delegate = GetDelegate(endpoint);
+    WindowCoveringDelegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
         CHIP_ERROR err = delegate->HandleStopMotion();
@@ -812,7 +812,7 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
     if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
-        Delegate * delegate = GetDelegate(endpoint);
+        WindowCoveringDelegate * delegate = GetDelegate(endpoint);
         if (delegate)
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
@@ -856,7 +856,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
         if (IsPercent100thsValid(percent100ths))
         {
             Attributes::TargetPositionLiftPercent100ths::Set(endpoint, percent100ths);
-            Delegate * delegate = GetDelegate(endpoint);
+            WindowCoveringDelegate * delegate = GetDelegate(endpoint);
             if (delegate)
             {
                 LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
@@ -904,7 +904,7 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
     if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
-        Delegate * delegate = GetDelegate(endpoint);
+        WindowCoveringDelegate * delegate = GetDelegate(endpoint);
         if (delegate)
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
@@ -948,7 +948,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
         if (IsPercent100thsValid(percent100ths))
         {
             Attributes::TargetPositionTiltPercent100ths::Set(endpoint, percent100ths);
-            Delegate * delegate = GetDelegate(endpoint);
+            WindowCoveringDelegate * delegate = GetDelegate(endpoint);
             if (delegate)
             {
                 LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));

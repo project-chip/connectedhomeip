@@ -1,0 +1,18 @@
+// NOTE:
+//    all-devices-common/devices/enabled_devices_config.h.in
+//    is a TEMPLATE to generate device enable/disable flags
+//
+// DO NOT EDIT except in template format ('.h.in' extension).
+// If this shows up as a `.h` file, it is generated and should not be
+// manually edited
+#pragma once
+
+#cmakedefine01 ALL_DEVICES_ENABLE_CONTACT_SENSOR
+#cmakedefine01 ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR
+#cmakedefine01 ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR
+#cmakedefine01 ALL_DEVICES_ENABLE_CHIME
+#cmakedefine01 ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
+#cmakedefine01 ALL_DEVICES_ENABLE_ON_OFF_LIGHT
+#cmakedefine01 ALL_DEVICES_ENABLE_SPEAKER
+#cmakedefine01 ALL_DEVICES_ENABLE_SOIL_SENSOR
+#cmakedefine01 ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR

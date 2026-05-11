@@ -24,7 +24,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Run Issue Bot
               uses: derjuulsn/todo-issue@main
               with:
