@@ -550,10 +550,14 @@ class AttributeSubscriptionHandler:
 
         Fails immediately if any report whose ``.value`` is in ``forbidden_values`` arrives
         before ``target_value``.  Fails with a timeout error if ``target_value`` is not seen
-        within ``timeout_sec``.
+        within ``timeout_sec``. Works with a single attribute subscription queue, so it is
+        the caller's responsibility to ensure that only relevant reports are enqueued (e.g.
+        by using a dedicated subscription or flushing irrelevant reports before calling this
+        method).
 
         Unlike :meth:`await_all_expected_report_matches`, each report is evaluated exactly
-        once at dequeue time, with no polling re-evaluation drift.
+        once at dequeue time, with no polling re-evaluation drift. Works with a single
+        attribute subscription queue.
 
         Args:
             target_value: The ``.value`` to wait for.
@@ -609,7 +613,10 @@ class AttributeSubscriptionHandler:
         collected but not checked, so a state that is forbidden early but expected near the
         boundary (e.g. kDownloading once the minimum re-query delay has passed) will not
         cause a spurious failure.  Reports arriving after ``duration_sec`` are not seen
-        because the method has already returned.
+        because the method has already returned. Works with a single attribute subscription
+        queue, so it is the caller's responsibility to ensure that only relevant reports are
+        enqueued (e.g. by using a dedicated subscription or flushing irrelevant reports before
+        calling this method).
 
         The method always waits the full ``duration_sec`` regardless of ``tolerance_sec``,
         so the caller's elapsed-time assertion can use ``>= duration_sec`` without adjustment.
@@ -617,7 +624,7 @@ class AttributeSubscriptionHandler:
         Unlike :meth:`await_all_expected_report_matches`, this method evaluates each report
         exactly once, at the moment it is dequeued, so the check is immune to the polling
         re-evaluation drift that occurs when ``time.time()`` is sampled inside a matcher
-        callback.
+        callback. Expected to work with a single attribute subscription queue.
 
         Args:
             duration_sec: Total time to block (e.g. 120 s).
