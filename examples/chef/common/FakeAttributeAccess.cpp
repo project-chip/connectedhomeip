@@ -43,6 +43,14 @@
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #endif
 
+#if MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/switch-server/CodegenIntegration.h>
+#endif
+
+#if MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -253,6 +261,67 @@ public:
             }
             break;
 #endif // MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case Switch::Id:
+            switch (path.mAttributeId)
+            {
+            case Switch::Attributes::CurrentPosition::Id: {
+                uint8_t currentPosition;
+                CHIP_ERROR err = decoder.Decode(currentPosition);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode switch current position: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                auto switchCluster = Switch::FindClusterOnEndpoint(path.mEndpointId);
+                if (switchCluster == nullptr)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to find switch cluster on endpoint: %d", path.mEndpointId);
+                    return ::pw::Status::Internal();
+                }
+                err = switchCluster->SetCurrentPosition(currentPosition);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set switch current position: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+#endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case RelativeHumidityMeasurement::Id:
+            switch (path.mAttributeId)
+            {
+            case RelativeHumidityMeasurement::Attributes::MeasuredValue::Id: {
+                DataModel::Nullable<uint16_t> measuredValue;
+                CHIP_ERROR err = decoder.Decode(measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode relative humidity measurement measured value: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                    return ::pw::Status::Internal();
+                }
+                auto relativeHumidityMeasurementCluster = RelativeHumidityMeasurement::FindClusterOnEndpoint(path.mEndpointId);
+                if (relativeHumidityMeasurementCluster == nullptr)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to find relative humidity measurement cluster on endpoint: %d",
+                                 path.mEndpointId);
+                    return ::pw::Status::Internal();
+                }
+                err = relativeHumidityMeasurementCluster->SetMeasuredValue(measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set relative humidity measurement measured value: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+#endif // MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         }
         return std::nullopt;
     }

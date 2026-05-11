@@ -196,7 +196,7 @@ void DnssdServer::GetPrimaryOrFallbackMACAddress(MutableByteSpan & mac)
         if (std::all_of(std::begin(mFallbackMAC), std::end(mFallbackMAC), [](uint8_t v) { return v == 0; }))
         {
             ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mFallbackMAC, sizeof(mFallbackMAC));
+            LogErrorOnFailure(Crypto::DRBG_get_bytes(mFallbackMAC, sizeof(mFallbackMAC)));
         }
         VerifyOrDie(mac.size() == sizeof(mFallbackMAC)); // kPrimaryMACAddressLength
         memcpy(mac.data(), mFallbackMAC, sizeof(mFallbackMAC));

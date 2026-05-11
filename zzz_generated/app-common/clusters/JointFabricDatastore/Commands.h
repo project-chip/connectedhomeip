@@ -324,7 +324,7 @@ public:
     DataModel::Nullable<uint16_t> groupKeySetID;
     DataModel::Nullable<uint16_t> groupCAT;
     DataModel::Nullable<uint16_t> groupCATVersion;
-    DatastoreAccessControlEntryPrivilegeEnum groupPermission = static_cast<DatastoreAccessControlEntryPrivilegeEnum>(0);
+    DataModel::Nullable<DatastoreAccessControlEntryPrivilegeEnum> groupPermission;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -345,7 +345,7 @@ public:
     DataModel::Nullable<uint16_t> groupKeySetID;
     DataModel::Nullable<uint16_t> groupCAT;
     DataModel::Nullable<uint16_t> groupCATVersion;
-    DatastoreAccessControlEntryPrivilegeEnum groupPermission = static_cast<DatastoreAccessControlEntryPrivilegeEnum>(0);
+    DataModel::Nullable<DatastoreAccessControlEntryPrivilegeEnum> groupPermission;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -442,9 +442,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UpdateAdmin::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
 
-    DataModel::Nullable<chip::NodeId> nodeID;
-    DataModel::Nullable<chip::CharSpan> friendlyName;
-    DataModel::Nullable<chip::ByteSpan> icac;
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    Optional<chip::CharSpan> friendlyName;
+    Optional<chip::ByteSpan> icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -460,9 +460,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::Nullable<chip::NodeId> nodeID;
-    DataModel::Nullable<chip::CharSpan> friendlyName;
-    DataModel::Nullable<chip::ByteSpan> icac;
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    Optional<chip::CharSpan> friendlyName;
+    Optional<chip::ByteSpan> icac;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -350,7 +350,10 @@ template("efr32_sdk") {
         defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
       }
 
-      defines += [ "MGM24" ]
+      defines += [
+        "MGM24",
+        "_SILICON_LABS_MODULE=1",
+      ]
     } else if (silabs_family == "efr32mg26") {
       _include_dirs += [
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/EFR32MG26/Include",
@@ -1005,6 +1008,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/EFR32MG24/Source/system_efr32mg24.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/clocks/sl_device_clock_efr32xg24.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg24.c",
+        "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_curves_efr32.c",
       ]
     } else if (silabs_family == "mgm24") {
       sources += [
@@ -1020,6 +1024,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/EFR32MG26/Source/system_efr32mg26.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/clocks/sl_device_clock_efr32xg26.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg26.c",
+        "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_curves_efr32.c",
       ]
     }
 
@@ -1036,7 +1041,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/service/mpu/src/sl_mpu_s2.c",
         "${efr32_sdk_root}/platform_core/platform/service/power_manager/src/sleep_loop/sl_power_manager_hal_s2.c",
         "${efr32_sdk_root}/platform_core/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
-        "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_curves_efr32.c",
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_rssi/sl_rail_util_rssi.c",
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_sequencer/sl_rail_util_sequencer.c",
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",
