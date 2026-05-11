@@ -674,7 +674,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 asserts.assert_equal(val, 5)
 
                 # Test Harness restores the original value of MinSetpointDeadBand
-                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue / 10), endpoint_id=endpoint)
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue // 10), endpoint_id=endpoint)
 
         self.step("11b")
 
@@ -697,7 +697,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(127), endpoint_id=endpoint)
 
             # Test Harness restores the original value of MinSetpointDeadBand
-            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue / 10), endpoint_id=endpoint)
+            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue // 10), endpoint_id=endpoint)
 
         self.step("12")
 
