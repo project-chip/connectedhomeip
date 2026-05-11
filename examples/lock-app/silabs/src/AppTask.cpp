@@ -241,8 +241,8 @@ CHIP_ERROR AppTask::AppInit()
     }
 
     DlLockState bootState = appInstance().NextState() ? DlLockState::kUnlocked : DlLockState::kLocked;
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
-        UpdateClusterState, static_cast<intptr_t>(chip::to_underlying(bootState)));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
+                                                                           static_cast<intptr_t>(chip::to_underlying(bootState)));
 
     ConfigurationMgr().LogDeviceConfig();
 
