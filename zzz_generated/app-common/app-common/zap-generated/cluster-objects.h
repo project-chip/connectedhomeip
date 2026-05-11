@@ -179,6 +179,10 @@
 #include <clusters/DoorLock/Commands.h>
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Structs.h>
+#include <clusters/DynamicLighting/Attributes.h>
+#include <clusters/DynamicLighting/Commands.h>
+#include <clusters/DynamicLighting/Events.h>
+#include <clusters/DynamicLighting/Structs.h>
 #include <clusters/EcosystemInformation/Attributes.h>
 #include <clusters/EcosystemInformation/Commands.h>
 #include <clusters/EcosystemInformation/Events.h>

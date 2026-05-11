@@ -58,7 +58,7 @@ public:
 
         // Get UserActiveModeTriggerHint
         BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Get(endpointId, &userActiveModeTriggerHint) !=
+        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::GetDefault(endpointId, &userActiveModeTriggerHint) !=
             Protocols::InteractionModel::Status::Success)
         {
             ChipLogError(Zcl, "Failed to get UserActiveModeTriggerHint, using default (0)");
@@ -69,7 +69,7 @@ public:
         char instructionBuffer[kUserActiveModeTriggerInstructionMaxLength];
         MutableCharSpan instructionSpan(instructionBuffer);
 
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Get(endpointId, instructionSpan) !=
+        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::GetDefault(endpointId, instructionSpan) !=
             Protocols::InteractionModel::Status::Success)
         {
             ChipLogError(Zcl, "Failed to get UserActiveModeTriggerInstruction, using default (empty string)");

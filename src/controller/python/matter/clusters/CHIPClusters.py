@@ -10020,6 +10020,79 @@ class ChipClusters:
             },
         },
     }
+    _DYNAMIC_LIGHTING_CLUSTER_INFO = {
+        "clusterName": "DynamicLighting",
+        "clusterId": 0x00000305,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "StartEffect",
+                "args": {
+                    "effectID": "int",
+                    "speed": "int",
+                    "colorMode": "int",
+                    "colorPalette": "EffectColorStruct",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "StopEffect",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "AvailableEffects",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentEffectID",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CurrentSpeed",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO = {
         "clusterName": "IlluminanceMeasurement",
         "clusterId": 0x00000400,
@@ -16426,6 +16499,7 @@ class ChipClusters:
         0x00000205: _HUMIDISTAT_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x00000301: _BALLAST_CONFIGURATION_CLUSTER_INFO,
+        0x00000305: _DYNAMIC_LIGHTING_CLUSTER_INFO,
         0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
         0x00000402: _TEMPERATURE_MEASUREMENT_CLUSTER_INFO,
         0x00000403: _PRESSURE_MEASUREMENT_CLUSTER_INFO,
@@ -16575,6 +16649,7 @@ class ChipClusters:
         "Humidistat": _HUMIDISTAT_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "BallastConfiguration": _BALLAST_CONFIGURATION_CLUSTER_INFO,
+        "DynamicLighting": _DYNAMIC_LIGHTING_CLUSTER_INFO,
         "IlluminanceMeasurement": _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
         "TemperatureMeasurement": _TEMPERATURE_MEASUREMENT_CLUSTER_INFO,
         "PressureMeasurement": _PRESSURE_MEASUREMENT_CLUSTER_INFO,
