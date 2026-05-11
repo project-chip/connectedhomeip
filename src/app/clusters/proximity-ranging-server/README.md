@@ -9,20 +9,23 @@ UWB).
 
 This directory contains a code-driven C++ implementation of the Matter Proximity
 Ranging cluster server (cluster ID `0x0433`). The implementation follows the
-`DefaultServerCluster` pattern with `CodegenIntegration` (matching the
-BooleanStateConfiguration cluster pattern) and delegates all technology-specific
-operations to a `ProximityRangingDriver` set via `SetDriver()`.
+`DefaultServerCluster` pattern with a `Config` + Builder API for feature
+configuration and `CodegenIntegration` for ZAP-based deployments. All
+technology-specific runtime operations are delegated to a
+`ProximityRangingDriver` set via `SetDriver()`.
 
 The cluster handles:
 
 -   Matter protocol interactions (attribute reads, command dispatch)
+-   Feature map ownership (immutable, set at construction via Config)
 -   Session ID allocation and tracking
 -   Event emission for ranging results and session status changes
 -   Attribute change notifications from the driver
 
 The application is responsible for:
 
--   Implementing the `ProximityRangingDriver` interface
+-   Configuring which features are supported (via `Config` builders)
+-   Implementing the `ProximityRangingDriver` interface for runtime behavior
 -   Owning ranging technology adapters and the controller
 -   Persisting device identity attributes (e.g., BLE Device ID)
 
@@ -56,23 +59,48 @@ The application is responsible for:
 
 ## Features
 
-The cluster supports the following optional features:
+The cluster supports the following optional features, configured at construction
+time via `Config` builder methods:
 
--   **Wi-Fi USD Proximity Detection (WFUSDPD)**: Ranging based on Wi-Fi USD.
--   **Bluetooth Channel Sounding (BLTCS)**: Ranging based on Bluetooth Channel
-    Sounding.
--   **BLE Beacon RSSI (BLERBC)**: Ranging based on BLE Beacon RSSI. Enables the
-    `BLEDeviceId` attribute.
+-   **Wi-Fi USD Proximity Detection (WFUSDPD)**:
+    `Config::WithWiFiUSDProximityDetection()` — enables ranging based on Wi-Fi
+    USD and the `WiFiDevIK` attribute.
+-   **Bluetooth Channel Sounding (BLTCS)**:
+    `Config::WithBluetoothChannelSounding()` — enables ranging based on
+    Bluetooth Channel Sounding and the `BLTDevIK`, `BLTCSSecurityLevel`, and
+    `BLTCSModeCapability` attributes.
+-   **BLE Beacon RSSI (BLERBC)**: `Config::WithBleBeaconRssi()` — enables
+    ranging based on BLE Beacon RSSI and the `BLEDeviceId` attribute.
+-   **UWB Ranging (UWB)**: `Config::WithUWBRanging()` — enables ranging based on
+    Ultra-Wideband.
 
-At least one feature must be enabled.
+Each `With...()` method atomically sets the feature bit and marks the mandatory
+associated attributes as present. At least one feature must be enabled.
 
 ## CodegenIntegration
 
 The cluster uses `CodegenIntegration.cpp` to bridge between ZAP-generated
 endpoint configuration and the code-driven cluster. The framework calls
 `MatterProximityRangingClusterInitCallback` which registers the cluster via
-`LazyRegisteredServerCluster`. The application then calls
-`FindClusterOnEndpoint()` to get the cluster instance and set the driver:
+`LazyRegisteredServerCluster`. The bridge reads the feature map from ember
+attribute storage and translates it into `Config` builder calls:
+
+```cpp
+// Inside CodegenIntegration.cpp — CreateRegistration()
+ProximityRangingCluster::Config config(endpointId);
+BitMask<Feature> features(featureMap);
+
+if (features.Has(Feature::kBleBeaconRssi))
+    config.WithBleBeaconRssi();
+if (features.Has(Feature::kBluetoothChannelSounding))
+    config.WithBluetoothChannelSounding();
+// ...
+
+gServers[idx].Create(config);
+```
+
+The application then calls `FindClusterOnEndpoint()` to get the cluster instance
+and set the driver:
 
 ```cpp
 #include <app/clusters/proximity-ranging-server/CodegenIntegration.h>
@@ -89,7 +117,38 @@ if (cluster != nullptr)
 The all-devices-app demonstrates the recommended integration pattern where
 platform-specific code owns the ranging infrastructure.
 
-### 1. Platform Override File
+### 1. Cluster Construction
+
+The cluster is constructed with a `Config` that declares supported features. In
+the CodeDriven path, the application iterates its adapters to configure features
+directly — no intermediate feature map computation needed:
+
+```cpp
+ProximityRanging::ProximityRangingCluster::Config config(endpoint);
+for (auto * adapter : adapters)
+{
+    switch (adapter->GetTechnology())
+    {
+    case RangingTechEnum::kBluetoothChannelSounding:
+        config.WithBluetoothChannelSounding();
+        break;
+    case RangingTechEnum::kWiFiRoundTripTimeRanging:
+    case RangingTechEnum::kWiFiNextGenerationRanging:
+        config.WithWiFiUSDProximityDetection();
+        break;
+    case RangingTechEnum::kBLEBeaconRSSIRanging:
+        config.WithBleBeaconRssi();
+        break;
+    default:
+        break;
+    }
+}
+
+mCluster.Create(config);
+mCluster.Cluster().SetDriver(&myDriver);
+```
+
+### 2. Platform Override File
 
 Each platform (POSIX, ESP32) has a `DeviceFactoryPlatformOverride` that owns the
 controller, driver, and adapter as statics:
@@ -101,7 +160,7 @@ using namespace chip::app::Clusters::ProximityRanging;
 
 DarwinBleRssiRangingAdapter sBleAdapter;
 RangingTechnologyController sRangingController;
-DefaultProximityRangingDriver sRangingDriver{ sRangingController, BitMask<Feature>(Feature::kBleBeaconRssi) };
+DefaultProximityRangingDriver sRangingDriver{ sRangingController };
 } // namespace
 
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
@@ -118,7 +177,7 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
 }
 ```
 
-### 2. Implement a Platform Adapter
+### 3. Implement a Platform Adapter
 
 Platform adapters inherit from `BleRssiRangingAdapter` (which provides
 encode/decode and technology identification) and implement session management:
@@ -143,7 +202,7 @@ public:
 };
 ```
 
-### 3. Lifecycle
+### 4. Lifecycle
 
 The `DefaultProximityRangingDriver` connects to the controller via
 `AddListener`/`RemoveListener`:
@@ -164,7 +223,6 @@ program exit.
 | `HandleStartRanging()`     | Start a ranging session (synchronous)                 |
 | `HandleStopRanging()`      | Stop a ranging session (synchronous)                  |
 | `GetRangingCapabilities()` | Encode the list of supported capabilities             |
-| `GetFeatureMap()`          | Return the feature bitmap for this driver             |
 | `GetActiveSessionIds()`    | Return active session IDs (for session ID generation) |
 | `GetBleDeviceId()`         | Return BLE Device ID (optional, BLERBC feature)       |
 | `GetWiFiDevIK()`           | Return Wi-Fi Device Identity Key (optional, WFUSDPD)  |

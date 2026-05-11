@@ -69,7 +69,6 @@ public:
             return listEncoder.Encode(cap);
         });
     }
-    BitMask<Feature> GetFeatureMap() override { return mFeatureMap; }
 
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override
     {
@@ -104,7 +103,6 @@ public:
     ResultCodeEnum mStartRangingResult   = ResultCodeEnum::kAccepted;
     CHIP_ERROR mStopRangingError         = CHIP_NO_ERROR;
     CHIP_ERROR mGetActiveSessionIdsError = CHIP_NO_ERROR;
-    BitMask<Feature> mFeatureMap;
     std::vector<uint8_t> mActiveSessionIds;
     uint8_t mLastStartSessionId = 0;
     uint8_t mLastStopSessionId  = 0;
@@ -123,7 +121,7 @@ struct TestProximityRangingCluster : public ::testing::Test
 
 TEST_F(TestProximityRangingCluster, TestAttributeListMandatoryOnly)
 {
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -132,15 +130,12 @@ TEST_F(TestProximityRangingCluster, TestAttributeListMandatoryOnly)
                                         }));
 }
 
-TEST_F(TestProximityRangingCluster, TestAttributeListWithOptional)
+TEST_F(TestProximityRangingCluster, TestAttributeListWithAllFeatures)
 {
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::OptionalAttributes()
-                                        .Set<Attributes::WiFiDevIK::Id>()
-                                        .Set<Attributes::BLEDeviceID::Id>()
-                                        .Set<Attributes::BLTDevIK::Id>()
-                                        .Set<Attributes::BLTCSSecurityLevel::Id>()
-                                        .Set<Attributes::BLTCSModeCapability::Id>());
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId)
+                                        .WithWiFiUSDProximityDetection()
+                                        .WithBleBeaconRssi()
+                                        .WithBluetoothChannelSounding());
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -154,9 +149,98 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithOptional)
                                         }));
 }
 
+TEST_F(TestProximityRangingCluster, TestAttributeListWithBleBeaconRssi)
+{
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
+
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::RangingCapabilities::kMetadataEntry,
+                                            Attributes::BLEDeviceID::kMetadataEntry,
+                                            Attributes::SessionIDList::kMetadataEntry,
+                                        }));
+}
+
+TEST_F(TestProximityRangingCluster, TestAttributeListWithBluetoothChannelSounding)
+{
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBluetoothChannelSounding());
+
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::RangingCapabilities::kMetadataEntry,
+                                            Attributes::BLTDevIK::kMetadataEntry,
+                                            Attributes::BLTCSSecurityLevel::kMetadataEntry,
+                                            Attributes::BLTCSModeCapability::kMetadataEntry,
+                                            Attributes::SessionIDList::kMetadataEntry,
+                                        }));
+}
+
+TEST_F(TestProximityRangingCluster, TestAttributeListWithWiFiUSDProximityDetection)
+{
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection());
+
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::RangingCapabilities::kMetadataEntry,
+                                            Attributes::WiFiDevIK::kMetadataEntry,
+                                            Attributes::SessionIDList::kMetadataEntry,
+                                        }));
+}
+
+TEST_F(TestProximityRangingCluster, TestAttributeListWithUWBRanging)
+{
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithUWBRanging());
+
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::RangingCapabilities::kMetadataEntry,
+                                            Attributes::SessionIDList::kMetadataEntry,
+                                        }));
+}
+
+TEST_F(TestProximityRangingCluster, TestFeatureMapMultipleFeatures)
+{
+    TestServerClusterContext context;
+    MockProximityRangingDriver driver;
+
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId)
+                                        .WithBleBeaconRssi()
+                                        .WithBluetoothChannelSounding()
+                                        .WithWiFiUSDProximityDetection()
+                                        .WithUWBRanging());
+    cluster.SetDriver(&driver);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    uint32_t featureMap = 0;
+    EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap,
+              static_cast<uint32_t>(Feature::kBleBeaconRssi) | static_cast<uint32_t>(Feature::kBluetoothChannelSounding) |
+                  static_cast<uint32_t>(Feature::kWiFiUsdProximityDetection) | static_cast<uint32_t>(Feature::kUwbRanging));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestReadAttributeNotInFeatureMap)
+{
+    TestServerClusterContext context;
+    MockProximityRangingDriver driver;
+
+    // Only WiFi feature enabled — BLEDeviceID should not be readable
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection());
+    cluster.SetDriver(&driver);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    uint64_t bleId = 0;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::BLEDeviceID::Id, bleId), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestProximityRangingCluster, TestAcceptedCommands)
 {
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
 
     ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
@@ -167,7 +251,7 @@ TEST_F(TestProximityRangingCluster, TestAcceptedCommands)
 
 TEST_F(TestProximityRangingCluster, TestGeneratedCommands)
 {
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
 
     ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::StartRangingResponse::Id }));
 }
@@ -175,7 +259,7 @@ TEST_F(TestProximityRangingCluster, TestGeneratedCommands)
 TEST_F(TestProximityRangingCluster, TestStartupWithoutDriver)
 {
     TestServerClusterContext context;
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_ERROR_INCORRECT_STATE);
 }
@@ -186,7 +270,7 @@ TEST_F(TestProximityRangingCluster, TestStartupDriverInitFailure)
     MockProximityRangingDriver driver;
     driver.mInitError = CHIP_ERROR_INTERNAL;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_ERROR_INTERNAL);
@@ -197,7 +281,7 @@ TEST_F(TestProximityRangingCluster, TestStartupShutdownLifecycle)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -210,9 +294,8 @@ TEST_F(TestProximityRangingCluster, TestReadFeatureMap)
 {
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
-    driver.mFeatureMap = BitMask<Feature>(Feature::kBleBeaconRssi);
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -229,7 +312,7 @@ TEST_F(TestProximityRangingCluster, TestReadClusterRevision)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -246,7 +329,7 @@ TEST_F(TestProximityRangingCluster, TestReadRangingCapabilities)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -267,14 +350,18 @@ TEST_F(TestProximityRangingCluster, TestReadSessionIdListEmpty)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
     Attributes::SessionIDList::TypeInfo::DecodableType sessionList;
     EXPECT_EQ(tester.ReadAttribute(Attributes::SessionIDList::Id, sessionList), CHIP_NO_ERROR);
-    EXPECT_TRUE(sessionList.IsNull());
+    EXPECT_FALSE(sessionList.IsNull());
+
+    size_t count = 0;
+    EXPECT_EQ(sessionList.Value().ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -285,7 +372,7 @@ TEST_F(TestProximityRangingCluster, TestReadSessionIdListNonEmpty)
     MockProximityRangingDriver driver;
     driver.mActiveSessionIds = { 5, 10, 15 };
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -313,8 +400,7 @@ TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdSupported)
     driver.mBleDeviceIdSupported = true;
     driver.mBleDeviceId          = 0x1234;
 
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::OptionalAttributes().Set<Attributes::BLEDeviceID::Id>());
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -331,8 +417,7 @@ TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdUnsupported)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::OptionalAttributes().Set<Attributes::BLEDeviceID::Id>());
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -350,8 +435,7 @@ TEST_F(TestProximityRangingCluster, TestReadWiFiDevIKSupported)
     driver.mWiFiDevIKSupported = true;
     memset(driver.mWiFiDevIK, 0xAB, sizeof(driver.mWiFiDevIK));
 
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::OptionalAttributes().Set<Attributes::WiFiDevIK::Id>());
+    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection());
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -369,12 +453,8 @@ TEST_F(TestProximityRangingCluster, TestReadOptionalAttributeUnsupportedByDriver
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::OptionalAttributes()
-                                        .Set<Attributes::WiFiDevIK::Id>()
-                                        .Set<Attributes::BLTDevIK::Id>()
-                                        .Set<Attributes::BLTCSSecurityLevel::Id>()
-                                        .Set<Attributes::BLTCSModeCapability::Id>());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection().WithBluetoothChannelSounding());
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -396,7 +476,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
     MockProximityRangingDriver driver;
     driver.mStartRangingResult = ResultCodeEnum::kAccepted;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -427,7 +507,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingRejected)
     MockProximityRangingDriver driver;
     driver.mStartRangingResult = ResultCodeEnum::kRejectedInfeasibleRanging;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -455,7 +535,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingCapacityExhausted)
     MockProximityRangingDriver driver;
     driver.mGetActiveSessionIdsError = CHIP_ERROR_INTERNAL;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -484,7 +564,7 @@ TEST_F(TestProximityRangingCluster, TestStopRangingSuccess)
     MockProximityRangingDriver driver;
     driver.mStopRangingError = CHIP_NO_ERROR;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -505,7 +585,7 @@ TEST_F(TestProximityRangingCluster, TestStopRangingNotFound)
     MockProximityRangingDriver driver;
     driver.mStopRangingError = CHIP_ERROR_NOT_FOUND;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -517,7 +597,7 @@ TEST_F(TestProximityRangingCluster, TestStopRangingNotFound)
     EXPECT_FALSE(result.IsSuccess());
     if (result.GetStatusCode().has_value())
     {
-        EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+        EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
     }
     else
     {
@@ -533,7 +613,7 @@ TEST_F(TestProximityRangingCluster, TestStopRangingFailure)
     MockProximityRangingDriver driver;
     driver.mStopRangingError = CHIP_ERROR_INTERNAL;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -560,7 +640,7 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -592,7 +672,7 @@ TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(kTestEndpointId, {});
+    ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 

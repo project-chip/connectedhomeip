@@ -90,11 +90,6 @@ public:
     virtual CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder) = 0;
 
     /**
-     * Get the feature map for this driver.
-     */
-    virtual BitMask<Feature> GetFeatureMap() = 0;
-
-    /**
      * Collect active session IDs across all ranging technologies.
      */
     virtual CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }

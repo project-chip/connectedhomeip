@@ -39,7 +39,27 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId, ProximityRangingCluster::OptionalAttributes(optionalAttributeBits));
+        ProximityRangingCluster::Config config(endpointId);
+        BitMask<Feature> features(featureMap);
+
+        if (features.Has(Feature::kBleBeaconRssi))
+        {
+            config.WithBleBeaconRssi();
+        }
+        if (features.Has(Feature::kBluetoothChannelSounding))
+        {
+            config.WithBluetoothChannelSounding();
+        }
+        if (features.Has(Feature::kWiFiUsdProximityDetection))
+        {
+            config.WithWiFiUSDProximityDetection();
+        }
+        if (features.Has(Feature::kUwbRanging))
+        {
+            config.WithUWBRanging();
+        }
+
+        gServers[clusterInstanceIndex].Create(config);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -65,7 +85,7 @@ void MatterProximityRangingClusterInitCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kProximityRangingFixedClusterCount,
             .maxClusterInstanceCount   = kProximityRangingMaxClusterCount,
             .fetchFeatureMap           = true,
-            .fetchOptionalAttributes   = true,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }

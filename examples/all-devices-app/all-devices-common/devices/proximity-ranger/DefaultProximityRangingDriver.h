@@ -32,12 +32,9 @@ namespace ProximityRanging {
 class DefaultProximityRangingDriver : public ProximityRangingDriver, public RangingTechnologyController::Listener
 {
 public:
-    explicit DefaultProximityRangingDriver(RangingTechnologyController & controller, BitMask<Feature> features = {}) :
-        mController(controller), mFeatures(features)
-    {}
+    explicit DefaultProximityRangingDriver(RangingTechnologyController & controller) : mController(controller) {}
 
     // ProximityRangingDriver implementation
-    BitMask<Feature> GetFeatureMap() override { return mFeatures; }
     CHIP_ERROR Init(Callback & callback) override;
     void Shutdown() override;
     ResultCodeEnum HandleStartRanging(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) override;
@@ -53,7 +50,6 @@ public:
 
 private:
     RangingTechnologyController & mController;
-    BitMask<Feature> mFeatures;
     Callback * mCallback = nullptr;
 };
 

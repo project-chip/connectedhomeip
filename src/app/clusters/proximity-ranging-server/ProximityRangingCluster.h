@@ -18,7 +18,6 @@
 
 #include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProximityRanging/ClusterId.h>
 #include <clusters/ProximityRanging/CommandIds.h>
@@ -50,12 +49,49 @@ public:
     /// Maximum Device Identity Key length for Wi-Fi USD and BTCS
     static constexpr size_t kDeviceIdentityKeyLen = 16;
 
-    using OptionalAttributes =
-        OptionalAttributeSet<Attributes::WiFiDevIK::Id, Attributes::BLEDeviceID::Id, Attributes::BLTDevIK::Id,
-                             Attributes::BLTCSSecurityLevel::Id, Attributes::BLTCSModeCapability::Id>;
+    /**
+     * Configuration builder for ProximityRangingCluster.
+     *
+     * Each With...() method sets the corresponding feature bit.
+     */
+    class Config
+    {
+    public:
+        explicit Config(EndpointId endpoint) : mEndpointId(endpoint) {}
 
-    ProximityRangingCluster(EndpointId endpointId, OptionalAttributes optionalAttributes) :
-        DefaultServerCluster({ endpointId, ProximityRanging::Id }), mOptionalAttributes(optionalAttributes)
+        Config & WithBleBeaconRssi()
+        {
+            mFeatureMap.Set(Feature::kBleBeaconRssi);
+            return *this;
+        }
+
+        Config & WithBluetoothChannelSounding()
+        {
+            mFeatureMap.Set(Feature::kBluetoothChannelSounding);
+            return *this;
+        }
+
+        Config & WithWiFiUSDProximityDetection()
+        {
+            mFeatureMap.Set(Feature::kWiFiUsdProximityDetection);
+            return *this;
+        }
+
+        Config & WithUWBRanging()
+        {
+            mFeatureMap.Set(Feature::kUwbRanging);
+            return *this;
+        }
+
+    private:
+        friend class ProximityRangingCluster;
+
+        BitMask<Feature> mFeatureMap;
+        EndpointId mEndpointId;
+    };
+
+    explicit ProximityRangingCluster(const Config & config) :
+        DefaultServerCluster({ config.mEndpointId, ProximityRanging::Id }), mFeatureMap(config.mFeatureMap)
     {}
 
     void SetDriver(ProximityRangingDriver * driver) { mDriver = driver; }
@@ -91,7 +127,7 @@ private:
 
     // Members
     ProximityRangingDriver * mDriver = nullptr;
-    const OptionalAttributes mOptionalAttributes;
+    const BitMask<Feature> mFeatureMap;
 
     uint8_t mNextSessionId = 0;
 };

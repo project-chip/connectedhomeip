@@ -124,7 +124,7 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
     }
 
     case Attributes::FeatureMap::Id:
-        return encoder.Encode(mDriver->GetFeatureMap());
+        return encoder.Encode(mFeatureMap);
 
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(ProximityRanging::kRevision);
@@ -137,17 +137,17 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
 CHIP_ERROR ProximityRangingCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    static constexpr DataModel::AttributeEntry kOptionalAttributesMeta[] = {
-        ProximityRanging::Attributes::WiFiDevIK::kMetadataEntry,
-        ProximityRanging::Attributes::BLEDeviceID::kMetadataEntry,
-        ProximityRanging::Attributes::BLTDevIK::kMetadataEntry,
-        ProximityRanging::Attributes::BLTCSSecurityLevel::kMetadataEntry,
-        ProximityRanging::Attributes::BLTCSModeCapability::kMetadataEntry,
+    using OptionalEntry               = AttributeListBuilder::OptionalAttributeEntry;
+    OptionalEntry featureAttributes[] = {
+        { mFeatureMap.Has(Feature::kWiFiUsdProximityDetection), Attributes::WiFiDevIK::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kBleBeaconRssi), Attributes::BLEDeviceID::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kBluetoothChannelSounding), Attributes::BLTDevIK::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kBluetoothChannelSounding), Attributes::BLTCSSecurityLevel::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kBluetoothChannelSounding), Attributes::BLTCSModeCapability::kMetadataEntry },
     };
 
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(ProximityRanging::Attributes::kMandatoryMetadata),
-                              Span<const DataModel::AttributeEntry>(kOptionalAttributesMeta), mOptionalAttributes);
+    return listBuilder.Append(Span(ProximityRanging::Attributes::kMandatoryMetadata), Span(featureAttributes));
 }
 
 CHIP_ERROR ProximityRangingCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -199,7 +199,6 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
     }
     else
     {
-        // Driver is responsible for validating configurations of request and returning response accordingly
         resultCode = mDriver->HandleStartRanging(sessionId, commandData);
     }
 
