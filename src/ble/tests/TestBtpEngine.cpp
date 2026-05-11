@@ -666,25 +666,37 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
 
 TEST_F(TestBtpEngine, EnforcesMinFragmentSize)
 {
-    // Default is 20.
-    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), 20);
-    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), 20);
 
-    // Set to a value smaller than sMinFragmentSize (which is 6).
-    mBtpEngine.SetTxFragmentSize(3);
-    mBtpEngine.SetRxFragmentSize(3);
+    const uint16_t belowMinFragmentSize = static_cast<uint16_t>(BtpEngine::sMinFragmentSize - 1);
+    const uint16_t aboveMinFragmentSize = static_cast<uint16_t>(BtpEngine::sMinFragmentSize + 4);
+    const uint16_t aboveMaxFragmentSize = static_cast<uint16_t>(BtpEngine::sMaxFragmentSize + 3);
+    // Default should match the engine constant.
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), BtpEngine::sDefaultFragmentSize);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), BtpEngine::sDefaultFragmentSize);
+
+    // Set to a value smaller than sMinFragmentSize.
+    mBtpEngine.SetTxFragmentSize(belowMinFragmentSize);
+    mBtpEngine.SetRxFragmentSize(belowMinFragmentSize);
 
     // Verify that it is clamped to sMinFragmentSize.
     EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), BtpEngine::sMinFragmentSize);
     EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), BtpEngine::sMinFragmentSize);
 
     // Set to a value larger than sMinFragmentSize.
-    mBtpEngine.SetTxFragmentSize(10);
-    mBtpEngine.SetRxFragmentSize(10);
+    mBtpEngine.SetTxFragmentSize(aboveMinFragmentSize);
+    mBtpEngine.SetRxFragmentSize(aboveMinFragmentSize);
 
     // Verify that it is set correctly.
-    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), 10);
-    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), 10);
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), aboveMinFragmentSize;
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), aboveMinFragmentSize);
+
+    // Set to a value larger than sMaxFragmentSize.
+    mBtpEngine.SetTxFragmentSize(aboveMaxFragmentSize);
+    mBtpEngine.SetRxFragmentSize(aboveMaxFragmentSize);
+
+    // Verify that it is clamped to sMaxFragmentSize
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), BtpEngine::sMaxFragmentSize);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), BtpEngine::sMaxFragmentSize);
 }
 
 } // namespace
