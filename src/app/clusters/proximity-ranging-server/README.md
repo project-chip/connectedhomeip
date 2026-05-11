@@ -72,7 +72,7 @@ time via `Config` builder methods:
 -   **BLE Beacon RSSI (BLERBC)**: `Config::WithBleBeaconRssi()` — enables
     ranging based on BLE Beacon RSSI and the `BLEDeviceId` attribute.
 -   **UWB Ranging (UWB)**: `Config::WithUWBRanging()` — enables ranging based on
-    Ultra-Wideband.
+    UWB.
 
 Each `With...()` method atomically sets the feature bit and marks the mandatory
 associated attributes as present. At least one feature must be enabled.
