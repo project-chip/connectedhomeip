@@ -102,15 +102,15 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
         # Start the server and register in the exit stack.
         exit_stack.enter_context(server)
 
-    class Server(SimpleXMLRPCServer, threading.Thread):
+    class Server(SimpleXMLRPCServer):
         def __init__(self, stop_timeout_sec: float):
-            SimpleXMLRPCServer.__init__(self, addr=(IP, PORT))
+            super().__init__(addr=(IP, PORT))
 
             self._stop_timeout_sec = stop_timeout_sec
-            threading.Thread.__init__(self, name="Server", target=self.serve_forever, daemon=True)
+            self._thread = threading.Thread(name="Server", target=self.serve_forever, daemon=True)
 
         def __enter__(self) -> Self:
-            threading.Thread.start(self)
+            self._thread.start()
             return self
 
         def __exit__(self, *args: Any) -> None:
@@ -118,8 +118,8 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
             self.shutdown()
 
             log.debug("Waiting for XMLRPC Server thread to stop")
-            self.join(timeout=self._stop_timeout_sec)
-            if self.is_alive():
+            self._thread.join(timeout=self._stop_timeout_sec)
+            if self._thread.is_alive():
                 log.error("XMLRPC Server thread failed to stop")
             self.server_close()
 
