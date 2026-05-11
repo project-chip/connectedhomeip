@@ -128,6 +128,10 @@ is the primary reference for this implementation pattern.
     constructor directly, not stored in the `Config` object. This allows the
     same `Config` instance to be reused across multiple cluster instances on
     different endpoints.
+-   **Separate Member Variables:** Extract configuration values from the
+    `Config` object into separate member variables within the cluster class,
+    rather than storing the `Config` object itself. This allows making immutable
+    configuration values `const` (enhancing safety) and reduces coupling.
 
 **Example Implementation (from LevelControlCluster):**
 
@@ -476,7 +480,8 @@ Unit tests should reside in `src/app/clusters/<cluster-name>/tests/`.
 
 Use the `chip::Testing::ClusterTester` utility to write your unit tests. This
 modern API removes the need to manually mock encoders, handlers, or raw TLV
-buffers. More on [ClusterTester Helper Class Guide](cluster_tester.md).
+buffers. More on
+[ClusterTester Helper Class Guide](../cluster_and_device_type_dev/cluster_tester.md).
 
 -   **Test Setup:** Create a mock delegate to inject fake data into your cluster
     instance.

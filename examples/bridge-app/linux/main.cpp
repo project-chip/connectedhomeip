@@ -269,8 +269,6 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             CHIP_ERROR err;
             while (true)
             {
-                // Todo: Update this to schedule the work rather than use this lock
-                DeviceLayer::StackLock lock;
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
 #if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
@@ -328,9 +326,6 @@ int RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
-            // Todo: Update this to schedule the work rather than use this lock
-            DeviceLayer::StackLock lock;
-
             gDevices[index]->Unregister();
 
             // Silence complaints about unused ep when progress logging
@@ -692,141 +687,149 @@ bool kbhit()
 
 const int16_t oneDegree = 100;
 
+void handle_char_input(int ch)
+{
+    static bool light1_added = true;
+    static bool light2_added = false;
+
+    // Commands used for the actions bridge test plan.
+    if (ch == '2' && light2_added == false)
+    {
+        // TC-BR-2 step 2, Add Light2
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+        AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight2DataVersions), 1);
+#else
+        AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight2DataVersions), ""_span, 1);
+#endif
+        light2_added = true;
+    }
+    else if (ch == '4' && light1_added == true)
+    {
+        // TC-BR-2 step 4, Remove Light 1
+        RemoveDeviceEndpoint(&Light1);
+        light1_added = false;
+    }
+    if (ch == '5' && light1_added == false)
+    {
+        // TC-BR-2 step 5, Add Light 1 back
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+        AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight2DataVersions), 1);
+#else
+        AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight1DataVersions), ""_span, 1);
+#endif
+        light1_added = true;
+    }
+    if (ch == 'b')
+    {
+        // TC-BR-3 step 1b, rename lights
+        if (light1_added)
+        {
+            Light1.SetName("Light 1b");
+        }
+        if (light2_added)
+        {
+            Light2.SetName("Light 2b");
+        }
+    }
+    if (ch == 'c')
+    {
+        // TC-BR-3 step 2c, change the state of the lights
+        if (light1_added)
+        {
+            Light1.Toggle();
+        }
+        if (light2_added)
+        {
+            Light2.Toggle();
+        }
+    }
+    if (ch == 't')
+    {
+        // TC-BR-4 step 1g, change the state of the temperature sensors
+        TempSensor1.SetMeasuredValue(static_cast<int16_t>(TempSensor1.GetMeasuredValue() + oneDegree));
+        TempSensor2.SetMeasuredValue(static_cast<int16_t>(TempSensor2.GetMeasuredValue() + oneDegree));
+        ComposedTempSensor1.SetMeasuredValue(static_cast<int16_t>(ComposedTempSensor1.GetMeasuredValue() + oneDegree));
+        ComposedTempSensor2.SetMeasuredValue(static_cast<int16_t>(ComposedTempSensor2.GetMeasuredValue() + oneDegree));
+    }
+
+    // Commands used for the actions cluster test plan.
+    if (ch == 'r')
+    {
+        // TC-ACT-2.2 step 2c, rename "Room 1"
+        room1.setName("Room 1 renamed");
+        ActionLight1.SetLocation(room1.getName());
+        ActionLight2.SetLocation(room1.getName());
+    }
+    if (ch == 'f')
+    {
+        // TC-ACT-2.2 step 2f, move "Action Light 3" from "Room 2" to "Room 1"
+        ActionLight3.SetLocation(room1.getName());
+    }
+    if (ch == 'i')
+    {
+        // TC-ACT-2.2 step 2i, remove "Room 2" (make it not visible in the endpoint list), do not remove the lights
+        room2.setIsVisible(false);
+    }
+    if (ch == 'l')
+    {
+        // TC-ACT-2.2 step 2l, add a new "Zone 3" and add "Action Light 2" to the new zone
+        room3.setIsVisible(true);
+        ActionLight2.SetZone("Zone 3");
+    }
+    if (ch == 'm')
+    {
+        // TC-ACT-2.2 step 3c, rename "Turn on Room 1 lights"
+        action1.setName("Turn On Room 1");
+    }
+    if (ch == 'n')
+    {
+        // TC-ACT-2.2 step 3f, remove "Turn on Room 2 lights"
+        action2.setIsVisible(false);
+    }
+    if (ch == 'o')
+    {
+        // TC-ACT-2.2 step 3i, add "Turn off Room 1 renamed lights"
+        action3.setIsVisible(true);
+    }
+
+    // Commands used for the Bridged Device Basic Information test plan
+    if (ch == 'u')
+    {
+        // TC-BRBINFO-2.2 step 2 "Set reachable to false"
+        TempSensor1.SetReachable(false);
+    }
+    if (ch == 'v')
+    {
+        // TC-BRBINFO-2.2 step 2 "Set reachable to true"
+        TempSensor1.SetReachable(true);
+    }
+    if (ch == 'w')
+    {
+        // TC-BRBINFO-3.2 step 3
+        Light1.IncreaseConfigurationVersion();
+    }
+}
+
 void * bridge_polling_thread(void * context)
 {
-    bool light1_added = true;
-    bool light2_added = false;
     while (true)
     {
         if (kbhit())
         {
             int ch = getchar();
 
-            // Commands used for the actions bridge test plan.
-            if (ch == '2' && light2_added == false)
-            {
-                // TC-BR-2 step 2, Add Light2
-#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-                AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight2DataVersions), 1);
-#else
-                AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight2DataVersions), ""_span, 1);
-#endif
-                light2_added = true;
-            }
-            else if (ch == '4' && light1_added == true)
-            {
-                // TC-BR-2 step 4, Remove Light 1
-                RemoveDeviceEndpoint(&Light1);
-                light1_added = false;
-            }
-            if (ch == '5' && light1_added == false)
-            {
-                // TC-BR-2 step 5, Add Light 1 back
-#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-                AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight2DataVersions), 1);
-#else
-                AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight1DataVersions), ""_span, 1);
-#endif
-                light1_added = true;
-            }
-            if (ch == 'b')
-            {
-                // TC-BR-3 step 1b, rename lights
-                if (light1_added)
-                {
-                    Light1.SetName("Light 1b");
-                }
-                if (light2_added)
-                {
-                    Light2.SetName("Light 2b");
-                }
-            }
-            if (ch == 'c')
-            {
-                // TC-BR-3 step 2c, change the state of the lights
-                if (light1_added)
-                {
-                    Light1.Toggle();
-                }
-                if (light2_added)
-                {
-                    Light2.Toggle();
-                }
-            }
-            if (ch == 't')
-            {
-                // TC-BR-4 step 1g, change the state of the temperature sensors
-                TempSensor1.SetMeasuredValue(static_cast<int16_t>(TempSensor1.GetMeasuredValue() + oneDegree));
-                TempSensor2.SetMeasuredValue(static_cast<int16_t>(TempSensor2.GetMeasuredValue() + oneDegree));
-                ComposedTempSensor1.SetMeasuredValue(static_cast<int16_t>(ComposedTempSensor1.GetMeasuredValue() + oneDegree));
-                ComposedTempSensor2.SetMeasuredValue(static_cast<int16_t>(ComposedTempSensor2.GetMeasuredValue() + oneDegree));
-            }
-
-            // Commands used for the actions cluster test plan.
-            if (ch == 'r')
-            {
-                // TC-ACT-2.2 step 2c, rename "Room 1"
-                room1.setName("Room 1 renamed");
-                ActionLight1.SetLocation(room1.getName());
-                ActionLight2.SetLocation(room1.getName());
-            }
-            if (ch == 'f')
-            {
-                // TC-ACT-2.2 step 2f, move "Action Light 3" from "Room 2" to "Room 1"
-                ActionLight3.SetLocation(room1.getName());
-            }
-            if (ch == 'i')
-            {
-                // TC-ACT-2.2 step 2i, remove "Room 2" (make it not visible in the endpoint list), do not remove the lights
-                room2.setIsVisible(false);
-            }
-            if (ch == 'l')
-            {
-                // TC-ACT-2.2 step 2l, add a new "Zone 3" and add "Action Light 2" to the new zone
-                room3.setIsVisible(true);
-                ActionLight2.SetZone("Zone 3");
-            }
-            if (ch == 'm')
-            {
-                // TC-ACT-2.2 step 3c, rename "Turn on Room 1 lights"
-                action1.setName("Turn On Room 1");
-            }
-            if (ch == 'n')
-            {
-                // TC-ACT-2.2 step 3f, remove "Turn on Room 2 lights"
-                action2.setIsVisible(false);
-            }
-            if (ch == 'o')
-            {
-                // TC-ACT-2.2 step 3i, add "Turn off Room 1 renamed lights"
-                action3.setIsVisible(true);
-            }
-
-            // Commands used for the Bridged Device Basic Information test plan
-            if (ch == 'u')
-            {
-                // TC-BRBINFO-2.2 step 2 "Set reachable to false"
-                TempSensor1.SetReachable(false);
-            }
-            if (ch == 'v')
-            {
-                // TC-BRBINFO-2.2 step 2 "Set reachable to true"
-                TempSensor1.SetReachable(true);
-            }
-            if (ch == 'w')
-            {
-                // TC-BRBINFO-3.2 step 3
-                Light1.IncreaseConfigurationVersion();
-            }
-            continue;
+            // MUST be on the chip thread, as we access device properties
+            DeviceLayer::SystemLayer().ScheduleLambda([ch]() { handle_char_input(ch); });
         }
-
-        // Sleep to avoid tight loop reading commands
-        usleep(POLL_INTERVAL_MS * 1000);
+        else
+        {
+            // Sleep to avoid tight loop reading commands
+            usleep(POLL_INTERVAL_MS * 1000);
+        }
     }
 
     return nullptr;

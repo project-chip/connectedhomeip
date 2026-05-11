@@ -129,7 +129,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 
 ### Writing List Attributes
 
--   There are (Mainly) two patterns used to write list attributes, and cluster
+-   There are two main patterns used to write list attributes, and cluster
     servers usually support both of them.
 -   For that reason, ClusterTester provides a `WriteAttribute` overload for
     lists that takes a `ListWritingPattern`
@@ -221,9 +221,14 @@ TLV data for you.
 The `Invoke` wrapper simplifies the distinction between Status responses and
 Data responses.
 
--   **Unified Result**: It returns an `InvokeResult` that acts as a single
-    container for both success/failure status and the decoded response payload
-    (if the command returns data).
+-   **Unified Result**: It returns an `InvokeResult<ResponseType>` that holds
+    both the status and the decoded response payload (if the command returns
+    data).
+-   **`IsSuccess()`**: Returns true if the status is a success and, for commands
+    that return data, a response is present.
+-   **`GetStatusCode()`**: Returns `std::optional<ClusterStatusCode>` — a
+    convenience method that lets tests check the status code with a single
+    `EXPECT_EQ()` without a prior `ASSERT_TRUE(status.has_value())`.
 -   **Synchronous execution**: The helper is designed for unit tests where
     command execution is expected to be synchronous.
 
@@ -238,12 +243,14 @@ as emitting an event or marking an attribute as "dirty" (ready for reporting).
 // 1. Perform action (e.g. write attribute)
 tester.WriteAttribute(MyAttribute::Id, newValue);
 
-// 2. Check the event generator from the underlying context
+// 2. Pop the next event from the queue
 auto event = tester.GetNextGeneratedEvent();
-if (event.has_value()) {
-   // Decode event data...
-}
+ASSERT_TRUE(event.has_value());
 
+// 3. Decode the event payload using the spec-generated decodable type
+MyCluster::Events::MyEvent::DecodableType eventData;
+ASSERT_EQ(event->GetEventData(eventData), CHIP_NO_ERROR);
+// ... verify eventData fields ...
 ```
 
 **Verifying Dirty Attributes:**
@@ -252,9 +259,9 @@ if (event.has_value()) {
 // 1. Perform action
 tester.Invoke(myCommand);
 
-// 2. Inspect the dirty list
-auto & dirtyList = tester.GetDirtyList();
-bool markedDirty = std::any_of(dirtyList.begin(), dirtyList.end(),
-    [](const auto & path){ return path.mAttributeId == MyAttribute::Id; });
+// 2. Check if a specific attribute was marked dirty
+EXPECT_TRUE(tester.IsAttributeDirty(MyAttribute::Id));
 
+// Or inspect the full dirty path list if needed
+auto & dirtyList = tester.GetDirtyList();
 ```

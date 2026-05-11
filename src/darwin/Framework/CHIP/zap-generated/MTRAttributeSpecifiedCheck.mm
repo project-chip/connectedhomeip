@@ -4535,6 +4535,40 @@ static BOOL AttributeIsSpecifiedInBallastConfigurationCluster(AttributeId aAttri
     }
     }
 }
+static BOOL AttributeIsSpecifiedInDynamicLightingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DynamicLighting;
+    switch (aAttributeId) {
+    case Attributes::AvailableEffects::Id: {
+        return YES;
+    }
+    case Attributes::CurrentEffectID::Id: {
+        return YES;
+    }
+    case Attributes::CurrentSpeed::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known DynamicLighting attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInIlluminanceMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::IlluminanceMeasurement;
@@ -5522,6 +5556,40 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
     }
     default: {
         // Not a known ProximityRanging attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInNetworkIdentityManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aAttributeId) {
+    case Attributes::ActiveNetworkIdentities::Id: {
+        return YES;
+    }
+    case Attributes::Clients::Id: {
+        return YES;
+    }
+    case Attributes::ClientTableSize::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known NetworkIdentityManagement attribute.
         return NO;
     }
     }
@@ -7458,6 +7526,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::BallastConfiguration::Id: {
         return AttributeIsSpecifiedInBallastConfigurationCluster(aAttributeId);
     }
+    case Clusters::DynamicLighting::Id: {
+        return AttributeIsSpecifiedInDynamicLightingCluster(aAttributeId);
+    }
     case Clusters::IlluminanceMeasurement::Id: {
         return AttributeIsSpecifiedInIlluminanceMeasurementCluster(aAttributeId);
     }
@@ -7514,6 +7585,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ProximityRanging::Id: {
         return AttributeIsSpecifiedInProximityRangingCluster(aAttributeId);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return AttributeIsSpecifiedInNetworkIdentityManagementCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);

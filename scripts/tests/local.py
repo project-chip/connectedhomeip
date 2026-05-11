@@ -294,7 +294,7 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             env_key="LIGHTING_APP_NO_UNIQUE_ID",
             cli_key="lighting",
             target=f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-wifi-{suffix}",
-            binary="chip-lighting-app",
+            binary="chip-lighting-data-model-no-unique-id-app",
         )
     )
 
@@ -1326,7 +1326,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:181
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:<VERSION>
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

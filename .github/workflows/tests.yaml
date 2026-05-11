@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:190
+            image: ghcr.io/project-chip/chip-build:193
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v6.0.2
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -139,6 +139,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/humidistat-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proximity-ranging-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
@@ -633,10 +634,12 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Setup Environment
-              # coreutils for stdbuf
-              run: brew install coreutils
+              # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
+              run: |
+                brew install coreutils
+                echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
             - name: Install ccache
               run: |
                 brew install ccache
@@ -824,7 +827,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:190
+            image: ghcr.io/project-chip/chip-build:193
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -844,7 +847,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -1094,7 +1097,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:190
+            image: ghcr.io/project-chip/chip-build:193
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1113,7 +1116,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -1158,7 +1161,7 @@ jobs:
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app-${BUILD_VARIANT}-clang/jfa-app" >> /tmp/test_env.yaml
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app-${BUILD_VARIANT}-clang/jfc-app" >> /tmp/test_env.yaml
-                  echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
+                  echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-data-model-no-unique-id-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-clang-test/lit-icd-app" >> /tmp/test_env.yaml
                   echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
                   echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-clang-test-unified/chip-ota-provider-app" >> /tmp/test_env.yaml
@@ -1187,6 +1190,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceTest.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCreateNewController.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDefaultWarnings.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestMatterTestingSupport.py'
@@ -1196,8 +1200,11 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingNamespace.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestStepExtractor.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestTestMetadata.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestFactoryResetRequests.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
+
             - name: Run Tests (individual)
               if: ${{matrix.filter == ''}}
               run: |
@@ -1285,7 +1292,7 @@ jobs:
 
       steps:
           - name: Checkout
-            uses: actions/checkout@v6
+            uses: actions/checkout@v6.0.2
 
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
@@ -1300,9 +1307,10 @@ jobs:
                 report_paths: junit-results/**/*.xml
                 detailed_summary: true
                 require_tests: false
+                annotate_only: true
 
           - name: Checkout gh-pages for Allure history
-            uses: actions/checkout@v6
+            uses: actions/checkout@v6.0.2
             with:
                 ref: gh-pages
                 path: gh-pages
@@ -1359,10 +1367,12 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Setup Environment
-              # coreutils for stdbuf
-              run: brew install coreutils
+              # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
+              run: |
+                brew install coreutils
+                echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
