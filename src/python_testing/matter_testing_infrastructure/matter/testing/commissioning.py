@@ -19,16 +19,22 @@
 This module contains classes and functions designed to handle the commissioning process of Matter devices.
 """
 
+import asyncio
+import contextlib
 import logging
 from dataclasses import dataclass
+from enum import Enum
 from typing import Any, List, Optional
 
 from mobly import asserts
 
+import matter.clusters as Clusters
 from matter import ChipDeviceCtrl, discovery
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
+
+from .commissioning_types import PaseParams
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -390,3 +396,324 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
+
+
+# Commissioning Status Detection Functions
+
+# Default timeout for DNS-SD discovery (in seconds)
+# Short timeout since DNS-SD is fast - device should respond quickly if operational
+DNSSD_DISCOVERY_TIMEOUT_SEC = 3
+
+
+class EstablishedSessionKind(str, Enum):
+    """Session type that succeeded when establishing PASE and CASE in parallel."""
+
+    PASE = "pase"
+    CASE = "case"
+
+
+async def _is_device_operational_via_dnssd(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
+) -> bool:
+    """
+    Check if a device is advertising as operational on this fabric via DNS-SD.
+
+    This is a fast check that avoids the long CASE timeout when a device is not
+    commissioned. Devices advertise operational services on _matter._tcp.local.
+    with instance name format: {compressed_fabric_id}-{node_id}
+
+    Args:
+        dev_ctrl: The chip device controller instance (used to get compressed fabric ID)
+        node_id: Node ID of the device to check
+        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
+
+    Returns:
+        True if device is advertising as operational on this fabric, False otherwise
+    """
+    from mdns_discovery.mdns_discovery import MdnsDiscovery
+
+    try:
+        # Build expected instance name for this fabric+node
+        compressed_fabric_id = dev_ctrl.GetCompressedFabricId()
+        expected_instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+
+        LOGGER.info(f"Checking DNS-SD for operational service: {expected_instance_name}")
+
+        # Discover operational services
+        mdns = MdnsDiscovery()
+        services = await mdns.get_operational_services(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        # Check if our expected instance is in the discovered services
+        for service in services:
+            if service.instance_name == expected_instance_name:
+                LOGGER.info(f"Device {node_id} found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
+                return True
+
+        LOGGER.info(f"Device {node_id} not found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
+        return False
+
+    except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
+        LOGGER.warning(f"DNS-SD check failed, will fall back to connection attempt: {e}")
+        return False
+
+
+async def _is_device_commissionable_via_dnssd(
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
+) -> bool:
+    """
+    Check if any device is advertising as commissionable via DNS-SD on the network.
+
+    This check avoids long CASE timeouts when a device is in pairing mode.
+    Devices advertise commissionable services on _matterc._udp.local.
+
+    Args:
+        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
+
+    Returns:
+        True if any device is advertising as commissionable, False otherwise
+    """
+    from mdns_discovery.mdns_discovery import MdnsDiscovery
+
+    try:
+        LOGGER.info("Checking DNS-SD for commissionable service (_matterc._udp.local.)")
+
+        # Discover commissionable services
+        mdns = MdnsDiscovery()
+        services = await mdns.get_commissionable_services(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        if services:
+            LOGGER.info(f"Found {len(services)} commissionable device(s) via DNS-SD")
+            return True
+
+        LOGGER.info("No commissionable devices found via DNS-SD")
+        return False
+
+    except (OSError, ValueError, RuntimeError, TypeError) as e:
+        LOGGER.warning(f"DNS-SD commissionable check failed: {e}")
+        return False
+
+
+async def _establish_pase_or_case_session(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    pase_params: Optional[PaseParams] = None
+) -> EstablishedSessionKind:
+    """
+    Establish a session to the device by trying PASE and CASE in parallel.
+
+    This is used as a fallback when DNS-SD check doesn't find the device operational.
+    The device might be:
+    - Not commissioned (PASE will succeed if pase_params provided)
+    - Commissioned but DNS-SD failed for some reason (CASE will succeed)
+
+    Whichever connection succeeds first is used; the other is cancelled.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID for the session
+        pase_params: Optional parameters for PASE establishment.
+                    If not provided, only CASE will be attempted.
+
+    Returns:
+        Whether the active session is PASE or CASE. CASE implies an operational
+        session on this controller's fabric; PASE implies not (for this fabric).
+
+    Raises:
+        RuntimeError: If both connection attempts fail
+    """
+    task_list = []
+
+    # Add PASE task if we have parameters
+    if pase_params is not None:
+        setup_code = pase_params.resolve_setup_code(dev_ctrl)
+
+        if setup_code:
+            LOGGER.info(f"Creating PASE task for node {node_id}")
+            pase_future = dev_ctrl.FindOrEstablishPASESession(setup_code, node_id)
+            task_list.append(asyncio.create_task(pase_future, name="pase"))
+
+    # Always add CASE task (allowPASE=False to force CASE)
+    LOGGER.info(f"Creating CASE task for node {node_id}")
+    case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
+    task_list.append(asyncio.create_task(case_future, name="case"))
+
+    LOGGER.info(f"Attempting parallel PASE/CASE connection to node {node_id}")
+
+    # Wait for first successful completion
+    done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+
+    # Check if the completed task succeeded or raised an exception
+    completed_task = done.pop()
+    completed_name = completed_task.get_name()
+
+    def _session_kind_from_task_name(name: str) -> EstablishedSessionKind:
+        return EstablishedSessionKind.PASE if name == "pase" else EstablishedSessionKind.CASE
+
+    try:
+        # This will raise if the task failed
+        completed_task.result()
+        LOGGER.info(f"Successfully established {completed_name.upper()} session to node {node_id}")
+    except (ChipStackError, RuntimeError, OSError) as e:
+        # First task failed, wait for the other if there is one
+        if pending:
+            LOGGER.info(f"{completed_name.upper()} failed ({e}), waiting for other connection attempt")
+            done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+            completed_task2 = done2.pop()
+            completed_name2 = completed_task2.get_name()
+            try:
+                completed_task2.result()
+                LOGGER.info(f"Successfully established {completed_name2.upper()} session to node {node_id}")
+                # Cancel any remaining
+                for task in pending2:
+                    task.cancel()
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await task
+                return _session_kind_from_task_name(completed_name2)
+            except (ChipStackError, RuntimeError, OSError) as e2:
+                # Use task names to correctly label which error came from which connection type
+                if completed_name == "pase":
+                    pase_error, case_error = e, e2
+                else:
+                    pase_error, case_error = e2, e
+                raise RuntimeError(
+                    f"Both PASE and CASE connection attempts failed for node {node_id}. "
+                    f"PASE error: {pase_error}, CASE error: {case_error}"
+                ) from e2
+        else:
+            raise
+
+    # Cancel pending tasks
+    for task in pending:
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
+
+    return _session_kind_from_task_name(completed_name)
+
+
+async def is_commissioned(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int
+) -> bool:
+    """
+    Check if the device is commissioned on the current fabric (Controller's fabric).
+
+    Uses a passive detection strategy:
+
+    1. DNS-SD operational check (_matter._tcp): if the device advertises as operational
+       for this fabric and node, returns True immediately.
+    2. DNS-SD commissionable check (_matterc._udp): if the device advertises a pairing
+       window, returns False immediately (fast-fail — device is not operational).
+    3. If neither mDNS check is conclusive, returns False (device is off, broken,
+       or on another fabric without an open commissioning window).
+
+    This function is side-effect free: it does not open PASE or CASE sessions.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+
+    Returns:
+        True if the device is confirmed to be commissioned on this fabric, False otherwise.
+    """
+    try:
+        # Step 1: Fast DNS-SD check — is the device operational on this fabric?
+        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
+
+        if is_operational:
+            LOGGER.info(f"Device {node_id} is operational via DNS-SD - confirmed commissioned")
+            return True
+
+        # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
+        is_commissionable = await _is_device_commissionable_via_dnssd()
+
+        if is_commissionable:
+            LOGGER.info(f"Device {node_id} is commissionable via DNS-SD (pairing window open) - not commissioned")
+            return False
+
+        # Step 3: Neither mDNS check was conclusive.
+        # Device is off, broken, or on another fabric without a commissioning window.
+        LOGGER.info(f"Device {node_id} not found via any DNS-SD check - not commissioned on this fabric")
+        return False
+
+    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
+        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
+        raise
+
+
+async def get_commissioned_fabric_count(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    pase_params: Optional[PaseParams] = None
+) -> int:
+    """
+    Get the number of commissioned fabrics on a device.
+
+    Uses DNS-SD to check if the device is operational on this fabric, avoiding long timeouts.
+    Then reads the TrustedRootCertificates attribute from endpoint 0 and returns the count.
+    OperationalCredentials is node-scoped per the Matter spec and always resides on endpoint 0.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
+
+    Returns:
+        Number of commissioned fabrics (count of trusted root certificates).
+        Returns 0 if device is factory fresh.
+
+    Raises:
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
+    """
+    try:
+        # Fast DNS-SD check to determine if device is operational on this fabric
+        # This avoids the long CASE timeout if device is not commissioned
+        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
+
+        if is_operational:
+            # Device is operational on this fabric - use CASE
+            LOGGER.info(f"Device {node_id} is operational via DNS-SD, using CASE connection")
+            result = await dev_ctrl.ReadAttribute(
+                nodeId=node_id,
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        elif pase_params is not None:
+            # Device not operational on this fabric via DNS-SD - could be:
+            # 1. Not commissioned at all (factory fresh) - PASE will work
+            # 2. Commissioned but DNS-SD failed - CASE will work
+            # Try both in parallel for fastest response
+            LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
+            await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
+            result = await dev_ctrl.ReadAttribute(
+                nodeId=node_id,
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        else:
+            # No PASE params and not operational - can't proceed without risking long timeout
+            raise ValueError(
+                f"Device {node_id} is not operational on this fabric and no PASE parameters provided. "
+                "Cannot get fabric count without risking long connection timeout."
+            )
+
+        # Extract the trusted root certificates list
+        # OperationalCredentials is node-scoped, always on endpoint 0
+        root_certs = result[0][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
+        ]
+
+        # Return the count
+        return len(root_certs)
+
+    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
+        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
+        raise
