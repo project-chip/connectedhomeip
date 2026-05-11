@@ -59,6 +59,7 @@
 #include <clusters/DishwasherAlarm/AttributeIds.h>
 #include <clusters/DishwasherMode/AttributeIds.h>
 #include <clusters/DoorLock/AttributeIds.h>
+#include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>

@@ -16,7 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/thread-border-router-management-server.cpp"
+    "${CLUSTER_DIR}/ThreadBorderRouterManagementCluster.cpp"
     "${CLUSTER_DIR}/thread-border-router-management-server.h"
     "${CLUSTER_DIR}/thread-br-delegate.h"
 )

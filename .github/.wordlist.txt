@@ -73,6 +73,7 @@ approver
 appspot
 appwrite
 aps
+ARD
 arg
 argc
 args
@@ -81,10 +82,6 @@ armeabi
 armino
 ARMmbed
 armv
-ARD
-SCL
-SDA
-VCC
 ASAN
 asdk
 ASR
@@ -94,8 +91,8 @@ ASYNC
 AsyncZeroconfServiceTypes
 ATL
 ATLs
-atomics
 atomicity
+atomics
 att
 attId
 attr
@@ -254,6 +251,7 @@ ChlorodibromomethaneConcentrationMeasurement
 ChloroformConcentrationMeasurement
 chmod
 chown
+chroot
 chrpath
 CIPD
 CircleCI
@@ -299,7 +297,6 @@ commissionee
 CommissioningFlow
 commondatastorage
 Compat
-compat
 CONF
 CONFIG
 ConfigDescription
@@ -349,8 +346,8 @@ cstdint
 csu
 csv
 ctl
-CTS
 ctrl
+CTS
 ctypes
 CurrentHue
 CurrentLevel
@@ -565,9 +562,9 @@ EvalCode
 EvalCodeWithName
 EvalFrameDefault
 EVB
-EVKBMIMXRT
 EventLogging
 evk
+EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
@@ -606,8 +603,10 @@ FFFFFFFFFFFF0102
 FFmpeg
 Fi
 filepath
+filesystems
 fini
 FixedLabel
+fixups
 flashdebug
 FlowMeasurement
 FluorideConcentrationMeasurement
@@ -619,9 +618,9 @@ formatters
 forwarding
 FOTA
 framerate
+FRDM
 FreeRTOS
 FreeRTOSConfig
-FRDM
 FS
 fsl
 fstab
@@ -715,7 +714,6 @@ hostname
 hotfixes
 href
 hsm
-HSM
 HTTPS
 Humidistat
 HW
@@ -892,8 +890,8 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
-lookups
 LogEvent
+lookups
 loopback
 LowPower
 LPC
@@ -1097,8 +1095,8 @@ optionMask
 optionOverride
 optionsMask
 optionsOverride
-orgs
 Orchestrator
+orgs
 OSS
 OTA
 OTADownloader
@@ -1201,6 +1199,7 @@ PowerSourceConfiguration
 ppm
 pre
 PrebuiltDataModelDirectory
+prepends
 preprocessor
 Presetup
 PressureMeasurement
@@ -1280,7 +1279,6 @@ rebase
 recommand
 recommanded
 Reconnection
-reconnection
 reconnections
 recurse
 refrigeratoralarm
@@ -1357,10 +1355,12 @@ scalability
 scalable
 schema
 schemas
+SCL
 scm
 sco
 scp
 ScriptBinding
+SDA
 SDB
 SDC
 SDHC
@@ -1481,6 +1481,7 @@ svg
 SVR
 SWD
 SWU
+symlink
 symlinks
 sysbuild
 sysconfdir
@@ -1488,6 +1489,7 @@ SysConfig
 sysctl
 sysdeps
 SYSROOT
+sysroots
 systemctl
 systemd
 systemdsystemunitdir
@@ -1616,6 +1618,7 @@ Unicast
 UniFlash
 UnitLocalization
 unittest
+unlinking
 unpair
 unprovisioned
 unreferenced
@@ -1649,6 +1652,7 @@ UUID
 ux
 valgrind
 validator
+VCC
 vcom
 VCP
 Vectorcall
@@ -1759,8 +1763,8 @@ zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject
-zhengyaohan
 Zeroconf
+zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread

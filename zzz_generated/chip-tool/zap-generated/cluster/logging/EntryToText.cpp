@@ -205,6 +205,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ColorControl";
     case chip::app::Clusters::BallastConfiguration::Id:
         return "BallastConfiguration";
+    case chip::app::Clusters::DynamicLighting::Id:
+        return "DynamicLighting";
     case chip::app::Clusters::IlluminanceMeasurement::Id:
         return "IlluminanceMeasurement";
     case chip::app::Clusters::TemperatureMeasurement::Id:
@@ -3414,6 +3416,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::DynamicLighting::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DynamicLighting::Attributes::AvailableEffects::Id:
+            return "AvailableEffects";
+        case chip::app::Clusters::DynamicLighting::Attributes::CurrentEffectID::Id:
+            return "CurrentEffectID";
+        case chip::app::Clusters::DynamicLighting::Attributes::CurrentSpeed::Id:
+            return "CurrentSpeed";
+        case chip::app::Clusters::DynamicLighting::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::DynamicLighting::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::DynamicLighting::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::DynamicLighting::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::DynamicLighting::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::IlluminanceMeasurement::Id: {
         switch (id)
         {
@@ -6125,6 +6150,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveColorTemperature";
         case chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Id:
             return "StepColorTemperature";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::DynamicLighting::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DynamicLighting::Commands::StartEffect::Id:
+            return "StartEffect";
+        case chip::app::Clusters::DynamicLighting::Commands::StopEffect::Id:
+            return "StopEffect";
         default:
             return "Unknown";
         }
