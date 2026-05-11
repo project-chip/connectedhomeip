@@ -1222,16 +1222,18 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         case ControlSequenceOfOperationEnum::kCoolingOnly:
         case ControlSequenceOfOperationEnum::kCoolingWithReheat:
             if (RequestedSystemMode == SystemModeEnum::kHeat || RequestedSystemMode == SystemModeEnum::kEmergencyHeat)
+            {
                 return Status::InvalidValue;
-            else
-                return Status::Success;
+            }
+            return Status::Success;
 
         case ControlSequenceOfOperationEnum::kHeatingOnly:
         case ControlSequenceOfOperationEnum::kHeatingWithReheat:
             if (RequestedSystemMode == SystemModeEnum::kCool || RequestedSystemMode == SystemModeEnum::kPrecooling)
+            {
                 return Status::InvalidValue;
-            else
-                return Status::Success;
+            }
+            return Status::Success;
         default:
             return Status::Success;
         }
