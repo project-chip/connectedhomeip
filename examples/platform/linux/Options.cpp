@@ -155,6 +155,7 @@ enum
     kDeviceOption_Camera_TestAudiosrc,
     kDeviceOption_Camera_AudioPlayback,
     kDeviceOption_Camera_VideoDevice,
+    kDeviceOption_Camera_Framerate,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
@@ -264,6 +265,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-test-audiosrc", kNoArgument, kDeviceOption_Camera_TestAudiosrc },
     { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
+    { "camera-framerate", kArgumentRequired, kDeviceOption_Camera_Framerate },
 #endif
     {}
 };
@@ -490,6 +492,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-audio-playback\n"
     "       Enables audio playback gstreamer pipeline to play the audio received from remote peer.\n"
+    "\n"
+    "  --camera-framerate <fps>\n"
+    "       Framerate for video streaming (default: 30).\n"
     "\n"
 #endif
     "\n";
@@ -997,6 +1002,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
     case kDeviceOption_Camera_VideoDevice: {
         LinuxDeviceOptions::GetInstance().cameraVideoDevice.SetValue(aValue);
+        break;
+    }
+    case kDeviceOption_Camera_Framerate: {
+        uint16_t value = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
+        LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(value);
         break;
     }
 #endif

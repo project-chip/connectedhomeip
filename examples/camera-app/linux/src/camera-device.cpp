@@ -897,10 +897,22 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    uint16_t framerate = 30; // Default to 30 fps
+    if (LinuxDeviceOptions::GetInstance().cameraFramerate.HasValue())
+    {
+        framerate = LinuxDeviceOptions::GetInstance().cameraFramerate.Value();
+    }
+
+    if (framerate < allocatedStream.minFrameRate || framerate > allocatedStream.maxFrameRate)
+    {
+        ChipLogError(Camera, "Requested frame rate %u is out of range [%u, %u]", framerate, allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
+        return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
+    }
+
     // Create Gstreamer video pipeline using the final allocated stream parameters
     CameraError error          = CameraError::SUCCESS;
     GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
-                                                     allocatedStream.minResolution.height, allocatedStream.minFrameRate, error);
+                                                     allocatedStream.minResolution.height, framerate, error);
     if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
