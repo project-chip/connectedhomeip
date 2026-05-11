@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementDelegate.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -50,11 +51,61 @@ public:
         Attributes::CumulativeEnergyReset::Id           //
         >;
 
-    static constexpr System::Clock::Timeout kMaxReportDelayInterval = System::Clock::Seconds32(60);
-    /// Alias for the maximum delay between timer-driven snapshot attempts (same as kMaxReportDelayInterval).
-    static constexpr System::Clock::Timeout kMaxReportInterval = kMaxReportDelayInterval;
+    //
+    // Per Spec, a server cannot report morte frequently than every 1 second:
+    // 6.X. [Cumulative/Periodic]Energy[Imported/Exported] Attribute:
+    // The server SHALL NOT mark this attribute ready for report if the last time this was done was more recently than 1 second ago.
+    //
     static constexpr System::Clock::Timeout kMinReportInterval = System::Clock::Seconds32(1);
 
+    /**
+     * Quieter reporting wrapper for Nullable<EnergyMeasurementStruct>.
+     *
+     * QuieterReportingAttribute<T> only accepts arithmetic T. This wrapper provides
+     * the same semantics for the EnergyMeasurementStruct and updates the dirty state based on
+     * the struct's `energy` field via an internal QuieterReportingAttribute<int64_t>.
+     *
+     */
+    class QuieterReportingEnergyAttribute
+    {
+    public:
+        using StructType = Structs::EnergyMeasurementStruct::Type;
+        template <typename T>
+        using Nullable = DataModel::Nullable<T>;
+
+        QuieterReportingEnergyAttribute() = default;
+
+        explicit QuieterReportingEnergyAttribute(const Nullable<StructType> & initialValue) :
+            mValue(initialValue), mEnergyTracker(EnergyKey(initialValue))
+        {}
+
+        const Nullable<StructType> & value() const { return mValue; }
+
+        /**
+         * Update the held struct and compute reporting state based on the energy field.
+         *
+         * @param newValue new struct value (or null) to store
+         * @param now      monotonic timestamp at the time of the call
+         * @return AttributeDirtyState::kMustReport if a report is required, otherwise kNoReportNeeded.
+         */
+        AttributeDirtyState SetValue(const Nullable<StructType> & newValue, System::Clock::Milliseconds64 now)
+        {
+
+            auto predicate            = mEnergyTracker.GetPredicateForSufficientTimeSinceLastDirty(kMinReportInterval);
+            AttributeDirtyState state = mEnergyTracker.SetValue(EnergyKey(newValue), now, predicate);
+            mValue                    = newValue;
+            return state;
+        }
+
+    private:
+        static Nullable<int64_t> EnergyKey(const Nullable<StructType> & v)
+        {
+            return v.IsNull() ? Nullable<int64_t>() : DataModel::MakeNullable(v.Value().energy);
+        }
+
+        Nullable<StructType> mValue;
+        QuieterReportingAttribute<int64_t> mEnergyTracker;
+    };
     struct Config
     {
         EndpointId endpointId;
@@ -124,36 +175,23 @@ private:
         PeriodicEnergyExported   = 0x8,
     };
 
-    CHIP_ERROR SetCumulativeEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetCumulativeEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetPeriodicEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetPeriodicEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetCumulativeEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetCumulativeEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetPeriodicEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetPeriodicEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
 
     // Attributes
     Structs::MeasurementAccuracyStruct::Type mMeasurementAccuracy;
-    Nullable<Structs::EnergyMeasurementStruct::Type> mCumulativeImported;
-    Nullable<Structs::EnergyMeasurementStruct::Type> mCumulativeExported;
-    Nullable<Structs::EnergyMeasurementStruct::Type> mPeriodicImported;
-    Nullable<Structs::EnergyMeasurementStruct::Type> mPeriodicExported;
+    QuieterReportingEnergyAttribute mCumulativeImported;
+    QuieterReportingEnergyAttribute mCumulativeExported;
+    QuieterReportingEnergyAttribute mPeriodicImported;
+    QuieterReportingEnergyAttribute mPeriodicExported;
     Nullable<Structs::CumulativeEnergyResetStruct::Type> mCumulativeReset;
 
     /** @brief Builds an EnergyMeasurementStruct with timestamps. For periodic (isCumulative == false), copies previous
      *  endTimestamp/endSystime into start*. For cumulative (isCumulative == true), start fields stay unset (spec). */
     DataModel::Nullable<EnergyMeasurementStruct>
     BuildMeasurement(Nullable<int64_t> energy, const Nullable<EnergyMeasurementStruct> & previous, bool isCumulative);
-
-    void StartReportDelayTimer();
-    void CancelReportDelayTimer();
-
-    class ReportDelayTimer : public TimerContext
-    {
-    public:
-        ReportDelayTimer(ElectricalEnergyMeasurementCluster & cluster) : mCluster(cluster) {}
-        void TimerFired() override;
-
-    private:
-        ElectricalEnergyMeasurementCluster & mCluster;
-    };
 
     const BitFlags<Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
@@ -164,9 +202,6 @@ private:
 
     Delegate & mDelegate;
     TimerDelegate & mTimerDelegate;
-
-    BitFlags<AttributeIgnoredDirtyState> mAttributeDirtyState;
-    ReportDelayTimer mReportDelayTimer{ *this };
 };
 
 } // namespace ElectricalEnergyMeasurement

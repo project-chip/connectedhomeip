@@ -19,28 +19,12 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
 
 using namespace ElectricalPowerMeasurement;
 using namespace ElectricalEnergyMeasurement;
-
-namespace {
-/// Common pattern of:
-///   - if error (i.e. NOT CHIP_NO_ERROR), then call shutdown and return error
-#define SuccessOrShutdown(err_expr)                                                                                                \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (CHIP_ERROR __err = err_expr; __err != CHIP_NO_ERROR)                                                                   \
-        {                                                                                                                          \
-            Shutdown();                                                                                                            \
-            return __err;                                                                                                          \
-        }                                                                                                                          \
-    } while (0)
-
-} // namespace
 
 CHIP_ERROR ElectricalSensorManager::Init(EndpointId endpointId, const EpmConfig & epmConfig, const EemConfig & eemConfig,
                                          const PtConfig & ptConfig)
