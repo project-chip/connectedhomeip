@@ -40,7 +40,8 @@ struct ConcreteAttributePath : public ConcreteClusterPath
         mExpanded = false;
     }
 
-    CHIP_CPP20(constexpr) ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+    CHIP_CPP20(constexpr)
+    ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteClusterPath(aEndpointId, aClusterId), mAttributeId(aAttributeId)
     {
         // Note: mExpanded is in the supercclass, so we can't use a field
