@@ -14,8 +14,8 @@
 app_config_dependent_sources = [
   "CodegenIntegration.h",
   "Delegate.h",
+  "ModeBaseCluster.cpp",
   "mode-base-cluster-objects.cpp",
   "mode-base-cluster-objects.h",
   "mode-base-server.h",
-  "ModeBaseCluster.cpp",
 ]
