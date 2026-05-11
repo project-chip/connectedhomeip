@@ -80,6 +80,7 @@ public:
         }
     }
 
+    bool IsReferencing(const T *p) const { return mRefCounted == p; }
 protected:
     T * mRefCounted = nullptr;
 };
