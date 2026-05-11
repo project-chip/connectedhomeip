@@ -313,7 +313,7 @@ public:
             return *this;
 
         ClearSecretData(mBytes);
-        TEMPORARY_RETURN_IGNORED SetLength(other.Length());
+        SuccessOrDie(SetLength(other.Length()));
         ::memcpy(Bytes(), other.ConstBytes(), other.Length());
         return *this;
     }

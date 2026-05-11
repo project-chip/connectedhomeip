@@ -674,10 +674,16 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params,
-                                          DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
+                                          DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData,
+                                          Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
-
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (meshcopCommissionParams.HasValue())
+    {
+        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
+    }
+#endif
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
 
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
@@ -757,10 +763,18 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     return errorCode;
 }
 
-CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
-                                                       Optional<Dnssd::CommonResolutionData> resolutionData)
+CHIP_ERROR
+DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
+                                            Optional<Dnssd::CommonResolutionData> resolutionData,
+                                            Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (meshcopCommissionParams.HasValue())
+    {
+        mSetUpCodePairer.SetThreadMeshcopCommissionParamsAndProxy(meshcopCommissionParams.Value(), &mThreadMeshcopCommissionProxy);
+    }
+#endif
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
                                        resolutionData);
 }
@@ -865,7 +879,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByObject(
                         params.GetDiscoveredObject(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
-        else if (params.HasDiscriminator())
+        else if (params.GetSetupDiscriminator().has_value())
         {
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
@@ -1961,7 +1975,7 @@ CHIP_ERROR DeviceCommissioner::SetUdcListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::FindCommissionableNode(char * instanceName)
+void DeviceCommissioner::FindCommissionableNode(const char * instanceName)
 {
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instanceName);
     TEMPORARY_RETURN_IGNORED DiscoverCommissionableNodes(filter);

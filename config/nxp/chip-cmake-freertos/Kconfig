@@ -45,12 +45,6 @@ choice CHIP_NXP_PLATFORM_SELECTION
 		help
 			NXP RT1060 platform.
 
-	config CHIP_NXP_PLATFORM_MCXW71
-		bool "mcxw71 platform"
-		depends on MCUX_HW_DEVICE_MCXW716C
-		help
-			NXP mcxw71 platform.
-
 	config CHIP_NXP_PLATFORM_MCXW72
 		bool "mcxw72 platform"
 		depends on MCUX_HW_DEVICE_MCXW727C
@@ -64,7 +58,6 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 	default "rt/rw61x" if CHIP_NXP_PLATFORM_RW61X
 	default "rt/rt1170" if CHIP_NXP_PLATFORM_RT1170
 	default "rt/rt1060" if CHIP_NXP_PLATFORM_RT1060
-	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "mcxw72" if CHIP_NXP_PLATFORM_MCXW72
 	default "not specified"
 	help
@@ -72,13 +65,12 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 
 config CHIP_NXP_DEVICE_LAYER
 	string "NXP device layer"
-	default "nxp/mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "nxp/common"
 
 # Invisible symbol to get the platform family name
 config CHIP_NXP_PLATFORM_FAMILY
 	string
-	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default "mcxw72" if CHIP_NXP_PLATFORM_MCXW72
 	default "rt" if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
 
 config CHIP_NXP_CRYPTO_IMPL
@@ -233,7 +225,7 @@ config DEBUG
 
 config CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
 	bool "Use Multiple BLE connections after commissioning"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of Multiple BLE connections after commissioning.
 
@@ -251,13 +243,13 @@ config CHIP_NXP_BLE_BONDING
 
 config NXP_USE_SMU2_STATIC
 	bool "Use SMU2"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of SMU2.
 
 config NXP_USE_SMU2_DYNAMIC
 	bool "Use extra SMU2 after commissioning"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of extra SMU2 after commissioning.
 

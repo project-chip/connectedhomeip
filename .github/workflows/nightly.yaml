@@ -59,7 +59,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:184
+            image: ghcr.io/project-chip/chip-build:193
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -78,7 +78,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -226,7 +226,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:184
+            image: ghcr.io/project-chip/chip-build:193
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -242,7 +242,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
 
             # NOTE: we need bootstrap to be able to use ASAN symbolizer and get ASAN Stack traces
             - name: Checkout submodules & Bootstrap
@@ -321,7 +321,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
 
             - name: Download all JUnit XML results
               uses: actions/download-artifact@v8
@@ -336,9 +336,10 @@ jobs:
                   report_paths: junit-results/**/*.xml
                   detailed_summary: true
                   require_tests: false
+                  annotate_only: true
 
             - name: Checkout gh-pages for Allure history
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6.0.2
               with:
                   ref: gh-pages
                   path: gh-pages

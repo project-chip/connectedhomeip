@@ -649,7 +649,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
         self.internal_render_one_output(
             template_path="MatterFiles_gni.jinja",
             output_file_name="java/matter/controller/cluster/files.gni",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -661,7 +661,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
             self.internal_render_one_output(
                 template_path="MatterClusters.jinja",
                 output_file_name=output_name,
-                vars={
+                template_vars={
                     'idl': self.idl,
                     'cluster': cluster,
                 }
@@ -680,7 +680,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         struct_name=struct.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'struct': struct,
                         'typeLookup': TypeLookupContext(self.idl, cluster),
@@ -697,7 +697,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         event_name=event.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'event': event,
                         'typeLookup': TypeLookupContext(self.idl, cluster),

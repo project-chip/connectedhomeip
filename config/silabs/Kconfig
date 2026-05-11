@@ -624,13 +624,13 @@ if CHIP_CRYPTO_IMPL_PSA
         default y
     config MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
         bool
-        default y
+        default n
     config MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
         bool
-        default y
+        default n
 	config MBEDTLS_RSA_C
 		bool
-		default y
+		default n
 	config MBEDTLS_CMAC
 		bool
 		default y		
