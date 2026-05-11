@@ -1000,9 +1000,11 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
     // Select fragment size for connection based on ATT MTU.
     if (mtu > 0) // If one or both device knows connection's MTU...
     {
-        uint16_t negotiated_size = (mtu > 3) ? static_cast<uint16_t>(mtu - 3) : 0;
-        uint16_t clamped_size    = std::min(negotiated_size, BtpEngine::sMaxFragmentSize);
-        resp.mFragmentSize       = (clamped_size > BtpEngine::sMinFragmentSize) ? clamped_size : BtpEngine::sMinFragmentSize;
+    resp.mFragmentSize = std::clamp(
+        std::max(mtu, 3) - 3,  // ensure no undeflow
+        BtpEngine::sMinFragmentSize,
+        BtpEngine::sMaxFragmentSize,
+   );
     }
     else // Else, if neither device knows MTU...
     {
