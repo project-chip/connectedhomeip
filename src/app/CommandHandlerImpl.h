@@ -259,12 +259,12 @@ public:
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.
      */
-    bool IsGroupRequest() { return mGroupRequest; }
+    bool IsGroupRequest() const { return mGroupRequest; }
 
     /**
-     * Check wheher the SuppressResponse flag is set.
+     * Check whether the SuppressResponse flag is set.
      */
-    bool IsResponseSuppressed() { return mSuppressResponse; }
+    bool IsResponseSuppressed() const { return mSuppressResponse; }
 
 protected:
     // Lifetime management for CommandHandler::Handle
