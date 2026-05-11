@@ -31,8 +31,7 @@ namespace app {
 struct ConcreteClusterPath
 {
     CHIP_CPP20(constexpr)
-    ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId)
-    {}
+    ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
     CHIP_CPP20(constexpr) ConcreteClusterPath() = default;
 
     ConcreteClusterPath(const ConcreteClusterPath & aOther)             = default;
