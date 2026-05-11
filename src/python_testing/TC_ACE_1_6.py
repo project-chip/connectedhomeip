@@ -83,6 +83,8 @@ log = logging.getLogger(__name__)
 # NOTE: WARNING - Multicast is not always reliable when testing over Wi-Fi, and the test currently does not
 # implement retries. If the test fails (likely due to timeouts on operations such as receiving events),
 # Try the test again from factory reset a few times.
+
+
 class TC_ACE_1_6(MatterBaseTest):
 
     def desc_TC_ACE_1_6(self) -> str:
