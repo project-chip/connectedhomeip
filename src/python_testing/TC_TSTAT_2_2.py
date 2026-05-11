@@ -666,15 +666,16 @@ class TC_TSTAT_2_2(MatterBaseTest):
             asserts.assert_less_equal(val, 127)
 
             if self.pics_guard(self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
-                # Test Harness Writes a value back that is different but valid for MinSetpointDeadBand attribute
-                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(5), endpoint_id=endpoint)
+                try:
+                    # Test Harness Writes a value back that is different but valid for MinSetpointDeadBand attribute
+                    await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(5), endpoint_id=endpoint)
 
-                # Test Harness Reads it back again to confirm the successful write of MinSetpointDeadBand attribute
-                val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
-                asserts.assert_equal(val, 5)
-
-                # Test Harness restores the original value of MinSetpointDeadBand
-                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue // 10), endpoint_id=endpoint)
+                    # Test Harness Reads it back again to confirm the successful write of MinSetpointDeadBand attribute
+                    val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                    asserts.assert_equal(val, 5)
+                finally:
+                    # Test Harness restores the original value of MinSetpointDeadBand
+                    await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue // 10), endpoint_id=endpoint)
 
         self.step("11b")
 
@@ -690,14 +691,15 @@ class TC_TSTAT_2_2(MatterBaseTest):
         self.step("11c")
 
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
-            # Test Harness Writes the min limit of MinSetpointDeadBand
-            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(0), endpoint_id=endpoint)
+            try:
+                # Test Harness Writes the min limit of MinSetpointDeadBand
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(0), endpoint_id=endpoint)
 
-            # Test Harness Writes the max limit of MinSetpointDeadBand
-            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(127), endpoint_id=endpoint)
-
-            # Test Harness restores the original value of MinSetpointDeadBand
-            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue // 10), endpoint_id=endpoint)
+                # Test Harness Writes the max limit of MinSetpointDeadBand
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(127), endpoint_id=endpoint)
+            finally:
+                # Test Harness restores the original value of MinSetpointDeadBand
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue // 10), endpoint_id=endpoint)
 
         self.step("12")
 
