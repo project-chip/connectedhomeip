@@ -93,17 +93,17 @@ def lock_output_dir(func: Callable[Concatenate[S, P], R | Iterator[R]]) -> Calla
     def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R | Iterator[R]:
         if self.output_dir_lock is None:
             return func(self, *args, **kwargs)
-        with self.output_dir_lock.lock_dir(self.output_dir):
-            # Check if func returns a generator, and if so, we need to keep the lock acquired until the generator is exhausted.
-            # This is needed for build_outputs and bundle_outputs which are generators that yield BuilderOutput objects.
-            result = func(self, *args, **kwargs)
-            if isinstance(result, Iterator):
-                def generator_with_lock():
-                    yield from result
 
-                return generator_with_lock()
+        output_dir_lock = self.output_dir_lock
 
-            return result
+        # Keep the lock held while an iterator result is consumed. This is needed for build_outputs and bundle_outputs which are
+        # generators yielding BuilderOutput objects.
+        def iterator_with_lock(result: Iterator[R]) -> Iterator[R]:
+            with output_dir_lock.lock_dir(self.output_dir):
+                yield from result
+
+        with output_dir_lock.lock_dir(self.output_dir):
+            return iterator_with_lock(result) if isinstance(result := func(self, *args, **kwargs), Iterator) else result
 
     return wrapper
 
