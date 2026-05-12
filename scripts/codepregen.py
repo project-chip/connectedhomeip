@@ -115,14 +115,14 @@ def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, external
     else:
         runner = DryRunner()
 
-    filter = TargetFilter(path_glob=input_glob)
+    target_filter = TargetFilter(path_glob=input_glob)
 
     if generator == 'zap':
-        filter.file_type = IdlFileType.ZAP
+        target_filter.file_type = IdlFileType.ZAP
     elif generator == 'codegen':
-        filter.file_type = IdlFileType.MATTER
+        target_filter.file_type = IdlFileType.MATTER
 
-    targets = FindPregenerationTargets(sdk_root, external_root, filter, runner)
+    targets = FindPregenerationTargets(sdk_root, external_root, target_filter, runner)
 
     runner.ensure_directory_exists(output_dir)
     if parallel:

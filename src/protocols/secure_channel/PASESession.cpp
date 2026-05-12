@@ -123,9 +123,10 @@ PASESession::~PASESession()
 
 void PASESession::OnSessionReleased()
 {
-    // Call into our super-class before we clear our state.
-    PairingSession::OnSessionReleased();
+    // Clear our own state first, then call the base class.
+    // See CASESession::OnSessionReleased for the full rationale.
     Clear();
+    PairingSession::OnSessionReleased();
 }
 
 void PASESession::Finish()
