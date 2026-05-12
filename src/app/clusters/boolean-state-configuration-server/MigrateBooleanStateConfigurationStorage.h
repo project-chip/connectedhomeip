@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,28 +18,18 @@
 
 #pragma once
 
-#include <access/Privilege.h>
-#include <app/ConcreteAttributePath.h>
+#include <app/persistence/AttributePersistenceMigration.h>
+#include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
+namespace Clusters {
+namespace BooleanStateConfiguration {
 
-/**
- * AttributeAccessToken records the privilege granted for accessing the specified attribute. This struct is used in chunked write
- * to avoid losing privilege when updating ACL items.
- */
-struct AttributeAccessToken
-{
-    ConcreteAttributePath mPath;
-    Access::Privilege mPrivilege;
+CHIP_ERROR MigrateBooleanStateConfigurationStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
+                                                   AttributePersistenceProvider & dstProvider);
 
-    bool operator==(const AttributeAccessToken & other) const { return mPath == other.mPath && mPrivilege == other.mPrivilege; }
-
-    bool Matches(const ConcreteAttributePath & aPath, const Access::Privilege & aPrivilege) const
-    {
-        return mPath == aPath && mPrivilege == aPrivilege;
-    }
-};
-
+} // namespace BooleanStateConfiguration
+} // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -1,1 +1,1 @@
-193 : [Tizen] Update installer script for Tizen 10.0
+194 : [crosscompile] Add armhf sysroot, update aarch64 sysroot to build-2026.05.07

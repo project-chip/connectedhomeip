@@ -102,6 +102,7 @@ Generally regenerate using one of:
 |        517 |      0x205 | Humidistat                                              |
 |        768 |      0x300 | ColorControl                                            |
 |        769 |      0x301 | BallastConfiguration                                    |
+|        773 |      0x305 | DynamicLighting                                         |
 |       1024 |      0x400 | IlluminanceMeasurement                                  |
 |       1026 |      0x402 | TemperatureMeasurement                                  |
 |       1027 |      0x403 | PressureMeasurement                                     |
