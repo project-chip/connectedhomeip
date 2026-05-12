@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import defaultdict
+import contextlib
+import functools
+import threading
 import logging
 import os
 import shutil
@@ -19,6 +23,9 @@ import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Callable, Concatenate, Iterator, ParamSpec, TypeVar
+
+from runner.runner import Runner
 
 
 class BuildProfile(StrEnum):
@@ -53,6 +60,42 @@ class BuilderOutput:
     target: str  # Target file to be copied to
 
 
+class OutDirLock:
+    """Lock to provide mutual exclusion for oprations on output directories."""
+
+    def __init__(self) -> None:
+        self._dir_locks: dict[str, threading.RLock] = defaultdict(threading.RLock)
+        self._dict_lock: threading.Lock = threading.Lock()
+
+    @contextlib.contextmanager
+    def lock_dir(self, dir_path: str | None) -> Iterator[None]:
+        # No directory to lock, just yield
+        if dir_path is None:
+            yield
+            return
+
+        with self._dict_lock:
+            dir_lock = self._dir_locks[dir_path]
+
+        with dir_lock:
+            yield
+
+
+S = TypeVar('S', bound='Builder')
+P = ParamSpec('P')
+R = TypeVar('R')
+
+
+def lock_output_dir(func: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
+    """Decorator to wrap build steps with output directory lock."""
+
+    @functools.wraps(func)
+    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R:
+        with self.output_dir_lock.lock_dir(self.output_dir):
+            return func(self, *args, **kwargs)
+
+    return wrapper
+
 class Builder(ABC):
     """Generic builder base class for CHIP.
 
@@ -61,9 +104,10 @@ class Builder(ABC):
 
     """
 
-    def __init__(self, root, runner):
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock):
         self.root = os.path.abspath(root)
         self._runner = runner
+        self.output_dir_lock = output_dir_lock
 
         # Set post-init once actual build target is known
         self.identifier = None

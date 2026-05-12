@@ -126,6 +126,16 @@ def ValidateTargetNames(context, parameter, values):
     default=None,
     help='Number of ninja jobs')
 @click.option(
+    '--concurrent-generation',
+    type=click.IntRange(min=0),
+    default=0,
+    help='Number of concurrent generation jobs. If 0, use number of CPU cores.')
+@click.option(
+    '--concurrent-builders',
+    type=click.IntRange(min=1),
+    default=1,
+    help='Number of concurrent builders. If greater than 1, count of Ninja jobs are scaled down accordingly')
+@click.option(
     '--pregen-dir',
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
@@ -156,11 +166,11 @@ def ValidateTargetNames(context, parameter, values):
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, verbose, quiet, target, build_profile, enable_link_map_file, repo,
-         out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
-         enable_flashbundle, log_timestamps, pw_command_launcher):
+def main(context, log_level, verbose, quiet, target, build_profile, enable_link_map_file, repo, out_prefix, ninja_jobs,
+         concurrent_generation: int, concurrent_builders: int, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
+         log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(threadName)s: %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if 'PW_PROJECT_ROOT' not in os.environ:
@@ -177,8 +187,8 @@ before running this script.
         runner = ShellRunner(root=repo)
 
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, verbose=verbose, quiet=quiet,
-        ninja_jobs=ninja_jobs, runner=runner
+        repository_path=repo, output_prefix=out_prefix, verbose=verbose, quiet=quiet, ninja_jobs=ninja_jobs,
+        concurrent_generation=concurrent_generation, concurrent_builders=concurrent_builders, runner=runner
     )
 
     requested_targets = {t.lower() for t in target}
