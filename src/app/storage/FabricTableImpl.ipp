@@ -322,9 +322,10 @@ struct FabricEntryData : public PersistableData<kFabricMaxBytes>
     }
 
     /// @brief  Finds the index where the current entry should be inserted by going through the endpoint's table and checking
-    /// whether the entry is already there. If the target is not in the table, sets idx to the first empty space
-    /// @param target_entry StorageId of entry to find
-    /// @param idx Index where target or space is found
+    /// whether the entry is already there. If the target is not in the table, sets idx to the first empty space.
+    /// If the target was not found and the table is full, sets idx to kUndefinedEntryIndex.
+    /// @param[in] target_entry StorageId of entry to find
+    /// @param[out] idx Index where target or space is found.
     /// @return CHIP_NO_ERROR if managed to find the target entry, CHIP_ERROR_NOT_FOUND if not found and space left
     ///         CHIP_ERROR_NO_MEMORY if target was not found and table is full
     CHIP_ERROR Find(const StorageId & target_entry, EntryIndex & idx)
@@ -351,7 +352,7 @@ struct FabricEntryData : public PersistableData<kFabricMaxBytes>
             idx = firstFreeIdx;
             return CHIP_ERROR_NOT_FOUND;
         }
-
+        idx = Data::kUndefinedEntryIndex;
         return CHIP_ERROR_NO_MEMORY;
     }
 
@@ -360,8 +361,8 @@ struct FabricEntryData : public PersistableData<kFabricMaxBytes>
         CHIP_ERROR err = CHIP_NO_ERROR;
         // Look for empty storage space
 
-        EntryIndex index;
-        err = this->Find(id, index);
+        EntryIndex index = Data::kUndefinedEntryIndex;
+        err              = this->Find(id, index);
 
         // C++ doesn't have const constructors; variable is declared const
         const TypedTableEntryData entry(endpoint_id, fabric_index, const_cast<StorageId &>(id), const_cast<StorageData &>(data),

@@ -3,33 +3,35 @@
 import os
 import shlex
 import subprocess
+from pathlib import Path
 
 import click
+
+# figure out paths for building
+repo_dir = Path(__file__).resolve().parents[1] / "repo"
 
 
 @click.command()
 @click.option("--clang", is_flag=True, default=False, help="If specified, use clang instead of gcc")
-@click.option("--output-dir", default="build", help="Output directory for libdatachannel build")
+@click.option("--build-dir", default=repo_dir / "build", show_default=True,
+              help="Build directory for libdatachannel build")
 @click.option("--cross-compile-cpu-type", default=None, help="CPU type for cross compilation if needed")
 @click.option("--target-cc", default=None, help="C compiler for cross compilation (from args.gn)")
 @click.option("--target-cxx", default=None, help="C++ compiler for cross compilation (from args.gn)")
-def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None,
+def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
          target_cc: str | None, target_cxx: str | None):
-    # figure out paths for building
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_dir = os.path.join(script_dir, "..", "repo")
-    build_dir = os.path.join(repo_dir, output_dir)
 
-    # Generate build files in ./build
+    # Generate build files in build_dir
     cmake_cmd = [
         "cmake",
+        "-S",
+        str(repo_dir),
         "-B",
-        build_dir,
+        str(build_dir),
         "-DUSE_GNUTLS=0",
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_CXX_FLAGS=-Wno-shadow",
-        "-DBUILD_SHARED_LIBS=OFF",
     ]
 
     # Default compilers
@@ -93,12 +95,11 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None,
     )
 
     print(f"Running: {shlex.join(cmake_cmd)}")
-    subprocess.run(cmake_cmd, cwd=repo_dir, check=True)
+    subprocess.run(cmake_cmd, check=True)
 
-    # Build with Make
-    make_cmd = ["make", "-j%d" % os.cpu_count()]
+    make_cmd = ["cmake", "--build", str(build_dir), "--target", "datachannel-static", f"-j{os.cpu_count()}"]
     print(f"Running: {shlex.join(make_cmd)}")
-    subprocess.run(make_cmd, cwd=build_dir, check=True)
+    subprocess.run(make_cmd, check=True)
 
     print("libdatachannel build complete.")
     print(f"Artifacts are located in: {build_dir}")

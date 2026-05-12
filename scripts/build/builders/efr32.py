@@ -37,6 +37,7 @@ class Efr32App(Enum):
     UNIT_TEST = auto()
     AIR_QUALITY_SENSOR = auto()
     CLOSURE = auto()
+    SMOKE_CO_ALARM = auto()
 
     def ExampleName(self):
         if self == Efr32App.EVSE:
@@ -59,6 +60,8 @@ class Efr32App(Enum):
             return 'air-quality-sensor-app'
         if self == Efr32App.CLOSURE:
             return 'closure-app'
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'smoke-co-alarm-app'
         raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
@@ -84,6 +87,8 @@ class Efr32App(Enum):
             return 'matter-silabs-air-quality-sensor-example'
         if self == Efr32App.CLOSURE:
             return 'matter-silabs-closure-example'
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'matter-silabs-smoke-co-alarm-example'
         raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
@@ -109,6 +114,8 @@ class Efr32App(Enum):
             return 'air_quality_sensor_app.flashbundle.txt'
         if self == Efr32App.CLOSURE:
             return 'closure_app.flashbundle.txt'
+        if self == Efr32App.SMOKE_CO_ALARM:
+            return 'smoke_co_alarm_app.flashbundle.txt'
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
@@ -292,7 +299,9 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append(f"wifi_sdk_root=\"{wifi_sdk_path}\"")
 
     def GnBuildArgs(self):
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
     def _bundle(self):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
@@ -354,7 +363,7 @@ class Efr32Builder(GnBuilder):
                     sourcepath,
                     os.path.join("flashbundle", name))
 
-    def generate(self):
+    def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
@@ -363,33 +372,19 @@ class Efr32Builder(GnBuilder):
         if self.dotfile:
             cmd += ['--dotfile=%s' % self.dotfile]
 
-        extra_args = self.GnBuildArgs()
-
-        if self.options.pw_command_launcher:
-            extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-        if self.options.enable_link_map_file:
-            extra_args.append('chip_generate_link_map_file=true')
-
-        if self.options.pregen_dir:
-            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-        if extra_args:
-            cmd += ['--args=%s' % ' '.join(extra_args)]
+        if args := self.GnBuildArgs():
+            cmd += ['--args=%s' % ' '.join(args)]
 
         cmd += [self.output_dir]
 
-        title = 'Generating ' + self.identifier
-        extra_env = self.GnBuildEnv()
-
-        if extra_env:
+        if env := self.GnBuildEnv():
             # convert the command into a bash command that includes
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]
 
-        self._Execute(cmd, title=title)
+        self._Execute(cmd, title=f"Generating {self.identifier}", dedup=dedup)

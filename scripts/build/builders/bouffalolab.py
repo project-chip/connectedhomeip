@@ -284,7 +284,9 @@ class BouffalolabBuilder(GnBuilder):
             return (2, 1, 0)
 
     def GnBuildArgs(self):
-        return self.argsOpt
+        args = super().GnBuildArgs()
+        args.extend(self.argsOpt)
+        return args
 
     def build_outputs(self):
         extensions = ["out"]

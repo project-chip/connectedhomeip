@@ -52,12 +52,13 @@ class Context:
          to generate make/ninja instructions and to compile.
       """
 
-    def __init__(self, runner, repository_path: str, output_prefix: str, verbose: bool, ninja_jobs: int):
+    def __init__(self, runner, repository_path: str, output_prefix: str, verbose: bool, quiet: bool, ninja_jobs: int):
         self.builders = []
         self.runner = runner
         self.repository_path = repository_path
         self.output_prefix = output_prefix
         self.verbose = verbose
+        self.quiet = quiet
         self.ninja_jobs = ninja_jobs
         self.completed_steps = set()
 
@@ -73,7 +74,7 @@ class Context:
             found_choice = None
             for choice in BUILD_TARGETS:
                 builder = choice.Create(target, self.runner, self.repository_path,
-                                        self.output_prefix, self.verbose, self.ninja_jobs,
+                                        self.output_prefix, self.verbose, self.quiet, self.ninja_jobs,
                                         options)
                 if builder:
                     self.builders.append(builder)
@@ -110,7 +111,8 @@ class Context:
         self.runner.StartCommandExecution()
 
         for builder in self.builders:
-            log.info('Generating %s', builder.output_dir)
+            if not builder.quiet:
+                log.info('Generating %s', builder.output_dir)
             builder.generate()
 
         self.completed_steps.add(BuildSteps.GENERATED)
@@ -120,7 +122,8 @@ class Context:
 
         timer = BuildTimer()
         timer.time_builds(self.builders)
-        timer.print_timing_report()
+        if not self.quiet:
+            timer.print_timing_report()
 
     def CleanOutputDirectories(self):
         for builder in self.builders:

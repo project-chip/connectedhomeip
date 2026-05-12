@@ -99,6 +99,15 @@ struct GDBusWpaSupplicant
     GAutoPtr<WpaSupplicant1Interface> iface;
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
+
+    // Must be called synchronously on the GLib thread while the GLib main loop is still running.
+    void Reset()
+    {
+        iface.reset();
+        proxy.reset();
+        interfacePath.reset();
+        networkPath.reset();
+    }
 };
 #endif
 
@@ -145,6 +154,8 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
+    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
     CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                  OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
@@ -163,6 +174,9 @@ public:
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
+    // Release GLib objects before the GLib main loop is quit.
+    // Must be called from PlatformManagerImpl::_Shutdown() before g_main_loop_quit().
+    void StopWiFiManagement();
     bool IsWiFiManagementStarted();
     void StartNonConcurrentWiFiManagement();
     int32_t GetDisconnectReason();
@@ -239,6 +253,7 @@ private:
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAFAdvertiseParam mPafAdvParam;
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
@@ -254,6 +269,7 @@ private:
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
     CHIP_ERROR _StartWiFiManagement();
+    CHIP_ERROR _StopWiFiManagement();
 
     bool mAssociationStarted             = false;
     unsigned int mAssociationRetriesLeft = 0;

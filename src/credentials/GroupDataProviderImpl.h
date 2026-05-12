@@ -114,11 +114,16 @@ public:
     // Groupcast configurations
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
     uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
+
     bool ConsumeAuxAclNotificationNeeded() override
     {
-        bool needed               = mAuxAclNotificationNeeded;
-        mAuxAclNotificationNeeded = false;
-        return needed;
+        if (IsGroupcastEnabled())
+        {
+            bool needed               = mAuxAclNotificationNeeded;
+            mAuxAclNotificationNeeded = false;
+            return needed;
+        }
+        return false;
     }
 
 protected:

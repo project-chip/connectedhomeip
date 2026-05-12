@@ -118,8 +118,6 @@ namespace Silabs {
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
 
-SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
-
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     TEMPORARY_RETURN_IGNORED NvmInit();
@@ -281,6 +279,7 @@ CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 extern "C" void sl_button_on_change(const sl_button_t * handle)
 {
     if (Silabs::GetPlatform().mButtonCallback == nullptr)
@@ -303,13 +302,17 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     const sl_button_t * handle = SL_SIMPLE_BUTTON_INSTANCE(button);
     return nullptr == handle ? 0 : sl_button_get_state(handle);
 }
-
-#else
-uint8_t SilabsPlatform::GetButtonState(uint8_t button)
-{
-    return 0;
-}
+#ifdef SL_ICD_ENABLED
+void SilabsPlatform::SleepButtonActionHandler() {}
+#endif // SL_ICD_ENABLED
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
+{
+    return SL_STATUS_OK;
+}
+#endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
 #if SL_MATTER_DEBUG_WATCHDOG_ENABLE
 void SilabsPlatform::WatchdogInit()

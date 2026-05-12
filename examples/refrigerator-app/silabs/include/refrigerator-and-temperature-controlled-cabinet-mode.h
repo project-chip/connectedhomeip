@@ -45,13 +45,12 @@ private:
                                                  { .value = to_underlying(ModeTag::kRapidFreeze) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Cool"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Rapid Cool"_span,
                                                  .mode     = ModeRapidCool,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsRapidCool) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Freeze"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Rapid Freeze"_span,
                                                  .mode     = ModeRapidFreeze,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsRapidFreeze) },
     };

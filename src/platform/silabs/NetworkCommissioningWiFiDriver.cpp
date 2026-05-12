@@ -143,7 +143,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconnecting for current wifi");
-        ReturnErrorOnFailure(WifiInterface::GetInstance().TriggerDisconnection());
+        WifiInterface::GetInstance().TriggerDisconnection();
     }
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
@@ -163,8 +163,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s", NullTerminated(ssid, ssidLen).c_str());
     // Resetting the retry connection state machine for a new access point connection
     WifiInterface::GetInstance().ResetConnectionRetryInterval();
-    // Configure the WFX WiFi interface.
-    WifiInterface::GetInstance().SetWifiCredentials(wifiConfig);
+    ReturnErrorOnFailure(WifiInterface::GetInstance().SetWifiCredentials(wifiConfig));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
     return CHIP_NO_ERROR;
@@ -250,7 +249,7 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return true;
 }
 
-void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
+void SlWiFiDriver::OnScanWiFiNetworkDone(NetworkCommissioning::WiFiScanResponse * aScanResult)
 {
     SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
     // Cannot use the driver if the instance is not initialized.
@@ -279,18 +278,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     }
     else
     {
-        NetworkCommissioning::WiFiScanResponse scanResponse = {};
-
-        scanResponse.security        = aScanResult->security;
-        scanResponse.channel         = aScanResult->chan;
-        scanResponse.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
-        scanResponse.signal.strength = aScanResult->rssi;
-        scanResponse.ssidLen         = aScanResult->ssid_length;
-        memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
-        memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
-        scanResponse.wiFiBand = aScanResult->wiFiBand;
-
-        mScanResponseIter.Add(&scanResponse);
+        mScanResponseIter.Add(aScanResult);
     }
 }
 

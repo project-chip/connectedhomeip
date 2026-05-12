@@ -599,6 +599,13 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 
+void ConnectivityManagerImpl::StopWiFiManagement()
+{
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](ConnectivityManagerImpl * self) { return self->_StopWiFiManagement(); }, this);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to stop WiFi management"));
+}
+
 CHIP_ERROR ConnectivityManagerImpl::StartWiFiManagementSync()
 {
     if (IsWiFiManagementStarted())
@@ -1631,6 +1638,14 @@ CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ConnectivityManagerImpl::_StopWiFiManagement()
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    mWpaSupplicant.Reset();
+
+    return CHIP_NO_ERROR;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 } // namespace DeviceLayer

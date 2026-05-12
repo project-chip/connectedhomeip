@@ -123,7 +123,7 @@ public:
 private:
     bool NetworkMatch(const Silabs::WifiInterface::WiFiCredentials & network, ByteSpan networkId);
     bool StartScanWiFiNetworks(ByteSpan ssid);
-    static void OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult);
+    static void OnScanWiFiNetworkDone(NetworkCommissioning::WiFiScanResponse * aScanResult);
 
     static SlWiFiDriver * mDriver;
     Silabs::WifiInterface::WiFiCredentials mSavedNetwork   = {};

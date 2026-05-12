@@ -171,9 +171,11 @@ public:
     {
         static constexpr size_t kEpochKeysMax = 3;
 
-        KeySet() = default;
+        KeySet() { ClearKeys(); }
         KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
-        {}
+        {
+            ClearKeys();
+        }
 
         // The actual keys for the group key set
         EpochKey epoch_keys[kEpochKeysMax];
@@ -393,6 +395,10 @@ public:
         }
     }
 
+    void SetGroupcastEnabled(bool groupcastVal) { mGroupcastEnabled = groupcastVal; }
+
+    bool IsGroupcastEnabled() { return mGroupcastEnabled; }
+
     // Groupcast
     virtual uint16_t getMaxMembershipCount() = 0;
     virtual uint16_t getMaxMcastAddrCount()  = 0;
@@ -441,6 +447,7 @@ protected:
     const uint16_t mMaxGroupsPerFabric;
     const uint16_t mMaxGroupKeysPerFabric;
     GroupListener * mListeners[kMaxListeners] = { nullptr };
+    bool mGroupcastEnabled                    = false;
 };
 
 /**

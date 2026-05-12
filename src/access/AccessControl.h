@@ -658,7 +658,7 @@ public:
     CHIP_ERROR AuxiliaryEntries(FabricIndex fabricIndex, EntryIterator & iterator) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_NOT_IMPLEMENTED);
         return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabricIndex);
     }
 

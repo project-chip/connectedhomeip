@@ -15,15 +15,75 @@
 #    limitations under the License.
 #
 
+import ipaddress
 import logging
+from dataclasses import dataclass
 from typing import Optional
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import AttributeMatcher
+from matter.testing.spec_parsing import build_xml_clusters, dm_from_spec_version
 
 logger = logging.getLogger(__name__)
+
+
+def group_id_from_node_id(node_id: int) -> int:
+    """Extracts the 16-bit Group ID from a Group-scoped Node ID."""
+    return node_id & 0xFFFF
+
+
+def get_auxiliary_acl_equivalence_set(aux_acl, parts_list) -> set[tuple[int, int, int]]:
+    """Expands AuxiliaryACL entries into a set of (fabric_index, group_id, endpoint_id) tuples.
+
+    This implements the equivalence class logic for verifying auxiliary entries, accounting
+    for various encodings and wildcards (empty target lists). It also strictly validates
+    that Groupcast auxiliary entries have the correct privilege and auth mode.
+
+    Args:
+        aux_acl: The list of AuxiliaryACL entries read from the DUT.
+        parts_list: The list of endpoints from the Root Node's Descriptor PartsList attribute.
+
+    Returns:
+        A set of (fabric_index, group_id, endpoint_id) tuples representing the granted access.
+    """
+    equivalence_set = set()
+    for entry in aux_acl:
+        # We only process Groupcast auxiliary entries.
+        if entry.auxiliaryType != Clusters.AccessControl.Enums.AccessControlAuxiliaryTypeEnum.kGroupcast:
+            continue
+
+        # Strictly validate metadata for Groupcast auxiliary entries.
+        asserts.assert_equal(entry.privilege, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                             f"Groupcast auxiliary entry MUST have Operate privilege, but has {entry.privilege}")
+        asserts.assert_equal(entry.authMode, Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
+                             f"Groupcast auxiliary entry MUST have Group auth mode, but has {entry.authMode}")
+
+        subjects = entry.subjects if (entry.subjects is not None and entry.subjects is not NullValue) else []
+        targets = entry.targets if (entry.targets is not None and entry.targets is not NullValue) else []
+
+        for subject in subjects:
+            group_id = group_id_from_node_id(subject)
+
+            if not targets:
+                # Wildcard: empty target list represents all endpoints in the parts list (excluding root).
+                for endpoint_id in parts_list:
+                    if endpoint_id != 0:
+                        equivalence_set.add((entry.fabricIndex, group_id, endpoint_id))
+            else:
+                for target in targets:
+                    endpoint_id = target.endpoint
+                    if endpoint_id is None or endpoint_id is NullValue:
+                        # Wildcard target: applies to all endpoints in the parts list (excluding root).
+                        for ep in parts_list:
+                            if ep != 0:
+                                equivalence_set.add((entry.fabricIndex, group_id, ep))
+                    else:
+                        equivalence_set.add((entry.fabricIndex, group_id, endpoint_id))
+    return equivalence_set
 
 
 def is_groupcast_supporting_cluster(cluster_id: int) -> bool:
@@ -82,6 +142,15 @@ async def valid_endpoints_list(test, ln_enabled: bool) -> list:
         asserts.assert_greater(len(endpoints_list), 0,
                                "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
     return endpoints_list
+
+
+async def is_groupcast_on_root_node(test) -> bool:
+    """Check if Groupcast cluster is present on the RootNode endpoint (EP0)."""
+    server_list = await test.read_single_attribute_check_success(
+        cluster=Clusters.Descriptor,
+        attribute=Clusters.Descriptor.Attributes.ServerList,
+        endpoint=0)
+    return Clusters.Groupcast.id in server_list
 
 
 def generate_membership_entry_matcher(
@@ -200,3 +269,108 @@ def generate_usedMcastAddrCount_entry_matcher(expected_count: int) -> AttributeM
 
     description = f"UsedMcastAddrCount == {expected_count}"
     return AttributeMatcher.from_callable(description=description, matcher=predicate)
+
+
+@dataclass
+class OperateOnlyCommand:
+    endpoint_id: int
+    cluster_object: Clusters.ClusterObjects.Cluster
+    command_object: Clusters.ClusterObjects.ClusterCommand
+
+
+async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: Optional[int] = None) -> list[OperateOnlyCommand]:
+    """
+    Reads all AcceptedCommandList attributes and the SpecificationVersion to determine all
+    commands that only require Operate privilege.
+
+    Args:
+        dev_ctrl: The ChipDeviceController instance.
+        node_id: The node ID of the device to query.
+        exclude_ep0: Boolean to determine if endpoint 0 should be excluded in the search for valid cluster commands
+        endpoint_id_to_search: Optional argument. When specified, search for commands will only be on clusters on the specified endpoint. Search all endpoints if not specified
+
+    Returns:
+        A list of OperateOnlyCommand dataclass objects for each command that only requires
+        Operate privilege.
+    """
+    # Helper function to perform wildcard read and get spec info
+    async def get_device_composition_and_spec(dev_ctrl, node_id) -> tuple[dict, int]:
+        wildcard_read = await dev_ctrl.Read(node_id, [()])
+        attributes = wildcard_read.attributes
+        spec_version = attributes[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+        return attributes, spec_version
+
+    # Helper function to parse spec
+    def get_xml_clusters(spec_version: int):
+        dm = dm_from_spec_version(spec_version)
+        xml_clusters, _ = build_xml_clusters(dm)
+        return xml_clusters
+
+    def find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands):
+        for cluster, cluster_data in endpoint_data.items():
+            if cluster.Attributes.AcceptedCommandList in cluster_data:
+                command_list = cluster_data[cluster.Attributes.AcceptedCommandList]
+                for cmd_id in command_list:
+                    try:
+                        xml_command = xml_clusters[cluster.id].accepted_commands[cmd_id]
+                        if xml_command.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate:
+                            cluster_object = Clusters.ClusterObjects.ALL_CLUSTERS[cluster.id]
+                            command_object = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster.id][cmd_id]
+
+                            # Only client-to-server commands (no response commands)
+                            if not command_object.is_client:
+                                continue
+
+                            # In this codebase, all generated ClusterCommand subclasses have defaults for all fields.
+                            operate_only_commands.append(OperateOnlyCommand(
+                                endpoint_id=endpoint_id, cluster_object=cluster_object, command_object=command_object))
+
+                    except KeyError:
+                        logger.warning(
+                            f"Command ID {cmd_id} on cluster {cluster.id} not found in spec XMLs. This may be a manufacturer-specific command.")
+
+    # Main logic
+    attributes, spec_version = await get_device_composition_and_spec(dev_ctrl, node_id)
+    xml_clusters = get_xml_clusters(spec_version)
+    operate_only_commands = []
+
+    if endpoint_id_to_search is not None:
+        asserts.assert_false((exclude_ep0 and endpoint_id_to_search == 0),
+                             "Endpoint 0 was both specified to be searched in and to be ignored.")
+        endpoint_data = attributes.get(endpoint_id_to_search)
+        if endpoint_data is None:
+            asserts.fail(f"Endpoint {endpoint_id_to_search} not found on the device.")
+        find_commands_on_endpoint_and_cluster(endpoint_id_to_search, endpoint_data, operate_only_commands)
+    else:
+        for endpoint_id, endpoint_data in attributes.items():
+            if exclude_ep0 and endpoint_id == 0:
+                continue
+            find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands)
+
+    return operate_only_commands
+
+
+def get_iana_multicast_address() -> bytes:
+    """Returns the 16-byte IANA-assigned multicast address for Groupcast (ff05::fa)."""
+    return bytes.fromhex("ff0500000000000000000000000000fa")
+
+
+def get_per_group_multicast_address(fabric_id: int, group_id: int) -> bytes:
+    """Returns the 16-byte per-group multicast address (ff35:0040:fd<Fabric ID>00:<Group ID>)."""
+
+    # The first 32 bits will always be a fixed value. 0xFF3 defined by RFC 3306,
+    # 0x05 represents scope, 0x00 is a reserved byte, and 0x40 represents length
+    # of network prefix (64 bits)
+    prefix_scope_plen = 0xFF350040
+
+    # Create 64 bit network prefix. Consists of FD (locally assigned ULA prefix) and then
+    # the upper 56 bits of fabric ID (in big endian format)
+    network_prefix = 0xfd00000000000000 | ((fabric_id >> 8) & 0x00ffffffffffffff)
+
+    # Create 32 bit group identifier portion. Constists of the lower 8 bits of fabric id,
+    # a reserved 0x00 byte, then followed by 16 bit group id
+    group_id_field = ((fabric_id << 24) & 0xff000000) | (group_id & 0xffff)
+
+    # Combine all portions into 128-bit address
+    addr_int = (prefix_scope_plen << 96) | (network_prefix << 32) | group_id_field
+    return ipaddress.IPv6Address(addr_int).packed

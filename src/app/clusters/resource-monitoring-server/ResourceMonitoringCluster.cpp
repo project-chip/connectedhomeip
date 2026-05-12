@@ -16,7 +16,6 @@
 
 #include <app/clusters/resource-monitoring-server/ResourceMonitoringCluster.h>
 
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
@@ -68,15 +67,9 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
     {
     case ResourceMonitoring::Attributes::LastChangedTime::Id: {
 
-        Attributes::LastChangedTime::TypeInfo::Type newLastChangedTime;
-        ReturnErrorOnFailure(decoder.Decode(newLastChangedTime));
-
-        VerifyOrReturnValue(newLastChangedTime != mLastChangedTime, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
-        ReturnErrorOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), newLastChangedTime));
-        mLastChangedTime = newLastChangedTime;
-        return Status::Success;
+        VerifyOrReturnError(mContext != nullptr, Status::InvalidInState);
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        return attrPersistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLastChangedTime);
     }
 
     default:
@@ -220,6 +213,7 @@ Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndi
 chip::Protocols::InteractionModel::Status
 ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
 {
+    VerifyOrReturnError(mContext != nullptr, Status::InvalidInState);
     auto oldLastchangedTime = mLastChangedTime;
     mLastChangedTime        = aNewLastChangedTime;
     VerifyOrReturnValue(mLastChangedTime != oldLastchangedTime, Status::Success);
@@ -229,9 +223,13 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
     static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
     static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
 
-    ReturnValueOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                             ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime),
-                         Status::Failure);
+    NumericAttributeTraits<uint32_t>::StorageType storageValue;
+    DataModel::NullableToStorage(mLastChangedTime, storageValue);
+
+    ReturnValueOnFailure(
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId),
+                                              { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }),
+        Status::Failure);
     NotifyAttributeChanged(kAttributeId);
 
     return Protocols::InteractionModel::Status::Success;
@@ -239,33 +237,31 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
 
 void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturn(mContext != nullptr);
 
     // same attribute ID for all clusters
     constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::LastChangedTime::Id;
     static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
     static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
 
-    err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime);
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
+    const DataModel::Nullable<uint32_t> defaultValue = DataModel::Nullable<uint32_t>();
 
-    if (err == CHIP_NO_ERROR)
-    {
-        if (mLastChangedTime.IsNull())
-        {
-            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as null");
-        }
-        else
-        {
-            ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %lu",
-                          (long unsigned int) mLastChangedTime.Value()); // on some platforms uint32_t is a long, cast it to
-                                                                         // unsigned long on all platforms to prevent CI errors
-        }
-    }
-    else
+    if (!attrPersistence.LoadNativeEndianValue<uint32_t>(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId),
+                                                         mLastChangedTime, defaultValue))
     {
         // If we cannot find the previous LastChangedTime, we will assume it to be null.
         ChipLogDetail(Zcl, "ResourceMonitoring: Unable to load the LastChangedTime from the KVS. Assuming null");
+    }
+    else if (mLastChangedTime.IsNull())
+    {
+        ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as null");
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ResourceMonitoring: Loaded LastChangedTime as %lu",
+                      (long unsigned int) mLastChangedTime.Value()); // on some platforms uint32_t is a long, cast it to
+                                                                     // unsigned long on all platforms to prevent CI errors
     }
 }
 

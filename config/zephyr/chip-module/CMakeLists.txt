@@ -59,10 +59,12 @@ if(CONFIG_CHIP)
         endif()
     endif()
 
-    # For ARM targets, use nosys.specs which provides stub implementations of
-    # system calls for embedded environments without full OS support
-    if (CONFIG_ARM)
-        matter_add_cflags(--specs=nosys.specs)
+    if(CONFIG_NEWLIB_LIBC)
+        # For ARM targets, use nosys.specs which provides stub implementations of
+        # system calls for embedded environments without full OS support
+        if (CONFIG_ARM)
+            matter_add_cflags(--specs=nosys.specs)
+        endif()
     endif()
 
     if(CONFIG_MBEDTLS)
@@ -71,6 +73,15 @@ if(CONFIG_CHIP)
 
         if(CONFIG_SOC_FAMILY_NXP_RW AND CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC)
             zephyr_compile_definitions(PSA_CRYPTO_DRIVER_ELS_PKC)
+        endif()
+    endif()
+
+    
+    # IMU task has no Kconfig for priority; on RW platforms it is critical infrastructure,
+    # so its priority is forced to cooperative to prevent starvation.
+    if(CONFIG_SOC_FAMILY_NXP_RW)
+        if(DEFINED CONFIG_NUM_COOP_PRIORITIES AND CONFIG_NUM_COOP_PRIORITIES GREATER 0)
+            zephyr_compile_definitions(IMU_TASK_PRIORITY=-1)
         endif()
     endif()
 
@@ -125,7 +136,7 @@ if(CONFIG_CHIP)
         matter_add_gn_arg_string("chip_mdns" "minimal")
     elseif(CONFIG_CHIP_ETHERNET)
         matter_add_gn_arg_string("chip_mdns" "minimal")
-    elseif(CONFIG_NET_L2_OPENTHREAD)
+    elseif(CONFIG_OPENTHREAD)
         matter_add_gn_arg_string("chip_mdns" "platform")
     else()
         matter_add_gn_arg_string("chip_mdns" "none")

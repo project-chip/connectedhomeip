@@ -1,7 +1,5 @@
 /*
- *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,25 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/commissioner-control-server/commissioner-control-server.h>
 
-#include <protocols/interaction_model/StatusCode.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandler.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/EventLogging.h>
-#include <app/reporting/reporting.h>
-#include <memory>
+#include <app/clusters/commissioner-control-server/CommissionerControlCluster.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/CommissionerControl/Metadata.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-using namespace chip;
-using namespace chip::app;
+namespace chip::app::Clusters {
 
-using chip::Protocols::InteractionModel::Status;
+using namespace CommissionerControl;
+using namespace CommissionerControl::Attributes;
 
 namespace {
 
@@ -63,116 +53,108 @@ void AddReverseOpenCommissioningWindowResponse(CommandHandler & commandHandler, 
 
 } // namespace
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace CommissionerControl {
+CommissionerControlCluster::CommissionerControlCluster(EndpointId endpointId, Delegate & delegate) :
+    DefaultServerCluster({ endpointId, CommissionerControl::Id }), mDelegate(delegate)
+{}
 
-CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
-    CommandHandlerInterface(MakeOptional(endpointId), Id)
+DataModel::ActionReturnStatus CommissionerControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                        AttributeValueEncoder & encoder)
 {
-    mDelegate = delegate;
-}
-
-CommissionerControlServer::~CommissionerControlServer()
-{
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-}
-
-CHIP_ERROR CommissionerControlServer::Init()
-{
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    return CHIP_NO_ERROR;
-}
-
-Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
-    EndpointId endpoint, BitMask<SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const
-{
-    Status status = Attributes::SupportedDeviceCategories::Get(endpoint, supportedDeviceCategories);
-    if (status != Status::Success)
+    switch (request.path.mAttributeId)
     {
-        ChipLogProgress(Zcl, "CommissionerControl: reading  supportedDeviceCategories, err:0x%x", to_underlying(status));
-    }
-    return status;
-}
-
-Status
-CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint,
-                                                             const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
-{
-    Status status = Status::Success;
-
-    if ((status = Attributes::SupportedDeviceCategories::Set(endpoint, supportedDeviceCategories)) != Status::Success)
-    {
-        ChipLogProgress(Zcl, "CommissionerControl: writing supportedDeviceCategories, err:0x%x", to_underlying(status));
-        return status;
-    }
-
-    return status;
-}
-
-CHIP_ERROR
-CommissionerControlServer::GenerateCommissioningRequestResultEvent(EndpointId endpoint,
-                                                                   const Events::CommissioningRequestResult::Type & result)
-{
-    EventNumber eventNumber;
-    CHIP_ERROR error = LogEvent(result, endpoint, eventNumber);
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Zcl, "CommissionerControl: Unable to emit CommissioningRequestResult event: %" CHIP_ERROR_FORMAT,
-                     error.Format());
-    }
-
-    return error;
-}
-
-void CommissionerControlServer::InvokeCommand(HandlerContext & handlerContext)
-{
-    ChipLogDetail(Zcl, "CommissionerControl: InvokeCommand");
-    switch (handlerContext.mRequestPath.mCommandId)
-    {
-    case Commands::RequestCommissioningApproval::Id:
-        ChipLogDetail(Zcl, "CommissionerControl: Entering RequestCommissioningApproval");
-
-        CommandHandlerInterface::HandleCommand<Commands::RequestCommissioningApproval::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleRequestCommissioningApproval(ctx, req); });
-        break;
-
-    case Commands::CommissionNode::Id:
-        ChipLogDetail(Zcl, "CommissionerControl: Entering CommissionNode");
-
-        CommandHandlerInterface::HandleCommand<Commands::CommissionNode::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleCommissionNode(ctx, req); });
-        break;
+    case ClusterRevision::Id:
+        return encoder.Encode(CommissionerControl::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode<uint32_t>(0);
+    case SupportedDeviceCategories::Id:
+        return encoder.Encode(mSupportedDeviceCategories);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 }
 
-void CommissionerControlServer::HandleRequestCommissioningApproval(
-    HandlerContext & ctx, const Commands::RequestCommissioningApproval::DecodableType & req)
+CHIP_ERROR CommissionerControlCluster::Attributes(const ConcreteClusterPath & path,
+                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    return listBuilder.Append(Span(kMandatoryMetadata), {});
+}
+
+std::optional<DataModel::ActionReturnStatus> CommissionerControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                       TLV::TLVReader & input_arguments,
+                                                                                       CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case Commands::RequestCommissioningApproval::Id: {
+        Commands::RequestCommissioningApproval::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+        return HandleRequestCommissioningApproval(handler, request.path, data);
+    }
+    case Commands::CommissionNode::Id: {
+        Commands::CommissionNode::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+        return HandleCommissionNode(handler, request.path, data);
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+CHIP_ERROR CommissionerControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    return builder.AppendElements(
+        { Commands::RequestCommissioningApproval::kMetadataEntry, Commands::CommissionNode::kMetadataEntry });
+}
+
+CHIP_ERROR CommissionerControlCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                         ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return builder.AppendElements({
+        Commands::ReverseOpenCommissioningWindow::Id,
+    });
+}
+
+void CommissionerControlCluster::SetSupportedDeviceCategories(
+    const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
+{
+    SetAttributeValue(mSupportedDeviceCategories, supportedDeviceCategories, SupportedDeviceCategories::Id);
+}
+
+void CommissionerControlCluster::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
+{
+    VerifyOrReturn(mContext != nullptr);
+    mContext->interactionContext.eventsGenerator.GenerateEvent(result, mPath.mEndpointId);
+}
+
+std::optional<DataModel::ActionReturnStatus> CommissionerControlCluster::HandleRequestCommissioningApproval(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const CommissionerControl::Commands::RequestCommissioningApproval::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Status status  = Status::Success;
+    using namespace chip::Protocols::InteractionModel;
 
     ChipLogProgress(Zcl, "Received command to request commissioning approval");
 
-    auto sourceNodeId = GetNodeId(ctx.mCommandHandler);
+    auto sourceNodeId = GetNodeId(*commandObj);
 
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {
         ChipLogError(Zcl, "Commissioning approval request not executed via CASE session, failing with UNSUPPORTED_ACCESS");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedAccess);
-        return;
+        return Status::UnsupportedAccess;
     }
 
-    auto fabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
-    auto requestId   = req.requestID;
-    auto vendorId    = req.vendorID;
-    auto productId   = req.productID;
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
+    auto requestId   = commandData.requestID;
+    auto vendorId    = commandData.vendorID;
+    auto productId   = commandData.productID;
 
     // The label assigned from req need to be stored in CommissionerControl::Delegate which ensure that the backing buffer
     // of it has a valid lifespan during fabric sync setup process.
-    auto & label = req.label;
+    auto & label = commandData.label;
 
     // Create a CommissioningApprovalRequest struct and populate it with the command data
     Clusters::CommissionerControl::CommissioningApprovalRequest request = { .requestId    = requestId,
@@ -182,75 +164,62 @@ void CommissionerControlServer::HandleRequestCommissioningApproval(
                                                                             .fabricIndex  = fabricIndex,
                                                                             .label        = label };
 
-    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     // Handle commissioning approval request
-    err = mDelegate->HandleCommissioningApprovalRequest(request);
-
-exit:
+    err = mDelegate.HandleCommissioningApprovalRequest(request);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleRequestCommissioningApproval error: %" CHIP_ERROR_FORMAT, err.Format());
-        status = StatusIB(err).mStatus;
+        return err;
     }
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    return Status::Success;
 }
 
-void CommissionerControlServer::HandleCommissionNode(HandlerContext & ctx, const Commands::CommissionNode::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+CommissionerControlCluster::HandleCommissionNode(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                 const CommissionerControl::Commands::CommissionNode::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    using namespace chip::Protocols::InteractionModel;
 
     ChipLogProgress(Zcl, "Received command to commission node");
 
-    auto sourceNodeId = GetNodeId(ctx.mCommandHandler);
+    auto sourceNodeId = GetNodeId(*commandObj);
 
     // Constraint on responseTimeoutSeconds is [30; 120] seconds
-    if ((req.responseTimeoutSeconds < 30) || (req.responseTimeoutSeconds > 120))
+    if ((commandData.responseTimeoutSeconds < 30) || (commandData.responseTimeoutSeconds > 120))
     {
         ChipLogError(Zcl, "Invalid responseTimeoutSeconds for CommissionNode.");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
+        return Status::ConstraintError;
     }
 
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {
         ChipLogError(Zcl, "Commission node request not executed via CASE session, failing with UNSUPPORTED_ACCESS");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedAccess);
-        return;
+        return Status::UnsupportedAccess;
     }
 
-    auto requestId                 = req.requestID;
-    auto delegate                  = mDelegate;
+    auto requestId                 = commandData.requestID;
     auto commissioningWindowParams = std::make_unique<Clusters::CommissionerControl::CommissioningWindowParams>();
 
-    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     // Validate the commission node command.
-    err = mDelegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
+    err = mDelegate.ValidateCommissionNodeCommand(sourceNodeId, requestId);
     SuccessOrExit(err);
 
     // Populate the parameters for the commissioning window
-    err = mDelegate->GetCommissioningWindowParams(*commissioningWindowParams);
+    err = mDelegate.GetCommissioningWindowParams(*commissioningWindowParams);
     SuccessOrExit(err);
 
     // Add the response for the commissioning window.
-    AddReverseOpenCommissioningWindowResponse(ctx.mCommandHandler, ctx.mRequestPath, *commissioningWindowParams);
+    AddReverseOpenCommissioningWindowResponse(*commandObj, commandPath, *commissioningWindowParams);
 
     // Schedule the deferred reverse commission node task
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate, params = commissioningWindowParams.release()]() {
-        if (delegate != nullptr)
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, params = commissioningWindowParams.release()]() {
+        CHIP_ERROR error = mDelegate.HandleCommissionNode(*params);
+        if (error != CHIP_NO_ERROR)
         {
-            CHIP_ERROR error = delegate->HandleCommissionNode(*params);
-            if (error != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, error.Format());
-            }
-        }
-        else
-        {
-            ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
+            ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, error.Format());
         }
 
         delete params;
@@ -260,21 +229,10 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);
+        return err;
     }
+
+    return std::nullopt;
 }
 
-} // namespace CommissionerControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-void MatterCommissionerControlPluginServerInitCallback()
-{
-    ChipLogProgress(Zcl, "Initializing Commissioner Control cluster.");
-}
-
-void MatterCommissionerControlPluginServerShutdownCallback()
-{
-    ChipLogProgress(Zcl, "Shutdown Commissioner Control cluster.");
-}
+} // namespace chip::app::Clusters

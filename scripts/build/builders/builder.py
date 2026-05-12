@@ -18,23 +18,33 @@ import shutil
 import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import StrEnum
+
+
+class BuildProfile(StrEnum):
+    """Build profile to use for the build."""
+    DEFAULT = "default"                  # Profile defined by the build system.
+    DEBUG = "debug"                      # Default debug profile.
+    DEBUG_OPTIMIZED = "debug-optimized"  # Debug profile with optimizations enabled.
+    RELEASE = "release"                  # Release profile optimized for performance.
+    RELEASE_SIZE = "release-size"        # Release profile optimized for size.
+
 
 log = logging.getLogger(__name__)
 
 
 @dataclass
 class BuilderOptions:
+    # Build profile
+    build_profile: BuildProfile = BuildProfile.DEFAULT
     # Generate a link map file
     enable_link_map_file: bool = False
-
     # Enable flashbundle generation stage
     enable_flashbundle: bool = False
-
     # Allow to wrap default build command
-    pw_command_launcher: str = None
-
+    pw_command_launcher: str | None = None
     # Locations where files are pre-generated
-    pregen_dir: str = None
+    pregen_dir: str | None = None
 
 
 @dataclass
@@ -59,6 +69,8 @@ class Builder(ABC):
         self.identifier = None
         self.output_dir = None
         self.options = BuilderOptions()
+        self.quiet = False
+        self.verbose = False
 
     @abstractmethod
     def generate(self):
@@ -111,7 +123,7 @@ class Builder(ABC):
             self._bundle()
 
     def _Execute(self, cmdarray, title=None, dedup=False):
-        self._runner.Run(cmdarray, title=title, dedup=dedup)
+        self._runner.Run(cmdarray, title=title, dedup=dedup, quiet=self.quiet)
 
     def CompressArtifacts(self, target_file: str):
         with tarfile.open(target_file, "w:gz") as tar:

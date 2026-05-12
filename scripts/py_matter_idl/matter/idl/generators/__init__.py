@@ -84,7 +84,7 @@ class CodeGenerator:
         """
         raise NotImplementedError("Method should be implemented by subclasses")
 
-    def internal_render_one_output(self, template_path: str, output_file_name: str, vars: Dict):
+    def internal_render_one_output(self, template_path: str, output_file_name: str, template_vars: Dict):
         """
         Method to be called by subclasses to mark that a template is to be generated.
 
@@ -106,7 +106,7 @@ class CodeGenerator:
             return
 
         log.info("Template path: '%s', CWD: '%s'", template_path, os.getcwd())
-        rendered = self.jinja_env.get_template(template_path).render(vars)
+        rendered = self.jinja_env.get_template(template_path).render(template_vars)
 
         # Report regardless if it has changed or not. This is because even if
         # files are unchanged, validation of what the correct output is should
