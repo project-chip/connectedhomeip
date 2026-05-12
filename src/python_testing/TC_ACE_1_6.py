@@ -421,11 +421,12 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 11e: Re-add GroupKeyMap
             self.step("11e")
-            await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([
+            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID1),
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID1),
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID3),
             ]))])
+            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
             # Step 11f: Group command to Group 0x0103 after re-adding keys
             self.step("11f")
