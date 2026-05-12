@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "DefaultThreadNetworkDirectoryStorage.cpp",
-  "DefaultThreadNetworkDirectoryStorage.h",
-  "ThreadNetworkDirectoryCluster.cpp",
-  "ThreadNetworkDirectoryCluster.h",
-  "ThreadNetworkDirectoryStorage.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
 ]
