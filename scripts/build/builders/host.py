@@ -250,9 +250,12 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.LIGHT or self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+        elif self == HostApp.LIGHT:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
+        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            yield 'chip-lighting-data-model-no-unique-id-app'
+            yield 'chip-lighting-data-model-no-unique-id-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
@@ -417,6 +420,7 @@ class HostBuilder(GnBuilder):
                  openthread_endpoint=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 all_devices_enabled_devices=None,
                  ):
         """
         Construct a host builder.
@@ -521,6 +525,7 @@ class HostBuilder(GnBuilder):
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
 
+        self.use_nl_fault_injection = use_nl_fault_injection
         if use_nl_fault_injection:
             self.extra_gn_options.append('chip_with_nlfaultinjection=true')
 
@@ -600,6 +605,11 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_endpoint_unique_id=true')
             else:
                 self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
+
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
+        if self.all_devices_enabled_devices:
+            devices_str = '[' + ','.join(f'"{d}"' for d in self.all_devices_enabled_devices) + ']'
+            self.extra_gn_options.append(f'all_devices_enabled_devices={devices_str}')
 
         if openthread_endpoint:
             if enable_wifi:
@@ -825,7 +835,37 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.KOTLIN_MATTER_CONTROLLER:
             self.createJavaExecutable("kotlin-matter-controller")
 
+        if self.app == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-lighting-app'),
+                 os.path.join(self.output_dir, 'chip-lighting-data-model-no-unique-id-app')],
+                title="Rename lighting-data-model-no-unique-id app binary"
+            )
+
+        if self.app == HostApp.ALL_CLUSTERS and self.use_nl_fault_injection:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-all-clusters-app'),
+                 os.path.join(self.output_dir, 'chip-all-clusters-app-nlfaultinject')],
+                title="Rename all-clusters nlfaultinject app binary"
+            )
+
+    def _AllDevicesOutputName(self):
+        """Return the binary name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            # device built with all-examples does not change the name.
+            return 'example-device-app'
+        return 'all-devices-app'
+
     def build_outputs(self):
+        if self.app == HostApp.ALL_DEVICES_APP:
+            base = self._AllDevicesOutputName()
+            for name in [base, base + '.map']:
+                if not self.options.enable_link_map_file and name.endswith('.map'):
+                    continue
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
         for name in self.app.OutputNames():
             if not self.options.enable_link_map_file and name.endswith(".map"):
                 continue

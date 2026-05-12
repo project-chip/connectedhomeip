@@ -5311,6 +5311,119 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::W
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectColorStruct.level", "level", value.isMember("level")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectColorStruct.x", "x", value.isMember("x")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectColorStruct.y", "y", value.isMember("y")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectColorStruct.hue", "hue", value.isMember("hue")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("EffectColorStruct.enhancedHue", "enhancedHue", value.isMember("enhancedHue")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("EffectColorStruct.saturation", "saturation", value.isMember("saturation")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "level");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.level, value["level"]));
+    valueCopy.removeMember("level");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x, value["x"]));
+    valueCopy.removeMember("x");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y, value["y"]));
+    valueCopy.removeMember("y");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hue");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hue, value["hue"]));
+    valueCopy.removeMember("hue");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enhancedHue");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enhancedHue, value["enhancedHue"]));
+    valueCopy.removeMember("enhancedHue");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "saturation");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.saturation, value["saturation"]));
+    valueCopy.removeMember("saturation");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.level);
+    ComplexArgumentParser::Finalize(request.x);
+    ComplexArgumentParser::Finalize(request.y);
+    ComplexArgumentParser::Finalize(request.hue);
+    ComplexArgumentParser::Finalize(request.enhancedHue);
+    ComplexArgumentParser::Finalize(request.saturation);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::DynamicLighting::Structs::EffectStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectStruct.effectID", "effectID", value.isMember("effectID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectStruct.source", "source", value.isMember("source")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectStruct.label", "label", value.isMember("label")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectStruct.maxSpeed", "maxSpeed", value.isMember("maxSpeed")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("EffectStruct.defaultSpeed", "defaultSpeed", value.isMember("defaultSpeed")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EffectStruct.supportsColorPalette", "supportsColorPalette",
+                                                                  value.isMember("supportsColorPalette")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "effectID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.effectID, value["effectID"]));
+    valueCopy.removeMember("effectID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "source");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.source, value["source"]));
+    valueCopy.removeMember("source");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
+    valueCopy.removeMember("label");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxSpeed");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxSpeed, value["maxSpeed"]));
+    valueCopy.removeMember("maxSpeed");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "defaultSpeed");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.defaultSpeed, value["defaultSpeed"]));
+    valueCopy.removeMember("defaultSpeed");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "supportsColorPalette");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.supportsColorPalette, value["supportsColorPalette"]));
+    valueCopy.removeMember("supportsColorPalette");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::DynamicLighting::Structs::EffectStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.effectID);
+    ComplexArgumentParser::Finalize(request.source);
+    ComplexArgumentParser::Finalize(request.label);
+    ComplexArgumentParser::Finalize(request.maxSpeed);
+    ComplexArgumentParser::Finalize(request.defaultSpeed);
+    ComplexArgumentParser::Finalize(request.supportsColorPalette);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request,
                                         Json::Value & value)
 {
