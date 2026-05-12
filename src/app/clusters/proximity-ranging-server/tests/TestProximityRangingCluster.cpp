@@ -83,6 +83,7 @@ public:
         sessionIds.reduce_size(count);
         return CHIP_NO_ERROR;
     }
+    size_t GetNumActiveSessionIds() override { return mActiveSessionIds.size(); }
     CHIP_ERROR GetBleDeviceId(uint64_t & bleDeviceId) override
     {
         VerifyOrReturnError(mBleDeviceIdSupported, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);

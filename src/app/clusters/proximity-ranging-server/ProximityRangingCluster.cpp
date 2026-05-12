@@ -69,32 +69,42 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
     case Attributes::WiFiDevIK::Id: {
         uint8_t buf[kDeviceIdentityKeyLen] = { 0 };
         MutableByteSpan span(buf);
-        ReturnErrorOnFailure(mDriver->GetWiFiDevIK(span));
+        CHIP_ERROR err = mDriver->GetWiFiDevIK(span);
+        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
+        ReturnErrorOnFailure(err);
         return encoder.Encode(span);
     }
 
     case Attributes::BLEDeviceID::Id: {
         uint64_t bleDeviceId = 0;
-        ReturnErrorOnFailure(mDriver->GetBleDeviceId(bleDeviceId));
+        CHIP_ERROR err       = mDriver->GetBleDeviceId(bleDeviceId);
+        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
+        ReturnErrorOnFailure(err);
         return encoder.Encode(bleDeviceId);
     }
 
     case Attributes::BLTDevIK::Id: {
         uint8_t buf[kDeviceIdentityKeyLen] = { 0 };
         MutableByteSpan span(buf);
-        ReturnErrorOnFailure(mDriver->GetBLTDevIK(span));
+        CHIP_ERROR err = mDriver->GetBLTDevIK(span);
+        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
+        ReturnErrorOnFailure(err);
         return encoder.Encode(span);
     }
 
     case Attributes::BLTCSSecurityLevel::Id: {
         BLTCSSecurityLevelEnum securityLevel;
-        ReturnErrorOnFailure(mDriver->GetBLTCSSecurityLevel(securityLevel));
+        CHIP_ERROR err = mDriver->GetBLTCSSecurityLevel(securityLevel);
+        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
+        ReturnErrorOnFailure(err);
         return encoder.Encode(securityLevel);
     }
 
     case Attributes::BLTCSModeCapability::Id: {
         BLTCSModeEnum modeCapability = BLTCSModeEnum::kUnknownEnumValue;
-        ReturnErrorOnFailure(mDriver->GetBLTCSModeCapability(modeCapability));
+        CHIP_ERROR err               = mDriver->GetBLTCSModeCapability(modeCapability);
+        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
+        ReturnErrorOnFailure(err);
         return encoder.Encode(modeCapability);
     }
 
