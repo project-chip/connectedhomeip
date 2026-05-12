@@ -125,7 +125,7 @@ public:
         if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
         {
             // for dynamic endpoints
-            description = GetCharStringDefaultValueFromEmber<Description::TypeInfo::MaxLength()>(
+            description = GetCharStringDefaultValueFromEmber(
                 Description::GetDefault, endpointId,
                 // this static cast does nothing, it is here to make the code template dependent on class template, so the code will
                 // compile.
@@ -236,7 +236,7 @@ public:
                         {
                             // for dynamic endpoints
                             replacementDescription =
-                                GetCharStringDefaultValueFromEmber<BatReplacementDescription::TypeInfo::MaxLength()>(
+                                GetCharStringDefaultValueFromEmber(
                                     BatReplacementDescription::GetDefault, endpointId,
                                     // this static cast does nothing, it is here to make the code template dependent on class
                                     // template, so the code will compile.
@@ -266,7 +266,7 @@ public:
                             {
                                 // for dynamic endpoints
                                 config.batANSIDesignation =
-                                    GetCharStringDefaultValueFromEmber<BatANSIDesignation::TypeInfo::MaxLength()>(
+                                    GetCharStringDefaultValueFromEmber(
                                         BatANSIDesignation::GetDefault, endpointId,
                                         // this static cast does nothing, it is here to make the code template dependent on class
                                         // template, so the code will compile.
@@ -290,7 +290,7 @@ public:
                             {
                                 // for dynamic endpoints
                                 config.batIECDesignation =
-                                    GetCharStringDefaultValueFromEmber<BatIECDesignation::TypeInfo::MaxLength()>(
+                                    GetCharStringDefaultValueFromEmber(
                                         BatIECDesignation::GetDefault, endpointId,
                                         // this static cast does nothing, it is here to make the code template dependent on class
                                         // template, so the code will compile.
