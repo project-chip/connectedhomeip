@@ -72,9 +72,14 @@ inline void chipAbort(void)
  *
  *  @param[in]  cond  A Boolean expression to be evaluated.
  */
-// clang-format off
-#define VerifyOrDieWithoutLogging(cond) do { if (!(cond)) { chipAbort(); } } while (false)
-// clang-format on
+#define VerifyOrDieWithoutLogging(cond)                                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(cond))                                                                                                               \
+        {                                                                                                                          \
+            chipAbort();                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
 
 /**
  *  @def AbortWithAction(anAction...)
@@ -84,9 +89,12 @@ inline void chipAbort(void)
  *
  *  @param[in]  ...         Statements to execute.
  */
-// clang-format off
-#define AbortWithAction(...) do { __VA_ARGS__; chipAbort(); } while (false)
-// clang-format on
+#define AbortWithAction(...)                                                                                                       \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        __VA_ARGS__;                                                                                                               \
+        chipAbort();                                                                                                               \
+    } while (false)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -247,13 +255,12 @@ inline void chipAbort(void)
  *
  *  @param[in]  ...         Statements to execute. Optional.
  */
-// clang-format off
-#define ExitNow(...)                                                   \
-    do {                                                               \
-        __VA_ARGS__;                                                   \
-        goto exit;                                                     \
+#define ExitNow(...)                                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        __VA_ARGS__;                                                                                                               \
+        goto exit;                                                                                                                 \
     } while (0)
-// clang-format on
 
 /**
  *  @def IgnoreUnusedVariable(aVariable)
