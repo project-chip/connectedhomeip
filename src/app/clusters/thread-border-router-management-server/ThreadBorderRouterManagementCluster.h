@@ -17,40 +17,61 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/reporting/reporting.h>
+#include <app/FailSafeContext.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
+#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/ThreadBorderRouterManagement/Ids.h>
 
 namespace chip::app::Clusters {
-namespace ThreadBorderRouterManagement {
 
-class Delegate;
-
-class ThreadBorderRouterManagementCluster : public DefaultServerCluster
+class ThreadBorderRouterManagementCluster : public DefaultServerCluster, public ThreadBorderRouterManagement::Delegate::ActivateDatasetCallback
 {
 public:
     class Config
     {
     public:
-        Config(Delegate & delegate) : mDelegate(delegate) {}
+        Config(ThreadBorderRouterManagement::Delegate & delegate, FailSafeContext & failSafeContext, BreadCrumbTracker & breadcrumbTracker) :
+            mDelegate(delegate), mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker) {}
 
     private:
         friend class ThreadBorderRouterManagementCluster;
-        Delegate & mDelegate;
+        ThreadBorderRouterManagement::Delegate & mDelegate;
+        FailSafeContext & mFailSafeContext;
+        BreadCrumbTracker & mBreadcrumbTracker;
     };
 
     ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
-        DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate)
+        DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate), mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker)
     {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType reason) override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & payload,
+                                                               CommandHandler * ctx) override;
+
+    // ThreadBorderRouterManagement::Delegate::ActivateDatasetCallback
+    void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
+
+    // Platform event handler
+    static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
 protected:
-    Delegate & mDelegate;
+    ThreadBorderRouterManagement::Delegate & mDelegate;
+    FailSafeContext & mFailSafeContext;
+    BreadCrumbTracker & mBreadcrumbTracker;
+    CommandHandler::Handle mAsyncCommandHandle;
+    uint32_t mSetActiveDatasetSequenceNumber = 0;
+    Optional<uint64_t> mBreadcrumb;
 };
 
-} // namespace ThreadBorderRouterManagement
 } // namespace chip::app::Clusters
