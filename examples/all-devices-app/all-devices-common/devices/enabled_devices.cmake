@@ -100,11 +100,11 @@ foreach(_key
         dimmable-light
         occupancy-sensor
         on-off-light
+        proximity-ranger
         soil-sensor
         speaker
         temperature-sensor
         water-leak-detector
-        proximity-ranger
         # keep-sorted: end
     )
     string(REPLACE "-" "_" _suffix "${_key}")

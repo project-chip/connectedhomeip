@@ -22,6 +22,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ProximityRanging/Metadata.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -32,8 +33,6 @@ namespace ProximityRanging {
 using Status = Protocols::InteractionModel::Status;
 
 namespace {
-// Maximum number of active sessions supported by ProximityRanging cluster
-static constexpr size_t kMaxActiveSessions = 50;
 static constexpr uint8_t kInvalidSessionId = 0;
 } // namespace
 
@@ -70,50 +69,41 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
     case Attributes::WiFiDevIK::Id: {
         uint8_t buf[kDeviceIdentityKeyLen] = { 0 };
         MutableByteSpan span(buf);
-        CHIP_ERROR err = mDriver->GetWiFiDevIK(span);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+        ReturnErrorOnFailure(mDriver->GetWiFiDevIK(span));
         return encoder.Encode(span);
     }
 
     case Attributes::BLEDeviceID::Id: {
         uint64_t bleDeviceId = 0;
-        CHIP_ERROR err       = mDriver->GetBleDeviceId(bleDeviceId);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+        ReturnErrorOnFailure(mDriver->GetBleDeviceId(bleDeviceId));
         return encoder.Encode(bleDeviceId);
     }
 
     case Attributes::BLTDevIK::Id: {
         uint8_t buf[kDeviceIdentityKeyLen] = { 0 };
         MutableByteSpan span(buf);
-        CHIP_ERROR err = mDriver->GetBLTDevIK(span);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+        ReturnErrorOnFailure(mDriver->GetBLTDevIK(span));
         return encoder.Encode(span);
     }
 
     case Attributes::BLTCSSecurityLevel::Id: {
         BLTCSSecurityLevelEnum securityLevel;
-        CHIP_ERROR err = mDriver->GetBLTCSSecurityLevel(securityLevel);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+        ReturnErrorOnFailure(mDriver->GetBLTCSSecurityLevel(securityLevel));
         return encoder.Encode(securityLevel);
     }
 
     case Attributes::BLTCSModeCapability::Id: {
         BLTCSModeEnum modeCapability = BLTCSModeEnum::kUnknownEnumValue;
-        CHIP_ERROR err               = mDriver->GetBLTCSModeCapability(modeCapability);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+        ReturnErrorOnFailure(mDriver->GetBLTCSModeCapability(modeCapability));
         return encoder.Encode(modeCapability);
     }
 
     case Attributes::SessionIDList::Id: {
-        uint8_t buf[kMaxActiveSessions] = { 0 };
-        Span<uint8_t> sessionIds(buf, kMaxActiveSessions);
-        CHIP_ERROR err = mDriver->GetActiveSessionIds(sessionIds);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+        const size_t numSessions = mDriver->GetNumActiveSessionIds();
+        Platform::ScopedMemoryBuffer<uint8_t> buf;
+        VerifyOrReturnError(buf.Calloc(numSessions), Status::ResourceExhausted);
+        Span<uint8_t> sessionIds(buf.Get(), numSessions);
+        ReturnErrorOnFailure(mDriver->GetActiveSessionIds(sessionIds));
         return encoder.EncodeList([&sessionIds](const auto & listEncoder) -> CHIP_ERROR {
             for (size_t i = 0; i < sessionIds.size(); i++)
             {
@@ -230,12 +220,7 @@ DataModel::ActionReturnStatus ProximityRangingCluster::HandleStopRangingRequest(
         // If SessionID does not match any active ranging session, the Server SHALL response with the status code INVALID_IN_STATE
         return Status::InvalidInState;
     }
-    if (err != CHIP_NO_ERROR)
-    {
-        return Status::Failure;
-    }
-
-    return Status::Success;
+    return err;
 }
 
 void ProximityRangingCluster::OnMeasurementData(uint8_t sessionId, const Structs::RangingMeasurementDataStruct::Type & measurement)
@@ -261,14 +246,16 @@ void ProximityRangingCluster::OnSessionStopped(uint8_t sessionId, RangingSession
 uint8_t ProximityRangingCluster::GenerateSessionId()
 {
     VerifyOrReturnValue(mDriver != nullptr, kInvalidSessionId);
-    uint8_t buf[kMaxActiveSessions] = { 0 };
-    Span<uint8_t> activeSessions(buf);
+    const size_t numSessions = mDriver->GetNumActiveSessionIds();
+    Platform::ScopedMemoryBuffer<uint8_t> buf;
+    VerifyOrReturnValue(buf.Calloc(numSessions), kInvalidSessionId);
+    Span<uint8_t> activeSessions(buf.Get(), numSessions);
     if (mDriver->GetActiveSessionIds(activeSessions) != CHIP_NO_ERROR)
     {
         return kInvalidSessionId;
     }
 
-    for (uint8_t attempt = 0; attempt <= kMaxActiveSessions; attempt++)
+    for (size_t attempt = 0; attempt <= numSessions; attempt++)
     {
         uint8_t candidate = mNextSessionId++;
         if (candidate == kInvalidSessionId)

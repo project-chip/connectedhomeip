@@ -39,6 +39,11 @@ CHIP_ERROR BleRssiRangingAdapter::Init(chip::PersistentStorageDelegate * store)
     if (mBleDeviceId == kInvalidBleDeviceId)
     {
         ReturnErrorOnFailure(GenerateBleDeviceId());
+        // Persist newly generated BLE Device ID if storage is provided
+        if (mpStore != nullptr)
+        {
+            ReturnErrorOnFailure(mpStore->SyncSetKeyValue(kBleDeviceIdKeyName, &mBleDeviceId, sizeof(mBleDeviceId)));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -87,10 +92,9 @@ CHIP_ERROR BleRssiRangingAdapter::GenerateBleDeviceId()
         {
             mBleDeviceId = id;
 
-            if (mpStore != nullptr)
+            if (mpStore == nullptr)
             {
-                // Fallthrough if no storage delegate registered
-                LogErrorOnFailure(mpStore->SyncSetKeyValue(kBleDeviceIdKeyName, &mBleDeviceId, sizeof(mBleDeviceId)));
+                ChipLogError(DeviceLayer, "Warning: no persistent storage, BleDeviceId randomly generated on each reboot");
             }
             return CHIP_NO_ERROR;
         }
@@ -99,7 +103,7 @@ CHIP_ERROR BleRssiRangingAdapter::GenerateBleDeviceId()
     return CHIP_ERROR_INTERNAL;
 }
 
-uint64_t BleRssiRangingAdapter::GetBleDeviceId()
+std::optional<uint64_t> BleRssiRangingAdapter::GetDeviceId()
 {
     if (mBleDeviceId == kInvalidBleDeviceId)
     {

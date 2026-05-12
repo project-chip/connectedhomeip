@@ -115,6 +115,11 @@ public:
      */
     void StopAllSessions();
 
+    /**
+     * Returns the number of active sessions across all adapters
+     */
+    size_t GetNumActiveSessionIds() const { return mSessions.size(); }
+
     CHIP_ERROR GetActiveSessionIds(chip::Span<uint8_t> & sessionIds);
 
     // RangingAdapter::Callback implementation

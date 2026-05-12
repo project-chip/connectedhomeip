@@ -63,6 +63,10 @@ _available_devices = [
     "ON_OFF_LIGHT",
   ],
   [
+    "proximity-ranger",
+    "PROXIMITY_RANGER",
+  ],
+  [
     "soil-sensor",
     "SOIL_SENSOR",
   ],
@@ -77,10 +81,6 @@ _available_devices = [
   [
     "water-leak-detector",
     "WATER_LEAK_DETECTOR",
-  ],
-  [
-    "proximity-ranger",
-    "PROXIMITY_RANGER",
   ],
 ]
 

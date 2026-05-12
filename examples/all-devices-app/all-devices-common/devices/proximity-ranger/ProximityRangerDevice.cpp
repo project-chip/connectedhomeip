@@ -21,7 +21,11 @@ using namespace chip::app::Clusters;
 
 namespace {
 // Global controller shared across all ProximityRangerDevice instances.
-ProximityRanging::RangingTechnologyController sRangingController;
+ProximityRanging::RangingTechnologyController & GetRangingController()
+{
+    static ProximityRanging::RangingTechnologyController sRangingController;
+    return sRangingController;
+}
 } // namespace
 
 namespace chip {
@@ -30,7 +34,7 @@ namespace app {
 ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
                                              Span<ProximityRanging::RangingAdapter * const> adapters) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
-    mRangingDriver(sRangingController), mTimerDelegate(timerDelegate), mAdapters(adapters)
+    mRangingDriver(GetRangingController()), mTimerDelegate(timerDelegate), mAdapters(adapters)
 {}
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -39,7 +43,7 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
     for (auto * adapter : mAdapters)
     {
         VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        CHIP_ERROR err = sRangingController.RegisterAdapter(*adapter);
+        CHIP_ERROR err = GetRangingController().RegisterAdapter(*adapter);
         if (err != CHIP_NO_ERROR && err != CHIP_ERROR_DUPLICATE_KEY_ID)
         {
             return err;
@@ -100,7 +104,7 @@ void ProximityRangerDevice::Unregister(CodeDrivenDataModelProvider & provider)
     {
         if (adapter != nullptr)
         {
-            LogErrorOnFailure(sRangingController.UnregisterAdapter(*adapter));
+            LogErrorOnFailure(GetRangingController().UnregisterAdapter(*adapter));
         }
     }
 }

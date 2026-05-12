@@ -169,19 +169,22 @@ void RangingTechnologyController::StopAllSessions()
 {
     for (auto & entry : mSessions)
     {
-        [[maybe_unused]] auto err = entry.adapter->StopSession(entry.sessionId);
+        LogErrorOnFailure(entry.adapter->StopSession(entry.sessionId));
     }
     mSessions.clear();
 }
 
 CHIP_ERROR RangingTechnologyController::GetActiveSessionIds(Span<uint8_t> & sessionIds)
 {
-    size_t count = std::min(mSessions.size(), sessionIds.size());
-    for (size_t i = 0; i < count; i++)
+    if (sessionIds.size() < mSessions.size())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    for (size_t i = 0; i < mSessions.size(); i++)
     {
         sessionIds.data()[i] = mSessions[i].sessionId;
     }
-    sessionIds.reduce_size(count);
+    sessionIds.reduce_size(mSessions.size());
     return CHIP_NO_ERROR;
 }
 
@@ -239,7 +242,9 @@ uint64_t RangingTechnologyController::GetBleDeviceId()
     {
         return 0;
     }
-    return adapter->GetBleDeviceId();
+    std::optional<uint64_t> deviceId = adapter->GetDeviceId();
+    // Return 0 (invalid ID) if no ID returned
+    return deviceId.value_or(0);
 }
 
 } // namespace ProximityRanging

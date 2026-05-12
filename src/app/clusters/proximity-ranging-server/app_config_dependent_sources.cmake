@@ -19,12 +19,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
 )
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/ProximityRangingCluster.cpp"
-    "${CLUSTER_DIR}/ProximityRangingCluster.h"
-    "${CLUSTER_DIR}/ProximityRangingDriver.h"
-)

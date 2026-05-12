@@ -69,11 +69,13 @@ public:
 
     /**
      * Initialize the adapter with persistent storage for BLE Device ID.
-     * Must be called before GetBleDeviceId() to enable persistence.
+     * Retrieves persisted ID (if available) or generates random value if none already exist.
+     * Must be called before @e GetDeviceId to ensure persistence, otherwise new BLE Device ID will be generated.
+     * @note Providing no persistent storage results in random ID generation after every reboot.
      */
     CHIP_ERROR Init(chip::PersistentStorageDelegate * store);
 
-    virtual uint64_t GetBleDeviceId() override;
+    virtual std::optional<uint64_t> GetDeviceId() override;
 
     chip::app::Clusters::ProximityRanging::RangingTechEnum GetTechnology() const override
     {

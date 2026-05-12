@@ -24,6 +24,7 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 
+#include <optional>
 #include <vector>
 
 namespace chip {
@@ -94,9 +95,9 @@ public:
     virtual CHIP_ERROR GetActiveSessionIds(std::vector<uint8_t> & sessionIds) = 0;
 
     /**
-     * Get the BLE Device ID for this adapter. Only meaningful for BLE-based adapters.
+     * Get the unique Device ID for this adapter if supported.
      */
-    virtual uint64_t GetBleDeviceId() { return 0; }
+    virtual std::optional<uint64_t> GetDeviceId() { return std::nullopt; }
 
 protected:
     Callback * mCallback = nullptr;

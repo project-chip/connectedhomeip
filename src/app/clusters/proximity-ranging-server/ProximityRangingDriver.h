@@ -90,9 +90,14 @@ public:
     virtual CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder) = 0;
 
     /**
+     * Returns number of active session IDs across all ranging technologies.
+     */
+    virtual size_t GetNumActiveSessionIds() = 0;
+
+    /**
      * Collect active session IDs across all ranging technologies.
      */
-    virtual CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    virtual CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) = 0;
 
     /**
      * Get the BLE Device ID. Override if the BLERBC feature is supported.

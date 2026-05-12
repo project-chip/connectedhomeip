@@ -41,6 +41,7 @@ public:
     CHIP_ERROR HandleStopRanging(uint8_t sessionId) override;
     CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder) override;
     CHIP_ERROR GetBleDeviceId(uint64_t & bleDeviceId) override;
+    size_t GetNumActiveSessionIds() override { return mController.GetNumActiveSessionIds(); }
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override;
 
     // RangingTechnologyController::Listener implementation
