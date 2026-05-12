@@ -45,18 +45,6 @@ is removed.
 Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/basic_information.adoc#tc-binfo-2-2
 
-Notes/Considerations
-StartUp event: the test first attempts to read the StartUp event without rebooting, since
-the event is typically already present in the log from commissioning. Only if the log is
-empty is a reboot triggered. On a real DUT this prompts the operator; in CI the test
-runner handles the reboot automatically.
-
-ShutDown event: not tested. The event is optional and there is no guarantee it will be
-transmitted before the device powers off.
-
-Leave event: only tested when BINFO.S.E02 is declared in PICS. A second TH fabric is
-commissioned and then removed, producing a deterministic Leave event whose fabricIndex
-can be verified.
 '''
 
 import logging
@@ -97,16 +85,14 @@ class TC_BINFO_2_2(MatterBaseTest):
                         If no StartUp event is present, reboot DUT and read StartUp event again.
                         - Verify that the StartUp event is present.
                         - Verify that the softwareVersion field from the StartUp event matches the SoftwareVersion attribute value read in step 1."""),
-            TestStep(3, "Check if BINFO.S.E02 (Leave event) is supported", "If not supported, skip the remaining steps."),
-            TestStep(4, """Setup a second controller TH2 on its own fabric.
+            TestStep(3, """Setup a second controller TH2 on its own fabric.
                            TH1 opens an Enhanced Commissioning Window on the DUT.
                            TH2 commissions the DUT on a new fabric.""",
-                        "- TH2 successfully commissions the DUT on a new fabric."),
-            TestStep(5, """TH2 reads CurrentFabricIndex and saves as th2_fabric_index.
-                           TH1 sends RemoveFabric command with th2_fabric_index.
-                           TH1 reads the Leave event from the DUT.""", """
-                        - Verify that the Leave event is present.
-                        - Verify that the fabricIndex field from the Leave event matches th2_fabric_index."""),
+                        "TH2 successfully commissions the DUT on a new fabric."),
+            TestStep(4, "TH2 reads CurrentFabricIndex.", "Store value as th2_fabric_index."),
+            TestStep(5, """TH1 sends RemoveFabric command with th2_fabric_index and reads the Leave event from the DUT.""", """
+                        - If the Leave event is present: verify that the fabricIndex field matches th2_fabric_index, and verify that BINFO.S.E02 is declared in PICS.
+                        - If the Leave event is absent: verify that BINFO.S.E02 is not declared in PICS."""),
         ]
 
     def pics_TC_BINFO_2_2(self) -> list[str]:
@@ -163,70 +149,67 @@ class TC_BINFO_2_2(MatterBaseTest):
                              f"StartUp event softwareVersion {software_version_from_startup_event} does not match SoftwareVersion attribute {software_version_from_attribute}")
 
         # *** STEP 3 ***
-        # Check if BINFO.S.E02 (Leave event) is supported
-        # If not supported, skip the remaining steps
+        # Setup a second controller TH2 on its own fabric.
+        # TH1 opens an Enhanced Commissioning Window on the DUT.
+        # TH2 commissions the DUT on a new fabric.
         self.step(3)
-        supports_leave_event = self.check_pics("BINFO.S.E02")
 
-        if not supports_leave_event:
-            self.mark_step_range_skipped(4, 5)
-        else:
-            # *** STEP 4 ***
-            # Setup a second controller TH2 on its own fabric.
-            # TH1 opens an Enhanced Commissioning Window on the DUT.
-            # TH2 commissions the DUT on a new fabric.
-            self.step(4)
+        th2_ca = self.certificate_authority_manager.NewCertificateAuthority()
+        th2_fabric_admin = th2_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.TH1.fabricId + 1)
+        self.TH2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
-            # Setup a second controller TH2 on its own fabric
-            th2_ca = self.certificate_authority_manager.NewCertificateAuthority()
-            th2_fabric_admin = th2_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.TH1.fabricId + 1)
-            self.TH2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        ecw = await self.open_commissioning_window(dev_ctrl=self.TH1, node_id=self.dut_node_id)
 
-            # TH1 opens an Enhanced Commissioning Window on the DUT.
-            ecw = await self.open_commissioning_window(dev_ctrl=self.TH1, node_id=self.dut_node_id)
+        th2_dut_node_id = self.dut_node_id + 1
+        await self.TH2.CommissionOnNetwork(
+            nodeId=th2_dut_node_id,
+            setupPinCode=ecw.commissioningParameters.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=ecw.randomDiscriminator
+        )
 
-            # TH2 commissions the DUT on a new fabric.
-            th2_dut_node_id = self.dut_node_id + 1
-            await self.TH2.CommissionOnNetwork(
-                nodeId=th2_dut_node_id,
-                setupPinCode=ecw.commissioningParameters.setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-                filter=ecw.randomDiscriminator
-            )
+        # *** STEP 4 ***
+        # TH2 reads CurrentFabricIndex.
+        self.step(4)
+        th2_fabric_index = await self.read_single_attribute_check_success(
+            dev_ctrl=self.TH2,
+            node_id=th2_dut_node_id,
+            cluster=Clusters.OperationalCredentials,
+            attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
+            endpoint=0
+        )
 
-            # *** STEP 5 ***
-            # TH2 reads CurrentFabricIndex and saves as th2_fabric_index.
-            # TH1 sends RemoveFabric command with th2_fabric_index.
-            # TH1 reads the Leave event from the DUT.
-            self.step(5)
-            # TH2 reads CurrentFabricIndex and saves as th2_fabric_index.
-            th2_fabric_index = await self.read_single_attribute_check_success(
-                dev_ctrl=self.TH2,
-                node_id=th2_dut_node_id,
-                cluster=Clusters.OperationalCredentials,
-                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
-                endpoint=0
-            )
+        # *** STEP 5 ***
+        # TH1 sends RemoveFabric command with th2_fabric_index
+        # and reads the Leave event from the DUT.
+        self.step(5)
 
-            # TH1 sends RemoveFabric command with th2_fabric_index.
-            await self.send_single_cmd(
-                cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_index),
-                endpoint=0
-            )
+        # Send RemoveFabric command with th2_fabric_index
+        await self.send_single_cmd(
+            cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_index),
+            endpoint=0
+        )
 
-            # TH1 reads the Leave event from the DUT.
-            leave_events = await self.TH1.ReadEvent(
-                nodeId=self.dut_node_id,
-                events=[(0, events.Leave, 0)]
-            )
+        # Read Leave event
+        leave_events = await self.TH1.ReadEvent(
+            nodeId=self.dut_node_id,
+            events=[(0, events.Leave, 0)]
+        )
 
-            # Verify that the Leave event is present.
-            asserts.assert_true(leave_events, "Leave event not present in event log after RemoveFabric")
-
-            # Verify that the fabricIndex field from the Leave event matches th2_fabric_index.
+        if leave_events:
             leave_event_fabric_index = leave_events[-1].Data.fabricIndex
+
+            # Verify that the fabricIndex field from the Leave event matches th2_fabric_index
             asserts.assert_equal(leave_event_fabric_index, th2_fabric_index,
                                  f"Leave event fabricIndex {leave_event_fabric_index} does not match removed fabric index {th2_fabric_index}")
+
+            # Verify that BINFO.S.E02 is declared in PICS
+            asserts.assert_true(self.check_pics("BINFO.S.E02"),
+                                "DUT sent a Leave event but BINFO.S.E02 is not declared in PICS")
+        else:
+            # If no Leave event is present, verify that BINFO.S.E02 is not declared in PICS
+            asserts.assert_false(self.check_pics("BINFO.S.E02"),
+                                 "BINFO.S.E02 is declared in PICS but no Leave event was observed after RemoveFabric")
 
 
 if __name__ == "__main__":
