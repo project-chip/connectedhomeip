@@ -39,6 +39,7 @@ import logging
 import typing
 
 from mobly import asserts
+from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
@@ -109,6 +110,12 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             TestStep("2j", "Unlatch the device manually"),
             TestStep("2k", "Wait until a subscription report with OverallCurrentState.Latch is received",
                      "OverallCurrentState.Latch should be False"),
+            TestStep("2l", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT.",
+                     "Returns list (possibly empty)"),
+            TestStep("2m", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT.",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep("2n", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT.",
+                     "Receive SUCCESS response from the DUT"),
             TestStep("3a", "Handle Latch with LatchControlModes = 0 (Bit 0 = 0, Bit 1 = 0), else skip steps 3b to 3e"),
             TestStep("3b", "Send GroupedMoveTo command with Latch = True",
                      "Receive INVALID_IN_STATE error from the DUT"),
@@ -118,7 +125,8 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             TestStep("3e", "Manually unlatch the device and wait until a subscription report with OverallCurrentState.Latch is received",
                      "OverallCurrentState.Latch should be False"),
             TestStep("4a", "Handle Latch with LatchControlModes = 1 (Bit 0 = 1, Bit 1 = 0), else skip steps 4b to 4h"),
-            TestStep("4b", "Send GroupedMoveTo command with Latch = True", "Receive SUCCESS response from the DUT"),
+            TestStep("4b", "Send GroupedMoveTo command with Latch = True",
+                     "Receive SUCCESS response from the DUT, if command sent by unicast"),
             TestStep("4c", "Wait until a subscription report with OverallTargetState is received",
                      "OverallTargetState.Latch should be True"),
             TestStep("4d", "Wait until a subscription report with MainState is received", "MainState should be Moving"),
@@ -132,7 +140,8 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             TestStep("5b", "Send GroupedMoveTo command with Latch = True", "Receive INVALID_IN_STATE error from the DUT"),
             TestStep("5c", "Manually latch the device and wait until a subscription report with OverallCurrentState.Latch is received",
                      "OverallCurrentState.Latch should be True"),
-            TestStep("5d", "Send GroupedMoveTo command with Latch = False", "Receive SUCCESS response from the DUT"),
+            TestStep("5d", "Send GroupedMoveTo command with Latch = False",
+                     "Receive SUCCESS response from the DUT, if command sent by unicast"),
             TestStep("5e", "Wait until a subscription report with OverallTargetState.Latch is received",
                      "OverallTargetState.Latch should be False"),
             TestStep("5f", "Wait until a subscription report with MainState is received", "MainState should be Moving"),
@@ -140,14 +149,16 @@ class TC_CLCTRL_7_2(MatterBaseTest):
                      "OverallCurrentState.Latch should be False"),
             TestStep("5h", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
             TestStep("6a", "Handle Latch with LatchControlModes = 3 (Bit 0 = 1, Bit 1 = 1), else skip steps 6b to 6k"),
-            TestStep("6b", "Send GroupedMoveTo command with Latch = True", "Receive SUCCESS response from the DUT"),
+            TestStep("6b", "Send GroupedMoveTo command with Latch = True",
+                     "Receive SUCCESS response from the DUT, if command sent by unicast"),
             TestStep("6c", "Wait until a subscription report with OverallTargetState is received",
                      "OverallTargetState.Latch should be True"),
             TestStep("6d", "Wait until a subscription report with MainState is received", "MainState should be Moving"),
             TestStep("6e", "Wait until a subscription report with OverallCurrentState is received",
                      "OverallCurrentState.Latch should be True"),
             TestStep("6f", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
-            TestStep("6g", "Send GroupedMoveTo command with Latch = False", "Receive SUCCESS response from the DUT"),
+            TestStep("6g", "Send GroupedMoveTo command with Latch = False",
+                     "Receive SUCCESS response from the DUT, if command sent by unicast"),
             TestStep("6h", "Wait until a subscription report with OverallTargetState is received",
                      "OverallTargetState.Latch should be False"),
             TestStep("6i", "Wait until a subscription report with MainState is received", "MainState should be Moving"),
@@ -166,10 +177,20 @@ class TC_CLCTRL_7_2(MatterBaseTest):
         return 1
 
     @async_test_body
+    async def teardown_test(self):
+        if self.groupcast_enabled:
+            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+        super().teardown_test()
+
+    @async_test_body
     async def test_TC_CLCTRL_7_2(self):
 
         endpoint = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
+        self.kGroupKeysetId = 0x01a1
+        self.kGroupId = 0x0001
+        self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
+        self.groupcast_enabled = await is_groupcast_on_root_node(self)
 
         self.step(1)
         attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
@@ -225,7 +246,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
                 log.info("LatchControlModes Bit 1 is 1, sending GroupedMoveTo command with Latch = False")
 
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
 
@@ -236,6 +257,28 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
             sub_handler.reset()
 
+        self.step("2l")
+        membership = None
+        if self.groupcast_enabled:
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership
+            )
+
+        self.step("2m")
+        if self.groupcast_enabled:
+            if membership:
+                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+
+        self.step("2n")
+        if self.groupcast_enabled:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=self.kGroupId,
+                endpoints=[endpoint],
+                keySetID=self.kGroupKeysetId,
+                key=self.kGroupKey), endpoint=0)
+
         self.step("3a")
         if latch_control_modes != 0:
             log.info("LatchControlModes is not 0, skipping steps 3b to 3e")
@@ -244,7 +287,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             log.info("LatchControlModes is 0, proceeding with fully manual latch tests")
             self.step("3b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
                 log.error("GroupedMoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 0")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -258,7 +301,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
 
             self.step("3d")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                 log.error("GroupedMoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 0")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -276,11 +319,15 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             self.mark_step_range_skipped("4b", "4h")
         else:
             self.step("4b")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True), timedRequestTimeoutMs=1000)
-                log.info("GroupedMoveTo command with Latch = True sent successfully")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = True failed: {e}")
+            if self.groupcast_enabled:
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
+                log.info("GroupedMoveTo command with Latch = True sent by groupcast")
+            else:
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
+                    log.info("GroupedMoveTo command with Latch = True sent successfully by unicast")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = True failed: {e}")
 
             self.step("4c")
             sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(True)], timeout_sec=timeout)
@@ -294,7 +341,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
                 Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
             self.step("4g")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                 log.error("GroupedMoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 1")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -313,7 +360,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
         else:
             self.step("5b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
                 log.error("GroupedMoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 2")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -326,11 +373,15 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
 
             self.step("5d")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
-                log.info("GroupedMoveTo command with Latch = False sent successfully")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
+            if self.groupcast_enabled:
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
+                log.info("GroupedMoveTo command with Latch = False sent by groupcast")
+            else:
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
+                    log.info("GroupedMoveTo command with Latch = False sent successfully by unicast")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
 
             self.step("5e")
             sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(False)], timeout_sec=timeout)
@@ -350,11 +401,15 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             self.mark_step_range_skipped("6b", "6k")
         else:
             self.step("6b")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True), timedRequestTimeoutMs=1000)
-                log.info("GroupedMoveTo command with Latch = True sent successfully")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = True failed: {e}")
+            if self.groupcast_enabled:
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
+                log.info("GroupedMoveTo command with Latch = True sent by groupcast")
+            else:
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
+                    log.info("GroupedMoveTo command with Latch = True sent successfully by unicast")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = True failed: {e}")
 
             self.step("6c")
             sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(True)], timeout_sec=timeout)
@@ -368,11 +423,15 @@ class TC_CLCTRL_7_2(MatterBaseTest):
                 Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
             self.step("6g")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
-                log.info("GroupedMoveTo command with Latch = False sent successfully")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
+            if self.groupcast_enabled:
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
+                log.info("GroupedMoveTo command with Latch = False sent by groupcast")
+            else:
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
+                    log.info("GroupedMoveTo command with Latch = False sent successfully by unicast")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
 
             self.step("6h")
             sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(False)], timeout_sec=timeout)

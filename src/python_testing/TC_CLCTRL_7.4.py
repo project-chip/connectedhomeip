@@ -36,6 +36,7 @@ import logging
 import typing
 
 from mobly import asserts
+from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
@@ -90,14 +91,14 @@ class TC_CLCTRL_7_4(MatterBaseTest):
     def steps_TC_CLCTRL_7_4(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
-                     "AttributeList of the ClosureControl cluster is returned by the DUT"),
-            TestStep("2b", "Check if CountdownTime attribute is supported",
-                     "CountdownTime attribute should be present in the AttributeList"),
-            TestStep("2c", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
-                     "Subscription successfully established"),
-            TestStep("2d", "Read the FeatureMap attribute to determine supported features",
+            TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
+            TestStep("2b", "Read the AttributeList attribute to determine supported attributes",
+                     "AttributeList of the ClosureControl cluster is returned by the DUT"),
+            TestStep("2c", "Check if CountdownTime attribute is supported",
+                     "CountdownTime attribute should be present in the AttributeList"),
+            TestStep("2d", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
+                     "Subscription successfully established"),
             TestStep("2e", "Check if LT feature is supported", "Skip steps 2f to 2m if LT feature is not supported"),
             TestStep("2f", "Read the LatchControlModes attribute",
                      "LatchControlModes of the ClosureControl cluster is returned by the DUT; Value saved as LatchControlModes"),
@@ -110,6 +111,12 @@ class TC_CLCTRL_7_4(MatterBaseTest):
             TestStep("2l", "Unlatch the device manually"),
             TestStep("2m", "Wait until a subscription report with OverallCurrentState.Latch is received",
                      "OverallCurrentState.Latch should be False"),
+            TestStep("2n", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT.",
+                     "Returns list (possibly empty)"),
+            TestStep("2o", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT.",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep("2p", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT.",
+                     "Receive SUCCESS response from the DUT"),
             TestStep(3, "Read the CountdownTime attribute when no operation is in progress", "CountdownTime should be 0 or null"),
             TestStep("4a", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Position field is saved as CurrentPosition"),
@@ -142,11 +149,21 @@ class TC_CLCTRL_7_4(MatterBaseTest):
         return 1
 
     @async_test_body
+    async def teardown_test(self):
+        if self.groupcast_enabled:
+            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+        super().teardown_test()
+
+    @async_test_body
     async def test_TC_CLCTRL_7_4(self):
         countdown_time_max: uint = 259200
 
         endpoint: int = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else countdown_time_max
+        self.kGroupKeysetId = 0x01a1
+        self.kGroupId = 0x0001
+        self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
+        self.groupcast_enabled = await is_groupcast_on_root_node(self)
 
         self.step(1)
         attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
@@ -213,7 +230,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                     log.info("LatchControlModes Bit 1 is 1, sending GroupedMoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
 
@@ -224,6 +241,31 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
                 log.info("Latch is now False, proceeding with CountdownTime checks")
                 sub_handler.reset()
+
+        # STEP 2n: If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT
+        self.step("2n")
+        membership = None
+        if self.groupcast_enabled:
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership
+            )
+
+        # STEP 2o: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
+        self.step("2o")
+        if self.groupcast_enabled:
+            if membership:
+                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+
+        # STEP 2p: If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT
+        self.step("2p")
+        if self.groupcast_enabled:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=self.kGroupId,
+                endpoints=[endpoint],
+                keySetID=self.kGroupKeysetId,
+                key=self.kGroupKey), endpoint=0)
 
         # STEP 3: Verify the CountdownTime when no operation is in progress
         self.step(3)
@@ -251,10 +293,16 @@ class TC_CLCTRL_7_4(MatterBaseTest):
             log.info("CurrentPosition is not FullyClosed, proceeding with Position = FullyClosed preparation steps")
 
             self.step("4c")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyClosed position failed: {e}")
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command with Position = FullyClosed by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+            else:
+                log.info("Sending GroupedMoveTo command with Position = FullyClosed by unicast")
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyClosed position failed: {e}")
 
             self.step("4d")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
@@ -262,10 +310,16 @@ class TC_CLCTRL_7_4(MatterBaseTest):
             sub_handler.reset()
 
         self.step("4e")
-        try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyOpened position failed: {e}")
+        if self.groupcast_enabled:
+            log.info("Sending GroupedMoveTo command with Position = FullyOpen by groupcast")
+            self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+        else:
+            log.info("Sending GroupedMoveTo command with Position = FullyOpen by unicast")
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyOpen position failed: {e}")
 
         self.step("4f")
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
@@ -300,10 +354,16 @@ class TC_CLCTRL_7_4(MatterBaseTest):
             self.mark_step_range_skipped("5b", "5f")
         else:
             self.step("5b")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyClosed position failed: {e}")
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command with Position = FullyClosed by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+            else:
+                log.info("Sending GroupedMoveTo command with Position = FullyClosed by unicast")
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command to FullyClosed position failed: {e}")
 
             self.step("5c")
             countdown_time_before_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
