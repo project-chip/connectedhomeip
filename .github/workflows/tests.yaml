@@ -1284,7 +1284,7 @@ jobs:
 
       runs-on: ubuntu-latest
       concurrency:
-          group: ${{ github.event_name == 'pull_request' && format('gh-pages-report-{0}', github.run_id) || 'gh-pages-deploy' }}
+          group: gh-pages-deploy
           cancel-in-progress: false
       permissions:
           contents: write
