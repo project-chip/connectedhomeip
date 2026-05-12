@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -31,7 +32,7 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
   val epochStartTime1: ULong?,
   val epochKey2: ByteArray?,
   val epochStartTime2: ULong?,
-  val groupKeyMulticastPolicy: UInt,
+  val groupKeyMulticastPolicy: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreGroupKeySetStruct {\n")
@@ -82,7 +83,10 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
       } else {
         putNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
       }
-      put(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY), groupKeyMulticastPolicy)
+      if (groupKeyMulticastPolicy.isPresent) {
+        val optgroupKeyMulticastPolicy = groupKeyMulticastPolicy.get()
+        put(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY), optgroupKeyMulticastPolicy)
+      }
       endStructure()
     }
   }
@@ -149,7 +153,11 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
           null
         }
       val groupKeyMulticastPolicy =
-        tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 

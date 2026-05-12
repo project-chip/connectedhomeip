@@ -42044,7 +42044,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
-        encodableStruct.groupKeySet.groupKeyMulticastPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeyMulticastPolicy)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
+        if (self.groupKeySet.groupKeyMulticastPolicy != nil) {
+            auto & definedValue_1 = encodableStruct.groupKeySet.groupKeyMulticastPolicy.Emplace();
+            definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -42161,7 +42164,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
-        encodableStruct.groupKeySet.groupKeyMulticastPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeyMulticastPolicy)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
+        if (self.groupKeySet.groupKeyMulticastPolicy != nil) {
+            auto & definedValue_1 = encodableStruct.groupKeySet.groupKeyMulticastPolicy.Emplace();
+            definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

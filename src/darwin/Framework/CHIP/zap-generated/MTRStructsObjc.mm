@@ -12807,7 +12807,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _epochStartTime2 = nil;
 
-        _groupKeyMulticastPolicy = @(0);
+        _groupKeyMulticastPolicy = nil;
     }
     return self;
 }

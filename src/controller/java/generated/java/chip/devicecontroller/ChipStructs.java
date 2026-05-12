@@ -21157,10 +21157,10 @@ public static class JointFabricDatastoreClusterDatastoreBindingTargetStruct {
   public Optional<Integer> group;
   public Optional<Integer> endpoint;
   public Optional<Long> cluster;
-  private static final long NODE_ID = 0L;
-  private static final long GROUP_ID = 1L;
-  private static final long ENDPOINT_ID = 2L;
-  private static final long CLUSTER_ID = 3L;
+  private static final long NODE_ID = 1L;
+  private static final long GROUP_ID = 2L;
+  private static final long ENDPOINT_ID = 3L;
+  private static final long CLUSTER_ID = 4L;
 
   public JointFabricDatastoreClusterDatastoreBindingTargetStruct(
     Optional<Long> node,
@@ -21430,10 +21430,10 @@ public static class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct
   public Integer authMode;
   public @Nullable ArrayList<Long> subjects;
   public @Nullable ArrayList<ChipStructs.JointFabricDatastoreClusterDatastoreAccessControlTargetStruct> targets;
-  private static final long PRIVILEGE_ID = 0L;
-  private static final long AUTH_MODE_ID = 1L;
-  private static final long SUBJECTS_ID = 2L;
-  private static final long TARGETS_ID = 3L;
+  private static final long PRIVILEGE_ID = 1L;
+  private static final long AUTH_MODE_ID = 2L;
+  private static final long SUBJECTS_ID = 3L;
+  private static final long TARGETS_ID = 4L;
 
   public JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
     Integer privilege,
@@ -21904,7 +21904,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
   public @Nullable Long epochStartTime1;
   public @Nullable byte[] epochKey2;
   public @Nullable Long epochStartTime2;
-  public Integer groupKeyMulticastPolicy;
+  public Optional<Integer> groupKeyMulticastPolicy;
   private static final long GROUP_KEY_SET_ID_ID = 0L;
   private static final long GROUP_KEY_SECURITY_POLICY_ID = 1L;
   private static final long EPOCH_KEY0_ID = 2L;
@@ -21924,7 +21924,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     @Nullable Long epochStartTime1,
     @Nullable byte[] epochKey2,
     @Nullable Long epochStartTime2,
-    Integer groupKeyMulticastPolicy
+    Optional<Integer> groupKeyMulticastPolicy
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -21947,7 +21947,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     values.add(new StructElement(EPOCH_START_TIME1_ID, epochStartTime1 != null ? new UIntType(epochStartTime1) : new NullType()));
     values.add(new StructElement(EPOCH_KEY2_ID, epochKey2 != null ? new ByteArrayType(epochKey2) : new NullType()));
     values.add(new StructElement(EPOCH_START_TIME2_ID, epochStartTime2 != null ? new UIntType(epochStartTime2) : new NullType()));
-    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, new UIntType(groupKeyMulticastPolicy)));
+    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, groupKeyMulticastPolicy.<BaseTLVType>map((nonOptionalgroupKeyMulticastPolicy) -> new UIntType(nonOptionalgroupKeyMulticastPolicy)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -21964,7 +21964,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
     @Nullable Long epochStartTime1 = null;
     @Nullable byte[] epochKey2 = null;
     @Nullable Long epochStartTime2 = null;
-    Integer groupKeyMulticastPolicy = null;
+    Optional<Integer> groupKeyMulticastPolicy = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -22009,7 +22009,7 @@ public static class JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
       } else if (element.contextTagNum() == GROUP_KEY_MULTICAST_POLICY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          groupKeyMulticastPolicy = castingValue.value(Integer.class);
+          groupKeyMulticastPolicy = Optional.of(castingValue.value(Integer.class));
         }
       }
     }

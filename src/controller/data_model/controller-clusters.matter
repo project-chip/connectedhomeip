@@ -11606,16 +11606,16 @@ provisional cluster JointFabricDatastore = 1874 {
   revision 1;
 
   enum DatastoreAccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 0 [spec_name = "PASE"];
-    kCASE = 1 [spec_name = "CASE"];
-    kGroup = 2;
+    kPASE = 1 [spec_name = "PASE"];
+    kCASE = 2 [spec_name = "CASE"];
+    kGroup = 3;
   }
 
   enum DatastoreAccessControlEntryPrivilegeEnum : enum8 {
-    kView = 0;
-    kOperate = 2;
-    kManage = 3;
-    kAdminister = 4;
+    kView = 1;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
   }
 
   enum DatastoreGroupKeyMulticastPolicyEnum : enum8 {
@@ -11660,10 +11660,10 @@ provisional cluster JointFabricDatastore = 1874 {
   }
 
   struct DatastoreBindingTargetStruct {
-    optional node_id node = 0;
-    optional group_id group = 1;
-    optional endpoint_no endpoint = 2;
-    optional cluster_id cluster = 3;
+    optional node_id node = 1;
+    optional group_id group = 2;
+    optional endpoint_no endpoint = 3;
+    optional cluster_id cluster = 4;
   }
 
   struct DatastoreEndpointBindingEntryStruct {
@@ -11681,10 +11681,10 @@ provisional cluster JointFabricDatastore = 1874 {
   }
 
   struct DatastoreAccessControlEntryStruct {
-    DatastoreAccessControlEntryPrivilegeEnum privilege = 0;
-    DatastoreAccessControlEntryAuthModeEnum authMode = 1;
-    nullable int64u subjects[] = 2;
-    nullable DatastoreAccessControlTargetStruct targets[] = 3;
+    DatastoreAccessControlEntryPrivilegeEnum privilege = 1;
+    DatastoreAccessControlEntryAuthModeEnum authMode = 2;
+    nullable int64u subjects[] = 3;
+    nullable DatastoreAccessControlTargetStruct targets[] = 4;
   }
 
   struct DatastoreACLEntryStruct {
@@ -11725,7 +11725,7 @@ provisional cluster JointFabricDatastore = 1874 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    DatastoreGroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
+    optional DatastoreGroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   provisional readonly attribute access(read: administer) long_octet_string<400> anchorRootCA = 0;
