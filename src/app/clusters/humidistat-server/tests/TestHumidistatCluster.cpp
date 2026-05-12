@@ -231,8 +231,8 @@ TEST_F(TestHumidistatCluster, ReadAttributes)
     config.sleep          = true;
     config.optimal        = false;
 
-    const BitFlags<Feature> features{ Feature::kSensor,    Feature::kHumidifier, Feature::kContinuous,
-                                      Feature::kOptimal, Feature::kColdMist,    Feature::kWarmMist };
+    const BitFlags<Feature> features{ Feature::kSensor,  Feature::kHumidifier, Feature::kContinuous,
+                                      Feature::kOptimal, Feature::kColdMist,   Feature::kWarmMist };
 
     HumidistatCluster::OptionalAttributeSet optionalAttrs;
     optionalAttrs.Set<Sleep::Id>().Set<TargetSetpoint::Id>();
@@ -720,14 +720,14 @@ public:
         lastOptimal = newOptimal;
     }
 
-    int modeChangedCount                = 0;
-    int systemStateChangedCount         = 0;
-    int userSetpointChangedCount        = 0;
-    int targetSetpointChangedCount      = 0;
-    int mistTypeChangedCount            = 0;
-    int continuousChangedCount          = 0;
-    int sleepChangedCount               = 0;
-    int optimalChangedCount             = 0;
+    int modeChangedCount           = 0;
+    int systemStateChangedCount    = 0;
+    int userSetpointChangedCount   = 0;
+    int targetSetpointChangedCount = 0;
+    int mistTypeChangedCount       = 0;
+    int continuousChangedCount     = 0;
+    int sleepChangedCount          = 0;
+    int optimalChangedCount        = 0;
 
     std::optional<Humidistat::ModeEnum> lastMode;
     std::optional<Humidistat::SystemStateEnum> lastSystemState;

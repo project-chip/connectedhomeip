@@ -94,24 +94,22 @@ public:
 class HumidistatCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet = chip::app::OptionalAttributeSet<Humidistat::Attributes::Sleep::Id,
-                                                                  Humidistat::Attributes::TargetSetpoint::Id>;
+    using OptionalAttributeSet =
+        chip::app::OptionalAttributeSet<Humidistat::Attributes::Sleep::Id, Humidistat::Attributes::TargetSetpoint::Id>;
     using FullOptionalAttributeSet = chip::app::OptionalAttributeSet<
-        Humidistat::Attributes::UserSetpoint::Id, Humidistat::Attributes::MinSetpoint::Id,
-        Humidistat::Attributes::MaxSetpoint::Id, Humidistat::Attributes::Step::Id,
-        Humidistat::Attributes::TargetSetpoint::Id, Humidistat::Attributes::MistType::Id,
-        Humidistat::Attributes::Continuous::Id, Humidistat::Attributes::Sleep::Id,
-        Humidistat::Attributes::Optimal::Id>;
+        Humidistat::Attributes::UserSetpoint::Id, Humidistat::Attributes::MinSetpoint::Id, Humidistat::Attributes::MaxSetpoint::Id,
+        Humidistat::Attributes::Step::Id, Humidistat::Attributes::TargetSetpoint::Id, Humidistat::Attributes::MistType::Id,
+        Humidistat::Attributes::Continuous::Id, Humidistat::Attributes::Sleep::Id, Humidistat::Attributes::Optimal::Id>;
 
     struct StartupConfiguration
     {
         Humidistat::ModeEnum mode               = Humidistat::ModeEnum::kOff;
         Humidistat::SystemStateEnum systemState = Humidistat::SystemStateEnum::kOff;
-        chip::Percent userSetpoint     = 50;
-        chip::Percent minSetpoint      = 0;
-        chip::Percent maxSetpoint      = 100;
-        chip::Percent step             = 1;
-        chip::Percent targetSetpoint   = 50;
+        chip::Percent userSetpoint              = 50;
+        chip::Percent minSetpoint               = 0;
+        chip::Percent maxSetpoint               = 100;
+        chip::Percent step                      = 1;
+        chip::Percent targetSetpoint            = 50;
         chip::BitMask<Humidistat::MistTypeBitmap> mistType{ 0 };
         bool continuous = false;
         bool sleep      = false;
@@ -132,8 +130,7 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
-                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
