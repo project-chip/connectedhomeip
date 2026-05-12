@@ -274,7 +274,7 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
             // Bounds check added to prevent buffer overflow vulnerabilities.
             VerifyOrReturn(kMaxWiFiSSIDLength <= sizeof(p->ssid));
 
-	    // Keep old behaviour due to compatibility with SDK
+            // Keep old behaviour due to compatibility with SDK
             strncpy((char *) p->ssid, (const char *) pmsg->records[i].ssid,
                     kMaxWiFiSSIDLength); // NOLINT(bugprone-unsafe-functions)
 
