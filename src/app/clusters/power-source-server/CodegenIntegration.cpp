@@ -246,7 +246,8 @@ public:
                 typename EmberBatteryPowerSourceClusterT::ConfigType config(endpointId, description, replaceability,
                                                                             gTimerDelegate);
 
-                SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::PowerSourceStatusEnum, Status, status);
+                SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::PowerSourceStatusEnum, Status,
+                                             status);
                 SetSimpleIntegerDefault(Battery, uint8_t, Order, order);
                 SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatVoltage, batVoltage);
                 SetNullableAttributeDefaultFromEmber(Battery, uint8_t, BatPercentRemaining, batPercentRemaining);
