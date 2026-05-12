@@ -135,7 +135,7 @@ Status ActionsDelegateImpl::HandleDisableActionWithDuration(uint16_t actionId, u
     return Status::NotFound;
 }
 
-void MatterActionsClusterInitCallback(EndpointId endpoint)
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrReturn(endpoint == 1,
                    ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
@@ -149,7 +149,7 @@ void MatterActionsClusterInitCallback(EndpointId endpoint)
     TEMPORARY_RETURN_IGNORED sActionsServer->Init();
 }
 
-void MatterActionsClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType)
+void emberAfActionsClusterShutdownCallback(EndpointId endpoint)
 {
     if (sActionsServer)
     {
