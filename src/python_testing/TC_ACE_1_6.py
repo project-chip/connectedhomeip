@@ -418,6 +418,8 @@ class TC_ACE_1_6(MatterBaseTest):
             self.step("11d")
             event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 11e: Re-add GroupKeyMap
             self.step("11e")
@@ -456,6 +458,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 12: Group command to Group 0x0102
             self.step(12)
