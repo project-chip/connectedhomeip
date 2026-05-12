@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:181
+            image: ghcr.io/project-chip/chip-build-nxp:193
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -68,20 +68,6 @@ jobs:
               if: ${{ !env.ACT }}
               with:
                   gh-context: ${{ toJson(github) }}
-
-            - name: Build MCXW71 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory \
-                      build \
-                  "
-            - name: Get MCXW71 contact sensor size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp mcxw71+release contact \
-                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory/app.elf \
-                    /tmp/bloat_reports/
 
             - name: Build MCXW72 examples
               run: |
@@ -153,7 +139,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:181
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:193
 
         steps:
             - name: Checkout
@@ -169,6 +155,8 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                        - '**/Zephyr/**'
+                        - '**/zephyr/**'
                       pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'

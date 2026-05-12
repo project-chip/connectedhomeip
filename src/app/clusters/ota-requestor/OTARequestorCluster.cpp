@@ -153,12 +153,14 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
         ReturnErrorOnFailure(data.Decode(input_arguments));
 
         auto & metadataForNode = data.metadataForNode;
-        if (metadataForNode.HasValue() && metadataForNode.Value().size() > kMaxMetadataLen)
-        {
-            ChipLogError(Zcl, "Metadata size %u exceeds max %u", static_cast<unsigned>(metadataForNode.Value().size()),
-                         static_cast<unsigned>(kMaxMetadataLen));
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
+        VerifyOrReturnError(!metadataForNode.HasValue() || metadataForNode.Value().size() <= kMaxMetadataLen,
+                            Protocols::InteractionModel::Status::ConstraintError,
+                            ChipLogError(Zcl, "Metadata size %u exceeds max %u",
+                                         static_cast<unsigned>(metadataForNode.Value().size()),
+                                         static_cast<unsigned>(kMaxMetadataLen)));
+        VerifyOrReturnError(data.announcementReason != OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUnknownEnumValue,
+                            Protocols::InteractionModel::Status::ConstraintError,
+                            ChipLogError(Zcl, "Received unknown announcement reason"));
         mOtaCommands.HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }
