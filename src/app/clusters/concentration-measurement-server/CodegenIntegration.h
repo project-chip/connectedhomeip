@@ -67,7 +67,8 @@ public:
     // Constructor for clusters with kNumericMeasurement.
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium,
              MeasurementUnitEnum aMeasurementUnit) :
-        mEndpointId(aEndpointId), mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
+        mEndpointId(aEndpointId),
+        mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
     {}
 
     ~Instance()
