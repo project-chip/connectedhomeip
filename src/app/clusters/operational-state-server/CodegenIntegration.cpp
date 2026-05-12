@@ -133,4 +133,3 @@ void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId) {}
 void MatterRvcOperationalStateClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
 void MatterOvenCavityOperationalStateClusterInitCallback(chip::EndpointId) {}
 void MatterOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
-
