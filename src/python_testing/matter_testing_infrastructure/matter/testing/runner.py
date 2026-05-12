@@ -457,6 +457,8 @@ def run_tests_no_exit(
         runner = TestRunner(log_dir=test_config.log_path,
                             testbed_name=test_config.testbed_name)
 
+        stored_global_wildcard = None
+
         with runner.mobly_logger():
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
