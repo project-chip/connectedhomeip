@@ -26,6 +26,7 @@ source_set("thread-border-router-management-server") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/clusters/general-commissioning-server:bread-crumb-tracker",
     "${chip_root}/zzz_generated/app-common/clusters/ThreadBorderRouterManagement",
   ]
 }
