@@ -142,7 +142,7 @@ public:
 #define SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                                   \
     if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
     {                                                                                                                              \
-        if (attr_type val{}; attr_name::GetDefault(endpointId, &val) == InteractionModel::Status::Success)                                \
+        if (attr_type val{}; attr_name::GetDefault(endpointId, &val) == InteractionModel::Status::Success)                         \
         {                                                                                                                          \
             config.config_field_name = val;                                                                                        \
         }                                                                                                                          \
@@ -151,7 +151,7 @@ public:
 #define SetNullableAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)                           \
     if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
     {                                                                                                                              \
-        if (DataModel::Nullable<attr_type> val{}; attr_name::GetDefault(endpointId, val) == InteractionModel::Status::Success)            \
+        if (DataModel::Nullable<attr_type> val{}; attr_name::GetDefault(endpointId, val) == InteractionModel::Status::Success)     \
         {                                                                                                                          \
             if (!val.IsNull())                                                                                                     \
             {                                                                                                                      \
@@ -235,14 +235,13 @@ public:
                         if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
                         {
                             // for dynamic endpoints
-                            replacementDescription =
-                                GetCharStringDefaultValueFromEmber(
-                                    BatReplacementDescription::GetDefault, endpointId,
-                                    // this static cast does nothing, it is here to make the code template dependent on class
-                                    // template, so the code will compile.
-                                    static_cast<StringStorageModuleT &>(
-                                        gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
-                                        .batReplacementDescription);
+                            replacementDescription = GetCharStringDefaultValueFromEmber(
+                                BatReplacementDescription::GetDefault, endpointId,
+                                // this static cast does nothing, it is here to make the code template dependent on class
+                                // template, so the code will compile.
+                                static_cast<StringStorageModuleT &>(
+                                    gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
+                                    .batReplacementDescription);
                         }
                         else
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
@@ -265,14 +264,13 @@ public:
                             if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
                             {
                                 // for dynamic endpoints
-                                config.batANSIDesignation =
-                                    GetCharStringDefaultValueFromEmber(
-                                        BatANSIDesignation::GetDefault, endpointId,
-                                        // this static cast does nothing, it is here to make the code template dependent on class
-                                        // template, so the code will compile.
-                                        static_cast<StringStorageModuleT &>(
-                                            gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
-                                            .batANSIDesignation);
+                                config.batANSIDesignation = GetCharStringDefaultValueFromEmber(
+                                    BatANSIDesignation::GetDefault, endpointId,
+                                    // this static cast does nothing, it is here to make the code template dependent on class
+                                    // template, so the code will compile.
+                                    static_cast<StringStorageModuleT &>(
+                                        gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
+                                        .batANSIDesignation);
                             }
                             else
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
@@ -289,14 +287,13 @@ public:
                             if (clusterInstanceIndex >= kPowerSourceFixedClusterCount)
                             {
                                 // for dynamic endpoints
-                                config.batIECDesignation =
-                                    GetCharStringDefaultValueFromEmber(
-                                        BatIECDesignation::GetDefault, endpointId,
-                                        // this static cast does nothing, it is here to make the code template dependent on class
-                                        // template, so the code will compile.
-                                        static_cast<StringStorageModuleT &>(
-                                            gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
-                                            .batIECDesignation);
+                                config.batIECDesignation = GetCharStringDefaultValueFromEmber(
+                                    BatIECDesignation::GetDefault, endpointId,
+                                    // this static cast does nothing, it is here to make the code template dependent on class
+                                    // template, so the code will compile.
+                                    static_cast<StringStorageModuleT &>(
+                                        gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])
+                                        .batIECDesignation);
                             }
                             else
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
