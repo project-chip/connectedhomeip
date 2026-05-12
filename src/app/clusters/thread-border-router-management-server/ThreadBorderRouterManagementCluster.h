@@ -25,14 +25,18 @@
 
 namespace chip::app::Clusters {
 
-class ThreadBorderRouterManagementCluster : public DefaultServerCluster, public ThreadBorderRouterManagement::Delegate::ActivateDatasetCallback
+class ThreadBorderRouterManagementCluster : public DefaultServerCluster,
+                                            public ThreadBorderRouterManagement::Delegate::ActivateDatasetCallback
 {
 public:
     class Config
     {
     public:
-        Config(ThreadBorderRouterManagement::Delegate & delegate, FailSafeContext & failSafeContext, BreadCrumbTracker & breadcrumbTracker) :
-            mDelegate(delegate), mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker) {}
+        Config(ThreadBorderRouterManagement::Delegate & delegate, FailSafeContext & failSafeContext,
+               BreadCrumbTracker & breadcrumbTracker) :
+            mDelegate(delegate),
+            mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker)
+        {}
 
     private:
         friend class ThreadBorderRouterManagementCluster;
@@ -42,12 +46,14 @@ public:
     };
 
     ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
-        DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate), mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker)
+        DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate),
+        mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker)
     {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType reason) override;
@@ -55,8 +61,7 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & payload,
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & payload,
                                                                CommandHandler * ctx) override;
 
     // ThreadBorderRouterManagement::Delegate::ActivateDatasetCallback

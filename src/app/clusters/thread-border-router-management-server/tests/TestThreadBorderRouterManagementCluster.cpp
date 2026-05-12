@@ -17,13 +17,13 @@
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/server-cluster/testing/ClusterTester.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
-#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <clusters/ThreadBorderRouterManagement/Metadata.h>
 #include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
+#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <clusters/ThreadBorderRouterManagement/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -41,7 +41,10 @@ public:
 
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override { return CHIP_NO_ERROR; }
     bool GetPanChangeSupported() override { return mPanChangeSupported; }
-    void GetBorderRouterName(MutableCharSpan & borderRouterName) override { (void) CopyCharSpanToMutableCharSpan("MockBR"_span, borderRouterName); }
+    void GetBorderRouterName(MutableCharSpan & borderRouterName) override
+    {
+        (void) CopyCharSpanToMutableCharSpan("MockBR"_span, borderRouterName);
+    }
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override { return CHIP_NO_ERROR; }
     uint16_t GetThreadVersion() override { return 1; }
     bool GetInterfaceEnabled() override { return true; }
@@ -57,22 +60,36 @@ public:
         }
         return CHIP_NO_ERROR;
     }
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum, ActivateDatasetCallback * callback) override {}
-    CHIP_ERROR CommitActiveDataset() override { mCommitCalled = true; return CHIP_NO_ERROR; }
-    CHIP_ERROR RevertActiveDataset() override { mRevertCalled = true; return CHIP_NO_ERROR; }
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
+                          ActivateDatasetCallback * callback) override
+    {}
+    CHIP_ERROR CommitActiveDataset() override
+    {
+        mCommitCalled = true;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR RevertActiveDataset() override
+    {
+        mRevertCalled = true;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override { return CHIP_NO_ERROR; }
-    
-    bool mRevertCalled = false;
+
+    bool mRevertCalled             = false;
     bool mReturnNotFoundForDataset = false;
-    bool mCommitCalled = false;
+    bool mCommitCalled             = false;
 };
 
 class MockBreadcrumbTracker : public BreadCrumbTracker
 {
 public:
-    void SetBreadCrumb(uint64_t v) override { mBreadcrumb = v; mCalled = true; }
+    void SetBreadCrumb(uint64_t v) override
+    {
+        mBreadcrumb = v;
+        mCalled     = true;
+    }
     uint64_t mBreadcrumb = 0;
-    bool mCalled = false;
+    bool mCalled         = false;
 };
 
 struct TestThreadBorderRouterManagementCluster : public ::testing::Test
@@ -82,13 +99,13 @@ struct TestThreadBorderRouterManagementCluster : public ::testing::Test
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
     }
-    
+
     static void TearDownTestSuite()
     {
         DeviceLayer::PlatformMgr().Shutdown();
         Platform::MemoryShutdown();
     }
-    
+
     FailSafeContext failSafeContext;
     MockBreadcrumbTracker breadcrumbTracker;
 };
@@ -114,14 +131,11 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestAttributesList)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, {
-        Attributes::BorderRouterName::kMetadataEntry,
-        Attributes::BorderAgentID::kMetadataEntry,
-        Attributes::ThreadVersion::kMetadataEntry,
-        Attributes::InterfaceEnabled::kMetadataEntry,
-        Attributes::ActiveDatasetTimestamp::kMetadataEntry,
-        Attributes::PendingDatasetTimestamp::kMetadataEntry
-    }));
+    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(
+        cluster,
+        { Attributes::BorderRouterName::kMetadataEntry, Attributes::BorderAgentID::kMetadataEntry,
+          Attributes::ThreadVersion::kMetadataEntry, Attributes::InterfaceEnabled::kMetadataEntry,
+          Attributes::ActiveDatasetTimestamp::kMetadataEntry, Attributes::PendingDatasetTimestamp::kMetadataEntry }));
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
@@ -172,7 +186,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap)
         EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
         EXPECT_EQ(featureMap, 1u);
     }
-    
+
     // Case 2: PANChange feature is NOT supported
     {
         MockDelegate delegate;
@@ -195,11 +209,10 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequest)
     ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    
 
     Commands::GetActiveDatasetRequest::Type request;
     auto result = tester.Invoke(request);
-    
+
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(result.response.has_value());
 }
@@ -211,11 +224,10 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetPendingDatasetRequest)
     ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    
 
     Commands::GetPendingDatasetRequest::Type request;
     auto result = tester.Invoke(request);
-    
+
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(result.response.has_value());
 }
@@ -228,7 +240,6 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequest)
     ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    
 
     // Arm FailSafe (required by spec)
     EXPECT_EQ(failSafeContext.ArmFailSafe(1, System::Clock::Seconds16(60)), CHIP_NO_ERROR);
@@ -240,11 +251,11 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequest)
                                0xc5, 0x25, 0x7f, 0x68, 0x4c, 0x54, 0x9d, 0x6a, 0x57, 0x5e, 0x03, 0x0a, 0x4f, 0x70, 0x65, 0x6e, 0x54,
                                0x68, 0x72, 0x65, 0x61, 0x64, 0x01, 0x02, 0xc1, 0x15, 0x04, 0x10, 0xcb, 0x13, 0x47, 0xeb, 0x0c, 0xd4,
                                0xb3, 0x5c, 0xd1, 0x42, 0xda, 0x5e, 0x6d, 0xf1, 0x8b, 0x88, 0x0c, 0x04, 0x02, 0xa0, 0xf7, 0xf8 };
-    request.activeDataset = ByteSpan(validDataset);
+    request.activeDataset  = ByteSpan(validDataset);
     request.breadcrumb.SetValue(1);
-    
+
     auto result = tester.Invoke(request);
-    
+
     EXPECT_TRUE(result.IsSuccess());
 }
 
@@ -255,7 +266,6 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetPendingDatasetRequest)
     ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    
 
     Commands::SetPendingDatasetRequest::Type request;
     uint8_t validDataset[] = { 0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x0b, 0x35, 0x06,
@@ -265,9 +275,9 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetPendingDatasetRequest)
                                0x68, 0x72, 0x65, 0x61, 0x64, 0x01, 0x02, 0xc1, 0x15, 0x04, 0x10, 0xcb, 0x13, 0x47, 0xeb, 0x0c, 0xd4,
                                0xb3, 0x5c, 0xd1, 0x42, 0xda, 0x5e, 0x6d, 0xf1, 0x8b, 0x88, 0x0c, 0x04, 0x02, 0xa0, 0xf7, 0xf8 };
     request.pendingDataset = ByteSpan(validDataset);
-    
+
     auto result = tester.Invoke(request);
-    
+
     EXPECT_TRUE(result.IsSuccess());
 }
 
@@ -282,14 +292,12 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestAcceptedCommandsList)
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-        EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster, {
-            Commands::GetActiveDatasetRequest::kMetadataEntry,
-            Commands::GetPendingDatasetRequest::kMetadataEntry,
-            Commands::SetActiveDatasetRequest::kMetadataEntry,
-            Commands::SetPendingDatasetRequest::kMetadataEntry
-        }));
+        EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(
+            cluster,
+            { Commands::GetActiveDatasetRequest::kMetadataEntry, Commands::GetPendingDatasetRequest::kMetadataEntry,
+              Commands::SetActiveDatasetRequest::kMetadataEntry, Commands::SetPendingDatasetRequest::kMetadataEntry }));
     }
-    
+
     // Case 2: PANChange feature is NOT supported, expect SetPendingDataset to be omitted
     {
         MockDelegate delegate;
@@ -299,11 +307,10 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestAcceptedCommandsList)
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-        EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster, {
-            Commands::GetActiveDatasetRequest::kMetadataEntry,
-            Commands::GetPendingDatasetRequest::kMetadataEntry,
-            Commands::SetActiveDatasetRequest::kMetadataEntry
-        }));
+        EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster,
+                                                                 { Commands::GetActiveDatasetRequest::kMetadataEntry,
+                                                                   Commands::GetPendingDatasetRequest::kMetadataEntry,
+                                                                   Commands::SetActiveDatasetRequest::kMetadataEntry }));
     }
 }
 
@@ -314,14 +321,13 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequestFails
     ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    
 
     Commands::SetActiveDatasetRequest::Type request;
-    request.activeDataset = ByteSpan(); 
+    request.activeDataset = ByteSpan();
     request.breadcrumb.SetValue(1);
-    
+
     auto result = tester.Invoke(request);
-    
+
     // Expect failure because FailSafe is not armed!
     EXPECT_FALSE(result.IsSuccess());
 }
@@ -336,10 +342,10 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFailSafeTimerExpired)
 
     DeviceLayer::ChipDeviceEvent event;
     event.Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
-    
+
     // Call handler directly (we will need to make it accessible or friend it)
     cluster.OnPlatformEventHandler(&event, reinterpret_cast<intptr_t>(&cluster));
-    
+
     EXPECT_TRUE(delegate.mRevertCalled);
 }
 
@@ -351,27 +357,24 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestBreadcrumbHandling)
     ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    
 
     // Arm FailSafe (required for SetActiveDataset)
     EXPECT_EQ(failSafeContext.ArmFailSafe(1, System::Clock::Seconds16(60)), CHIP_NO_ERROR);
 
     Commands::SetActiveDatasetRequest::Type request;
-    request.activeDataset = ByteSpan(); 
+    request.activeDataset = ByteSpan();
     request.breadcrumb.SetValue(42);
-    
+
     auto result = tester.Invoke(request);
     EXPECT_TRUE(result.IsSuccess());
-    
+
     // Simulate async completion
     cluster.OnActivateDatasetComplete(1, CHIP_NO_ERROR);
-    
+
     // Verify breadcrumb was applied to tracker!
     EXPECT_TRUE(breadcrumbTracker.mCalled);
     EXPECT_EQ(breadcrumbTracker.mBreadcrumb, 42uLL);
 }
-
-
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestRequiresCASE)
 {
@@ -388,16 +391,18 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestRequi
 
     Commands::GetActiveDatasetRequest::Type request;
     auto result = tester.Invoke(request);
-    
+
     // Expect failure with UnsupportedAccess!
     EXPECT_FALSE(result.IsSuccess());
-    EXPECT_EQ(result.GetStatusCode(), std::make_optional(Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess)));
+    EXPECT_EQ(
+        result.GetStatusCode(),
+        std::make_optional(Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess)));
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestNotFoundReturnsEmpty)
 {
     MockDelegate delegate;
-    delegate.mReturnNotFoundForDataset = true; 
+    delegate.mReturnNotFoundForDataset = true;
     ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker);
     ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
@@ -405,7 +410,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestNotFo
 
     Commands::GetActiveDatasetRequest::Type request;
     auto result = tester.Invoke(request);
-    
+
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(result.response.has_value());
     EXPECT_TRUE(result.response->dataset.empty());
@@ -428,12 +433,14 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequestInval
                                0xc5, 0x25, 0x7f, 0x68, 0x4c, 0x54, 0x9d, 0x6a, 0x57, 0x5e, 0x03, 0x0a, 0x4f, 0x70, 0x65, 0x6e, 0x54,
                                0x68, 0x72, 0x65, 0x61, 0x64, 0x01, 0x02, 0xc1, 0x15, 0x04, 0x10, 0xcb, 0x13, 0x47, 0xeb, 0x0c, 0xd4,
                                0xb3, 0x5c, 0xd1, 0x42, 0xda, 0x5e, 0x6d, 0xf1, 0x8b, 0x88, 0x0c, 0x04, 0x02, 0xa0, 0xf7, 0xf8 };
-    request.activeDataset = ByteSpan(validDataset);
-    
+    request.activeDataset  = ByteSpan(validDataset);
+
     auto result = tester.Invoke(request);
-    
+
     EXPECT_FALSE(result.IsSuccess());
-    EXPECT_EQ(result.GetStatusCode(), std::make_optional(Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState)));
+    EXPECT_EQ(
+        result.GetStatusCode(),
+        std::make_optional(Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState)));
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestCommissioningComplete)
@@ -446,10 +453,10 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestCommissioningComplete)
 
     DeviceLayer::ChipDeviceEvent event;
     event.Type = DeviceLayer::DeviceEventType::kCommissioningComplete;
-    
+
     // Call handler directly
     ThreadBorderRouterManagementCluster::OnPlatformEventHandler(&event, reinterpret_cast<intptr_t>(&cluster));
-    
+
     EXPECT_TRUE(delegate.mCommitCalled);
 }
 

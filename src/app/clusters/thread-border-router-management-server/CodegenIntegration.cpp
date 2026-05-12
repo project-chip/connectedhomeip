@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/thread-border-router-management-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
-#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 
 namespace chip {
 namespace app {

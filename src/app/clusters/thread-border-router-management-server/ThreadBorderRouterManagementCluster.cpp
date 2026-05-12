@@ -29,7 +29,7 @@ namespace chip::app::Clusters {
 using namespace ThreadBorderRouterManagement;
 
 DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                                AttributeValueEncoder & encoder)
+                                                                                 AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -86,24 +86,25 @@ DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute
 }
 
 CHIP_ERROR ThreadBorderRouterManagementCluster::Attributes(const ConcreteClusterPath & path,
-                                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(ThreadBorderRouterManagement::Attributes::kMandatoryMetadata), {});
 }
 
-CHIP_ERROR ThreadBorderRouterManagementCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR ThreadBorderRouterManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(4));
     ReturnErrorOnFailure(builder.Append(ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::kMetadataEntry));
     ReturnErrorOnFailure(builder.Append(ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::kMetadataEntry));
     ReturnErrorOnFailure(builder.Append(ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::kMetadataEntry));
-    
+
     if (mDelegate.GetPanChangeSupported())
     {
         ReturnErrorOnFailure(builder.Append(ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::kMetadataEntry));
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -120,9 +121,9 @@ void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
     DefaultServerCluster::Shutdown(reason);
 }
 
-std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                            TLV::TLVReader & payload,
-                                                            CommandHandler * ctx)
+std::optional<DataModel::ActionReturnStatus>
+ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & payload,
+                                                   CommandHandler * ctx)
 {
     if (ctx->GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
     {
@@ -137,7 +138,7 @@ std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
         }
-        
+
         Thread::OperationalDataset dataset;
         CHIP_ERROR err = mDelegate.GetDataset(dataset, Delegate::DatasetType::kActive);
         if (err == CHIP_ERROR_NOT_FOUND)
@@ -152,7 +153,7 @@ std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster
         {
             return std::make_optional(DataModel::ActionReturnStatus(StatusIB(err).mStatus));
         }
-        
+
         ThreadBorderRouterManagement::Commands::DatasetResponse::Type response;
         response.dataset = dataset.AsByteSpan();
         ctx->AddResponse(request.path, response);
@@ -164,7 +165,7 @@ std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
         }
-        
+
         Thread::OperationalDataset dataset;
         CHIP_ERROR err = mDelegate.GetDataset(dataset, Delegate::DatasetType::kPending);
         if (err == CHIP_ERROR_NOT_FOUND)
@@ -179,7 +180,7 @@ std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster
         {
             return std::make_optional(DataModel::ActionReturnStatus(StatusIB(err).mStatus));
         }
-        
+
         ThreadBorderRouterManagement::Commands::DatasetResponse::Type response;
         response.dataset = dataset.AsByteSpan();
         ctx->AddResponse(request.path, response);
@@ -191,18 +192,18 @@ std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
         }
-        
+
         if (!mFailSafeContext.IsFailSafeArmed(ctx->GetAccessingFabricIndex()))
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::FailsafeRequired));
         }
-        
+
         Thread::OperationalDataset activeDataset;
         if (activeDataset.Init(req.activeDataset) != CHIP_NO_ERROR)
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
         }
-        
+
         Thread::OperationalDataset currentActiveDataset;
         uint64_t currentActiveDatasetTimestamp = 0;
         if ((mDelegate.GetDataset(currentActiveDataset, Delegate::DatasetType::kActive) == CHIP_NO_ERROR) &&
@@ -215,13 +216,13 @@ std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Busy));
         }
-        
+
         mAsyncCommandHandle = CommandHandler::Handle(ctx);
-        mBreadcrumb = req.breadcrumb;
+        mBreadcrumb         = req.breadcrumb;
         mSetActiveDatasetSequenceNumber++;
-        
+
         mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, this);
-        
+
         return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success));
     }
     case ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id: {
@@ -230,18 +231,18 @@ std::optional<DataModel::ActionReturnStatus> ThreadBorderRouterManagementCluster
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
         }
-        
+
         if (!mDelegate.GetPanChangeSupported())
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::UnsupportedCommand));
         }
-        
+
         Thread::OperationalDataset pendingDataset;
         if (pendingDataset.Init(req.pendingDataset) != CHIP_NO_ERROR)
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
         }
-        
+
         CHIP_ERROR err = mDelegate.SetPendingDataset(pendingDataset);
         return std::make_optional(DataModel::ActionReturnStatus(app::StatusIB(err).mStatus));
     }
@@ -269,7 +270,9 @@ void ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(uint32_t seq
     }
     mBreadcrumb.ClearValue();
 
-    commandHandle->AddStatus(ConcreteCommandPath(mPath.mEndpointId, mPath.mClusterId, ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id), app::StatusIB(error).mStatus);
+    commandHandle->AddStatus(ConcreteCommandPath(mPath.mEndpointId, mPath.mClusterId,
+                                                 ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id),
+                             app::StatusIB(error).mStatus);
 }
 
 void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -278,12 +281,14 @@ void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLay
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         (void) _this->mDelegate.RevertActiveDataset();
-        
+
         auto commandHandleRef = std::move(_this->mAsyncCommandHandle);
         auto commandHandle    = commandHandleRef.Get();
         if (commandHandle != nullptr)
         {
-            commandHandle->AddStatus(ConcreteCommandPath(_this->mPath.mEndpointId, _this->mPath.mClusterId, ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id), Protocols::InteractionModel::Status::Timeout);
+            commandHandle->AddStatus(ConcreteCommandPath(_this->mPath.mEndpointId, _this->mPath.mClusterId,
+                                                         ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id),
+                                     Protocols::InteractionModel::Status::Timeout);
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
