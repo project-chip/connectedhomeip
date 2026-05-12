@@ -72,7 +72,7 @@ class Context:
         self.concurrent_generation = concurrent_generation
         self.concurrent_builders = concurrent_builders
         if concurrent_builders > 1 and (ninja_jobs is None or ninja_jobs == 0):
-            self.ninja_jobs = math.floor(multiprocessing.cpu_count() / concurrent_builders)
+            self.ninja_jobs = max(1, math.floor(multiprocessing.cpu_count() / concurrent_builders))
         else:
             self.ninja_jobs = ninja_jobs
         self.completed_steps = set()
