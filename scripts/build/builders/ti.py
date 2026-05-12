@@ -16,7 +16,9 @@ import os
 from enum import Enum, auto
 from typing import Optional
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -74,14 +76,13 @@ class TIBoard(Enum):
 class TIBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board=TIBoard.LP_EM_CC1354P10_6,
                  app: TIApp = TIApp.LOCK,
                  openthread_ftd: Optional[bool] = None):
-        super(TIBuilder, self).__init__(
-            root=app.BuildRoot(root, board),
-            runner=runner)
+        super(TIBuilder, self).__init__(root=app.BuildRoot(root, board), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
         self.board = board
@@ -105,6 +106,7 @@ class TIBuilder(GnBuilder):
 
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         if self.board == TIBoard.LP_EM_CC1354P10_6:
             if self.app in [TIApp.LOCK,

@@ -464,8 +464,7 @@ class BuildTarget:
         if not quiet:
             log.info("Preparing builder '%s'" % (name,))
 
-        builder = self.builder_class(repository_path, runner=runner, **kargs)
-        builder.output_dir_lock = output_dir_lock
+        builder = self.builder_class(repository_path, runner=runner, output_dir_lock=output_dir_lock, **kargs)
         builder.target = self
         builder.identifier = name
         if self.isUnifiedBuild(parts):
