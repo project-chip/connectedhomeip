@@ -183,4 +183,3 @@ private:
     uint8_t mAliroGroupResolvingKey[chip::app::Clusters::DoorLock::kAliroGroupResolvingKeySize];
     bool mAliroStateInitialized = false;
 };
-
