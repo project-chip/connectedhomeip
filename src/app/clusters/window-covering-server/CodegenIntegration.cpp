@@ -18,7 +18,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
-#include <app/clusters/window-covering-server/WindowCoveringClusterDelegate.h>
+#include <app/clusters/window-covering-server/WindowCoveringDelegate.h>
 #include <app/static-cluster-config/WindowCovering.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
