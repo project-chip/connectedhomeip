@@ -94,7 +94,12 @@ def lock_output_dir(func: Callable[Concatenate[S, P], R]) -> Callable[Concatenat
         if self.output_dir_lock is None:
             return func(self, *args, **kwargs)
         with self.output_dir_lock.lock_dir(self.output_dir):
-            return func(self, *args, **kwargs)
+            # Check if func returns a generator, and if so, we need to keep the lock acquired until the generator is exhausted.
+            # This is needed for build_outputs and bundle_outputs which are generators that yield BuilderOutput objects.
+            result = func(self, *args, **kwargs)
+            if isinstance(result, Iterator):
+                return (yield from result)
+            return result
 
     return wrapper
 
