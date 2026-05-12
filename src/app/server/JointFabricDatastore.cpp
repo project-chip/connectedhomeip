@@ -996,9 +996,7 @@ JointFabricDatastore::UpdateGroupKeySetEntry(
             LogErrorOnFailure(UpdateNodeKeySetList(groupKeySet));
 
             VerifyOrReturnValue(groupKeySet.groupKeySecurityPolicy <
-                                        Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue &&
-                                    groupKeySet.groupKeyMulticastPolicy <
-                                        Clusters::JointFabricDatastore::DatastoreGroupKeyMulticastPolicyEnum::kUnknownEnumValue,
+                                    Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue,
                                 CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
             CopyGroupKeySetWithOwnedSpans(groupKeySet, entry);
@@ -1081,9 +1079,7 @@ JointFabricDatastore::UpdateNodeKeySetList(Clusters::JointFabricDatastore::Struc
         if (entry.groupKeySetID == groupKeySet.groupKeySetID)
         {
             if (groupKeySet.groupKeySecurityPolicy <
-                    Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue &&
-                groupKeySet.groupKeyMulticastPolicy <
-                    Clusters::JointFabricDatastore::DatastoreGroupKeyMulticastPolicyEnum::kUnknownEnumValue)
+                Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue)
             {
 
                 size_t index = i;
