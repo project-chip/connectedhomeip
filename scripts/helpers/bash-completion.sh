@@ -105,7 +105,7 @@ _chip_build_example() {
 
 # Get the list of commands from the output of the chip-cert tool.
 _chip_cert_get_commands() {
-    "$@" --help 2>&1 | awk '/ -- /{ print $1 }'
+    "$@" --help 2>&1 | awk '/ -- / && $1 !~ /^-/ { print $1 }'
 }
 
 # Get the list of commands from the output of the chip-tool,
@@ -177,12 +177,11 @@ _chip_cert() {
     local cur prev words cword split
     _init_completion -s || return
 
-    local i command command_comp_cword
+    local i command
     # Get the first non-option argument.
     for ((i = 1; i < COMP_CWORD; i++)); do
         if [[ "${COMP_WORDS[i]}" != -* ]] && [[ -n "${COMP_WORDS[i]}" ]]; then
             command="${COMP_WORDS[i]}"
-            command_comp_cword=$i
             break
         fi
     done
