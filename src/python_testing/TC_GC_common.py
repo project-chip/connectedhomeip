@@ -351,9 +351,11 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
 
     return operate_only_commands_dict
 
+
 def get_iana_multicast_address() -> bytes:
     """Returns the 16-byte IANA-assigned multicast address for Groupcast (ff05::fa)."""
     return bytes.fromhex("ff0500000000000000000000000000fa")
+
 
 def get_per_group_multicast_address(fabric_id: int, group_id: int) -> bytes:
     """Returns the 16-byte per-group multicast address (ff35:0040:fd<Fabric ID>00:<Group ID>)."""
