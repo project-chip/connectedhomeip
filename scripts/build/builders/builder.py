@@ -91,6 +91,8 @@ def lock_output_dir(func: Callable[Concatenate[S, P], R]) -> Callable[Concatenat
 
     @functools.wraps(func)
     def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R:
+        if self.output_dir_lock is None:
+            return func(self, *args, **kwargs)
         with self.output_dir_lock.lock_dir(self.output_dir):
             return func(self, *args, **kwargs)
 
@@ -104,7 +106,7 @@ class Builder(ABC):
 
     """
 
-    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock):
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock | None = None):
         self.root = os.path.abspath(root)
         self._runner = runner
         self.output_dir_lock = output_dir_lock
