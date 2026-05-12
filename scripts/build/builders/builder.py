@@ -98,6 +98,7 @@ def lock_output_dir(func: Callable[Concatenate[S, P], R]) -> Callable[Concatenat
 
     return wrapper
 
+
 class Builder(ABC):
     """Generic builder base class for CHIP.
 
