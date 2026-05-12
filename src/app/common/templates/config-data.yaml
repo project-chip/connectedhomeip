@@ -111,6 +111,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Bridged Device Basic Information
     - Camera AV Stream Management
     - Chime
     - Closure Control
@@ -142,6 +143,7 @@ CodeDrivenClusters:
     - Occupancy Sensing
     - Operational Credentials
     - Power Topology
+    - Pressure Measurement
     - Push AV Stream Transport
     - Relative Humidity Measurement
     - Scenes Management
