@@ -14,7 +14,7 @@ RUN set -x \
 WORKDIR /opt
 # Unpack the sysroots, while also removing some rather large items in them that
 # are generally not required for compilation
-# Executables are also removed as those confuse cmake. It tries to run `make` from the sysrot and fails.
+# Executables are also removed as those confuse cmake. It tries to run `make` from the sysroot and fails.
 RUN set -x \
   && SYSROOT_VERSION="build-2026.05.07" \
   && git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools \
