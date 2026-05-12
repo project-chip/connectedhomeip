@@ -51,6 +51,19 @@ static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevis
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+
+bool IsInRange(const chip::app::DataModel::Nullable<float> & value, const chip::app::DataModel::Nullable<float> & minV,
+               const chip::app::DataModel::Nullable<float> & maxV)
+{
+    VerifyOrReturnValue(!value.IsNull(), true);
+    VerifyOrReturnValue(!minV.IsNull() && value.Value() > minV.Value(), false);
+    VerifyOrReturnValue(!maxV.IsNull() && value.Value() < maxV.Value(), false);
+    return true;
+}
+
+} // namespace
+
 namespace chip {
 namespace app {
 namespace Clusters {

@@ -78,16 +78,6 @@ private:
                                      DataModel::Nullable<float> & storage, AttributeId attr);
     CHIP_ERROR SetWindowValue(uint32_t value, Feature requiredFeature, uint32_t & storage, AttributeId attr);
 
-    static bool IsInRange(const DataModel::Nullable<float> & value, const DataModel::Nullable<float> & minV,
-                          const DataModel::Nullable<float> & maxV)
-    {
-        VerifyOrReturnValue(!value.IsNull(), true);
-        VerifyOrReturnValue(!minV.IsNull() && value.Value() > minV.Value(), false);
-        VerifyOrReturnValue(!maxV.IsNull() && value.Value() < maxV.Value(), false);
-
-        return true;
-    }
-
     const BitFlags<Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
 
