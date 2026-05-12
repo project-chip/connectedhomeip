@@ -68,7 +68,8 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_on_root_node
+from TC_GC_common import (get_feature_map, get_iana_multicast_address, get_operate_only_commands, get_per_group_multicast_address,
+                          is_groupcast_on_root_node)
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -389,6 +390,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 11b: Write empty key map
             self.step("11b")
@@ -464,6 +467,9 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth)
+            expected_dest_addr = get_per_group_multicast_address(
+                self.default_controller.fabricId, groupID2) if pga_enabled else get_iana_multicast_address()
+            asserts.assert_equal(event_data.destinationIpAddress, expected_dest_addr, "Incorrect destination IP address in event")
 
         # Step 14: Revoke group access
         self.step(14)
@@ -488,6 +494,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 17: ConfigureAuxiliaryACL
             self.step(17)
@@ -504,6 +512,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 20: DisableTesting
             self.step(20)

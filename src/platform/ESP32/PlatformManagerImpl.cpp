@@ -35,6 +35,9 @@
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#if !CHIP_CRYPTO_PSA
+#include "esp_random.h"
+#endif
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -45,6 +48,11 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+namespace Internal {
+CHIP_ERROR InitPlatformNetworkStack();
+void DeinitPlatformNetworkStack();
+} // namespace Internal
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
@@ -63,15 +71,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
 
-    // Initialize TCP/IP network interface, which internally initializes LwIP stack. We have to
-    // call this before the usage of PacketBufferHandle::New() because in case of LwIP-based pool
-    // allocator, the LwIP pool allocator uses the LwIP stack.
-    esp_err_t err = esp_netif_init();
-    VerifyOrReturnError(err == ESP_OK, Internal::ESP32Utils::MapError(err));
-
-    // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
-    err = esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, nullptr);
-    VerifyOrReturnError(err == ESP_OK, Internal::ESP32Utils::MapError(err));
+    ReturnErrorOnFailure(Internal::InitPlatformNetworkStack());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
@@ -101,8 +101,7 @@ void PlatformManagerImpl::_Shutdown()
 
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 
-    esp_event_handler_unregister(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent);
-    esp_netif_deinit();
+    Internal::DeinitPlatformNetworkStack();
 }
 
 void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData)

@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -120,6 +121,20 @@ static_library("ESP32_custom") {
     } else {
       sources += [ "CHIPMem-PlatformDefault.cpp" ]
     }
+  }
+
+  if (chip_with_lwip) {
+    sources += [
+      "${chip_root}/src/platform/ESP32/DiagnosticDataProviderImpl_LwIP.cpp",
+      "${chip_root}/src/platform/ESP32/ESP32Utils_LwIP.cpp",
+      "${chip_root}/src/platform/ESP32/PlatformManagerImpl_LwIP.cpp",
+    ]
+  } else {
+    sources += [
+      "${chip_root}/src/platform/ESP32/DiagnosticDataProviderImpl_OT.cpp",
+      "${chip_root}/src/platform/ESP32/ESP32Utils_NoLwIP.cpp",
+      "${chip_root}/src/platform/ESP32/PlatformManagerImpl_NoLwIP.cpp",
+    ]
   }
 
   if (chip_enable_ble) {
