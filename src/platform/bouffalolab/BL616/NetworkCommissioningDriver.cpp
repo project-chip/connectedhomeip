@@ -158,16 +158,9 @@ CHIP_ERROR BflbWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
 
     // Bounds check added to prevent buffer overflow vulnerabilities.
-    VerifyOrReturnError(ssidLen <= sizeof(conn_param.ssid), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ssidLen <= sizeof(conn_param.ssid), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // Note on avoiding `CopyString` and `memcpy`:
-    // `chip::Platform::CopyString` forces null-termination (`dest[len - 1] = 0`).
-    // If the SSID exactly fills the hardware buffer (e.g., 32 bytes), `CopyString`
-    // would truncate the last character, introducing a critical connection bug.
-    // While `memcpy` avoids this and seems logically correct for known lengths,
-    // I deliberately retain `strncpy` to preserve the exact legacy memory-padding
-    // behavior expected by the vendor SDK. Without hardware to test on, this
-    // guarantees no unintended regressions.
+    // Keep old behaviour due to compatibility with SDK
     strncpy((char *) conn_param.ssid, ssid, ssidLen); // NOLINT(bugprone-unsafe-functions)
     conn_param.ssid_len = ssidLen;
 
@@ -176,8 +169,7 @@ CHIP_ERROR BflbWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
         // Bounds check added to prevent buffer overflow vulnerabilities.
         VerifyOrReturnError(keyLen <= sizeof(conn_param.key), CHIP_ERROR_INVALID_ARGUMENT);
 
-        // Deliberately avoiding CopyString (to prevent truncation of max-length keys)
-        // and keeping strncpy to ensure 100% legacy compatibility with the vendor driver.
+        // Keep old behaviour due to compatibility with SDK
         strncpy((char *) conn_param.key, key, keyLen); // NOLINT(bugprone-unsafe-functions)
         conn_param.key_len = keyLen;
     }

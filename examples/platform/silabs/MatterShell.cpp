@@ -75,20 +75,16 @@ CHIP_ERROR CmdSilabsDispatch(int argc, char ** argv)
 
     VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Create a stack-allocated buffer of the specified size
     chip::StringBuilder<SL_CLI_INPUT_BUFFER_SIZE> builder;
 
     for (int i = 0; i < argc; i++)
     {
-        // Add() automatically checks buffer boundaries and prevents overflows
         builder.Add(argv[i]);
         builder.Add(" ");
     }
 
-    // builder.Fit() returns 'false' if space ran out during any of the Add() calls
     VerifyOrExit(builder.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // c_str() guarantees proper null-termination ('\0')
     sl_cli_handle_input(sl_cli_default_handle, builder.c_str());
 
 exit:
