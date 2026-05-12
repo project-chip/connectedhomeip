@@ -11975,7 +11975,7 @@ namespace Attributes {
 
 namespace Type {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::Type>;
     Traits::StorageType temp;
@@ -11995,7 +11995,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace PhysicalClosedLimitLift {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12015,7 +12015,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace PhysicalClosedLimitTilt {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12035,7 +12035,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace CurrentPositionLift {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12058,7 +12058,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace CurrentPositionTilt {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12081,7 +12081,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace NumberOfActuationsLift {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12101,7 +12101,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace NumberOfActuationsTilt {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12121,8 +12121,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace ConfigStatus {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>>;
     Traits::StorageType temp;
@@ -12142,7 +12142,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
 
 namespace CurrentPositionLiftPercentage {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value)
 {
     using Traits = NumericAttributeTraits<chip::Percent>;
     Traits::StorageType temp;
@@ -12165,7 +12165,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace CurrentPositionTiltPercentage {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value)
 {
     using Traits = NumericAttributeTraits<chip::Percent>;
     Traits::StorageType temp;
@@ -12188,7 +12188,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace TargetPositionLiftPercent100ths {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
 {
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     Traits::StorageType temp;
@@ -12211,7 +12211,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace TargetPositionTiltPercent100ths {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
 {
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     Traits::StorageType temp;
@@ -12234,7 +12234,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace EndProductType {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::EndProductType>;
     Traits::StorageType temp;
@@ -12254,7 +12254,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace CurrentPositionLiftPercent100ths {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
 {
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     Traits::StorageType temp;
@@ -12277,7 +12277,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace CurrentPositionTiltPercent100ths {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value)
 {
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     Traits::StorageType temp;
@@ -12300,7 +12300,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable
 
 namespace InstalledOpenLimitLift {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12320,7 +12320,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace InstalledClosedLimitLift {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12340,7 +12340,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace InstalledOpenLimitTilt {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12360,7 +12360,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace InstalledClosedLimitTilt {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -12380,7 +12380,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 
 namespace Mode {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::WindowCovering::Mode> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>;
     Traits::StorageType temp;
@@ -12400,7 +12401,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip:
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
