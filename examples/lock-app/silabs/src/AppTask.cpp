@@ -165,7 +165,7 @@ chip::StorageKeyName LockHolidayScheduleEndpoint(chip::EndpointId endpoint, uint
 
 // ---- Misc helpers ----------------------------------------------------------
 
-const char * LockStateToString(chip::app::Clusters::DoorLock::DlLockState lockState)
+[[maybe_unused]] const char * LockStateToString(chip::app::Clusters::DoorLock::DlLockState lockState)
 {
     using chip::app::Clusters::DoorLock::DlLockState;
     switch (lockState)
