@@ -81,10 +81,8 @@ uint32_t GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(EndpointId endpo
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpointId, PowerSource::Id, attributeId);
     VerifyOrDie(metadata != nullptr);
     VerifyOrDie(!metadata->IsExternal());
-    VerifyOrDie(metadata->attributeType == ZCL_BOOLEAN_ATTRIBUTE_TYPE ||
-                metadata->attributeType == ZCL_INT8U_ATTRIBUTE_TYPE   ||
-                metadata->attributeType == ZCL_INT16U_ATTRIBUTE_TYPE  ||
-                metadata->attributeType == ZCL_INT32U_ATTRIBUTE_TYPE);
+    VerifyOrDie(metadata->attributeType == ZCL_BOOLEAN_ATTRIBUTE_TYPE || metadata->attributeType == ZCL_INT8U_ATTRIBUTE_TYPE ||
+                metadata->attributeType == ZCL_INT16U_ATTRIBUTE_TYPE || metadata->attributeType == ZCL_INT32U_ATTRIBUTE_TYPE);
     return metadata->defaultValue.defaultValue;
 }
 
@@ -174,13 +172,15 @@ public:
     }
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
-    #define SetSimpleIntegerDefault(power_source_type, attr_type, attr_name, config_field_name) \
-        if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
-        {                                                                                                                              \
-            config.config_field_name = static_cast<attr_type>(GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(endpointId, attr_name::Id));           \
-        }
+#define SetSimpleIntegerDefault(power_source_type, attr_type, attr_name, config_field_name)                                        \
+    if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
+    {                                                                                                                              \
+        config.config_field_name =                                                                                                 \
+            static_cast<attr_type>(GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(endpointId, attr_name::Id));             \
+    }
 #else // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
-    #define SetSimpleIntegerDefault(power_source_type, attr_type, attr_name, config_field_name) SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)
+#define SetSimpleIntegerDefault(power_source_type, attr_type, attr_name, config_field_name)                                        \
+    SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
 
         // doesn't matter if Wired or Battery is used here, both will have the mandatory attributes supported
@@ -281,8 +281,9 @@ public:
                         uint8_t quantity;
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
                         VerifyOrDie(BatQuantity::GetDefault(endpointId, &quantity) == InteractionModel::Status::Success);
-#else // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
-                        quantity = static_cast<uint8_t>(GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(endpointId, BatQuantity::Id));
+#else  // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
+                        quantity = static_cast<uint8_t>(
+                            GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(endpointId, BatQuantity::Id));
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
                         config.MakeReplaceable(replacementDescription, quantity);
 
