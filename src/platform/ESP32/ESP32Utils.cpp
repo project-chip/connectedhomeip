@@ -31,7 +31,6 @@
 
 #include "esp_event.h"
 #include "esp_netif.h"
-#include "esp_netif_net_stack.h"
 #include "esp_wifi.h"
 #include "nvs.h"
 
@@ -167,11 +166,6 @@ const char * ESP32Utils::WiFiModeToStr(wifi_mode_t wifiMode)
     }
 }
 
-struct netif * ESP32Utils::GetStationNetif(void)
-{
-    return GetNetif(kDefaultWiFiStationNetifKey);
-}
-
 CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
     wifi_config_t stationConfig;
@@ -301,27 +295,6 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-struct netif * ESP32Utils::GetNetif(const char * ifKey)
-{
-    struct netif * netif       = NULL;
-    esp_netif_t * netif_handle = NULL;
-    netif_handle               = esp_netif_get_handle_from_ifkey(ifKey);
-    netif                      = (struct netif *) esp_netif_get_netif_impl(netif_handle);
-    return netif;
-}
-
-bool ESP32Utils::IsInterfaceUp(const char * ifKey)
-{
-    struct netif * netif = GetNetif(ifKey);
-    return netif != NULL && netif_is_up(netif);
-}
-
-bool ESP32Utils::HasIPv6LinkLocalAddress(const char * ifKey)
-{
-    struct esp_ip6_addr if_ip6_unused;
-    return esp_netif_get_ip6_linklocal(esp_netif_get_handle_from_ifkey(ifKey), &if_ip6_unused) == ESP_OK;
-}
 
 CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
 {

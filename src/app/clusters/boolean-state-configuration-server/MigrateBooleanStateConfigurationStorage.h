@@ -1,5 +1,7 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,31 +16,20 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines and implements macros for verifying values that do not
- *      involve logging.
- */
-
 #pragma once
 
-#include <nlassert.h>
+#include <app/persistence/AttributePersistenceMigration.h>
+#include <app/util/basic-types.h>
 
-#define VerifyOrDieWithoutLogging(aCondition) nlABORT(aCondition)
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace BooleanStateConfiguration {
 
-/**
- *  @def IgnoreUnusedVariable(aVariable)
- *
- *  @brief
- *    This casts the specified @a aVariable to void to quell any
- *    compiler-issued unused variable warnings or errors.
- *
- *  @code
- *  void foo (int err)
- *  {
- *      IgnoreUnusedVariable(err)
- *  }
- *  @endcode
- *
- */
-#define IgnoreUnusedVariable(aVariable) ((void) (aVariable))
+CHIP_ERROR MigrateBooleanStateConfigurationStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
+                                                   AttributePersistenceProvider & dstProvider);
+
+} // namespace BooleanStateConfiguration
+} // namespace Clusters
+} // namespace app
+} // namespace chip

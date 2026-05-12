@@ -40,8 +40,8 @@ def include_package(package: dict) -> bool:
     return True
 
 
-def generate_new_cipd_package_json(input, output, extra):
-    with open(input) as ins:
+def generate_new_cipd_package_json(input_file, output, extra):
+    with open(input_file) as ins:
         packages = json.load(ins)
 
         file_packages = packages.get('packages')
@@ -81,7 +81,7 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        '--input', '-i', required=True
+        '--input', '-i', dest='input_file', required=True
     )
     parser.add_argument(
         '--output', '-o', required=True
