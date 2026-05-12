@@ -125,7 +125,7 @@ MatterOvenCavityOperationalStateClusterServerPreAttributeChangedCallback(const C
 }
 
 // Code-driven init/shutdown hooks — applications instantiate Instance directly
-// and call Init(). These weak stubs satisfy the linker for apps that do not
+// and call Init(). These stubs satisfy the linker for apps that do not
 // need custom lifecycle handling.
 void MatterOperationalStateClusterInitCallback(chip::EndpointId) {}
 void MatterOperationalStateClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
