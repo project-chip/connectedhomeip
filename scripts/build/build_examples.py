@@ -186,6 +186,12 @@ before running this script.
 
     if dry_run:
         runner = PrintOnlyRunner(dry_run_output, root=repo)
+        if concurrent_builders > 1:
+            log.warning(
+                "Concurrent builders is set to %d, but dry-run mode is enabled. "
+                "Ignoring concurrent builders and running in single-threaded mode.",
+                concurrent_builders)
+            concurrent_builders = 1
     else:
         runner = ShellRunner(root=repo)
 
