@@ -86,11 +86,11 @@ P = ParamSpec('P')
 R = TypeVar('R')
 
 
-def lock_output_dir(func: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
+def lock_output_dir(func: Callable[Concatenate[S, P], R | Iterator[R]]) -> Callable[Concatenate[S, P], R | Iterator[R]]:
     """Decorator to wrap build steps with output directory lock."""
 
     @functools.wraps(func)
-    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R:
+    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R | Iterator[R]:
         if self.output_dir_lock is None:
             return func(self, *args, **kwargs)
         with self.output_dir_lock.lock_dir(self.output_dir):
@@ -98,7 +98,11 @@ def lock_output_dir(func: Callable[Concatenate[S, P], R]) -> Callable[Concatenat
             # This is needed for build_outputs and bundle_outputs which are generators that yield BuilderOutput objects.
             result = func(self, *args, **kwargs)
             if isinstance(result, Iterator):
-                return (yield from result)
+                def generator_with_lock():
+                    yield from result
+
+                return generator_with_lock()
+
             return result
 
     return wrapper
