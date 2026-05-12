@@ -75,6 +75,7 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
     return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + 1, length);
 }
 
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
 // This function can handle non nullable signed integer and boolean attributes, up to uint32_t.
 uint32_t GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(EndpointId endpointId, AttributeId attributeId)
 {
@@ -85,6 +86,7 @@ uint32_t GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(EndpointId endpo
                 metadata->attributeType == ZCL_INT16U_ATTRIBUTE_TYPE || metadata->attributeType == ZCL_INT32U_ATTRIBUTE_TYPE);
     return metadata->defaultValue.defaultValue;
 }
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
 
 template <class GetAccessor>
 CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpointId, std::string & storage)
@@ -183,10 +185,6 @@ public:
     SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
 
-        // doesn't matter if Wired or Battery is used here, both will have the mandatory attributes supported
-        SetAttributeDefaultFromEmber(Wired, typename EmberWiredPowerSourceClusterT::PowerSourceStatusEnum, Status, status);
-        SetSimpleIntegerDefault(Wired, uint8_t, Order, order);
-
         if constexpr (wiredSupported)
         {
             if (features.Has(Feature::kWired))
@@ -206,6 +204,9 @@ public:
                         }
                     }
                 }
+
+                SetAttributeDefaultFromEmber(Wired, typename EmberWiredPowerSourceClusterT::PowerSourceStatusEnum, Status, status);
+                SetSimpleIntegerDefault(Wired, uint8_t, Order, order);
                 SetNullableAttributeDefaultFromEmber(Wired, uint32_t, WiredAssessedInputVoltage, wiredAssessedInputVoltage);
                 SetNullableAttributeDefaultFromEmber(Wired, uint16_t, WiredAssessedInputFrequency, wiredAssessedInputFrequency);
                 SetNullableAttributeDefaultFromEmber(Wired, uint32_t, WiredAssessedCurrent, wiredAssessedCurrent);
@@ -245,6 +246,8 @@ public:
                 typename EmberBatteryPowerSourceClusterT::ConfigType config(endpointId, description, replaceability,
                                                                             gTimerDelegate);
 
+                SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::PowerSourceStatusEnum, Status, status);
+                SetSimpleIntegerDefault(Battery, uint8_t, Order, order);
                 SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatVoltage, batVoltage);
                 SetNullableAttributeDefaultFromEmber(Battery, uint8_t, BatPercentRemaining, batPercentRemaining);
                 SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatTimeRemaining, batTimeRemaining);
