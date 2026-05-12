@@ -261,7 +261,7 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
     case OperationalStateList::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             GenericOperationalState opState;
-            for (size_t i = 0;;i++)
+            for (size_t i = 0;; i++)
             {
                 CHIP_ERROR err = mDelegate->GetOperationalStateAtIndex(i, opState);
                 if (err == CHIP_ERROR_NOT_FOUND)
