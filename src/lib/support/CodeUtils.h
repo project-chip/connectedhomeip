@@ -499,7 +499,7 @@
  *    This is expected to be called from within a class that implements a Shutdown method.
  *    It checks for the specified error, which is expected to commonly be successful (CHIP_NO_ERROR),
  *    on failure, it calls the statements to be executed before shutdown if provided,
- *    executed before shutdown if provided, then calls the Shutdown method of the class en returns the error.
+ *    then calls the Shutdown method of the class and returns the error.
  *
  *  @param[in]  expr  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  *  @param[in]  ...     Statements to execute before shutdown. Optional.

@@ -695,7 +695,15 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
             EXPECT_EQ(decoded.energyImported.Value().energy, 100);
             EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
             EXPECT_FALSE(decoded.energyImported.Value().startSystime.HasValue());
-            ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
+            uint32_t currentTimestamp;
+            if(System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            {
+                ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
+            }
+            else
+            {
+                EXPECT_FALSE(decoded.energyImported.Value().endTimestamp.HasValue());
+            }
             ASSERT_TRUE(decoded.energyImported.Value().endSystime.HasValue());
             EXPECT_EQ(decoded.energyImported.Value().endSystime.Value(), 0u);
         }

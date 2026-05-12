@@ -52,7 +52,7 @@ public:
         >;
 
     //
-    // Per Spec, a server cannot report morte frequently than every 1 second:
+    // Per Spec, a server cannot report more frequently than every 1 second:
     // 6.X. [Cumulative/Periodic]Energy[Imported/Exported] Attribute:
     // The server SHALL NOT mark this attribute ready for report if the last time this was done was more recently than 1 second ago.
     //
@@ -156,7 +156,7 @@ public:
      *  pulls readings from the delegate, updates attributes, and generates events.
      *
      * @note Enforces the minimum reporting interval: if a report was generated less than kMinReportInterval ago, this will
-     *       do nothing, and any subsequent reports will be produced according to the existing reporting/timer mechanisms.
+     *        update the cluster values without generating a report.
      */
     void GenerateSnapshots();
 
@@ -167,14 +167,6 @@ public:
                                 const Nullable<EnergyMeasurementStruct> & energyExported);
 
 private:
-    enum class AttributeIgnoredDirtyState : uint32_t
-    {
-        CumulativeEnergyImported = 0x1,
-        CumulativeEnergyExported = 0x2,
-        PeriodicEnergyImported   = 0x4,
-        PeriodicEnergyExported   = 0x8,
-    };
-
     AttributeDirtyState SetCumulativeEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
     AttributeDirtyState SetCumulativeEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
     AttributeDirtyState SetPeriodicEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
