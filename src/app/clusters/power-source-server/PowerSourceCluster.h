@@ -218,7 +218,7 @@ struct PowerSourceClusterConfig
     static_assert(supportedFeatures.Has(PowerSource::Feature::kWired) ^ supportedFeatures.Has(PowerSource::Feature::kBattery),
                   "Exactly one of Wired or Battery features must be set");
 
-    static constexpr AttributeSet supportedOptionalAttributeSet =
+    constexpr static AttributeSet supportedOptionalAttributeSet =
         PowerSource::detail::GetValidOptionalAttributeSet(AttributeSet(supportedOptionalAttributeBits), supportedFeatures);
 
     PowerSourceClusterConfig(EndpointId endpointId, CharSpan desc, PowerSource::WiredCurrentTypeEnum currType)
@@ -1280,7 +1280,7 @@ private:
         NotifyAttributeChanged(PowerSource::Attributes::ActiveBatChargeFaults::Id);
     }
 
-    static constexpr System::Clock::Timeout kNotifyTimerDuration = System::Clock::Seconds16(10);
+    constexpr static System::Clock::Timeout kNotifyTimerDuration = System::Clock::Seconds16(10);
 };
 
 using FullWiredPowerSourceConfig =

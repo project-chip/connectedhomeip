@@ -86,6 +86,14 @@ public:
     using BatChargeStateEnum       = PowerSource::BatChargeStateEnum;
     using BatChargeFaultEnum       = PowerSource::BatChargeFaultEnum;
 
+    constexpr static BitFlags<PowerSource::Feature> supportedFeatures {
+        PowerSource::Feature::kWired,
+        PowerSource::Feature::kBattery,
+        PowerSource::Feature::kRechargeable,
+        PowerSource::Feature::kReplaceable
+    };
+    constexpr static AttributeSet supportedOptionalAttributeSet { UINT32_MAX };
+
     DummyPowerSourceCluster()                                            = delete;
     DummyPowerSourceCluster(const DummyPowerSourceCluster &)             = delete;
     DummyPowerSourceCluster & operator=(const DummyPowerSourceCluster &) = delete;

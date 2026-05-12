@@ -75,6 +75,19 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
     return CharSpan(reinterpret_cast<const char *>(metadata->defaultValue.ptrToDefaultValue) + 1, length);
 }
 
+// This function can handle non nullable signed integer and boolean attributes, up to uint32_t.
+uint32_t GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(EndpointId endpointId, AttributeId attributeId)
+{
+    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpointId, PowerSource::Id, attributeId);
+    VerifyOrDie(metadata != nullptr);
+    VerifyOrDie(!metadata->IsExternal());
+    VerifyOrDie(metadata->attributeType == ZCL_BOOLEAN_ATTRIBUTE_TYPE ||
+                metadata->attributeType == ZCL_INT8U_ATTRIBUTE_TYPE   ||
+                metadata->attributeType == ZCL_INT16U_ATTRIBUTE_TYPE  ||
+                metadata->attributeType == ZCL_INT32U_ATTRIBUTE_TYPE);
+    return metadata->defaultValue.defaultValue;
+}
+
 template <class GetAccessor>
 CharSpan GetCharStringDefaultValueFromEmber(GetAccessor getter, EndpointId endpointId, std::string & storage)
 {
@@ -160,6 +173,20 @@ public:
         }                                                                                                                          \
     }
 
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
+    #define SetSimpleIntegerDefault(power_source_type, attr_type, attr_name, config_field_name) \
+        if constexpr (Ember##power_source_type##PowerSourceClusterT::supportedOptionalAttributeSet.IsSet(attr_name::Id))               \
+        {                                                                                                                              \
+            config.config_field_name = static_cast<attr_type>(GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(endpointId, attr_name::Id));           \
+        }
+#else // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
+    #define SetSimpleIntegerDefault(power_source_type, attr_type, attr_name, config_field_name) SetAttributeDefaultFromEmber(power_source_type, attr_type, attr_name, config_field_name)
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
+
+        // doesn't matter if Wired or Battery is used here, both will have the mandatory attributes supported
+        SetAttributeDefaultFromEmber(Wired, typename EmberWiredPowerSourceClusterT::PowerSourceStatusEnum, Status, status);
+        SetSimpleIntegerDefault(Wired, uint8_t, Order, order);
+
         if constexpr (wiredSupported)
         {
             if (features.Has(Feature::kWired))
@@ -182,9 +209,9 @@ public:
                 SetNullableAttributeDefaultFromEmber(Wired, uint32_t, WiredAssessedInputVoltage, wiredAssessedInputVoltage);
                 SetNullableAttributeDefaultFromEmber(Wired, uint16_t, WiredAssessedInputFrequency, wiredAssessedInputFrequency);
                 SetNullableAttributeDefaultFromEmber(Wired, uint32_t, WiredAssessedCurrent, wiredAssessedCurrent);
-                SetAttributeDefaultFromEmber(Wired, uint32_t, WiredNominalVoltage, wiredNominalVoltage);
-                SetAttributeDefaultFromEmber(Wired, uint32_t, WiredMaximumCurrent, wiredMaximumCurrent);
-                SetAttributeDefaultFromEmber(Wired, bool, WiredPresent, wiredPresent);
+                SetSimpleIntegerDefault(Wired, uint32_t, WiredNominalVoltage, wiredNominalVoltage);
+                SetSimpleIntegerDefault(Wired, uint32_t, WiredMaximumCurrent, wiredMaximumCurrent);
+                SetSimpleIntegerDefault(Wired, bool, WiredPresent, wiredPresent);
 
                 config.usedOptionalAttributes = optionalAttributeSet;
                 LazyRegisteredWiredSourceClusterT * server;
@@ -223,8 +250,8 @@ public:
                 SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatTimeRemaining, batTimeRemaining);
                 SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeLevelEnum, BatChargeLevel,
                                              batChargeLevel);
-                SetAttributeDefaultFromEmber(Battery, bool, BatReplacementNeeded, batReplacementNeeded);
-                SetAttributeDefaultFromEmber(Battery, bool, BatPresent, batPresent);
+                SetSimpleIntegerDefault(Battery, bool, BatReplacementNeeded, batReplacementNeeded);
+                SetSimpleIntegerDefault(Battery, bool, BatPresent, batPresent);
 
                 if constexpr (batteryFeatures.Has(Feature::kReplaceable))
                 {
@@ -252,7 +279,11 @@ public:
                         }
 
                         uint8_t quantity;
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
                         VerifyOrDie(BatQuantity::GetDefault(endpointId, &quantity) == InteractionModel::Status::Success);
+#else // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
+                        quantity = static_cast<uint8_t>(GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(endpointId, BatQuantity::Id));
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
                         config.MakeReplaceable(replacementDescription, quantity);
 
                         SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatCommonDesignationEnum,
@@ -316,12 +347,12 @@ public:
                         SetAttributeDefaultFromEmber(Battery, typename EmberBatteryPowerSourceClusterT::BatChargeStateEnum,
                                                      BatChargeState, batChargeState);
                         SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatTimeToFullCharge, batTimeToFullCharge);
-                        SetAttributeDefaultFromEmber(Battery, bool, BatFunctionalWhileCharging, batFunctionalWhileCharging);
+                        SetSimpleIntegerDefault(Battery, bool, BatFunctionalWhileCharging, batFunctionalWhileCharging);
                         SetNullableAttributeDefaultFromEmber(Battery, uint32_t, BatChargingCurrent, batChargingCurrent);
                     }
                 }
 
-                SetAttributeDefaultFromEmber(Battery, uint32_t, BatCapacity, batCapacity);
+                SetSimpleIntegerDefault(Battery, uint32_t, BatCapacity, batCapacity);
 
                 config.usedOptionalAttributes = optionalAttributeSet;
                 LazyRegisteredBatterySourceClusterT * server;
@@ -345,6 +376,7 @@ public:
 
 #undef SetAttributeDefaultFromEmber
 #undef SetNullableAttributeDefaultFromEmber
+#undef SetSimpleIntegerDefault
 
         // unreachable
         chipDie();
