@@ -37,7 +37,7 @@ class LogPipe(threading.Thread):
 
             and start the thread
             """
-        threading.Thread.__init__(self, name=title if title else self.__class__.__name__)
+        threading.Thread.__init__(self, name=title or self.__class__.__name__)
         self.daemon = False
         self.level = level
         self.fd_read, self.fd_write = os.pipe()
