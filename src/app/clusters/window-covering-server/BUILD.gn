@@ -18,7 +18,7 @@ source_set("window-covering-server") {
   sources = [
     "WindowCoveringCluster.cpp",
     "WindowCoveringCluster.h",
-    "WindowCoveringClusterDelegate.h",
+    "WindowCoveringDelegate.h",
     "window-covering-delegate.h",
     "window-covering-server.h",
   ]

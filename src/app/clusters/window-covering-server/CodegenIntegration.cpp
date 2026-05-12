@@ -75,14 +75,21 @@ public:
 
         WindowCoveringCluster::Config config;
         if (features.Has(Feature::kPositionAwareLift))
+        {
             config.WithPositionAwareLift();
+        }
         else if (features.Has(Feature::kLift))
+        {
             config.WithLift();
-
+        }
         if (features.Has(Feature::kPositionAwareTilt))
+        {
             config.WithPositionAwareTilt();
+        }
         else if (features.Has(Feature::kTilt))
+        {
             config.WithTilt();
+        }
 
         config.WithOptionalAttributes(optionalAttributes);
         gServers[clusterInstanceIndex].Create(endpointId, config);
@@ -231,35 +238,35 @@ void SetDefaultDelegate(EndpointId endpointId, WindowCoveringDelegate * delegate
 void TypeSet(chip::EndpointId endpoint, Type type)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     cluster->SetType(type);
 }
 
 Type TypeGet(chip::EndpointId endpoint)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturnValue(cluster != nullptr, Type::kUnknown);
+    VerifyOrDie(cluster != nullptr);
     return cluster->GetType();
 }
 
 void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus> & configStatus)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     cluster->SetConfigStatus(configStatus);
 }
 
 chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturnError(cluster != nullptr, chip::BitMask<ConfigStatus>(0));
+    VerifyOrDie(cluster != nullptr);
     return cluster->GetConfigStatus();
 }
 
 void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
 
     configStatus.Set(ConfigStatus::kLiftPositionAware, cluster->HasFeaturePaLift());
@@ -277,14 +284,14 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
 chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturnValue(cluster != nullptr, chip::BitMask<OperationalStatus>(0));
+    VerifyOrDie(cluster != nullptr);
     return cluster->GetOperationalStatus();
 }
 
 void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalStatus> newStatus)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     chip::BitMask<OperationalStatus> prevStatus = cluster->GetOperationalStatus();
 
     // Filter changes
@@ -298,7 +305,7 @@ void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalSt
 void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field, OperationalState state)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     chip::BitMask<OperationalStatus> status = cluster->GetOperationalStatus();
 
     /* Filter only Lift or Tilt action since we cannot allow global reflecting a state alone */
@@ -319,7 +326,7 @@ void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<Operatio
 OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturnValue(cluster != nullptr, OperationalState::Stall);
+    VerifyOrDie(cluster != nullptr);
     chip::BitMask<OperationalStatus> status = cluster->GetOperationalStatus();
 
     return static_cast<OperationalState>(status.GetField(field));
@@ -328,42 +335,42 @@ OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitM
 void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     cluster->SetEndProductType(type);
 }
 
 EndProductType EndProductTypeGet(chip::EndpointId endpoint)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturnValue(cluster != nullptr, EndProductType::kUnknown);
+    VerifyOrDie(cluster != nullptr);
     return cluster->GetEndProductType();
 }
 
 void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     cluster->SetMode(newMode);
 }
 
 chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturnValue(cluster != nullptr, chip::BitMask<Mode>(0));
+    VerifyOrDie(cluster != nullptr);
     return cluster->GetMode();
 }
 
 void SafetyStatusSet(chip::EndpointId endpoint, chip::BitMask<SafetyStatus> & newSafetyStatus)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     cluster->SetSafetyStatus(newSafetyStatus);
 }
 
 chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturnValue(cluster != nullptr, chip::BitMask<SafetyStatus>(0));
+    VerifyOrDie(cluster != nullptr);
     return cluster->GetSafetyStatus();
 }
 
@@ -414,7 +421,7 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     NPercent percent;
 
     if (percent100ths.IsNull())
@@ -434,7 +441,7 @@ void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
     NPercent percent;
 
     if (percent100ths.IsNull())
@@ -454,7 +461,7 @@ void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrReturn(cluster != nullptr);
+    VerifyOrDie(cluster != nullptr);
 
     BitMask<Mode> mode;
     BitMask<ConfigStatus> configStatus;
