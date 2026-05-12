@@ -67,16 +67,15 @@ public:
     // Constructor for clusters with kNumericMeasurement.
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium,
              MeasurementUnitEnum aMeasurementUnit) :
-        mEndpointId(aEndpointId),
-        mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
+        mEndpointId(aEndpointId), mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
     {}
 
     ~Instance()
     {
-        if (mRegistered)
+        if (mCluster.IsConstructed())
         {
-            mRegistered = false;
             LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
+            mCluster.Destroy();
         }
     }
 
@@ -86,7 +85,7 @@ public:
      */
     CHIP_ERROR Init()
     {
-        VerifyOrReturnError(!mRegistered, CHIP_NO_ERROR);
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_NO_ERROR);
         mCluster.Create(mEndpointId, mConfig);
         CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
         if (err != CHIP_NO_ERROR)
@@ -94,7 +93,6 @@ public:
             mCluster.Destroy();
             return err;
         }
-        mRegistered = true;
         return CHIP_NO_ERROR;
     }
 
@@ -178,7 +176,6 @@ private:
         return f;
     }
 
-    bool mRegistered = false;
     EndpointId mEndpointId;
     ConcentrationMeasurementCluster::Config mConfig;
     LazyRegisteredServerCluster<ConcentrationMeasurementCluster> mCluster;

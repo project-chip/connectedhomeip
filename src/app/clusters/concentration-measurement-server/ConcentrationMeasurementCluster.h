@@ -24,6 +24,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <lib/support/BitFlags.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -45,7 +46,7 @@ public:
         MeasurementUnitEnum unit;
         DataModel::Nullable<float> minMeasured = DataModel::MakeNullable(0.0f);
         DataModel::Nullable<float> maxMeasured = DataModel::Nullable<float>();
-        float uncertainty                      = 0.0f;
+        std::optional<float> uncertainty;
     };
 
     using OptionalAttributeSet =
@@ -80,12 +81,10 @@ private:
     static bool IsInRange(const DataModel::Nullable<float> & value, const DataModel::Nullable<float> & minV,
                           const DataModel::Nullable<float> & maxV)
     {
-        if (value.IsNull())
-            return true;
-        if (!minV.IsNull() && value.Value() < minV.Value())
-            return false;
-        if (!maxV.IsNull() && value.Value() > maxV.Value())
-            return false;
+        VerifyOrReturnValue(!value.IsNull(), true);
+        VerifyOrReturnValue(!minV.IsNull() && value.Value() > minV.Value(), false);
+        VerifyOrReturnValue(!maxV.IsNull() && value.Value() < maxV.Value(), false);
+
         return true;
     }
 
@@ -96,7 +95,7 @@ private:
     MeasurementUnitEnum mUnit;
     DataModel::Nullable<float> mMinMeasuredValue;
     DataModel::Nullable<float> mMaxMeasuredValue;
-    float mUncertainty;
+    std::optional<float> mUncertainty;
     DataModel::Nullable<float> mMeasuredValue;
     DataModel::Nullable<float> mPeakMeasuredValue;
     uint32_t mPeakMeasuredValueWindow = 0;

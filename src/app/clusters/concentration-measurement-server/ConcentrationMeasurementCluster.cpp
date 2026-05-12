@@ -60,23 +60,38 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
     DefaultServerCluster({ endpointId, config.clusterId }), mFeatures([&] {
         BitFlags<Feature> f = config.features;
         if (f.HasAny(Feature::kMediumLevel, Feature::kCriticalLevel))
+        {
             f.Set(Feature::kLevelIndication);
+        }
         if (f.HasAny(Feature::kPeakMeasurement, Feature::kAverageMeasurement))
+        {
             f.Set(Feature::kNumericMeasurement);
+        }
         return f;
     }()),
     mOptionalAttributeSet([&] {
         uint32_t bits = 0;
         if (mFeatures.Has(Feature::kNumericMeasurement))
+        {
             bits |= (1u << Attributes::MeasuredValue::Id) | (1u << Attributes::MinMeasuredValue::Id) |
-                (1u << Attributes::MaxMeasuredValue::Id) | (1u << Attributes::Uncertainty::Id) |
-                (1u << Attributes::MeasurementUnit::Id);
+                (1u << Attributes::MaxMeasuredValue::Id) | (1u << Attributes::MeasurementUnit::Id);
+            if (config.uncertainty.has_value())
+            {
+                bits |= (1u << Attributes::Uncertainty::Id);
+            }
+        }
         if (mFeatures.Has(Feature::kPeakMeasurement))
+        {
             bits |= (1u << Attributes::PeakMeasuredValue::Id) | (1u << Attributes::PeakMeasuredValueWindow::Id);
+        }
         if (mFeatures.Has(Feature::kAverageMeasurement))
+        {
             bits |= (1u << Attributes::AverageMeasuredValue::Id) | (1u << Attributes::AverageMeasuredValueWindow::Id);
+        }
         if (mFeatures.Has(Feature::kLevelIndication))
+        {
             bits |= (1u << Attributes::LevelValue::Id);
+        }
         return OptionalAttributeSet(bits);
     }()),
     mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured), mMaxMeasuredValue(config.maxMeasured),
@@ -111,7 +126,7 @@ DataModel::ActionReturnStatus ConcentrationMeasurementCluster::ReadAttribute(con
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision);
     case Uncertainty::Id:
-        return encoder.Encode(mUncertainty);
+        return encoder.Encode(mUncertainty.value_or(0.0f));
     case MeasurementUnit::Id:
         return encoder.Encode(mUnit);
     case PeakMeasuredValueWindow::Id:
