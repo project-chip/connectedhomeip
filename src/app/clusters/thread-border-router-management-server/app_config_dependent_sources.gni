@@ -13,6 +13,7 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "thread-border-router-management-server.h",
   "thread-br-delegate.h",
 ]
