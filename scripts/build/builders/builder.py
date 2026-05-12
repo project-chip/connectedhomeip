@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
+from collections.abc import Iterator
 import contextlib
 import functools
 import threading
@@ -23,7 +24,7 @@ import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Callable, Concatenate, Iterator, ParamSpec, TypeVar
+from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from runner.runner import Runner
 
