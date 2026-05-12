@@ -24,7 +24,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include "OTAConfig.h"
+#endif // SILABS_OTA_ENABLED
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
@@ -37,9 +39,11 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#ifdef ENABLE_CHIP_SHELL
 #if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
-#include <shell/im/IMShellCommands.h>
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+#include <shell/im/IMShellCommands.h> // nogncheck
+#endif                                // CHIP_CONFIG_ENABLE_READ_CLIENT
+#endif                                // ENABLE_CHIP_SHELL
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -88,6 +92,10 @@
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 #include <app-common/zap-generated/callback.h>
 #endif
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+#include "CustomerAppTask.h"
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
 
 /**********************************************************
  * Defines and Constants
@@ -1032,3 +1040,12 @@ bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
 }
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
+    CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
+}
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

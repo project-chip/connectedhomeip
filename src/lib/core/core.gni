@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+assert(current_toolchain != "",
+       "Build settings cannot be evaluated without a toolchain." +
+           " Do not import this file from default_args / args.gni.")
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/config/recommended.gni")

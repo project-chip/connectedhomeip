@@ -33,6 +33,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
 
 Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
+    emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId);
     return Status::Success;
 }
 

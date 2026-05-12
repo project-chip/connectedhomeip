@@ -250,9 +250,12 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.LIGHT or self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+        elif self == HostApp.LIGHT:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
+        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            yield 'chip-lighting-data-model-no-unique-id-app'
+            yield 'chip-lighting-data-model-no-unique-id-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
@@ -362,6 +365,7 @@ class HostBoard(Enum):
 
     # cross-compile support
     ARM64 = auto()
+    ARM = auto()
 
     # for test support
     FAKE = auto()
@@ -382,6 +386,8 @@ class HostBoard(Enum):
             return arch
         if self == HostBoard.ARM64:
             return 'arm64'
+        if self == HostBoard.ARM:
+            return 'arm'
         if self == HostBoard.FAKE:
             return 'fake'
         raise Exception('Unknown host board type: %r' % self)
@@ -399,7 +405,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
-                 enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
+                 enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
@@ -414,6 +420,7 @@ class HostBuilder(GnBuilder):
                  openthread_endpoint=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 all_devices_enabled_devices=None,
                  ):
         """
         Construct a host builder.
@@ -442,6 +449,9 @@ class HostBuilder(GnBuilder):
 
         if not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
+
+        if not enable_groupcast:
+            self.extra_gn_options.append('chip_config_enable_groupcast=false')
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
@@ -515,6 +525,7 @@ class HostBuilder(GnBuilder):
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
 
+        self.use_nl_fault_injection = use_nl_fault_injection
         if use_nl_fault_injection:
             self.extra_gn_options.append('chip_with_nlfaultinjection=true')
 
@@ -595,19 +606,24 @@ class HostBuilder(GnBuilder):
             else:
                 self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
 
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
+        if self.all_devices_enabled_devices:
+            devices_str = '[' + ','.join(f'"{d}"' for d in self.all_devices_enabled_devices) + ']'
+            self.extra_gn_options.append(f'all_devices_enabled_devices={devices_str}')
+
         if openthread_endpoint:
             if enable_wifi:
                 raise Exception("OpenThread EndPoint mode does not support Wifi")
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
 
-        if self.board == HostBoard.ARM64:
+        if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:
                 raise Exception("Cross compile only supported using clang")
 
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl
-            if self.board == HostBoard.ARM64 and crypto_library == HostCryptoLibrary.MBEDTLS:
+            if self.board in (HostBoard.ARM64, HostBoard.ARM) and crypto_library == HostCryptoLibrary.MBEDTLS:
                 raise Exception("MbedTLS not supported for cross compiling cert tool")
             self.build_command = 'src/tools/chip-cert'
         elif app == HostApp.ADDRESS_RESOLVE:
@@ -647,6 +663,11 @@ class HostBuilder(GnBuilder):
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
                 ])
+            case HostBoard.ARM:
+                args.extend([
+                    'target_cpu="arm"',
+                    'sysroot="%s"' % self.SysRootPath('SYSROOT_ARMHF'),
+                ])
             case HostBoard.FAKE:
                 args.extend([
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
@@ -670,6 +691,9 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
+        if self.board == HostBoard.ARM:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(
+                self.SysRootPath('SYSROOT_ARMHF'), 'lib/arm-linux-gnueabihf/pkgconfig')
         if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
             # Every test is expected to have a distinct build ID, so `%m` will be
             # distinct.
@@ -811,7 +835,37 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.KOTLIN_MATTER_CONTROLLER:
             self.createJavaExecutable("kotlin-matter-controller")
 
+        if self.app == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-lighting-app'),
+                 os.path.join(self.output_dir, 'chip-lighting-data-model-no-unique-id-app')],
+                title="Rename lighting-data-model-no-unique-id app binary"
+            )
+
+        if self.app == HostApp.ALL_CLUSTERS and self.use_nl_fault_injection:
+            self._Execute(
+                ['mv',
+                 os.path.join(self.output_dir, 'chip-all-clusters-app'),
+                 os.path.join(self.output_dir, 'chip-all-clusters-app-nlfaultinject')],
+                title="Rename all-clusters nlfaultinject app binary"
+            )
+
+    def _AllDevicesOutputName(self):
+        """Return the binary name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            # device built with all-examples does not change the name.
+            return 'example-device-app'
+        return 'all-devices-app'
+
     def build_outputs(self):
+        if self.app == HostApp.ALL_DEVICES_APP:
+            base = self._AllDevicesOutputName()
+            for name in [base, base + '.map']:
+                if not self.options.enable_link_map_file and name.endswith('.map'):
+                    continue
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
         for name in self.app.OutputNames():
             if not self.options.enable_link_map_file and name.endswith(".map"):
                 continue

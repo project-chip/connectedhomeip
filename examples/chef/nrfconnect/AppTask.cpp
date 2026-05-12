@@ -37,7 +37,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 #ifdef CONFIG_CHIP_CRYPTO_PSA
@@ -84,7 +84,7 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 bool sIsSitModeRequested = false;
 #endif
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 } // namespace
@@ -147,7 +147,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Network connectivity
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -169,7 +169,7 @@ CHIP_ERROR AppTask::Init()
     TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 #else
     return CHIP_ERROR_INTERNAL;
-#endif // CONFIG_NET_L2_OPENTHREAD
+#endif // CONFIG_OPENTHREAD
 
     // Initialize LEDs
     LEDWidget::InitGpio();
@@ -439,13 +439,13 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
         break;
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     case DeviceEventType::kThreadStateChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
         break;
-#endif // CONFIG_NET_L2_OPENTHREAD
+#endif // CONFIG_OPENTHREAD
     default:
         break;
     }

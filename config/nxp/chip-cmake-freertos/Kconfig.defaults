@@ -25,7 +25,7 @@ config CHIP_DEVICE_VENDOR_NAME
 	default "NXP Semiconductors"
 
 choice CHIP_CRYPTO
-	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_SE05X
+	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW72 || CHIP_SE05X
 	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
 endchoice
 
@@ -37,13 +37,13 @@ config CHIP_WIFI
 	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
 
 config NET_L2_OPENTHREAD
-	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default y if CHIP_NXP_PLATFORM_MCXW72
 
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	default 1
 
 config CHIP_DEVICE_CONFIG_ENABLE_SED
-	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default y if CHIP_NXP_PLATFORM_MCXW72
 
 config CHIP_LIB_SHELL
 	default y if CHIP_NXP_PLATFORM_MCXW72
@@ -111,7 +111,6 @@ config CHIP_DEVICE_MANUFACTURING_DATE
 config CHIP_DEVICE_PRODUCT_ID
 	default 41510 if CHIP_NXP_PLATFORM_RW61X
 	default 41511 if CHIP_NXP_PLATFORM_RT1170
-	default 41985 if CHIP_NXP_PLATFORM_MCXW71
 	default 42241 if CHIP_NXP_PLATFORM_MCXW72
 
 config CHIP_DEVICE_ROTATING_DEVICE_UID
@@ -130,7 +129,6 @@ config CHIP_DEVICE_PRODUCT_URL
 	default "https://www.nxp.com/products/wireless/wi-fi-plus-bluetooth-plus-802-15-4/wireless-mcu-with-integrated-tri-radiobr1x1-wi-fi-6-plus-bluetooth-low-energy-5-3-802-15-4:RW612" if CHIP_NXP_PLATFORM_RW61X
 	default "https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/i-mx-rt-crossover-mcus/i-mx-rt1170-1-ghz-crossover-mcu-with-arm-cortex-cores:i.MX-RT1170" if CHIP_NXP_PLATFORM_RT1170
 	default "https://www.nxp.com/products/i.MX-RT1060" if CHIP_NXP_PLATFORM_RT1060
-	default "https://www.nxp.com/products/MCX-W71X" if CHIP_NXP_PLATFORM_MCXW71
 	default "https://www.nxp.com/products/MCX-W72X" if CHIP_NXP_PLATFORM_MCXW72
 
 
@@ -138,14 +136,12 @@ config CHIP_DEVICE_PRODUCT_LABEL
 	default "RW612" if CHIP_NXP_PLATFORM_RW61X
 	default "RT1170" if CHIP_NXP_PLATFORM_RT1170
 	default "RT1060" if CHIP_NXP_PLATFORM_RT1060
-	default "MCXW71X" if CHIP_NXP_PLATFORM_MCXW71
 	default "MCXW72X" if CHIP_NXP_PLATFORM_MCXW72
 
 config CHIP_DEVICE_PART_NUMBER
 	default "RW612" if CHIP_NXP_PLATFORM_RW61X
 	default "RT1170" if CHIP_NXP_PLATFORM_RT1170
 	default "RT1060" if CHIP_NXP_PLATFORM_RT1060
-	default "MCXW71X" if CHIP_NXP_PLATFORM_MCXW71
 	default "MCXW72X" if CHIP_NXP_PLATFORM_MCXW72
 
 endif # CHIP_FACTORY_DATA
@@ -153,19 +149,16 @@ endif # CHIP_FACTORY_DATA
 config CHIP_LOG_SIZE_OPTIMIZATION
 	default y
 
-config CHIP_OPTIMIZE_DEBUG_LEVEL
-	default "g" if CHIP_NXP_PLATFORM_MCXW71
-
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY
 	default y
 
 config CHIP_WITH_LWIP
-	default n if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default n if CHIP_NXP_PLATFORM_MCXW72
 	default y
 
 config CHIP_ENABLE_PAIRING_AUTOSTART
-	default n if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default n if CHIP_NXP_PLATFORM_MCXW72
 	default y
 
 config CHIP_ICD_SLOW_POLL_INTERVAL

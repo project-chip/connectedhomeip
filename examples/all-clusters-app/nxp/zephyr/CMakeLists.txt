@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -101,7 +101,7 @@ chip_configure_data_model(app
 
 if(CONFIG_CHIP_LIB_SHELL)
     target_compile_definitions(app PRIVATE ENABLE_CHIP_SHELL)
-    target_include_directories(app PRIVATE 
+    target_include_directories(app PRIVATE
                                ${CHIP_ROOT}/examples/shell/shell_common/include
                                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/include
     )

@@ -93,13 +93,13 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
-    mGroupcastCluster.Create(
-        GroupcastContext{
-            .fabricTable       = mContext.fabricTable,
-            .groupDataProvider = mContext.groupDataProvider,
-            .timerDelegate     = mContext.timerDelegate,
-        },
-        BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender));
+    mGroupcastCluster.Create(GroupcastContext{ .fabricTable       = mContext.fabricTable,
+                                               .groupDataProvider = mContext.groupDataProvider,
+                                               .timerDelegate     = mContext.timerDelegate,
+                                               .accessControl     = mContext.accessControl },
+                             BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener,
+                                                                    Clusters::Groupcast::Feature::kSender,
+                                                                    Clusters::Groupcast::Feature::kPerGroup));
     ReturnErrorOnFailure(provider.AddCluster(mGroupcastCluster.Registration()));
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
