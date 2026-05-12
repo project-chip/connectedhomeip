@@ -202,6 +202,11 @@ void MatterOperationalStateClusterInitCallback(EndpointId endpointId)
     gOperationalStateDelegate->SetEndpointId(OperationalStateEndpointId);
 }
 
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    OperationalState::Shutdown();
+}
+
 void OperationalState::Shutdown()
 {
     if (gOperationalStateInstance)

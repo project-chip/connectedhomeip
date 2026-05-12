@@ -485,4 +485,15 @@ void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gRvcOperationalStateInstance = std::make_unique<RvcOperationalState::Instance>(gRvcOperationalStateDelegate.get(), endpointId);
     TEMPORARY_RETURN_IGNORED gRvcOperationalStateInstance->Init();
 }
+
+void MatterRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    if (gRvcOperationalStateInstance)
+    {
+        gRvcOperationalStateInstance->Shutdown();
+    }
+    gRvcOperationalStateInstance.reset();
+    gRvcOperationalStateDelegate.reset();
+}
+
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
