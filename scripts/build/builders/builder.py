@@ -61,7 +61,7 @@ class BuilderOutput:
 
 
 class OutDirLock:
-    """Lock to provide mutual exclusion for oprations on output directories."""
+    """Lock to provide mutual exclusion for operations on output directories."""
 
     def __init__(self) -> None:
         self._dir_locks: dict[str, threading.RLock] = defaultdict(threading.RLock)
