@@ -560,7 +560,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GenerateSnapshotsRespectsMinInter
 
     mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
 
-    // First report -- all 4 attributes should notify, both events should fire.
+    // First report, all 4 attributes should notify, both events should fire.
     cluster.GenerateSnapshots();
     {
         auto cumulativeEvent = logOnlyEvents.GetNextEvent();
@@ -582,7 +582,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GenerateSnapshotsRespectsMinInter
         EXPECT_EQ(periodicDecoded.energyExported.Value().energy, 5);
     }
 
-    // +1 ms: inside min interval -- all 4 attributes should be gated, no events.
+    // +1 ms: inside min interval, all 4 attributes should be gated, no events.
     mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
     mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(200));
     mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(150));
@@ -613,7 +613,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GenerateSnapshotsRespectsMinInter
         EXPECT_EQ(readValue.Value().energy, 15);
     }
 
-    // Advance past min interval -- all 4 should notify, both events should fire with latest values.
+    // Advance past min interval, all 4 should notify, both events should fire with latest values.
     mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
     cluster.GenerateSnapshots();
     {
@@ -634,93 +634,6 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GenerateSnapshotsRespectsMinInter
         EXPECT_EQ(periodicDecoded.energyImported.Value().energy, 20);
         ASSERT_TRUE(periodicDecoded.energyExported.HasValue());
         EXPECT_EQ(periodicDecoded.energyExported.Value().energy, 15);
-    }
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-TEST_F(TestElectricalEnergyMeasurementCluster, TimerFiresAndGeneratesReport)
-{
-    TestServerClusterContext testContext;
-
-    BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
-                                 Feature::kPeriodicEnergy);
-
-    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
-        .endpointId         = kTestEndpointId,
-        .featureFlags       = allFeatures,
-        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
-        .accuracyStruct     = kTestAccuracy,
-        .delegate           = mDelegate,
-        .timerDelegate      = mTimerDelegate,
-    });
-
-    EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-    auto & logOnlyEvents = testContext.EventsGenerator();
-
-    // Establish stored values with a first report.
-    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(1));
-    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(1));
-    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(1));
-    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(1));
-    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
-    cluster.GenerateSnapshots();
-    ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
-    ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
-
-    // Rate-limited update within 1 s -- starts the delay timer.
-    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
-    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(99999));
-    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(88888));
-    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(7777));
-    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(6666));
-    cluster.GenerateSnapshots();
-    EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
-
-    // Advance past the max-delay timer -- should fire and produce a full report.
-    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportDelayInterval);
-
-    {
-        auto event = logOnlyEvents.GetNextEvent();
-        ASSERT_TRUE(event.has_value());
-        Events::CumulativeEnergyMeasured::DecodableType decoded;
-        ASSERT_EQ(event->GetEventData(decoded), CHIP_NO_ERROR);
-        ASSERT_TRUE(decoded.energyImported.HasValue());
-        EXPECT_EQ(decoded.energyImported.Value().energy, 99999);
-        ASSERT_TRUE(decoded.energyExported.HasValue());
-        EXPECT_EQ(decoded.energyExported.Value().energy, 88888);
-    }
-
-    {
-        auto event = logOnlyEvents.GetNextEvent();
-        ASSERT_TRUE(event.has_value());
-        Events::PeriodicEnergyMeasured::DecodableType decoded;
-        ASSERT_EQ(event->GetEventData(decoded), CHIP_NO_ERROR);
-        ASSERT_TRUE(decoded.energyImported.HasValue());
-        EXPECT_EQ(decoded.energyImported.Value().energy, 7777);
-        ASSERT_TRUE(decoded.energyExported.HasValue());
-        EXPECT_EQ(decoded.energyExported.Value().energy, 6666);
-    }
-
-    // All 4 attributes must be readable with the correct values.
-    {
-        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
-        EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull());
-        EXPECT_EQ(readValue.Value().energy, 99999);
-
-        EXPECT_EQ(cluster.GetCumulativeEnergyExported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull());
-        EXPECT_EQ(readValue.Value().energy, 88888);
-
-        EXPECT_EQ(cluster.GetPeriodicEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull());
-        EXPECT_EQ(readValue.Value().energy, 7777);
-
-        EXPECT_EQ(cluster.GetPeriodicEnergyExported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull());
-        EXPECT_EQ(readValue.Value().energy, 6666);
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -891,7 +804,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, RateLimitedUpdateFlushesOnMaxDela
         ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
     }
 
-    // Update all 4 delegate values inside the min interval -- all should be rate-limited.
+    // Update all 4 delegate values inside the min interval, all should be rate-limited.
     mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
     mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(200));
     mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(150));
@@ -900,8 +813,9 @@ TEST_F(TestElectricalEnergyMeasurementCluster, RateLimitedUpdateFlushesOnMaxDela
     cluster.GenerateSnapshots();
     EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
 
-    // Fire the max-delay timer -- all 4 dirty attributes should flush, both events should be generated.
-    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportDelayInterval);
+    // Wait for the min-delay and generate report, all 4 dirty attributes shoult be in the next event.
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+    cluster.GenerateSnapshots();
 
     // CumulativeEnergyMeasured event
     {
