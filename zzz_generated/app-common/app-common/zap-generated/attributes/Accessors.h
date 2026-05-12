@@ -2322,90 +2322,94 @@ namespace WindowCovering {
 namespace Attributes {
 
 namespace Type {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type * value); // Type
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type * value); // Type
 } // namespace Type
 
 namespace PhysicalClosedLimitLift {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace PhysicalClosedLimitLift
 
 namespace PhysicalClosedLimitTilt {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace PhysicalClosedLimitTilt
 
 namespace CurrentPositionLift {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 } // namespace CurrentPositionLift
 
 namespace CurrentPositionTilt {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 } // namespace CurrentPositionTilt
 
 namespace NumberOfActuationsLift {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace NumberOfActuationsLift
 
 namespace NumberOfActuationsTilt {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace NumberOfActuationsTilt
 
 namespace ConfigStatus {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> * value); // ConfigStatus
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> * value); // ConfigStatus
 } // namespace ConfigStatus
 
 namespace CurrentPositionLiftPercentage {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 } // namespace CurrentPositionLiftPercentage
 
 namespace CurrentPositionTiltPercentage {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 } // namespace CurrentPositionTiltPercentage
 
 namespace TargetPositionLiftPercent100ths {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 } // namespace TargetPositionLiftPercent100ths
 
 namespace TargetPositionTiltPercent100ths {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 } // namespace TargetPositionTiltPercent100ths
 
 namespace EndProductType {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::WindowCovering::EndProductType * value); // EndProductType
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::WindowCovering::EndProductType * value); // EndProductType
 } // namespace EndProductType
 
 namespace CurrentPositionLiftPercent100ths {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 } // namespace CurrentPositionLiftPercent100ths
 
 namespace CurrentPositionTiltPercent100ths {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 } // namespace CurrentPositionTiltPercent100ths
 
 namespace InstalledOpenLimitLift {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace InstalledOpenLimitLift
 
 namespace InstalledClosedLimitLift {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace InstalledClosedLimitLift
 
 namespace InstalledOpenLimitTilt {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace InstalledOpenLimitTilt
 
 namespace InstalledClosedLimitTilt {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace InstalledClosedLimitTilt
 
 namespace Mode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::WindowCovering::Mode> * value); // Mode
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::WindowCovering::Mode> * value); // Mode
 } // namespace Mode
 
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
 
 } // namespace Attributes

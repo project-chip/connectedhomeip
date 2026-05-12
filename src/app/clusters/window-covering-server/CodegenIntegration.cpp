@@ -98,25 +98,25 @@ public:
 
         // Load mandatory attribute values from ZAP-defined defaults.
         WindowCovering::Type type{};
-        if (Attributes::Type::Get(endpointId, &type) == Status::Success)
+        if (Attributes::Type::GetDefault(endpointId, &type) == Status::Success)
         {
             cluster.SetType(type);
         }
 
         chip::BitMask<WindowCovering::ConfigStatus> configStatus;
-        if (Attributes::ConfigStatus::Get(endpointId, &configStatus) == Status::Success)
+        if (Attributes::ConfigStatus::GetDefault(endpointId, &configStatus) == Status::Success)
         {
             cluster.SetConfigStatus(configStatus);
         }
 
         WindowCovering::EndProductType endProductType{};
-        if (Attributes::EndProductType::Get(endpointId, &endProductType) == Status::Success)
+        if (Attributes::EndProductType::GetDefault(endpointId, &endProductType) == Status::Success)
         {
             cluster.SetEndProductType(endProductType);
         }
 
         chip::BitMask<WindowCovering::Mode> mode;
-        if (Attributes::Mode::Get(endpointId, &mode) == Status::Success)
+        if (Attributes::Mode::GetDefault(endpointId, &mode) == Status::Success)
         {
             cluster.SetMode(mode);
         }
@@ -125,11 +125,11 @@ public:
         if (features.HasAll(Feature::kLift, Feature::kPositionAwareLift))
         {
             DataModel::Nullable<Percent100ths> percent100ths;
-            if (Attributes::CurrentPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            if (Attributes::CurrentPositionLiftPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
                 cluster.SetCurrentPositionLiftPercentage100ths(percent100ths);
             }
-            if (Attributes::TargetPositionLiftPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            if (Attributes::TargetPositionLiftPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
                 cluster.SetTargetPositionLiftPercent100ths(percent100ths);
             }
@@ -137,7 +137,7 @@ public:
             if (optionalAttributes.IsSet(Attributes::CurrentPositionLiftPercentage::Id))
             {
                 DataModel::Nullable<Percent> percent;
-                if (Attributes::CurrentPositionLiftPercentage::Get(endpointId, percent) == Status::Success)
+                if (Attributes::CurrentPositionLiftPercentage::GetDefault(endpointId, percent) == Status::Success)
                 {
                     cluster.SetCurrentPositionLiftPercentage(percent);
                 }
@@ -147,11 +147,11 @@ public:
         if (features.HasAll(Feature::kTilt, Feature::kPositionAwareTilt))
         {
             DataModel::Nullable<Percent100ths> percent100ths;
-            if (Attributes::CurrentPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            if (Attributes::CurrentPositionTiltPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
                 cluster.SetCurrentPositionTiltPercentage100ths(percent100ths);
             }
-            if (Attributes::TargetPositionTiltPercent100ths::Get(endpointId, percent100ths) == Status::Success)
+            if (Attributes::TargetPositionTiltPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
                 cluster.SetTargetPositionTiltPercent100ths(percent100ths);
             }
@@ -159,7 +159,7 @@ public:
             if (optionalAttributes.IsSet(Attributes::CurrentPositionTiltPercentage::Id))
             {
                 DataModel::Nullable<Percent> percent;
-                if (Attributes::CurrentPositionTiltPercentage::Get(endpointId, percent) == Status::Success)
+                if (Attributes::CurrentPositionTiltPercentage::GetDefault(endpointId, percent) == Status::Success)
                 {
                     cluster.SetCurrentPositionTiltPercentage(percent);
                 }
@@ -378,8 +378,8 @@ uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitLift::GetDefault(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitLift::GetDefault(endpoint, &closedLimit);
 
     AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
     return ValueToPercent100ths(limits, lift);
@@ -389,8 +389,8 @@ uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitLift::GetDefault(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitLift::GetDefault(endpoint, &closedLimit);
 
     AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
     return Percent100thsToValue(limits, percent100ths);
@@ -400,8 +400,8 @@ uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitTilt::GetDefault(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitTilt::GetDefault(endpoint, &closedLimit);
 
     AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
     return ValueToPercent100ths(limits, tilt);
@@ -411,8 +411,8 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitTilt::GetDefault(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitTilt::GetDefault(endpoint, &closedLimit);
 
     AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
     return Percent100thsToValue(limits, percent100ths);
