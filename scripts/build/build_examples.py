@@ -134,7 +134,7 @@ def ValidateTargetNames(context, parameter, values):
     '--concurrent-builders',
     type=click.IntRange(min=1),
     default=1,
-    help='Number of concurrent builders. If greater than 1, count of Ninja jobs are scaled down accordingly')
+    help='Number of concurrent builders. If greater than 1, count of Ninja jobs is scaled down accordingly')
 @click.option(
     '--pregen-dir',
     default=None,
