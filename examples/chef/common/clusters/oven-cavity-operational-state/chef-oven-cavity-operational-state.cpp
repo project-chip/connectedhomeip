@@ -294,9 +294,15 @@ CHIP_ERROR ChefDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpa
     return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
+} // namespace OvenCavityOperationalState
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 void MatterOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    // Check if endpoint has OvenCavityOperationalState cluster enabled
+    using namespace chip::app::Clusters::OvenCavityOperationalState;
     uint16_t epIndex =
         emberAfGetClusterServerEndpointIndex(endpointId, Id, MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIndex >= kOvenCavityOperationalStateTableSize)
@@ -312,6 +318,7 @@ void MatterOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpoi
 
 void MatterOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
+    using namespace chip::app::Clusters::OvenCavityOperationalState;
     uint16_t epIndex =
         emberAfGetClusterServerEndpointIndex(endpointId, Id, MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIndex >= kOvenCavityOperationalStateTableSize)
@@ -324,11 +331,5 @@ void MatterOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId en
     gInstanceTable[epIndex].reset();
     gDelegateTable[epIndex].reset();
 }
-
-} // namespace OvenCavityOperationalState
-
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 #endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
