@@ -170,7 +170,10 @@ def main(context, log_level, verbose, quiet, target, build_profile, enable_link_
          concurrent_generation: int, concurrent_builders: int, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
          log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(threadName)s: %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
+    if log_timestamps:
+        log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(threadName)s: %(message)s'
+    else:
+        log_fmt = '%(levelname)-7s %(threadName)s: %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if 'PW_PROJECT_ROOT' not in os.environ:
