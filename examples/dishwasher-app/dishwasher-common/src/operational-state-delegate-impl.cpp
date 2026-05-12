@@ -128,3 +128,8 @@ void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     TEMPORARY_RETURN_IGNORED gOperationalStateInstance->Init();
 }
+
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    OperationalState::Shutdown();
+}

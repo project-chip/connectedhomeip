@@ -294,34 +294,35 @@ CHIP_ERROR ChefDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpa
     return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
-/**
- * Initializes OvenCavityOperationalState cluster for the app (all endpoints where cluster is enabled).
- */
-void InitChefOvenCavityOperationalStateCluster()
+void MatterOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    const uint16_t endpointCount = emberAfEndpointCount();
+    // Check if endpoint has OvenCavityOperationalState cluster enabled
+    uint16_t epIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, Id, MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOvenCavityOperationalStateTableSize)
+        return;
 
-    for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
+    gDelegateTable[epIndex] = std::make_unique<ChefDelegate>();
+
+    gInstanceTable[epIndex] = std::make_unique<Instance>(gDelegateTable[epIndex].get(), endpointId);
+    TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
+
+    ChipLogProgress(DeviceLayer, "Endpoint %d OvenCavityOperationalState Initialized.", endpointId);
+}
+
+void MatterOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    uint16_t epIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, Id, MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOvenCavityOperationalStateTableSize)
+        return;
+
+    if (gInstanceTable[epIndex])
     {
-        EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
-        if (endpointId == kInvalidEndpointId)
-        {
-            continue;
-        }
-
-        // Check if endpoint has OvenCavityOperationalState cluster enabled
-        uint16_t epIndex =
-            emberAfGetClusterServerEndpointIndex(endpointId, Id, MATTER_DM_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER_ENDPOINT_COUNT);
-        if (epIndex >= kOvenCavityOperationalStateTableSize)
-            continue;
-
-        gDelegateTable[epIndex] = std::make_unique<ChefDelegate>();
-
-        gInstanceTable[epIndex] = std::make_unique<Instance>(gDelegateTable[epIndex].get(), endpointId);
-        TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
-
-        ChipLogProgress(DeviceLayer, "Endpoint %d OvenCavityOperationalState Initialized.", endpointId);
+        gInstanceTable[epIndex]->Shutdown();
     }
+    gInstanceTable[epIndex].reset();
+    gDelegateTable[epIndex].reset();
 }
 
 } // namespace OvenCavityOperationalState

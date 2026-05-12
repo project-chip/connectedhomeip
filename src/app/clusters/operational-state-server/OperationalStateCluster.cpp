@@ -199,13 +199,13 @@ bool OperationalStateCluster::IsSupportedPhase(uint8_t aPhase)
 {
     char buffer[kMaxPhaseNameLength];
     MutableCharSpan phase(buffer);
-    return mDelegate->GetOperationalPhaseAtIndex(aPhase, phase) != CHIP_ERROR_NOT_FOUND;
+    return mDelegate->GetOperationalPhaseAtIndex(aPhase, phase) == CHIP_NO_ERROR;
 }
 
 bool OperationalStateCluster::IsSupportedOperationalState(uint8_t aState)
 {
     GenericOperationalState opState;
-    for (uint8_t i = 0; mDelegate->GetOperationalStateAtIndex(i, opState) != CHIP_ERROR_NOT_FOUND; i++)
+    for (uint8_t i = 0; mDelegate->GetOperationalStateAtIndex(i, opState) == CHIP_NO_ERROR; i++)
     {
         if (opState.operationalStateID == aState)
         {
@@ -261,11 +261,16 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
     case OperationalStateList::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             GenericOperationalState opState;
-            for (size_t i = 0; mDelegate->GetOperationalStateAtIndex(i, opState) != CHIP_ERROR_NOT_FOUND; i++)
+            for (size_t i = 0;;i++)
             {
+                CHIP_ERROR err = mDelegate->GetOperationalStateAtIndex(i, opState);
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
                 ReturnErrorOnFailure(listEncoder.Encode(opState));
             }
-            return CHIP_NO_ERROR;
         });
     case Attributes::OperationalState::Id:
         return encoder.Encode(mOperationalState);
