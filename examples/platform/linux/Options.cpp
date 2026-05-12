@@ -1005,8 +1005,13 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
     case kDeviceOption_Camera_Framerate: {
-        uint16_t value = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
-        LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(value);
+        unsigned long value = strtoul(aValue, nullptr, 0);
+        if (value > UINT16_MAX)
+        {
+            PrintArgError("%s: Invalid camera framerate: %s\n", aProgram, aValue);
+            return false;
+        }
+        LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(static_cast<uint16_t>(value));
         break;
     }
 #endif

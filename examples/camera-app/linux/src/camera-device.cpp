@@ -897,7 +897,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    uint16_t framerate = 30; // Default to 30 fps
+    uint16_t framerate = k30fpsVideoFrameRate; // Default to 30 fps
     if (LinuxDeviceOptions::GetInstance().cameraFramerate.HasValue())
     {
         framerate = LinuxDeviceOptions::GetInstance().cameraFramerate.Value();
