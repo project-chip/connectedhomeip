@@ -30,11 +30,19 @@ chip_test_suite("tests") {
 }
 
 chip_test_suite("tests-backwards-compatibility") {
+  import(
+      "${chip_root}/src/app/clusters/concentration-measurement-server/app_config_dependent_sources.gni")
+
   output_name = "TestConcentrationMeasurementClusterBackwardsCompat"
 
   test_sources = [ "TestConcentrationMeasurementClusterBackwardsCompat.cpp" ]
 
   cflags = [ "-Wconversion" ]
+
+  sources = []
+  foreach(file, app_config_dependent_sources) {
+    sources += [ "../" + file ]
+  }
 
   public_deps = [
     "${chip_root}/src/app/clusters/concentration-measurement-server",

@@ -70,36 +70,23 @@ ConcentrationMeasurementCluster::ConcentrationMeasurementCluster(EndpointId endp
         return f;
     }()),
     mOptionalAttributeSet([&] {
-        uint32_t bits = 0;
-        if (mFeatures.Has(Feature::kNumericMeasurement))
-        {
-            bits |= (1u << Attributes::MeasuredValue::Id) | (1u << Attributes::MinMeasuredValue::Id) |
-                (1u << Attributes::MaxMeasuredValue::Id) | (1u << Attributes::MeasurementUnit::Id);
-            if (config.uncertainty.has_value())
-            {
-                bits |= (1u << Attributes::Uncertainty::Id);
-            }
-        }
-        if (mFeatures.Has(Feature::kPeakMeasurement))
-        {
-            bits |= (1u << Attributes::PeakMeasuredValue::Id) | (1u << Attributes::PeakMeasuredValueWindow::Id);
-        }
-        if (mFeatures.Has(Feature::kAverageMeasurement))
-        {
-            bits |= (1u << Attributes::AverageMeasuredValue::Id) | (1u << Attributes::AverageMeasuredValueWindow::Id);
-        }
-        if (mFeatures.Has(Feature::kLevelIndication))
-        {
-            bits |= (1u << Attributes::LevelValue::Id);
-        }
-        return OptionalAttributeSet(bits);
+        OptionalAttributeSet optionalAttributes;
+        optionalAttributes.Set<Attributes::MeasuredValue::Id>(mFeatures.Has(Feature::kNumericMeasurement));
+        optionalAttributes.Set<Attributes::MinMeasuredValue::Id>(mFeatures.Has(Feature::kNumericMeasurement));
+        optionalAttributes.Set<Attributes::MaxMeasuredValue::Id>(mFeatures.Has(Feature::kNumericMeasurement));
+        optionalAttributes.Set<Attributes::MeasurementUnit::Id>(mFeatures.Has(Feature::kNumericMeasurement));
+        optionalAttributes.Set<Attributes::Uncertainty::Id>(mFeatures.Has(Feature::kNumericMeasurement) &&
+                                                            config.uncertainty.has_value());
+        optionalAttributes.Set<Attributes::PeakMeasuredValue::Id>(mFeatures.Has(Feature::kPeakMeasurement));
+        optionalAttributes.Set<Attributes::PeakMeasuredValueWindow::Id>(mFeatures.Has(Feature::kPeakMeasurement));
+        optionalAttributes.Set<Attributes::AverageMeasuredValue::Id>(mFeatures.Has(Feature::kAverageMeasurement));
+        optionalAttributes.Set<Attributes::AverageMeasuredValueWindow::Id>(mFeatures.Has(Feature::kAverageMeasurement));
+        optionalAttributes.Set<Attributes::LevelValue::Id>(mFeatures.Has(Feature::kLevelIndication));
+        return optionalAttributes;
     }()),
     mMedium(config.medium), mUnit(config.unit), mMinMeasuredValue(config.minMeasured), mMaxMeasuredValue(config.maxMeasured),
     mUncertainty(config.uncertainty)
 {
-    (void) mMedium;
-    (void) mUnit;
-    (void) mUncertainty;
     VerifyOrDie(std::find(AliasedClusters.begin(), AliasedClusters.end(), config.clusterId) !=
                 AliasedClusters.end()); // NOLINT(bugprone-signed-bitwise)
 }
