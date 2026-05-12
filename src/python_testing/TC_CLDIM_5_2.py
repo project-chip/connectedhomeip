@@ -38,6 +38,7 @@
 import logging
 
 from mobly import asserts
+from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
@@ -80,6 +81,9 @@ class TC_CLDIM_5_2(MatterBaseTest):
             TestStep("2j", "If LatchControlModes is remote unlatching, skip step 2k"),
             TestStep("2k", "Manually unlatch the device"),
             TestStep("2l", "Wait for CurrentState.Latched to be False"),
+            TestStep("2m", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT."),
+            TestStep("2n", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT."),
+            TestStep("2o", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT."),
             TestStep("3a", "If manual latching is required, skip steps 3b and 3c"),
             TestStep("3b", "Send GroupedSetTarget command with Latch=True"),
             TestStep("3c", "Manually latch the device"),
@@ -106,9 +110,19 @@ class TC_CLDIM_5_2(MatterBaseTest):
         return 1
 
     @async_test_body
+    async def teardown_test(self):
+        if self.groupcast_enabled:
+            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+        super().teardown_test()
+
+    @async_test_body
     async def test_TC_CLDIM_5_2(self):
         endpoint = self.get_endpoint()
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        self.kGroupKeysetId = 0x01a1
+        self.kGroupId = 0x0001
+        self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
+        self.groupcast_enabled = await is_groupcast_on_root_node(self)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -169,7 +183,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                        endpoint=endpoint, timedRequestTimeoutMs=1000
+                        endpoint=endpoint
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -189,6 +203,31 @@ class TC_CLDIM_5_2(MatterBaseTest):
             sub_handler.await_all_expected_report_matches(
                 expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
+        # STEP 2m: If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT
+        self.step("2m")
+        membership = None
+        if self.groupcast_enabled:
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership
+            )
+
+        # STEP 2n: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
+        self.step("2n")
+        if self.groupcast_enabled:
+            if membership:
+                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+
+        # STEP 2o: If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT
+        self.step("2o")
+        if self.groupcast_enabled:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=self.kGroupId,
+                endpoints=[endpoint],
+                keySetID=self.kGroupKeysetId,
+                key=self.kGroupKey), endpoint=0)
+
         # STEP 3a: If manual latching is required, skip steps 3b and 3c
         self.step("3a")
         sub_handler.reset()
@@ -201,7 +240,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=True),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
                 asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
@@ -218,13 +257,17 @@ class TC_CLDIM_5_2(MatterBaseTest):
         else:
             # STEP 3e: Send GroupedSetTarget command with Latch=True
             self.step("3e")
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=True),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            if self.groupcast_enabled:
+                self.default_controller.SendGroupCommand(
+                    self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=True))
+            else:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=True),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
             # STEP 3f: Verify TargetState attribute is updated
             self.step("3f")
@@ -243,7 +286,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=1),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
                 asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
@@ -255,7 +298,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
                 asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
@@ -278,13 +321,17 @@ class TC_CLDIM_5_2(MatterBaseTest):
         # STEP 5c: Send GroupedSetTarget command with Latch=False
         self.step("5c")
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                endpoint=endpoint, timedRequestTimeoutMs=1000
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected status returned")
+        if self.groupcast_enabled:
+            self.default_controller.SendGroupCommand(
+                self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False))
+        else:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 5d: Verify TargetState attribute is updated
         self.step("5d")

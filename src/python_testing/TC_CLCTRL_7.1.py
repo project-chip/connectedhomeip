@@ -38,6 +38,7 @@ import asyncio
 import logging
 
 from mobly import asserts
+from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -102,10 +103,13 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
-            TestStep("2b", "If the PS feature is not supported on the cluster, skip remaining steps and end test case."),
+            TestStep("2b", "If the PS feature is not supported or if ACC feature is supported on the cluster, skip remaining steps and end test case."),
             TestStep("2c", "TH reads TestEventTrigger attribute from the General Diagnostic Cluster."),
             TestStep("2d", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),
             TestStep("2e", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
+            TestStep("2f", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT."),
+            TestStep("2g", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT."),
+            TestStep("2h", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT."),
             TestStep("3a", "TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("3b", "If CurrentPosition = FullyClosed, skip steps 3c to 3d."),
             TestStep("3c", "TH sends command GroupedMoveTo with Position = MoveToFullyClosed."),
@@ -205,11 +209,21 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         return 1
 
     @async_test_body
+    async def teardown_test(self):
+        if self.groupcast_enabled:
+            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+        super().teardown_test()
+
+    @async_test_body
     async def test_TC_CLCTRL_7_1(self):
         endpoint = self.get_endpoint()
         dev_controller = self.default_controller
         attributes = Clusters.ClosureControl.Attributes
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        self.kGroupKeysetId = 0x01a1
+        self.kGroupId = 0x0001
+        self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
+        self.groupcast_enabled = await is_groupcast_on_root_node(self)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -228,12 +242,13 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         is_mo_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kManuallyOperable
         is_is_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
         is_lt_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
+        is_acc_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kAccess
 
         # STEP 2b: If the PS feature is not supported on the cluster, skip remaining steps and end test case
         self.step("2b")
 
-        if not is_ps_feature_supported:
-            log.info("Position feature not supported, skipping test case")
+        if (not is_ps_feature_supported) or is_acc_feature_supported:
+            log.info("Position feature not supported or access feature supported, skipping test case")
             self.mark_all_remaining_steps_skipped("2c")
             return
 
@@ -254,6 +269,31 @@ class TC_CLCTRL_7_1(MatterBaseTest):
 
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await sub_handler.start(dev_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
+        # STEP 2f: If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT
+        self.step("2f")
+        membership = None
+        if self.groupcast_enabled:
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership
+            )
+
+        # STEP 2g: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
+        self.step("2g")
+        if self.groupcast_enabled:
+            if membership:
+                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+
+        # STEP 2h: If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT
+        self.step("2h")
+        if self.groupcast_enabled:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=self.kGroupId,
+                endpoints=[endpoint],
+                keySetID=self.kGroupKeysetId,
+                key=self.kGroupKey), endpoint=0)
 
         # STEP 3a: TH reads from the DUT the OverallCurrentState attribute
         self.step("3a")
@@ -282,14 +322,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("3c")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 3d: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
             self.step("3d")
@@ -361,14 +407,21 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                     # STEP 3j: TH sends command GroupedMoveTo with Latch = True
                     self.step("3j")
 
-                    try:
-                        await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                            latch=True
-                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-                    except InteractionModelError as e:
-                        asserts.assert_equal(
-                            e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                        pass
+                    if self.groupcast_enabled:
+                        log.info("Sending GroupedMoveTo command by groupcast")
+                        self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                            latch=True))
+                    else:
+                        log.info("Sending GroupedMoveTo command by unicast")
+                        try:
+                            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                                latch=True
+                            ), endpoint=endpoint)
+                        except InteractionModelError as e:
+                            asserts.assert_equal(
+                                e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                            pass
+
                     self.step("3k")
                     self.skip_step("3l")
 
@@ -393,7 +446,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -426,14 +479,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 # STEP 5b: TH sends command GroupedMoveTo with Latch = False
                 self.step("5b")
 
-                try:
-                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                        latch=False
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-                except InteractionModelError as e:
-                    asserts.assert_equal(
-                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                    pass
+                if self.groupcast_enabled:
+                    log.info("Sending GroupedMoveTo command by groupcast")
+                    self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        latch=False))
+                else:
+                    log.info("Sending GroupedMoveTo command by unicast")
+                    try:
+                        await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                            latch=False
+                        ), endpoint=endpoint)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(
+                            e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                        pass
 
                 self.step("5c")
                 self.skip_step("5d")
@@ -489,14 +548,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 self.step("6d")
 
                 sub_handler.reset()
-                try:
-                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                        speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-                except InteractionModelError as e:
-                    asserts.assert_equal(
-                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                    pass
+                if self.groupcast_enabled:
+                    log.info("Sending GroupedMoveTo command by groupcast")
+                    self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow))
+                else:
+                    log.info("Sending GroupedMoveTo command by unicast")
+                    try:
+                        await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                            speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
+                        ), endpoint=endpoint)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(
+                            e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                        pass
 
                 # STEP 6e: Wait until TH receives a subscription report with OverallCurrentState.Speed = Low
                 self.step("6e")
@@ -509,14 +574,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.step("7a")
 
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
-            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-            pass
+        if self.groupcast_enabled:
+            log.info("Sending GroupedMoveTo command by groupcast")
+            self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition))
+        else:
+            log.info("Sending GroupedMoveTo command by unicast")
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
+                ), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                pass
 
         # STEP 7b: TH reads from the DUT the OverallTargetState attribute
         self.step("7b")
@@ -573,14 +644,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 self.step("8d")
 
                 sub_handler.reset()
-                try:
-                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-                except InteractionModelError as e:
-                    asserts.assert_equal(
-                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                    pass
+                if self.groupcast_enabled:
+                    log.info("Sending GroupedMoveTo command by groupcast")
+                    self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                else:
+                    log.info("Sending GroupedMoveTo command by unicast")
+                    try:
+                        await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                            position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                        ), endpoint=endpoint)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(
+                            e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                        pass
 
                 # STEP 8e: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
                 self.step("8e")
@@ -593,14 +670,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("8f")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 8g: TH reads from the DUT the OverallTargetState attribute
             self.step("8g")
@@ -659,14 +742,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 self.step("9d")
 
                 sub_handler.reset()
-                try:
-                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-                except InteractionModelError as e:
-                    asserts.assert_equal(
-                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                    pass
+                if self.groupcast_enabled:
+                    log.info("Sending GroupedMoveTo command by groupcast")
+                    self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                else:
+                    log.info("Sending GroupedMoveTo command by unicast")
+                    try:
+                        await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                            position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                        ), endpoint=endpoint)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(
+                            e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                        pass
 
                 # STEP 9e: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
                 self.step("9e")
@@ -679,14 +768,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("9f")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 9g: TH reads from the DUT the OverallTargetState attribute
             self.step("9g")
@@ -733,14 +828,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("10c")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 10d: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
             self.step("10d")
@@ -753,14 +854,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.step("10e")
 
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-            pass
+        if self.groupcast_enabled:
+            log.info("Sending GroupedMoveTo command by groupcast")
+            self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+        else:
+            log.info("Sending GroupedMoveTo command by unicast")
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                pass
 
         # STEP 10f: TH reads from the DUT the OverallTargetState attribute
         self.step("10f")
@@ -788,14 +895,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.step("11a")
 
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-            pass
+        if self.groupcast_enabled:
+            log.info("Sending GroupedMoveTo command by groupcast")
+            self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+        else:
+            log.info("Sending GroupedMoveTo command by unicast")
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                ), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                pass
 
         # STEP 11b: TH reads from the DUT the OverallTargetState attribute
         self.step("11b")
@@ -832,14 +945,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("12b")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 12c: TH reads from the DUT the OverallTargetState attribute
             self.step("12c")
@@ -860,14 +979,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("12e")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 12f: TH reads from the DUT the OverallTargetState attribute
             self.step("12f")
@@ -912,7 +1037,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -969,7 +1094,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -1006,14 +1131,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("15b")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 15c: TH reads from the DUT the OverallTargetState attribute
             self.step("15c")
@@ -1049,14 +1180,20 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             self.step("15f")
 
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
-                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
-                pass
+            if self.groupcast_enabled:
+                log.info("Sending GroupedMoveTo command by groupcast")
+                self.default_controller.SendGroupCommand(self.kGroupId, Clusters.ClosureControl.Commands.GroupedMoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+            else:
+                log.info("Sending GroupedMoveTo command by unicast")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                    ), endpoint=endpoint)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command GroupedMoveTo: {e.status}")
+                    pass
 
             # STEP 15g: TH reads from the DUT the OverallTargetState attribute
             self.step("15g")

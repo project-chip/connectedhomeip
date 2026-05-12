@@ -194,7 +194,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                        endpoint=endpoint, timedRequestTimeoutMs=1000
+                        endpoint=endpoint
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -219,7 +219,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(),
-                endpoint=endpoint, timedRequestTimeoutMs=1000
+                endpoint=endpoint
             )
 
             asserts.fail("Expected InvalidCommand for empty GroupedSetTarget command")
@@ -239,7 +239,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -250,7 +250,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position - 1),
-                        endpoint=endpoint, timedRequestTimeoutMs=1000
+                        endpoint=endpoint
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -264,7 +264,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position + 1),
-                        endpoint=endpoint, timedRequestTimeoutMs=1000
+                        endpoint=endpoint
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -277,7 +277,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=10001),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -294,7 +294,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=0),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -319,7 +319,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=10000),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -344,7 +344,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=10001),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
                 asserts.fail("Expected ConstraintError for invalid Position")
 
@@ -370,7 +370,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position + resolution - 1),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -409,7 +409,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=(max_position - resolution) + 1),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -446,7 +446,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=True),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -461,7 +461,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
                         speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -475,7 +475,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(speed=4),  # Invalid speed
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -489,7 +489,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(speed=4),  # Invalid speed
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
+                    endpoint=endpoint
                 )
 
                 asserts.fail("Expected ConstraintError for invalid Speed")

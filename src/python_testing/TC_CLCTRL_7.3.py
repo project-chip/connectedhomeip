@@ -239,7 +239,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
 
         self.step(3)
         try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(), timedRequestTimeoutMs=1000)
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo())
             log.error("GroupedMoveTo command with no fields should have failed but succeeded")
             asserts.assert_true(False, "GroupedMoveTo command with no fields should have failed but succeeded")
         except InteractionModelError as e:
@@ -270,7 +270,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             else:
                 self.step("4d")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
                     log.info("GroupedMoveTo command with Position = MoveToFullyClosed sent successfully")
                 except InteractionModelError as e:
                     log.error(f"GroupedMoveTo command with Position = MoveToFullyClosed failed: {e}")
@@ -283,7 +283,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
 
             self.step("4f")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
                 log.info("GroupedMoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 log.error(f"GroupedMoveTo command with Latch = True failed: {e}")
@@ -292,7 +292,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
 
             self.step("4g")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True, position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True, position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
                 log.info("GroupedMoveTo command with Latch = True and Position = MoveToFullyOpen sent successfully")
             except InteractionModelError as e:
                 log.error(f"GroupedMoveTo command with Latch = True and Position = MoveToFullyOpen failed: {e}")
@@ -338,7 +338,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                     log.info("LatchControlModes Bit 1 is 1, sending GroupedMoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
 
@@ -351,7 +351,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
 
             self.step("5i")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
                 log.info("GroupedMoveTo command with Position = MoveToFullyOpen sent successfully")
             except InteractionModelError as e:
                 log.error(f"GroupedMoveTo command with Position = MoveToFullyOpen failed: {e}")
@@ -366,7 +366,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             else:
                 self.step("5k")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True))
                     log.info("GroupedMoveTo command with Position = MoveToFullyOpen and Latch = True sent successfully")
                 except InteractionModelError as e:
                     log.error(f"GroupedMoveTo command with Position = MoveToFullyOpen and Latch = True failed: {e}")
@@ -400,7 +400,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 else:
                     self.step("5p")
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                         log.info("GroupedMoveTo command with Latch = False sent successfully")
                     except InteractionModelError as e:
                         log.error(f"GroupedMoveTo command with Latch = False failed: {e}")
@@ -426,7 +426,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             else:
                 self.step("5u")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True))
                     log.error("GroupedMoveTo command with Position = MoveToFullyOpen and Latch = True should have failed but succeeded")
                     asserts.assert_true(
                         False, "GroupedMoveTo command with Position = MoveToFullyOpen and Latch = True should have failed but succeeded")
@@ -458,7 +458,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             else:
                 self.step("6d")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh))
                     log.info("GroupedMoveTo command with Speed = High sent successfully")
                 except InteractionModelError as e:
                     log.error(f"GroupedMoveTo command with Speed = High failed: {e}")
@@ -471,7 +471,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
 
             self.step("6f")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True))
                 log.info("GroupedMoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 log.error(f"GroupedMoveTo command with Latch = True failed: {e}")
@@ -479,7 +479,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                                      f"Expected Success status for GroupedMoveTo with Latch = True, but got: {e}")
             self.step("6g")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=True, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow))
                 log.info("GroupedMoveTo command with Latch = True and Speed = Low sent successfully")
             except InteractionModelError as e:
                 log.error(f"GroupedMoveTo command with Latch = True and Speed = Low failed: {e}")
@@ -493,7 +493,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
         if is_position_supported:
             self.step("7a")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=6), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=6))
                 log.error("GroupedMoveTo command with Position = 6 should have failed but succeeded")
                 asserts.assert_true(False, "GroupedMoveTo command with Position = 6 should have failed but succeeded")
             except InteractionModelError as e:
@@ -507,7 +507,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
         if is_speed_supported:
             self.step("7b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(speed=4), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(speed=4))
                 log.error("GroupedMoveTo command with Speed = 4 should have failed but succeeded")
                 asserts.assert_true(False, "GroupedMoveTo command with Speed = 4 should have failed but succeeded")
             except InteractionModelError as e:
@@ -516,7 +516,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                                      f"Expected CONSTRAINT_ERROR for GroupedMoveTo with Speed = 4 but got: {e}")
             self.step("7c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=6, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=6, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh))
                 log.error("GroupedMoveTo command with Position = 6 and Speed = High should have failed but succeeded")
                 asserts.assert_true(
                     False, "GroupedMoveTo command with Position = 6 and Speed = High should have failed but succeeded")
@@ -526,7 +526,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                                      f"Expected CONSTRAINT_ERROR for GroupedMoveTo with Position = 6 and Speed = High but got: {e}")
             self.step("7d")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed, speed=4), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed, speed=4))
                 log.error("GroupedMoveTo command with Position = MoveToFullyClosed and Speed = 4 should have failed but succeeded")
                 asserts.assert_true(
                     False, "GroupedMoveTo command with Position = MoveToFullyClosed and Speed = 4 should have failed but succeeded")
@@ -549,7 +549,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 self.step("8c")
                 log.info("CurrentLatch is True and LatchControlModes Bit 0 = 1, sending GroupedMoveTo command with Latch = CurrentLatch")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch))
                     log.info("GroupedMoveTo command with Latch = CurrentLatch sent successfully")
                 except InteractionModelError as e:
                     log.error(f"GroupedMoveTo command with Latch = CurrentLatch failed: {e}")
@@ -563,7 +563,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 self.step("8d")
                 log.info("CurrentLatch is True and LatchControlModes Bit 0 = 0, sending GroupedMoveTo command with Latch = CurrentLatch")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch))
                     log.error("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                     asserts.assert_fail("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
@@ -578,7 +578,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 self.step("8e")
                 log.info("CurrentLatch is False and LatchControlModes Bit 1 = 1, sending GroupedMoveTo command with Latch = CurrentLatch")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch))
                     log.info("GroupedMoveTo command with Latch = CurrentLatch sent successfully")
                 except InteractionModelError as e:
                     log.error(f"GroupedMoveTo command with Latch = CurrentLatch failed: {e}")
@@ -592,7 +592,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 self.step("8f")
                 log.info("CurrentLatch is False and LatchControlModes Bit 1 = 0, sending GroupedMoveTo command with Latch = CurrentLatch")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=current_latch))
                     log.error("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                     asserts.assert_true(False, "GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
@@ -634,7 +634,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                     log.info("LatchControlModes Bit 1 is 1, sending GroupedMoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
 
@@ -650,7 +650,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
 
             self.step("9i")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=current_position), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=current_position))
                 log.info("GroupedMoveTo command with Position = CurrentPosition sent successfully")
             except InteractionModelError as e:
                 log.error(f"GroupedMoveTo command with Position = CurrentPosition failed: {e}")
@@ -689,7 +689,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                     log.info("LatchControlModes Bit 1 is 1, sending GroupedMoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False), timedRequestTimeoutMs=1000)
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(latch=False))
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"GroupedMoveTo command with Latch = False failed: {e}")
 
@@ -706,7 +706,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
 
             self.step("10i")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(speed=current_speed), timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(speed=current_speed))
                 log.info("GroupedMoveTo command with Speed = CurrentSpeed sent successfully")
             except InteractionModelError as e:
                 log.error(f"GroupedMoveTo command with Speed = CurrentSpeed failed: {e}")

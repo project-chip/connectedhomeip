@@ -38,6 +38,7 @@
 import logging
 
 from mobly import asserts
+from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
@@ -98,6 +99,9 @@ class TC_CLDIM_6_1(MatterBaseTest):
             TestStep("2k", "If LatchControlModes is remote unlatching, skip step 2l"),
             TestStep("2l", "Manually unlatch the device"),
             TestStep("2m", "Wait for CurrentState.Latched to be False"),
+            TestStep("2n", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT."),
+            TestStep("2o", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT."),
+            TestStep("2p", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT."),
             TestStep("3a", "Send GroupedStep command to increase position to MaxPosition"),
             TestStep("3b", "Wait for CurrentState.Position to be updated to MaxPosition"),
             TestStep("4a", "Send GroupedStep command to decrease position by 2 steps"),
@@ -133,9 +137,19 @@ class TC_CLDIM_6_1(MatterBaseTest):
         return 1
 
     @async_test_body
+    async def teardown_test(self):
+        if self.groupcast_enabled:
+            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+        super().teardown_test()
+
+    @async_test_body
     async def test_TC_CLDIM_6_1(self):
         endpoint = self.get_endpoint()
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        self.kGroupKeysetId = 0x01a1
+        self.kGroupId = 0x0001
+        self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
+        self.groupcast_enabled = await is_groupcast_on_root_node(self)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -204,7 +218,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                        endpoint=endpoint, timedRequestTimeoutMs=1000
+                        endpoint=endpoint
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -224,17 +238,47 @@ class TC_CLDIM_6_1(MatterBaseTest):
             sub_handler.await_all_expected_report_matches(
                 expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
+        # STEP 2n: If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT
+        self.step("2n")
+        membership = None
+        if self.groupcast_enabled:
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership
+            )
+
+        # STEP 2o: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
+        self.step("2o")
+        if self.groupcast_enabled:
+            if membership:
+                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+
+        # STEP 2p: If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT
+        self.step("2p")
+        if self.groupcast_enabled:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=self.kGroupId,
+                endpoints=[endpoint],
+                keySetID=self.kGroupKeysetId,
+                key=self.kGroupKey), endpoint=0)
+
         # STEP 3a: Send GroupedStep command to increase position to MaxPosition
         self.step("3a")
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=65535),
-                endpoint=endpoint, timedRequestTimeoutMs=1000
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+        if self.groupcast_enabled:
+            self.default_controller.SendGroupCommand(
+                self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=65535))
+        else:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=65535),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 3b: Wait for CurrentState.Position to be updated to MaxPosition
         self.step("3b")
@@ -248,14 +292,19 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 4a: Send GroupedStep command to decrease position by 2 steps
         self.step("4a")
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=2),
-                endpoint=endpoint, timedRequestTimeoutMs=1000
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+        if self.groupcast_enabled:
+            self.default_controller.SendGroupCommand(
+                self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=2))
+        else:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=2),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 4b: Verify TargetState attribute is updated
         self.step("4b")
@@ -272,14 +321,19 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 4d: Send GroupedStep command to increase position by 2 steps
         self.step("4d")
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=2),
-                endpoint=endpoint, timedRequestTimeoutMs=1000
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+        if self.groupcast_enabled:
+            self.default_controller.SendGroupCommand(
+                self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=2))
+        else:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=2),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 4e: Verify TargetState attribute is updated
         self.step("4e")
@@ -300,17 +354,24 @@ class TC_CLDIM_6_1(MatterBaseTest):
             # STEP 5b: Send GroupedStep command to decrease position by 1 step with Speed=High
             self.step("5b")
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+            if self.groupcast_enabled:
+                self.default_controller.SendGroupCommand(
+                    self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedStep(
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
                         numberOfSteps=1,
-                        speed=Globals.Enums.ThreeLevelAutoEnum.kHigh
-                    ),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kHigh))
+            else:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                            direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                            numberOfSteps=1,
+                            speed=Globals.Enums.ThreeLevelAutoEnum.kHigh
+                        ),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
             # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
@@ -335,17 +396,24 @@ class TC_CLDIM_6_1(MatterBaseTest):
             # STEP 6b: Send GroupedStep command to increase position by 1 step with Speed=Auto
             self.step("6b")
             sub_handler.reset()
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+            if self.groupcast_enabled:
+                self.default_controller.SendGroupCommand(
+                    self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedStep(
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
                         numberOfSteps=1,
-                        speed=Globals.Enums.ThreeLevelAutoEnum.kAuto
-                    ),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kAuto))
+            else:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                            direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
+                            numberOfSteps=1,
+                            speed=Globals.Enums.ThreeLevelAutoEnum.kAuto
+                        ),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
             # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
@@ -368,16 +436,22 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 7b: Send GroupedStep command to decrease position beyond MinPosition
         self.step("7b")
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+        if self.groupcast_enabled:
+            self.default_controller.SendGroupCommand(
+                self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedStep(
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    numberOfSteps=65535
-                ),
-                endpoint=endpoint, timedRequestTimeoutMs=1000
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                    numberOfSteps=65535))
+        else:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
+                        numberOfSteps=65535
+                    ),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 7c: Verify TargetState attribute is at MinPosition
         self.step("7c")
@@ -396,16 +470,22 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 7e: Send GroupedStep command to increase position beyond MaxPosition
         self.step("7e")
         sub_handler.reset()
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+        if self.groupcast_enabled:
+            self.default_controller.SendGroupCommand(
+                self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedStep(
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
-                    numberOfSteps=65535
-                ),
-                endpoint=endpoint, timedRequestTimeoutMs=1000
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                    numberOfSteps=65535))
+        else:
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedStep(
+                        direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
+                        numberOfSteps=65535
+                    ),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 7f: Verify TargetState attribute is at MaxPosition
         self.step("7f")
