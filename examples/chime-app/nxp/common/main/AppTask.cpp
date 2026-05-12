@@ -24,10 +24,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include "BLEApplicationManager.h"
-#endif
-
 using namespace chip;
 
 void ChimeApp::AppTask::PreInitMatterStack()
@@ -41,8 +37,6 @@ void ChimeApp::AppTask::PostInitMatterStack()
 #ifdef APP_BT_DEVICE_NAME
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(APP_BT_DEVICE_NAME);
 #endif
-    /* BLEApplicationManager implemented per platform or left blank */
-    chip::NXP::App::BleAppMgr().Init();
 #endif
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 }
