@@ -94,7 +94,9 @@ For each command:
     -   Decode payload.
     -   Perform spec checks (CASE session, FailSafe, busy, etc.).
     -   Call the appropriate `Delegate` method.
-    -   Ensure the `default` case returns `Protocols::InteractionModel::Status::UnsupportedCommand` directly (do not delegate to base class).
+    -   Ensure the `default` case returns
+        `Protocols::InteractionModel::Status::UnsupportedCommand` directly (do
+        not delegate to base class).
 3.  **Verify Success**:
     -   Run tests and ensure they pass.
 
@@ -124,11 +126,15 @@ For each command:
 ### Step 8: Verification & ZAP Regen
 
 1.  Run all unit tests.
-2.  Update `config-data.yaml` and `zcl.json` as per `code-driven-cluster-migration` skill.
+2.  Update `config-data.yaml` and `zcl.json` as per
+    `code-driven-cluster-migration` skill.
 3.  Run `zap_regen_all.py` and commit all generated files.
 4.  **Integration Testing** (If migrating an existing cluster):
-    -   **Verify Example App Build**: Identify an example app that uses the cluster, and build it with its specific target (e.g., `linux-x64-network-manager-boringssl`).
-    -   **End-to-End Testing**: Run the app, and use the `chip-tool-testing` skill to commission and test it against `chip-tool`.
+    -   **Verify Example App Build**: Identify an example app that uses the
+        cluster, and build it with its specific target (e.g.,
+        `linux-x64-network-manager-boringssl`).
+    -   **End-to-End Testing**: Run the app, and use the `chip-tool-testing`
+        skill to commission and test it against `chip-tool`.
 5.  **Ensure all tests pass** before committing or pushing changes.
 
 ## 4. Common TDD Scenarios
@@ -144,7 +150,9 @@ For each command:
 
 -   **Failing Test**: Mock the async callback and verify that side effects (like
     setting breadcrumb via `BreadCrumbTracker`) occur.
--   **Implementation**: Use the appropriate interface or callback (e.g., `OnCommandNameComplete`) to handle side effects. Return `Status::UnsupportedCommand` for unknown commands in `InvokeCommand`.
+-   **Implementation**: Use the appropriate interface or callback (e.g.,
+    `OnCommandNameComplete`) to handle side effects. Return
+    `Status::UnsupportedCommand` for unknown commands in `InvokeCommand`.
 
 ### 4.3 Timer-Driven Logic
 
