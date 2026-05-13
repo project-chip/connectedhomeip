@@ -78,17 +78,18 @@ class TC_CLDIM_5_3(MatterBaseTest):
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "If Limitation feature is supported, read LimitRange attribute"),
-            TestStep("2c", "If Positioning feature is supported, read Resolution attribute"),
-            TestStep("2d", "Establish wilcard subscription to all attributes"),
-            TestStep("2e", "Read CurrentState attribute"),
-            TestStep("2f", "If Latching feature is not supported or state is unlatched, skip steps 2g to 2l"),
-            TestStep("2g", "Read LatchControlModes attribute"),
-            TestStep("2h", "If LatchControlModes is manual unlatching, skip step 2i"),
-            TestStep("2i", "Send GroupedSetTarget command with Latch=False"),
-            TestStep("2j", "If LatchControlModes is remote unlatching, skip step 2k"),
-            TestStep("2k", "Manually unlatch the device"),
-            TestStep("2l", "Wait for CurrentState.Latched to be False"),
+            TestStep("2b", "If Access feature is supported, skip remaining steps and end test case"),
+            TestStep("2c", "If Limitation feature is supported, read LimitRange attribute"),
+            TestStep("2d", "If Positioning feature is supported, read Resolution attribute"),
+            TestStep("2e", "Establish wilcard subscription to all attributes"),
+            TestStep("2f", "Read CurrentState attribute"),
+            TestStep("2g", "If Latching feature is not supported or state is unlatched, skip steps 2h to 2m"),
+            TestStep("2h", "Read LatchControlModes attribute"),
+            TestStep("2i", "If LatchControlModes is manual unlatching, skip step 2j"),
+            TestStep("2j", "Send GroupedSetTarget command with Latch=False"),
+            TestStep("2k", "If LatchControlModes is remote unlatching, skip step 2l"),
+            TestStep("2l", "Manually unlatch the device"),
+            TestStep("2m", "Wait for CurrentState.Latched to be False"),
             TestStep(3, "Send GroupedSetTarget command with no fields"),
             TestStep("4a", "If Positioning feature is supported, skip step 4b to 4e"),
             TestStep("4b", "Send GroupedSetTarget command with Position MaxPosition"),
@@ -149,48 +150,56 @@ class TC_CLDIM_5_3(MatterBaseTest):
         is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_limitation_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
         is_speed_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_access_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kAccess
 
-        # STEP 2b: Read LimitRange attribute if supported
+        # STEP 2b: If Access feature is supported, skip remaining steps
         self.step("2b")
+        if is_access_supported:
+            log.info("Acess feature is supported. Skipping remaining steps.")
+            self.mark_all_remaining_steps_skipped("2c")
+            return
+
+        # STEP 2c: Read LimitRange attribute if supported
+        self.step("2c")
         if is_limitation_supported:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             min_position = limit_range.min
             max_position = limit_range.max
 
-        # STEP 2c: Read Resolution attribute if supported
-        self.step("2c")
+        # STEP 2d: Read Resolution attribute if supported
+        self.step("2d")
         resolution = 1  # Default resolution
         if is_positioning_supported:
             resolution = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Resolution)
 
-        # STEP 2d: Establish wildcard subscription to all attributes"
-        self.step("2d")
+        # STEP 2e: Establish wildcard subscription to all attributes"
+        self.step("2e")
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
-        # STEP 2e: Read CurrentState attribute
-        self.step("2e")
+        # STEP 2f: Read CurrentState attribute
+        self.step("2f")
         current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-        # STEP 2f: If Latching feature is not supported or state is unlatched, skip steps 2g to 2l
-        self.step("2f")
+        # STEP 2g: If Latching feature is not supported or state is unlatched, skip steps 2h to 2m
+        self.step("2g")
         if (not is_latching_supported) or (not current_state.latch):
-            log.info("Latching feature is not supported or state is unlatched. Skipping steps 2g to 2l.")
-            self.mark_step_range_skipped("2g", "2l")
+            log.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2m.")
+            self.mark_step_range_skipped("2h", "2m")
         else:
-            # STEP 2g: Read LatchControlModes attribute
-            self.step("2g")
+            # STEP 2h: Read LatchControlModes attribute
+            self.step("2h")
             latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
 
-            # STEP 2h: If LatchControlModes is manual unlatching, skip step 2i
-            self.step("2h")
+            # STEP 2i: If LatchControlModes is manual unlatching, skip step 2j
+            self.step("2i")
             sub_handler.reset()
             if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                log.info("LatchControlModes is manual unlatching. Skipping step 2i.")
-                self.skip_step("2i")
+                log.info("LatchControlModes is manual unlatching. Skipping step 2j.")
+                self.skip_step("2j")
             else:
-                # STEP 2i: Send GroupedSetTarget command with Latch=False
-                self.step("2i")
+                # STEP 2j: Send GroupedSetTarget command with Latch=False
+                self.step("2j")
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
@@ -199,18 +208,18 @@ class TC_CLDIM_5_3(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-            # STEP 2j: If LatchControlModes is remote unlatching, skip step 2k
-            self.step("2j")
+            # STEP 2k: If LatchControlModes is remote unlatching, skip step 2l
+            self.step("2k")
             if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                log.info("LatchControlModes is remote unlatching. Skipping step 2k.")
-                self.skip_step("2k")
+                log.info("LatchControlModes is remote unlatching. Skipping step 2l.")
+                self.skip_step("2l")
             else:
-                # STEP 2k: Manually unlatch the device
-                self.step("2k")
+                # STEP 2l: Manually unlatch the device
+                self.step("2l")
                 self.wait_for_user_input(prompt_msg="Manual unlatch the device, and press Enter when ready.")
 
-            # STEP 2l: Wait for CurrentState.Latched to be False
-            self.step("2l")
+            # STEP 2m: Wait for CurrentState.Latched to be False
+            self.step("2m")
             sub_handler.await_all_expected_report_matches(
                 expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 

@@ -96,7 +96,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
-            TestStep("2b", "If the LT feature is not supported, skip remaining steps and end test case"),
+            TestStep("2b", "If the LT feature is not supported OR if Access feature is supported, skip remaining steps and end test case"),
             TestStep("2c", "Read the LatchControlModes attribute",
                      "LatchControlModes of the ClosureControl cluster is returned by the DUT; Value saved as LatchControlModes"),
             TestStep("2d", "Read the OverallCurrentState attribute",
@@ -198,15 +198,16 @@ class TC_CLCTRL_7_2(MatterBaseTest):
         self.step("2a")
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
+        is_access_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kAccess
 
         log.info(f"FeatureMap: {feature_map}")
 
         self.step("2b")
-        if not is_latching_supported:
-            log.info("Latching feature is not supported, skipping remaining steps.")
+        if (not is_latching_supported) or is_access_supported:
+            log.info("Latching feature is not supported or Access feature is supported, skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
-        log.info("Latching feature is supported, proceeding with the test.")
+        log.info("Latching feature is supported and Access feature is not supported, proceeding with the test.")
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)

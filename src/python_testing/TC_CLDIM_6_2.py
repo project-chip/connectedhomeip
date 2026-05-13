@@ -70,7 +70,7 @@ class TC_CLDIM_6_2(MatterBaseTest):
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
+            TestStep("2b", "If Positioning feature is not supported OR Access feature is supported, skip remaining steps"),
             TestStep("2c", "Establish wilcard subscription to all attributes"),
             TestStep("2d", "Read CurrentState attribute"),
             TestStep("2e", "If Latching feature not supported or state is unlatched, skip steps 2f to 2k"),
@@ -114,11 +114,12 @@ class TC_CLDIM_6_2(MatterBaseTest):
         is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_speed_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_access_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kAccess
 
-        # STEP 2b: If Positioning feature is not supported, skip remaining steps
+        # STEP 2b: If Positioning feature is not supported OR Access feature is supported, skip remaining steps
         self.step("2b")
-        if not is_positioning_supported:
-            log.info("Positioning feature is not supported. Skipping remaining steps.")
+        if (not is_positioning_supported) or is_access_supported:
+            log.info("Positioning feature is not supported or Access feature is supported. Skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
 
@@ -206,6 +207,9 @@ class TC_CLDIM_6_2(MatterBaseTest):
 
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned for invalid Speed")
+        else:
+            log.info("Speed feature is not supported. Skipping step 4.")
+            self.mark_current_step_skipped()
 
         # STEP 5: Send GroupedStep command with NumberOfSteps = 0
         self.step(5)
