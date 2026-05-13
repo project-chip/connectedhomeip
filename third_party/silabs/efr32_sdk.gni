@@ -671,11 +671,15 @@ template("efr32_sdk") {
       # undefined __aeabi_read_tp symbol
       cflags += [
         "-femulated-tls",
-        "-Wno-unknown-pragmas", # Temporary until sisdk fix for cland implemented
-        "-Wno-uninitialized", # Temporary until sisdk fix for cland implemented
-        "-Wno-implicit-fallthrough", # Temporary until sisdk fix for cland implemented
-        "-Wno-shorten-64-to-32", # Temporary until sisdk fix for cland implemented
-        "-Wno-parentheses-equality", # Temporary until sisdk fix for cland implemented
+        "-Wno-unknown-pragmas",  # Temporary until sisdk fix for cland
+                                 # implemented
+        "-Wno-uninitialized",  # Temporary until sisdk fix for cland implemented
+        "-Wno-implicit-fallthrough",  # Temporary until sisdk fix for cland
+                                      # implemented
+        "-Wno-shorten-64-to-32",  # Temporary until sisdk fix for cland
+                                  # implemented
+        "-Wno-parentheses-equality",  # Temporary until sisdk fix for cland
+                                      # implemented
       ]
     }
 
