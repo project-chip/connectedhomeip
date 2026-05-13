@@ -94,7 +94,10 @@ For each command:
 3.  Use `CodegenClusterIntegration::RegisterServer` (recommended) or direct
     registration to bridge ZAP defaults (like `FeatureMap` and optional
     attributes) to the new cluster instance.
-4.  If the cluster has a legacy class that applications interact with directly (e.g., `ChimeServer` or `Identify`), maintain it in `CodegenIntegration` and refactor it to act as a proxy wrapper around the new code-driven cluster implementation. This ensures existing applications do not need to change.
+4.  If the cluster has a legacy class that applications interact with directly
+    (e.g., `ChimeServer` or `Identify`), maintain it in `CodegenIntegration` and
+    refactor it to act as a proxy wrapper around the new code-driven cluster
+    implementation. This ensures existing applications do not need to change.
 
 ### Step 7: Verification & ZAP Regen
 
