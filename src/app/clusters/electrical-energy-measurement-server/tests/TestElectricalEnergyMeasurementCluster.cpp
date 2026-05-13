@@ -696,7 +696,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
             EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
             EXPECT_FALSE(decoded.energyImported.Value().startSystime.HasValue());
             uint32_t currentTimestamp;
-            if(System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            if (System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
             {
                 ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
             }
@@ -759,7 +759,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
             EXPECT_EQ(decoded.energyImported.Value().energy, 10);
             EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
 
-            if(System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            if (System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
             {
                 ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
                 firstPeriodicEndTimestamp = decoded.energyImported.Value().endTimestamp.Value();
@@ -780,7 +780,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
             ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
             ASSERT_TRUE(decoded.energyImported.HasValue());
             EXPECT_EQ(decoded.energyImported.Value().energy, 20);
-            if(System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            if (System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
             {
                 ASSERT_TRUE(decoded.energyImported.Value().startTimestamp.HasValue());
                 EXPECT_EQ(decoded.energyImported.Value().startTimestamp.Value(), firstPeriodicEndTimestamp);
