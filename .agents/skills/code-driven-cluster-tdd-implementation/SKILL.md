@@ -171,17 +171,26 @@ For each command:
 
 ## 6. Integration Testing (For Migrations)
 
-If you are migrating an existing cluster that is already used in example applications:
+If you are migrating an existing cluster that is already used in example
+applications:
 
 ### 6.1 Verify Example App Build
-1.  Identify an example application that uses the cluster (e.g., `network-manager-app` for `ThreadBorderRouterManagement`).
-2.  Build the example application to ensure that the `CodegenIntegration` layer correctly bridges the new cluster implementation with the legacy application.
-3.  Use the target specific to the application (e.g. `linux-x64-network-manager-boringssl`).
+
+1.  Identify an example application that uses the cluster (e.g.,
+    `network-manager-app` for `ThreadBorderRouterManagement`).
+2.  Build the example application to ensure that the `CodegenIntegration` layer
+    correctly bridges the new cluster implementation with the legacy
+    application.
+3.  Use the target specific to the application (e.g.
+    `linux-x64-network-manager-boringssl`).
 
 ### 6.2 End-to-End Testing with chip-tool
+
 1.  Run the built example application.
-2.  Use the `chip-tool-testing` skill to commission the device and interact with the cluster.
-3.  Verify that attributes can be read and commands can be invoked successfully, producing the expected results on the application side.
+2.  Use the `chip-tool-testing` skill to commission the device and interact with
+    the cluster.
+3.  Verify that attributes can be read and commands can be invoked successfully,
+    producing the expected results on the application side.
 
 ## 7. Common Commands Reference
 
