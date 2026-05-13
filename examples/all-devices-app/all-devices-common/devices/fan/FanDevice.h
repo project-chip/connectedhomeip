@@ -41,6 +41,8 @@ public:
         bool includeOnOffCluster = true;
     };
 
+    /// If onOffDelegate is null, the endpoint will not have an On/Off cluster. If it is not null, Register() will add
+    /// the On/Off cluster and wire it to that delegate. When the pointer is null, context.includeOnOffCluster must be false.
     FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate, const Context & context);
 
     ~FanDevice() override = default;
