@@ -66,7 +66,8 @@ the substantive conversion (Phase 3) using TDD:
 For each writable attribute:
 
 1.  **Write a Failing Test**:
-    -   Write the attribute via `tester.WriteAttribute()` and expect failure or success depending on test setup.
+    -   Write the attribute via `tester.WriteAttribute()` and expect failure or
+        success depending on test setup.
 2.  **Implement**:
     -   Add the case in `WriteAttribute` switch.
     -   Decode the payload using `AttributeValueDecoder`.
@@ -153,9 +154,13 @@ For each command:
 
 ## 5. Best Practices for Test Design
 
--   **Focused Tests**: Keep tests small and focused on a single requirement. Avoid monolithic tests that verify multiple behaviors at once.
--   **Isolation**: Use mocks (e.g., `MockDelegate`, `MockBreadcrumbTracker`) to isolate cluster logic from platform dependencies. This ensures tests are fast and deterministic.
--   **Edge Cases**: Always test boundary values (min/max) and invalid inputs to verify spec compliance and error handling.
+-   **Focused Tests**: Keep tests small and focused on a single requirement.
+    Avoid monolithic tests that verify multiple behaviors at once.
+-   **Isolation**: Use mocks (e.g., `MockDelegate`, `MockBreadcrumbTracker`) to
+    isolate cluster logic from platform dependencies. This ensures tests are
+    fast and deterministic.
+-   **Edge Cases**: Always test boundary values (min/max) and invalid inputs to
+    verify spec compliance and error handling.
 
 ## 6. Common Commands Reference
 
