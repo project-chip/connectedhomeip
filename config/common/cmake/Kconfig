@@ -737,18 +737,6 @@ config CHIP_ENABLE_READ_CLIENT
 	  This config can be disabled for device types that do not require Read Client functionality.
 	  Disabling this config can save flash and RAM space.
 
-config I2C
-	bool
-	default y if CHIP_SE05X  # SE05x uses I2C for communication
-	help
-		Enable i2c
-
-config PINCTRL
-	bool
-	default y if CHIP_SE05X  # I2C pin configuration for communication with SE05x
-	help
-		enable i2c
-
 # Build system options
 
 config CHIP_WITH_LWIP

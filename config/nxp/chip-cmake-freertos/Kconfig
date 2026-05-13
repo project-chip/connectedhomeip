@@ -17,7 +17,6 @@
 rsource "../../common/cmake/Kconfig"
 rsource "../cmake/Kconfig.matter.nxp"
 rsource "Kconfig.openthread.common"
-rsource "../cmake/Kconfig.se05x"
 rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig"
 
 # See config/common/cmake/Kconfig for full definition

@@ -43,6 +43,12 @@ else()
         ${CHIP_ROOT}/src/platform/nxp/crypto/se05x/
     )
 
+if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE)
+    target_include_directories(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/include
+    )
+endif()
+
 # GN platform abstraction layer is platform-agnostic for Zephyr, se05x based nxp crypto lib file added here.
     target_sources(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x/source/AppSe05x.cpp
@@ -56,5 +62,36 @@ else()
         ${CHIP_ROOT}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_spake2p.cpp
         ${CHIP_ROOT}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp
     )
+
+if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE)
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreSE05X.cpp
+    )
+endif()
+
+if (CONFIG_CHIP_APP_FACTORY_DATA)
+    if (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_PLATFORM)
+        target_sources(app PRIVATE
+            ${EXAMPLE_NXP_PLATFORM_DIR}/factory_data/source/AppFactoryDataExample.cpp
+        )
+        if (CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA)
+            target_compile_definitions(app PRIVATE
+                ENABLE_SECURE_WHOLE_FACTORY_DATA
+            )
+        endif()
+    elseif (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_COMMON)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
+        )
+    endif()
+
+    if (CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES OR CONFIG_CHIP_SE05X_DEVICE_ATTESTATION)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/mcu/common/factory_data_impl/Se05xDataProvider.cpp
+        )
+    endif()
+endif()
+
+
 endif()
 endif()

@@ -642,6 +642,19 @@ choice POSIX_AEP_CHOICE
 	default POSIX_AEP_CHOICE_NONE
 endchoice
 
+config CHIP_SE05X
+	bool "Enable SE05X secure element support"
+	select SE05X_LIB
+	select I2C
+	select PINCTRL
+	help
+		Enable support for NXP SE05X secure element.
+		The SE05X provides hardware-based cryptographic operations,
+		secure key storage, and device attestation capabilities.
+		When enabled, cryptographic operations (ECDSA, ECDH, etc.)
+		will be offloaded to the SE05X hardware instead of using
+		software implementations.
+
 endif # CHIP
 
 endif # SOC_FAMILY_NXP_RW

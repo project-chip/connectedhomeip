@@ -45,6 +45,7 @@ project(chip-nxp-all-clusters-app-example)
 
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x.cmake)
 
 target_include_directories(app
     PRIVATE
@@ -59,8 +60,6 @@ target_include_directories(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
 )
-
-include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x.cmake)
 
 target_sources(app
     PRIVATE
