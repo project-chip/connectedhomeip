@@ -24,6 +24,8 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
     # Generate build files in build_dir
     cmake_cmd = [
         "cmake",
+        "-G",
+        "Ninja",
         "-S",
         str(repo_dir),
         "-B",
@@ -103,7 +105,6 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
         [
             f"-DCMAKE_C_COMPILER={c_compiler}",
             f"-DCMAKE_CXX_COMPILER={cxx_compiler}",
-            "-DCMAKE_MAKE_PROGRAM=make",
         ]
     )
 
