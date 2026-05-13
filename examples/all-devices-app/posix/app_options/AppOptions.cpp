@@ -70,7 +70,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     case kOptionBLE:
         if (!ParseInt(value, mConfig.bleController))
         {
-            ChipLogError(Support, "Invalid BLE controller specified: %s\n", value);
+            ChipLogError(Support, "Invalid BLE controller specified: %s", value);
             return false;
         }
         return true;
@@ -86,7 +86,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         unsigned long val = strtoul(value, &endptr, 0);
         if (*endptr != '\0' || val > 0xFFF)
         {
-            ChipLogError(Support, "Invalid discriminator: %s\n", value);
+            ChipLogError(Support, "Invalid discriminator: %s", value);
             return false;
         }
         mConfig.discriminator = static_cast<uint16_t>(val);
@@ -103,11 +103,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         unsigned long val = strtoul(value, &endptr, 0);
         if (*endptr != '\0' || val > 0xFFFF)
         {
-            ChipLogError(Support, "Invalid port: %s\n", value);
+            ChipLogError(Support, "Invalid port: %s", value);
             return false;
         }
         mConfig.port = static_cast<uint16_t>(val);
-        ChipLogProgress(AppServer, "Port option set to %u\n", static_cast<uint16_t>(val));
+        ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
         return true;
     }
     case kOptionInterfaceId:
