@@ -24,7 +24,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <app_options/AppOptions.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -94,7 +93,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
-    if (AppOptions::GetConfig().enableGroupcast)
+    if (mContext.groupDataProvider.IsGroupcastEnabled())
     {
         mGroupcastCluster.Create(GroupcastContext{ .fabricTable       = mContext.fabricTable,
                                                    .groupDataProvider = mContext.groupDataProvider,
