@@ -61,11 +61,7 @@ from python_path import PythonPath
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.commissioning import (
-    _is_device_operational_via_dnssd,
-    get_commissioned_fabric_count,
-    is_commissioned,
-)
+from matter.testing.commissioning import _is_device_operational_via_dnssd, get_commissioned_fabric_count, is_commissioned
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main

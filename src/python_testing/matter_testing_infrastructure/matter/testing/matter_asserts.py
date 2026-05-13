@@ -422,12 +422,8 @@ async def assert_factory_fresh(
     # Import here (not at module level) to avoid pulling in commissioning.py's
     # dependencies (matter.clusters, ChipDeviceCtrl, mdns_discovery) which would cause
     # ModuleNotFoundError in Pigweed-isolated unit tests (test_matter_asserts).
-    from matter.testing.commissioning import (
-        DNSSD_DISCOVERY_TIMEOUT_SEC,
-        establish_pase_or_case_session,
-        get_commissioned_fabric_count,
-        is_device_operational_on_fabric_dnssd,
-    )
+    from matter.testing.commissioning import (DNSSD_DISCOVERY_TIMEOUT_SEC, establish_pase_or_case_session,
+                                              get_commissioned_fabric_count, is_device_operational_on_fabric_dnssd)
 
     timeout = DNSSD_DISCOVERY_TIMEOUT_SEC if discovery_timeout_sec is None else discovery_timeout_sec
 
@@ -501,12 +497,8 @@ async def assert_fabric_count(
     # Import here (not at module level) to avoid pulling in commissioning.py's heavy
     # dependencies (matter.clusters, ChipDeviceCtrl, mdns_discovery) which would cause
     # ModuleNotFoundError in Pigweed-isolated unit tests (test_matter_asserts).
-    from matter.testing.commissioning import (
-        DNSSD_DISCOVERY_TIMEOUT_SEC,
-        establish_pase_or_case_session,
-        get_commissioned_fabric_count,
-        is_device_operational_on_fabric_dnssd,
-    )
+    from matter.testing.commissioning import (DNSSD_DISCOVERY_TIMEOUT_SEC, establish_pase_or_case_session,
+                                              get_commissioned_fabric_count, is_device_operational_on_fabric_dnssd)
 
     timeout = DNSSD_DISCOVERY_TIMEOUT_SEC if discovery_timeout_sec is None else discovery_timeout_sec
 
