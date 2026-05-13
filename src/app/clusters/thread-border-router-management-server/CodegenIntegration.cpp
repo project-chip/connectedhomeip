@@ -46,7 +46,7 @@ static CodegenGeneralCommissioningBreadcrumbTracker sBreadcrumbTracker;
 
 } // namespace
 
-ServerInstance::ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
+ServerInstance::ServerInstance(EndpointId endpointId, ThreadBorderRouterManagementDelegate * delegate, FailSafeContext & failSafeContext) :
     mCluster(endpointId, ThreadBorderRouterManagementCluster::Config(*delegate, failSafeContext, sBreadcrumbTracker))
 {}
 

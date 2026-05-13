@@ -33,7 +33,7 @@ namespace ThreadBorderRouterManagement {
 class ServerInstance
 {
 public:
-    ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext);
+    ServerInstance(EndpointId endpointId, ThreadBorderRouterManagementDelegate * delegate, FailSafeContext & failSafeContext);
     ~ServerInstance();
 
     CHIP_ERROR Init();
