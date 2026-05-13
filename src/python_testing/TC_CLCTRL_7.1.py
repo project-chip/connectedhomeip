@@ -1062,7 +1062,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
             asserts.assert_true(is_stopped, "MainState is not in the expected state")
         else:
-            log.info("Position feature not supported, skipping steps 13b to 13f")
+            log.info("Protection feature not supported, skipping steps 13b to 13f")
             # Skipping steps 13b to 13f
             self.mark_step_range_skipped("13b", "13f")
 

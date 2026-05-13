@@ -82,7 +82,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Attributes.MainState)
 
 class TC_CLCTRL_7_4(MatterBaseTest):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.ClosureControl
+        cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_CLCTRL_7_4(self) -> str:
