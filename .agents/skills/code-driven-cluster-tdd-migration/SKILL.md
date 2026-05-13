@@ -106,6 +106,7 @@ For each command:
     `code-driven-cluster-migration` skill.
 3.  Run `zap_regen_all.py` and commit all generated files.
 4.  Verify by building an example app that uses the cluster.
+5.  **Ensure all tests pass** before committing or pushing changes.
 
 ## 4. Common TDD Scenarios
 
@@ -137,12 +138,11 @@ For each command:
 -   **Implementation**: Use `ListEncodeHelper` and delegate methods to fetch
     items by index and encode them.
 
-## 5. Best Practices
+## 5. Best Practices for Test Design
 
--   Keep tests small and focused on a single requirement.
--   Use mocks (e.g. `MockDelegate`, `MockBreadcrumbTracker`) to isolate cluster
-    logic from platform dependencies.
--   Ensure all tests pass before committing.
+-   **Focused Tests**: Keep tests small and focused on a single requirement. Avoid monolithic tests that verify multiple behaviors at once.
+-   **Isolation**: Use mocks (e.g., `MockDelegate`, `MockBreadcrumbTracker`) to isolate cluster logic from platform dependencies. This ensures tests are fast and deterministic.
+-   **Edge Cases**: Always test boundary values (min/max) and invalid inputs to verify spec compliance and error handling.
 
 ## 6. Common Commands Reference
 
