@@ -897,29 +897,10 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    uint16_t framerate = k30fpsVideoFrameRate; // Default to 30 fps
-    if (LinuxDeviceOptions::GetInstance().cameraFramerate.HasValue())
-    {
-        framerate = LinuxDeviceOptions::GetInstance().cameraFramerate.Value();
-    }
-    else
-    {
-        if (framerate < allocatedStream.minFrameRate)
-        {
-            framerate = allocatedStream.minFrameRate;
-        }
-        else if (framerate > allocatedStream.maxFrameRate)
-        {
-            framerate = allocatedStream.maxFrameRate;
-        }
-    }
-
-    if (framerate < allocatedStream.minFrameRate || framerate > allocatedStream.maxFrameRate)
-    {
-        ChipLogError(Camera, "Requested frame rate %u is out of range [%u, %u]", framerate, allocatedStream.minFrameRate,
-                     allocatedStream.maxFrameRate);
-        return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
-    }
+    const uint16_t framerate = std::clamp(
+        LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
+        allocatedStream.minFrameRate,
+        allocatedStream.maxFrameRate);
 
     mCurrentVideoFrameRate = framerate;
 
