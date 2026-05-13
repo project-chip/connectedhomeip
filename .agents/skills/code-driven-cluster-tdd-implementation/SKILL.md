@@ -28,10 +28,9 @@ of the requirements before implementing them.
     already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the
     TDD conversion.
 
-## 3. Step-by-Step Conversion Workflow (Phase 3)
+## 3. Step-by-Step Implementation Workflow
 
-Once Phase 1 (Renames) and Phase 2 (Moves) are complete, follow these steps for
-the substantive conversion (Phase 3) using TDD:
+Follow these steps for the substantive implementation using TDD. If you are performing a migration, ensure that Phase 1 (Renames) and Phase 2 (Moves) are complete before starting this workflow:
 
 ### Step 1: Initial Boilerplate & Tests Setup
 
