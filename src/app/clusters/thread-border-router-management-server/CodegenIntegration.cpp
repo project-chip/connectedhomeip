@@ -27,7 +27,7 @@ namespace app {
 namespace Clusters {
 namespace ThreadBorderRouterManagement {
 
-class GlobalBreadCrumbTracker : public BreadCrumbTracker
+class CodegenGeneralCommissioningBreadcrumbTracker : public BreadCrumbTracker
 {
 public:
     void SetBreadCrumb(uint64_t v) override
@@ -40,10 +40,10 @@ public:
     }
 };
 
-static GlobalBreadCrumbTracker sGlobalBreadCrumbTracker;
+static CodegenGeneralCommissioningBreadcrumbTracker sBreadcrumbTracker;
 
 ServerInstance::ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
-    mCluster(endpointId, ThreadBorderRouterManagementCluster::Config(*delegate, failSafeContext, sGlobalBreadCrumbTracker))
+    mCluster(endpointId, ThreadBorderRouterManagementCluster::Config(*delegate, failSafeContext, sBreadcrumbTracker))
 {}
 
 ServerInstance::~ServerInstance()
