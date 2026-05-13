@@ -30,12 +30,12 @@ copyrightNotice = """/*
 """
 
 
-def bytes_from_hex(hex: str) -> bytes:
-    """Converts any `hex` string representation including `01:ab:cd` to bytes
+def bytes_from_hex(s: str) -> bytes:
+    """Converts any `s` string representation including `01:ab:cd` to bytes
 
     Handles any whitespace including newlines, which are all stripped.
     """
-    return unhexlify("".join(hex.replace(":", "").split()))
+    return unhexlify("".join(s.replace(":", "").split()))
 
 
 def make_c_array(byte_string: bytes, name: str, linelen: int) -> str:

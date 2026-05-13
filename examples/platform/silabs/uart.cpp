@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 #include "uart.h"
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -644,8 +645,9 @@ void uartMainLoop(void * args)
             {
                 // If there are missed logs, log the count
 
-                workBuffer.length = sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %lu\r\n", sMissedLogCount);
-                sMissedLogCount   = 0; // Reset the count after logging
+                workBuffer.length =
+                    sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %" PRIu32 "\r\n", sMissedLogCount);
+                sMissedLogCount = 0; // Reset the count after logging
                 uartSendBytes(workBuffer.data, workBuffer.length);
             }
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);

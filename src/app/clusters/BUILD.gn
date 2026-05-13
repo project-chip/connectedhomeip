@@ -30,6 +30,7 @@ source_set("clusters") {
     "closure-control-server",
     "closure-dimension-server",
     "commissioner-control-server",
+    "concentration-measurement-server",
     "descriptor",
     "flow-measurement-server",
     "general-commissioning-server",
