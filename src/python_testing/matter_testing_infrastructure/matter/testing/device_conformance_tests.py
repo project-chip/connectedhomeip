@@ -478,7 +478,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
-    def check_flat_model_device_type_requirements(self, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
+    def check_composed_device_type_requirements(self, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
 
@@ -496,16 +496,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             problems.append(ProblemNotice("IDM-10.5", location, ProblemSeverity.ERROR, problem, ""))
             success = False
 
-        # First, count instances of each device type across the entire device
-        device_type_counts: dict[int, int] = {}
-        for endpoint_id, endpoint in self.endpoints.items():
-            if Clusters.Descriptor not in endpoint:
-                continue
-            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            for dt in device_types:
-                device_type_counts[dt.deviceType] = device_type_counts.get(dt.deviceType, 0) + 1
-
-        # Now evaluate composed device type requirements for each device type found
+        # Evaluate composed device type requirements for each device type found
         for endpoint_id, endpoint in self.endpoints.items():
             if Clusters.Descriptor not in endpoint:
                 continue
@@ -520,23 +511,37 @@ class DeviceConformanceTests(BasicCompositionTests):
                 for req in xml_device.composed_device_types:
                     # Conformance Assessment
                     conformance_decision = req.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
-                    count = device_type_counts.get(req.device_type_id, 0)
+                    
+                    # Count instances in child endpoints
+                    parts_list = []
+                    if Clusters.Descriptor.Attributes.PartsList in endpoint[Clusters.Descriptor]:
+                        parts_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+                    
+                    count = 0
+                    for child_ep_id in parts_list:
+                        if child_ep_id in self.endpoints:
+                            child_ep = self.endpoints[child_ep_id]
+                            if Clusters.Descriptor in child_ep:
+                                child_dt_list = child_ep[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+                                if any(child_dt.deviceType == req.device_type_id for child_dt in child_dt_list):
+                                    count += 1
+                    
                     location = DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id)
 
                     if conformance_decision.is_mandatory() and count == 0:
                         record_error(
-                            location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is missing on the device")
+                            location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} is missing in child endpoints")
                     elif not conformance_allowed(conformance_decision, allow_provisional) and count > 0:
                         record_error(
-                            location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is present on the device")
+                            location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} is present in child endpoints")
 
                     if conformance_allowed(conformance_decision, allow_provisional):
                         if req.min_instances is not None and count < req.min_instances:
                             record_error(
-                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at least {req.min_instances} instances, but found {count}")
+                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} expects at least {req.min_instances} instances in child endpoints, but found {count}")
                         if req.max_instances is not None and count > req.max_instances:
                             record_error(
-                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at most {req.max_instances} instances, but found {count}")
+                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} on endpoint {endpoint_id} expects at most {req.max_instances} instances in child endpoints, but found {count}")
 
         return success, problems
 

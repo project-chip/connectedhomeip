@@ -125,10 +125,10 @@ class TC_DeviceConformance(DeviceConformanceTests):
                                                    allow_provisional_test_event_only_disallowed_for_certification)
         self.problems.extend(problems)
 
-        flat_dt_req_success, flat_dt_req_problems = self.check_flat_model_device_type_requirements(allow_provisional)
-        self.problems.extend(flat_dt_req_problems)
+        composed_dt_req_success, composed_dt_req_problems = self.check_composed_device_type_requirements(allow_provisional_test_event_only_disallowed_for_certification)
+        self.problems.extend(composed_dt_req_problems)
 
-        if not success or not flat_dt_req_success:
+        if not success or not composed_dt_req_success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
 
     def test_TC_IDM_10_6(self):
