@@ -120,10 +120,11 @@ jobs:
             out/efr32-brd4338a-lock-skip-rps-generation/matter-silabs-lock-example.out \
             /tmp/bloat_reports/
 
-      - name: Test Clang build
-        run: |
-          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app-clang BRD4187C --uart_log is_clang=true
-          rm -rf ./out/
+      # TODO: re-enable Clang build once supported fully in the sisdk
+      # - name: Test Clang build
+      #   run: |
+      #     scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app-clang BRD4187C --uart_log is_clang=true
+      #     rm -rf ./out/
           
       - name: Clean out build output
         run: rm -rf ./out
