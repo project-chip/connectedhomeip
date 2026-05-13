@@ -83,6 +83,18 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
                         "-DCMAKE_CXX_COMPILER_TARGET=aarch64-linux-gnu",
                     ]
                 )
+        elif cross_compile_cpu_type == "arm":
+            sysroot = SysRootPath("SYSROOT_ARMHF")
+            cmake_cmd.append(f"-DCMAKE_SYSROOT={sysroot}")
+
+            if clang:
+                # These defines are not used by gcc
+                cmake_cmd.extend(
+                    [
+                        "-DCMAKE_C_COMPILER_TARGET=armv7-unknown-linux-gnueabihf",
+                        "-DCMAKE_CXX_COMPILER_TARGET=armv7-unknown-linux-gnueabihf",
+                    ]
+                )
         else:
             raise click.UsageError(f"No sysroot and compiler targets defined for target_cpu '{cross_compile_cpu_type}'")
 
