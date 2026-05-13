@@ -123,10 +123,11 @@ For each command:
 ### Step 8: Verification & ZAP Regen
 
 1.  Run all unit tests.
-2.  Update `config-data.yaml` and `zcl.json` as per
-    `code-driven-cluster-migration` skill.
+2.  Update `config-data.yaml` and `zcl.json` as per `code-driven-cluster-migration` skill.
 3.  Run `zap_regen_all.py` and commit all generated files.
-4.  Verify by building an example app that uses the cluster.
+4.  **Integration Testing** (If migrating an existing cluster):
+    -   **Verify Example App Build**: Identify an example app that uses the cluster, and build it with its specific target (e.g., `linux-x64-network-manager-boringssl`).
+    -   **End-to-End Testing**: Run the app, and use the `chip-tool-testing` skill to commission and test it against `chip-tool`.
 5.  **Ensure all tests pass** before committing or pushing changes.
 
 ## 4. Common TDD Scenarios
@@ -169,30 +170,7 @@ For each command:
 -   **Edge Cases**: Always test boundary values (min/max) and invalid inputs to
     verify spec compliance and error handling.
 
-## 6. Integration Testing (For Migrations)
-
-If you are migrating an existing cluster that is already used in example
-applications:
-
-### 6.1 Verify Example App Build
-
-1.  Identify an example application that uses the cluster (e.g.,
-    `network-manager-app` for `ThreadBorderRouterManagement`).
-2.  Build the example application to ensure that the `CodegenIntegration` layer
-    correctly bridges the new cluster implementation with the legacy
-    application.
-3.  Use the target specific to the application (e.g.
-    `linux-x64-network-manager-boringssl`).
-
-### 6.2 End-to-End Testing with chip-tool
-
-1.  Run the built example application.
-2.  Use the `chip-tool-testing` skill to commission the device and interact with
-    the cluster.
-3.  Verify that attributes can be read and commands can be invoked successfully,
-    producing the expected results on the application side.
-
-## 7. Common Commands Reference
+## 6. Common Commands Reference
 
 ### Environment Activation
 
