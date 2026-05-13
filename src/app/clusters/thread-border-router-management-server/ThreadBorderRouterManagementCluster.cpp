@@ -206,7 +206,8 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
         Thread::OperationalDataset currentActiveDataset;
         uint64_t currentActiveDatasetTimestamp = 0;
-        if ((mDelegate.GetDataset(currentActiveDataset, ThreadBorderRouterManagementDelegate::DatasetType::kActive) == CHIP_NO_ERROR) &&
+        if ((mDelegate.GetDataset(currentActiveDataset, ThreadBorderRouterManagementDelegate::DatasetType::kActive) ==
+             CHIP_NO_ERROR) &&
             (currentActiveDataset.GetActiveTimestamp(currentActiveDatasetTimestamp) == CHIP_NO_ERROR))
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidInState));
