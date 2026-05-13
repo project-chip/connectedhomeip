@@ -14,8 +14,10 @@ feature parity with the legacy implementation and adheres strictly to the
 specification. By writing failing tests first, we validate our understanding of
 the requirements before implementing them.
 
-> [!IMPORTANT]
-> **Preserve Legacy Behavior**: Constantly refer to the legacy implementation (e.g., by keeping a `.legacy` copy of the original file) to ensure you are not dropping existing functionality or changing behavior unexpectedly, unless explicitly required by spec updates.
+> [!IMPORTANT] > **Preserve Legacy Behavior**: Constantly refer to the legacy
+> implementation (e.g., by keeping a `.legacy` copy of the original file) to
+> ensure you are not dropping existing functionality or changing behavior
+> unexpectedly, unless explicitly required by spec updates.
 
 ## 2. Prerequisites
 
