@@ -902,6 +902,17 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     {
         framerate = LinuxDeviceOptions::GetInstance().cameraFramerate.Value();
     }
+    else
+    {
+        if (framerate < allocatedStream.minFrameRate)
+        {
+            framerate = allocatedStream.minFrameRate;
+        }
+        else if (framerate > allocatedStream.maxFrameRate)
+        {
+            framerate = allocatedStream.maxFrameRate;
+        }
+    }
 
     if (framerate < allocatedStream.minFrameRate || framerate > allocatedStream.maxFrameRate)
     {
@@ -909,6 +920,8 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
                      allocatedStream.maxFrameRate);
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
+
+    mCurrentVideoFrameRate = framerate;
 
     // Create Gstreamer video pipeline using the final allocated stream parameters
     CameraError error          = CameraError::SUCCESS;
@@ -932,7 +945,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
-                    allocatedStream.minResolution.height, allocatedStream.minFrameRate);
+                    allocatedStream.minResolution.height, framerate);
 
     // Start the pipeline
     ChipLogProgress(Camera, "Requesting PLAYING …");

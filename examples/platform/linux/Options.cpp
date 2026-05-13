@@ -1009,7 +1009,8 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         if (value > UINT16_MAX)
         {
             PrintArgError("%s: Invalid camera framerate: %s\n", aProgram, aValue);
-            return false;
+            retval = false;
+            break;
         }
         LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(static_cast<uint16_t>(value));
         break;
