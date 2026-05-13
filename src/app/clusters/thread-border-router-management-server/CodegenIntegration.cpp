@@ -27,6 +27,8 @@ namespace app {
 namespace Clusters {
 namespace ThreadBorderRouterManagement {
 
+namespace {
+
 class CodegenGeneralCommissioningBreadcrumbTracker : public BreadCrumbTracker
 {
 public:
@@ -41,6 +43,8 @@ public:
 };
 
 static CodegenGeneralCommissioningBreadcrumbTracker sBreadcrumbTracker;
+
+} // namespace
 
 ServerInstance::ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
     mCluster(endpointId, ThreadBorderRouterManagementCluster::Config(*delegate, failSafeContext, sBreadcrumbTracker))
