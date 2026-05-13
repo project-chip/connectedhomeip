@@ -794,11 +794,9 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
     if (appInstance().mUnlatchContext.mEndpointId != kInvalidEndpointId)
     {
         Optional<chip::ByteSpan> pin = (appInstance().mUnlatchContext.mPinLength)
-            ? MakeOptional(
-                  chip::ByteSpan(appInstance().mUnlatchContext.mPinBuffer, appInstance().mUnlatchContext.mPinLength))
+            ? MakeOptional(chip::ByteSpan(appInstance().mUnlatchContext.mPinBuffer, appInstance().mUnlatchContext.mPinLength))
             : Optional<chip::ByteSpan>::Missing();
-        succes = appInstance().SetLockState(appInstance().mUnlatchContext.mEndpointId,
-                                            appInstance().mUnlatchContext.mFabricIdx,
+        succes = appInstance().SetLockState(appInstance().mUnlatchContext.mEndpointId, appInstance().mUnlatchContext.mFabricIdx,
                                             appInstance().mUnlatchContext.mNodeId, DlLockState::kUnlocked, pin,
                                             appInstance().mUnlatchContext.mErr);
     }

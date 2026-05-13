@@ -318,8 +318,7 @@ private:
 
     void DMDoorLockOnAutoRelockImpl(chip::EndpointId endpointId) { AppTask::DMDoorLockOnAutoRelock(endpointId); }
 
-    bool SetLockStateImpl(chip::EndpointId endpointId,
-                          const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
+    bool SetLockStateImpl(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                           const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                           chip::app::Clusters::DoorLock::DlLockState lockState, const chip::Optional<chip::ByteSpan> & pin,
                           chip::app::Clusters::DoorLock::OperationErrorEnum & err)
