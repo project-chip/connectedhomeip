@@ -204,10 +204,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
-                                                                                        &Server::GetInstance().GetFabricTable());
-    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
-    gGroupDataProvider.SetGroupcastEnabled(true);
+    if (AppOptions::GetConfig().enableGroupcast)
+    {
+        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
+                                                                                            &Server::GetInstance().GetFabricTable());
+        initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+        gGroupDataProvider.SetGroupcastEnabled(true);
+    }
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

@@ -36,6 +36,7 @@ constexpr uint16_t kOptionVendorId      = 0xffd5;
 constexpr uint16_t kOptionProductId     = 0xffd6;
 constexpr uint16_t kOptionPort          = 0xffd7;
 constexpr uint16_t kOptionInterfaceId   = 0xffd8;
+constexpr uint16_t kOptionGroupcast     = 0xffd9;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -105,6 +106,10 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     case kOptionInterfaceId:
         mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
         return true;
+    case kOptionGroupcast:
+        mConfig.enableGroupcast = true;
+        ChipLogProgress(AppServer, "Groupcast usage enabled");
+        return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -126,6 +131,7 @@ OptionSet * AppOptions::GetOptions()
         { "product-id", kArgumentRequired, kOptionProductId },
         { "port", kArgumentRequired, kOptionPort },
         { "interface-id", kArgumentRequired, kOptionInterfaceId },
+        { "groupcast", kNoArgument, kOptionGroupcast },
         {}, // need empty terminator
     };
 
