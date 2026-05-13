@@ -62,7 +62,7 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
     // Spec: MistType SHALL be zero when Mode is not Humidifier.
     if (mMode != ModeEnum::kHumidifier)
     {
-        mMistType.SetRaw(0);
+        mMistType.ClearAll();
     }
 }
 
@@ -85,6 +85,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     }
     if (!IsModeSupported(mMode))
     {
+        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported Mode value %u, forcing Off",
+                      static_cast<unsigned>(mMode));
         mMode = ModeEnum::kOff;
     }
 
@@ -96,6 +98,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     }
     if (!IsSystemStateSupported(mSystemState))
     {
+        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported SystemState value %u, forcing Off",
+                      static_cast<unsigned>(mSystemState));
         mSystemState = SystemStateEnum::kOff;
     }
 
@@ -112,28 +116,31 @@ void HumidistatCluster::LoadPersistentAttributes()
 
     if (mFeatures.Has(Feature::kHumidifier))
     {
-        auto rawMistType              = mMistType.Raw();
-        const auto defaultRawMistType = rawMistType;
+        uint8_t rawMistType              = mMistType.Raw();
+        const uint8_t defaultRawMistType = rawMistType;
         if (!attrPersistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
                                                             rawMistType, defaultRawMistType))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load MistType attribute, using default");
         }
+
+        chip::BitMask<MistTypeBitmap> loadedMistType(rawMistType);
+
         // Clear any bits not supported by the current feature set to guard against stale persisted data.
         if (!mFeatures.Has(Feature::kColdMist))
         {
-            rawMistType &= ~static_cast<uint8_t>(MistTypeBitmap::kMistCold);
+            loadedMistType.Clear(MistTypeBitmap::kMistCold);
         }
         if (!mFeatures.Has(Feature::kWarmMist))
         {
-            rawMistType &= ~static_cast<uint8_t>(MistTypeBitmap::kMistWarm);
+            loadedMistType.Clear(MistTypeBitmap::kMistWarm);
         }
         // Spec: MistType SHALL be zero when Mode is not Humidifier.
         if (mMode != ModeEnum::kHumidifier)
         {
-            rawMistType = 0;
+            loadedMistType.ClearAll();
         }
-        mMistType.SetRaw(rawMistType);
+        mMistType = loadedMistType;
     }
 
     if (mFeatures.Has(Feature::kContinuous))
@@ -207,9 +214,7 @@ bool HumidistatCluster::IsSystemStateSupported(Humidistat::SystemStateEnum syste
 bool HumidistatCluster::IsMistTypeSupportable(chip::BitMask<Humidistat::MistTypeBitmap> mistType) const
 {
     // Reject any bits that are not defined in the spec (MistCold=bit0, MistWarm=bit1).
-    constexpr uint8_t kKnownBits =
-        static_cast<uint8_t>(MistTypeBitmap::kMistCold) | static_cast<uint8_t>(MistTypeBitmap::kMistWarm);
-    if ((mistType.Raw() & ~kKnownBits) != 0)
+    if (!mistType.HasOnly(MistTypeBitmap::kMistCold, MistTypeBitmap::kMistWarm))
     {
         return false;
     }
@@ -246,6 +251,10 @@ HumidistatCluster::FullOptionalAttributeSet HumidistatCluster::ComputeActiveOpti
         active.ForceSet<Continuous::Id>();
     }
 
+    // Spec: TargetSetpoint conformance:
+    //   - Mandatory when OPTIMAL is enabled (OPTIMAL requires SENSOR per spec constraints).
+    //   - Optional when SENSOR is present but OPTIMAL is not enabled (user can explicitly request it).
+    //   - Hidden otherwise (requires SENSOR).
     if (mFeatures.Has(Feature::kSensor) && (mFeatures.Has(Feature::kOptimal) || mOptionalAttributes.IsSet(TargetSetpoint::Id)))
     {
         active.ForceSet<TargetSetpoint::Id>();
@@ -263,22 +272,11 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
 {
     VerifyOrReturnError(IsModeSupported(mode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    const bool modeChanged = (mMode != mode);
     const bool shouldClearMistType =
-        mFeatures.Has(Feature::kHumidifier) && (mode != ModeEnum::kHumidifier) && (mMistType.Raw() != 0);
+        mFeatures.Has(Feature::kHumidifier) && (mode != ModeEnum::kHumidifier) && mMistType.HasAny();
 
-    if (!modeChanged && !shouldClearMistType)
+    if (SetAttributeValue(mMode, mode, Mode::Id))
     {
-        return CHIP_NO_ERROR;
-    }
-
-    if (modeChanged)
-    {
-        if (!SetAttributeValue(mMode, mode, Mode::Id))
-        {
-            return CHIP_NO_ERROR;
-        }
-
         if (mContext != nullptr)
         {
             uint8_t value = static_cast<uint8_t>(mMode);
@@ -292,21 +290,20 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
         }
     }
 
-    // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
-    if (shouldClearMistType)
-    {
-        const chip::BitMask<MistTypeBitmap> clearedMistType{};
-        if (SetAttributeValue(mMistType, clearedMistType, MistType::Id) && (mContext != nullptr))
-        {
-            uint8_t value = mMistType.Raw();
-            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), { &value, sizeof(value) }));
-        }
+    VerifyOrReturnValue(shouldClearMistType, CHIP_NO_ERROR);
 
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnMistTypeChanged(mMistType);
-        }
+    // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
+    const chip::BitMask<MistTypeBitmap> clearedMistType{};
+    if (SetAttributeValue(mMistType, clearedMistType, MistType::Id) && (mContext != nullptr))
+    {
+        uint8_t value = mMistType.Raw();
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), { &value, sizeof(value) }));
+    }
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnMistTypeChanged(mMistType);
     }
 
     return CHIP_NO_ERROR;
@@ -316,15 +313,7 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
 {
     VerifyOrReturnError(IsSystemStateSupported(systemState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    if (mSystemState == systemState)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (!SetAttributeValue(mSystemState, systemState, SystemState::Id))
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnValue(SetAttributeValue(mSystemState, systemState, SystemState::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
         uint8_t value = static_cast<uint8_t>(mSystemState);
@@ -374,15 +363,8 @@ CHIP_ERROR HumidistatCluster::SetUserSetpoint(chip::Percent userSetpoint)
     // Spec: if not step-aligned, snap to the nearest valid value and succeed.
     userSetpoint = SnapToNearestStep(userSetpoint);
 
-    if (mUserSetpoint == userSetpoint)
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnValue(SetAttributeValue(mUserSetpoint, userSetpoint, UserSetpoint::Id), CHIP_NO_ERROR);
 
-    if (!SetAttributeValue(mUserSetpoint, userSetpoint, UserSetpoint::Id))
-    {
-        return CHIP_NO_ERROR;
-    }
     if (mContext != nullptr)
     {
         uint8_t value = mUserSetpoint;
@@ -402,18 +384,10 @@ CHIP_ERROR HumidistatCluster::SetMistType(chip::BitMask<Humidistat::MistTypeBitm
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kHumidifier), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
-    VerifyOrReturnError(mMode == ModeEnum::kHumidifier || mistType.Raw() == 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(mMode == ModeEnum::kHumidifier || !mistType.HasAny(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(IsMistTypeSupportable(mistType), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
-    if (mMistType.Raw() == mistType.Raw())
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (!SetAttributeValue(mMistType, mistType, MistType::Id))
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnValue(SetAttributeValue(mMistType, mistType, MistType::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
         uint8_t value = mMistType.Raw();
@@ -437,15 +411,7 @@ CHIP_ERROR HumidistatCluster::SetTargetSetpoint(chip::Percent targetSetpoint)
 
     targetSetpoint = SnapToNearestStep(targetSetpoint);
 
-    if (mTargetSetpoint == targetSetpoint)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (!SetAttributeValue(mTargetSetpoint, targetSetpoint, TargetSetpoint::Id))
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnValue(SetAttributeValue(mTargetSetpoint, targetSetpoint, TargetSetpoint::Id), CHIP_NO_ERROR);
 
     if (mDelegate != nullptr)
     {
@@ -459,15 +425,7 @@ CHIP_ERROR HumidistatCluster::SetContinuous(bool continuous)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kContinuous), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
-    if (mContinuous == continuous)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (!SetAttributeValue(mContinuous, continuous, Continuous::Id))
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnValue(SetAttributeValue(mContinuous, continuous, Continuous::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
         uint8_t value = mContinuous ? 1 : 0;
@@ -487,15 +445,7 @@ CHIP_ERROR HumidistatCluster::SetSleep(bool sleep)
 {
     VerifyOrReturnError(mOptionalAttributes.IsSet(Sleep::Id), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
-    if (mSleep == sleep)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (!SetAttributeValue(mSleep, sleep, Sleep::Id))
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnValue(SetAttributeValue(mSleep, sleep, Sleep::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
         uint8_t value = mSleep ? 1 : 0;
@@ -515,15 +465,7 @@ CHIP_ERROR HumidistatCluster::SetOptimal(bool optimal)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kOptimal), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
-    if (mOptimal == optimal)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    if (!SetAttributeValue(mOptimal, optimal, Optimal::Id))
-    {
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnValue(SetAttributeValue(mOptimal, optimal, Optimal::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
         uint8_t value = mOptimal ? 1 : 0;
@@ -638,7 +580,7 @@ DataModel::ActionReturnStatus HumidistatCluster::HandleSetSettings(chip::TLV::TL
     // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
     if (commandData.mistType.HasValue() && mFeatures.Has(Feature::kHumidifier))
     {
-        VerifyOrReturnError(effectiveMode == ModeEnum::kHumidifier || commandData.mistType.Value().Raw() == 0,
+        VerifyOrReturnError(effectiveMode == ModeEnum::kHumidifier || !commandData.mistType.Value().HasAny(),
                             CHIP_IM_GLOBAL_STATUS(ConstraintError));
         // Spec: unsupported bits SHALL result in INVALID_IN_STATE.
         VerifyOrReturnError(IsMistTypeSupportable(commandData.mistType.Value()), CHIP_IM_GLOBAL_STATUS(InvalidInState));

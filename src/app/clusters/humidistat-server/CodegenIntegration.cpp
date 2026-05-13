@@ -48,16 +48,22 @@ public:
 
         BitFlags<Humidistat::Feature> features(featureMap);
 
-        // Sanitize optional attributes: only truly optional attributes per spec should pass through.
-        // TargetSetpoint is optional only when SENSOR is present; otherwise it's invalid.
-        // Sleep is always optional. All other "optional" attributes are actually feature-forced.
-        uint32_t validOptionalBits = optionalAttributeBits;
+        // Validate feature dependencies from spec constraints.
+        VerifyOrDie(!features.Has(Feature::kOptimal) || features.Has(Feature::kSensor));
+        VerifyOrDie(!features.HasAny(Feature::kColdMist, Feature::kWarmMist) || features.Has(Feature::kHumidifier));
+        VerifyOrDie(!features.Has(Feature::kAuto) ||
+                    (features.Has(Feature::kHumidifier) && features.Has(Feature::kDehumidifier) &&
+                     features.Has(Feature::kSensor)));
+
+        HumidistatCluster::OptionalAttributeSet optionalAttributes(optionalAttributeBits);
+
+        // TargetSetpoint is optional only when SENSOR is present.
+        // When OPTIMAL is enabled (which requires SENSOR), TargetSetpoint is effectively mandatory.
         if (!features.Has(Feature::kSensor))
         {
-            validOptionalBits &= ~(1u << TargetSetpoint::Id);
+            optionalAttributes.Set<TargetSetpoint::Id>(false);
         }
 
-        HumidistatCluster::OptionalAttributeSet optionalAttributes(validOptionalBits);
         HumidistatCluster::StartupConfiguration config;
 
         if (features.Has(Feature::kSensor))

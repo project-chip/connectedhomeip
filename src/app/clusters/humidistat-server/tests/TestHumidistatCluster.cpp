@@ -752,8 +752,7 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnModeChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetMode(), ModeEnum::kHumidifier);
     EXPECT_EQ(delegate.modeChangedCount, 1);
-    ASSERT_TRUE(delegate.lastMode.has_value());
-    EXPECT_EQ(delegate.lastMode.value(), ModeEnum::kHumidifier);
+    EXPECT_EQ(delegate.lastMode, std::optional<ModeEnum>(ModeEnum::kHumidifier));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -771,8 +770,7 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnSystemStateChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetSystemState(), SystemStateEnum::kHumidifying);
     EXPECT_EQ(delegate.systemStateChangedCount, 1);
-    ASSERT_TRUE(delegate.lastSystemState.has_value());
-    EXPECT_EQ(delegate.lastSystemState.value(), SystemStateEnum::kHumidifying);
+    EXPECT_EQ(delegate.lastSystemState, std::optional<SystemStateEnum>(SystemStateEnum::kHumidifying));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -796,8 +794,7 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnUserSetpointChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetUserSetpoint(), 60);
     EXPECT_EQ(delegate.userSetpointChangedCount, 1);
-    ASSERT_TRUE(delegate.lastUserSetpoint.has_value());
-    EXPECT_EQ(delegate.lastUserSetpoint.value(), 60);
+    EXPECT_EQ(delegate.lastUserSetpoint, std::optional<chip::Percent>(60));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -822,8 +819,7 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnTargetSetpointChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetTargetSetpoint(), 70);
     EXPECT_EQ(delegate.targetSetpointChangedCount, 1);
-    ASSERT_TRUE(delegate.lastTargetSetpoint.has_value());
-    EXPECT_EQ(delegate.lastTargetSetpoint.value(), 70);
+    EXPECT_EQ(delegate.lastTargetSetpoint, std::optional<chip::Percent>(70));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -847,8 +843,14 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnMistTypeChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetMistType().Raw(), expectedMistType.Raw());
     EXPECT_EQ(delegate.mistTypeChangedCount, 1);
-    ASSERT_TRUE(delegate.lastMistType.has_value());
-    EXPECT_EQ(delegate.lastMistType.value().Raw(), expectedMistType.Raw());
+    if (!delegate.lastMistType.has_value())
+    {
+        ADD_FAILURE() << "Expected lastMistType to be set";
+    }
+    else
+    {
+        EXPECT_EQ(delegate.lastMistType->Raw(), expectedMistType.Raw());
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -866,8 +868,7 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnContinuousChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetContinuous());
     EXPECT_EQ(delegate.continuousChangedCount, 1);
-    ASSERT_TRUE(delegate.lastContinuous.has_value());
-    EXPECT_TRUE(delegate.lastContinuous.value());
+    EXPECT_EQ(delegate.lastContinuous, std::optional<bool>(true));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -888,8 +889,7 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnSleepChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetSleep());
     EXPECT_EQ(delegate.sleepChangedCount, 1);
-    ASSERT_TRUE(delegate.lastSleep.has_value());
-    EXPECT_TRUE(delegate.lastSleep.value());
+    EXPECT_EQ(delegate.lastSleep, std::optional<bool>(true));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -907,8 +907,7 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnOptimalChanged)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetOptimal());
     EXPECT_EQ(delegate.optimalChangedCount, 1);
-    ASSERT_TRUE(delegate.lastOptimal.has_value());
-    EXPECT_TRUE(delegate.lastOptimal.value());
+    EXPECT_EQ(delegate.lastOptimal, std::optional<bool>(true));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
