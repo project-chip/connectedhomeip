@@ -43,25 +43,20 @@ the substantive conversion (Phase 3) using TDD:
 ### Step 2: Implement Static Metadata Methods (TDD)
 
 1.  **Attributes()**:
-    -   Write a test expecting `Attributes()` to return the list of mandatory
-        attributes (and optional ones based on feature flags).
-    -   Implement `Attributes()` using `AttributeListBuilder` and generated
-        metadata.
+    -   Write a **failing** test expecting `Attributes()` to return the list of mandatory attributes.
+    -   Implement `Attributes()` using `AttributeListBuilder` and generated metadata.
     -   Verify test passes.
 2.  **AcceptedCommands()**:
-    -   Write a test expecting `AcceptedCommands()` to return the list of
-        supported commands.
-    -   Implement `AcceptedCommands()` returning the list (conditional on
-        features).
+    -   Write a **failing** test expecting `AcceptedCommands()` to return the list of supported commands.
+    -   Implement `AcceptedCommands()` returning the list (conditional on features).
     -   Verify test passes.
 
 ### Step 3: Implement ReadAttribute (TDD)
 
 1.  For each mandatory or supported attribute:
-    -   Write a test reading the attribute via `tester.ReadAttribute()` and
-        expecting a default or mocked value.
-    -   Implement the case in `ReadAttribute` switch, fetching data from
-        Delegate or member variables.
+    -   Write a **failing** test reading the attribute via `tester.ReadAttribute()` and expecting a default or mocked value.
+    -   Implement the case in `ReadAttribute` switch, fetching data from Delegate or member variables.
+    -   Ensure the `default` case returns `Protocols::InteractionModel::Status::UnsupportedAttribute` directly.
     -   Verify test passes.
 
 ### Step 4: Implement WriteAttribute (TDD)
@@ -75,9 +70,8 @@ For each writable attribute:
     -   Add the case in `WriteAttribute` switch.
     -   Decode the payload using `AttributeValueDecoder`.
     -   Update the member variable or call the delegate.
-    -   Use `SetAttributeValue` to update member variables and automatically
-        notify subscribers. For complex cases (like lists), use
-        `NotifyAttributeChanged` directly.
+    -   Use `SetAttributeValue` to update member variables and automatically notify subscribers. For complex cases (like lists), use `NotifyAttributeChanged` directly.
+    -   Ensure the `default` case returns `Protocols::InteractionModel::Status::UnsupportedAttribute` directly.
 3.  **Verify Success**:
     -   Run tests and ensure they pass.
 
@@ -92,7 +86,7 @@ For each command:
 2.  **Implement**:
     -   Add the case in `InvokeCommand` switch.
     -   Decode payload.
-    -   Perform spec checks (CASE session, FailSafe, busy, etc.).
+    -   Perform spec checks (CASE session, FailSafe, busy, etc.). Use standard `if` blocks instead of early-return macros (like `VerifyOrReturnError`) if cleanup or state modification is needed before returning.
     -   Call the appropriate `Delegate` method.
     -   Ensure the `default` case returns
         `Protocols::InteractionModel::Status::UnsupportedCommand` directly (do
@@ -112,11 +106,8 @@ For each command:
 ### Step 7: Create CodegenIntegration Layer
 
 1.  Create or update `CodegenIntegration.h` and `.cpp` in the cluster folder.
-2.  Provide implementations for the generated callbacks (e.g.,
-    `Matter<ClusterName>ClusterInitCallback` and `ShutdownCallback`).
-3.  Use `CodegenClusterIntegration::RegisterServer` (recommended) or direct
-    registration to bridge ZAP defaults (like `FeatureMap` and optional
-    attributes) to the new cluster instance.
+2.  Provide implementations for the generated callbacks (e.g., `Matter<ClusterName>ClusterInitCallback` and `ShutdownCallback`). Note that the `IntegrationDelegate` can typically be stack-allocated if it is only used for lookups during the function call and does not need to outlive the call.
+3.  Use `CodegenClusterIntegration::RegisterServer` (recommended) or direct registration to bridge ZAP defaults (like `FeatureMap` and optional attributes) to the new cluster instance.
 4.  If you are migrating or replacing an existing implementation that has a
     legacy class applications interact with directly (e.g., `ChimeServer` or
     `Identify`), maintain it in `CodegenIntegration` and refactor it to act as a
