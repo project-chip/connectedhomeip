@@ -49,16 +49,16 @@ constexpr static T SpanToBitSet(Span<const uint8_t> span)
     return val;
 }
 
-template <class T, class = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, void>>
-constexpr static void BitSetToSpan(T bitset, Span<uint8_t> & buffer)
+static void BitSetToSpan(uint16_t bitset, Span<uint8_t> & buffer)
 {
     size_t bufInd = 0;
-    for (uint8_t i = 0; i < sizeof(T) * 8 && bufInd < buffer.size(); i++)
+    for (uint8_t i = 0; bitset > 0 && bufInd < buffer.size(); i++)
     {
-        if (bitset & (1 << i))
+        if (bitset & 1)
         {
             buffer[bufInd++] = i;
         }
+        bitset >>= 1;
     }
     buffer.reduce_size(bufInd);
 }
@@ -70,16 +70,8 @@ constexpr static Span<To> ConvertSpanType(Span<From> span)
 }
 
 template <typename T>
-CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const std::optional<T> & value, CHIP_ERROR err = CHIP_NO_ERROR)
+CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const std::optional<T> & value)
 {
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        return encoder.EncodeNull();
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
     if (!value.has_value())
     {
         return encoder.EncodeNull();
@@ -88,45 +80,12 @@ CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const std::optional<T
 }
 
 template <typename T>
-CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const Optional<T> & value, CHIP_ERROR err = CHIP_NO_ERROR)
+CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueList)
 {
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        return encoder.EncodeNull();
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    if (!value.HasValue())
-    {
-        return encoder.EncodeNull();
-    }
-    return encoder.Encode(value.Value());
-}
-
-template <typename T>
-CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueList, CHIP_ERROR err = CHIP_NO_ERROR)
-{
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        return encoder.EncodeEmptyList();
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
     return encoder.EncodeList([&valueList](const auto & enc) -> CHIP_ERROR {
         for (const auto & value : valueList)
         {
-            if constexpr (std::is_enum_v<std::remove_cv_t<std::remove_reference_t<decltype(value)>>>)
-            {
-                ReturnErrorOnFailure(enc.Encode(to_underlying(value)));
-            }
-            else
-            {
-                ReturnErrorOnFailure(enc.Encode(value));
-            }
+            ReturnErrorOnFailure(enc.Encode(value));
         }
 
         return CHIP_NO_ERROR;
@@ -148,10 +107,25 @@ constexpr static AttributeSet MandatoryAttributeSetFromFeatures(BitFlags<PowerSo
     constexpr uint32_t rechargeableBatteryMandatoryAttributeBits =
         OptionalAttributeSet<BatChargeState::Id, BatFunctionalWhileCharging::Id>::All();
 
-    uint32_t attributeBits = (wiredMandatoryAttributeBits * features.Has(PowerSource::Feature::kWired)) |
-        (batteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kBattery)) |
-        (replaceableBatteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kReplaceable)) |
-        (rechargeableBatteryMandatoryAttributeBits * features.Has(PowerSource::Feature::kRechargeable));
+    uint32_t attributeBits = 0;
+
+    if (features.Has(Feature::kWired))
+    {
+        attributeBits |= wiredMandatoryAttributeBits;
+    }
+    if (features.Has(Feature::kBattery))
+    {
+        attributeBits |= batteryMandatoryAttributeBits;
+    }
+    if (features.Has(Feature::kReplaceable))
+    {
+        attributeBits |= replaceableBatteryMandatoryAttributeBits;
+    }
+    if (features.Has(Feature::kRechargeable))
+    {
+        attributeBits |= rechargeableBatteryMandatoryAttributeBits;
+    }
+
     return AttributeSet(attributeBits);
 }
 
@@ -179,14 +153,30 @@ constexpr static AttributeSet DisabledAttributeSetFromFeatures(BitFlags<PowerSou
 
     constexpr uint32_t capacityAttributeBit = OptionalAttributeSet<BatCapacity::Id>::All();
 
-    uint32_t attributeBits =
-        ~(wiredAttributeBits * !features.Has(PowerSource::Feature::kWired) |
-          batteryAttributeBits * !features.Has(PowerSource::Feature::kBattery) |
-          replaceableBatteryAttributeBits * !features.Has(PowerSource::Feature::kReplaceable) |
-          rechargeableBatteryAttributeBits * !features.Has(PowerSource::Feature::kRechargeable) |
-          capacityAttributeBit *
-              !(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable)));
-    return AttributeSet(attributeBits);
+    uint32_t disabledBits = 0;
+
+    if (!features.Has(PowerSource::Feature::kWired))
+    {
+        disabledBits |= wiredAttributeBits;
+    }
+    if (!features.Has(PowerSource::Feature::kBattery))
+    {
+        disabledBits |= batteryAttributeBits;
+    }
+    if (!features.Has(PowerSource::Feature::kReplaceable))
+    {
+        disabledBits |= replaceableBatteryAttributeBits;
+    }
+    if (!features.Has(PowerSource::Feature::kRechargeable))
+    {
+        disabledBits |= rechargeableBatteryAttributeBits;
+    }
+    if (!(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable)))
+    {
+        disabledBits |= capacityAttributeBit;
+    }
+
+    return AttributeSet(~disabledBits);
 }
 
 constexpr static AttributeSet GetValidOptionalAttributeSet(AttributeSet optionalAttributeSet,
@@ -320,238 +310,239 @@ public:
         // `ReadAttribute` is guaranteed to only be called for attributes that are supported by the cluster, so the code below is
         // valid.
         AttributeId id = request.path.mAttributeId;
-        if (id == Status::Id)
+
+        switch (id)
         {
+        case Status::Id:
             return encoder.Encode(this->status);
-        }
-        if (id == Order::Id)
-        {
+
+        case Order::Id:
             return encoder.Encode(this->order);
-        }
-        if (id == Description::Id)
-        {
+
+        case Description::Id:
             return encoder.Encode(
                 this->description.SubSpan(0, std::min(this->description.size(), Description::TypeInfo::MaxLength())));
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputVoltage::Id))
-        {
-            if (id == WiredAssessedInputVoltage::Id)
+
+        case EndpointList::Id:
+            return EncodeListOfValues(encoder, GetEndpointList());
+
+        case Globals::Attributes::FeatureMap::Id:
+            return encoder.Encode(Features().Raw());
+
+        case Globals::Attributes::ClusterRevision::Id:
+            return encoder.Encode(PowerSource::kRevision);
+
+        // Feature dependent and optional attributes
+        case WiredAssessedInputVoltage::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputVoltage::Id))
             {
                 return EncodeOptional(encoder, this->wiredAssessedInputVoltage);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputFrequency::Id))
-        {
-            if (id == WiredAssessedInputFrequency::Id)
+            break;
+
+        case WiredAssessedInputFrequency::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedInputFrequency::Id))
             {
                 return EncodeOptional(encoder, this->wiredAssessedInputFrequency);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(WiredCurrentType::Id))
-        {
-            if (id == WiredCurrentType::Id)
+            break;
+
+        case WiredCurrentType::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(WiredCurrentType::Id))
             {
                 return encoder.Encode(this->wiredCurrentType);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedCurrent::Id))
-        {
-            if (id == WiredAssessedCurrent::Id)
+            break;
+
+        case WiredAssessedCurrent::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(WiredAssessedCurrent::Id))
             {
                 return EncodeOptional(encoder, this->wiredAssessedCurrent);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(WiredNominalVoltage::Id))
-        {
-            if (id == WiredNominalVoltage::Id)
+            break;
+
+        case WiredNominalVoltage::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(WiredNominalVoltage::Id))
             {
                 return encoder.Encode(this->wiredNominalVoltage);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(WiredMaximumCurrent::Id))
-        {
-            if (id == WiredMaximumCurrent::Id)
+            break;
+
+        case WiredMaximumCurrent::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(WiredMaximumCurrent::Id))
             {
                 return encoder.Encode(this->wiredMaximumCurrent);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(WiredPresent::Id))
-        {
-            if (id == WiredPresent::Id)
+            break;
+
+        case WiredPresent::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(WiredPresent::Id))
             {
                 return encoder.Encode(this->wiredPresent);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(ActiveWiredFaults::Id))
-        {
-            if (id == ActiveWiredFaults::Id)
+            break;
+
+        case ActiveWiredFaults::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(ActiveWiredFaults::Id))
             {
                 uint8_t faultsBuf[to_underlying(WiredFaultEnum::kUnknownEnumValue)];
                 auto faultsSpan = Span(faultsBuf, to_underlying(WiredFaultEnum::kUnknownEnumValue));
                 BitSetToSpan(this->activeWiredFaultsBitSet, faultsSpan);
                 return EncodeListOfValues(encoder, faultsSpan);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatVoltage::Id))
-        {
-            if (id == BatVoltage::Id)
+            break;
+
+        case BatVoltage::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatVoltage::Id))
             {
                 return EncodeOptional(encoder, this->batVoltage);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatPercentRemaining::Id))
-        {
-            if (id == BatPercentRemaining::Id)
+            break;
+
+        case BatPercentRemaining::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatPercentRemaining::Id))
             {
                 return EncodeOptional(encoder, this->batPercentRemaining);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeRemaining::Id))
-        {
-            if (id == BatTimeRemaining::Id)
+            break;
+
+        case BatTimeRemaining::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeRemaining::Id))
             {
                 return EncodeOptional(encoder, this->batTimeRemaining);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatChargeLevel::Id))
-        {
-            if (id == BatChargeLevel::Id)
+            break;
+
+        case BatChargeLevel::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatChargeLevel::Id))
             {
                 return encoder.Encode(this->batChargeLevel);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatReplacementNeeded::Id))
-        {
-            if (id == BatReplacementNeeded::Id)
+            break;
+
+        case BatReplacementNeeded::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatReplacementNeeded::Id))
             {
                 return encoder.Encode(this->batReplacementNeeded);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatReplaceability::Id))
-        {
-            if (id == BatReplaceability::Id)
+            break;
+
+        case BatReplaceability::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatReplaceability::Id))
             {
                 return encoder.Encode(this->batReplaceability);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatPresent::Id))
-        {
-            if (id == BatPresent::Id)
+            break;
+
+        case BatPresent::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatPresent::Id))
             {
                 return encoder.Encode(this->batPresent);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(ActiveBatFaults::Id))
-        {
-            if (id == ActiveBatFaults::Id)
+            break;
+
+        case ActiveBatFaults::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(ActiveBatFaults::Id))
             {
                 uint8_t faultsBuf[to_underlying(BatFaultEnum::kUnknownEnumValue)];
                 auto faultsSpan = Span(faultsBuf, to_underlying(BatFaultEnum::kUnknownEnumValue));
                 BitSetToSpan(this->activeBatFaultsBitSet, faultsSpan);
                 return EncodeListOfValues(encoder, faultsSpan);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatReplacementDescription::Id))
-        {
-            if (id == BatReplacementDescription::Id)
+            break;
+
+        case BatReplacementDescription::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatReplacementDescription::Id))
             {
                 return encoder.Encode(this->batReplacementDescription.SubSpan(
                     0, std::min(this->batReplacementDescription.size(), BatReplacementDescription::TypeInfo::MaxLength())));
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatCommonDesignation::Id))
-        {
-            if (id == BatCommonDesignation::Id)
+            break;
+
+        case BatCommonDesignation::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatCommonDesignation::Id))
             {
                 return encoder.Encode(this->batCommonDesignation);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatANSIDesignation::Id))
-        {
-            if (id == BatANSIDesignation::Id)
+            break;
+
+        case BatANSIDesignation::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatANSIDesignation::Id))
             {
                 return encoder.Encode(this->batANSIDesignation.SubSpan(
                     0, std::min(this->batANSIDesignation.size(), BatANSIDesignation::TypeInfo::MaxLength())));
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatIECDesignation::Id))
-        {
-            if (id == BatIECDesignation::Id)
+            break;
+
+        case BatIECDesignation::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatIECDesignation::Id))
             {
                 return encoder.Encode(this->batIECDesignation.SubSpan(
                     0, std::min(this->batIECDesignation.size(), BatIECDesignation::TypeInfo::MaxLength())));
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatApprovedChemistry::Id))
-        {
-            if (id == BatApprovedChemistry::Id)
+            break;
+
+        case BatApprovedChemistry::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatApprovedChemistry::Id))
             {
                 return encoder.Encode(this->batApprovedChemistry);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatCapacity::Id))
-        {
-            if (id == BatCapacity::Id)
+            break;
+
+        case BatCapacity::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatCapacity::Id))
             {
                 return encoder.Encode(this->batCapacity);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatQuantity::Id))
-        {
-            if (id == BatQuantity::Id)
+            break;
+
+        case BatQuantity::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatQuantity::Id))
             {
                 return encoder.Encode(this->batQuantity);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatChargeState::Id))
-        {
-            if (id == BatChargeState::Id)
+            break;
+
+        case BatChargeState::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatChargeState::Id))
             {
                 return encoder.Encode(this->batChargeState);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeToFullCharge::Id))
-        {
-            if (id == BatTimeToFullCharge::Id)
+            break;
+
+        case BatTimeToFullCharge::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatTimeToFullCharge::Id))
             {
                 return EncodeOptional(encoder, this->batTimeToFullCharge);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatFunctionalWhileCharging::Id))
-        {
-            if (id == BatFunctionalWhileCharging::Id)
+            break;
+
+        case BatFunctionalWhileCharging::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatFunctionalWhileCharging::Id))
             {
                 return encoder.Encode(this->batFunctionalWhileCharging);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(BatChargingCurrent::Id))
-        {
-            if (id == BatChargingCurrent::Id)
+            break;
+
+        case BatChargingCurrent::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(BatChargingCurrent::Id))
             {
                 return EncodeOptional(encoder, this->batChargingCurrent);
             }
-        }
-        if constexpr (supportedOptionalAttributeSet.IsSet(ActiveBatChargeFaults::Id))
-        {
-            if (id == ActiveBatChargeFaults::Id)
+            break;
+
+        case ActiveBatChargeFaults::Id:
+            if constexpr (supportedOptionalAttributeSet.IsSet(ActiveBatChargeFaults::Id))
             {
                 uint8_t faultsBuf[to_underlying(BatChargeFaultEnum::kUnknownEnumValue)];
                 auto faultsSpan = Span(faultsBuf, to_underlying(BatChargeFaultEnum::kUnknownEnumValue));
                 BitSetToSpan(this->activeBatChargeFaultsBitSet, faultsSpan);
                 return EncodeListOfValues(encoder, faultsSpan);
             }
-        }
-        if (id == EndpointList::Id)
-        {
-            return EncodeListOfValues(encoder, GetEndpointList());
-        }
-        if (id == Globals::Attributes::FeatureMap::Id)
-        {
-            return encoder.Encode(Features());
-        }
-        if (id == Globals::Attributes::ClusterRevision::Id)
-        {
-            return encoder.Encode(PowerSource::kRevision);
+            break;
+
+        default:
+            break;
         }
 
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
