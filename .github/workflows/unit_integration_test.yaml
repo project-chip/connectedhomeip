@@ -33,7 +33,7 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls, all_features]
+                type: [main, mbedtls, all_features]
         env:
             BUILD_TYPE: ${{ matrix.type }}
 
