@@ -89,9 +89,14 @@ For each command:
 ### Step 6: Create CodegenIntegration Layer
 
 1.  Create or update `CodegenIntegration.h` and `.cpp` in the cluster folder.
-2.  Provide implementations for the generated callbacks (e.g., `Matter<ClusterName>ClusterInitCallback` and `ShutdownCallback`).
-3.  Use `CodegenClusterIntegration::RegisterServer` (recommended) or direct registration to bridge ZAP defaults (like `FeatureMap` and optional attributes) to the new cluster instance.
-4.  If the cluster has legacy wrapper classes (like `ServerInstance` in `ThreadBorderRouterManagement`), maintain them for backward compatibility with legacy applications.
+2.  Provide implementations for the generated callbacks (e.g.,
+    `Matter<ClusterName>ClusterInitCallback` and `ShutdownCallback`).
+3.  Use `CodegenClusterIntegration::RegisterServer` (recommended) or direct
+    registration to bridge ZAP defaults (like `FeatureMap` and optional
+    attributes) to the new cluster instance.
+4.  If the cluster has legacy wrapper classes (like `ServerInstance` in
+    `ThreadBorderRouterManagement`), maintain them for backward compatibility
+    with legacy applications.
 
 ### Step 7: Verification & ZAP Regen
 
