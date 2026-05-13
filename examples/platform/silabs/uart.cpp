@@ -647,7 +647,7 @@ void uartMainLoop(void * args)
 
                 workBuffer.length =
                     sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %" PRIu32 "\r\n", sMissedLogCount);
-                sMissedLogCount   = 0; // Reset the count after logging
+                sMissedLogCount = 0; // Reset the count after logging
                 uartSendBytes(workBuffer.data, workBuffer.length);
             }
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);
