@@ -118,6 +118,20 @@ For each command:
 -   **Implementation**: Use `BreadCrumbTracker` interface in
     `OnActivateDatasetComplete`.
 
+### 4.3 Timer-Driven Logic
+
+-   **Failing Test**: Verify that time passes and state changes (e.g.,
+    `IdentifyTime` decrements).
+-   **Mocking**: Do NOT use `sleep()`. Use `TimerDelegate` and
+    `TimerDelegateMock` to advance the mock clock and trigger timer callbacks
+    synchronously.
+
+### 4.4 List Attributes
+
+-   **Failing Test**: Read the list attribute and verify its contents.
+-   **Implementation**: Use `ListEncodeHelper` and delegate methods to fetch
+    items by index and encode them.
+
 ## 5. Best Practices
 
 -   Keep tests small and focused on a single requirement.
