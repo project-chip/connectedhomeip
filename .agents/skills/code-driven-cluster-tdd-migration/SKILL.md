@@ -143,3 +143,26 @@ For each command:
 -   Use mocks (e.g. `MockDelegate`, `MockBreadcrumbTracker`) to isolate cluster
     logic from platform dependencies.
 -   Ensure all tests pass before committing.
+
+## 6. Common Commands Reference
+
+### Environment Activation
+```bash
+source scripts/activate.sh
+```
+Or run commands directly in the environment:
+```bash
+scripts/run_in_build_env.sh "<command>"
+```
+
+### Running Unit Tests
+To compile and run a specific cluster test:
+```bash
+scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang src/app/clusters/<cluster-folder>/tests:Test<ClusterName>Cluster.run"
+```
+
+### ZAP Regeneration
+To regenerate files after updating templates or ZCL JSON:
+```bash
+scripts/run_in_build_env.sh "scripts/tools/zap_regen_all.py"
+```
