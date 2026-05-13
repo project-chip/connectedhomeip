@@ -67,8 +67,7 @@ public:
     // Constructor for clusters with kNumericMeasurement.
     Instance(EndpointId aEndpointId, ClusterId aClusterId, MeasurementMediumEnum aMeasurementMedium,
              MeasurementUnitEnum aMeasurementUnit) :
-        mEndpointId(aEndpointId),
-        mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
+        mEndpointId(aEndpointId), mConfig{ aClusterId, MakeFeatureFlags(), aMeasurementMedium, aMeasurementUnit }
     {}
 
     ~Instance()
@@ -86,7 +85,7 @@ public:
      */
     CHIP_ERROR Init()
     {
-        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_NO_ERROR);
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
         mCluster.Create(mEndpointId, mConfig);
         CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
         if (err != CHIP_NO_ERROR)
@@ -131,36 +130,48 @@ public:
     template <bool En = NumericMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<float> v)
     {
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
         return mCluster.Cluster().SetMeasuredValue(v);
     }
 
     template <bool En = PeakMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetPeakMeasuredValue(DataModel::Nullable<float> v)
     {
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
         return mCluster.Cluster().SetPeakMeasuredValue(v);
     }
 
     template <bool En = PeakMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetPeakMeasuredValueWindow(uint32_t v)
     {
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
         return mCluster.Cluster().SetPeakMeasuredValueWindow(v);
     }
 
     template <bool En = AverageMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetAverageMeasuredValue(DataModel::Nullable<float> v)
     {
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
         return mCluster.Cluster().SetAverageMeasuredValue(v);
     }
 
     template <bool En = AverageMeasurementEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetAverageMeasuredValueWindow(uint32_t v)
     {
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
         return mCluster.Cluster().SetAverageMeasuredValueWindow(v);
     }
 
     template <bool En = LevelIndicationEnabled, typename = std::enable_if_t<En>>
     CHIP_ERROR SetLevelValue(LevelValueEnum v)
     {
+        VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
         return mCluster.Cluster().SetLevelValue(v);
     }
 
