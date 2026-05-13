@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/mode-base-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -43,6 +43,10 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ModeBase {
+
+// A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
+// todo change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
+static IntrusiveList<Instance> gModeBaseAliasesInstances;
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),

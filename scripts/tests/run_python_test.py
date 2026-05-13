@@ -200,8 +200,8 @@ class IpPacketCaptureManager():
                                                                              'src',
                                                                              'controller',
                                                                              'python',
-                                                                             'test',
-                                                                             'test_scripts',
+                                                                             'tests',
+                                                                             'scripts',
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')

@@ -768,6 +768,20 @@ menu "CHIP Device Layer"
             help
                 Stack size of Thread task.
 
+        config CHIP_USE_OT_ENDPOINT
+            bool "Use native OpenThread UDP endpoint"
+            default n
+            depends on ENABLE_MATTER_OVER_THREAD
+            depends on !OPENTHREAD_PLATFORM_NETIF
+            depends on !ENABLE_TCP_TRANSPORT
+            depends on !WIFI_NETWORK_COMMISSIONING_DRIVER
+            depends on !ETHERNET_NETWORK_COMMISSIONING_DRIVER
+            help
+                Build CHIP to use Matter's native OpenThread UDP endpoint instead of the
+                ESP-IDF OpenThread esp_netif/lwIP glue. This is intended for Thread-only
+                images and requires CONFIG_OPENTHREAD_PLATFORM_NETIF to be disabled when
+                that ESP-IDF option is available.
+
     endmenu
 
     menu "Ethernet Options"
