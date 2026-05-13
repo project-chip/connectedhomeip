@@ -61,7 +61,20 @@ the substantive conversion (Phase 3) using TDD:
         Delegate or member variables.
     -   Verify test passes.
 
-### Step 4: Implement Commands in InvokeCommand (TDD)
+### Step 4: Implement WriteAttribute (TDD)
+
+For each writable attribute:
+
+1.  **Write a Failing Test**:
+    -   Write the attribute via `tester.WriteAttribute()` and expect failure or success depending on test setup.
+2.  **Implement**:
+    -   Add the case in `WriteAttribute` switch.
+    -   Decode the payload using `AttributeValueDecoder`.
+    -   Update member variable or call delegate.
+3.  **Verify Success**:
+    -   Run tests and ensure they pass.
+
+### Step 5: Implement Commands in InvokeCommand (TDD)
 
 For each command:
 
@@ -77,7 +90,7 @@ For each command:
 3.  **Verify Success**:
     -   Run tests and ensure they pass.
 
-### Step 5: Handle Platform Events (TDD)
+### Step 6: Handle Platform Events (TDD)
 
 1.  Identify needed events (e.g. `kFailSafeTimerExpired`,
     `kCommissioningComplete`).
@@ -86,7 +99,7 @@ For each command:
 3.  Implement `OnPlatformEventHandler` and hook it up in `Startup`/`Shutdown`.
 4.  Verify tests pass.
 
-### Step 6: Create CodegenIntegration Layer
+### Step 7: Create CodegenIntegration Layer
 
 1.  Create or update `CodegenIntegration.h` and `.cpp` in the cluster folder.
 2.  Provide implementations for the generated callbacks (e.g.,
@@ -99,7 +112,7 @@ For each command:
     refactor it to act as a proxy wrapper around the new code-driven cluster
     implementation. This ensures existing applications do not need to change.
 
-### Step 7: Verification & ZAP Regen
+### Step 8: Verification & ZAP Regen
 
 1.  Run all unit tests.
 2.  Update `config-data.yaml` and `zcl.json` as per
