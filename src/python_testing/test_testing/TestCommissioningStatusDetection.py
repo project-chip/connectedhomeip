@@ -763,7 +763,7 @@ async def test_get_fabric_count_not_operational_no_commissioning_params():
         try:
             await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
             return "Expected ChipStackError when not operational and ReadAttribute has no session"
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: test asserts expected error from get_commissioned_fabric_count when ReadAttribute has no session
             if "No CASE session" not in str(e):
                 return f"Unexpected error message: {e}"
     return None
