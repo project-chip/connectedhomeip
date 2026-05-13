@@ -30,7 +30,7 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-class Instance;
+class InstanceBase;
 
 /**
  * A delegate to handle application logic of the Operational State aliased Cluster.
@@ -108,29 +108,29 @@ public:
      * @param aInstance A pointer to the Instance object related to this delegate object.
      * @note This method is for internal SDK use and should only be called by the `Instance` constructor and destructor.
      */
-    void SetInstance(Instance * aInstance)
+    void SetInstance(InstanceBase * aInstance)
     {
         VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
         mInstance = aInstance;
     }
 
 private:
-    Instance * mInstance = nullptr;
+    InstanceBase * mInstance = nullptr;
 
 protected:
     /**
      * @brief Provides access to the const Instance pointer.
      *
-     * @return A const pointer to the Instance object associated with this delegate.
+     * @return A const pointer to the InstanceBase object associated with this delegate.
      */
-    const Instance * GetInstance() const { return mInstance; }
+    const InstanceBase * GetInstance() const { return mInstance; }
 
     /**
      * @brief Provides access to the Instance pointer.
      *
-     * @return A pointer to the Instance object associated with this delegate.
+     * @return A pointer to the InstanceBase object associated with this delegate.
      */
-    Instance * GetInstance() { return mInstance; }
+    InstanceBase * GetInstance() { return mInstance; }
 };
 
 } // namespace OperationalState
