@@ -58,11 +58,34 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) = 0;
 
-    virtual void OnPersistenceRestored() {}
-
+    /**
+     * Notifies the application when fan drive-related attributes change due to cluster processing (for example
+     * FanMode, PercentSetting / PercentCurrent, or SpeedSetting / SpeedCurrent after a successful write or
+     * FanMode side effects). Not called when the delegate callback is temporarily suppressed to avoid re-entrancy.
+     *
+     * @param[in] newState Current fan drive snapshot after the update.
+     */
     virtual void OnFanDriveStateChanged(const FanDriveState & newState) {}
+
+    /**
+     * Notifies the application after RockSetting was successfully updated (Rock feature).
+     *
+     * @param[in] newValue Committed RockSetting value.
+     */
     virtual void OnRockSettingChanged(BitMask<RockBitmap> newValue) {}
+
+    /**
+     * Notifies the application after WindSetting was successfully updated (Wind feature).
+     *
+     * @param[in] newValue Committed WindSetting value.
+     */
     virtual void OnWindSettingChanged(BitMask<WindBitmap> newValue) {}
+
+    /**
+     * Notifies the application after AirflowDirection was successfully updated (AirflowDirection feature).
+     *
+     * @param[in] newValue Committed AirflowDirection value.
+     */
     virtual void OnAirflowDirectionChanged(AirflowDirectionEnum newValue) {}
 
     Delegate(EndpointId aEndpoint = kInvalidEndpointId) : mEndpoint(aEndpoint) {}

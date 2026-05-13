@@ -56,21 +56,6 @@ public:
 
 TestFanControlDelegate gTestDelegate(kTestEndpointId);
 
-class CountingFanControlDelegate : public FanControl::Delegate
-{
-public:
-    int mPersistenceRestoreCount = 0;
-
-    CountingFanControlDelegate(EndpointId endpoint) : Delegate(endpoint) {}
-
-    Protocols::InteractionModel::Status HandleStep(StepDirectionEnum, bool, bool) override
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    void OnPersistenceRestored() override { mPersistenceRestoreCount++; }
-};
-
 class NotifyingFanControlDelegate : public FanControl::Delegate
 {
 public:
@@ -235,11 +220,11 @@ TEST_F(TestFanControlPersistence, StartupRestoresFanModeFromStorage)
         ctx.AttributePersistenceProvider().WriteValue(path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
         CHIP_NO_ERROR);
 
-    CountingFanControlDelegate delegate(kTestEndpointId);
+    NotifyingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
         FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     ASSERT_EQ(cluster.Startup(ctx.Get()), CHIP_NO_ERROR);
-    EXPECT_EQ(delegate.mPersistenceRestoreCount, 1);
+    EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
 
     ClusterTester tester(cluster);
     FanModeEnum readMode = FanModeEnum::kOff;
@@ -258,9 +243,8 @@ TEST_F(TestFanControlPersistence, StartupInvalidPersistedFanMode_FallsBackToOff)
         ctx.AttributePersistenceProvider().WriteValue(path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
         CHIP_NO_ERROR);
 
-    CountingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh));
+        FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh));
     ASSERT_EQ(cluster.Startup(ctx.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);

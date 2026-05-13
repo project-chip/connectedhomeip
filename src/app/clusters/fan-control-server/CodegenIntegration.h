@@ -21,9 +21,26 @@
 
 namespace chip::app::Clusters::FanControl {
 
+/**
+ * Returns the code-driven Fan Control server cluster instance registered for `endpointId` when using the
+ * codegen data model, or `nullptr` if the endpoint has no Fan Control server or the cluster is not registered.
+ */
 FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+/**
+ * Registers the application `FanControl::Delegate` for `aEndpoint` used by the codegen integration layer.
+ *
+ * The integration keeps one delegate pointer per Fan Control server endpoint. That pointer is passed into
+ * `FanControlCluster` when the cluster instance is created, and drives application-specific behavior (for
+ * example the Step command via `Delegate::HandleStep`, and optional notifications such as
+ * `OnFanDriveStateChanged`). Call this from application init (for example `emberAfFanControlClusterInitCallback`)
+ * before or after the cluster is constructed, if the cluster already exists, the running instance is updated.
+ *
+ * @param aDelegate Application delegate, or `nullptr` if none.
+ */
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
+
+/** Returns the delegate registered with `SetDefaultDelegate` for `aEndpoint`, or `nullptr` if none or invalid. */
 Delegate * GetDelegate(EndpointId aEndpoint);
 
 } // namespace chip::app::Clusters::FanControl

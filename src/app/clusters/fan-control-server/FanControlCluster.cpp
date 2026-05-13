@@ -76,11 +76,6 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
     }
     VerifyOrReturnError(status.IsSuccess(), CHIP_ERROR_INTERNAL);
 
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnPersistenceRestored();
-    }
-
     return CHIP_NO_ERROR;
 }
 
