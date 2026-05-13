@@ -79,4 +79,5 @@ void MatterThreadBorderRouterManagementPluginServerInitCallback() {}
 void MatterThreadBorderRouterManagementPluginServerShutdownCallback() {}
 
 void MatterThreadBorderRouterManagementClusterInitCallback(chip::EndpointId endpointId) {}
-void MatterThreadBorderRouterManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType) {}
+void MatterThreadBorderRouterManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{}
