@@ -24,7 +24,7 @@ import contextlib
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Set
 
 from mobly import asserts
 
@@ -39,6 +39,20 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
+
+
+def _successful_task_in_done_set(done: Set[asyncio.Task]) -> Optional[asyncio.Task]:
+    """
+    Return a task from *done* that finished without raising, if any.
+
+    ``asyncio.wait(..., FIRST_COMPLETED)`` can place more than one task in *done* when
+    several futures complete in the same event-loop iteration; callers must not rely
+    on ``set.pop()`` order to pick the successful session.
+    """
+    for task in done:
+        if not task.cancelled() and task.exception() is None:
+            return task
+    return None
 
 
 @dataclass
@@ -433,9 +447,9 @@ async def _is_device_operational_via_dnssd(
 
         LOGGER.info(f"Checking DNS-SD for operational service: {expected_instance_name}")
 
+        mdns = MdnsDiscovery()
         for attempt in range(max_retries):
             # Discover operational services
-            mdns = MdnsDiscovery()
             services = await mdns.get_operational_services(
                 discovery_timeout_sec=discovery_timeout_sec,
                 log_output=False
@@ -566,36 +580,76 @@ async def establish_pase_or_case_session(
     # Wait for first successful completion
     done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
 
-    # Check if the completed task succeeded or raised an exception
-    completed_task = done.pop()
-    completed_name = completed_task.get_name()
-
     def _session_kind_from_task_name(name: str) -> EstablishedSessionKind:
         return EstablishedSessionKind.PASE if name == "pase" else EstablishedSessionKind.CASE
 
+    first_wait_successful = _successful_task_in_done_set(done)
+    if first_wait_successful is not None:
+        for task in task_list:
+            if task is not first_wait_successful:
+                task.cancel()
+        for task in task_list:
+            if task is not first_wait_successful:
+                with contextlib.suppress(asyncio.CancelledError):
+                    await task
+        LOGGER.info(
+            f"Successfully established {first_wait_successful.get_name().upper()} session to node {node_id}"
+        )
+        return _session_kind_from_task_name(first_wait_successful.get_name())
+
+    # First asyncio.wait returned only failures (or cancellations): inspect one representative task.
+    first_wait_task = next((t for t in done if not t.cancelled()), None)
+    if first_wait_task is None:
+        first_wait_task = done.pop()
+    first_wait_task_name = first_wait_task.get_name()
+
     try:
         # This will raise if the task failed
-        completed_task.result()
-        LOGGER.info(f"Successfully established {completed_name.upper()} session to node {node_id}")
+        first_wait_task.result()
+        LOGGER.info(
+            f"Successfully established {first_wait_task_name.upper()} session to node {node_id}"
+        )
     except (ChipStackError, RuntimeError, OSError) as e:
-        # First task failed, wait for the other if there is one
+        # First-wait task failed, wait for the other if there is one
         if pending:
-            LOGGER.info(f"{completed_name.upper()} failed ({e}), waiting for other connection attempt")
-            done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
-            completed_task2 = done2.pop()
-            completed_name2 = completed_task2.get_name()
+            LOGGER.info(
+                f"{first_wait_task_name.upper()} failed ({e}), waiting for other connection attempt"
+            )
+            done_after_second_wait, pending_after_second_wait = await asyncio.wait(
+                pending, return_when=asyncio.FIRST_COMPLETED
+            )
+            second_wait_successful = _successful_task_in_done_set(done_after_second_wait)
+            if second_wait_successful is not None:
+                for task in pending:
+                    if task is not second_wait_successful:
+                        task.cancel()
+                for task in pending:
+                    if task is not second_wait_successful:
+                        with contextlib.suppress(asyncio.CancelledError):
+                            await task
+                LOGGER.info(
+                    f"Successfully established {second_wait_successful.get_name().upper()} session to node {node_id}"
+                )
+                return _session_kind_from_task_name(second_wait_successful.get_name())
+
+            second_wait_task = next((t for t in done_after_second_wait if not t.cancelled()), None)
+            if second_wait_task is None:
+                second_wait_task = done_after_second_wait.pop()
+            second_wait_task_name = second_wait_task.get_name()
             try:
-                completed_task2.result()
-                LOGGER.info(f"Successfully established {completed_name2.upper()} session to node {node_id}")
+                second_wait_task.result()
+                LOGGER.info(
+                    f"Successfully established {second_wait_task_name.upper()} session to node {node_id}"
+                )
                 # Cancel any remaining
-                for task in pending2:
+                for task in pending_after_second_wait:
                     task.cancel()
                     with contextlib.suppress(asyncio.CancelledError):
                         await task
-                return _session_kind_from_task_name(completed_name2)
+                return _session_kind_from_task_name(second_wait_task_name)
             except (ChipStackError, RuntimeError, OSError) as e2:
                 # Use task names to correctly label which error came from which connection type
-                if completed_name == "pase":
+                if first_wait_task_name == "pase":
                     pase_error, case_error = e, e2
                 else:
                     pase_error, case_error = e2, e
@@ -612,7 +666,7 @@ async def establish_pase_or_case_session(
         with contextlib.suppress(asyncio.CancelledError):
             await task
 
-    return _session_kind_from_task_name(completed_name)
+    return _session_kind_from_task_name(first_wait_task_name)
 
 
 async def is_commissioned(
