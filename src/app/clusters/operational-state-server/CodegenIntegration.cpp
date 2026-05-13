@@ -30,38 +30,29 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 
 // ---------------------------------------------------------------------------
-// OperationalState::Instance
+// OperationalState::InstanceBase
 // ---------------------------------------------------------------------------
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config) :
-    mDelegate(aDelegate), mOwnedCluster(new RegisteredServerCluster<OperationalStateCluster>(aEndpointId, aDelegate, config))
-{
-    mClusterPtr = &mOwnedCluster->Cluster();
-    mRegPtr     = &mOwnedCluster->Registration();
-    aDelegate->SetInstance(this);
-}
-
-Instance::Instance(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate) :
-    mDelegate(aDelegate), mClusterPtr(&cluster), mRegPtr(&registration), mOwnedCluster(nullptr)
+InstanceBase::InstanceBase(OperationalStateCluster & cluster, ServerClusterRegistration & registration, Delegate * aDelegate) :
+    mDelegate(aDelegate), mClusterPtr(&cluster), mRegPtr(&registration)
 {
     aDelegate->SetInstance(this);
 }
 
-Instance::~Instance()
+InstanceBase::~InstanceBase()
 {
     if (mRegistered)
     {
-        ChipLogError(AppServer, "OperationalState::Instance destroyed without Shutdown(); shutting down now.");
+        ChipLogError(AppServer, "OperationalState::InstanceBase destroyed without Shutdown(); shutting down now.");
         Shutdown();
     }
     if (mDelegate)
     {
         mDelegate->SetInstance(nullptr);
     }
-    delete mOwnedCluster;
 }
 
-CHIP_ERROR Instance::Init()
+CHIP_ERROR InstanceBase::Init()
 {
     VerifyOrReturnError(!mRegistered, CHIP_NO_ERROR);
     ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(*mRegPtr));
@@ -69,7 +60,7 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-void Instance::Shutdown()
+void InstanceBase::Shutdown()
 {
     VerifyOrReturn(mRegistered);
     mRegistered    = false;
