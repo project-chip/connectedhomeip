@@ -95,7 +95,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
+            TestStep("2b", "If Positioning feature is not supported OR Access feature is supported, skip remaining steps"),
             TestStep("2c", "Read LimitRange attribute"),
             TestStep("2d", "Establish wilcard subscription to all attributes"),
             TestStep("2e", "Read CurrentState attribute"),
@@ -166,11 +166,12 @@ class TC_CLDIM_5_1(MatterBaseTest):
         is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_limitation_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
         is_speed_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_access_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kAccess
 
-        # STEP 2b: If Positioning Feature is not supported, skip remaining steps
+        # STEP 2b: If Positioning feature is not supported OR Access feature is supported, skip remaining steps
         self.step("2b")
-        if not is_positioning_supported:
-            log.info("Positioning Feature is not supported. Skipping remaining steps.")
+        if (not is_positioning_supported) or is_access_supported:
+            log.info("Positioning feature is not supported or Access feature is supported. Skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
 
