@@ -37,7 +37,10 @@ This guide is designed to be effective by providing:
 ## 2. Prerequisites
 
 -   Read `code-driven-cluster-development` for core implementation patterns.
--   If performing a **migration**, read `code-driven-cluster-migration` for general migration steps (renaming, directory layout). We assume you have already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the TDD implementation.
+-   If performing a **migration**, read `code-driven-cluster-migration` for
+    general migration steps (renaming, directory layout). We assume you have
+    already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the
+    TDD implementation.
 
 ## 3. Step-by-Step Implementation Workflow
 
@@ -186,8 +189,11 @@ For each command:
 
 ### 4.5 Handling Platform Events
 
--   **Failing Test**: Write tests that trigger specific platform events (e.g., `kFailSafeTimerExpired`) directly on the platform event handler and verify expected side effects.
--   **Implementation**: Implement `OnPlatformEventHandler` and hook it up in `Startup`/`Shutdown` to listen for needed events.
+-   **Failing Test**: Write tests that trigger specific platform events (e.g.,
+    `kFailSafeTimerExpired`) directly on the platform event handler and verify
+    expected side effects.
+-   **Implementation**: Implement `OnPlatformEventHandler` and hook it up in
+    `Startup`/`Shutdown` to listen for needed events.
 
 ## 5. Best Practices for Test Design
 
