@@ -148,14 +148,21 @@ For each command:
 ### Step 8: Verification & ZAP Regen
 
 1.  Run all unit tests.
-2.  Update `config-data.yaml` and `zcl.json` as per `code-driven-cluster-migration` skill.
+2.  Update `config-data.yaml` and `zcl.json` as per
+    `code-driven-cluster-migration` skill.
 3.  Run `zap_regen_all.py` and commit all generated files.
 4.  **Integration Testing** (If migrating an existing cluster):
-    -   **Verify Example App Build**: Identify an example app that uses the cluster, and build it with its specific target (e.g., `linux-x64-network-manager-boringssl`).
-    -   **End-to-End Testing**: Run the app, and use the `chip-tool-testing` skill to commission and test it against `chip-tool`.
-5.  **Verify Spec Conformance**: Refer to the relevant cluster specification `.adoc` file to ensure full conformance.
-6.  **Verify Against Test Plan**: Refer to the relevant test plan `.adoc` file to ensure all required test cases are covered or feasible.
-    *   *Note*: See the `matter-specification-access` skill for instructions on how to find and access these private repositories.
+    -   **Verify Example App Build**: Identify an example app that uses the
+        cluster, and build it with its specific target (e.g.,
+        `linux-x64-network-manager-boringssl`).
+    -   **End-to-End Testing**: Run the app, and use the `chip-tool-testing`
+        skill to commission and test it against `chip-tool`.
+5.  **Verify Spec Conformance**: Refer to the relevant cluster specification
+    `.adoc` file to ensure full conformance.
+6.  **Verify Against Test Plan**: Refer to the relevant test plan `.adoc` file
+    to ensure all required test cases are covered or feasible.
+    -   _Note_: See the `matter-specification-access` skill for instructions on
+        how to find and access these private repositories.
 7.  **Ensure all tests pass** before committing or pushing changes.
 
 ## 4. Common TDD Scenarios
