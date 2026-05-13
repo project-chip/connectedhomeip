@@ -49,6 +49,7 @@ constexpr static T SpanToBitSet(Span<const uint8_t> span)
     return val;
 }
 
+template <class = void> // to silence "unused" warnings
 static void BitSetToSpan(uint16_t bitset, Span<uint8_t> & buffer)
 {
     size_t bufInd = 0;
@@ -58,7 +59,7 @@ static void BitSetToSpan(uint16_t bitset, Span<uint8_t> & buffer)
         {
             buffer[bufInd++] = i;
         }
-        bitset >>= 1;
+        bitset >>= static_cast<uint16_t>(1);
     }
     buffer.reduce_size(bufInd);
 }
