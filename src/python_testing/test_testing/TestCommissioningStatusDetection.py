@@ -20,6 +20,7 @@ Unit tests for commissioning status detection functions in commissioning.py.
 
 Tests cover:
 - DNS-SD discovery (_is_device_operational_via_dnssd)
+- Public wrapper ``is_device_operational_on_fabric_dnssd`` (forwards timeouts)
 - Parallel session establishment (establish_pase_or_case_session)
 - is_commissioned() integration scenarios
 - get_commissioned_fabric_count() integration scenarios
@@ -710,7 +711,7 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     """
     Test: SCENARIO 1 - Factory fresh device, should return 0.
 
-    Value: Verifies 0 count for uncommissioned devices.
+    Value: Verifies 0 count for uncommissioned devices after caller establishes PASE.
     """
     import matter.clusters as Clusters
     from matter.testing import commissioning
@@ -733,9 +734,10 @@ async def test_get_fabric_count_scenario1_factory_fresh():
 
         commissioning_params = commissioning.CustomCommissioningParameters(
             setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
-        result = await commissioning.get_commissioned_fabric_count(
-            mock_controller, TEST_NODE_ID, commissioning_params=commissioning_params
-        )
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
+        mock_parallel.assert_called_once_with(mock_controller, TEST_NODE_ID, commissioning_params)
+
+        result = await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
 
         if result != 0:
             return f"Expected fabric count 0 for factory fresh, got {result}"
@@ -744,22 +746,25 @@ async def test_get_fabric_count_scenario1_factory_fresh():
 
 async def test_get_fabric_count_not_operational_no_commissioning_params():
     """
-    Test: Device not operational via DNS-SD and no CustomCommissioningParameters provided.
+    Test: Device not operational via DNS-SD; ReadAttribute without prior session can fail.
 
-    Value: Ensures ValueError is raised to prevent timeout.
+    Value: Documents that get_commissioned_fabric_count does not establish sessions; failures propagate.
     """
+    from matter.exceptions import ChipStackError
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
         mock_dnssd.return_value = False
+        # ChipStackError is (code: int, msg=None); a single string is misinterpreted as code and breaks % formatting.
+        mock_controller.ReadAttribute = AsyncMock(side_effect=ChipStackError(0, "No CASE session"))
 
         try:
-            await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID, commissioning_params=None)
-            return "Expected ValueError when not operational and no CustomCommissioningParameters"
-        except ValueError as e:
-            if "not operational on this fabric" not in str(e):
+            await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
+            return "Expected ChipStackError when not operational and ReadAttribute has no session"
+        except ChipStackError as e:
+            if "No CASE session" not in str(e):
                 return f"Unexpected error message: {e}"
     return None
 
@@ -839,6 +844,32 @@ async def test_commissioning_credentials_sdk_pin_with_random_discriminator():
 
 
 # =============================================================================
+# CATEGORY F: is_device_operational_on_fabric_dnssd (public wrapper)
+# =============================================================================
+
+
+async def test_is_device_operational_public_wrapper_forwards_call():
+    """
+    Public wrapper must invoke the internal DNS-SD helper with the same arguments
+    (including discovery_timeout_sec) so matter_asserts and other callers stay aligned.
+    """
+    from matter.testing import commissioning
+
+    mock_controller = MockDeviceController()
+    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_internal:
+        mock_internal.return_value = True
+        result = await commissioning.is_device_operational_on_fabric_dnssd(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=7.5
+        )
+        if not result:
+            return "Expected True from wrapper when internal check returns True"
+        mock_internal.assert_called_once_with(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=7.5
+        )
+    return None
+
+
+# =============================================================================
 # TEST RUNNER
 # =============================================================================
 
@@ -874,7 +905,8 @@ def main():
         # Category D: get_commissioned_fabric_count() Tests
         ("D1. get_fabric_count: SCENARIO 2 - operational", test_get_fabric_count_scenario2_operational),
         ("D2. get_fabric_count: SCENARIO 1 - factory fresh", test_get_fabric_count_scenario1_factory_fresh),
-        ("D3. get_fabric_count: not operational, no credentials", test_get_fabric_count_not_operational_no_commissioning_params),
+        ("D3. get_fabric_count: not operational, ReadAttribute without session",
+         test_get_fabric_count_not_operational_no_commissioning_params),
 
         # Category E: CustomCommissioningParameters
         ("E1. CustomCommissioningParameters: setup_code only", test_commissioning_credentials_setup_code_only),
@@ -883,6 +915,10 @@ def main():
         ("E4. CustomCommissioningParameters: SDK manual when no QR", test_commissioning_credentials_sdk_manual_when_no_qr),
         ("E5. CustomCommissioningParameters: SDK pin + random discriminator",
          test_commissioning_credentials_sdk_pin_with_random_discriminator),
+
+        # Category F: public DNS-SD operational wrapper
+        ("F1. is_device_operational_on_fabric_dnssd forwards to internal helper",
+         test_is_device_operational_public_wrapper_forwards_call),
     ]
 
     print("\n" + "=" * 70)

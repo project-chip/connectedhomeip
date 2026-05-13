@@ -378,7 +378,8 @@ async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,
     description: str = "Device",
-    commissioning_params: Optional[CustomCommissioningParameters] = None
+    commissioning_params: Optional[CustomCommissioningParameters] = None,
+    discovery_timeout_sec: Optional[float] = None,
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -395,9 +396,14 @@ async def assert_factory_fresh(
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
-        commissioning_params: Optional :class:`CustomCommissioningParameters` for the parallel PASE path
-            when DNS-SD does not see the device on this fabric. Same contract as
-            :func:`matter.testing.commissioning.get_commissioned_fabric_count`.
+        commissioning_params: Optional :class:`CustomCommissioningParameters`. When the device
+            is not operational on this fabric via DNS-SD, a session is established with
+            :func:`matter.testing.commissioning.establish_pase_or_case_session` before reading
+            fabric count. When DNS-SD already shows the device operational, no extra session
+            setup is performed.
+        discovery_timeout_sec: Optional DNS-SD timeout (seconds) passed to operational discovery
+            and :func:`matter.testing.commissioning.get_commissioned_fabric_count`; defaults to
+            the infrastructure default when omitted.
 
     Raises:
         AssertionError: If device has any commissioned fabrics
@@ -416,9 +422,26 @@ async def assert_factory_fresh(
     # Import here (not at module level) to avoid pulling in commissioning.py's heavy
     # dependencies (matter.clusters, ChipDeviceCtrl, mdns_discovery) which would cause
     # ModuleNotFoundError in Pigweed-isolated unit tests (test_matter_asserts).
-    from matter.testing.commissioning import get_commissioned_fabric_count
+    from matter.testing.commissioning import (
+        DNSSD_DISCOVERY_TIMEOUT_SEC,
+        establish_pase_or_case_session,
+        get_commissioned_fabric_count,
+        is_device_operational_on_fabric_dnssd,
+    )
 
-    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, commissioning_params=commissioning_params)
+    timeout = DNSSD_DISCOVERY_TIMEOUT_SEC if discovery_timeout_sec is None else discovery_timeout_sec
+
+    if commissioning_params is None:
+        if not await is_device_operational_on_fabric_dnssd(dev_ctrl, node_id, discovery_timeout_sec=timeout):
+            raise ValueError(
+                f"Device {node_id} is not operational on this fabric and no CustomCommissioningParameters "
+                "(pairing or commissioning-window data) were provided. "
+                "Cannot read fabric count without risking long connection timeout."
+            )
+    elif not await is_device_operational_on_fabric_dnssd(dev_ctrl, node_id, discovery_timeout_sec=timeout):
+        await establish_pase_or_case_session(dev_ctrl, node_id, commissioning_params)
+
+    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, discovery_timeout_sec=timeout)
     asserts.assert_equal(
         fabric_count,
         0,
@@ -433,7 +456,8 @@ async def assert_fabric_count(
     node_id: int,
     expected_count: int,
     description: str = "Device",
-    commissioning_params: Optional[CustomCommissioningParameters] = None
+    commissioning_params: Optional[CustomCommissioningParameters] = None,
+    discovery_timeout_sec: Optional[float] = None,
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.
@@ -452,8 +476,13 @@ async def assert_fabric_count(
         node_id: Node ID of the device to check
         expected_count: Expected number of commissioned fabrics
         description: User-defined description for error messages (default: "Device")
-        commissioning_params: Optional :class:`CustomCommissioningParameters`; same contract as
-            :func:`matter.testing.commissioning.get_commissioned_fabric_count`.
+        commissioning_params: Optional :class:`CustomCommissioningParameters`. When the device
+            is not operational on this fabric via DNS-SD, a session is established with
+            :func:`matter.testing.commissioning.establish_pase_or_case_session` before reading
+            fabric count. When DNS-SD already shows the device operational, no extra session
+            setup is performed.
+        discovery_timeout_sec: Optional DNS-SD timeout (seconds); same as
+            :func:`assert_factory_fresh`.
 
     Raises:
         AssertionError: If actual fabric count doesn't match expected count
@@ -472,9 +501,26 @@ async def assert_fabric_count(
     # Import here (not at module level) to avoid pulling in commissioning.py's heavy
     # dependencies (matter.clusters, ChipDeviceCtrl, mdns_discovery) which would cause
     # ModuleNotFoundError in Pigweed-isolated unit tests (test_matter_asserts).
-    from matter.testing.commissioning import get_commissioned_fabric_count
+    from matter.testing.commissioning import (
+        DNSSD_DISCOVERY_TIMEOUT_SEC,
+        establish_pase_or_case_session,
+        get_commissioned_fabric_count,
+        is_device_operational_on_fabric_dnssd,
+    )
 
-    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, commissioning_params=commissioning_params)
+    timeout = DNSSD_DISCOVERY_TIMEOUT_SEC if discovery_timeout_sec is None else discovery_timeout_sec
+
+    if commissioning_params is None:
+        if not await is_device_operational_on_fabric_dnssd(dev_ctrl, node_id, discovery_timeout_sec=timeout):
+            raise ValueError(
+                f"Device {node_id} is not operational on this fabric and no CustomCommissioningParameters "
+                "(pairing or commissioning-window data) were provided. "
+                "Cannot read fabric count without risking long connection timeout."
+            )
+    elif not await is_device_operational_on_fabric_dnssd(dev_ctrl, node_id, discovery_timeout_sec=timeout):
+        await establish_pase_or_case_session(dev_ctrl, node_id, commissioning_params)
+
+    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, discovery_timeout_sec=timeout)
     asserts.assert_equal(
         actual_count,
         expected_count,
