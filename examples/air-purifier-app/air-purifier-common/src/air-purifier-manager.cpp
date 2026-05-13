@@ -151,31 +151,24 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
 void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
-    if (!mHandlingFanDriveDelegate)
+    if (mOnOffClusterOn)
     {
-        mHandlingFanDriveDelegate = true;
+        FanModeWriteCallback(newState.mode);
 
-        if (mOnOffClusterOn)
+        if (!newState.percentSetting.IsNull())
         {
-            FanModeWriteCallback(newState.mode);
-
-            if (!newState.percentSetting.IsNull())
-            {
-                PercentSettingWriteCallback(newState.percentSetting.Value());
-            }
-
-            FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpointId);
-            if (cluster != nullptr && cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-            {
-                DataModel::Nullable<uint8_t> speed = cluster->GetSpeedSetting();
-                if (!speed.IsNull())
-                {
-                    SpeedSettingWriteCallback(speed.Value());
-                }
-            }
+            PercentSettingWriteCallback(newState.percentSetting.Value());
         }
 
-        mHandlingFanDriveDelegate = false;
+        FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+        if (cluster != nullptr && cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+        {
+            DataModel::Nullable<uint8_t> speed = cluster->GetSpeedSetting();
+            if (!speed.IsNull())
+            {
+                SpeedSettingWriteCallback(speed.Value());
+            }
+        }
     }
 
     ClampFanDriveCurrentWhenOff();

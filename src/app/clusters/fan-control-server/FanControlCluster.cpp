@@ -212,18 +212,20 @@ void FanControlCluster::ApplyPercentSettingChanged()
         return;
     }
 
-    FanModeEnum newMode = ComputeFanModeFromPercent(mPercentSetting.Value(), mFanModeSequence);
-    if (SetAttributeValue(mFanMode, newMode, FanMode::Id))
-    {
-        StoreFanModePersistence();
-    }
-
+    // Apply MultiSpeed before FanMode so delegates that react to FanMode (and read SpeedSetting)
+    // observe a consistent pair; otherwise SpeedSetting can still be stale from the prior mode.
     if (SupportsMultiSpeed())
     {
         uint16_t percent     = mPercentSetting.Value();
         uint8_t speedSetting = static_cast<uint8_t>((mSpeedMax * percent + 99) / 100);
         SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(speedSetting), SpeedSetting::Id);
         SetAttributeValue(mSpeedCurrent, speedSetting, SpeedCurrent::Id);
+    }
+
+    FanModeEnum newMode = ComputeFanModeFromPercent(mPercentSetting.Value(), mFanModeSequence);
+    if (SetAttributeValue(mFanMode, newMode, FanMode::Id))
+    {
+        StoreFanModePersistence();
     }
 
     SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
@@ -446,7 +448,10 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         }
     }
 
-    SetAttributeValue(mFanMode, newMode, FanMode::Id);
+    if (!SetAttributeValue(mFanMode, newMode, FanMode::Id))
+    {
+        return Status::Success;
+    }
 
     ApplyFanModeSideEffects(newMode);
 
@@ -473,7 +478,11 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mPercentSetting, value, PercentSetting::Id);
+    if (!SetAttributeValue(mPercentSetting, value, PercentSetting::Id))
+    {
+        return Status::Success;
+    }
+
     ApplyPercentSettingChanged();
     NotifyDelegateFanDriveState();
     return Status::Success;
@@ -496,7 +505,11 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mSpeedSetting, value, SpeedSetting::Id);
+    if (!SetAttributeValue(mSpeedSetting, value, SpeedSetting::Id))
+    {
+        return Status::Success;
+    }
+
     ApplySpeedSettingChanged();
     NotifyDelegateFanDriveState();
     return Status::Success;

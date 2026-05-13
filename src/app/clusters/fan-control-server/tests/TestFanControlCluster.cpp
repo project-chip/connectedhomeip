@@ -747,6 +747,46 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSetting_NotifiesDelegate)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestFanControlDelegateCallbacks, WritePercentSettingSameValue_DoesNotNotifyDelegateAgain)
+{
+    TestServerClusterContext testContext;
+    NotifyingFanControlDelegate delegate(kTestEndpointId);
+    FanControlCluster cluster(
+        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+    DataModel::Nullable<chip::Percent> percentSetting;
+    percentSetting.SetNonNull(40);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
+
+    delegate.mFanDriveStateNotifyCount = 0;
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestFanControlDelegateCallbacks, WriteFanModeSameValue_DoesNotNotifyDelegateAgain)
+{
+    TestServerClusterContext testContext;
+    NotifyingFanControlDelegate delegate(kTestEndpointId);
+    FanControlCluster cluster(
+        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    delegate.mFanDriveStateNotifyCount = 0;
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kLow), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
+
+    delegate.mFanDriveStateNotifyCount = 0;
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kLow), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestFanControlDelegateCallbacks, WritePercentSettingToZero_NotifiesFanDriveStateOnce)
 {
     TestServerClusterContext testContext;
