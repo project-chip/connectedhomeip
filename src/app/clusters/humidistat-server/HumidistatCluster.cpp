@@ -85,8 +85,7 @@ void HumidistatCluster::LoadPersistentAttributes()
     }
     if (!IsModeSupported(mMode))
     {
-        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported Mode value %u, forcing Off",
-                      static_cast<unsigned>(mMode));
+        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported Mode value %u, forcing Off", static_cast<unsigned>(mMode));
         mMode = ModeEnum::kOff;
     }
 
@@ -98,8 +97,7 @@ void HumidistatCluster::LoadPersistentAttributes()
     }
     if (!IsSystemStateSupported(mSystemState))
     {
-        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported SystemState value %u, forcing Off",
-                      static_cast<unsigned>(mSystemState));
+        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported SystemState value %u, forcing Off", static_cast<unsigned>(mSystemState));
         mSystemState = SystemStateEnum::kOff;
     }
 
@@ -272,8 +270,7 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
 {
     VerifyOrReturnError(IsModeSupported(mode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    const bool shouldClearMistType =
-        mFeatures.Has(Feature::kHumidifier) && (mode != ModeEnum::kHumidifier) && mMistType.HasAny();
+    const bool shouldClearMistType = mFeatures.Has(Feature::kHumidifier) && (mode != ModeEnum::kHumidifier) && mMistType.HasAny();
 
     if (SetAttributeValue(mMode, mode, Mode::Id))
     {

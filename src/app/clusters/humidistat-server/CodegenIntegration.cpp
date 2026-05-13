@@ -52,8 +52,7 @@ public:
         VerifyOrDie(!features.Has(Feature::kOptimal) || features.Has(Feature::kSensor));
         VerifyOrDie(!features.HasAny(Feature::kColdMist, Feature::kWarmMist) || features.Has(Feature::kHumidifier));
         VerifyOrDie(!features.Has(Feature::kAuto) ||
-                    (features.Has(Feature::kHumidifier) && features.Has(Feature::kDehumidifier) &&
-                     features.Has(Feature::kSensor)));
+                    (features.Has(Feature::kHumidifier) && features.Has(Feature::kDehumidifier) && features.Has(Feature::kSensor)));
 
         HumidistatCluster::OptionalAttributeSet optionalAttributes(optionalAttributeBits);
 
