@@ -97,8 +97,8 @@ class ReentrantFanDriveDelegate : public FanControl::Delegate
 {
 public:
     FanControlCluster * mCluster  = nullptr;
-    int mFanDriveStateNotifyCount   = 0;
-    bool mDidNestedPercentWrite    = false;
+    int mFanDriveStateNotifyCount = 0;
+    bool mDidNestedPercentWrite   = false;
 
     ReentrantFanDriveDelegate(EndpointId endpoint) : Delegate(endpoint) {}
 
