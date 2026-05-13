@@ -34,7 +34,7 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
-class MockDelegate : public Delegate
+class MockDelegate : public ThreadBorderRouterManagementDelegate
 {
 public:
     bool mPanChangeSupported = true;
@@ -62,7 +62,12 @@ public:
     }
     void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
                           ActivateDatasetCallback * callback) override
-    {}
+    {
+        if (callback != nullptr)
+        {
+            callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
+        }
+    }
     CHIP_ERROR CommitActiveDataset() override
     {
         mCommitCalled = true;

@@ -30,11 +30,13 @@ namespace ThreadBorderRouterManagement {
 constexpr size_t kBorderRouterNameMaxLength = 63;
 constexpr size_t kBorderAgentIdLength       = 16;
 
-class Delegate
+} // namespace ThreadBorderRouterManagement
+
+class ThreadBorderRouterManagementDelegate
 {
 public:
-    Delegate()          = default;
-    virtual ~Delegate() = default;
+    ThreadBorderRouterManagementDelegate()          = default;
+    virtual ~ThreadBorderRouterManagementDelegate() = default;
 
     class ActivateDatasetCallback
     {
@@ -109,7 +111,6 @@ public:
     virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;
 };
 
-} // namespace ThreadBorderRouterManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

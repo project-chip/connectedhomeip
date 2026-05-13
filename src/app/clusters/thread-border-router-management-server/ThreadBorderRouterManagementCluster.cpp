@@ -63,7 +63,7 @@ DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute
     case ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id: {
         uint64_t timestamp = 0;
         Thread::OperationalDataset dataset;
-        if ((mDelegate.GetDataset(dataset, Delegate::DatasetType::kActive) == CHIP_NO_ERROR) &&
+        if ((mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kActive) == CHIP_NO_ERROR) &&
             (dataset.GetActiveTimestamp(timestamp) == CHIP_NO_ERROR))
         {
             return encoder.Encode(DataModel::Nullable<uint64_t>(timestamp));
@@ -73,7 +73,7 @@ DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute
     case ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id: {
         uint64_t timestamp = 0;
         Thread::OperationalDataset dataset;
-        if ((mDelegate.GetDataset(dataset, Delegate::DatasetType::kPending) == CHIP_NO_ERROR) &&
+        if ((mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kPending) == CHIP_NO_ERROR) &&
             (dataset.GetActiveTimestamp(timestamp) == CHIP_NO_ERROR))
         {
             return encoder.Encode(DataModel::Nullable<uint64_t>(timestamp));
@@ -140,7 +140,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         }
 
         Thread::OperationalDataset dataset;
-        CHIP_ERROR err = mDelegate.GetDataset(dataset, Delegate::DatasetType::kActive);
+        CHIP_ERROR err = mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kActive);
         if (err == CHIP_ERROR_NOT_FOUND)
         {
             CHIP_ERROR initErr = dataset.Init(ByteSpan());
@@ -167,7 +167,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         }
 
         Thread::OperationalDataset dataset;
-        CHIP_ERROR err = mDelegate.GetDataset(dataset, Delegate::DatasetType::kPending);
+        CHIP_ERROR err = mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kPending);
         if (err == CHIP_ERROR_NOT_FOUND)
         {
             CHIP_ERROR initErr = dataset.Init(ByteSpan());
@@ -206,7 +206,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
         Thread::OperationalDataset currentActiveDataset;
         uint64_t currentActiveDatasetTimestamp = 0;
-        if ((mDelegate.GetDataset(currentActiveDataset, Delegate::DatasetType::kActive) == CHIP_NO_ERROR) &&
+        if ((mDelegate.GetDataset(currentActiveDataset, ThreadBorderRouterManagementDelegate::DatasetType::kActive) == CHIP_NO_ERROR) &&
             (currentActiveDataset.GetActiveTimestamp(currentActiveDatasetTimestamp) == CHIP_NO_ERROR))
         {
             return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidInState));

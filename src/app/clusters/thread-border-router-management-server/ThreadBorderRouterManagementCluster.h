@@ -26,13 +26,13 @@
 namespace chip::app::Clusters {
 
 class ThreadBorderRouterManagementCluster : public DefaultServerCluster,
-                                            public ThreadBorderRouterManagement::Delegate::ActivateDatasetCallback
+                                            public ThreadBorderRouterManagementDelegate::ActivateDatasetCallback
 {
 public:
     class Config
     {
     public:
-        Config(ThreadBorderRouterManagement::Delegate & delegate, FailSafeContext & failSafeContext,
+        Config(ThreadBorderRouterManagementDelegate & delegate, FailSafeContext & failSafeContext,
                BreadCrumbTracker & breadcrumbTracker) :
             mDelegate(delegate),
             mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker)
@@ -40,7 +40,7 @@ public:
 
     private:
         friend class ThreadBorderRouterManagementCluster;
-        ThreadBorderRouterManagement::Delegate & mDelegate;
+        ThreadBorderRouterManagementDelegate & mDelegate;
         FailSafeContext & mFailSafeContext;
         BreadCrumbTracker & mBreadcrumbTracker;
     };
@@ -64,14 +64,14 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & payload,
                                                                CommandHandler * ctx) override;
 
-    // ThreadBorderRouterManagement::Delegate::ActivateDatasetCallback
+    // ThreadBorderRouterManagementDelegate::ActivateDatasetCallback
     void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
 
     // Platform event handler
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 protected:
-    ThreadBorderRouterManagement::Delegate & mDelegate;
+    ThreadBorderRouterManagementDelegate & mDelegate;
     FailSafeContext & mFailSafeContext;
     BreadCrumbTracker & mBreadcrumbTracker;
     CommandHandler::Handle mAsyncCommandHandle;

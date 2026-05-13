@@ -17,3 +17,15 @@
 
 #pragma once
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ThreadBorderRouterManagement {
+
+using Delegate = chip::app::Clusters::ThreadBorderRouterManagementDelegate;
+
+} // namespace ThreadBorderRouterManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
