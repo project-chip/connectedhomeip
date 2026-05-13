@@ -51,8 +51,13 @@ void FanControlCluster::NotifyDelegateFanDriveState()
     {
         return;
     }
+    VerifyOrReturn(!mTemporarilyIgnoreFanDriveDelegateCallbacks);
+
+    // Prevent potential callback loops
+    mTemporarilyIgnoreFanDriveDelegateCallbacks = true;
     const FanDriveState state{ mFanMode, mPercentSetting, mPercentCurrent, mSpeedSetting, mSpeedCurrent };
     mDelegate->OnFanDriveStateChanged(state);
+    mTemporarilyIgnoreFanDriveDelegateCallbacks = false;
 }
 
 CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)

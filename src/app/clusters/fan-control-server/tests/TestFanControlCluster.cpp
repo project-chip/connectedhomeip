@@ -92,6 +92,34 @@ public:
     }
 };
 
+/// Exercises synchronous re-entry into the cluster from OnFanDriveStateChanged (nested notify must be suppressed).
+class ReentrantFanDriveDelegate : public FanControl::Delegate
+{
+public:
+    FanControlCluster * mCluster  = nullptr;
+    int mFanDriveStateNotifyCount   = 0;
+    bool mDidNestedPercentWrite    = false;
+
+    ReentrantFanDriveDelegate(EndpointId endpoint) : Delegate(endpoint) {}
+
+    Protocols::InteractionModel::Status HandleStep(StepDirectionEnum, bool, bool) override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    void OnFanDriveStateChanged(const FanDriveState &) override
+    {
+        mFanDriveStateNotifyCount++;
+        if (mCluster != nullptr && !mDidNestedPercentWrite)
+        {
+            mDidNestedPercentWrite = true;
+            DataModel::Nullable<chip::Percent> percentSetting;
+            percentSetting.SetNonNull(50);
+            EXPECT_TRUE(mCluster->SetPercentSetting(percentSetting).IsSuccess());
+        }
+    }
+};
+
 FanControlCluster::Config MakeTestConfig()
 {
     return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
@@ -743,6 +771,27 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSetting_NotifiesDelegate)
     percentSetting.SetNonNull(40);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestFanControlDelegateCallbacks, NestedSetPercentFromDelegate_SuppressesNestedFanDriveNotify)
+{
+    TestServerClusterContext testContext;
+    ReentrantFanDriveDelegate delegate(kTestEndpointId);
+    FanControlCluster cluster(
+        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+    delegate.mCluster = &cluster;
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    DataModel::Nullable<chip::Percent> percentSetting;
+    percentSetting.SetNonNull(40);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
+
+    EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
+    ASSERT_FALSE(cluster.GetPercentSetting().IsNull());
+    EXPECT_EQ(cluster.GetPercentSetting().Value(), static_cast<chip::Percent>(50));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

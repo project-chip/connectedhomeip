@@ -172,6 +172,10 @@ private:
 
     void NotifyDelegateFanDriveState();
 
+    // Used to ignore/prevent reentrance of OnFanDriveStateChanged when notifying the delegate while nested cluster updates
+    // run synchronously from that callback (SetPercentSetting / SetFanMode / SetSpeedSetting).
+    bool mTemporarilyIgnoreFanDriveDelegateCallbacks = false;
+
     // Attributes
     FanControl::FanModeEnum mFanMode = FanControl::FanModeEnum::kOff;
     FanControl::FanModeSequenceEnum mFanModeSequence;
