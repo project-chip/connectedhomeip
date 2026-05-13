@@ -59,11 +59,17 @@ def format_cluster_label(clusterName: str, single_line_max: int = 22) -> str:
     return " ".join(words[:split]) + r"\n" + " ".join(words[split:])
 
 
-def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
+def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef, kind):
+    # A cluster can appear in both ServerList and ClientList on the same endpoint
+    # (e.g. an On/Off Light that also binds to OnOff on another endpoint). Include
+    # the kind in the node id so the two declarations don't collide and overwrite
+    # each other in graphviz.
+    nodeId = f"ep{endpoint}_{kind}_{clusterName}"
     label = format_cluster_label(clusterName)
-    graphSection.node(f"ep{endpoint}_{clusterName}", label=label, style="filled,rounded",
+    graphSection.node(nodeId, label=label, style="filled,rounded",
                       color=color, shape="box", fixedsize="true", width="3.5", height="0.7")
-    graphSection.edge(nodeRef, f"ep{endpoint}_{clusterName}", style="invis")
+    graphSection.edge(nodeRef, nodeId, style="invis")
+    return nodeId
 
 
 def tag_str(tag: Clusters.Objects.Globals.Structs.SemanticTagStruct,
@@ -127,8 +133,12 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_
     nextNodeRef = ""
     nodeRef = f"ep{endpoint}"
     clusterColumnCount = 0
+    lastNodeId = nodeRef
 
-    for clusterId in wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList]:
+    serverList = wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList]
+    clientList = wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ClientList]
+
+    for clusterId in serverList:
         clusterColumnCount += 1
 
         try:
@@ -136,16 +146,23 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_
         except KeyError:
             clusterName = f"MEI 0x{clusterId:08X}"
 
-        AddServerOrClientNode(graphSection, endpoint, clusterName, "olivedrab", nodeRef)
+        lastNodeId = AddServerOrClientNode(graphSection, endpoint, clusterName, "olivedrab", nodeRef, "srv")
 
         if clusterColumnCount == 2:
-            nextNodeRef = f"ep{endpoint}_{clusterName}"
+            nextNodeRef = lastNodeId
         elif clusterColumnCount == 3:
             nodeRef = nextNodeRef
             clusterColumnCount = 0
             numberOfRowsInEndpoint += 1
 
-    for clusterId in wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ClientList]:
+    # Force a new row before client clusters so the green server block and the orange
+    # client block don't share a row.
+    if serverList and clientList and clusterColumnCount != 0:
+        nodeRef = lastNodeId
+        clusterColumnCount = 0
+        numberOfRowsInEndpoint += 1
+
+    for clusterId in clientList:
         clusterColumnCount += 1
 
         try:
@@ -153,10 +170,10 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse, device_
         except KeyError:
             clusterName = f"MEI 0x{clusterId:08X}"
 
-        AddServerOrClientNode(graphSection, endpoint, clusterName, "orange", nodeRef)
+        lastNodeId = AddServerOrClientNode(graphSection, endpoint, clusterName, "orange", nodeRef, "cli")
 
         if clusterColumnCount == 2:
-            nextNodeRef = f"ep{endpoint}_{clusterName}"
+            nextNodeRef = lastNodeId
         elif clusterColumnCount == 3:
             nodeRef = nextNodeRef
             clusterColumnCount = 0
