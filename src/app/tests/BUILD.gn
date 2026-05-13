@@ -119,8 +119,6 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-
-
 source_set("ecosystem-information-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.cpp",
