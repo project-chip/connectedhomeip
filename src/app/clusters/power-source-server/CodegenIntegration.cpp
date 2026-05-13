@@ -334,12 +334,9 @@ public:
                 VerifyOrReturnValue(wiredServer->IsConstructed(), nullptr);
                 return &wiredServer->Cluster();
             }
-            else
-            {
-                auto * batteryServer = std::get_if<LazyRegisteredBatterySourceClusterT>(&gServer);
-                VerifyOrReturnValue(batteryServer->IsConstructed(), nullptr);
-                return &batteryServer->Cluster();
-            }
+            auto * batteryServer = std::get_if<LazyRegisteredBatterySourceClusterT>(&gServer);
+            VerifyOrReturnValue(batteryServer->IsConstructed(), nullptr);
+            return &batteryServer->Cluster();
         }
         else
         {
