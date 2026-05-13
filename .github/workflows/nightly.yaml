@@ -17,12 +17,12 @@ on:
     schedule:
       - cron: '0 0 * * *'
 # --- TEST SECTION: Uncomment below to test on PRs ---
-    push:
-        branches:
-            - master
-            - 'v*-branch'
-    pull_request:
-    merge_group:
+    # push:
+    #     branches:
+    #         - master
+    #         - 'v*-branch'
+    # pull_request:
+    # merge_group:
 # --- END TEST SECTION ---
     workflow_dispatch:
         inputs:
@@ -333,7 +333,7 @@ jobs:
                     "./scripts/build/build_examples.py --target linux-x64-tests-mbedtls-asan-clang build" \
                     && rm -rf out/linux-x64-tests-mbedtls-asan-clang
             # TODO #71721: Add PSA Crypto backend once we can build it on Linux
-            # OpenSSL is the default backend and already runs in regular CI, Therefore it was not added to this job
+            # OpenSSL is the default backend and already runs in regular CI. Therefore it was not added to this job
 
     nightly_repl_tests_report:
         name: Nightly REPL Tests - Test Report
