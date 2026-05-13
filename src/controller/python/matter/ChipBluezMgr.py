@@ -83,8 +83,8 @@ def get_bluez_objects(bluez, bus, interface, prefix_path):
             continue
         if item[0].startswith(prefix_path):
             results.append({
-              "object": bus.get_object(BLUEZ_NAME, item[0]),
-              "path": item[0]
+                "object": bus.get_object(BLUEZ_NAME, item[0]),
+                "path": item[0]
             })
     return results
 
