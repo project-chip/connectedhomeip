@@ -57,14 +57,15 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0301" name="Thermostat" revision="6">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0301" name="Thermostat" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation, added Clusters required for Matter support, restricted legacy elements to Zigbee only"/>
     <revision revision="3" summary="Addition of Energy Preference cluster and updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
     <revision revision="4" summary="Remove Time Synchronization cluster, Scenes Management and Zigbee only clusters, remove provisional marking from Energy Preference cluster"/>
     <revision revision="5" summary="Moved disallowed element conformance to Thermostat cluster."/>
-    <revision revision="6" summary="Added Groupcast condition requirement."/>
+    <revision revision="6" summary="Added Ambient Context Sensing client cluster."/>
+    <revision revision="7" summary="Added Groupcast condition requirement."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditionRequirements>
@@ -108,6 +109,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0406" name="Occupancy Sensing" side="client">
       <optionalConform/>
+    </cluster>
+    <cluster id="0x0431" name="Ambient Context Sensing" side="client">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>

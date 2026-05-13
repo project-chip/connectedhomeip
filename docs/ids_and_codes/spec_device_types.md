@@ -68,7 +68,7 @@ The following markers are used in this document (matches the ID master list):
 |269           |0x010D    |Extended Color Light          |C  |C  |C  |C  |C  |C    |C          |C  |C              |C  |
 |271           |0x010F    |Mounted On/Off Control        |   |   |   |   |C  |C    |C          |C  |C              |C  |
 |272           |0x0110    |Mounted Dimmable Load Control |   |   |   |   |C  |C    |C          |C  |C              |C  |
-|304           |0x0130    |Joint Fabric Administrator    |   |   |   |   |P  |P    |P          |P  |P              |P  |
+|304           |0x0130    |Joint Fabric Administrator    |   |   |   |   |P  |P    |P          |P  |P              |C  |
 |320           |0x0140    |Intercom                      |   |   |   |   |   |     |           |C  |C              |C  |
 |321           |0x0141    |Audio Doorbell                |   |   |   |   |   |     |           |C  |C              |C  |
 |322           |0x0142    |Camera                        |   |   |   |   |   |     |           |C  |C              |C  |

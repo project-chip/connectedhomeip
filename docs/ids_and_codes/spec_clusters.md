@@ -120,11 +120,10 @@ The following markers are used in this document (matches the ID master list):
 |1070          |0x042E    |Total Volatile Organic Compounds Concentration Measurement|TVOCCONC       |   |   |C  |C  |C  |C    |C          |C  |C              |C  |
 |1071          |0x042F    |Radon Concentration Measurement                           |RNCONC         |   |   |C  |C  |C  |C    |C          |C  |C              |C  |
 |1072          |0x0430    |Soil Measurement                                          |SOIL           |   |   |   |   |   |     |           |C  |C              |C  |
-|1104          |0x0450    |Network Identity Management                               |NETIM          |   |   |   |   |   |     |           |   |               |P  |
+|1073          |0x0431    |Ambient Context Sensing                                   |ACS            |   |   |   |   |   |     |           |   |               |P  |
 |1105          |0x0451    |Wi-Fi Network Management                                  |WIFINM         |   |   |   |   |C  |C    |C          |C  |C              |C  |
 |1106          |0x0452    |Thread Border Router Management                           |TBRM           |   |   |   |   |C  |C    |C          |C  |C              |C  |
 |1107          |0x0453    |Thread Network Directory                                  |THNETDIR       |   |   |   |   |C  |C    |C          |C  |C              |C  |
-|1108          |0x0454    |Thread Border Router Diagnostics                          |TBRD           |   |   |   |   |   |     |           |   |               |P  |
 |1283          |0x0503    |Wake On LAN                                               |WAKEONLAN      |C  |C  |C  |C  |C  |C    |C          |C  |C              |C  |
 |1284          |0x0504    |Channel                                                   |CHANNEL        |C  |C  |C  |C  |C  |C    |C          |C  |C              |C  |
 |1285          |0x0505    |Target Navigator                                          |TGTNAV         |C  |C  |C  |C  |C  |C    |C          |C  |C              |C  |
@@ -149,8 +148,8 @@ The following markers are used in this document (matches the ID master list):
 |1792          |0x0700    |Commodity Tariff                                          |SETRF          |   |   |   |   |   |     |           |C  |C              |C  |
 |1872          |0x0750    |Ecosystem Information                                     |ECOINFO        |   |   |   |   |C  |C    |C          |C  |C              |C  |
 |1873          |0x0751    |Commissioner Control                                      |CCTRL          |   |   |   |   |C  |C    |C          |C  |C              |C  |
-|1874          |0x0752    |Joint Fabric Datastore                                    |JFDS           |   |   |   |   |P  |P    |P          |P  |P              |P  |
-|1875          |0x0753    |Joint Fabric Administrator                                |JFADMIN        |   |   |   |   |P  |P    |P          |P  |P              |P  |
+|1874          |0x0752    |Joint Fabric Datastore                                    |JFDS           |   |   |   |   |P  |P    |P          |P  |P              |C  |
+|1875          |0x0753    |Joint Fabric Administrator                                |JFPKI          |   |   |   |   |P  |P    |P          |P  |P              |C  |
 |2049          |0x0801    |TLS Certificate Management                                |TLSCERT        |   |   |   |   |   |     |           |C  |C              |C  |
 |2050          |0x0802    |TLS Client Management                                     |TLSCLIENT      |   |   |   |   |   |     |           |C  |C              |C  |
 |2822          |0x0B06    |Meter Identification                                      |MTRID          |   |   |   |   |   |     |           |C  |C              |C  |
