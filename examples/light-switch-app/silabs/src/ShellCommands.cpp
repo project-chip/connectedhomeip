@@ -24,12 +24,23 @@
 #include <app/clusters/bindings/BindingManager.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LevelControl;
+
+namespace {
+void BindingWorkerFunction(intptr_t context)
+{
+    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
+    auto * entry = reinterpret_cast<Binding::TableEntry *>(context);
+    TEMPORARY_RETURN_IGNORED AddBindingEntry(*entry);
+    Platform::Delete(entry);
+}
+} // namespace
 
 namespace LightSwitchCommands {
 
@@ -147,7 +158,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::BindingWorkerFunction,
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction,
                                                                      reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }
@@ -158,7 +169,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::BindingWorkerFunction,
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction,
                                                                      reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }

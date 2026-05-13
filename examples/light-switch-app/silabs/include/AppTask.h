@@ -29,6 +29,7 @@
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
+#include <app/ConcreteAttributePath.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/clusters/bindings/BindingManager.h>
@@ -105,35 +106,6 @@ public:
     AppTask() = default;
 
     static AppTask & GetAppTask() { return sAppTask; }
-
-    struct Timer
-    {
-        typedef void (*Callback)(Timer & timer);
-
-        Timer(uint32_t timeoutInMs, Callback callback, void * context);
-        ~Timer();
-
-        void Start();
-        void Stop();
-        void Timeout();
-
-        Callback mCallback = nullptr;
-        void * mContext    = nullptr;
-        bool mIsActive     = false;
-
-        osTimerId_t mHandler = nullptr;
-
-    private:
-        static void TimerCallback(void * timerCbArg);
-    };
-
-    enum class LightSwitchAction : uint8_t
-    {
-        Toggle,
-        On,
-        Off
-    };
-
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
@@ -144,79 +116,35 @@ public:
 
     CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
 
-    void GenericSwitchOnInitialPress();
-
-    void GenericSwitchOnShortRelease();
-
-    void TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand = false);
-
-    void TriggerLevelControlAction(chip::app::Clusters::LevelControl::StepModeEnum stepMode, bool isGroupCommand = false);
-
-    chip::app::Clusters::LevelControl::StepModeEnum getStepMode();
-
-    void changeStepMode();
-
-    void SwitchActionEventHandler(uint16_t eventType);
-
-    CHIP_ERROR InitBindingHandler();
+    static void InitBindingHandler(intptr_t arg);
 
     static void SwitchWorkerFunction(intptr_t context);
 
-    static void BindingWorkerFunction(intptr_t context);
+    static void GenericSwitchWorkerFunction(intptr_t context);
 
     static void PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                             uint8_t * value);
 
-    static void OnOffClusterInitCallback(chip::EndpointId endpoint);
+    static void ProcessOnOffBindingCommand(chip::CommandId commandId,
+                                           const chip::app::Clusters::Binding::TableEntry & binding,
+                                           chip::OperationalDeviceProxy * peer_device);
+
+    static void ProcessLevelControlBindingCommand(BindingCommandData * data,
+                                                  const chip::app::Clusters::Binding::TableEntry & binding,
+                                                  chip::OperationalDeviceProxy * peer_device);
+
+protected:
+    CHIP_ERROR AppInit() override;
 
 private:
     static AppTask sAppTask;
-    Timer * longPressTimer = nullptr;
-    static bool functionButtonPressed;  // True when button0 is pressed, used to trigger factory reset
-    static bool actionButtonPressed;    // True when button1 is pressed, used to initiate toggle or level-up/down
-    static bool actionButtonSuppressed; // True when both button0 and button1 are pressed, used to switch step direction
-    static bool isButtonEventTriggered; // True when button0 press event is posted to BaseApplication
 
-    /**
-     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
-     *
-     * @return CHIP_ERROR
-     */
-    CHIP_ERROR AppInit() override;
+    osTimerId_t longPressTimer = nullptr;
 
-    static void OnLongPressTimeout(Timer & timer);
-
-    /**
-     * @brief This function will be called when PB1 is
-     *        long-pressed to trigger the level-control action
-     */
-    void HandleLongPress();
-
-    chip::EndpointId mLightSwitchEndpoint                          = chip::kInvalidEndpointId;
-    chip::EndpointId mGenericSwitchEndpoint                        = chip::kInvalidEndpointId;
-    chip::app::Clusters::LevelControl::StepModeEnum mStepDirection = chip::app::Clusters::LevelControl::StepModeEnum::kUp;
-
-    static void GenericSwitchWorkerFunction(intptr_t context);
-
-    static void InitBindingHandlerInternal(intptr_t arg);
+    static void PostLevelControlActionEvent(void * context);
 
     static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
                                           chip::OperationalDeviceProxy * peer_device, void * context);
 
     static void LightSwitchContextReleaseHandler(void * context);
-
-    static void ProcessOnOffUnicastBindingCommand(chip::CommandId commandId,
-                                                  const chip::app::Clusters::Binding::TableEntry & binding,
-                                                  chip::Messaging::ExchangeManager * exchangeMgr,
-                                                  const chip::SessionHandle & sessionHandle);
-
-    static void ProcessOnOffGroupBindingCommand(chip::CommandId commandId,
-                                                const chip::app::Clusters::Binding::TableEntry & binding);
-
-    static void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data,
-                                                         const chip::app::Clusters::Binding::TableEntry & binding,
-                                                         chip::OperationalDeviceProxy * peer_device);
-
-    static void ProcessLevelControlGroupBindingCommand(BindingCommandData * data,
-                                                       const chip::app::Clusters::Binding::TableEntry & binding);
 };

@@ -81,16 +81,43 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 using namespace chip::TLV;
 
+namespace {
+
+using StepModeEnum = chip::app::Clusters::LevelControl::StepModeEnum;
+
+chip::EndpointId gLightSwitchEndpoint   = chip::kInvalidEndpointId;
+chip::EndpointId gGenericSwitchEndpoint = chip::kInvalidEndpointId;
+StepModeEnum gStepDirection             = StepModeEnum::kUp;
+
+bool sFunctionButtonPressed  = false;
+bool sActionButtonPressed    = false;
+bool sActionButtonSuppressed = false;
+bool sIsButtonEventTriggered = false;
+
+} // namespace
+
 /**********************************************************
  * AppTask Definitions
  *********************************************************/
 
 AppTask AppTask::sAppTask;
 
-bool AppTask::functionButtonPressed  = false;
-bool AppTask::actionButtonPressed    = false;
-bool AppTask::actionButtonSuppressed = false;
-bool AppTask::isButtonEventTriggered = false;
+void AppTask::PostLevelControlActionEvent(void * context)
+{
+    AppTask * app = static_cast<AppTask *>(context);
+    if (!app)
+    {
+        return;
+    }
+    AppEvent event;
+    event.Handler = AppTask::AppEventHandler;
+    if (sActionButtonPressed)
+    {
+        sActionButtonSuppressed = true;
+        event.Type              = AppEvent::kEventType_TriggerLevelControlAction;
+        app->PostEvent(&event);
+    }
+}
 
 CHIP_ERROR AppTask::AppInit()
 {
@@ -104,97 +131,14 @@ CHIP_ERROR AppTask::AppInit()
         appError(err);
     }
 
-    longPressTimer = new Timer(LONG_PRESS_TIMEOUT_MS, OnLongPressTimeout, this);
-
-    return err;
-}
-
-void AppTask::Timer::Start()
-{
-    osStatus_t status = osTimerStart(mHandler, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT_MS));
-    if (status != osOK)
-    {
-        SILABS_LOG("Timer start() failed with error code : %lx", status);
-        appError(APP_ERROR_START_TIMER_FAILED);
-    }
-
-    mIsActive = true;
-}
-
-void AppTask::Timer::Timeout()
-{
-    mIsActive = false;
-    if (mCallback)
-    {
-        mCallback(*this);
-    }
-}
-
-void AppTask::HandleLongPress()
-{
-    AppEvent event;
-    event.Handler = AppTask::AppEventHandler;
-
-    if (actionButtonPressed)
-    {
-        actionButtonSuppressed = true;
-        // Long press button up : Trigger Level Control Action
-        event.Type = AppEvent::kEventType_TriggerLevelControlAction;
-        AppTask::GetAppTask().PostEvent(&event);
-    }
-}
-
-void AppTask::OnLongPressTimeout(AppTask::Timer & timer)
-{
-    AppTask * app = static_cast<AppTask *>(timer.mContext);
-    if (app)
-    {
-        app->HandleLongPress();
-    }
-}
-
-AppTask::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * context) : mCallback(callback), mContext(context)
-{
-    mHandler = osTimerNew(TimerCallback, // timer callback handler
-                          osTimerOnce,   // no timer reload (one-shot timer)
-                          this,          // pass the app task obj context
-                          NULL           // No osTimerAttr_t to provide.
-    );
-
-    if (mHandler == NULL)
+    longPressTimer = osTimerNew(PostLevelControlActionEvent, osTimerOnce, this, NULL);
+    if (longPressTimer == NULL)
     {
         SILABS_LOG("Timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
-}
 
-AppTask::Timer::~Timer()
-{
-    if (mHandler)
-    {
-        osTimerDelete(mHandler);
-        mHandler = nullptr;
-    }
-}
-
-void AppTask::Timer::Stop()
-{
-    // Abort on osError (-1) as it indicates an unspecified failure with no clear recovery path.
-    if (osTimerStop(mHandler) == osError)
-    {
-        SILABS_LOG("Timer stop() failed");
-        appError(APP_ERROR_STOP_TIMER_FAILED);
-    }
-    mIsActive = false;
-}
-
-void AppTask::Timer::TimerCallback(void * timerCbArg)
-{
-    Timer * timer = reinterpret_cast<Timer *>(timerCbArg);
-    if (timer)
-    {
-        timer->Timeout();
-    }
+    return err;
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -242,7 +186,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         event.Type = (button ? AppEvent::kEventType_ActionButtonReleased : AppEvent::kEventType_FunctionButtonReleased);
     }
-    AppTask::GetAppTask().PostEvent(&event);
+    sAppTask.PostEvent(&event);
 }
 
 void AppTask::AppEventHandler(AppEvent * aEvent)
@@ -250,71 +194,118 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     switch (aEvent->Type)
     {
     case AppEvent::kEventType_FunctionButtonPressed:
-        functionButtonPressed = true;
-        if (actionButtonPressed)
+        sFunctionButtonPressed = true;
+        if (sActionButtonPressed)
         {
-            actionButtonSuppressed = true;
-            sAppTask.changeStepMode();
+            sActionButtonSuppressed = true;
+            gStepDirection = (gStepDirection == StepModeEnum::kUp) ? StepModeEnum::kDown : StepModeEnum::kUp;
+            ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
+                            ((gStepDirection == StepModeEnum::kUp) ? "kUp" : "kDown"));
         }
         else
         {
-            isButtonEventTriggered = true;
+            sIsButtonEventTriggered = true;
             // Post button press event to BaseApplication
             AppEvent button_event           = {};
             button_event.Type               = AppEvent::kEventType_Button;
             button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed);
             button_event.Handler            = BaseApplication::ButtonHandler;
-            AppTask::GetAppTask().PostEvent(&button_event);
+            sAppTask.PostEvent(&button_event);
         }
         break;
-    case AppEvent::kEventType_FunctionButtonReleased: {
-        functionButtonPressed = false;
-        if (isButtonEventTriggered)
+
+    case AppEvent::kEventType_FunctionButtonReleased:
+        sFunctionButtonPressed = false;
+        if (sIsButtonEventTriggered)
         {
-            isButtonEventTriggered = false;
+            sIsButtonEventTriggered = false;
             // Post button release event to BaseApplication
             AppEvent button_event           = {};
             button_event.Type               = AppEvent::kEventType_Button;
             button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased);
             button_event.Handler            = BaseApplication::ButtonHandler;
-            AppTask::GetAppTask().PostEvent(&button_event);
+            sAppTask.PostEvent(&button_event);
         }
         break;
-    }
+
     case AppEvent::kEventType_ActionButtonPressed:
-        actionButtonPressed = true;
-        sAppTask.SwitchActionEventHandler(aEvent->Type);
-        if (functionButtonPressed)
+        sActionButtonPressed = true;
         {
-            actionButtonSuppressed = true;
-            sAppTask.changeStepMode();
+            auto * switchData = Platform::New<GenericSwitchEventData>();
+            switchData->endpoint = gGenericSwitchEndpoint;
+            switchData->event    = Switch::Events::InitialPress::Id;
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
+                                                                             reinterpret_cast<intptr_t>(switchData));
+        }
+        if (sFunctionButtonPressed)
+        {
+            sActionButtonSuppressed = true;
+            gStepDirection = (gStepDirection == StepModeEnum::kUp) ? StepModeEnum::kDown : StepModeEnum::kUp;
+            ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
+                            ((gStepDirection == StepModeEnum::kUp) ? "kUp" : "kDown"));
         }
         else if (sAppTask.longPressTimer)
         {
-            sAppTask.longPressTimer->Start();
+            osStatus_t status = osTimerStart(sAppTask.longPressTimer, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT_MS));
+            if (status != osOK)
+            {
+                SILABS_LOG("Timer start() failed with error code : %lx", status);
+                appError(APP_ERROR_START_TIMER_FAILED);
+            }
         }
         break;
+
     case AppEvent::kEventType_ActionButtonReleased:
-        actionButtonPressed = false;
+        sActionButtonPressed = false;
         if (sAppTask.longPressTimer)
         {
-            sAppTask.longPressTimer->Stop();
+            if (osTimerStop(sAppTask.longPressTimer) == osError)
+            {
+                SILABS_LOG("Timer stop() failed");
+                appError(APP_ERROR_STOP_TIMER_FAILED);
+            }
         }
-        if (actionButtonSuppressed)
+        if (sActionButtonSuppressed)
         {
-            actionButtonSuppressed = false;
+            sActionButtonSuppressed = false;
         }
         else
         {
-            aEvent->Type = AppEvent::kEventType_TriggerToggle;
-            sAppTask.SwitchActionEventHandler(aEvent->Type);
+            BindingCommandData * toggleData = Platform::New<BindingCommandData>();
+            toggleData->localEndpointId = gLightSwitchEndpoint;
+            toggleData->clusterId       = Clusters::OnOff::Id;
+            toggleData->isGroup         = false;
+            toggleData->commandId       = OnOff::Commands::Toggle::Id;
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction,
+                                                                             reinterpret_cast<intptr_t>(toggleData));
         }
-        aEvent->Type = AppEvent::kEventType_ActionButtonReleased;
-        sAppTask.SwitchActionEventHandler(aEvent->Type);
+        {
+            auto * switchData = Platform::New<GenericSwitchEventData>();
+            switchData->endpoint = gGenericSwitchEndpoint;
+            switchData->event    = Switch::Events::ShortRelease::Id;
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
+                                                                             reinterpret_cast<intptr_t>(switchData));
+        }
         break;
+
     case AppEvent::kEventType_TriggerLevelControlAction:
-        sAppTask.SwitchActionEventHandler(aEvent->Type);
+        {
+            BindingCommandData * data = Platform::New<BindingCommandData>();
+            data->localEndpointId = gLightSwitchEndpoint;
+            data->clusterId       = Clusters::LevelControl::Id;
+            data->isGroup         = false;
+            data->commandId       = LevelControl::Commands::StepWithOnOff::Id;
+            BindingCommandData::Step stepData{ .stepMode       = gStepDirection,
+                                               .stepSize       = kStepCommand.stepSize,
+                                               .transitionTime = kStepCommand.transitionTime };
+            stepData.optionsMask.Set(kStepCommand.optionsMask);
+            stepData.optionsOverride.Set(kStepCommand.optionsOverride);
+            data->commandData = stepData;
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction,
+                                                                             reinterpret_cast<intptr_t>(data));
+        }
         break;
+
     default:
         break;
     }
@@ -325,100 +316,21 @@ CHIP_ERROR AppTask::InitLightSwitch(EndpointId lightSwitchEndpoint, EndpointId g
     VerifyOrReturnError(lightSwitchEndpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(genericSwitchEndpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mLightSwitchEndpoint   = lightSwitchEndpoint;
-    mGenericSwitchEndpoint = genericSwitchEndpoint;
+    gLightSwitchEndpoint   = lightSwitchEndpoint;
+    gGenericSwitchEndpoint = genericSwitchEndpoint;
 
-    CHIP_ERROR error = InitBindingHandler();
-    if (error != CHIP_NO_ERROR)
+    CHIP_ERROR scheduleErr = chip::DeviceLayer::PlatformMgr().ScheduleWork(&AppTask::InitBindingHandler, 0);
+    if (scheduleErr != CHIP_NO_ERROR)
     {
-        SILABS_LOG("InitBindingHandler() failed!");
-        appError(error);
+        SILABS_LOG("InitBindingHandler() failed! Error: %" CHIP_ERROR_FORMAT, scheduleErr.Format());
+        return scheduleErr;
     }
 
 #if defined(ENABLE_CHIP_SHELL)
     LightSwitchCommands::RegisterSwitchCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 
-    return error;
-}
-
-void AppTask::GenericSwitchOnInitialPress()
-{
-    GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-
-    data->endpoint = mGenericSwitchEndpoint;
-    data->event    = Switch::Events::InitialPress::Id;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-}
-
-void AppTask::GenericSwitchOnShortRelease()
-{
-    GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-
-    data->endpoint = mGenericSwitchEndpoint;
-    data->event    = Switch::Events::ShortRelease::Id;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-}
-
-StepModeEnum AppTask::getStepMode()
-{
-    return mStepDirection;
-}
-
-void AppTask::changeStepMode()
-{
-    mStepDirection = (mStepDirection == StepModeEnum::kUp) ? StepModeEnum::kDown : StepModeEnum::kUp;
-    ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
-                    ((getStepMode() == StepModeEnum::kUp) ? "kUp" : "kDown"));
-}
-
-void AppTask::TriggerLightSwitchAction(AppTask::LightSwitchAction action, bool isGroupCommand)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-
-    data->clusterId = Clusters::OnOff::Id;
-    data->isGroup   = isGroupCommand;
-
-    switch (action)
-    {
-    case AppTask::LightSwitchAction::Toggle:
-        data->commandId = OnOff::Commands::Toggle::Id;
-        break;
-
-    case AppTask::LightSwitchAction::On:
-        data->commandId = OnOff::Commands::On::Id;
-        break;
-
-    case AppTask::LightSwitchAction::Off:
-        data->commandId = OnOff::Commands::Off::Id;
-        break;
-
-    default:
-        Platform::Delete(data);
-        return;
-    }
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-}
-
-void AppTask::TriggerLevelControlAction(StepModeEnum stepMode, bool isGroupCommand)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-
-    data->clusterId = Clusters::LevelControl::Id;
-    data->isGroup   = isGroupCommand;
-    data->commandId = LevelControl::Commands::StepWithOnOff::Id;
-
-    BindingCommandData::Step stepData{ .stepMode       = stepMode,
-                                       .stepSize       = kStepCommand.stepSize,
-                                       .transitionTime = kStepCommand.transitionTime };
-    stepData.optionsMask.Set(kStepCommand.optionsMask);
-    stepData.optionsOverride.Set(kStepCommand.optionsOverride);
-    data->commandData = stepData;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
 }
 
 void AppTask::GenericSwitchWorkerFunction(intptr_t context)
@@ -461,29 +373,8 @@ void AppTask::GenericSwitchWorkerFunction(intptr_t context)
     Platform::Delete(data);
 }
 
-void AppTask::SwitchActionEventHandler(uint16_t eventType)
-{
-    switch (eventType)
-    {
-    case AppEvent::kEventType_ActionButtonPressed:
-        GenericSwitchOnInitialPress();
-        break;
-    case AppEvent::kEventType_ActionButtonReleased:
-        GenericSwitchOnShortRelease();
-        break;
-    case AppEvent::kEventType_TriggerLevelControlAction:
-        TriggerLevelControlAction(getStepMode());
-        break;
-    case AppEvent::kEventType_TriggerToggle:
-        TriggerLightSwitchAction(AppTask::LightSwitchAction::Toggle);
-        break;
-    default:
-        break;
-    }
-}
-
-void AppTask::ProcessOnOffUnicastBindingCommand(CommandId commandId, const Binding::TableEntry & binding,
-                                                Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle)
+void AppTask::ProcessOnOffBindingCommand(CommandId commandId, const Binding::TableEntry & binding,
+                                         OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "OnOff command succeeds");
@@ -493,58 +384,68 @@ void AppTask::ProcessOnOffUnicastBindingCommand(CommandId commandId, const Bindi
         ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
     };
 
-    switch (commandId)
+    if (peer_device != nullptr)
     {
-    case Clusters::OnOff::Commands::Toggle::Id: {
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand,
-                                                                  onSuccess, onFailure);
-        break;
+        VerifyOrDie(peer_device->ConnectionReady());
+        Messaging::ExchangeManager * exchangeMgr = peer_device->GetExchangeManager();
+        const SessionHandle & sessionHandle      = peer_device->GetSecureSession().Value();
+
+        switch (commandId)
+        {
+        case Clusters::OnOff::Commands::Toggle::Id: {
+            Clusters::OnOff::Commands::Toggle::Type toggleCommand;
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand,
+                                                                      onSuccess, onFailure);
+            break;
+        }
+        case Clusters::OnOff::Commands::On::Id: {
+            Clusters::OnOff::Commands::On::Type onCommand;
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess,
+                                                                      onFailure);
+            break;
+        }
+        case Clusters::OnOff::Commands::Off::Id: {
+            Clusters::OnOff::Commands::Off::Type offCommand;
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess,
+                                                                      onFailure);
+            break;
+        }
+        default:
+            break;
+        }
     }
-    case Clusters::OnOff::Commands::On::Id: {
-        Clusters::OnOff::Commands::On::Type onCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess,
-                                                                  onFailure);
-        break;
-    }
-    case Clusters::OnOff::Commands::Off::Id: {
-        Clusters::OnOff::Commands::Off::Type offCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess,
-                                                                  onFailure);
-        break;
-    }
+    else
+    {
+        Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+
+        switch (commandId)
+        {
+        case Clusters::OnOff::Commands::Toggle::Id: {
+            Clusters::OnOff::Commands::Toggle::Type toggleCommand;
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           toggleCommand);
+            break;
+        }
+        case Clusters::OnOff::Commands::On::Id: {
+            Clusters::OnOff::Commands::On::Type onCommand;
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           onCommand);
+            break;
+        }
+        case Clusters::OnOff::Commands::Off::Id: {
+            Clusters::OnOff::Commands::Off::Type offCommand;
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           offCommand);
+            break;
+        }
+        default:
+            break;
+        }
     }
 }
 
-void AppTask::ProcessOnOffGroupBindingCommand(CommandId commandId, const Binding::TableEntry & binding)
-{
-    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-
-    switch (commandId)
-    {
-    case Clusters::OnOff::Commands::Toggle::Id: {
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
-                                                                       toggleCommand);
-        break;
-    }
-    case Clusters::OnOff::Commands::On::Id: {
-        Clusters::OnOff::Commands::On::Type onCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
-                                                                       onCommand);
-        break;
-    }
-    case Clusters::OnOff::Commands::Off::Id: {
-        Clusters::OnOff::Commands::Off::Type offCommand;
-        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
-                                                                       offCommand);
-        break;
-    }
-    }
-}
-
-void AppTask::ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const Binding::TableEntry & binding,
-                                                       OperationalDeviceProxy * peer_device)
+void AppTask::ProcessLevelControlBindingCommand(BindingCommandData * data, const Binding::TableEntry & binding,
+                                                OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "LevelControl command succeeds");
@@ -554,9 +455,11 @@ void AppTask::ProcessLevelControlUnicastBindingCommand(BindingCommandData * data
         ChipLogError(NotSpecified, "LevelControl command failed: %" CHIP_ERROR_FORMAT, error.Format());
     };
 
-    VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
+    if (peer_device != nullptr)
+    {
+        VerifyOrDie(peer_device->ConnectionReady());
 
-    switch (data->commandId)
+        switch (data->commandId)
     {
     case Clusters::LevelControl::Commands::MoveToLevel::Id: {
         Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
@@ -671,13 +574,12 @@ void AppTask::ProcessLevelControlUnicastBindingCommand(BindingCommandData * data
     default:
         break;
     }
-}
+    }
+    else
+    {
+        Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
-void AppTask::ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Binding::TableEntry & binding)
-{
-    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-
-    switch (data->commandId)
+        switch (data->commandId)
     {
     case Clusters::LevelControl::Commands::MoveToLevel::Id: {
         Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
@@ -784,6 +686,7 @@ void AppTask::ProcessLevelControlGroupBindingCommand(BindingCommandData * data, 
     default:
         break;
     }
+    }
 }
 
 void AppTask::LightSwitchChangedHandler(const Binding::TableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
@@ -796,10 +699,10 @@ void AppTask::LightSwitchChangedHandler(const Binding::TableEntry & binding, Ope
         switch (data->clusterId)
         {
         case Clusters::OnOff::Id:
-            ProcessOnOffGroupBindingCommand(data->commandId, binding);
+            ProcessOnOffBindingCommand(data->commandId, binding, nullptr);
             break;
         case Clusters::LevelControl::Id:
-            ProcessLevelControlGroupBindingCommand(data, binding);
+            ProcessLevelControlBindingCommand(data, binding, nullptr);
             break;
         }
     }
@@ -809,11 +712,10 @@ void AppTask::LightSwitchChangedHandler(const Binding::TableEntry & binding, Ope
         {
         case Clusters::OnOff::Id:
             VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
-            ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device->GetExchangeManager(),
-                                              peer_device->GetSecureSession().Value());
+            ProcessOnOffBindingCommand(data->commandId, binding, peer_device);
             break;
         case Clusters::LevelControl::Id:
-            ProcessLevelControlUnicastBindingCommand(data, binding, peer_device);
+            ProcessLevelControlBindingCommand(data, binding, peer_device);
             break;
         }
     }
@@ -825,8 +727,10 @@ void AppTask::LightSwitchContextReleaseHandler(void * context)
     Platform::Delete(static_cast<BindingCommandData *>(context));
 }
 
-void AppTask::InitBindingHandlerInternal(intptr_t arg)
+void AppTask::InitBindingHandler(intptr_t arg)
 {
+    (void) arg;
+
     auto & server = chip::Server::GetInstance();
     LogErrorOnFailure(Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }));
@@ -848,22 +752,6 @@ void AppTask::SwitchWorkerFunction(intptr_t context)
     }
 }
 
-void AppTask::BindingWorkerFunction(intptr_t context)
-{
-    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
-
-    Binding::TableEntry * entry = reinterpret_cast<Binding::TableEntry *>(context);
-    TEMPORARY_RETURN_IGNORED AddBindingEntry(*entry);
-
-    Platform::Delete(entry);
-}
-
-CHIP_ERROR AppTask::InitBindingHandler()
-{
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
-    return CHIP_NO_ERROR;
-}
-
 void AppTask::PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                           uint8_t * value)
 {
@@ -878,11 +766,6 @@ void AppTask::PostAttributeChangeCallback(const chip::app::ConcreteAttributePath
     }
 }
 
-void AppTask::OnOffClusterInitCallback(chip::EndpointId endpoint)
-{
-    // TODO: implement any additional Cluster Server init actions
-}
-
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
@@ -891,5 +774,5 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    AppTask::OnOffClusterInitCallback(endpoint);
+    (void) endpoint;
 }
