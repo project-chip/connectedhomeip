@@ -141,12 +141,9 @@ int soc_pll_config(void)
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
-SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    mButtonCallback = nullptr;
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
     // Configuration the clock rate
     soc_pll_config();
@@ -232,6 +229,7 @@ CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
 #if SL_ICD_ENABLED
@@ -335,11 +333,6 @@ void SilabsPlatform::SleepButtonActionHandler()
     sl_button_on_change(SL_BUTTON_BTN0_NUMBER, btnAction);
 }
 #endif // SL_ICD_ENABLED
-#else
-uint8_t SilabsPlatform::GetButtonState(uint8_t button)
-{
-    return 0;
-}
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 void SilabsPlatform::SoftwareReset()

@@ -419,7 +419,7 @@ async def assert_factory_fresh(
         commissioning_params = CustomCommissioningParameters(discriminator=1234, passcode=20202021)
         await assert_factory_fresh(controller, node_id=1234, description="DUT", commissioning_params=commissioning_params)
     """
-    # Import here (not at module level) to avoid pulling in commissioning.py's heavy
+    # Import here (not at module level) to avoid pulling in commissioning.py's
     # dependencies (matter.clusters, ChipDeviceCtrl, mdns_discovery) which would cause
     # ModuleNotFoundError in Pigweed-isolated unit tests (test_matter_asserts).
     from matter.testing.commissioning import (
