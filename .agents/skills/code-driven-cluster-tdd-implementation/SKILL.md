@@ -20,6 +20,12 @@ of the requirements before implementing them.
 > original file) to ensure you are not dropping existing functionality or
 > changing behavior unexpectedly.
 
+This guide is designed to be effective by providing:
+-   **Logical Breakdown**: It breaks down complex implementations into small, manageable steps (Boilerplate -> Metadata -> Reads -> Writes -> Commands -> Events -> Integration).
+-   **Enforced Quality**: By requiring failing tests for every step, it ensures we don't write dead code and that we handle errors and edge cases correctly from the start.
+-   **Pattern Library**: It provides solutions for common complex scenarios like security checks, async side effects, timers without sleeping, and list encoding.
+-   **Self-Contained Reference**: It includes common commands so you don't need to search other documents to run tests.
+
 ## 2. Prerequisites
 
 -   Read `code-driven-cluster-development` for core implementation patterns.
