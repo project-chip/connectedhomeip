@@ -749,6 +749,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
 
         periodicCluster.GenerateSnapshots();
         uint32_t firstPeriodicEndTimestamp = 0;
+        uint32_t currentTimestamp;
         {
             auto event = logOnlyEvents.GetNextEvent();
             ASSERT_TRUE(event.has_value());
@@ -757,8 +758,16 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
             ASSERT_TRUE(decoded.energyImported.HasValue());
             EXPECT_EQ(decoded.energyImported.Value().energy, 10);
             EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
-            ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
-            firstPeriodicEndTimestamp = decoded.energyImported.Value().endTimestamp.Value();
+            
+            if(System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            {
+                ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
+                firstPeriodicEndTimestamp = decoded.energyImported.Value().endTimestamp.Value();
+            }
+            else
+            {
+                EXPECT_FALSE(decoded.energyImported.Value().endTimestamp.HasValue());
+            }
         }
 
         mDelegate.mPeriodicImported = DataModel::MakeNullable(static_cast<int64_t>(20));
@@ -771,8 +780,11 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
             ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
             ASSERT_TRUE(decoded.energyImported.HasValue());
             EXPECT_EQ(decoded.energyImported.Value().energy, 20);
-            ASSERT_TRUE(decoded.energyImported.Value().startTimestamp.HasValue());
-            EXPECT_EQ(decoded.energyImported.Value().startTimestamp.Value(), firstPeriodicEndTimestamp);
+            if(System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            {
+                ASSERT_TRUE(decoded.energyImported.Value().startTimestamp.HasValue());
+                EXPECT_EQ(decoded.energyImported.Value().startTimestamp.Value(), firstPeriodicEndTimestamp);
+            }
         }
 
         periodicCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -821,7 +833,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, RateLimitedUpdateFlushesOnMaxDela
     cluster.GenerateSnapshots();
     EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
 
-    // Wait for the min-delay and generate report, all 4 dirty attributes shoult be in the next event.
+    // Wait for the min-delay and generate report, all 4 dirty attributes should be in the next event.
     mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
     cluster.GenerateSnapshots();
 
