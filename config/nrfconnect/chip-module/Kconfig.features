@@ -85,63 +85,6 @@ config CHIP_MEMORY_PROFILING
 	help
 	  Enables features for tracking memory usage in Matter.
 
-config CHIP_NUS
-	bool "Enable Nordic UART service for Matter purposes"
-	select BT_NUS
-	select BT_SMP
-	select BT_NUS_AUTHEN
-	help
-	  Enables Nordic UART service (NUS) for Matter samples.
-	  Using NUS service you can control a Matter sample using pre-defined BLE commands 
-	  and do defined operations. The CHIP NUS service can be useful to keep communication
-	  with a smart home device when a connection within Matter network is lost.
-
-if CHIP_NUS
-
-# Requires providing a PIN for each pair request
-config BT_BONDABLE
-	default n
-
-config BT_RX_STACK_SIZE
-	default 2560 if SOC_SERIES_NRF54L
-	default 1536
-
-config SYSTEM_WORKQUEUE_STACK_SIZE
-	default 2048
-
-config BT_DEVICE_APPEARANCE
-	default 833
-
-if !LOG
-
-config BT_APP_PASSKEY
-	default y
-
-endif
-
-config CHIP_NUS_MAX_COMMAND_LEN
-	int "Maximum length of single command in Bytes"
-	default 10
-	help
-	  Maximum length of single command. This command will be send via Bluetooth LE to
-	  a paired smart home device.
-
-config CHIP_NUS_FIXED_PASSKEY
-	int "Define the default passkey for NUS"
-	depends on BT_APP_PASSKEY
-	default 123456
-	help
-	  Define the default password for pairing with the Bluetooth LE device.
-
-config CHIP_NUS_MAX_COMMANDS
-	int "Define maximum NUS commands amount"
-	default 2
-	help
-	  Define the maximum number of NUS commands to declare by user.
-
-endif
-
-
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
 	imply BOOTLOADER_MCUBOOT
