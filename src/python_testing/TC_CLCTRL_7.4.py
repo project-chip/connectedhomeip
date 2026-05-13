@@ -327,7 +327,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
 
         self.step("4g")
         current_countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
-        asserts.assert_true(countdown_time == NullValue or (1 <= current_countdown_time <= countdown_time_max),
+        asserts.assert_true(current_countdown_time == NullValue or (1 <= current_countdown_time <= countdown_time_max),
                             f"CountdownTime should be between 1 and {countdown_time_max}, or null, got: {current_countdown_time}.")
         log.info(f"CurrentCountdownTime: {current_countdown_time}")
 
