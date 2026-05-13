@@ -678,8 +678,8 @@ void WindowManager::UpdateLCD()
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         Type type = TypeGet(cover.mEndpoint);
 
-        Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
-        Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
+        Attributes::CurrentPositionLift::GetDefault(cover.mEndpoint, lift);
+        Attributes::CurrentPositionTilt::GetDefault(cover.mEndpoint, tilt);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!tilt.IsNull() && !lift.IsNull())
