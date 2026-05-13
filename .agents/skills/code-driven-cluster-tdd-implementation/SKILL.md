@@ -37,10 +37,7 @@ This guide is designed to be effective by providing:
 ## 2. Prerequisites
 
 -   Read `code-driven-cluster-development` for core implementation patterns.
--   If performing a **migration**, read `code-driven-cluster-migration` for
-    general migration steps (renaming, directory layout). We assume you have
-    already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the
-    TDD conversion.
+-   If performing a **migration**, read `code-driven-cluster-migration` for general migration steps (renaming, directory layout). We assume you have already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the TDD implementation.
 
 ## 3. Step-by-Step Implementation Workflow
 
@@ -119,16 +116,7 @@ For each command:
 3.  **Verify Success**:
     -   Run tests and ensure they pass.
 
-### Step 6: Handle Platform Events (TDD)
-
-1.  Identify needed events (e.g. `kFailSafeTimerExpired`,
-    `kCommissioningComplete`).
-2.  Write tests that trigger these events directly on the platform event
-    handler.
-3.  Implement `OnPlatformEventHandler` and hook it up in `Startup`/`Shutdown`.
-4.  Verify tests pass.
-
-### Step 7: Create CodegenIntegration Layer
+### Step 6: Create CodegenIntegration Layer
 
 1.  Create or update `CodegenIntegration.h` and `.cpp` in the cluster folder.
 2.  Provide implementations for the generated callbacks (e.g.,
@@ -145,7 +133,7 @@ For each command:
     proxy wrapper around the new code-driven cluster implementation. This
     ensures existing applications do not need to change.
 
-### Step 8: Verification & ZAP Regen
+### Step 7: Verification & ZAP Regen
 
 1.  Run all unit tests.
 2.  Update `config-data.yaml` and `zcl.json` as per
@@ -195,6 +183,11 @@ For each command:
 -   **Failing Test**: Read the list attribute and verify its contents.
 -   **Implementation**: Use `ListEncodeHelper` and delegate methods to fetch
     items by index and encode them.
+
+### 4.5 Handling Platform Events
+
+-   **Failing Test**: Write tests that trigger specific platform events (e.g., `kFailSafeTimerExpired`) directly on the platform event handler and verify expected side effects.
+-   **Implementation**: Implement `OnPlatformEventHandler` and hook it up in `Startup`/`Shutdown` to listen for needed events.
 
 ## 5. Best Practices for Test Design
 
