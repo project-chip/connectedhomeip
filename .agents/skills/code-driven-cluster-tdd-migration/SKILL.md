@@ -71,7 +71,8 @@ For each writable attribute:
 2.  **Implement**:
     -   Add the case in `WriteAttribute` switch.
     -   Decode the payload using `AttributeValueDecoder`.
-    -   Update member variable or call delegate.
+    -   Update the member variable or call the delegate.
+    -   Use `SetAttributeValue` to update member variables and automatically notify subscribers. For complex cases (like lists), use `NotifyAttributeChanged` directly.
 3.  **Verify Success**:
     -   Run tests and ensure they pass.
 
