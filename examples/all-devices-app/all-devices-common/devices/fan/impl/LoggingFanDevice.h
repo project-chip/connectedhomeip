@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <app/clusters/fan-control-server/fan-control-delegate.h>
+#include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <devices/fan/FanDevice.h>
 
 namespace chip {
