@@ -94,6 +94,7 @@ For each command:
     -   Decode payload.
     -   Perform spec checks (CASE session, FailSafe, busy, etc.).
     -   Call the appropriate `Delegate` method.
+    -   Ensure the `default` case returns `Protocols::InteractionModel::Status::UnsupportedCommand` directly (do not delegate to base class).
 3.  **Verify Success**:
     -   Run tests and ensure they pass.
 
@@ -143,8 +144,7 @@ For each command:
 
 -   **Failing Test**: Mock the async callback and verify that side effects (like
     setting breadcrumb via `BreadCrumbTracker`) occur.
--   **Implementation**: Use `BreadCrumbTracker` interface in
-    `OnActivateDatasetComplete`.
+-   **Implementation**: Use the appropriate interface or callback (e.g., `OnCommandNameComplete`) to handle side effects. Return `Status::UnsupportedCommand` for unknown commands in `InvokeCommand`.
 
 ### 4.3 Timer-Driven Logic
 
