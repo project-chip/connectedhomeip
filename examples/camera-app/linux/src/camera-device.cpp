@@ -897,10 +897,8 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    const uint16_t framerate = std::clamp(
-        LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
-        allocatedStream.minFrameRate,
-        allocatedStream.maxFrameRate);
+    const uint16_t framerate = std::clamp(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
+                                          allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
 
     mCurrentVideoFrameRate = framerate;
 
