@@ -29,108 +29,10 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/Assertions.h>
 #include <lib/support/ObjectDump.h>
-#include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <memory>
-
-/**
- * Base-level abnormal termination.
- *
- * Terminate the program immediately, without invoking destructors, atexit callbacks, etc.
- * Used to implement the default `chipDie()`.
- *
- * @note
- *  This should never be invoked directly by code outside this file.
- */
-#if !defined(CHIP_CONFIG_ABORT)
-#define CHIP_CONFIG_ABORT() abort()
-#endif
-
-/**
- *  @name chip-specific nlassert.h Overrides
- *
- *  @{
- *
- */
-
-/**
- *  @def NL_ASSERT_ABORT()
- *
- *  @brief
- *    This implements a chip-specific override for #NL_ASSERT_ABORT *
- *    from nlassert.h.
- *
- */
-#if !defined(NL_ASSERT_ABORT)
-#define NL_ASSERT_ABORT() chipAbort()
-#endif
-
-/**
- *  @def NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)
- *
- *  @brief
- *    This implements a chip-specific override for \c NL_ASSERT_LOG
- *    from nlassert.h.
- *
- *  @param[in]  aPrefix     A pointer to a NULL-terminated C string printed
- *                          at the beginning of the logged assertion
- *                          message. Typically this is and should be
- *                          \c NL_ASSERT_PREFIX_STRING.
- *  @param[in]  aName       A pointer to a NULL-terminated C string printed
- *                          following @a aPrefix that indicates what
- *                          module, program, application or subsystem
- *                          the assertion occurred in Typically this
- *                          is and should be
- *                          \c NL_ASSERT_COMPONENT_STRING.
- *  @param[in]  aCondition  A pointer to a NULL-terminated C string indicating
- *                          the expression that evaluated to false in
- *                          the assertion. Typically this is a
- *                          stringified version of the actual
- *                          assertion expression.
- *  @param[in]  aLabel      An optional pointer to a NULL-terminated C string
- *                          indicating, for exception-style
- *                          assertions, the label that will be
- *                          branched to when the assertion expression
- *                          evaluates to false.
- *  @param[in]  aFile       A pointer to a NULL-terminated C string indicating
- *                          the file in which the exception
- *                          occurred. Typically this is and should be
- *                          \_\_FILE\_\_ from the C preprocessor.
- *  @param[in]  aLine       The line number in @a aFile on which the assertion
- *                          expression evaluated to false. Typically
- *                          this is and should be \_\_LINE\_\_ from the C
- *                          preprocessor.
- *  @param[in]  aMessage    An optional pointer to a NULL-terminated C string
- *                          containing a caller-specified message
- *                          further describing the assertion failure.
- *
- */
-// clang-format off
-#if !defined(NL_ASSERT_LOG)
-#define NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
-    do                                                                                    \
-    {                                                                                     \
-        ChipLogError(NotSpecified,                                                       \
-                      NL_ASSERT_LOG_FORMAT_DEFAULT,                                       \
-                      aPrefix,                                                            \
-                      (((aName) == 0) || (*(aName) == '\0')) ? "" : aName,                \
-                      (((aName) == 0) || (*(aName) == '\0')) ? "" : ": ",                 \
-                      aCondition,                                                         \
-                      (((aMessage) == 0) ? "" : aMessage),                                \
-                      (((aMessage) == 0) ? "" : ", "),                                    \
-                      aFile,                                                              \
-                      aLine);                                                             \
-    } while (0)
-#endif
-// clang-format on
-
-/**
- *  @} chip-specific nlassert.h Overrides
- *
- */
-
-#include <nlassert.h>
 
 /**
  *  @def ReturnErrorOnFailure(expr, ...)
@@ -385,75 +287,6 @@
     } while (false)
 
 /**
- *  @def VerifyOrReturn(expr, ...)
- *
- *  @brief
- *    Returns from the void function if expression evaluates to false
- *
- *  Example usage:
- *
- *  @code
- *    VerifyOrReturn(param != nullptr, LogError("param is nullptr"));
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  ...         Statements to execute before returning. Optional.
- */
-#define VerifyOrReturn(expr, ...)                                                                                                  \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(expr))                                                                                                               \
-        {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
-            return;                                                                                                                \
-        }                                                                                                                          \
-    } while (false)
-
-/**
- *  @def VerifyOrReturnError(expr, code, ...)
- *
- *  @brief
- *    Returns a specified error code if expression evaluates to false
- *
- *  Example usage:
- *
- *  @code
- *    VerifyOrReturnError(param != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  code        A value to return if @a expr is false.
- *  @param[in]  ...         Statements to execute before returning. Optional.
- */
-#define VerifyOrReturnError(expr, code, ...) VerifyOrReturnValue(expr, code, ##__VA_ARGS__)
-
-/**
- *  @def VerifyOrReturnValue(expr, value, ...)
- *
- *  @brief
- *    Returns a specified value if expression evaluates to false
- *
- *  Example usage:
- *
- *  @code
- *    VerifyOrReturnError(param != nullptr, Foo());
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  value       A value to return if @a expr is false.
- *  @param[in]  ...         Statements to execute before returning. Optional.
- */
-#define VerifyOrReturnValue(expr, value, ...)                                                                                      \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(expr))                                                                                                               \
-        {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
-            return (value);                                                                                                        \
-        }                                                                                                                          \
-    } while (false)
-
-/**
  *  @def VerifyOrReturnLogError(expr, code)
  *
  *  @brief
@@ -521,7 +354,7 @@
  *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  *
  */
-#define SuccessOrExit(error) nlEXPECT(::chip::ChipError::IsSuccess((error)), exit)
+#define SuccessOrExit(error) VerifyOrExit(::chip::ChipError::IsSuccess((error)), {})
 
 /**
  *  @def SuccessOrExitAction(error, anAction)
@@ -534,109 +367,8 @@
  *
  *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  */
-#define SuccessOrExitAction(error, action) nlEXPECT_ACTION(::chip::ChipError::IsSuccess((error)), exit, action)
+#define SuccessOrExitAction(error, action) VerifyOrExit(::chip::ChipError::IsSuccess((error)), action)
 
-/**
- *  @def VerifyOrExit(aCondition, anAction)
- *
- *  @brief
- *    This checks for the specified condition, which is expected to
- *    commonly be true, and both executes @a anAction and branches to
- *    the local label 'exit' if the condition is false.
- *
- *  Example Usage:
- *
- *  @code
- *  CHIP_ERROR MakeBuffer(const uint8_t *& buf)
- *  {
- *      CHIP_ERROR err = CHIP_NO_ERROR;
- *
- *      buf = (uint8_t *)malloc(1024);
- *      VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
- *
- *      memset(buf, 0, 1024);
- *
- *  exit:
- *      return err;
- *  }
- *  @endcode
- *
- *  @param[in]  aCondition  A Boolean expression to be evaluated.
- *  @param[in]  anAction    An expression or block to execute when the
- *                          assertion fails.
- *
- */
-#define VerifyOrExit(aCondition, anAction) nlEXPECT_ACTION(aCondition, exit, anAction)
-
-/**
- *  @def ExitNow(...)
- *
- *  @brief
- *    This unconditionally executes @a ... and branches to the local
- *    label 'exit'.
- *
- *  @note The use of this interface implies neither success nor
- *        failure for the overall exit status of the enclosing function
- *        body.
- *
- *  Example Usage:
- *
- *  @code
- *  CHIP_ERROR ReadAll(Reader& reader)
- *  {
- *      CHIP_ERROR err;
- *
- *      while (true)
- *      {
- *          err = reader.ReadNext();
- *          if (err == CHIP_ERROR_AT_END)
- *              ExitNow(err = CHIP_NO_ERROR);
- *          SuccessOrExit(err);
- *          DoSomething();
- *      }
- *
- *  exit:
- *      return err;
- *  }
- *  @endcode
- *
- *  @param[in]  ...         Statements to execute. Optional.
- */
-// clang-format off
-#define ExitNow(...)                                                   \
-    do {                                                               \
-        __VA_ARGS__;                                                   \
-        goto exit;                                                     \
-    } while (0)
-// clang-format on
-
-/**
- *  @brief
- *    This is invoked when a #VerifyOrDie or #VerifyOrDieWithMsg
- *    assertion expression evaluates to false.
- *
- *    Developers may override and customize this by defining #chipDie
- *    before CodeUtils.h is included by the preprocessor.
- *
- *  Example Usage:
- *
- *  @code
- *  chipDie();
- *  @endcode
- *
- */
-#ifndef chipAbort
-extern "C" void chipAbort(void) __attribute((noreturn));
-
-inline void chipAbort(void)
-{
-    while (true)
-    {
-        // NL_ASSERT_ABORT is redefined to be chipAbort, so not useful here.
-        CHIP_CONFIG_ABORT();
-    }
-}
-#endif // chipAbort
 #ifndef chipDie
 extern "C" void chipDie(void) __attribute((noreturn));
 
@@ -673,10 +405,10 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
 #define VerifyOrDie(aCondition)                                                                                                    \
-    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d", __FILE__, __LINE__))
+    VerifyOrDo(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d", __FILE__, __LINE__); chipAbort())
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition)                                                                                                    \
-    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+    VerifyOrDo(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition); chipAbort())
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -709,17 +441,18 @@ inline void chipDie(void)
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (error);                                                                                                      \
-        nlABORT_ACTION(::chip::ChipError::IsSuccess(__err),                                                                        \
-                       ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr(__err), __FILE__, __LINE__));            \
+        VerifyOrDo(::chip::ChipError::IsSuccess(__err),                                                                            \
+                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                 \
+                   chipAbort());                                                                                                   \
     } while (false)
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error)                                                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (error);                                                                                                      \
-        nlABORT_ACTION(                                                                                                            \
-            ::chip::ChipError::IsSuccess(__err),                                                                                   \
-            ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr(__err), __FILE__, __LINE__, #error));           \
+        VerifyOrDo(::chip::ChipError::IsSuccess(__err),                                                                            \
+                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr(__err), __FILE__, __LINE__, #error);     \
+                   chipAbort());                                                                                                   \
     } while (false)
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error) VerifyOrDieWithoutLogging(::chip::ChipError::IsSuccess((error)))
@@ -734,8 +467,8 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject)                                                                                 \
-    nlABORT_ACTION(aCondition, ::chip::DumpObjectToLog(aObject);                                                                   \
-                   ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+    VerifyOrDo(aCondition, ::chip::DumpObjectToLog(aObject);                                                                       \
+               ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition); chipAbort())
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -775,7 +508,7 @@ inline void chipDie(void)
  *
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
-    nlABORT_ACTION(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__))
+    VerifyOrDo(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__); chipAbort())
 
 /**
  *  @def LogErrorOnFailure(expr)
@@ -798,30 +531,6 @@ inline void chipDie(void)
         if (__err != CHIP_NO_ERROR)                                                                                                \
         {                                                                                                                          \
             ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
-        }                                                                                                                          \
-    } while (false)
-
-/**
- *  @def VerifyOrDo(expr, ...)
- *
- *  @brief
- *    do something if expression evaluates to false
- *
- *  Example usage:
- *
- * @code
- *    VerifyOrDo(param != nullptr, LogError("param is nullptr"));
- *  @endcode
- *
- *  @param[in]  expr        A Boolean expression to be evaluated.
- *  @param[in]  ...         Statements to execute.
- */
-#define VerifyOrDo(expr, ...)                                                                                                      \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(expr))                                                                                                               \
-        {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
         }                                                                                                                          \
     } while (false)
 
