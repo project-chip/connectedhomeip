@@ -31,7 +31,6 @@ extern "C" {
 #include "sl_core.h"
 }
 
-#include <cinttypes>
 #include <platform/silabs/SilabsConfig.h>
 
 #ifdef _SILICON_LABS_32B_SERIES_2

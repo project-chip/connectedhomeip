@@ -53,7 +53,7 @@ static void _log_PSA_error(psa_status_t status)
 {
     if (status != PSA_SUCCESS)
     {
-        ChipLogError(Crypto, "PSA error: %" PRIu32, status);
+        ChipLogError(Crypto, "PSA error: %" PRId32, status);
     }
 }
 
