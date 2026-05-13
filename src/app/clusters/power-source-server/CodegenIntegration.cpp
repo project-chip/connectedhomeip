@@ -135,13 +135,15 @@ public:
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT > 0
 // The static cast here does nothing, it is here to make the code template dependent on class template, so the code will
 // compile.
-#define GetStringAttribute(attr_name, storage_field_name) \
-    ((clusterInstanceIndex >= kPowerSourceFixedClusterCount) ? \
-        GetCharStringDefaultValueFromEmber(attr_name::GetDefault, endpointId, \
-            static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount]).storage_field_name) : \
-        GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, attr_name::Id))
+#define GetStringAttribute(attr_name, storage_field_name)                                                                          \
+    ((clusterInstanceIndex >= kPowerSourceFixedClusterCount)                                                                       \
+         ? GetCharStringDefaultValueFromEmber(                                                                                     \
+               attr_name::GetDefault, endpointId,                                                                                  \
+               static_cast<StringStorageModuleT &>(gStringAttributeStorage[clusterInstanceIndex - kPowerSourceFixedClusterCount])  \
+                   .storage_field_name)                                                                                            \
+         : GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, attr_name::Id))
 #else
-#define GetStringAttribute(attr_name, storage_field_name) \
+#define GetStringAttribute(attr_name, storage_field_name)                                                                          \
     GetCharStringDefaultValueDirectlyFromEndpointConfig(endpointId, attr_name::Id)
 #endif
 
@@ -212,7 +214,7 @@ public:
                 if constexpr (batterySupported)
                 {
                     auto & gServer = static_cast<LazyRegisteredPowerSourceClusterT &>(gServers[clusterInstanceIndex]);
-                    auto & server = gServer.template emplace<LazyRegisteredWiredSourceClusterT>();
+                    auto & server  = gServer.template emplace<LazyRegisteredWiredSourceClusterT>();
                     server.Create(config);
                     return server.Registration();
                 }
@@ -299,7 +301,7 @@ public:
                 if constexpr (wiredSupported)
                 {
                     auto & gServer = static_cast<LazyRegisteredPowerSourceClusterT &>(gServers[clusterInstanceIndex]);
-                    auto & server = gServer.template emplace<LazyRegisteredBatterySourceClusterT>();
+                    auto & server  = gServer.template emplace<LazyRegisteredBatterySourceClusterT>();
                     server.Create(config);
                     return server.Registration();
                 }
