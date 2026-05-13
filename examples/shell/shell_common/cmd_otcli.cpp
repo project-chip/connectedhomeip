@@ -100,7 +100,6 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 #if OPENTHREAD_API_VERSION >= 85
         otCliInputLine(const_cast<char *>(builder.c_str()));
 #else
-        // Safely calculate the actual string length using standard strlen()
         otCliConsoleInputLine(const_cast<char *>(builder.c_str()), strlen(builder.c_str()));
 #endif
         chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
