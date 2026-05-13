@@ -59,7 +59,7 @@ static void BitSetToSpan(uint16_t bitset, Span<uint8_t> & buffer)
         {
             buffer[bufInd++] = i;
         }
-        bitset >>= static_cast<uint16_t>(1);
+        bitset = static_cast<uint16_t>(bitset >> 1);
     }
     buffer.reduce_size(bufInd);
 }
