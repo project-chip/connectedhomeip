@@ -510,6 +510,23 @@
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
 /**
+ *  @def CHIP_CONFIG_LOG_SESSION_KEYS
+ *
+ *  @brief
+ *    Log session encryption keys (I2R, R2I, attestation challenge) during PASE
+ *    and CASE session establishment, allowing captured traffic to be decrypted
+ *    for debugging purposes.
+ *
+ *  @note
+ *    WARNING: This option writes secret key material to the chip log. It MUST
+ *    NEVER be enabled in production builds. Use only on development hardware
+ *    for traffic analysis.
+ */
+#ifndef CHIP_CONFIG_LOG_SESSION_KEYS
+#define CHIP_CONFIG_LOG_SESSION_KEYS 0
+#endif // CHIP_CONFIG_LOG_SESSION_KEYS
+
+/**
  *  @def CHIP_CONFIG_TEST
  *
  *  @brief
