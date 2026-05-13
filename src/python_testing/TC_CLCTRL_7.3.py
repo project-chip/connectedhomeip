@@ -92,9 +92,10 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
-            TestStep("2b", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
+            TestStep("2b", "If the Access feature is supported, skip remaining steps and end test case"),
+            TestStep("2c", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
                      "Subscription successfully established"),
-            TestStep("2c", "If LT is supported, read the LatchControlModes attribute",
+            TestStep("2d", "If LT is supported, read the LatchControlModes attribute",
                      "LatchControlModes of the ClosureControl cluster is returned by the DUT; Value saved as LatchControlModes"),
             TestStep(3, "Send GroupedMoveTo command with no fields", "Receive INVALID_COMMAND response from the DUT"),
             TestStep("4a", "Check PS and LT feature support",
@@ -223,19 +224,26 @@ class TC_CLCTRL_7_3(MatterBaseTest):
         is_position_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
         is_speed_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
+        is_access_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kAccess
         log.info(f"FeatureMap: {feature_map}")
 
         self.step("2b")
+        if is_access_supported:
+            log.info("Access feature is supported, skipping remaining steps.")
+            self.mark_all_remaining_steps_skipped("2c")
+            return
+
+        self.step("2c")
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         if is_latching_supported:
-            self.step("2c")
+            self.step("2d")
             latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
             log.info(f"LatchControlModes: {latch_control_modes}")
         else:
             log.info("LatchControlModes attribute is not supported, skipping read")
-            self.skip_step("2c")
+            self.skip_step("2d")
 
         self.step(3)
         try:

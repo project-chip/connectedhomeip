@@ -95,8 +95,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
-            TestStep("2c", "Check if CountdownTime attribute is supported",
-                     "CountdownTime attribute should be present in the AttributeList"),
+            TestStep("2c", "If CountdownTime attribute is not supported OR Access feature is supported, skip remaining steps and end test case"),
             TestStep("2d", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
                      "Subscription successfully established"),
             TestStep("2e", "Check if LT feature is supported", "Skip steps 2f to 2m if LT feature is not supported"),
@@ -169,24 +168,25 @@ class TC_CLCTRL_7_4(MatterBaseTest):
         attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
 
         self.step("2a")
-        attribute_list: typing.List[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-        log.info(f"AttributeList: {attribute_list}")
-
-        self.step("2b")
-        is_countdown_time_supported: bool = attributes.CountdownTime.attribute_id in attribute_list
-
-        if not is_countdown_time_supported:
-            log.info("CountdownTime attribute not supported, skipping test")
-            self.mark_all_remaining_steps_skipped("2c")
-            return
-
-        self.step("2c")
-        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
-        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
-
-        self.step("2d")
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
+        is_access_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kAccess
+        log.info(f"FeatureMap: {feature_map}")
+
+        self.step("2b")
+        attribute_list: typing.List[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        is_countdown_time_supported: bool = attributes.CountdownTime.attribute_id in attribute_list
+        log.info(f"AttributeList: {attribute_list}")
+
+        self.step("2c")
+        if (not is_countdown_time_supported) or is_access_supported:
+            log.info("CountdownTime attribute not supported or Access feature supported, skipping remaining steps")
+            self.mark_all_remaining_steps_skipped("2d")
+            return
+
+        self.step("2d")
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         self.step("2e")
         if not is_latching_supported:
