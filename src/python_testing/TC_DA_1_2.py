@@ -253,8 +253,8 @@ class TC_DA_1_2(BasicCompositionTests):
                             "DUT returned invalid response to AttestationRequest")
 
         self.step("3a")
-        type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
-        dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
+        cert_type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
+        dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=cert_type))
         asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_dac = dac_resp.certificate
@@ -267,8 +267,8 @@ class TC_DA_1_2(BasicCompositionTests):
         asserts.assert_equal(parsed_dac.version, x509.Version.v3, "DUT returned incorrect certificate type")
 
         self.step("3b")
-        type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
-        pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
+        cert_type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
+        pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=cert_type))
         asserts.assert_true(matchers.is_type(pai_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_pai = pai_resp.certificate
