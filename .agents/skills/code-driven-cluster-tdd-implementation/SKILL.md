@@ -1,29 +1,23 @@
 ---
-name: code-driven-cluster-tdd-migration
+name: code-driven-cluster-tdd-implementation
 description: >
-    Guidelines for migrating Matter server clusters to the code-driven pattern
-    using Test-Driven Development (TDD).
+    Guidelines for implementing or migrating Matter server clusters to the
+    code-driven pattern using Test-Driven Development (TDD).
 ---
 
-# Code-Driven Cluster TDD Migration
+# Code-Driven Cluster TDD Implementation
 
 ## 1. Philosophy
 
-Test-Driven Development (TDD) ensures that the migrated cluster maintains full
-feature parity with the legacy implementation and adheres strictly to the
-specification. By writing failing tests first, we validate our understanding of
-the requirements before implementing them.
+Test-Driven Development (TDD) ensures that the cluster implementation adheres strictly to the specification and maintains full feature parity if migrating an existing cluster. By writing failing tests first, we validate our understanding of the requirements before implementing them.
 
-> [!IMPORTANT] > **Preserve Legacy Behavior**: Constantly refer to the legacy
-> implementation (e.g., by keeping a `.legacy` copy of the original file) to
-> ensure you are not dropping existing functionality or changing behavior
-> unexpectedly, unless explicitly required by spec updates.
+> [!IMPORTANT]
+> **Preserve Legacy Behavior**: If you are migrating an existing cluster or implementing a new version that has an existing implementation, constantly refer to the legacy code (e.g., by keeping a `.legacy` copy of the original file) to ensure you are not dropping existing functionality or changing behavior unexpectedly.
 
 ## 2. Prerequisites
 
--   Read `code-driven-cluster-migration` skill for general migration steps
-    (renaming, directory layout).
 -   Read `code-driven-cluster-development` for core implementation patterns.
+-   If performing a **migration**, read `code-driven-cluster-migration` for general migration steps (renaming, directory layout). We assume you have already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the TDD conversion.
 
 ## 3. Step-by-Step Conversion Workflow (Phase 3)
 
@@ -111,10 +105,7 @@ For each command:
 3.  Use `CodegenClusterIntegration::RegisterServer` (recommended) or direct
     registration to bridge ZAP defaults (like `FeatureMap` and optional
     attributes) to the new cluster instance.
-4.  If the cluster has a legacy class that applications interact with directly
-    (e.g., `ChimeServer` or `Identify`), maintain it in `CodegenIntegration` and
-    refactor it to act as a proxy wrapper around the new code-driven cluster
-    implementation. This ensures existing applications do not need to change.
+4.  If you are migrating or replacing an existing implementation that has a legacy class applications interact with directly (e.g., `ChimeServer` or `Identify`), maintain it in `CodegenIntegration` and refactor it to act as a proxy wrapper around the new code-driven cluster implementation. This ensures existing applications do not need to change.
 
 ### Step 8: Verification & ZAP Regen
 
