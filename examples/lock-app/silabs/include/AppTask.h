@@ -229,6 +229,11 @@ public:
 
     void DMDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
+    bool SetLockState(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
+                      const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
+                      chip::app::Clusters::DoorLock::DlLockState lockState, const chip::Optional<chip::ByteSpan> & pin,
+                      chip::app::Clusters::DoorLock::OperationErrorEnum & err);
+
     /** Door-lock actuator / cluster actions. */
     enum class LockAction : uint8_t
     {
@@ -370,15 +375,6 @@ private:
     static void UpdateClusterState(intptr_t context);
 
     static void PostLockActionEvent(int32_t actor, LockAction action);
-
-    // ---- PIN validation / cluster state push ----
-    bool Unlock(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
-                const chip::app::DataModel::Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pin,
-                chip::app::Clusters::DoorLock::OperationErrorEnum & err);
-    bool SetLockState(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
-                      const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
-                      chip::app::Clusters::DoorLock::DlLockState lockState, const chip::Optional<chip::ByteSpan> & pin,
-                      chip::app::Clusters::DoorLock::OperationErrorEnum & err);
 
     // ---- State ----
     UnlatchContext mUnlatchContext;

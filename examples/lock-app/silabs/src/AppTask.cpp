@@ -477,7 +477,7 @@ bool AppTask::DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nul
                                           OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
-    bool status = SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kLocked, pinCode, err);
+    bool status = appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kLocked, pinCode, err);
     if (status == true)
     {
         // Marshal the actuator transition onto the AppTask thread so that
@@ -492,19 +492,28 @@ bool AppTask::DMDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const N
                                             OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
-    bool status = Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
-    if (status == true)
+
+    if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
     {
-        if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
+        // TODO: Our current implementation does not support multiple endpoints. This needs to be fixed in the future.
+        if (endpointId != mUnlatchContext.mEndpointId)
         {
-            PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlatch);
+            mUnlatchContext.Update(endpointId, fabricIdx, nodeId, pinCode, err);
         }
-        else
+        if (!appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pinCode, err))
         {
-            PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+            return false;
         }
+        PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlatch);
+        return true;
     }
-    return status;
+
+    if (!appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pinCode, err))
+    {
+        return false;
+    }
+    PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+    return true;
 }
 
 bool AppTask::DMDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
@@ -512,12 +521,16 @@ bool AppTask::DMDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const N
                                             OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
-    bool status = Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
-    if (status == true)
+
+    // Per spec, `UnboltDoor` retracts the bolt without pulling the latch and
+    // ends at `LockState = Unlocked` (the cluster emits a single
+    // `LockOperation{Unlock}` event). No latch stage, no `mUnlatchContext`.
+    if (!appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pinCode, err))
     {
-        PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+        return false;
     }
-    return status;
+    PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+    return true;
 }
 
 void AppTask::DMDoorLockOnAutoRelock(chip::EndpointId /*endpointId*/)
@@ -776,17 +789,18 @@ void AppTask::TimerEventHandler(void * timerCbArg)
 }
 void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
 {
-    AppTask & self = appInstance();
-
     // write the new lock value
     bool succes = false;
-    if (self.mUnlatchContext.mEndpointId != kInvalidEndpointId)
+    if (appInstance().mUnlatchContext.mEndpointId != kInvalidEndpointId)
     {
-        Optional<chip::ByteSpan> pin = (self.mUnlatchContext.mPinLength)
-            ? MakeOptional(chip::ByteSpan(self.mUnlatchContext.mPinBuffer, self.mUnlatchContext.mPinLength))
+        Optional<chip::ByteSpan> pin = (appInstance().mUnlatchContext.mPinLength)
+            ? MakeOptional(
+                  chip::ByteSpan(appInstance().mUnlatchContext.mPinBuffer, appInstance().mUnlatchContext.mPinLength))
             : Optional<chip::ByteSpan>::Missing();
-        succes = self.SetLockState(self.mUnlatchContext.mEndpointId, self.mUnlatchContext.mFabricIdx, self.mUnlatchContext.mNodeId,
-                                   DlLockState::kUnlocked, pin, self.mUnlatchContext.mErr);
+        succes = appInstance().SetLockState(appInstance().mUnlatchContext.mEndpointId,
+                                            appInstance().mUnlatchContext.mFabricIdx,
+                                            appInstance().mUnlatchContext.mNodeId, DlLockState::kUnlocked, pin,
+                                            appInstance().mUnlatchContext.mErr);
     }
 
     if (!succes)
@@ -864,21 +878,6 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
             lock->mSyncClusterToButtonAction = false;
         }
     }
-}
-
-bool AppTask::Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                     const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
-{
-    if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
-    {
-        // TODO: Our current implementation does not support multiple endpoints. This needs to be fixed in the future.
-        if (endpointId != mUnlatchContext.mEndpointId)
-        {
-            mUnlatchContext.Update(endpointId, fabricIdx, nodeId, pin, err);
-        }
-        return SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pin, err);
-    }
-    return SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
 
 bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
