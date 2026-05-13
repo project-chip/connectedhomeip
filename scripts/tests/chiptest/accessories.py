@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import dataclasses
 import filecmp
 import functools
@@ -24,7 +25,7 @@ import subprocess
 import sys
 import threading
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, Self, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
 from chiptest.concurrency.context import StartStopContextMixin, mp_wrapped_spawn_context
@@ -68,8 +69,6 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
       `self._rsp_queue`.
     - `_call()` reads that response and re-raises exceptions so XML-RPC receives the original failure.
     """
-    _server_manager: SimpleXMLRPCServer
-    _server_thread_manager: threading.Thread
 
     def _call(self, name: str, *args: Any) -> bool:
         log.debug("Call: %s%r", name, args)
@@ -91,30 +90,39 @@ class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartSt
         s = name.split("_")
         return s[0] + "".join(word.capitalize() for word in s[1:])
 
-    def _proc_init(self) -> None:
+    def _proc_init(self, exit_stack: contextlib.ExitStack) -> None:
         # Create the XMLRPC server and register functions.
-        self._server_manager = SimpleXMLRPCServer((IP, PORT))
+        server = XmlRpcServerProcess.Server(self._config.stop_timeout_sec)
         for func in APPS_RPC_FUNCS:
-            self._server_manager.register_function(self._create_func(func), self._to_camel_case(func))
+            server.register_function(self._create_func(func), self._to_camel_case(func))
 
         # Set the log level for the process with the dedicated log level for RPC.
         self._config.log_config.set_fmt(level=self._config.log_config.level_rpc)
 
-        # Run the server loop in a separate thread.
-        self._server_thread_manager = threading.Thread(target=self._server_manager.serve_forever, name="Server")
-        self._server_thread_manager.start()
+        # Start the server and register in the exit stack.
+        exit_stack.enter_context(server)
 
-    def _proc_cleanup(self):
-        if hasattr(self, '_server_manager'):
+    class Server(SimpleXMLRPCServer):
+        def __init__(self, stop_timeout_sec: float):
+            super().__init__(addr=(IP, PORT))
+
+            self._stop_timeout_sec = stop_timeout_sec
+            self._thread = threading.Thread(name="Server", target=self.serve_forever, daemon=True)
+
+        def __enter__(self) -> Self:
+            self._thread.start()
+            return self
+
+        def __exit__(self, *args: Any) -> None:
             log.debug("Stopping XMLRPC Server thread")
-            self._server_manager.shutdown()
+            self.shutdown()
 
-        if hasattr(self, '_server_thread_manager'):
             log.debug("Waiting for XMLRPC Server thread to stop")
-            self._server_thread_manager.join(timeout=self._config.stop_timeout_sec)
-            if self._server_thread_manager.is_alive():
+            self._thread.join(timeout=self._stop_timeout_sec)
+            if not self._thread.is_alive():
+                log.debug("XMLRPC Server thread stopped")
+            else:
                 log.error("XMLRPC Server thread failed to stop")
-            log.debug("XMLRPC Server thread stopped")
 
 
 class XmlRpcServerProcessManager(threading.Thread):

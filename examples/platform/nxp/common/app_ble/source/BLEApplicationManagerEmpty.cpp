@@ -23,7 +23,12 @@ using namespace ::chip::NXP::App;
 
 BLEApplicationManager BLEApplicationManager::sInstance;
 
-void BLEApplicationManager::Init(void)
+void BLEApplicationManager::PreMatterStackInit(void)
+{
+    /*Empty implementation. Intentionally left blank */
+}
+
+void BLEApplicationManager::PostMatterStackInit(void)
 {
     /*Empty implementation. Intentionally left blank */
 }

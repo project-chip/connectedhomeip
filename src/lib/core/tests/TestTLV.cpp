@@ -4946,3 +4946,66 @@ TEST_F(TestTLV, TestUninitializedWriter)
         EXPECT_EQ(writer.CopyContainer(ContextTag(1), buf, static_cast<uint16_t>(sizeof(buf))), CHIP_ERROR_INCORRECT_STATE);
     }
 }
+
+TEST_F(TestTLV, CheckGetStringBoundsCheck)
+{
+    // Write a short UTF8 string "Hi" into TLV
+    uint8_t backingStore[32];
+    TLVWriter writer;
+    writer.Init(backingStore, sizeof(backingStore));
+
+    CHIP_ERROR err = writer.PutString(AnonymousTag(), "Hi");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = writer.Finalize();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Reading with exact-fit buffer (3 bytes: 'H', 'i', '\0') should succeed
+    {
+        TLVReader reader;
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        char buf[3];
+        err = reader.GetString(buf, sizeof(buf));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_STREQ(buf, "Hi");
+    }
+
+    // Reading with buffer larger than needed should succeed
+    {
+        TLVReader reader;
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        char buf[10];
+        err = reader.GetString(buf, sizeof(buf));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_STREQ(buf, "Hi");
+    }
+
+    // Reading with buffer too small by 1 byte should fail
+    {
+        TLVReader reader;
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        char buf[2];
+        err = reader.GetString(buf, sizeof(buf));
+        EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Reading with bufSize=0 should fail
+    {
+        TLVReader reader;
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        char buf[1];
+        err = reader.GetString(buf, 0);
+        EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+}

@@ -35,13 +35,13 @@
 #include <system/SystemMutex.h>
 #include <system/SystemStats.h>
 
-#include <stdint.h>
-
 #include <limits.h>
 #include <limits>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

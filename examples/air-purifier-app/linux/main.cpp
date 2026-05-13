@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
 #include <imgui_ui/windows/connectivity.h>

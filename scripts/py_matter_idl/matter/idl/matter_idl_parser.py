@@ -218,25 +218,25 @@ class MatterIdlTransformer(Transformer):
         raise Exception("Unexpected size for data type")
 
     @v_args(meta=True, inline=True)
-    def constant_entry(self, meta, api_maturity, id, number, spec_name):
+    def constant_entry(self, meta, api_maturity, constant_id, number, spec_name):
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return ConstantEntry(name=id, code=number, api_maturity=api_maturity, specification_name=spec_name, parse_meta=meta)
+        return ConstantEntry(name=constant_id, code=number, api_maturity=api_maturity, specification_name=spec_name, parse_meta=meta)
 
     @v_args(meta=True, inline=True)
-    def enum(self, meta, shared, id, type, *entries):
+    def enum(self, meta, shared, enum_id, enum_type, *entries):
         if shared is None:
             shared = False
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Enum(name=id, base_type=type, entries=list(entries), is_shared=shared, parse_meta=meta)
+        return Enum(name=enum_id, base_type=enum_type, entries=list(entries), is_shared=shared, parse_meta=meta)
 
     @v_args(meta=True, inline=True)
-    def bitmap(self, meta, shared, id, type, *entries):
+    def bitmap(self, meta, shared, bitmap_id, bitmap_type, *entries):
         if shared is None:
             shared = False
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Bitmap(name=id, base_type=type, entries=list(entries), is_shared=shared, parse_meta=meta)
+        return Bitmap(name=bitmap_id, base_type=bitmap_type, entries=list(entries), is_shared=shared, parse_meta=meta)
 
     @v_args(meta=True)
     def field(self, meta, args):
@@ -423,19 +423,19 @@ class MatterIdlTransformer(Transformer):
         return AttributeStorage.CALLBACK
 
     @v_args(meta=True, inline=True)
-    def endpoint_attribute_instantiation(self, meta, storage, id, default=None):
+    def endpoint_attribute_instantiation(self, meta, storage, attribute_id, default=None):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return AttributeInstantiation(parse_meta=meta, name=id, storage=storage, default=default)
+        return AttributeInstantiation(parse_meta=meta, name=attribute_id, storage=storage, default=default)
 
     @v_args(meta=True, inline=True)
-    def endpoint_command_instantiation(self, meta, id):
+    def endpoint_command_instantiation(self, meta, command_id):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return CommandInstantiation(parse_meta=meta, name=id)
+        return CommandInstantiation(parse_meta=meta, name=command_id)
 
     @v_args(meta=True, inline=True)
-    def endpoint_emitted_event(self, meta, id):
+    def endpoint_emitted_event(self, meta, event_id):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return id
+        return event_id
 
     def ESCAPED_STRING(self, s):
         # handle escapes, skip the start and end quotes
@@ -455,11 +455,11 @@ class MatterIdlTransformer(Transformer):
         return Attribute(definition=definition, qualities=qualities, **acl)
 
     @v_args(meta=True, inline=True)
-    def struct(self, meta, shared, qualities, id, *fields):
+    def struct(self, meta, shared, qualities, struct_id, *fields):
         if shared is None:
             shared = False
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Struct(name=id, qualities=qualities, fields=list(fields), is_shared=shared, parse_meta=meta)
+        return Struct(name=struct_id, qualities=qualities, fields=list(fields), is_shared=shared, parse_meta=meta)
 
     @v_args(inline=True)
     def request_struct(self, value):
@@ -467,9 +467,9 @@ class MatterIdlTransformer(Transformer):
         return value
 
     @v_args(meta=True, inline=True)
-    def response_struct(self, meta, id, code, *fields):
+    def response_struct(self, meta, struct_id, code, *fields):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields), parse_meta=meta)
+        return Struct(name=struct_id, tag=StructTag.RESPONSE, code=code, fields=list(fields), parse_meta=meta)
 
     @v_args(inline=True)
     def endpoint(self, number, *transforms):
@@ -485,11 +485,11 @@ class MatterIdlTransformer(Transformer):
         return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code, version=version))
 
     @v_args(inline=True)
-    def endpoint_cluster_binding(self, id):
-        return AddBindingToEndpointTransform(id)
+    def endpoint_cluster_binding(self, cluster_id):
+        return AddBindingToEndpointTransform(cluster_id)
 
     @v_args(meta=True, inline=True)
-    def endpoint_server_cluster(self, meta, id, *content):
+    def endpoint_server_cluster(self, meta, cluster_id, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         attributes = []
@@ -504,7 +504,7 @@ class MatterIdlTransformer(Transformer):
             else:
                 events.add(item)
         return AddServerClusterToEndpointTransform(
-            ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events, commands=commands))
+            ServerClusterInstantiation(parse_meta=meta, name=cluster_id, attributes=attributes, events_emitted=events, commands=commands))
 
     @v_args(inline=True)
     def cluster_content(self, api_maturity, element):
