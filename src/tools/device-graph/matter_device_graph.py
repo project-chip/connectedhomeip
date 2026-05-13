@@ -105,10 +105,10 @@ def AddNodeLabel(graphSection, endpoint, wildcardResponse, device_type_xml, aggr
         tags = []
 
     if tags:
-        tags_section = "Tags:\l  " + "\l  ".join(tags)  # noqa: W605
+        tags_section = r"Tags:\l  " + r"\l  ".join(tags)
     else:
         tags_section = "Tags: []"
-    endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l{tags_section}\l"  # noqa: W605
+    endpointLabel = fr"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l{tags_section}\l"
 
     if aggregator:
         color = 'grey'
