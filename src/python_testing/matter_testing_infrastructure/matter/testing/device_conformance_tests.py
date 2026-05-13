@@ -511,12 +511,12 @@ class DeviceConformanceTests(BasicCompositionTests):
                 for req in xml_device.composed_device_types:
                     # Conformance Assessment
                     conformance_decision = req.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
-                    
+
                     # Count instances in child endpoints
                     parts_list = []
                     if Clusters.Descriptor.Attributes.PartsList in endpoint[Clusters.Descriptor]:
                         parts_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
-                    
+
                     count = 0
                     for child_ep_id in parts_list:
                         if child_ep_id in self.endpoints:
@@ -525,7 +525,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                 child_dt_list = child_ep[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
                                 if any(child_dt.deviceType == req.device_type_id for child_dt in child_dt_list):
                                     count += 1
-                    
+
                     location = DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id)
 
                     if conformance_decision.is_mandatory() and count == 0:

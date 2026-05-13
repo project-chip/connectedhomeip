@@ -125,7 +125,8 @@ class TC_DeviceConformance(DeviceConformanceTests):
                                                    allow_provisional_test_event_only_disallowed_for_certification)
         self.problems.extend(problems)
 
-        composed_dt_req_success, composed_dt_req_problems = self.check_composed_device_type_requirements(allow_provisional_test_event_only_disallowed_for_certification)
+        composed_dt_req_success, composed_dt_req_problems = self.check_composed_device_type_requirements(
+            allow_provisional_test_event_only_disallowed_for_certification)
         self.problems.extend(composed_dt_req_problems)
 
         if not success or not composed_dt_req_success:
