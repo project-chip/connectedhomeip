@@ -18361,7 +18361,7 @@ namespace Attributes {
 
 namespace FanModeSequence {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::FanControl::FanModeSequenceEnum>;
     Traits::StorageType temp;
@@ -18381,7 +18381,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters
 
 namespace SpeedMax {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18401,7 +18401,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 
 namespace RockSupport {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>;
     Traits::StorageType temp;
@@ -18421,7 +18422,8 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip:
 
 namespace WindSupport {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>;
     Traits::StorageType temp;
@@ -18441,7 +18443,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip:
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;

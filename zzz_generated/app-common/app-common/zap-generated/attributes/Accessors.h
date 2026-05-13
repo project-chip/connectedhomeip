@@ -3051,26 +3051,26 @@ namespace FanControl {
 namespace Attributes {
 
 namespace FanModeSequence {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::FanControl::FanModeSequenceEnum * value); // FanModeSequenceEnum
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::FanControl::FanModeSequenceEnum * value); // FanModeSequenceEnum
 } // namespace FanModeSequence
 
 namespace SpeedMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace SpeedMax
 
 namespace RockSupport {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value); // RockBitmap
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value); // RockBitmap
 } // namespace RockSupport
 
 namespace WindSupport {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value); // WindBitmap
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value); // WindBitmap
 } // namespace WindSupport
 
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
 
 } // namespace Attributes
