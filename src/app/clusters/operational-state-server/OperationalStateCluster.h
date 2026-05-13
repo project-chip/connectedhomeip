@@ -221,8 +221,8 @@ class Instance : private detail::OperationalInstanceBase, public InstanceBase
 public:
     Instance(Delegate * aDelegate, EndpointId aEndpointId, const OperationalStateCluster::Config & config = {}) :
         detail::OperationalInstanceBase(aDelegate, aEndpointId, config),
-        InstanceBase(detail::OperationalInstanceBase::mCluster.Cluster(),
-                     detail::OperationalInstanceBase::mCluster.Registration(), aDelegate)
+        InstanceBase(detail::OperationalInstanceBase::mCluster.Cluster(), detail::OperationalInstanceBase::mCluster.Registration(),
+                     aDelegate)
     {}
     ~Instance() override = default;
 };
