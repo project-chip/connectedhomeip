@@ -29,8 +29,8 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, ClassVar, TypeAlias
 
+from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue
 from chiptest.log_config import LogConfig
-from chiptest.work_queue import CancellableQueue, EndOfQueue
 
 log = logging.getLogger(__name__)
 
@@ -178,6 +178,7 @@ class RunSummary(RunStats):
     If operated in multithreaded environment, it should be used as a context manager to ensure thread safety when recording results.
     """
     iterations: int
+    tests_per_iteration: int
     run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
@@ -207,6 +208,16 @@ class RunSummary(RunStats):
         # Record exception per iteration.
         self.exceptions[result.iteration][result.name] = result.exception
 
+    @property
+    def expected_test_count(self) -> int:
+        """Total number of tests expected to be run across all iterations."""
+        return self.iterations * self.tests_per_iteration
+
+    @property
+    def current_iteration(self) -> int:
+        """Estimate the current iteration based on the number of recorded results."""
+        return len(self.exceptions)
+
     def write_json(self, path: Path) -> None:
         """Write the test run summary to a JSON file."""
         def encode(obj: Any) -> Any:
@@ -234,7 +245,7 @@ class RunSummary(RunStats):
     def from_json(cls, path: Path) -> RunSummary:
         """Read the test run summary from a JSON file."""
         raw = json.loads(path.read_text())
-        ret = RunSummary(iterations=raw.get("iterations", 1))
+        ret = RunSummary(iterations=raw.get("iterations", 1), tests_per_iteration=raw.get("tests_per_iteration", 0))
 
         # Recover a timestamp.
         timestamp = raw.get("run_timestamp", "unknown")
@@ -343,7 +354,7 @@ class RunSummary(RunStats):
                               no_content_msg="No failures recorded",
                               headers_fmt=(("Test name", "<"), ("Iter", ">"), ("Duration", ">")),
                               rows=((r.name_decorated, str(r.iteration), f"{r.duration_seconds:.2f}s")
-                              for r in sorted(failed_results, key=lambda x: x.name)))
+                                    for r in sorted(failed_results, key=lambda x: x.name)))
 
         if show_flaky and self.iterations > 1:
             flaky = tuple((name, stats) for name, stats in self.test_stats.items() if stats.failed > 0)
@@ -351,7 +362,7 @@ class RunSummary(RunStats):
                               no_content_msg="No flaky results",
                               headers_fmt=(("Test name", "<"), ("Failures", ">"), ("Rate", ">")),
                               rows=((name, f"{stats.failed}/{stats.total_runs:<2}", f"{100 * stats.fail_rate:.1f}%")
-                              for name, stats in sorted(flaky, key=lambda item: -item[1].failed)))
+                                    for name, stats in sorted(flaky, key=lambda item: -item[1].failed)))
 
         if top_slowest:
             slowest = sorted((r for r in self.results if r.status not in (TestStatus.DRY_RUN, TestStatus.CANCELLED)),
@@ -364,7 +375,7 @@ class RunSummary(RunStats):
             self._print_table(title=f"SLOWEST {len(slowest)} TEST RUNS:", no_content_msg="No tests to show for slowest list",
                               headers_fmt=(("Test name", "<"), ("Status", "<"), ("Iter", ">"), ("Duration", ">")),
                               rows=((r.name_decorated, r.status, str(r.iteration), f"{r.duration_seconds:.2f}s")
-                              for r in slowest))
+                                    for r in slowest))
 
         if show_all:
             self._print_table(title="STATS OF ALL TESTS:", no_content_msg="No tests to show", last_col_max_width=20,
@@ -387,8 +398,7 @@ ResultQueueT: TypeAlias = CancellableQueue[TestResult]
 class ResultProcessingThread(threading.Thread):
     """Thread that processes test results from the result queue, keeps track of test run summary and prints it at the end."""
 
-    iterations: int
-    tests_per_iteration: int
+    summary: RunSummary
     expected_failures: int
     keep_going: bool
     summary_file: Path | None
@@ -397,8 +407,6 @@ class ResultProcessingThread(threading.Thread):
 
     def __post_init__(self) -> None:
         super().__init__(name="Results")
-
-        self._summary = RunSummary(self.iterations)
 
         self.result_queue: ResultQueueT = CancellableQueue()
         self.exception: BaseException | None = None
@@ -417,20 +425,20 @@ class ResultProcessingThread(threading.Thread):
 
     def _process_result(self, result: TestResult) -> None:
         iteration = result.iteration
-        with self._summary:
-            self._summary.record(result)
+        with self.summary:
+            self.summary.record(result)
 
             # Check for keep going on failure.
             if result.exception is not None and not isinstance(result.exception, KeyboardInterrupt) and not self.keep_going:
                 raise ResultError("Test failed and --keep-going flag is not set.")
 
             # Check if all results for the iteration are in.
-            if len(self._summary.exceptions[iteration]) < self.tests_per_iteration:
+            if len(self.summary.exceptions[iteration]) < self.summary.tests_per_iteration:
                 return
 
             log.debug("All results for iteration %i are in, checking failure count", iteration)
             observed_failures = sum(exc is not None and not isinstance(exc, KeyboardInterrupt)
-                                    for exc in self._summary.exceptions[iteration].values())
+                                    for exc in self.summary.exceptions[iteration].values())
             if observed_failures != self.expected_failures:
                 raise ResultError(
                     f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}")
@@ -458,6 +466,6 @@ class ResultProcessingThread(threading.Thread):
         finally:
             # We don't take the lock to ensure there is no deadlock in case of the thread being stuck on acquiring the lock. This
             # may lead to incomplete or corrupted summary, but it's better than hanging indefinitely.
-            self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+            self.summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
             if self.summary_file is not None:
-                self._summary.write_json(self.summary_file)
+                self.summary.write_json(self.summary_file)

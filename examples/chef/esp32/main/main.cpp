@@ -44,9 +44,11 @@
 #include <app/server/Dnssd.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
+#if CONFIG_HAVE_DISPLAY
 #include "Display.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
+#endif // CONFIG_HAVE_DISPLAY
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"

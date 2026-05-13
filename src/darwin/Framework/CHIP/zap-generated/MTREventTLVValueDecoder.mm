@@ -4576,6 +4576,19 @@ static id _Nullable DecodeEventPayloadForBallastConfigurationCluster(EventId aEv
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForDynamicLightingCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DynamicLighting;
+    switch (aEventId) {
+    default: {
+        // Not a known DynamicLighting event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForIlluminanceMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::IlluminanceMeasurement;
@@ -5043,6 +5056,19 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
     }
     default: {
         // Not a known ProximityRanging event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForNetworkIdentityManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aEventId) {
+    default: {
+        // Not a known NetworkIdentityManagement event.
         break;
     }
     }
@@ -6267,6 +6293,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::BallastConfiguration::Id: {
         return DecodeEventPayloadForBallastConfigurationCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::DynamicLighting::Id: {
+        return DecodeEventPayloadForDynamicLightingCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::IlluminanceMeasurement::Id: {
         return DecodeEventPayloadForIlluminanceMeasurementCluster(aPath.mEventId, aReader, aError);
     }
@@ -6323,6 +6352,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ProximityRanging::Id: {
         return DecodeEventPayloadForProximityRangingCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return DecodeEventPayloadForNetworkIdentityManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeEventPayloadForWiFiNetworkManagementCluster(aPath.mEventId, aReader, aError);

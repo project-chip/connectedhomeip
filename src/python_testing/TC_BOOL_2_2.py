@@ -108,7 +108,6 @@ class TC_BOOL_2_2(MatterBaseTest):
     def pics_TC_BOOL_2_2(self) -> list[str]:
         return [
             "BOOL.S",
-            "BOOL.S.M.ManuallyControlled",
         ]
 
     def _feature_map_has_chgevent(self, feature_map: int) -> bool:

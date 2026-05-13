@@ -731,10 +731,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
 
-            args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
             args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
-            TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
-            LinuxDeviceOptions::GetInstance().mPublishId = args.publish_id;
+            DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(args);
         }
     }
 #endif
@@ -1015,17 +1013,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         // This example use of the ARL feature proactively installs the provided entries on fabric index 1
         SuccessOrDie(exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value()));
-    }
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
-        // TODO #40789: Should we just NOT call WiFiPAFShutdown at startup and instead make sure that WiFiPAF is not published at
-        // all? or Change the handling within WiFiPAFShutdown?
-        // TODO #40814: Check the Return Value of the call to WiFiPAFShutdown
-        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
-                                                                                chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
     }
 #endif
 

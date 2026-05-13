@@ -231,7 +231,7 @@ TEST_F(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
     ASSERT_EQ(extension.GetDataVersion(mockPath2), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(mockPath.mEndpointId, mockPath.mClusterId, 234));
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(mockPath.mEndpointId, mockPath.mClusterId, 234));
 }
 
 TEST_F(TestServerClusterExtension, TestExtensionAttributes)

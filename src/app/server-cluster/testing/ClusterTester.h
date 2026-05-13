@@ -399,16 +399,17 @@ public:
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
 
-    std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
+    // TODO: Add methods to test AttributeChangeListener notifications.
+    std::vector<app::ConcreteAttributePath> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
 
     // Returns true if the given attribute appears in the dirty list.
-    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster
     // Will VerifyOrDie that `GetPaths()` returns exactly one path.
     bool IsAttributeDirty(AttributeId attributeId)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrDie(paths.size() == 1);
-        app::AttributePathParams target(paths[0].mEndpointId, paths[0].mClusterId, attributeId);
+        app::ConcreteAttributePath target(paths[0].mEndpointId, paths[0].mClusterId, attributeId);
         const auto & list = GetDirtyList();
         return std::find(list.begin(), list.end(), target) != list.end();
     }

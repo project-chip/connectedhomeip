@@ -59,6 +59,7 @@
 #include <clusters/DishwasherAlarm/AttributeIds.h>
 #include <clusters/DishwasherMode/AttributeIds.h>
 #include <clusters/DoorLock/AttributeIds.h>
+#include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
@@ -99,6 +100,7 @@
 #include <clusters/MicrowaveOvenMode/AttributeIds.h>
 #include <clusters/ModeSelect/AttributeIds.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
+#include <clusters/NetworkIdentityManagement/AttributeIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OnOff/AttributeIds.h>

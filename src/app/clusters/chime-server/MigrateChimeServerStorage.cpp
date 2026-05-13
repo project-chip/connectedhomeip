@@ -33,8 +33,9 @@ CHIP_ERROR MigrateChimeServerStorage(EndpointId endpointId, SafeAttributePersist
         { Attributes::Enabled::Id, sizeof(bool), true /* isScalar */ },
     };
     // We need to provide a buffer with enough space for the attributes that will be migrated.
-    // Both uint8_t and bool fit in 1 byte.
-    uint8_t attributeBuffer[sizeof(uint8_t)] = {};
+    static constexpr size_t kBufferSize = MaxAttrMigrationValueSize(attributesToUpdate);
+    static_assert(kBufferSize > 0, "All migration attributes have zero valueSize");
+    uint8_t attributeBuffer[kBufferSize] = {};
     MutableByteSpan buffer(attributeBuffer);
     return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, Chime::Id },
                                                          Span(attributesToUpdate), buffer);

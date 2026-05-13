@@ -50,7 +50,7 @@ std::string ReadSetupURL(EndpointId endpointId)
     // Use a stack buffer for the Ember read; the result is then copied into a std::string.
     char buf[kMaxSetupURLLength];
     MutableCharSpan urlSpan(buf);
-    VerifyOrReturnValue(Attributes::SetupURL::Get(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
+    VerifyOrReturnValue(Attributes::SetupURL::GetDefault(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
                         std::string());
     return std::string(urlSpan.data(), urlSpan.size());
 }
