@@ -56,7 +56,7 @@ class TC_DefaultChecker(BasicCompositionTests, DefaultChecker):
         self.success = True
 
     def steps_TC_IDM_13_1(self):
-        return [TestStep(1, "TH performs a wildcard read of all attributes", is_commissioning=True),
+        return [TestStep(1, "Commissioning and wildcard read of all attributes", is_commissioning=True),
                 TestStep(2, f"If the {FLAG_PRODUCT_NAME} flag is not set, check for \"Test\" in the product name",
                          "\"Test\" does not appear in the product name"),
                 TestStep(3, f"If the {FLAG_VENDOR_NAME} flag is not set, check for \"Test\" in the vendor name",
