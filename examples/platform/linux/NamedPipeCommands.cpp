@@ -166,10 +166,18 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
 
     while (self->mRunning)
     {
-        ssize_t readBytes = read(fd, readbuf, kChipEventCmdBufSize);
+        ssize_t readBytes = read(fd, readbuf, sizeof(readbuf) - 1);
         if (readBytes > 0)
         {
-            readbuf[readBytes - 1] = '\0';
+            // Null-terminate for processing (not guaranteed by writer).
+            readbuf[readBytes] = '\0';
+
+            // Strip trailing newline if present
+            if (readbuf[readBytes - 1] == '\n')
+            {
+                readbuf[readBytes - 1] = '\0';
+            }
+
             if (readbuf[0] == '\0')
             {
                 continue;
