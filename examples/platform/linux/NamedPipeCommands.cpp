@@ -19,6 +19,7 @@
 #include "NamedPipeCommands.h"
 
 #include <chrono>
+#include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <lib/support/CodeUtils.h>
@@ -48,16 +49,17 @@ CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::strin
     mFifoInPath  = inPath;
     mFifoOutPath = outPath;
 
-    // Creating the named file(FIFO)
+    // 1. Creating the named file(FIFO)
     VerifyOrExit((mkfifo(inPath.c_str(), 0660) == 0) || (errno == EEXIST), err = CHIP_ERROR_OPEN_FAILED);
-
-    VerifyOrExit(pthread_create(&mChipEventCommandListener, nullptr, EventCommandListenerTask, reinterpret_cast<void *>(this)) == 0,
-                 err = CHIP_ERROR_UNEXPECTED_EVENT);
 
     if (!outPath.empty())
     {
         VerifyOrExit((mkfifo(outPath.c_str(), 0660) == 0) || (errno == EEXIST), err = CHIP_ERROR_OPEN_FAILED);
     }
+
+    // 2. Spawn listener thread last
+    VerifyOrExit(pthread_create(&mChipEventCommandListener, nullptr, EventCommandListenerTask, reinterpret_cast<void *>(this)) == 0,
+                 err = CHIP_ERROR_UNEXPECTED_EVENT);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -78,6 +80,10 @@ CHIP_ERROR NamedPipeCommands::Stop()
     if (mRunning.exchange(false))
     {
         mDone = true;
+
+        // Ignore SIGPIPE to prevent process termination if the listener thread closes the read end concurrently.
+        signal(SIGPIPE, SIG_IGN);
+
         // Unblock the listener thread by writing a placeholder byte to the FIFO.
         int fd = open(mFifoInPath.c_str(), O_WRONLY | O_NONBLOCK);
         if (fd != -1)
@@ -90,10 +96,19 @@ CHIP_ERROR NamedPipeCommands::Stop()
             close(fd);
         }
 
-        // Wait further for the thread to terminate if we had previously created it.
-        if (pthread_join(mChipEventCommandListener, nullptr) != 0)
+        // Prevent deadlock: do not pthread_join if Stop() is called from the listener thread itself.
+        if (pthread_equal(pthread_self(), mChipEventCommandListener) == 0)
         {
-            ChipLogError(NotSpecified, "Failed to join listener thread");
+            // Wait further for the thread to terminate if we had previously created it.
+            if (pthread_join(mChipEventCommandListener, nullptr) != 0)
+            {
+                ChipLogError(NotSpecified, "Failed to join listener thread");
+            }
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "NamedPipeCommands::Stop() called from listener thread; detaching thread.");
+            pthread_detach(mChipEventCommandListener);
         }
     }
 
@@ -207,13 +222,16 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
         // Null-terminate for processing (not guaranteed by writer).
         readbuf[numBytesRead] = '\0';
 
-        // Strip trailing newline if present
-        if (readbuf[numBytesRead - 1] == '\n')
+        // Strip any trailing \0 (placeholder bytes), \n, or \r before processing.
+        while (numBytesRead > 0 && (readbuf[numBytesRead - 1] == '\n' ||
+                                    readbuf[numBytesRead - 1] == '\r' ||
+                                    readbuf[numBytesRead - 1] == '\0'))
         {
-            readbuf[numBytesRead - 1] = '\0';
+            numBytesRead--;
+            readbuf[numBytesRead] = '\0';
         }
 
-        if (readbuf[0] == '\0')
+        if (numBytesRead == 0)
         {
             continue;
         }
