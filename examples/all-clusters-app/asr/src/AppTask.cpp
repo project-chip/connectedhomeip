@@ -30,6 +30,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/pressure-measurement-server/CodegenIntegration.h>
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
@@ -190,8 +191,8 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         LogErrorOnFailure(chip::app::Clusters::RelativeHumidityMeasurement::SetMeasuredValue(
             /* endpoint ID */ 1, chip::app::DataModel::MakeNullable(static_cast<uint16_t>(humidity))));
 
-        chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::Set(
-            /* endpoint ID */ 1, /* pressure in 0.01 */ pressure);
+        LogErrorOnFailure(chip::app::Clusters::PressureMeasurement::SetMeasuredValue(
+            /* endpoint ID */ 1, chip::app::DataModel::MakeNullable(static_cast<int16_t>(pressure))));
 
         break;
     }

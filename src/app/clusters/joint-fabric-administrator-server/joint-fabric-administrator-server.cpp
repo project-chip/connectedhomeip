@@ -182,8 +182,8 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
 
     using namespace chip::app::Clusters::JointFabricAdministrator;
 
-    Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
-    Status globalStatus             = Status::Success;
+    Optional<ICACCSRResponseStatusCodeEnum> status = Optional<ICACCSRResponseStatusCodeEnum>::Missing();
+    Status globalStatus                            = Status::Success;
     Spake2pVerifier verifier;
     DataModel::Nullable<FabricIndex> administratorFabricIndex;
 
@@ -194,15 +194,15 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
-    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(ICACCSRResponseStatusCodeEnum::kPAKEParameterError));
     VerifyOrExit(Attributes::AdministratorFabricIndex::Get(ctx.mRequestPath.mEndpointId, administratorFabricIndex) ==
                      Status::Success,
                  globalStatus = Status::Failure);
     VerifyOrExit(!administratorFabricIndex.IsNull() && administratorFabricIndex.Value() != 0,
-                 status.Emplace(StatusCodeEnum::kInvalidAdministratorFabricIndex));
-    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCodeEnum::kBusy));
+                 status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(ICACCSRResponseStatusCodeEnum::kBusy));
 
-    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCodeEnum::kBusy));
+    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(ICACCSRResponseStatusCodeEnum::kBusy));
     VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, globalStatus = Status::InvalidCommand);
     VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, globalStatus = Status::InvalidCommand);
     VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, globalStatus = Status::InvalidCommand);
@@ -308,10 +308,10 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     MATTER_TRACE_SCOPE("ICACCSRRequest", "JointFabricAdministrator");
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an ICACCSRRequest command");
 
-    auto nonDefaultStatus           = Status::Success;
-    Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
-    auto & failSafeContext          = Server::GetInstance().GetFailSafeContext();
-    auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
+    auto nonDefaultStatus                          = Status::Success;
+    Optional<ICACCSRResponseStatusCodeEnum> status = Optional<ICACCSRResponseStatusCodeEnum>::Missing();
+    auto & failSafeContext                         = Server::GetInstance().GetFailSafeContext();
+    auto & jointFabricAdministrator                = Server::GetInstance().GetJointFabricAdministrator();
 
     uint8_t buf[Credentials::kMaxDERCertLength];
     MutableByteSpan icacCsr(buf, Credentials::kMaxDERCertLength);
@@ -328,17 +328,18 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
     VerifyOrExit(jointFabricAdministrator.WasVidVerificationExecutedForFabric(ctx.mCommandHandler.GetAccessingFabricIndex()),
-                 status.Emplace(StatusCodeEnum::kVIDNotVerified));
+                 status.Emplace(ICACCSRResponseStatusCodeEnum::kVIDNotVerified));
 
     VerifyOrExit(Attributes::AdministratorFabricIndex::Get(ctx.mRequestPath.mEndpointId, administratorFabricIndex) ==
                      Status::Success,
                  nonDefaultStatus = Status::Failure);
-    VerifyOrExit(!administratorFabricIndex.IsNull(), status.Emplace(StatusCodeEnum::kInvalidAdministratorFabricIndex));
+    VerifyOrExit(!administratorFabricIndex.IsNull(),
+                 status.Emplace(ICACCSRResponseStatusCodeEnum::kInvalidAdministratorFabricIndex));
 
     VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
     VerifyOrExit(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr) == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
 
-    response.icaccsr = icacCsr;
+    response.icaccsr = MakeOptional(icacCsr);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 
 exit:

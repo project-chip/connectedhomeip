@@ -122,6 +122,10 @@
 #include "ICDUtil.h"
 #endif // CONFIG_NXP_USE_POWER_DOWN
 
+#if CONFIG_CHIP_APP_IDENTIFY
+#include "Identify.h"
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -154,6 +158,16 @@ extern const char sBaseServiceInstanceName[];
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
+#endif
+
+#if CONFIG_CHIP_APP_IDENTIFY
+NXP::App::IdentifyDelegate sIdentifyDelegate;
+static chip::app::DefaultTimerDelegate sTimerDelegateIdentify;
+
+app::RegisteredServerCluster<app::Clusters::IdentifyCluster>
+    gIdentifyCluster(app::Clusters::IdentifyCluster::Config(CONFIG_CHIP_APP_IDENTIFY_ENDPOINT, sTimerDelegateIdentify)
+                         .WithIdentifyType(chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                         .WithDelegate(&sIdentifyDelegate));
 #endif
 
 #if CONFIG_NET_L2_OPENTHREAD
@@ -260,6 +274,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         goto exit;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().PreMatterStackInit();
+#endif
+
     /*
      * Initialize the CHIP stack.
      * Would also initialize all required platform modules
@@ -333,6 +352,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     SuccessOrExit(err);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().PostMatterStackInit();
+#endif
+
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
 #ifdef ENABLE_CHIP_SHELL
@@ -346,6 +370,15 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     {
         /* If an update is under test make it permanent */
         OTARequestorInitiator::Instance().HandleSelfTest();
+    }
+#endif
+
+#if CONFIG_CHIP_APP_IDENTIFY
+    err = chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during Register(gIdentifyCluster.Registration()");
+        goto exit;
     }
 #endif
 

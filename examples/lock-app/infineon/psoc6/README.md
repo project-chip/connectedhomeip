@@ -60,8 +60,8 @@ will then join the network.
 
 _To build with Infineon Hardware Security Module-OPTIGA™ Trust M for Device
 attestation and other security use cases, please refer to the
-[Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm) for
-more instructions_
+[Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm)
+for more instructions_
 
 ## Flashing the Application
 
@@ -173,8 +173,8 @@ cloud, giving every IoT device its own unique identity.
 
 ### Optiga Trust M Provisioning
 
-For the description of OPTIGA™ Trust M Provisioning with test DAC generation and
-PAI and CD storage, please refer to
+For the description of OPTIGA™ Trust M Provisioning with test DAC generation
+and PAI and CD storage, please refer to
 [Infineon OPTIGA™ Trust M Provisioning](../../../../docs/platforms/infineon/infineon_trustm_provisioning.md)
 
 After completing OPTIGA™ Trust M Provisioning, proceed to

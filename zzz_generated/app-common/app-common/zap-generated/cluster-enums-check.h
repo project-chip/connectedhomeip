@@ -61,6 +61,7 @@
 #include <clusters/DishwasherAlarm/EnumsCheck.h>
 #include <clusters/DishwasherMode/EnumsCheck.h>
 #include <clusters/DoorLock/EnumsCheck.h>
+#include <clusters/DynamicLighting/EnumsCheck.h>
 #include <clusters/EcosystemInformation/EnumsCheck.h>
 #include <clusters/ElectricalEnergyMeasurement/EnumsCheck.h>
 #include <clusters/ElectricalGridConditions/EnumsCheck.h>
@@ -101,6 +102,7 @@
 #include <clusters/MicrowaveOvenMode/EnumsCheck.h>
 #include <clusters/ModeSelect/EnumsCheck.h>
 #include <clusters/NetworkCommissioning/EnumsCheck.h>
+#include <clusters/NetworkIdentityManagement/EnumsCheck.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EnumsCheck.h>
 #include <clusters/OccupancySensing/EnumsCheck.h>
 #include <clusters/OnOff/EnumsCheck.h>

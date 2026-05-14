@@ -45,6 +45,47 @@ public:
     virtual void Release(ScenesManagementSceneTable *) = 0;
 };
 
+/// RAII for a scenes management table provider:
+///    - does a `Take()` to get a ScenesManagementSceneTable at creation
+///    - ensures `Release()` is called on destruction
+///
+/// Use this for operating on scenes tables provided by a scene management table provider.
+/// This objects asserts that scene provider `Take` does NOT fail with nullptr.
+///
+/// For example to register a cluster for scene processing:
+///
+///    ScopedSceneTable  table(sceneTableProvider);
+///    table->RegisterHandler(&cluster)
+///
+/// And to unregister:
+///
+///    ScopedSceneTable  table(sceneTableProvider);
+///    table->UnregisterHandler(&cluster)
+///
+class ScopedSceneTable
+{
+public:
+    ScopedSceneTable(const ScopedSceneTable &)             = delete;
+    ScopedSceneTable & operator=(const ScopedSceneTable &) = delete;
+
+    explicit ScopedSceneTable(ScenesManagementTableProvider & provider) : mProvider(provider), mTable(provider.Take())
+    {
+        /// Users of this class DO NOT expect the scene provider to fail. This is generally the case
+        /// as existing implementations re-use a global static scene object.
+        VerifyOrDie(mTable != nullptr);
+    }
+    ~ScopedSceneTable() { mProvider.Release(mTable); }
+
+    ScenesManagementSceneTable * operator->() { return mTable; }
+    const ScenesManagementSceneTable * operator->() const { return mTable; }
+
+    operator bool() const { return mTable != nullptr; }
+
+private:
+    ScenesManagementTableProvider & mProvider;
+    ScenesManagementSceneTable * mTable;
+};
+
 class ScenesManagementCluster : public DefaultServerCluster, public FabricTable::Delegate, public scenes::ScenesIntegrationDelegate
 {
 public:

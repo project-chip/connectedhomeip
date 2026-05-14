@@ -53,6 +53,57 @@ endif # LOG
 config SHELL
     default y
 
+if !CHIP_WIFI
+
+config OPENTHREAD_MANUAL_START
+    default y
+config OPENTHREAD_OPERATIONAL_DATASET_AUTO_INIT
+    default n
+config OPENTHREAD_MLR
+    default y
+config OPENTHREAD_SLAAC
+    default y
+config OPENTHREAD_ENABLE_SERVICE
+    default y
+config OPENTHREAD_THREAD_PREEMPTIVE
+    default y
+config CHIP_TASK_PRIORITY
+    default 10
+config DNS_SD
+    default y
+
+config OPENTHREAD_PANID
+    default 48879
+config OPENTHREAD_NETWORK_NAME
+	default "Silabs-test"    
+
+config PM
+    default y
+config SILABS_SISDK_POWER_MANAGER
+    default y
+# generous stack sizes for now
+config MAIN_STACK_SIZE
+    default 16384
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    default 16384
+config OPENTHREAD_THREAD_STACK_SIZE
+    default 6144
+config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
+    default 2048
+
+# for 1.4 and the ability to ping
+choice OPENTHREAD_STACK_VERSION
+    default OPENTHREAD_THREAD_VERSION_1_4
+endchoice
+
+config OPENTHREAD_PING_SENDER
+    default y
+endif
+
+
+config SILABS_SISDK_RAIL_MULTIPROTOCOL
+    default y if !CHIP_WIFI
+
 if SHELL
 
 config SHELL_STACK_SIZE

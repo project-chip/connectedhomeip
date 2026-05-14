@@ -288,6 +288,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeBallastConfigurationID:
         result = @"BallastConfiguration";
         break;
+    case MTRClusterIDTypeDynamicLightingID:
+        result = @"DynamicLighting";
+        break;
     case MTRClusterIDTypeIlluminanceMeasurementID:
         result = @"IlluminanceMeasurement";
         break;
@@ -344,6 +347,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeProximityRangingID:
         result = @"ProximityRanging";
+        break;
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+        result = @"NetworkIdentityManagement";
         break;
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
@@ -6367,6 +6373,50 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeDynamicLightingID:
+
+        switch (attributeID) {
+
+            // Cluster DynamicLighting attributes
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeAvailableEffectsID:
+            result = @"AvailableEffects";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeCurrentEffectIDID:
+            result = @"CurrentEffectID";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeCurrentSpeedID:
+            result = @"CurrentSpeed";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterDynamicLightingAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known DynamicLighting attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeIlluminanceMeasurementID:
 
         switch (attributeID) {
@@ -7663,6 +7713,50 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (attributeID) {
+
+            // Cluster NetworkIdentityManagement attributes
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeActiveNetworkIdentitiesID:
+            result = @"ActiveNetworkIdentities";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientsID:
+            result = @"Clients";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientTableSizeID:
+            result = @"ClientTableSize";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known NetworkIdentityManagement attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (attributeID) {
@@ -8658,6 +8752,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStatusLightBrightnessID:
             result = @"StatusLightBrightness";
+            break;
+
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeImageRotationDiscreteAnglesID:
+            result = @"ImageRotationDiscreteAngles";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeGeneratedCommandListID:
@@ -11605,6 +11703,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeDynamicLightingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterDynamicLightingCommandStartEffectID:
+            result = @"StartEffect";
+            break;
+
+        case MTRCommandIDTypeClusterDynamicLightingCommandStopEffectID:
+            result = @"StopEffect";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeIlluminanceMeasurementID:
 
         switch (commandID) {
@@ -11795,6 +11911,36 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterProximityRangingCommandStopRangingRequestID:
             result = @"StopRangingRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientID:
+            result = @"AddClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandRemoveClientID:
+            result = @"RemoveClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityID:
+            result = @"QueryIdentity";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandImportAdminSecretID:
+            result = @"ImportAdminSecret";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretID:
+            result = @"ExportAdminSecret";
             break;
 
         default:
@@ -13973,6 +14119,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeDynamicLightingID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeIlluminanceMeasurementID:
 
         switch (commandID) {
@@ -14159,6 +14315,28 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterProximityRangingCommandStartRangingResponseID:
             result = @"StartRangingResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientResponseID:
+            result = @"AddClientResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityResponseID:
+            result = @"QueryIdentityResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretResponseID:
+            result = @"ExportAdminSecretResponse";
             break;
 
         default:
@@ -16137,6 +16315,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeDynamicLightingID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeIlluminanceMeasurementID:
 
         switch (eventID) {
@@ -16343,6 +16531,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterProximityRangingEventRangingSessionStatusID:
             result = @"RangingSessionStatus";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
