@@ -16,6 +16,8 @@ import os
 import shlex
 import subprocess
 import sys
+
+from pathlib import Path
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
@@ -23,16 +25,14 @@ from typing import Optional
 from .builder import BuilderOutput
 from .gn import GnBuilder
 
-_MSAN_DEFAULT_SYSROOT = os.path.expanduser('~/.cache/matter/msan_sysroot')
+_MSAN_DEFAULT_SYSROOT = Path.home() / '.cache/matter/msan_sysroot'
 _MSAN_BUILD_SCRIPT = 'scripts/build/build_msan_sysroot.sh'
 
 
-def _msan_sysroot_path() -> str:
+def _msan_sysroot_path() -> Path:
     """Resolve the MSAN sysroot path that GN will reference.
     """
-    if 'SYSROOT_MSAN' in os.environ:
-        return os.path.abspath(os.environ['SYSROOT_MSAN'])
-    return os.path.abspath(_MSAN_DEFAULT_SYSROOT)
+    return Path(os.getenv('SYSROOT_MSAN', _MSAN_DEFAULT_SYSROOT)).absolute()
 
 
 def _msan_validate_sysroot(chip_root: str) -> None:
@@ -46,7 +46,7 @@ def _msan_validate_sysroot(chip_root: str) -> None:
     actionable message instead of a click/builder traceback.
     """
     sysroot = _msan_sysroot_path()
-    script = os.path.join(chip_root, _MSAN_BUILD_SCRIPT)
+    script = Path(chip_root) / _MSAN_BUILD_SCRIPT
     result = subprocess.run(
         [script, '--out-dir', sysroot, '--check'],
         capture_output=True, text=True,
@@ -538,7 +538,7 @@ class HostBuilder(GnBuilder):
                 _msan_validate_sysroot(chip_root)
             self.extra_gn_options.append('is_msan=true')
             # Tell GN to build against the same sysroot we just validated.
-            self.extra_gn_options.append('msan_sysroot="%s"' % _msan_sysroot_path())
+            self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')

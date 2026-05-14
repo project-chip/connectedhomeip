@@ -225,7 +225,7 @@ make install_dev
 # zlib
 echo ">>> zlib"
 cd "$SRC"
-[[ -d "zlib-$ZLIB_VERSION" ]] || { wget -q "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.gz" && tar xzf "zlib-$ZLIB_VERSION.tar.gz"; }
+[[ -d "zlib-$ZLIB_VERSION" ]] || { wget -q -O - "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.gz" | tar xz; }
 cd "zlib-$ZLIB_VERSION"
 CC="$PW_CLANG" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" ./configure --prefix="$SYSROOT" --static
 make -j"$(nproc)" && make install

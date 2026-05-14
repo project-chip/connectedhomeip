@@ -474,6 +474,11 @@ config("sanitize_thread") {
   ldflags = cflags
 }
 
+# MSAN is implemented only by Clang; GCC has no -fsanitize=memory.
+assert(!is_msan || is_clang,
+       "is_msan=true requires is_clang=true. MSAN is only supported by Clang " +
+           "(GCC does not implement -fsanitize=memory).")
+
 # msan_sysroot is required by the sanitize_memory config below.
 assert(!is_msan || msan_sysroot != "",
        "msan_sysroot must be set when is_msan=true. Run via " +
