@@ -3576,7 +3576,7 @@
           "mfgCode": null,
           "define": "GROUPCAST_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "JoinGroup",
