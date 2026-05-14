@@ -348,10 +348,7 @@ bool PushAVTransport::HandleTriggerDetected()
     if (!mPreviousActivationByManualTrigger && !mCurrentActivationByManualTrigger &&
         InBlindPeriod(mBlindStartTime, mClipInfo.mBlindDurationS, now))
     {
-        ChipLogError(Camera,
-                     "PushAVTransport command/motion transport trigger received but ignored due to blind period. Clip duration "
-                     "[%d seconds]",
-                     mRecorder->mClipInfo.mMotionDetectedDurationS);
+        ChipLogError(Camera, "PushAVTransport command/motion transport trigger received but ignored due to blind period");
         return false;
     }
 
@@ -394,7 +391,7 @@ bool PushAVTransport::HandleTriggerDetected()
     mBlindStartTime = mClipInfo.mActivationTime + std::chrono::seconds(mClipInfo.mMotionDetectedDurationS);
 
     {
-        // std::lock_guard<std::mutex> lock(mRecorderMutex);
+        std::lock_guard<std::mutex> lock(mRecorderMutex);
         if (mRecorder.get() != nullptr)
         {
             mRecorder->mClipInfo.mMotionDetectedDurationS = mClipInfo.mMotionDetectedDurationS;
@@ -604,8 +601,8 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
             mUploader->Start();
         }
         {
-            InitializeRecorder();
-            std::lock_guard<std::mutex> lock(mRecorderMutex);
+          std::lock_guard<std::mutex> lock(mRecorderMutex);
+          InitializeRecorder();
         }
         if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
         {
