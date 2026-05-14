@@ -400,7 +400,7 @@ CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInt
 
 CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     VerifyOrReturnError(getifaddrs(&ifaddr) == 0, CHIP_ERROR_READ_FAILED,
