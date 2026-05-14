@@ -333,13 +333,13 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::InvokeComm
     switch (request.path.mCommandId)
     {
     case OperationalState::Commands::Pause::Id:
-        return HandlePauseState(request, input_arguments, handler);
-    case OperationalState::Commands::Stop::Id:
-        return HandleStopState(request, input_arguments, handler);
-    case OperationalState::Commands::Start::Id:
-        return HandleStartState(request, input_arguments, handler);
+        return HandlePauseOrResumeState(request, input_arguments, handler, true);
     case OperationalState::Commands::Resume::Id:
-        return HandleResumeState(request, input_arguments, handler);
+        return HandlePauseOrResumeState(request, input_arguments, handler, false);
+    case OperationalState::Commands::Stop::Id:
+        return HandleStartOrStopState(request, input_arguments, handler, false);
+    case OperationalState::Commands::Start::Id:
+        return HandleStartOrStopState(request, input_arguments, handler, true);
     default:
         return HandleDerivedClusterCommand(request, input_arguments, handler);
     }
@@ -349,12 +349,10 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::InvokeComm
 // Command handlers
 // ---------------------------------------------------------------------------
 
-std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandlePauseState(const DataModel::InvokeRequest & request,
-                                                                                       chip::TLV::TLVReader & input,
-                                                                                       CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+OperationalStateCluster::HandlePauseOrResumeState(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input,
+                                                  CommandHandler * handler, bool isPause)
 {
-    ChipLogDetail(Zcl, "OperationalStateCluster: HandlePauseState");
-
     OperationalState::Commands::Pause::DecodableType req;
     if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
     {
@@ -362,7 +360,8 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandlePaus
     }
 
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState = GetCurrentOperationalState();
+    uint8_t opState   = GetCurrentOperationalState();
+    uint8_t noOpState = isPause ? to_underlying(OperationalStateEnum::kPaused) : to_underlying(OperationalStateEnum::kRunning);
 
     if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kError))
     {
@@ -370,15 +369,19 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandlePaus
     }
     else if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart)
     {
-        if (!IsDerivedClusterStatePauseCompatible(opState))
+        bool compat = isPause ? IsDerivedClusterStatePauseCompatible(opState) : IsDerivedClusterStateResumeCompatible(opState);
+        if (!compat)
         {
             err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         }
     }
 
-    if (err.errorStateID == 0 && opState != to_underlying(OperationalStateEnum::kPaused))
+    if (err.errorStateID == 0 && opState != noOpState)
     {
-        mDelegate->HandlePauseStateCallback(err);
+        if (isPause)
+            mDelegate->HandlePauseStateCallback(err);
+        else
+            mDelegate->HandleResumeStateCallback(err);
     }
 
     OperationalState::Commands::OperationalCommandResponse::Type response;
@@ -387,12 +390,10 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandlePaus
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandleStopState(const DataModel::InvokeRequest & request,
-                                                                                      chip::TLV::TLVReader & input,
-                                                                                      CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+OperationalStateCluster::HandleStartOrStopState(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input,
+                                                CommandHandler * handler, bool isStart)
 {
-    ChipLogDetail(Zcl, "OperationalStateCluster: HandleStopState");
-
     OperationalState::Commands::Stop::DecodableType req;
     if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
     {
@@ -400,71 +401,14 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandleStop
     }
 
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    if (GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kStopped))
+    uint8_t noOpState = isStart ? to_underlying(OperationalStateEnum::kRunning) : to_underlying(OperationalStateEnum::kStopped);
+
+    if (GetCurrentOperationalState() != noOpState)
     {
-        mDelegate->HandleStopStateCallback(err);
-    }
-
-    OperationalState::Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
-}
-
-std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandleStartState(const DataModel::InvokeRequest & request,
-                                                                                       chip::TLV::TLVReader & input,
-                                                                                       CommandHandler * handler)
-{
-    ChipLogDetail(Zcl, "OperationalStateCluster: HandleStartState");
-
-    OperationalState::Commands::Start::DecodableType req;
-    if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
-    {
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    }
-
-    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    if (GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kRunning))
-    {
-        mDelegate->HandleStartStateCallback(err);
-    }
-
-    OperationalState::Commands::OperationalCommandResponse::Type response;
-    response.commandResponseState = err;
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
-}
-
-std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandleResumeState(const DataModel::InvokeRequest & request,
-                                                                                        chip::TLV::TLVReader & input,
-                                                                                        CommandHandler * handler)
-{
-    ChipLogDetail(Zcl, "OperationalStateCluster: HandleResumeState");
-
-    OperationalState::Commands::Resume::DecodableType req;
-    if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
-    {
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    }
-
-    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
-    uint8_t opState = GetCurrentOperationalState();
-
-    if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kError))
-    {
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    }
-    else if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart)
-    {
-        if (!IsDerivedClusterStateResumeCompatible(opState))
-        {
-            err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-        }
-    }
-
-    if (err.errorStateID == 0 && opState != to_underlying(OperationalStateEnum::kRunning))
-    {
-        mDelegate->HandleResumeStateCallback(err);
+        if (isStart)
+            mDelegate->HandleStartStateCallback(err);
+        else
+            mDelegate->HandleStopStateCallback(err);
     }
 
     OperationalState::Commands::OperationalCommandResponse::Type response;

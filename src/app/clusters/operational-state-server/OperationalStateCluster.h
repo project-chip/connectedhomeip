@@ -136,14 +136,13 @@ private:
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
     QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
 
-    std::optional<DataModel::ActionReturnStatus> HandlePauseState(const DataModel::InvokeRequest & request,
-                                                                  chip::TLV::TLVReader & input, CommandHandler * handler);
-    std::optional<DataModel::ActionReturnStatus> HandleStopState(const DataModel::InvokeRequest & request,
-                                                                 chip::TLV::TLVReader & input, CommandHandler * handler);
-    std::optional<DataModel::ActionReturnStatus> HandleStartState(const DataModel::InvokeRequest & request,
-                                                                  chip::TLV::TLVReader & input, CommandHandler * handler);
-    std::optional<DataModel::ActionReturnStatus> HandleResumeState(const DataModel::InvokeRequest & request,
-                                                                   chip::TLV::TLVReader & input, CommandHandler * handler);
+    // isPause=true → Pause, false → Resume. isStart=true → Start, false → Stop.
+    std::optional<DataModel::ActionReturnStatus> HandlePauseOrResumeState(const DataModel::InvokeRequest & request,
+                                                                          chip::TLV::TLVReader & input, CommandHandler * handler,
+                                                                          bool isPause);
+    std::optional<DataModel::ActionReturnStatus> HandleStartOrStopState(const DataModel::InvokeRequest & request,
+                                                                        chip::TLV::TLVReader & input, CommandHandler * handler,
+                                                                        bool isStart);
 };
 
 /**
@@ -160,7 +159,7 @@ private:
 class InstanceBase
 {
 public:
-    virtual ~InstanceBase();
+    ~InstanceBase();
 
     CHIP_ERROR Init();
     void Shutdown();
@@ -224,7 +223,6 @@ public:
         InstanceBase(detail::OperationalInstanceBase::mCluster.Cluster(), detail::OperationalInstanceBase::mCluster.Registration(),
                      aDelegate)
     {}
-    ~Instance() override = default;
 };
 
 } // namespace OperationalState
