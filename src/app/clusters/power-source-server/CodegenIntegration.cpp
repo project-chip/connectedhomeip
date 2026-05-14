@@ -128,7 +128,7 @@ public:
 
         VerifyOrDieWithMsg(
             // Exactly one of wired or battery features must be set
-            features.Has(Feature::kWired) ^ features.Has(Feature::kBattery) &&
+            (features.Has(Feature::kWired) ^ features.Has(Feature::kBattery)) &&
                 // features reported by ember must be a subset of features that are enabled on any endpoint in zap tool
                 (features.Raw() & kAllFeatures.Raw()) == features.Raw(),
             Zcl, "CreateRegistration called with invalid feature map");

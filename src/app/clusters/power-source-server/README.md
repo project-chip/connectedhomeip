@@ -95,7 +95,7 @@ This will be made more clear using examples
     `BatChargingCurrent` optional attributes. Replaceable battery will use the
     `BatTimeRemaining`, `BatCapacity` optional attributes.
 
-    It will be very benefitial to use one template specialization for the three
+    It will be very beneficial to use one template specialization for the three
     of these configurations.
 
     ```cpp
@@ -149,7 +149,7 @@ This will be made more clear using examples
     supported from the manufacturer side using the field
     `usedOptionalAttributes` in the config object. This will make the cluster to
     report specific information about what the cluster supports to the data
-    model. This will mean, that technically the cluster will have the capabitily
+    model. This will mean, that technically the cluster will have the capability
     to support certain attributes, but if manufacturer can't support it, the
     data model will see them as unsupported.
 

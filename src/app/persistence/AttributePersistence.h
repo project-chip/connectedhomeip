@@ -97,8 +97,7 @@ public:
     }
 
     /// Nullable type handling
-    /// Performs all the steps of:
-    ///   - write to storage
+    /// Just write to storage
     template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
     DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, const DataModel::Nullable<T> & value)
     {
