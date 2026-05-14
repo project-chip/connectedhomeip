@@ -418,7 +418,10 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestNotFo
 
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(result.response.has_value());
-    EXPECT_TRUE(result.response->dataset.empty());
+    if (result.response.has_value())
+    {
+        EXPECT_TRUE(result.response->dataset.empty());
+    }
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequestInvalidInState)
