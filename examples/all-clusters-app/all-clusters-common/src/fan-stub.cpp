@@ -55,7 +55,7 @@ static FanControlManager * mFanControlManager = nullptr;
 
 CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
-    // Legacy stub: PercentCurrent reads track PercentSetting (all-clusters has no separate current model).
+    // Return PercentSetting attribute value for now
     DataModel::Nullable<Percent> percentSetting;
     PercentSetting::Get(mEndpoint, percentSetting);
     Percent ret = 0;
@@ -69,7 +69,7 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 
 CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
-    // Legacy stub: SpeedCurrent reads track SpeedSetting.
+    // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
     SpeedSetting::Get(mEndpoint, speedSetting);
     uint8_t ret = 0;
@@ -88,7 +88,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    uint8_t speedMax = 0;
+    uint8_t speedMax;
     SpeedMax::Get(mEndpoint, &speedMax);
 
     DataModel::Nullable<uint8_t> speedSetting;
@@ -153,9 +153,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    // NOLINTNEXTLINE(bugprone-signed-bitwise): VerifyOrDie expands nlassert code that mixes signed flags with '&'.
     VerifyOrDie(aPath.mClusterId == FanControl::Id);
-    // NOLINTNEXTLINE(bugprone-signed-bitwise): VerifyOrDie expands nlassert code that mixes signed flags with '&'.
     VerifyOrDie(aPath.mEndpointId == mEndpoint);
 
     switch (aPath.mAttributeId)
@@ -174,7 +172,6 @@ CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, Attr
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    // NOLINTNEXTLINE(bugprone-signed-bitwise): VerifyOrDie expands nlassert code that mixes signed flags with '&'.
     VerifyOrDie(mFanControlManager == nullptr);
     mFanControlManager = new FanControlManager(endpoint);
     AttributeAccessInterfaceRegistry::Instance().Register(mFanControlManager);
