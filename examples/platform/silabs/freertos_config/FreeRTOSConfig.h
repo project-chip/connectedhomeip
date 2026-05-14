@@ -336,7 +336,7 @@ standard names. */
     (configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS + configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS + 1)
 #endif
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__cplusplus)
 /* For the linker. */
 #define fabs __builtin_fabs
 #endif

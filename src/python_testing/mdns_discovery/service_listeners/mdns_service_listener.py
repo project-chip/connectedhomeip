@@ -16,7 +16,7 @@
 #
 
 import logging
-from asyncio import Event, TimeoutError, wait_for
+from asyncio import Event, TimeoutError, wait_for  # noqa: A004
 
 from zeroconf import ServiceListener, Zeroconf
 
