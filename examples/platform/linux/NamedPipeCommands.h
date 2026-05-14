@@ -18,15 +18,15 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
 #include <atomic>
+#include <lib/core/CHIPError.h>
 #include <pthread.h>
 #include <string>
 
 class NamedPipeCommandDelegate
 {
 public:
-    virtual ~NamedPipeCommandDelegate()                    = default;
+    virtual ~NamedPipeCommandDelegate() = default;
     /**
      * @brief Handle a single NamedPipeCommands payload.
      *
@@ -70,7 +70,7 @@ public:
     const std::string & OutPath() const { return mFifoOutPath; }
 
 private:
-    std::atomic<bool> mRunning{false};
+    std::atomic<bool> mRunning{ false };
     pthread_t mChipEventCommandListener;
     std::string mFifoInPath;
     std::string mFifoOutPath;

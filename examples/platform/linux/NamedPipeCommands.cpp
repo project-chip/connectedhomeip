@@ -21,14 +21,14 @@
 #include <chrono>
 #include <errno.h>
 #include <fcntl.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <poll.h>
 #include <pthread.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <thread>
+#include <unistd.h>
 
 #include <string>
 
@@ -66,7 +66,7 @@ exit:
 
 CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, NamedPipeCommandDelegate * delegate)
 {
-    return Start(inPath, /*outPath=*/ "", delegate);
+    return Start(inPath, /*outPath=*/"", delegate);
 }
 
 CHIP_ERROR NamedPipeCommands::Stop()
@@ -139,7 +139,7 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
     }
 
     std::string payload = json + "\n";
-    ssize_t written = write(fd, payload.data(), payload.size());
+    ssize_t written     = write(fd, payload.data(), payload.size());
     if (written < 0 || static_cast<size_t>(written) != payload.size())
     {
         ChipLogError(DeviceLayer, "Failed to write JSON payload to out pipe");
@@ -178,7 +178,8 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
             ChipLogProgress(NotSpecified, "Received payload: '%s'", readbuf);
 
             // Process the received command request from event fifo
-            if (self->mDelegate) {
+            if (self->mDelegate)
+            {
                 self->mDelegate->OnEventCommandReceived(readbuf);
             }
         }
