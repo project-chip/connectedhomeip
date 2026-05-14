@@ -33,15 +33,15 @@ class Library(enum.Enum):
     SERVER = "_ChipServer.so"
 
 
-def _AllDirsToRoot(dir):
+def _AllDirsToRoot(p):
     """Return all parent paths of a directory."""
-    dir = os.path.abspath(dir)
+    p = os.path.abspath(p)
     while True:
-        yield dir
-        parent = os.path.dirname(dir)
-        if parent == "" or parent == dir:
+        yield p
+        parent = os.path.dirname(p)
+        if parent == "" or parent == p:
             break
-        dir = parent
+        p = parent
 
 
 class ErrorRange(enum.IntEnum):
@@ -199,8 +199,8 @@ def FindNativeLibraryPath(library: Library) -> str:
         "src/controller/python/.libs",
         library.value,
     )
-    for dir in _AllDirsToRoot(scriptDir):
-        dmDLLPathGlob = os.path.join(dir, relDMDLLPathGlob)
+    for p in _AllDirsToRoot(scriptDir):
+        dmDLLPathGlob = os.path.join(p, relDMDLLPathGlob)
         for dmDLLPath in glob.glob(dmDLLPathGlob):
             if os.path.exists(dmDLLPath):
                 return dmDLLPath

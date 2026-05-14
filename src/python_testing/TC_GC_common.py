@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import ipaddress
 import logging
 from dataclasses import dataclass
 from typing import Optional
@@ -347,3 +348,29 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
             find_commands_on_endpoint_and_cluster(endpoint_id, endpoint_data, operate_only_commands)
 
     return operate_only_commands
+
+
+def get_iana_multicast_address() -> bytes:
+    """Returns the 16-byte IANA-assigned multicast address for Groupcast (ff05::fa)."""
+    return bytes.fromhex("ff0500000000000000000000000000fa")
+
+
+def get_per_group_multicast_address(fabric_id: int, group_id: int) -> bytes:
+    """Returns the 16-byte per-group multicast address (ff35:0040:fd<Fabric ID>00:<Group ID>)."""
+
+    # The first 32 bits will always be a fixed value. 0xFF3 defined by RFC 3306,
+    # 0x05 represents scope, 0x00 is a reserved byte, and 0x40 represents length
+    # of network prefix (64 bits)
+    prefix_scope_plen = 0xFF350040
+
+    # Create 64 bit network prefix. Consists of FD (locally assigned ULA prefix) and then
+    # the upper 56 bits of fabric ID (in big endian format)
+    network_prefix = 0xfd00000000000000 | ((fabric_id >> 8) & 0x00ffffffffffffff)
+
+    # Create 32 bit group identifier portion. Constists of the lower 8 bits of fabric id,
+    # a reserved 0x00 byte, then followed by 16 bit group id
+    group_id_field = ((fabric_id << 24) & 0xff000000) | (group_id & 0xffff)
+
+    # Combine all portions into 128-bit address
+    addr_int = (prefix_scope_plen << 96) | (network_prefix << 32) | group_id_field
+    return ipaddress.IPv6Address(addr_int).packed
