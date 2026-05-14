@@ -111,6 +111,7 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::AcceptedCommands(const ConcreteC
 CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    ReturnErrorOnFailure(mDelegate.Init(this));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     return CHIP_NO_ERROR;
 }
@@ -296,6 +297,11 @@ void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLay
     {
         (void) _this->mDelegate.CommitActiveDataset();
     }
+}
+
+void ThreadBorderRouterManagementCluster::ReportAttributeChanged(AttributeId attributeId)
+{
+    NotifyAttributeChanged(attributeId);
 }
 
 } // namespace chip::app::Clusters

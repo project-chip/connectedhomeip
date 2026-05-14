@@ -26,7 +26,8 @@
 namespace chip::app::Clusters {
 
 class ThreadBorderRouterManagementCluster : public DefaultServerCluster,
-                                            public ThreadBorderRouterManagementDelegate::ActivateDatasetCallback
+                                            public ThreadBorderRouterManagementDelegate::ActivateDatasetCallback,
+                                            public ThreadBorderRouterManagementDelegate::AttributeChangeCallback
 {
 public:
     class Config
@@ -66,6 +67,9 @@ public:
 
     // ThreadBorderRouterManagementDelegate::ActivateDatasetCallback
     void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
+
+    // ThreadBorderRouterManagementDelegate::AttributeChangeCallback
+    void ReportAttributeChanged(AttributeId attributeId) override;
 
     // Platform event handler
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
