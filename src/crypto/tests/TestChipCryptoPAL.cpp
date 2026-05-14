@@ -185,13 +185,20 @@ void AssertKeysEqual(SessionKeystore & keystore, HkdfKeyHandle & left, const Hkd
 } // namespace
   //
 
-#if CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_MBEDTLS
+#if CHIP_CRYPTO_MBEDTLS
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
 {
     *olen = len;
     gs_test_entropy_source_called++;
+    return 0;
+}
+#elif CHIP_CRYPTO_OPENSSL
+
+static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
+{
+    *olen = len;
     return 0;
 }
 
@@ -1553,7 +1560,7 @@ TEST_F(TestChipCryptoPAL, TestAddEntropySources)
     EXPECT_EQ(DRBG_get_bytes(buffer, sizeof(buffer)), CHIP_NO_ERROR);
     for (int i = 0; i < 5000 * 2; i++)
     {
-        (void) DRBG_get_bytes(buffer, sizeof(buffer));
+        EXPECT_SUCCESS(DRBG_get_bytes(buffer, sizeof(buffer)));
     }
     EXPECT_GT(gs_test_entropy_source_called, test_entropy_source_call_count);
 }

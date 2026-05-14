@@ -24,6 +24,7 @@
 #include <platform/Linux/ConnectivityUtils.h>
 
 #include <arpa/inet.h>
+#include <errno.h>
 #include <ifaddrs.h>
 #include <linux/ethtool.h>
 #include <linux/if_link.h>
@@ -358,47 +359,42 @@ CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInt
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        err = CHIP_ERROR_READ_FAILED;
-    }
-    else
-    {
-        uint8_t index = 0;
+    VerifyOrReturnError(getifaddrs(&ifaddr) == 0, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
 
-        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    uint8_t index = 0;
+
+    for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
         {
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
+            if (strcmp(ifname, ifa->ifa_name) == 0)
             {
-                if (strcmp(ifname, ifa->ifa_name) == 0)
+                void * addPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
+
+                memcpy(ifp->Ipv4AddressesBuffer[index], addPtr, kMaxIPv4AddrSize);
+                ifp->Ipv4AddressSpans[index] = ByteSpan(ifp->Ipv4AddressesBuffer[index], kMaxIPv4AddrSize);
+                index++;
+
+                if (index >= kMaxIPv4AddrCount)
                 {
-                    void * addPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
-
-                    memcpy(ifp->Ipv4AddressesBuffer[index], addPtr, kMaxIPv4AddrSize);
-                    ifp->Ipv4AddressSpans[index] = ByteSpan(ifp->Ipv4AddressesBuffer[index], kMaxIPv4AddrSize);
-                    index++;
-
-                    if (index >= kMaxIPv4AddrCount)
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
         }
-
-        if (index > 0)
-        {
-            err  = CHIP_NO_ERROR;
-            size = index;
-        }
-        else
-        {
-            err = CHIP_ERROR_NOT_FOUND;
-        }
-
-        freeifaddrs(ifaddr);
     }
+
+    if (index > 0)
+    {
+        err  = CHIP_NO_ERROR;
+        size = index;
+    }
+    else
+    {
+        err = CHIP_ERROR_NOT_FOUND;
+    }
+
+    freeifaddrs(ifaddr);
     return err;
 }
 
@@ -407,48 +403,42 @@ CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInt
     CHIP_ERROR err;
     struct ifaddrs * ifaddr = nullptr;
 
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-        err = CHIP_ERROR_READ_FAILED;
-    }
-    else
-    {
-        uint8_t index = 0;
+    VerifyOrReturnError(getifaddrs(&ifaddr) == 0, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
 
-        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    uint8_t index = 0;
+
+    for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET6)
         {
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET6)
+            if (strcmp(ifname, ifa->ifa_name) == 0)
             {
-                if (strcmp(ifname, ifa->ifa_name) == 0)
+                void * addPtr = &((struct sockaddr_in6 *) ifa->ifa_addr)->sin6_addr;
+
+                memcpy(ifp->Ipv6AddressesBuffer[index], addPtr, kMaxIPv6AddrSize);
+                ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
+                index++;
+
+                if (index >= kMaxIPv6AddrCount)
                 {
-                    void * addPtr = &((struct sockaddr_in6 *) ifa->ifa_addr)->sin6_addr;
-
-                    memcpy(ifp->Ipv6AddressesBuffer[index], addPtr, kMaxIPv6AddrSize);
-                    ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
-                    index++;
-
-                    if (index >= kMaxIPv6AddrCount)
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
         }
-
-        if (index > 0)
-        {
-            err  = CHIP_NO_ERROR;
-            size = index;
-        }
-        else
-        {
-            err = CHIP_ERROR_NOT_FOUND;
-        }
-
-        freeifaddrs(ifaddr);
     }
 
+    if (index > 0)
+    {
+        err  = CHIP_NO_ERROR;
+        size = index;
+    }
+    else
+    {
+        err = CHIP_ERROR_NOT_FOUND;
+    }
+
+    freeifaddrs(ifaddr);
     return err;
 }
 

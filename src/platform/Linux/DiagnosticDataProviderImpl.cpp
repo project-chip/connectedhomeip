@@ -76,7 +76,7 @@ enum class WiFiStatsCountType
 
 #if defined(__GLIBC__)
 // Static variable to store the maximum heap size
-static size_t maxHeapHighWatermark = 0;
+static uint64_t maxHeapHighWatermark = 0;
 #endif
 
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)

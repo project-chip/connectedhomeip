@@ -16,6 +16,7 @@
  */
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixChimeDevice.h>
+#include <app_config/enabled_devices.h>
 #include <devices/device-factory/DeviceFactory.h>
 
 namespace chip {
@@ -23,13 +24,16 @@ namespace app {
 
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate)
 {
-    DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate]() {
-        static const ChimeDevice::Sound kDefaultSounds[] = {
-            { 0, "Ding Dong"_span },
-            { 1, "Ring Ring"_span },
-        };
-        return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
-    });
+    if constexpr (ALL_DEVICES_ENABLE_CHIME)
+    {
+        DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate]() {
+            static const ChimeDevice::Sound kDefaultSounds[] = {
+                { 0, "Ding Dong"_span },
+                { 1, "Ring Ring"_span },
+            };
+            return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+        });
+    }
 }
 
 } // namespace app
