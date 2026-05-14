@@ -63,18 +63,8 @@ CHIP_ERROR InstanceBase::Init()
 void InstanceBase::Shutdown()
 {
     VerifyOrReturn(mRegistered);
-    mRegistered    = false;
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(mClusterPtr);
-    if (err != CHIP_NO_ERROR)
-    {
-        Span<const ConcreteClusterPath> paths = mClusterPtr->GetPaths();
-        if (!paths.empty())
-        {
-            ChipLogError(AppServer, "Failed to unregister OperationalState cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                         paths[0].mEndpointId, ChipLogValueMEI(paths[0].mClusterId), // NOLINT(bugprone-signed-bitwise)
-                         err.Format());
-        }
-    }
+    mRegistered = false;
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(mClusterPtr));
 }
 
 // ---------------------------------------------------------------------------

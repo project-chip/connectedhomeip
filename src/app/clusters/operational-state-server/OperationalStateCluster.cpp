@@ -104,8 +104,6 @@ void OperationalStateCluster::GetCurrentOperationalError(GenericOperationalError
 
 void OperationalStateCluster::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
 {
-    ChipLogDetail(Zcl, "OperationalStateCluster: OnOperationalErrorDetected");
-
     if (mOperationalState != to_underlying(OperationalStateEnum::kError))
     {
         mOperationalState = to_underlying(OperationalStateEnum::kError);
@@ -136,8 +134,6 @@ void OperationalStateCluster::OnOperationCompletionDetected(uint8_t aCompletionE
                                                             const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
                                                             const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
 {
-    ChipLogDetail(Zcl, "OperationalStateCluster: OnOperationCompletionDetected");
-
     if (mContext == nullptr)
     {
         ChipLogError(Zcl, "OperationalStateCluster: cannot emit OperationCompletion event, no context");
@@ -329,7 +325,6 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::InvokeComm
                                                                                     chip::TLV::TLVReader & input_arguments,
                                                                                     CommandHandler * handler)
 {
-    ChipLogDetail(Zcl, "OperationalStateCluster: InvokeCommand 0x%08" PRIx32, request.path.mCommandId);
     switch (request.path.mCommandId)
     {
     case OperationalState::Commands::Pause::Id:
@@ -456,7 +451,6 @@ std::optional<DataModel::ActionReturnStatus>
 RvcOperationalState::RvcOperationalStateCluster::HandleDerivedClusterCommand(const DataModel::InvokeRequest & request,
                                                                              chip::TLV::TLVReader & input, CommandHandler * handler)
 {
-    ChipLogDetail(Zcl, "RvcOperationalStateCluster: HandleDerivedClusterCommand 0x%08" PRIx32, request.path.mCommandId);
     switch (request.path.mCommandId)
     {
     case RvcOperationalState::Commands::GoHome::Id:
@@ -470,8 +464,6 @@ std::optional<DataModel::ActionReturnStatus>
 RvcOperationalState::RvcOperationalStateCluster::HandleGoHomeCommand(const DataModel::InvokeRequest & request,
                                                                      chip::TLV::TLVReader & input, CommandHandler * handler)
 {
-    ChipLogDetail(Zcl, "RvcOperationalStateCluster: HandleGoHomeCommand");
-
     RvcOperationalState::Commands::GoHome::DecodableType req;
     if (DataModel::Decode(input, req) != CHIP_NO_ERROR)
     {

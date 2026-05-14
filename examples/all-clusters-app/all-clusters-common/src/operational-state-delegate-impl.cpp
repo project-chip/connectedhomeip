@@ -147,7 +147,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
     auto countdown_time = delegate->GetCountdownTime();
 
-    if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
+    if (countdown_time.IsNull() || countdown_time.Value() > 0)
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
         {
@@ -158,7 +158,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             delegate->mPausedTime++;
         }
     }
-    else if (!countdown_time.IsNull() && countdown_time.Value() <= 0)
+    else
     {
         OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         delegate->HandleStopStateCallback(noError);
