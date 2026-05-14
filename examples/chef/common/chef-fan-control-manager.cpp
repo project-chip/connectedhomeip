@@ -145,7 +145,7 @@ void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newStat
             SetSpeedCurrent(speed.ValueOr(0));
         }
         const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
-        FanControl::FanModeEnum currentMode = FanControl::FanModeEnum::kOff;
+        FanControl::FanModeEnum currentMode       = FanControl::FanModeEnum::kOff;
         if (FanControl::Attributes::FanMode::Get(mEndpoint, &currentMode) == Status::Success && currentMode != derivedMode)
         {
             Status st = FanControl::Attributes::FanMode::Set(mEndpoint, derivedMode);
