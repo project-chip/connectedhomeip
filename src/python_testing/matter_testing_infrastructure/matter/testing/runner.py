@@ -412,6 +412,40 @@ def run_tests_no_exit(
     else:
         stack = MatterStackState(matter_test_config)
 
+    def _read_wildcard(node_id):
+        """Read the global wildcard from the device, including Descriptor,
+        BasicInformation and the global attributes needed for guard functions."""
+        return event_loop.run_until_complete(
+            asyncio.wait_for(
+                default_controller.Read(
+                    node_id,
+                    [
+                        (Clusters.Descriptor),
+                        (Clusters.BasicInformation),
+                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                    ],
+                ),
+                timeout=60,
+            )
+        )
+
+    def _stash_wildcard(wildcard):
+        """Stash the wildcard into user_params and attempt to populate the
+        data model from the device's SpecificationVersion attribute."""
+        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(wildcard)
+        try:
+            spec_version = wildcard.attributes[0][
+                Clusters.BasicInformation
+            ][Clusters.BasicInformation.Attributes.SpecificationVersion]
+            dm_directory = dm_from_spec_version(spec_version)
+            test_config.user_params["data_model"] = global_stash.stash_globally(
+                build_xml_data_model(dm_directory)
+            )
+        except Exception:
+            LOGGER.warning("Could not populate data model from device spec version")
+
     with TracingContext() as tracing_ctx:
         for destination in matter_test_config.trace_to:
             tracing_ctx.StartFromString(destination)
@@ -441,9 +475,6 @@ def run_tests_no_exit(
         test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
             stack.certificate_authority_manager)
 
-        # Execute the test class with the config
-        ok = True
-
         def _handler(loop, context):
             loop.default_exception_handler(context)
             nonlocal ok
@@ -459,6 +490,8 @@ def run_tests_no_exit(
         with runner.mobly_logger():
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
+
+            stored_global_wildcard = None
 
             if getattr(test_class, 'NEEDS_COMMISSIONING', True):
 
@@ -483,21 +516,8 @@ def run_tests_no_exit(
                         )
                     )
                     if commissionee is not None:
-                        stored_global_wildcard = event_loop.run_until_complete(
-                            asyncio.wait_for(
-                                default_controller.Read(
-                                    node_id,
-                                    [
-                                        (Clusters.Descriptor),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                    ],
-                                ),
-                                timeout=60,
-                            )
-                        )
-                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                        stored_global_wildcard = _read_wildcard(node_id)
+                        _stash_wildcard(stored_global_wildcard)
                     else:
                         LOGGER.error("FindOrEstablishPASESession returned None")
 
@@ -510,42 +530,16 @@ def run_tests_no_exit(
                             )
                         )
                         if commissionee is not None:
-                            stored_global_wildcard = event_loop.run_until_complete(
-                                asyncio.wait_for(
-                                    default_controller.Read(
-                                        node_id,
-                                        [
-                                            (Clusters.Descriptor),
-                                            Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                            Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                            Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                        ],
-                                    ),
-                                    timeout=60,
-                                )
-                            )
-                            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                            stored_global_wildcard = _read_wildcard(node_id)
+                            _stash_wildcard(stored_global_wildcard)
                     except Exception:
                         LOGGER.warning("Could not pre-populate global wildcard via PASE")
 
                 else:
                     # Path 3: CASE (already commissioned, no setup code)
                     try:
-                        stored_global_wildcard = event_loop.run_until_complete(
-                            asyncio.wait_for(
-                                default_controller.Read(
-                                    node_id,
-                                    [
-                                        (Clusters.Descriptor),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                    ],
-                                ),
-                                timeout=60,
-                            )
-                        )
-                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                        stored_global_wildcard = _read_wildcard(node_id)
+                        _stash_wildcard(stored_global_wildcard)
                     except Exception:
                         LOGGER.warning("Could not pre-populate global wildcard via CASE")
 
