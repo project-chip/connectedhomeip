@@ -769,10 +769,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         Args:
             step: The step number or identifier to execute.
             description: Step description for inline step definitions.
-                Should always be provided (not empty) when any keyword arguments
+                Should always be provided(not empty) when any keyword arguments
                 (is_commissioning, expectation) are passed.
-            is_commissioning: Mark this step as the commissioning step (keyword-only).
-            expectation: Expected outcome for test plan generation (keyword-only).
+            is_commissioning: Mark this step as the commissioning step(keyword-only).
+            expectation: Expected outcome for test plan generation(keyword-only).
 
             All arguments to step() must be constants for automatic extraction of
             the test step list to work. If dynamic step() parameters are required
