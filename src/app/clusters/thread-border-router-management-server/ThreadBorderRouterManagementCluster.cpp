@@ -112,27 +112,15 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & c
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(mDelegate.Init(this));
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(mPlatformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     return CHIP_NO_ERROR;
-}
-
-ThreadBorderRouterManagementCluster::~ThreadBorderRouterManagementCluster()
-{
-    Cleanup();
 }
 
 void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
 {
-    Cleanup();
-    DefaultServerCluster::Shutdown(reason);
-}
-
-void ThreadBorderRouterManagementCluster::Cleanup()
-{
-    // Remove event handler to avoid dangling pointer if FailSafe timer expires later.
-    // This is especially important in unit tests where Shutdown() may not be called.
-    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     (void) mDelegate.Init(nullptr);
+    mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    DefaultServerCluster::Shutdown(reason);
 }
 
 std::optional<DataModel::ActionReturnStatus>

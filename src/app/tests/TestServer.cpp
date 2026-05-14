@@ -39,8 +39,9 @@ public:
     }
     static void TearDownTestSuite()
     {
-        Platform::MemoryShutdown();
+        Server::GetInstance().Shutdown();
         PlatformMgr().Shutdown();
+        Platform::MemoryShutdown();
     }
 };
 

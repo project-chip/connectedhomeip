@@ -22,6 +22,7 @@
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
+#include <platform/PlatformManager.h>
 
 namespace chip::app::Clusters {
 
@@ -34,9 +35,9 @@ public:
     {
     public:
         Config(ThreadBorderRouterManagementDelegate & delegate, FailSafeContext & failSafeContext,
-               BreadCrumbTracker & breadcrumbTracker) :
+               BreadCrumbTracker & breadcrumbTracker, DeviceLayer::PlatformManager & platformManager) :
             mDelegate(delegate),
-            mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker)
+            mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker), mPlatformManager(platformManager)
         {}
 
     private:
@@ -44,14 +45,16 @@ public:
         ThreadBorderRouterManagementDelegate & mDelegate;
         FailSafeContext & mFailSafeContext;
         BreadCrumbTracker & mBreadcrumbTracker;
+        DeviceLayer::PlatformManager & mPlatformManager;
     };
 
     ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
         DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate),
-        mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker)
+        mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker),
+        mPlatformManager(config.mPlatformManager)
     {}
 
-    ~ThreadBorderRouterManagementCluster() override;
+
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
@@ -80,12 +83,10 @@ protected:
     ThreadBorderRouterManagementDelegate & mDelegate;
     FailSafeContext & mFailSafeContext;
     BreadCrumbTracker & mBreadcrumbTracker;
+    DeviceLayer::PlatformManager & mPlatformManager;
     CommandHandler::Handle mAsyncCommandHandle;
     uint32_t mSetActiveDatasetSequenceNumber = 0;
     Optional<uint64_t> mBreadcrumb;
-
-private:
-    void Cleanup();
 };
 
 } // namespace chip::app::Clusters
