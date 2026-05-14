@@ -156,15 +156,7 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
 void AirPurifierManager::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
-    if (mOnOffClusterOn)
-    {
-        FanModeWriteCallback(newState.mode);
-
-        if (!newState.percentSetting.IsNull())
-        {
-            PercentSettingWriteCallback(newState.percentSetting.Value());
-        }
-    }
+    (void) newState;
 
     ClampFanDriveCurrentWhenOff();
 }
