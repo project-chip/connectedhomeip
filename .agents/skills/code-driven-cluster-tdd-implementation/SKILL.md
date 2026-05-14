@@ -7,34 +7,13 @@ description: >
 
 # Code-Driven Cluster TDD Implementation
 
-## 1. Philosophy
+## When to use this skill
+Use this skill when implementing or migrating Matter server clusters to the code-driven pattern using Test-Driven Development (TDD).
 
-Test-Driven Development (TDD) ensures that the cluster implementation adheres
-strictly to the specification and maintains full feature parity if migrating an
-existing cluster. By writing failing tests first, we validate our understanding
-of the requirements before implementing them.
+> [!IMPORTANT]
+> **Preserve Legacy Behavior**: If migrating an existing cluster, constantly refer to the legacy code to ensure no functional drop or unexpected behavior changes.
 
-> [!IMPORTANT] > **Preserve Legacy Behavior**: If you are migrating an existing
-> cluster or implementing a new version that has an existing implementation,
-> constantly refer to the legacy code (e.g., by keeping a `.legacy` copy of the
-> original file) to ensure you are not dropping existing functionality or
-> changing behavior unexpectedly.
-
-This guide is designed to be effective by providing:
-
--   **Logical Breakdown**: It breaks down complex implementations into small,
-    manageable steps (Boilerplate -> Metadata -> Reads -> Writes -> Commands ->
-    Events -> Integration).
--   **Enforced Quality**: By requiring failing tests for every step, it ensures
-    we don't write dead code and that we handle errors and edge cases correctly
-    from the start.
--   **Pattern Library**: It provides solutions for common complex scenarios like
-    security checks, async side effects, timers without sleeping, and list
-    encoding.
--   **Self-Contained Reference**: It includes common commands so you don't need
-    to search other documents to run tests.
-
-## 2. Prerequisites
+## 1. Prerequisites
 
 -   Read `code-driven-cluster-development` for core implementation patterns.
 -   Read `matter-specification-access` for instructions on how to access the
@@ -44,7 +23,7 @@ This guide is designed to be effective by providing:
     already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the
     TDD implementation.
 
-## 3. Step-by-Step Implementation Workflow
+## 2. Step-by-Step Implementation Workflow
 
 Follow these steps for the substantive implementation using TDD:
 
@@ -81,82 +60,35 @@ Follow these steps for the substantive implementation using TDD:
         `Protocols::InteractionModel::Status::UnsupportedAttribute` directly.
     -   Verify test passes.
 
-### Step 4: Implement WriteAttribute (TDD)
+### Step 4: Implement Writable Attributes and Commands (TDD)
 
-For each writable attribute:
-
-1.  **Write a Failing Test**:
-    -   Write the attribute via `tester.WriteAttribute()` and expect failure or
-        success depending on test setup.
-2.  **Implement**:
-    -   Add the case in `WriteAttribute` switch.
-    -   Decode the payload using `AttributeValueDecoder`.
-    -   Update the member variable or call the delegate.
-    -   Use `SetAttributeValue` to update member variables and automatically
-        notify subscribers. For complex cases (like lists), use
-        `NotifyAttributeChanged` directly.
-    -   Ensure the `default` case returns
-        `Protocols::InteractionModel::Status::UnsupportedAttribute` directly.
-3.  **Verify Success**:
-    -   Run tests and ensure they pass.
-
-### Step 5: Implement Commands in InvokeCommand (TDD)
-
-For each command:
+For each writable attribute or command, follow this cycle:
 
 1.  **Write a Failing Test**:
-    -   Invoke the command via `tester.Invoke()`.
-    -   Assert failure (e.g. `UnsupportedCommand` or specific error before
-        implementation).
+    -   **Attributes**: Use `tester.WriteAttribute()` and expect failure or success based on setup.
+    -   **Commands**: Invoke via `tester.Invoke()` and assert failure (e.g., `UnsupportedCommand`).
 2.  **Implement**:
-    -   Add the case in `InvokeCommand` switch.
-    -   Decode payload.
-    -   Perform spec checks (CASE session, FailSafe, busy, etc.). Use standard
-        `if` blocks instead of early-return macros (like `VerifyOrReturnError`)
-        if cleanup or state modification is needed before returning.
-    -   Call the appropriate `Delegate` method.
-    -   Ensure the `default` case returns
-        `Protocols::InteractionModel::Status::UnsupportedCommand` directly (do
-        not delegate to base class).
-3.  **Verify Success**:
-    -   Run tests and ensure they pass.
+    -   Add the case in `WriteAttribute` or `InvokeCommand` switch.
+    -   Decode the payload.
+    -   Execute logic (update state or call delegate).
+    -   Return `UnsupportedAttribute` or `UnsupportedCommand` in the `default` case.
+3.  **Verify Success**: Run tests and ensure they pass.
 
-### Step 6: Create CodegenIntegration Layer
+### Step 5: Create CodegenIntegration Layer
 
 1.  Create or update `CodegenIntegration.h` and `.cpp` in the cluster folder.
-2.  Provide implementations for the generated callbacks (e.g.,
-    `Matter<ClusterName>ClusterInitCallback` and `ShutdownCallback`). Note that
-    the `IntegrationDelegate` can typically be stack-allocated if it is only
-    used for lookups during the function call and does not need to outlive the
-    call.
-3.  Use `CodegenClusterIntegration::RegisterServer` (recommended) or direct
-    registration to bridge ZAP defaults (like `FeatureMap` and optional
-    attributes) to the new cluster instance.
-4.  If you are migrating or replacing an existing implementation that has a
-    legacy class applications interact with directly (e.g., `ChimeServer` or
-    `Identify`), maintain it in `CodegenIntegration` and refactor it to act as a
-    proxy wrapper around the new code-driven cluster implementation. This
-    ensures existing applications do not need to change.
+2.  Provide implementations for generated callbacks (e.g., `Matter<ClusterName>ClusterInitCallback`).
+3.  Use `CodegenClusterIntegration::RegisterServer` to bridge ZAP defaults to the new cluster instance.
+4.  Maintain legacy classes (e.g., `ChimeServer`) as proxy wrappers if needed for backward compatibility.
 
-### Step 7: Verification & ZAP Regen
+### Step 6: Verification & ZAP Regen
 
 1.  Run all unit tests.
-2.  Update `config-data.yaml` and `zcl.json` as per
-    `code-driven-cluster-migration` skill.
+2.  Update `config-data.yaml` and `zcl.json` as per `code-driven-cluster-migration` skill.
 3.  Run `zap_regen_all.py` and commit all generated files.
-4.  **Integration Testing** (If migrating an existing cluster):
-    -   **Verify Example App Build**: Identify an example app that uses the
-        cluster, and build it with its specific target (e.g.,
-        `linux-x64-network-manager-boringssl`).
-    -   **End-to-End Testing**: Run the app, and use the `chip-tool-testing`
-        skill to commission and test it against `chip-tool`.
-5.  **Verify Spec Conformance**: Refer to the relevant cluster specification
-    `.adoc` file to ensure full conformance.
-6.  **Verify Against Test Plan**: Refer to the relevant test plan `.adoc` file
-    to ensure all required test cases are covered or feasible.
-    -   _Note_: See the `matter-specification-access` skill for instructions on
-        how to find and access these private repositories.
-7.  **Ensure all tests pass** before committing or pushing changes.
+4.  **Integration Testing**: Build an example app and test against `chip-tool`.
+5.  **Verify Spec Conformance**: Refer to the relevant cluster specification `.adoc` file.
+6.  **Verify Against Test Plan**: Refer to the relevant test plan `.adoc` file.
 
 ## 4. Common TDD Scenarios
 
