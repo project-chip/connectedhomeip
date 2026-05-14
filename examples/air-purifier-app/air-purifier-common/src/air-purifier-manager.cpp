@@ -242,10 +242,8 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         return;
     }
     bool on = static_cast<bool>(*value);
-
     uint8_t new_speed;
     uint8_t new_percent;
-
     if (on)
     {
         // If either of these come back as NULL, that should mean the fan is operating in auto mode.
@@ -302,7 +300,7 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
     mOnOffClusterOn = on;
 
     FanControl::Attributes::SpeedCurrent::Set(mEndpointId, new_speed);
-    FanControl::Attributes::PercentCurrent::Set(mEndpointId, static_cast<chip::Percent>(new_percent));
+    FanControl::Attributes::PercentCurrent::Set(mEndpointId, new_percent);
 }
 
 void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
@@ -455,7 +453,6 @@ uint8_t AirPurifierManager::GetSpeedMax()
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedMax: failed to get SpeedMax attribute: %d", to_underlying(status));
-        speedMax = 1;
     }
     return speedMax;
 }
