@@ -62,10 +62,10 @@ class JointFabricDatastoreClusterDatastoreBindingTargetStruct(
   }
 
   companion object {
-    private const val TAG_NODE = 1
-    private const val TAG_GROUP = 2
-    private const val TAG_ENDPOINT = 3
-    private const val TAG_CLUSTER = 4
+    private const val TAG_NODE = 0
+    private const val TAG_GROUP = 1
+    private const val TAG_ENDPOINT = 2
+    private const val TAG_CLUSTER = 3
 
     fun fromTlv(
       tlvTag: Tag,

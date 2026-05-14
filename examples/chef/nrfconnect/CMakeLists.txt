@@ -112,6 +112,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/microwave-oven-mode/chef-microwave-oven-mode.cpp
     ${CHEF}/common/clusters/microwave-oven-control/chef-microwave-oven-control.cpp
     ${CHEF}/common/clusters/mode-base/chef-mode-base-default.cpp
+    ${CHEF}/common/clusters/mode-select/chef-supported-modes-manager.cpp
     ${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp
     ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp

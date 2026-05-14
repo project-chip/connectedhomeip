@@ -539,7 +539,7 @@ def main() -> int:
         shell.run_cmd(
             f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
         shell.run_cmd(
-            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/../.zephyrrc')
         # QUIRK:
         # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
         # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH
