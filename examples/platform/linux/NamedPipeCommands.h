@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <atomic>
 #include <pthread.h>
 #include <string>
 
@@ -26,23 +27,53 @@ class NamedPipeCommandDelegate
 {
 public:
     virtual ~NamedPipeCommandDelegate()                    = default;
+    /**
+     * @brief Handle a single NamedPipeCommands payload.
+     *
+     * This method must handle dispatching to the Matter stack via `PlatformMgr().ScheduleWork(...)`
+     * and must make copies internally of the input string if it needs to be passed beyond initial parsing.
+     *
+     * @param[in] json A null-terminated-string containing the JSON command payload to process.
+     */
     virtual void OnEventCommandReceived(const char * json) = 0;
 };
 
+/**
+ * This class implements a listener for named pipes (FIFOs). It uses a UNIX daemon
+ * best-practice pattern of opening the FIFO with O_RDWR. This prevents the `read()`
+ * call from constantly busy-looping and returning 0 (EOF) when external writers
+ * (like a one-shot `echo` command) connect, write, and immediately disconnect.
+ *
+ * Each handler has an input `inPath` (e.g. "/tmp/matter_test_pipe") and may also
+ * have an `outPath` which can be used with `WriteToOutPipe` to communicate
+ * payloads to another app's input pipe.
+ *
+ * All payloads should be JSON to work with existing conventions (although the
+ * NamedPipeCommands class does no parsing of its own or any real JSON checks.
+ *
+ * The handling of incoming payloads is done via NamedPipeCommandDelegate class
+ * instances which expect a single JSON string payload, usually of the shape:
+ *
+ *   {"Name": <Some command>, "EndpointId": <Target endpoint>, ...other args}
+ *
+ * Example of a typical command written to inPath of `/tmp/chip_all_clusters_fifo_1146610`:
+ *
+ *   echo '{"Name": "SimulateSwitchIdle", "EndpointId": 3}' > /tmp/chip_all_clusters_fifo_1146610
+ */
 class NamedPipeCommands
 {
 public:
-    CHIP_ERROR Start(const std::string & path, NamedPipeCommandDelegate * delegate);
-    CHIP_ERROR Start(const std::string & path, const std::string & path_out, NamedPipeCommandDelegate * delegate);
+    CHIP_ERROR Start(const std::string & inPath, NamedPipeCommandDelegate * delegate);
+    CHIP_ERROR Start(const std::string & inPath, const std::string & outPath, NamedPipeCommandDelegate * delegate);
     CHIP_ERROR Stop();
     void WriteToOutPipe(const std::string & json);
-    const std::string & OutPath() const { return mChipEventFifoPathOut; }
+    const std::string & OutPath() const { return mFifoOutPath; }
 
 private:
-    bool mStarted = false;
+    std::atomic<bool> mRunning{false};
     pthread_t mChipEventCommandListener;
-    std::string mChipEventFifoPath;
-    std::string mChipEventFifoPathOut;
+    std::string mFifoInPath;
+    std::string mFifoOutPath;
     NamedPipeCommandDelegate * mDelegate = nullptr;
 
     static void * EventCommandListenerTask(void * arg);
