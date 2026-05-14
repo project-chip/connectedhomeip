@@ -416,12 +416,11 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
     if (offEffectDuration == 0)
     {
         ChipLogProgress(Zcl, "OffWithEffect: unsupported effect, completing immediately");
-        sOffEffectArmed = true;
-        AppEvent event{};
-        event.Type               = AppEvent::kEventType_Timer;
-        event.TimerEvent.Context = nullptr;
-        event.Handler            = &OffEffectTimerEventHandler;
-        appInstance().PostEvent(&event);
+        sOffEffectArmed = false;
+        if (osTimerIsRunning(sLightTimer))
+        {
+            osTimerStop(sLightTimer);
+        }
         return;
     }
 
