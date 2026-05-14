@@ -17,15 +17,15 @@ import("//build_overrides/chip.gni")
 source_set("mode-base-server") {
   sources = [
     "AppDelegate.h",
-    "mode-base-cluster-objects.cpp",
-    "mode-base-cluster-objects.h",
     "ModeBaseCluster.cpp",
     "ModeBaseCluster.h",
+    "mode-base-cluster-objects.cpp",
+    "mode-base-cluster-objects.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app:attribute-persistence",
   ]
 }

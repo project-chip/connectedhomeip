@@ -25,11 +25,11 @@ config("includes") {
 executable("chip-rvc-app") {
   sources = [
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-device.cpp",
+    "${chip_root}/examples/rvc-app/rvc-common/src/rvc-mode-code-driven-callbacks.cpp",
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-mode-delegates.cpp",
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-operational-state-delegate.cpp",
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-service-area-delegate.cpp",
     "${chip_root}/examples/rvc-app/rvc-common/src/rvc-service-area-storage-delegate.cpp",
-    "${chip_root}/examples/rvc-app/rvc-common/src/rvc-mode-code-driven-callbacks.cpp",
     "Identify.cpp",
     "RvcAppCommandDelegate.cpp",
     "include/CHIPProjectAppConfig.h",
