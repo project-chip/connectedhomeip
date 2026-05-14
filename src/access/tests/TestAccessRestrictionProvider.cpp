@@ -19,12 +19,13 @@
 #include "access/AccessControl.h"
 #include "access/AccessRestrictionProvider.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
-
 #include <pw_unit_test/framework.h>
 
+#include "lib/support/tests/ExtraPwTestMacros.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
+
 namespace chip {
 namespace Access {
 
@@ -191,10 +192,10 @@ class TestAccessRestriction : public ::testing::Test
 public: // protected
     void SetUp() override
     {
-        accessRestrictionProvider.SetCommissioningEntries(std::vector<AccessRestrictionProvider::Entry>());
-        accessRestrictionProvider.SetEntries(0, std::vector<AccessRestrictionProvider::Entry>());
-        accessRestrictionProvider.SetEntries(1, std::vector<AccessRestrictionProvider::Entry>());
-        accessRestrictionProvider.SetEntries(2, std::vector<AccessRestrictionProvider::Entry>());
+        EXPECT_SUCCESS(accessRestrictionProvider.SetCommissioningEntries(std::vector<AccessRestrictionProvider::Entry>()));
+        EXPECT_SUCCESS(accessRestrictionProvider.SetEntries(0, std::vector<AccessRestrictionProvider::Entry>()));
+        EXPECT_SUCCESS(accessRestrictionProvider.SetEntries(1, std::vector<AccessRestrictionProvider::Entry>()));
+        EXPECT_SUCCESS(accessRestrictionProvider.SetEntries(2, std::vector<AccessRestrictionProvider::Entry>()));
     }
 
     static void SetUpTestSuite()

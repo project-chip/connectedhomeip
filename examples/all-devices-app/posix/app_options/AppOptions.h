@@ -33,7 +33,8 @@ public:
     struct AppConfig
     {
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
-        bool enableWiFi = false;
+        uint32_t bleController = 0;
+        bool enableWiFi        = false;
         std::string kvsPath;
         std::optional<uint16_t> discriminator;
         std::optional<uint16_t> vendorId;
