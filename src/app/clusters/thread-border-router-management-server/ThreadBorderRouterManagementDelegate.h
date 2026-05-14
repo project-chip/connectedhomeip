@@ -24,7 +24,6 @@
 
 namespace chip::app::Clusters {
 
-
 class ThreadBorderRouterManagementDelegate
 {
 public:
