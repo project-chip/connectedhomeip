@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -59,6 +61,7 @@ executable("all-devices-app") {
   ]
 
   output_dir = root_out_dir
+  output_name = all_devices_computed_name
 }
 
 group("posix") {

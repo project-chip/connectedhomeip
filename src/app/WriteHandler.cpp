@@ -87,7 +87,6 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
 
-    mACLCheckCache.ClearValue();
     mProcessingAttributePath.ClearValue();
 
     return CHIP_NO_ERROR;
