@@ -75,6 +75,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value
 namespace SpeedSetting {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const DataModel::Nullable<uint8_t> & value);
 } // namespace SpeedSetting
 
 namespace SpeedCurrent {

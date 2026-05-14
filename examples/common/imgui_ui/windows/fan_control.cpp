@@ -18,8 +18,6 @@
 #include "accessor_updaters.h"
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 
-#include <app/clusters/fan-control-server/FanControlCluster.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 
@@ -79,273 +77,27 @@ static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clust
                                 { { chip::app::Clusters::FanControl::WindBitmap::kSleepWind, "Sleep" },
                                   { chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural" } });
 }
-namespace {
-using namespace chip;
-using namespace chip::app::Clusters::FanControl;
-using chip::app::Clusters::FanControlCluster;
-using Protocols::InteractionModel::Status;
-static Status GetFanModeAdapter(EndpointId ep, FanModeEnum * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    *value = c->GetFanMode();
-    return Status::Success;
-}
-Status SetFanModeUI(EndpointId ep, FanModeEnum value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return c->SetFanMode(value).GetStatusCode().GetStatus();
-}
-
-static Status GetAirflowDirectionAdapter(EndpointId ep, AirflowDirectionEnum * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kAirflowDirection))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    *value = c->GetAirflowDirection();
-    return Status::Success;
-}
-Status SetAirflowDirectionUI(EndpointId ep, AirflowDirectionEnum value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return c->SetAirflowDirection(value).GetStatusCode().GetStatus();
-}
-
-static Status GetFanModeSequenceAdapter(EndpointId ep, FanModeSequenceEnum * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    *value = c->GetFanModeSequence();
-    return Status::Success;
-}
-Status SetFanModeSequenceUI(EndpointId ep, FanModeSequenceEnum value)
-{
-    return Status::UnsupportedWrite;
-}
-
-static Status GetPercentCurrentAdapter(EndpointId ep, Percent * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    *value = c->GetPercentCurrent();
-    return Status::Success;
-}
-
-static Status GetSpeedMaxAdapter(EndpointId ep, uint8_t * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    *value = c->GetSpeedMax();
-    return Status::Success;
-}
-
-static Status GetSpeedCurrentAdapter(EndpointId ep, uint8_t * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    *value = c->GetSpeedCurrent();
-    return Status::Success;
-}
-
-static Status GetFeatureMapAdapter(EndpointId ep, uint32_t * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    *value = c->GetFeatureMap().Raw();
-    return Status::Success;
-}
-
-Status SetPercentSettingUI(EndpointId ep, Percent value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return c->SetPercentSetting(app::DataModel::Nullable<Percent>(value)).GetStatusCode().GetStatus();
-}
-
-Status SetSpeedSettingUI(EndpointId ep, uint8_t value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return c->SetSpeedSetting(app::DataModel::Nullable<uint8_t>(value)).GetStatusCode().GetStatus();
-}
-
-static Status GetPercentSettingAdapter(EndpointId ep, app::DataModel::Nullable<Percent> & value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    value = c->GetPercentSetting();
-    return Status::Success;
-}
-
-static Status GetSpeedSettingAdapter(EndpointId ep, app::DataModel::Nullable<uint8_t> & value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = c->GetSpeedSetting();
-    return Status::Success;
-}
-
-static Status GetRockSupportAdapter(EndpointId ep, BitMask<RockBitmap> * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kRocking))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    *value = c->GetRockSupport();
-    return Status::Success;
-}
-Status SetRockSupportUI(EndpointId ep, BitMask<RockBitmap> value)
-{
-    return Status::UnsupportedWrite;
-}
-
-static Status GetRockSettingAdapter(EndpointId ep, BitMask<RockBitmap> * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kRocking))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    *value = c->GetRockSetting();
-    return Status::Success;
-}
-Status SetRockSettingUI(EndpointId ep, BitMask<RockBitmap> value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return c->SetRockSetting(value).GetStatusCode().GetStatus();
-}
-
-static Status GetWindSupportAdapter(EndpointId ep, BitMask<WindBitmap> * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kWind))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    *value = c->GetWindSupport();
-    return Status::Success;
-}
-Status SetWindSupportUI(EndpointId ep, BitMask<WindBitmap> value)
-{
-    return Status::UnsupportedWrite;
-}
-
-static Status GetWindSettingAdapter(EndpointId ep, BitMask<WindBitmap> * value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!c->GetFeatureMap().Has(FanControl::Feature::kWind))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    *value = c->GetWindSetting();
-    return Status::Success;
-}
-Status SetWindSettingUI(EndpointId ep, BitMask<WindBitmap> value)
-{
-    FanControlCluster * c = FanControl::FindClusterOnEndpoint(ep);
-    if (c == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return c->SetWindSetting(value).GetStatusCode().GetStatus();
-}
-} // namespace
 
 void FanControl::UpdateState()
 {
-    UpdateStateEnum(mEndpointId, mTargetFanMode, mFanMode, &SetFanModeUI, &GetFanModeAdapter);
-    UpdateStateEnum(mEndpointId, mTargetAirflowDirection, mAirflowDirection, &SetAirflowDirectionUI, &GetAirflowDirectionAdapter);
-    UpdateStateEnum(mEndpointId, mTargetFanModeSequence, mFanModeSequence, &SetFanModeSequenceUI, &GetFanModeSequenceAdapter);
+    namespace F = chip::app::Clusters::FanControl::Attributes;
 
-    UpdateStateReadOnly(mEndpointId, mTargetPercent, mPercent, &GetPercentCurrentAdapter);
-    UpdateStateReadOnly(mEndpointId, mTargetSpeedMax, mSpeedMax, &GetSpeedMaxAdapter);
-    UpdateStateReadOnly(mEndpointId, mTargetSpeedCurrent, mSpeedCurrent, &GetSpeedCurrentAdapter);
-    UpdateStateReadOnly(mEndpointId, mTargetFeatureMap, mFeatureMap, &GetFeatureMapAdapter);
+    UpdateStateEnum(mEndpointId, mTargetFanMode, mFanMode, &F::FanMode::Set, &F::FanMode::Get);
+    UpdateStateEnum(mEndpointId, mTargetAirflowDirection, mAirflowDirection, &F::AirflowDirection::Set, &F::AirflowDirection::Get);
+    UpdateStateEnum(mEndpointId, mTargetFanModeSequence, mFanModeSequence, &F::FanModeSequence::Set, &F::FanModeSequence::Get);
 
-    UpdateStateNullable(mEndpointId, mTargetPercentSetting, mPercentSetting, &SetPercentSettingUI, &GetPercentSettingAdapter);
-    UpdateStateNullable(mEndpointId, mTargetSpeedSetting, mSpeedSetting, &SetSpeedSettingUI, &GetSpeedSettingAdapter);
+    UpdateStateReadOnly(mEndpointId, mTargetPercent, mPercent, &F::PercentCurrent::Get);
+    UpdateStateReadOnly(mEndpointId, mTargetSpeedMax, mSpeedMax, &F::SpeedMax::Get);
+    UpdateStateReadOnly(mEndpointId, mTargetSpeedCurrent, mSpeedCurrent, &F::SpeedCurrent::Get);
+    UpdateStateReadOnly(mEndpointId, mTargetFeatureMap, mFeatureMap, &F::FeatureMap::Get);
 
-    UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport, &SetRockSupportUI, &GetRockSupportAdapter);
-    UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting, &SetRockSettingUI, &GetRockSettingAdapter);
-    UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport, &SetWindSupportUI, &GetWindSupportAdapter);
-    UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting, &SetWindSettingUI, &GetWindSettingAdapter);
+    UpdateStateNullable(mEndpointId, mTargetPercentSetting, mPercentSetting, &F::PercentSetting::Set, &F::PercentSetting::Get);
+    UpdateStateNullable(mEndpointId, mTargetSpeedSetting, mSpeedSetting, &F::SpeedSetting::Set, &F::SpeedSetting::Get);
+
+    UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport, &F::RockSupport::Set, &F::RockSupport::Get);
+    UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting, &F::RockSetting::Set, &F::RockSetting::Get);
+    UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport, &F::WindSupport::Set, &F::WindSupport::Get);
+    UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting, &F::WindSetting::Set, &F::WindSetting::Get);
 }
 
 void FanControl::Render()

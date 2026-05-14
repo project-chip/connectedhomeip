@@ -313,14 +313,19 @@ Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
     return Status::Success;
 }
 
-Status Set(EndpointId endpoint, uint8_t value)
+Status Set(EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
 {
     FanControlCluster * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
     }
-    return cluster->SetSpeedSetting(DataModel::Nullable<uint8_t>(value)).GetStatusCode().GetStatus();
+    return cluster->SetSpeedSetting(value).GetStatusCode().GetStatus();
+}
+
+Status Set(EndpointId endpoint, uint8_t value)
+{
+    return Set(endpoint, DataModel::Nullable<uint8_t>(value));
 }
 
 } // namespace SpeedSetting
