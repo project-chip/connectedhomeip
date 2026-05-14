@@ -71,9 +71,7 @@ void WaitForShellActivity()
 
 CHIP_ERROR CmdSilabsDispatch(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     chip::StringBuilder<SL_CLI_INPUT_BUFFER_SIZE> builder;
 
@@ -83,12 +81,11 @@ CHIP_ERROR CmdSilabsDispatch(int argc, char ** argv)
         builder.Add(" ");
     }
 
-    VerifyOrExit(builder.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     sl_cli_handle_input(sl_cli_default_handle, builder.c_str());
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 static const Shell::shell_command_t cmds_silabs_root = { &CmdSilabsDispatch, "silabs", "Dispatch Silicon Labs CLI command" };
