@@ -8502,6 +8502,90 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDynamicLightingClusterEffectColorStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _level = nil;
+
+        _x = nil;
+
+        _y = nil;
+
+        _hue = nil;
+
+        _enhancedHue = nil;
+
+        _saturation = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDynamicLightingClusterEffectColorStruct alloc] init];
+
+    other.level = self.level;
+    other.x = self.x;
+    other.y = self.y;
+    other.hue = self.hue;
+    other.enhancedHue = self.enhancedHue;
+    other.saturation = self.saturation;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: level:%@; x:%@; y:%@; hue:%@; enhancedHue:%@; saturation:%@; >", NSStringFromClass([self class]), _level, _x, _y, _hue, _enhancedHue, _saturation];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDynamicLightingClusterEffectStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _effectID = @(0);
+
+        _source = @(0);
+
+        _label = @"";
+
+        _maxSpeed = @(0);
+
+        _defaultSpeed = @(0);
+
+        _supportsColorPalette = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDynamicLightingClusterEffectStruct alloc] init];
+
+    other.effectID = self.effectID;
+    other.source = self.source;
+    other.label = self.label;
+    other.maxSpeed = self.maxSpeed;
+    other.defaultSpeed = self.defaultSpeed;
+    other.supportsColorPalette = self.supportsColorPalette;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectID:%@; source:%@; label:%@; maxSpeed:%@; defaultSpeed:%@; supportsColorPalette:%@; >", NSStringFromClass([self class]), _effectID, _source, _label, _maxSpeed, _defaultSpeed, _supportsColorPalette];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROccupancySensingClusterHoldTimeLimitsStruct
 - (instancetype)init
 {

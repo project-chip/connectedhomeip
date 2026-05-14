@@ -72,7 +72,7 @@ class FactoryDataWriter:
         return generation_results["Verifier"]
 
     # Populates numberOfBits starting from LSB of input into bits, which is assumed to be zero-initialized
-    def WriteBits(self, bits, offset, input, numberOfBits, totalPayloadSizeInBits):
+    def WriteBits(self, bits, offset, input_data, numberOfBits, totalPayloadSizeInBits):
         if ((offset + numberOfBits) > totalPayloadSizeInBits):
             print("THIS IS NOT VALID")
             return None
@@ -80,11 +80,11 @@ class FactoryDataWriter:
 
         index = offset
         offset += numberOfBits
-        while (input != 0):
-            if (input & 1):
+        while (input_data != 0):
+            if (input_data & 1):
                 bits[int(index / 8)] |= (1 << (index % 8))
             index += 1
-            input >>= 1
+            input_data >>= 1
 
         return offset
 

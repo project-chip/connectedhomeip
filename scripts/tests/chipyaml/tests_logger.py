@@ -27,8 +27,8 @@ from matter.yamltests.hooks import TestParserHooks, TestRunnerHooks, WebSocketRu
 from matter.yamltests.parser import TestStep
 
 
-def _strikethrough(str):
-    return '\u0336'.join(str[i:i+1] for i in range(0, len(str), 1))
+def _strikethrough(s):
+    return '\u0336'.join(s[i:i+1] for i in range(0, len(s), 1))
 
 
 _SUCCESS = click.style(u'\N{check mark}', fg='green')

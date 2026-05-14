@@ -46,9 +46,9 @@ FAKE_CONN_OBJ_VALUE = 12121212
 SERVICE_DATA_LEN = 8
 
 
-def VoidPtrToUUIDString(ptr, len):
+def VoidPtrToUUIDString(ptr, length):
     try:
-        ptr = ChipUtility.VoidPtrToByteArray(ptr, len)
+        ptr = ChipUtility.VoidPtrToByteArray(ptr, length)
         ptr = ChipUtility.Hexlify(ptr)
         ptr = (
             ptr[:8]

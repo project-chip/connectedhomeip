@@ -27,6 +27,7 @@
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 
+#include <cstdio>
 #include <limits>
 #include <utility>
 
