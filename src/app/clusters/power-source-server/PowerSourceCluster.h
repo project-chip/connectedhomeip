@@ -125,33 +125,46 @@ constexpr static AttributeSet GetValidOptionalAttributeSet(AttributeSet optional
     constexpr uint32_t capacityAttributeBit = OptionalAttributeSet<BatCapacity::Id>::All();
 
     uint32_t mandatoryBits = 0;
-    uint32_t disabledBits = 0;
+    uint32_t disabledBits  = 0;
 
-    if (features.Has(PowerSource::Feature::kWired)) {
+    if (features.Has(PowerSource::Feature::kWired))
+    {
         mandatoryBits |= wiredMandatoryAttributeBits;
-    } else {
+    }
+    else
+    {
         disabledBits |= wiredAttributeBits;
     }
 
-    if (features.Has(PowerSource::Feature::kBattery)) {
+    if (features.Has(PowerSource::Feature::kBattery))
+    {
         mandatoryBits |= batteryMandatoryAttributeBits;
-    } else {
+    }
+    else
+    {
         disabledBits |= batteryAttributeBits;
     }
 
-    if (features.Has(PowerSource::Feature::kReplaceable)) {
+    if (features.Has(PowerSource::Feature::kReplaceable))
+    {
         mandatoryBits |= replaceableBatteryMandatoryAttributeBits;
-    } else {
+    }
+    else
+    {
         disabledBits |= replaceableBatteryAttributeBits;
     }
 
-    if (features.Has(PowerSource::Feature::kRechargeable)) {
+    if (features.Has(PowerSource::Feature::kRechargeable))
+    {
         mandatoryBits |= rechargeableBatteryMandatoryAttributeBits;
-    } else {
+    }
+    else
+    {
         disabledBits |= rechargeableBatteryAttributeBits;
     }
 
-    if (!(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable))) {
+    if (!(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable)))
+    {
         disabledBits |= capacityAttributeBit;
     }
 
@@ -789,7 +802,8 @@ public:
     /// Attributes marked with the `Fixed` quality do not have setters.
     /// They can be only set during construction using the `PowerSourceClusterConfig` class.
     /// `Fixed` attributes are `Description`, `WiredCurrentType`, `WiredNominalVoltage`, `WiredMaximumCurrent`,
-    /// `BatReplaceability`, `BatReplacementDescription`, `BatCommonDesignation`, `BatANSIDesignation`, `BatIECDesignation`, `BatApprovedChemistry`, `BatCapacity`, `BatQuantity`.
+    /// `BatReplaceability`, `BatReplacementDescription`, `BatCommonDesignation`, `BatANSIDesignation`, `BatIECDesignation`,
+    /// `BatApprovedChemistry`, `BatCapacity`, `BatQuantity`.
 
     CHIP_ERROR SetStatus(PowerSourceStatusEnum val)
     {

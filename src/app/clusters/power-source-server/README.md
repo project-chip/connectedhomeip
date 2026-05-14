@@ -18,12 +18,16 @@ creating and registering the cluster directly. This can be done using
 
 ### How does the cluster work
 
-Because of flash considerations the implementation is a template based on the feature set and attribute set for things that the user wants to be supported. This will be made more clear using examples
+Because of flash considerations the implementation is a template based on the
+feature set and attribute set for things that the user wants to be supported.
+This will be made more clear using examples
 
 ### Examples
 
-- ## Configuration for a wired power source besides mandatory attributes.
-    This cluster supports `WiredAssessedInputVoltage` and `WiredNominalVoltage` optional attributes
+-   ## Configuration for a wired power source besides mandatory attributes.
+
+    This cluster supports `WiredAssessedInputVoltage` and `WiredNominalVoltage`
+    optional attributes
 
     ```cpp
     #include <app/clusters/PowerSourceCluster.h>
@@ -81,29 +85,33 @@ Because of flash considerations the implementation is a template based on the fe
 
     ```
 
-    Note that functions associated with attributes that are not supported will throw a compile error.
+    Note that functions associated with attributes that are not supported will
+    throw a compile error.
 
-- ## Configuration for three batteries, one simple, one rechargeable, one replaceable
+-   ## Configuration for three batteries, one simple, one rechargeable, one replaceable
+
     Simple battery will use the `BatPercentRemaining` optional attribute.
-    Rechargeable battery will use the `BatPercentRemaining`, `BatChargingCurrent` optional attributes.
-    Replaceable battery will use the `BatTimeRemaining`, `BatCapacity` optional attributes.
+    Rechargeable battery will use the `BatPercentRemaining`,
+    `BatChargingCurrent` optional attributes. Replaceable battery will use the
+    `BatTimeRemaining`, `BatCapacity` optional attributes.
 
-    It will be very benefitial to use one template specialization for the three of these configurations.
+    It will be very benefitial to use one template specialization for the three
+    of these configurations.
 
-   ```cpp
-    #include <app/clusters/PowerSourceCluster.h>
-    #include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
-    #include <platform/DefaultTimerDelegate.h>
-    #include <data-model-provider/CodeDrivenDataModelProvider.h>
+    ```cpp
+     #include <app/clusters/PowerSourceCluster.h>
+     #include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
+     #include <platform/DefaultTimerDelegate.h>
+     #include <data-model-provider/CodeDrivenDataModelProvider.h>
 
-    using namespace app;
-    using namespace app::Clusters;
+     using namespace app;
+     using namespace app::Clusters;
 
-    constexpr EndpointId powerSourceEndpointId1 = 1;
-    constexpr EndpointId powerSourceEndpointId2 = 2;
-    constexpr EndpointId powerSourceEndpointId3 = 3;
+     constexpr EndpointId powerSourceEndpointId1 = 1;
+     constexpr EndpointId powerSourceEndpointId2 = 2;
+     constexpr EndpointId powerSourceEndpointId3 = 3;
 
-    DefaultTimerDelegate timerDelegate;
+     DefaultTimerDelegate timerDelegate;
     ```
 
     Define the template specialization to be used
@@ -133,10 +141,17 @@ Because of flash considerations the implementation is a template based on the fe
 
     ```
 
-    Create config objects for the clusters, the clusters, and then use them
-    All three objects will have the same functionality in terms of accessible functions and config field members
+    Create config objects for the clusters, the clusters, and then use them All
+    three objects will have the same functionality in terms of accessible
+    functions and config field members
 
-    But it is possible to inform the cluster exactly what attributes are used or supported from the manufacturer side using the field `usedOptionalAttributes` in the config object. This will make the cluster to report specific information about what the cluster supports to the data model. This will mean, that technically the cluster will have the capabitily to support certain attributes, but if manufacturer can't support it, the data model will see them as unsupported.
+    But it is possible to inform the cluster exactly what attributes are used or
+    supported from the manufacturer side using the field
+    `usedOptionalAttributes` in the config object. This will make the cluster to
+    report specific information about what the cluster supports to the data
+    model. This will mean, that technically the cluster will have the capabitily
+    to support certain attributes, but if manufacturer can't support it, the
+    data model will see them as unsupported.
 
     ```cpp
 
@@ -186,23 +201,24 @@ Because of flash considerations the implementation is a template based on the fe
 
     ```
 
-- ## Configuration for one wired power source and one simple battery
+-   ## Configuration for one wired power source and one simple battery
 
-    When it is needed to have both wired and battery power sources, it is not possible to do this with one template specialization by design.
+    When it is needed to have both wired and battery power sources, it is not
+    possible to do this with one template specialization by design.
 
-   ```cpp
-    #include <app/clusters/PowerSourceCluster.h>
-    #include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
-    #include <platform/DefaultTimerDelegate.h>
-    #include <data-model-provider/CodeDrivenDataModelProvider.h>
+    ```cpp
+     #include <app/clusters/PowerSourceCluster.h>
+     #include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
+     #include <platform/DefaultTimerDelegate.h>
+     #include <data-model-provider/CodeDrivenDataModelProvider.h>
 
-    using namespace app;
-    using namespace app::Clusters;
+     using namespace app;
+     using namespace app::Clusters;
 
-    constexpr EndpointId powerSourceEndpointId1 = 1;
-    constexpr EndpointId powerSourceEndpointId2 = 2;
+     constexpr EndpointId powerSourceEndpointId1 = 1;
+     constexpr EndpointId powerSourceEndpointId2 = 2;
 
-    DefaultTimerDelegate timerDelegate;
+     DefaultTimerDelegate timerDelegate;
     ```
 
     Define the template specializations to be used
@@ -243,17 +259,24 @@ Because of flash considerations the implementation is a template based on the fe
 
 ### Notes
 
-For simplicity there are 4 already named specializations of the class in the `PowerSourceCluster.h` -
-- `MinimalWiredPowerSourceCluster`
-- `MinimalBatteryPowerSourceCluster`
-- `FullWiredPowerSourceCluster` (supports ALL wired optional attributes)
-- `FullBatteryPowerSourceCluster` (supports ALL battery optional attributes, and is BOTH replaceable and rechargeable)
+For simplicity there are 4 already named specializations of the class in the
+`PowerSourceCluster.h` -
 
-Instead of `RegisteredServercluster` one can use `LazyRegisteredServerCluster` which can defer the creation and overall provides dynamic lifetime management.
+-   `MinimalWiredPowerSourceCluster`
+-   `MinimalBatteryPowerSourceCluster`
+-   `FullWiredPowerSourceCluster` (supports ALL wired optional attributes)
+-   `FullBatteryPowerSourceCluster` (supports ALL battery optional attributes,
+    and is BOTH replaceable and rechargeable)
 
-Some attributes can be can be set only in the config object, and not after the clusters creation, because they are `Fixed` attributes.
+Instead of `RegisteredServercluster` one can use `LazyRegisteredServerCluster`
+which can defer the creation and overall provides dynamic lifetime management.
 
-Again, all this is to have the cluster to be the smallest possible type for the functionality needed. So if you do not have any FLASH restrictions, you can use `Full*PowerSourceCluster`s for everything. 
+Some attributes can be can be set only in the config object, and not after the
+clusters creation, because they are `Fixed` attributes.
+
+Again, all this is to have the cluster to be the smallest possible type for the
+functionality needed. So if you do not have any FLASH restrictions, you can use
+`Full*PowerSourceCluster`s for everything.
 
 ## Legacy Usage (Not Recommended)
 
@@ -273,9 +296,12 @@ initial startup will fail.
 
 To use the cluster in this mode, your application can get a pointer to the
 cluster instance and call its methods directly using
-`PowerSource::FindWiredClusterOnEndpoint(endpointId)` or `PowerSource::FindBatteryClusterOnEndpoint(endpointId)` depending the configuration.
+`PowerSource::FindWiredClusterOnEndpoint(endpointId)` or
+`PowerSource::FindBatteryClusterOnEndpoint(endpointId)` depending the
+configuration.
 
-If there is a wired configuration on some endpoint, `FindBatteryClusterOnEndpoint` will return nullptr.
+If there is a wired configuration on some endpoint,
+`FindBatteryClusterOnEndpoint` will return nullptr.
 
 Note that this method is for backwards compatibility only and is not recommended
 for new applications.
