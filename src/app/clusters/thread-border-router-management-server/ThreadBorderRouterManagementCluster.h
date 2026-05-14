@@ -83,6 +83,9 @@ protected:
     CommandHandler::Handle mAsyncCommandHandle;
     uint32_t mSetActiveDatasetSequenceNumber = 0;
     Optional<uint64_t> mBreadcrumb;
+
+private:
+    void Cleanup();
 };
 
 } // namespace chip::app::Clusters
