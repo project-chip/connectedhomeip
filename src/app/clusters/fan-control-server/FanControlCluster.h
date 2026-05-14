@@ -37,7 +37,7 @@ public:
 
     struct Config
     {
-        Config(EndpointId endpointId, FanControl::Delegate * delegate) : mEndpointId(endpointId), mDelegate(delegate) {}
+        Config(EndpointId endpointId, FanControl::Delegate & delegate) : mEndpointId(endpointId), mDelegate(delegate) {}
 
         Config & WithFanModeSequence(FanControl::FanModeSequenceEnum fanModeSequence)
         {
@@ -92,7 +92,7 @@ public:
         }
 
         EndpointId mEndpointId;
-        FanControl::Delegate * mDelegate;
+        FanControl::Delegate & mDelegate;
         FanControl::FanModeSequenceEnum mFanModeSequence = FanControl::FanModeSequenceEnum::kOffLowHigh;
         uint8_t mSpeedMax                                = 0;
         BitMask<FanControl::RockBitmap> mRockSupport;
@@ -103,6 +103,9 @@ public:
 
     FanControlCluster(const Config & config);
     ~FanControlCluster() = default;
+
+    /** Shared delegate when no application delegate is registered. HandleStep returns Failure. */
+    static FanControl::Delegate & PlaceholderDelegate();
 
     // ServerClusterInterface Implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;

@@ -80,7 +80,7 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     }
 
     // Fan
-    FanControlCluster::Config fanConfig(endpoint, &mFanDelegate);
+    FanControlCluster::Config fanConfig(endpoint, mFanDelegate);
     fanConfig.WithSpeedMax(10)
         .WithStep()
         .WithWindSupport(BitMask<FanControl::WindBitmap>(FanControl::WindBitmap::kSleepWind, FanControl::WindBitmap::kNaturalWind))

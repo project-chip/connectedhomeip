@@ -107,67 +107,67 @@ public:
 
 FanControlCluster::Config MakeTestConfig()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
 }
 
 FanControlCluster::Config MakeTestConfigWithStep()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
         .WithStep();
 }
 
 FanControlCluster::Config MakeTestConfigWithMultiSpeed()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
         .WithSpeedMax(10)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
 }
 
 FanControlCluster::Config MakeTestConfigWithAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigWithMultiSpeedAndAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
         .WithSpeedMax(10)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigOffHigh()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh);
 }
 
 FanControlCluster::Config MakeTestConfigOffHighAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHighAuto);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigOffLowMedHigh()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowMedHigh);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowMedHigh);
 }
 
 FanControlCluster::Config MakeTestConfigWithRocking()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
         .WithRockSupport(BitMask<RockBitmap>(RockBitmap::kRockLeftRight));
 }
 
 FanControlCluster::Config MakeTestConfigWithWind()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
         .WithWindSupport(BitMask<WindBitmap>(WindBitmap::kSleepWind));
 }
 
 FanControlCluster::Config MakeTestConfigWithAirflowDirection()
 {
-    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
         .WithAirflowDirection();
 }
@@ -222,7 +222,7 @@ TEST_F(TestFanControlPersistence, StartupRestoresFanModeFromStorage)
 
     NotifyingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+        FanControlCluster::Config(kTestEndpointId, delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     ASSERT_EQ(cluster.Startup(ctx.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.mFanDriveStateNotifyCount, 1);
 
@@ -244,7 +244,7 @@ TEST_F(TestFanControlPersistence, StartupInvalidPersistedFanMode_FallsBackToOff)
         CHIP_NO_ERROR);
 
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh));
+        FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh));
     ASSERT_EQ(cluster.Startup(ctx.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -746,7 +746,7 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSetting_NotifiesDelegate)
     TestServerClusterContext testContext;
     NotifyingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+        FanControlCluster::Config(kTestEndpointId, delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     delegate.mFanDriveStateNotifyCount = 0;
 
@@ -764,7 +764,7 @@ TEST_F(TestFanControlDelegateCallbacks, NestedSetPercentFromDelegate_SuppressesN
     TestServerClusterContext testContext;
     ReentrantFanDriveDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+        FanControlCluster::Config(kTestEndpointId, delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     delegate.mCluster = &cluster;
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -785,7 +785,7 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSettingSameValue_DoesNotNoti
     TestServerClusterContext testContext;
     NotifyingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+        FanControlCluster::Config(kTestEndpointId, delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
     DataModel::Nullable<chip::Percent> percentSetting;
@@ -805,7 +805,7 @@ TEST_F(TestFanControlDelegateCallbacks, WriteFanModeSameValue_DoesNotNotifyDeleg
     TestServerClusterContext testContext;
     NotifyingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+        FanControlCluster::Config(kTestEndpointId, delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -825,7 +825,7 @@ TEST_F(TestFanControlDelegateCallbacks, WritePercentSettingToZero_NotifiesFanDri
     TestServerClusterContext testContext;
     NotifyingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
-        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+        FanControlCluster::Config(kTestEndpointId, delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -847,7 +847,7 @@ TEST_F(TestFanControlDelegateCallbacks, WriteSpeedSettingToZero_NotifiesFanDrive
 {
     TestServerClusterContext testContext;
     NotifyingFanControlDelegate delegate(kTestEndpointId);
-    FanControlCluster cluster(FanControlCluster::Config(kTestEndpointId, &delegate)
+    FanControlCluster cluster(FanControlCluster::Config(kTestEndpointId, delegate)
                                   .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
                                   .WithSpeedMax(10));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -872,7 +872,7 @@ TEST_F(TestFanControlDelegateCallbacks, WriteRockSetting_NotifiesDelegate)
 {
     TestServerClusterContext testContext;
     NotifyingFanControlDelegate delegate(kTestEndpointId);
-    FanControlCluster cluster(FanControlCluster::Config(kTestEndpointId, &delegate)
+    FanControlCluster cluster(FanControlCluster::Config(kTestEndpointId, delegate)
                                   .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
                                   .WithRockSupport(BitMask<RockBitmap>(RockBitmap::kRockLeftRight)));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);

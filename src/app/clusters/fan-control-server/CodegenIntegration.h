@@ -37,7 +37,8 @@ FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
  * `OnFanDriveStateChanged`). Call this from application init (for example `emberAfFanControlClusterInitCallback`)
  * before or after the cluster is constructed, if the cluster already exists, the running instance is updated.
  *
- * @param aDelegate Application delegate, or `nullptr` if none.
+ * @param aDelegate Application delegate, or `nullptr` to unbind. While unbound, the cluster uses
+ * `FanControlCluster::PlaceholderDelegate()` internally (for example `HandleStep` returns Failure).
  */
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
 

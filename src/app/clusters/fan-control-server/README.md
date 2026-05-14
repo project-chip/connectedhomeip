@@ -62,7 +62,7 @@ rocking support).
 MyFanControlDelegate gMyFanDelegate(kYourEndpointId);
 
 chip::app::RegisteredServerCluster<chip::app::Clusters::FanControlCluster> gFanControlCluster(
-    chip::app::Clusters::FanControlCluster::Config(kYourEndpointId, &gMyFanDelegate)
+    chip::app::Clusters::FanControlCluster::Config(kYourEndpointId, gMyFanDelegate)
         .WithFanModeSequence(chip::app::Clusters::FanControl::FanModeSequenceEnum::kOffLowHigh)
         .WithSpeedMax(10)
         .WithStep()
