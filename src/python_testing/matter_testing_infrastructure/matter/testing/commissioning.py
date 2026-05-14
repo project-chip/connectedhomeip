@@ -24,7 +24,7 @@ import contextlib
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Optional, Set
+from typing import Any, Iterable, List, Optional, Set
 
 from mobly import asserts
 
@@ -53,6 +53,26 @@ def _successful_task_in_done_set(done: Set[asyncio.Task]) -> Optional[asyncio.Ta
         if not task.cancelled() and task.exception() is None:
             return task
     return None
+
+
+async def _cancel_other_tasks_except(others: Iterable[asyncio.Task], keep: asyncio.Task) -> None:
+    """
+    Cancel every task in *others* except *keep*, and await cancellations.
+
+    Sibling tasks that are already completed (for example they failed in the same
+    event-loop iteration as *keep* succeeded) must not be awaited: awaiting them
+    would re-raise their stored exception.
+    """
+    for task in others:
+        if task is keep:
+            continue
+        if task.done():
+            if not task.cancelled():
+                task.exception()
+            continue
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
 
 
 @dataclass
@@ -585,13 +605,7 @@ async def establish_pase_or_case_session(
 
     first_wait_successful = _successful_task_in_done_set(done)
     if first_wait_successful is not None:
-        for task in task_list:
-            if task is not first_wait_successful:
-                task.cancel()
-        for task in task_list:
-            if task is not first_wait_successful:
-                with contextlib.suppress(asyncio.CancelledError):
-                    await task
+        await _cancel_other_tasks_except(task_list, first_wait_successful)
         LOGGER.info(
             f"Successfully established {first_wait_successful.get_name().upper()} session to node {node_id}"
         )
@@ -620,13 +634,7 @@ async def establish_pase_or_case_session(
             )
             second_wait_successful = _successful_task_in_done_set(done_after_second_wait)
             if second_wait_successful is not None:
-                for task in pending:
-                    if task is not second_wait_successful:
-                        task.cancel()
-                for task in pending:
-                    if task is not second_wait_successful:
-                        with contextlib.suppress(asyncio.CancelledError):
-                            await task
+                await _cancel_other_tasks_except(pending, second_wait_successful)
                 LOGGER.info(
                     f"Successfully established {second_wait_successful.get_name().upper()} session to node {node_id}"
                 )
@@ -692,7 +700,9 @@ async def is_commissioned(
         discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
 
     Returns:
-        True if the device is commissioned or ready to be commissioned on this fabric, False otherwise.
+        True only when the device advertises as operational on this fabric (Step 1).
+        False when a commissionable pairing window is detected (Step 2) or when neither
+        operational nor commissionable DNS-SD signals are found (Step 3).
     """
     try:
         # Step 1: DNS-SD check — is the device operational on this fabric?
