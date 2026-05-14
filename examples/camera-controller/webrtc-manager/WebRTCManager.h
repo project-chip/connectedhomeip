@@ -88,11 +88,12 @@ private:
     // Close and reset the RTP sockets
     void CloseRTPSockets();
 
-    // PeerConnection callback handlers
-    void OnLocalDescriptionGenerated(const rtc::Description & desc);
-    void OnLocalCandidateGathered(const rtc::Candidate & candidate);
-    void OnConnectionStateChanged(rtc::PeerConnection::State state);
-    void OnGatheringStateChanged(rtc::PeerConnection::GatheringState state);
+    // PeerConnection callback handlers. The handlers are executed on the Matter thread.
+    void OnLocalDescriptionGenerated(const std::shared_ptr<rtc::PeerConnection> & connection, const rtc::Description & desc);
+    void OnLocalCandidateGathered(const std::shared_ptr<rtc::PeerConnection> & connection, const rtc::Candidate & candidate);
+    void OnConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection, rtc::PeerConnection::State state);
+    void OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                 rtc::PeerConnection::GatheringState state);
 
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster>
         mWebRTCRegisteredServerCluster;

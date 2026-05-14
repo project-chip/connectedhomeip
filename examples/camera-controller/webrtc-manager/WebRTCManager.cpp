@@ -90,6 +90,26 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
     return "N/A";
 }
 
+void ScheduleOnMatterThread(const std::weak_ptr<rtc::PeerConnection> & weakPeerConnection,
+                            std::function<void(const std::shared_ptr<rtc::PeerConnection> &)> && callback)
+{
+    struct CallbackState
+    {
+        std::weak_ptr<rtc::PeerConnection> weakPeerConnection;
+        std::function<void(const std::shared_ptr<rtc::PeerConnection> &)> callback;
+    };
+
+    auto * callbackState = new CallbackState{ weakPeerConnection, std::move(callback) };
+    SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([callbackState]() {
+        std::unique_ptr<CallbackState> guard(callbackState);
+        auto peerConnection = guard->weakPeerConnection.lock();
+        if (peerConnection)
+        {
+            guard->callback(peerConnection);
+        }
+    }));
+}
+
 } // namespace
 
 WebRTCManager::WebRTCManager() {}
@@ -272,25 +292,26 @@ CHIP_ERROR WebRTCManager::Connect(Controller::DeviceCommissioner & commissioner,
     config.iceServers.emplace_back("stun:stun.l.google.com:19302");
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
-    mPeerConnection->onLocalDescription([this](rtc::Description desc) {
-        auto * descPtr = new rtc::Description(desc);
-        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, descPtr]() {
-            std::unique_ptr<rtc::Description> guard(descPtr);
-            OnLocalDescriptionGenerated(*descPtr);
-        }));
+    std::weak_ptr<rtc::PeerConnection> weakPeerConnection = mPeerConnection;
+    mPeerConnection->onLocalDescription([this, weakPeerConnection](rtc::Description desc) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, desc](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnLocalDescriptionGenerated(connection, desc);
+        });
     });
-    mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        auto * candidatePtr = new rtc::Candidate(candidate);
-        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, candidatePtr]() {
-            std::unique_ptr<rtc::Candidate> guard(candidatePtr);
-            OnLocalCandidateGathered(*candidatePtr);
-        }));
+    mPeerConnection->onLocalCandidate([this, weakPeerConnection](rtc::Candidate candidate) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, candidate](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnLocalCandidateGathered(connection, candidate);
+        });
     });
-    mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
-        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, state]() { OnConnectionStateChanged(state); }));
+    mPeerConnection->onStateChange([this, weakPeerConnection](rtc::PeerConnection::State state) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, state](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnConnectionStateChanged(connection, state);
+        });
     });
-    mPeerConnection->onGatheringStateChange([this](rtc::PeerConnection::GatheringState state) {
-        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, state]() { OnGatheringStateChanged(state); }));
+    mPeerConnection->onGatheringStateChange([this, weakPeerConnection](rtc::PeerConnection::GatheringState state) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, state](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnGatheringStateChanged(connection, state);
+        });
     });
 
     // Create UDP socket for RTP forwarding
@@ -459,10 +480,12 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
     return err;
 }
 
-void WebRTCManager::OnLocalDescriptionGenerated(const rtc::Description & desc)
+void WebRTCManager::OnLocalDescriptionGenerated(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                                const rtc::Description & desc)
 {
-    if (!mPeerConnection)
+    if (connection != mPeerConnection)
     {
+        ChipLogDetail(Camera, "OnLocalDescriptionGenerated: ignoring stale callback for previous WebRTC session");
         return;
     }
 
@@ -514,10 +537,12 @@ void WebRTCManager::OnLocalDescriptionGenerated(const rtc::Description & desc)
     }
 }
 
-void WebRTCManager::OnLocalCandidateGathered(const rtc::Candidate & candidate)
+void WebRTCManager::OnLocalCandidateGathered(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                             const rtc::Candidate & candidate)
 {
-    if (!mPeerConnection)
+    if (connection != mPeerConnection)
     {
+        ChipLogDetail(Camera, "OnLocalCandidateGathered: ignoring stale callback for previous WebRTC session");
         return;
     }
 
@@ -533,10 +558,12 @@ void WebRTCManager::OnLocalCandidateGathered(const rtc::Candidate & candidate)
     mLocalCandidates.push_back(candidateInfo);
 }
 
-void WebRTCManager::OnConnectionStateChanged(rtc::PeerConnection::State state)
+void WebRTCManager::OnConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                             rtc::PeerConnection::State state)
 {
-    if (!mPeerConnection)
+    if (connection != mPeerConnection)
     {
+        ChipLogDetail(Camera, "OnConnectionStateChanged: ignoring stale callback for previous WebRTC session");
         return;
     }
 
@@ -558,7 +585,13 @@ void WebRTCManager::OnConnectionStateChanged(rtc::PeerConnection::State state)
     }
 }
 
-void WebRTCManager::OnGatheringStateChanged(rtc::PeerConnection::GatheringState state)
+void WebRTCManager::OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                            rtc::PeerConnection::GatheringState state)
 {
+    if (connection != mPeerConnection)
+    {
+        ChipLogDetail(Camera, "OnGatheringStateChanged: ignoring stale callback for previous WebRTC session");
+        return;
+    }
     ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
 }
