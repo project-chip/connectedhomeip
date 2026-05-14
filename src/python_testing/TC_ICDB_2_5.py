@@ -193,11 +193,7 @@ class TC_ICDB_2_5(ICDBaseTest):
         # TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ActiveModeThreshold attributes
         self.step(3)
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
-        active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
-        active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
         log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
-        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
-        log.info(f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
 
         # *** STEP 4 ***
         # TH1 and TH2 each subscribe to the ICDCounter attribute with MinIntervalFloor and MaxIntervalCeiling
