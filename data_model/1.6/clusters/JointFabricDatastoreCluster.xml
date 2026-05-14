@@ -67,27 +67,27 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="JFDS" scope="Node"/>
   <dataTypes>
     <enum name="DatastoreAccessControlEntryAuthModeEnum">
-      <item value="0" name="PASE" summary="Passcode authenticated session">
+      <item value="1" name="PASE" summary="Passcode authenticated session">
         <mandatoryConform/>
       </item>
-      <item value="1" name="CASE" summary="Certificate authenticated session">
+      <item value="2" name="CASE" summary="Certificate authenticated session">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Group" summary="Group authenticated session">
+      <item value="3" name="Group" summary="Group authenticated session">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="DatastoreAccessControlEntryPrivilegeEnum">
-      <item value="0" name="View" summary="Can read and observe all (except Access Control Cluster)">
+      <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster)">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Operate" summary="View privileges, and can perform the primary function of this Node (except Access Control Cluster)">
+      <item value="3" name="Operate" summary="View privileges, and can perform the primary function of this Node (except Access Control Cluster)">
         <mandatoryConform/>
       </item>
-      <item value="3" name="Manage" summary="Operate privileges, and can modify persistent configuration of this Node (except Access Control Cluster)">
+      <item value="4" name="Manage" summary="Operate privileges, and can modify persistent configuration of this Node (except Access Control Cluster)">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Administer" summary="Manage privileges, and can observe and modify the Access Control Cluster">
+      <item value="5" name="Administer" summary="Manage privileges, and can observe and modify the Access Control Cluster">
         <mandatoryConform/>
       </item>
     </enum>
@@ -133,13 +133,13 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="DatastoreAccessControlEntryStruct">
-      <field id="0" name="Privilege" type="DatastoreAccessControlEntryPrivilegeEnum">
+      <field id="1" name="Privilege" type="DatastoreAccessControlEntryPrivilegeEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="AuthMode" type="DatastoreAccessControlEntryAuthModeEnum">
+      <field id="2" name="AuthMode" type="DatastoreAccessControlEntryAuthModeEnum">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Subjects" type="list">
+      <field id="3" name="Subjects" type="list">
         <entry type="subject-id"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -149,7 +149,7 @@ Davis, CA 95616, USA
           </maxCount>
         </constraint>
       </field>
-      <field id="3" name="Targets" type="list">
+      <field id="4" name="Targets" type="list">
         <entry type="DatastoreAccessControlTargetStruct"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -195,12 +195,12 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="DatastoreBindingTargetStruct">
-      <field id="0" name="Node" type="node-id">
+      <field id="1" name="Node" type="node-id">
         <mandatoryConform>
           <field name="Endpoint"/>
         </mandatoryConform>
       </field>
-      <field id="1" name="Group" type="group-id">
+      <field id="2" name="Group" type="group-id">
         <mandatoryConform>
           <notTerm>
             <field name="Endpoint"/>
@@ -210,14 +210,14 @@ Davis, CA 95616, USA
           <min value="1"/>
         </constraint>
       </field>
-      <field id="2" name="Endpoint" type="endpoint-no">
+      <field id="3" name="Endpoint" type="endpoint-no">
         <mandatoryConform>
           <notTerm>
             <field name="Group"/>
           </notTerm>
         </mandatoryConform>
       </field>
-      <field id="3" name="Cluster" type="cluster-id">
+      <field id="4" name="Cluster" type="cluster-id">
         <optionalConform/>
       </field>
     </struct>

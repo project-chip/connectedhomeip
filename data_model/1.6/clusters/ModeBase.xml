@@ -67,7 +67,9 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster"/>
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+      <optionalConform/>
+    </feature>
   </features>
   <dataTypes>
     <struct name="ModeOptionStruct">
