@@ -75,9 +75,11 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     SetWaitingForResponseOrAck(inResponseExpected);
 }
 
-void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
+CHIP_ERROR ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
 {
+    VerifyOrReturnError(mSession, CHIP_ERROR_MISSING_SECURE_SESSION);
     SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout, !HasReceivedAtLeastOneMessage()));
+    return CHIP_NO_ERROR;
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)

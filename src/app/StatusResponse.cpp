@@ -37,13 +37,7 @@ CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Mes
     response.Status(aStatus);
     ReturnErrorOnFailure(response.GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
-    // The exchange's session may have been released between when this Send was
-    // scheduled and now (for example, when a TCP connection is closed while we
-    // are still synchronously processing an inbound message on this exchange).
-    // UseSuggestedResponseTimeout requires a valid session, so guard here and
-    // propagate a normal error instead of crashing inside Optional::Value().
-    VerifyOrReturnError(apExchangeContext->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
-    apExchangeContext->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    ReturnErrorOnFailure(apExchangeContext->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     ReturnErrorOnFailure(apExchangeContext->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
                                                         aExpectResponse ? Messaging::SendMessageFlags::kExpectResponse
                                                                         : Messaging::SendMessageFlags::kNone));

@@ -245,11 +245,8 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     SuccessOrExit(err);
 
     VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    // The underlying secure session can be released out from under us (for
-    // example, when a TCP connection is closed). Guard here and propagate a
-    // normal error instead of crashing.
-    VerifyOrExit(mExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
-    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    err = mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    SuccessOrExit(err);
     err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
                                     mStateFlags.Has(StateBits::kHasMoreChunks) ? Messaging::SendMessageFlags::kExpectResponse
                                                                                : Messaging::SendMessageFlags::kNone);
