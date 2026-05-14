@@ -157,13 +157,13 @@ CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, cons
     mPendingSdpContext.sessionId = session.id;
 
     // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
+    SuccessOrDie(DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(300),
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
-            TEMPORARY_RETURN_IGNORED self->ProvideICECandidates(self->mPendingSdpContext.sessionId);
+            LogErrorOnFailure(self->ProvideICECandidates(self->mPendingSdpContext.sessionId));
         },
-        this);
+        this));
 
     return CHIP_NO_ERROR;
 }
@@ -274,23 +274,23 @@ CHIP_ERROR WebRTCManager::Connect(Controller::DeviceCommissioner & commissioner,
 
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
         auto * descPtr = new rtc::Description(desc);
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, descPtr]() {
+        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, descPtr]() {
             std::unique_ptr<rtc::Description> guard(descPtr);
             OnLocalDescriptionGenerated(*descPtr);
-        });
+        }));
     });
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
         auto * candidatePtr = new rtc::Candidate(candidate);
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, candidatePtr]() {
+        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, candidatePtr]() {
             std::unique_ptr<rtc::Candidate> guard(candidatePtr);
             OnLocalCandidateGathered(*candidatePtr);
-        });
+        }));
     });
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, state]() { OnConnectionStateChanged(state); });
+        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, state]() { OnConnectionStateChanged(state); }));
     });
     mPeerConnection->onGatheringStateChange([this](rtc::PeerConnection::GatheringState state) {
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, state]() { OnGatheringStateChanged(state); });
+        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this, state]() { OnGatheringStateChanged(state); }));
     });
 
     // Create UDP socket for RTP forwarding
@@ -490,7 +490,7 @@ void WebRTCManager::OnLocalDescriptionGenerated(const rtc::Description & desc)
     {
         uint16_t sessionId = mPendingSdpContext.sessionId;
         mPendingSdpContext.Reset();
-        TEMPORARY_RETURN_IGNORED ProvideAnswer(sessionId, sdpStr);
+        LogErrorOnFailure(ProvideAnswer(sessionId, sdpStr));
     }
     else if (mPendingSdpContext.state == LocalSdpState::PendingOffer)
     {
