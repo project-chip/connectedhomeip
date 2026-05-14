@@ -407,6 +407,11 @@ bool IsValidUserStatusForSet(const Nullable<UserStatusEnum> & userStatus)
     return userStatus.IsNull() || (userStatus.Value() == UserStatusEnum::kOccupiedEnabled) ||
         (userStatus.Value() == UserStatusEnum::kOccupiedDisabled);
 }
+
+bool CredentialDataEqualConstantTime(const ByteSpan & a, const ByteSpan & b)
+{
+    return a.size() == b.size() && (a.empty() || Crypto::IsBufferContentEqualConstantTime(a.data(), b.data(), a.size()));
+}
 } // anonymous namespace
 
 void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandObj,
@@ -749,10 +754,7 @@ void DoorLockServer::setCredentialCommandHandler(
             return;
         }
         if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
-            currentCredential.credentialData.size() == credentialData.size() &&
-            (credentialData.empty() ||
-             chip::Crypto::IsBufferContentEqualConstantTime(currentCredential.credentialData.data(), credentialData.data(),
-                                                            credentialData.size())))
+            CredentialDataEqualConstantTime(currentCredential.credentialData, credentialData))
         {
             ChipLogProgress(Zcl,
                             "[SetCredential] Credential with the same data and type already exist "
@@ -1948,10 +1950,7 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
                 return false;
             }
 
-            if (credentialInfo.credentialData.size() == credentialData.size() &&
-                (credentialData.empty() ||
-                 chip::Crypto::IsBufferContentEqualConstantTime(credentialInfo.credentialData.data(), credentialData.data(),
-                                                                credentialData.size())))
+            if (CredentialDataEqualConstantTime(credentialInfo.credentialData, credentialData))
             {
                 userIndex       = i;
                 credentialIndex = credential.credentialIndex;
