@@ -108,11 +108,11 @@ COMMAND_ID_SUFFIX = SuffixIdRange(0x0000, 0x00FF)
 
 
 def device_type_id_type(tid: int) -> DeviceTypeIdType:
-    if id in STANDARD_PREFIX and tid in DEVICE_TYPE_ID_RANGE_SUFFIX:
+    if tid in STANDARD_PREFIX and tid in DEVICE_TYPE_ID_RANGE_SUFFIX:
         return DeviceTypeIdType.kStandard
-    if id in MANUFACTURER_PREFIX and tid in DEVICE_TYPE_ID_RANGE_SUFFIX:
+    if tid in MANUFACTURER_PREFIX and tid in DEVICE_TYPE_ID_RANGE_SUFFIX:
         return DeviceTypeIdType.kManufacturer
-    if id in TEST_PREFIX and tid in DEVICE_TYPE_ID_RANGE_SUFFIX:
+    if tid in TEST_PREFIX and tid in DEVICE_TYPE_ID_RANGE_SUFFIX:
         return DeviceTypeIdType.kTest
     return DeviceTypeIdType.kInvalid
 
@@ -131,11 +131,11 @@ def is_valid_device_type_id(tid: int, allow_test=False) -> bool:
 
 
 def cluster_id_type(cid: int) -> ClusterIdType:
-    if id in STANDARD_PREFIX and cid in CLUSTER_ID_STANDARD_RANGE_SUFFIX:
+    if cid in STANDARD_PREFIX and cid in CLUSTER_ID_STANDARD_RANGE_SUFFIX:
         return ClusterIdType.kStandard
-    if id in MANUFACTURER_PREFIX and cid in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX:
+    if cid in MANUFACTURER_PREFIX and cid in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX:
         return ClusterIdType.kManufacturer
-    if id in TEST_PREFIX and cid in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX:
+    if cid in TEST_PREFIX and cid in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX:
         return ClusterIdType.kTest
     return ClusterIdType.kInvalid
 
@@ -154,13 +154,13 @@ def is_valid_cluster_id(cid: int, allow_test: bool = False) -> bool:
 
 
 def attribute_id_type(aid: int) -> AttributeIdType:
-    if id in STANDARD_PREFIX and aid in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
+    if aid in STANDARD_PREFIX and aid in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
         return AttributeIdType.kStandardNonGlobal
-    if id in STANDARD_PREFIX and aid in ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX:
+    if aid in STANDARD_PREFIX and aid in ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX:
         return AttributeIdType.kStandardGlobal
-    if id in MANUFACTURER_PREFIX and aid in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
+    if aid in MANUFACTURER_PREFIX and aid in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
         return AttributeIdType.kManufacturer
-    if id in TEST_PREFIX and aid in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
+    if aid in TEST_PREFIX and aid in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
         return AttributeIdType.kTest
     return AttributeIdType.kInvalid
 

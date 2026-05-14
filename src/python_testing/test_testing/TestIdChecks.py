@@ -66,7 +66,7 @@ class TestIdChecks(MatterBaseTest):
         def check_all_bad(tid):
             id_type = device_type_id_type(tid)
             msg = f"Incorrect device type range assessment, expecting invalid {tid:08x}, type = {id_type}"
-            asserts.assert_equal(device_type_id_type(id), DeviceTypeIdType.kInvalid, msg)
+            asserts.assert_equal(device_type_id_type(tid), DeviceTypeIdType.kInvalid, msg)
             asserts.assert_false(is_valid_device_type_id(tid, allow_test=True), msg)
             asserts.assert_false(is_valid_device_type_id(tid, allow_test=False), msg)
             asserts.assert_false(is_standard_device_type_id(tid), msg)

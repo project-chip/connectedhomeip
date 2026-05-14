@@ -1032,7 +1032,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         day_patterns_IDs = []
 
-        if not next:
+        if not next_day:
             date = self.currentDayEntryDateValue
         else:
             date = self.nextDayEntryDateValue

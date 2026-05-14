@@ -60,7 +60,7 @@ def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
     # Ex. in the above example, the top level device types would be blinkable light and color temperature light
     # because they are supersets of other things, but have no device types that are supersets of them.
     top_level_device_types = [_id for _id, dt in xml_device_types.items(
-    ) if dt.superset_of_device_type_id != 0 and id not in device_types_that_have_supersets]
+    ) if dt.superset_of_device_type_id != 0 and _id not in device_types_that_have_supersets]
     supersets: list[set[int]] = []
     for top in top_level_device_types:
         line: set[int] = set()
