@@ -207,6 +207,7 @@ def cleanup_sysroot(sysroot_dir):
                 os.unlink(path)
 
     # Clean up large unneeded subdirectories inside usr/lib to save space
+    # Remove executables as we don't need them for the build and they just confuse `cmake`
     excludes = [
         "usr/lib/*/dri",
         "usr/lib/firmware",
@@ -214,6 +215,9 @@ def cleanup_sysroot(sysroot_dir):
         "usr/lib/modules",
         "usr/lib/ssl/private",
         "usr/lib/systemd",
+
+        "usr/bin",
+        "usr/sbin"
     ]
     for pattern in excludes:
         full_pattern = os.path.join(sysroot_dir, pattern)

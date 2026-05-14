@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 
 import sys
 
-from six.moves import range
+from six.moves import range  # noqa: A004
 
 __all__ = ['ComputeCheckChar',   'VerifyCheckChar',
            'ComputeCheckChar16', 'VerifyCheckChar16',
@@ -78,11 +78,11 @@ def Permute(val, permTable, iterCount):
     return Permute(permTable[val], permTable, iterCount - 1)
 
 
-def _ComputeCheckChar(str, strLen, polygonSize, permTable, charSet):
-    str = str.upper()
+def _ComputeCheckChar(s, strLen, polygonSize, permTable, charSet):
+    s = s.upper()
     c = 0
     for i in range(1, strLen+1):
-        ch = str[strLen - i]
+        ch = s[strLen - i]
         val = charSet.index(ch)
         p = Permute(val, permTable, i)
         c = DihedralMultiply(c, p, polygonSize)
@@ -90,44 +90,40 @@ def _ComputeCheckChar(str, strLen, polygonSize, permTable, charSet):
     return charSet[c]
 
 
-def ComputeCheckChar(str, charSet=CharSet_Base10):
-    return _ComputeCheckChar(str, len(str), polygonSize=5, permTable=PermTable_Base10, charSet=charSet)
+def ComputeCheckChar(s, charSet=CharSet_Base10):
+    return _ComputeCheckChar(s, len(s), polygonSize=5, permTable=PermTable_Base10, charSet=charSet)
 
 
-def VerifyCheckChar(str, charSet=CharSet_Base10):
-    expectedCheckCh = _ComputeCheckChar(str, len(
-        str)-1, polygonSize=5, permTable=PermTable_Base10, charSet=CharSet_Base10)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar(s, charSet=CharSet_Base10):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=5, permTable=PermTable_Base10, charSet=CharSet_Base10)
+    return s[-1] == expectedCheckCh
 
 
-def ComputeCheckChar16(str, charSet=CharSet_Base16):
-    return _ComputeCheckChar(str, len(str), polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
+def ComputeCheckChar16(s, charSet=CharSet_Base16):
+    return _ComputeCheckChar(s, len(s), polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
 
 
-def VerifyCheckChar16(str, charSet=CharSet_Base16):
-    expectedCheckCh = _ComputeCheckChar(
-        str, len(str)-1, polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar16(s, charSet=CharSet_Base16):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
+    return s[-1] == expectedCheckCh
 
 
-def ComputeCheckChar32(str, charSet=CharSet_Base32):
-    return _ComputeCheckChar(str, len(str), polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
+def ComputeCheckChar32(s, charSet=CharSet_Base32):
+    return _ComputeCheckChar(s, len(s), polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
 
 
-def VerifyCheckChar32(str, charSet=CharSet_Base32):
-    expectedCheckCh = _ComputeCheckChar(
-        str, len(str)-1, polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar32(s, charSet=CharSet_Base32):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
+    return s[-1] == expectedCheckCh
 
 
-def ComputeCheckChar36(str, charSet=CharSet_Base36):
-    return _ComputeCheckChar(str, len(str), polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
+def ComputeCheckChar36(s, charSet=CharSet_Base36):
+    return _ComputeCheckChar(s, len(s), polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
 
 
-def VerifyCheckChar36(str, charSet=CharSet_Base36):
-    expectedCheckCh = _ComputeCheckChar(
-        str, len(str)-1, polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar36(s, charSet=CharSet_Base36):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
+    return s[-1] == expectedCheckCh
 
 
 if __name__ == "__main__":

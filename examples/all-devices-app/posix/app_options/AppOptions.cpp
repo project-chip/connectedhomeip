@@ -36,6 +36,7 @@ constexpr uint16_t kOptionVendorId      = 0xffd5;
 constexpr uint16_t kOptionProductId     = 0xffd6;
 constexpr uint16_t kOptionPort          = 0xffd7;
 constexpr uint16_t kOptionInterfaceId   = 0xffd8;
+constexpr uint16_t kOptionBLE           = 0xffd9;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -66,6 +67,13 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
         return true;
     }
+    case kOptionBLE:
+        if (!ParseInt(value, mConfig.bleController))
+        {
+            ChipLogError(Support, "Invalid BLE controller specified: %s", value);
+            return false;
+        }
+        return true;
     case kOptionWiFi:
         mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
@@ -78,7 +86,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         unsigned long val = strtoul(value, &endptr, 0);
         if (*endptr != '\0' || val > 0xFFF)
         {
-            ChipLogError(Support, "Invalid discriminator: %s\n", value);
+            ChipLogError(Support, "Invalid discriminator: %s", value);
             return false;
         }
         mConfig.discriminator = static_cast<uint16_t>(val);
@@ -95,11 +103,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         unsigned long val = strtoul(value, &endptr, 0);
         if (*endptr != '\0' || val > 0xFFFF)
         {
-            ChipLogError(Support, "Invalid port: %s\n", value);
+            ChipLogError(Support, "Invalid port: %s", value);
             return false;
         }
         mConfig.port = static_cast<uint16_t>(val);
-        ChipLogProgress(AppServer, "Port option set to %u\n", static_cast<uint16_t>(val));
+        ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
         return true;
     }
     case kOptionInterfaceId:
@@ -117,6 +125,9 @@ OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        { "ble-controller", kArgumentRequired, kOptionBLE },
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
@@ -142,6 +153,11 @@ OptionSet * AppOptions::GetOptions()
         result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
         result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        result += "  --ble-controller <number>\n";
+        result += "       Select the BLE controller to use (default: 0)\n\n";
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";
