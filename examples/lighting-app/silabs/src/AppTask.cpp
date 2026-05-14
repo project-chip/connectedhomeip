@@ -128,7 +128,7 @@ void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
     {
         return;
     }
-    sOffEffectArmed = false; 
+    sOffEffectArmed = false;
 
     sLightOn = false;
     sLightLED.Set(false);
