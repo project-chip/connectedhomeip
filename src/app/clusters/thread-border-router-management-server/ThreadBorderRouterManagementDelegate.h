@@ -27,14 +27,14 @@ namespace app {
 namespace Clusters {
 namespace ThreadBorderRouterManagement {
 
-constexpr size_t kBorderRouterNameMaxLength = 63;
-constexpr size_t kBorderAgentIdLength       = 16;
-
 } // namespace ThreadBorderRouterManagement
 
 class ThreadBorderRouterManagementDelegate
 {
 public:
+    static constexpr size_t kBorderRouterNameMaxLength = 63;
+    static constexpr size_t kBorderAgentIdLength       = 16;
+
     ThreadBorderRouterManagementDelegate()          = default;
     virtual ~ThreadBorderRouterManagementDelegate() = default;
 

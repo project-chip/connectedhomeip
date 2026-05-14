@@ -45,13 +45,13 @@ DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute
         return encoder.Encode(featureMap);
     }
     case ThreadBorderRouterManagement::Attributes::BorderRouterName::Id: {
-        char buffer[kBorderRouterNameMaxLength];
+        char buffer[ThreadBorderRouterManagementDelegate::kBorderRouterNameMaxLength];
         MutableCharSpan name(buffer, sizeof(buffer));
         mDelegate.GetBorderRouterName(name);
         return encoder.Encode(name);
     }
     case ThreadBorderRouterManagement::Attributes::BorderAgentID::Id: {
-        uint8_t buffer[kBorderAgentIdLength];
+        uint8_t buffer[ThreadBorderRouterManagementDelegate::kBorderAgentIdLength];
         MutableByteSpan agentId(buffer, sizeof(buffer));
         ReturnErrorOnFailure(mDelegate.GetBorderAgentId(agentId));
         return encoder.Encode(agentId);

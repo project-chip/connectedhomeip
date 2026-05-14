@@ -19,6 +19,7 @@
 #include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/thread-border-router-management-server/CodegenIntegration.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -46,8 +47,7 @@ static CodegenGeneralCommissioningBreadcrumbTracker sBreadcrumbTracker;
 
 } // namespace
 
-ServerInstance::ServerInstance(EndpointId endpointId, ThreadBorderRouterManagementDelegate * delegate,
-                               FailSafeContext & failSafeContext) :
+ServerInstance::ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
     mCluster(endpointId, ThreadBorderRouterManagementCluster::Config(*delegate, failSafeContext, sBreadcrumbTracker))
 {}
 

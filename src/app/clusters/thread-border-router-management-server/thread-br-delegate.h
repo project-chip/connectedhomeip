@@ -25,6 +25,9 @@ namespace ThreadBorderRouterManagement {
 
 using Delegate = chip::app::Clusters::ThreadBorderRouterManagementDelegate;
 
+constexpr size_t kBorderRouterNameMaxLength = chip::app::Clusters::ThreadBorderRouterManagementDelegate::kBorderRouterNameMaxLength;
+constexpr size_t kBorderAgentIdLength       = chip::app::Clusters::ThreadBorderRouterManagementDelegate::kBorderAgentIdLength;
+
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters
 } // namespace app
