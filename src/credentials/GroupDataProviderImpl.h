@@ -36,7 +36,7 @@ public:
     // TODO Make this configurable. Note: if PGA feature is enabled it SHALL be >= 4. else it SHALL = 1.
     static constexpr uint16_t kMaxMcastAddrCount = 4;
 
-    GroupDataProviderImpl() : GroupDataProvider(kMaxMembershipPerFabric, kMaxGroupKeysPerFabric) {}
+    GroupDataProviderImpl() : GroupDataProvider(CHIP_CONFIG_MAX_GROUPS_PER_FABRIC, kMaxGroupKeysPerFabric) {}
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
         GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric)
     {}
