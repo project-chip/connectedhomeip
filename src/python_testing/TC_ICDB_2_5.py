@@ -138,7 +138,7 @@ class TC_ICDB_2_5(ICDBaseTest):
             TestStep(2, "TH2 reads from the DUT the RegisteredClients attribute.", """
                      Verify RegisteredClients is empty (TH2 did not register an ICD client during commissioning)."""),
             TestStep(3, "TH1 reads from the DUT the IdleModeDuration attribute.",
-                     "Store value for later use."),
+                     "Save value as idle_mode_duration_s, with it calculate: SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = MAX(idle_mode_duration_s, 3600s). Store value for later use."),
             TestStep(4, "TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor and MaxIntervalCeiling.", """
                      Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
             TestStep(5, "Wait for 1 or more MaxInterval.", """
@@ -191,15 +191,15 @@ class TC_ICDB_2_5(ICDBaseTest):
 
         # *** STEP 3 ***
         # TH1 reads from the DUT the IdleModeDuration attribute
+        # Calculate SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
         self.step(3)
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
+        subscription_max_interval_publisher_limit_s = max(idle_mode_duration_s, ONE_HOUR_S)
 
         # *** STEP 4 ***
         # TH1 and TH2 each subscribe to the ICDCounter attribute with MinIntervalFloor and MaxIntervalCeiling
         self.step(4)
-        subscription_max_interval_publisher_limit_s = max(idle_mode_duration_s, ONE_HOUR_S)
-
         th1_subscription = await self.default_controller.ReadAttribute(
             nodeId=self.dut_node_id,
             attributes=[(self.ROOT_NODE_ENDPOINT_ID, attributes.ICDCounter)],
