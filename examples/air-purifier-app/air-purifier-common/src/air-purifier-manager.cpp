@@ -255,7 +255,6 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         DataModel::Nullable<Percent> percent = GetPercentSetting();
         DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
         uint8_t speedMax                     = GetSpeedMax();
-
         if (speedMax == 0)
         {
             ChipLogError(NotSpecified, "Out of bounds value for SpeedMax, setting to default (1)");
@@ -308,7 +307,7 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
     ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", static_cast<int>(aNewPercentSetting));
     if (mOnOffClusterOn)
     {
-        Status status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, static_cast<Percent>(aNewPercentSetting));
+        Status status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, aNewPercentSetting);
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified,
