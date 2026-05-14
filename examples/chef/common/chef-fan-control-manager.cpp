@@ -19,13 +19,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
-#include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/attribute-table.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -36,6 +34,7 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FanControl;
+using namespace chip::app::Clusters::FanControl::Attributes;
 using Protocols::InteractionModel::Status;
 
 namespace {
@@ -92,14 +91,19 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpoint);
-    VerifyOrReturnError(cluster != nullptr, Status::InvalidCommand);
-    VerifyOrReturnError(cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed), Status::InvalidCommand);
+    Protocols::InteractionModel::Status status;
 
-    uint8_t speedMax                          = cluster->GetSpeedMax();
-    DataModel::Nullable<uint8_t> speedSetting = cluster->GetSpeedSetting();
+    uint8_t speedMax;
+    status = SpeedMax::Get(mEndpoint, &speedMax);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
 
-    uint8_t speedCurrent = speedSetting.ValueOr(0);
+    uint8_t speedCurrent;
+    status = SpeedCurrent::Get(mEndpoint, &speedCurrent);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
+
+    DataModel::Nullable<uint8_t> speedSetting;
+    status = SpeedSetting::Get(mEndpoint, speedSetting);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
 
     uint8_t newSpeedSetting    = speedSetting.ValueOr(0);
     uint8_t speedValue         = speedSetting.ValueOr(speedCurrent);
@@ -120,7 +124,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
         });
     }
 
-    return cluster->SetSpeedSetting(MakeNullable(newSpeedSetting)).GetStatusCode().GetStatus();
+    return SpeedSetting::Set(mEndpoint, newSpeedSetting);
 }
 
 void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newState)
@@ -131,15 +135,25 @@ void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newStat
     FanModeWriteCallback(newState.mode);
     SetPercentCurrent(newState.percentSetting.ValueOr(0));
 
-    if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
-        fc != nullptr && fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    uint32_t featureMap = 0;
+    if (FanControl::Attributes::FeatureMap::Get(mEndpoint, &featureMap) == Status::Success &&
+        BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed))
     {
-        DataModel::Nullable<uint8_t> speed = fc->GetSpeedSetting();
-        SetSpeedCurrent(speed.ValueOr(0));
-        const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
-        if (fc->GetFanMode() != derivedMode)
+        DataModel::Nullable<uint8_t> speed;
+        if (FanControl::Attributes::SpeedSetting::Get(mEndpoint, speed) == Status::Success)
         {
-            LogErrorOnFailure(fc->SetFanMode(derivedMode).GetUnderlyingError());
+            SetSpeedCurrent(speed.ValueOr(0));
+        }
+        const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
+        FanControl::FanModeEnum currentMode = FanControl::FanModeEnum::kOff;
+        if (FanControl::Attributes::FanMode::Get(mEndpoint, &currentMode) == Status::Success && currentMode != derivedMode)
+        {
+            Status st = FanControl::Attributes::FanMode::Set(mEndpoint, derivedMode);
+            if (st != Status::Success)
+            {
+                ChipLogError(NotSpecified, "ChefFanControlManager::OnFanDriveStateChanged: SetFanMode failed: %d",
+                             to_underlying(st));
+            }
         }
     }
 }
@@ -189,14 +203,7 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         // When not Null, SpeedCurrent tracks SpeedSetting's value.
         SetSpeedCurrent(speedSetting.ValueOr(0));
         // Determine if the speed change should also change the fan mode
-        if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
-        {
-            const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
-            if (fc->GetFanMode() != derivedMode)
-            {
-                LogErrorOnFailure(fc->SetFanMode(derivedMode).GetUnderlyingError());
-            }
-        }
+        FanControl::Attributes::FanMode::Set(mEndpoint, SpeedToFanMode(mSpeedCurrent));
         break;
     }
 
@@ -236,34 +243,22 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 {
     ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
     mPercentCurrent = aNewPercentCurrent;
-    if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
-    {
-        if (!fc->SetPercentCurrent(static_cast<Percent>(mPercentCurrent)))
-        {
-            ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute");
-        }
-    }
-    else
+    Status status   = FanControl::Attributes::PercentCurrent::Set(mEndpoint, static_cast<Percent>(mPercentCurrent));
+    if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute: %d",
-                     to_underlying(Status::UnsupportedEndpoint));
+                     to_underlying(status));
     }
 }
 
 void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
 {
     mSpeedCurrent = aNewSpeedCurrent;
-    if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
-    {
-        if (!fc->SetSpeedCurrent(mSpeedCurrent))
-        {
-            ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute");
-        }
-    }
-    else
+    Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpoint, aNewSpeedCurrent);
+    if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute: %d",
-                     to_underlying(Status::UnsupportedEndpoint));
+                     to_underlying(status));
     }
 }
 
@@ -316,18 +311,7 @@ void ChefFanControlManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFan
 
 void ChefFanControlManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting)
 {
-    if (aNewSpeedSetting.IsNull())
-    {
-        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: invalid null value");
-        return;
-    }
-    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
-    if (fc == nullptr)
-    {
-        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: no cluster on endpoint");
-        return;
-    }
-    Status status = fc->SetSpeedSetting(aNewSpeedSetting).GetStatusCode().GetStatus();
+    Status status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, aNewSpeedSetting);
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
@@ -344,34 +328,28 @@ void ChefFanControlManager::Init()
 DataModel::Nullable<Percent> ChefFanControlManager::GetPercentSetting()
 {
     DataModel::Nullable<Percent> percentSetting;
-    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
-    if (fc == nullptr)
+    Status status = FanControl::Attributes::PercentSetting::Get(mEndpoint, percentSetting);
+
+    if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::GetPercentSetting: failed to get PercentSetting attribute: %d",
-                     to_underlying(Status::UnsupportedEndpoint));
-        return percentSetting;
+                     to_underlying(status));
     }
-    percentSetting = fc->GetPercentSetting();
+
     return percentSetting;
 }
 
 DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
 {
     DataModel::Nullable<uint8_t> speedSetting;
-    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
-    if (fc == nullptr)
+    Status status = FanControl::Attributes::SpeedSetting::Get(mEndpoint, speedSetting);
+
+    if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
-                     to_underlying(Status::UnsupportedEndpoint));
-        return speedSetting;
+                     to_underlying(status));
     }
-    if (!fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        ChipLogError(NotSpecified, "ChefFanControlManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
-                     to_underlying(Status::UnsupportedAttribute));
-        return speedSetting;
-    }
-    speedSetting = fc->GetSpeedSetting();
+
     return speedSetting;
 }
 
@@ -389,37 +367,70 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
 {
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
 
-    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(fc != nullptr, Status::UnsupportedEndpoint);
+    FanControl::FanModeEnum fanMode;
+    FanControl::Attributes::FanMode::Get(endpointId, &fanMode);
 
-    if (fc->GetFanMode() == FanModeEnum::kOff)
+    if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent setting values are 0. Set fan to HIGH.
     {
-        return fc->SetFanMode(FanModeEnum::kHigh).GetStatusCode().GetStatus();
-    }
-
-    if (fc->GetFeatureMap().Has(Feature::kMultiSpeed))
-    {
-        DataModel::Nullable<uint8_t> speedSetting = fc->GetSpeedSetting();
-        if (!speedSetting.IsNull() && speedSetting.Value() != 0)
+        uint8_t speedMax;
+        Status status = SpeedMax::Get(mEndpoint, &speedMax);
+        if (status == Status::Success)
         {
-            Status status = fc->SetSpeedSetting(speedSetting).GetStatusCode().GetStatus();
-            if (status != Status::Success)
+            status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, speedMax);
+            if (status == Status::Success)
             {
-                ChipLogError(DeviceLayer, "ChefFanControlManager::OnCommand SetSpeedSetting failed: %d", to_underlying(status));
-                return status;
+                // Atribute change handler sets SpeedCurrent equal to SpeedSetting and updates FanMode.
+                MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "Error setting SpeedSetting: %d", to_underlying(status));
+                return status; // Speed is enabled since SpeedMax read was successful. So return failed status.
             }
         }
+        else
+        {
+            // Not returning error as speed is optional.
+            ChipLogError(DeviceLayer, "Error getting SpeedMax: %d", to_underlying(status));
+        }
+        status = FanControl::Attributes::PercentSetting::Set(mEndpoint, Percent{ 100 });
+        if (status == Status::Success)
+        {
+            // Atribute change handler sets PercentCurrent equal to PercentSetting.
+            MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentSetting::Id);
+        }
+        else
+        {
+            return status; // Percent is mandatory. So return failed status.
+        }
     }
 
-    DataModel::Nullable<Percent> percentSetting = fc->GetPercentSetting();
-    if (!percentSetting.IsNull() && percentSetting.Value() != 0)
+    Status status;
+
+    DataModel::Nullable<uint8_t> speedSetting(GetSpeedSetting());
+
+    if (!speedSetting.IsNull() && speedSetting.Value())
     {
-        Status status = fc->SetPercentSetting(percentSetting).GetStatusCode().GetStatus();
+        status = FanControl::Attributes::SpeedCurrent::Set(endpointId, speedSetting.Value());
         if (status != Status::Success)
         {
-            ChipLogError(DeviceLayer, "ChefFanControlManager::OnCommand SetPercentSetting failed: %d", to_underlying(status));
+            ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
             return status;
         }
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
+    }
+
+    DataModel::Nullable<Percent> percentSetting(GetPercentSetting());
+
+    if (!percentSetting.IsNull() && percentSetting.Value() != Percent{ 0 })
+    {
+        status = FanControl::Attributes::PercentCurrent::Set(endpointId, percentSetting.Value());
+        if (status != Status::Success)
+        {
+            ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
+            return status;
+        }
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
     }
 
     return Status::Success;
@@ -429,30 +440,43 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
 {
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OffCommand");
 
-    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(fc != nullptr, Status::UnsupportedEndpoint);
+    FanControl::FanModeEnum fanMode;
+    FanControl::Attributes::FanMode::Get(endpointId, &fanMode);
 
-    if (fc->GetFanMode() == FanModeEnum::kOff)
+    if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent current values are 0.
     {
         return Status::Success;
     }
 
-    if (fc->GetPercentCurrent() != Percent{ 0 })
+    Status status;
+
+    uint8_t speedCurrent;
+    status = SpeedCurrent::Get(endpointId, &speedCurrent);
+
+    if (status == Protocols::InteractionModel::Status::Success && speedCurrent)
     {
-        if (!fc->SetPercentCurrent(Percent{ 0 }))
+        status = FanControl::Attributes::SpeedCurrent::Set(endpointId, 0);
+        if (status != Status::Success)
         {
-            ChipLogError(DeviceLayer, "ChefFanControlManager::OffCommand: SetPercentCurrent failed");
-            return Status::Failure;
+            ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
+            return status;
         }
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
     }
 
-    if (fc->GetFeatureMap().Has(Feature::kMultiSpeed) && fc->GetSpeedCurrent() != 0)
+    uint8_t percentCurrent;
+    status = PercentCurrent::Get(endpointId, &percentCurrent);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+
+    if (percentCurrent)
     {
-        if (!fc->SetSpeedCurrent(0))
+        status = FanControl::Attributes::PercentCurrent::Set(endpointId, Percent{ 0 });
+        if (status != Status::Success)
         {
-            ChipLogError(DeviceLayer, "ChefFanControlManager::OffCommand: SetSpeedCurrent failed");
-            return Status::Failure;
+            ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
+            return status;
         }
+        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
     }
 
     return Status::Success;
