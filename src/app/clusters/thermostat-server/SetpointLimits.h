@@ -22,7 +22,7 @@
 #include <protocols/interaction_model/Constants.h>
 
 #include "SetpointAttributes.h"
-#include "SetpointLimits.h"
+#include "Temperature.h"
 
 namespace chip {
 namespace app {
@@ -35,24 +35,28 @@ struct SetpointLimits
 {
     virtual ~SetpointLimits()       = default;
 
-    chip::app::Clusters::Thermostat::SystemModeEnum mode;
-    int16_t minimum;
-    int16_t maximum;
-
-    SetpointLimits(chip::app::Clusters::Thermostat::SystemModeEnum systemMode) : mode(systemMode){};
-
+    SetpointLimits(SystemModeEnum systemMode) : mode(systemMode){};
+    SetpointLimits(SystemModeEnum systemMode, temperature minimum, temperature maximum) : mode(systemMode), minimum(minimum), maximum(maximum){};
     SetpointLimits(const SetpointLimits & al) : mode(al.mode), minimum(al.minimum), maximum(al.maximum){};
 
-    virtual int16_t Minimum() const { return minimum; };
-    virtual int16_t Maximum() const { return maximum; };
+    chip::app::Clusters::Thermostat::SystemModeEnum mode;
+    temperature minimum;
+    temperature maximum;
 
-    bool Valid(int16_t value) const {
+    virtual temperature Minimum() const { return minimum; };
+    virtual temperature Maximum() const { return maximum; };
+
+    virtual bool IsValid() { return Minimum() <= Maximum(); }
+
+    bool Valid(temperature value) const {
         ChipLogProgress(Zcl, "Limit Valid: %" PRId16 " <= %" PRId16 " <= %" PRId16,
                         Minimum(), value, Maximum());
         return Minimum() <= value && value <= Maximum();
     };
 
-    int16_t Clamp(int16_t value) const { return std::clamp(value, Minimum(), Maximum()); };
+    temperature Clamp(temperature value) const { return std::clamp(value, Minimum(), Maximum()); };
+
+    
 };
 
 struct EffectiveSetpointLimits : SetpointLimits
@@ -60,24 +64,26 @@ struct EffectiveSetpointLimits : SetpointLimits
     const Setpoints & setpoints;
 
     EffectiveSetpointLimits(const Setpoints & sp, chip::app::Clusters::Thermostat::SystemModeEnum mode);
+
 };
 
-struct SetpointLimitOverride : SetpointLimits
+struct UserSetpointLimits : SetpointLimits
 {
     const SetpointLimits & absoluteLimits;
 
-    Optional<int16_t> minimum;
-    Optional<int16_t> maximum;
+    Optional<temperature> userMinimum;
+    Optional<temperature> userMaximum;
 
-    SetpointLimitOverride(const SetpointLimits & al) : SetpointLimits(al.mode), absoluteLimits(al){};
-    SetpointLimitOverride(const SetpointLimits & al, const SetpointLimitOverride & override) :
-        SetpointLimits(al.mode), absoluteLimits(al), minimum(override.minimum), maximum(override.maximum){};
+    UserSetpointLimits(const SetpointLimits & al) : SetpointLimits(al.mode), absoluteLimits(al){};
+    UserSetpointLimits(const SetpointLimits & al, const UserSetpointLimits & override) :
+        SetpointLimits(al.mode), absoluteLimits(al), userMinimum(override.userMinimum), userMaximum(override.userMaximum){};
 
-    int16_t Minimum() const override { return minimum.HasValue() ? minimum.Value() : absoluteLimits.Minimum(); };
-    int16_t Maximum() const override { return maximum.HasValue() ? maximum.Value() : absoluteLimits.Maximum(); };
+    temperature Minimum() const override { return userMinimum.HasValue() ? userMinimum.Value() : absoluteLimits.Minimum(); };
+    temperature Maximum() const override { return userMaximum.HasValue() ? userMaximum.Value() : absoluteLimits.Maximum(); }    ;
 
+    SetpointAttributes MinimumAttribute() {return absoluteLimits.mode == SystemModeEnum::kHeat ? SetpointAttributes::kMinHeatSetpointLimit : SetpointAttributes::kMinCoolSetpointLimit; }
+    SetpointAttributes MaximumAttribute() {return absoluteLimits.mode == SystemModeEnum::kHeat ? SetpointAttributes::kMaxHeatSetpointLimit : SetpointAttributes::kMaxCoolSetpointLimit; }
 };
-
 
 } // namespace Thermostat
 } // namespace Clusters

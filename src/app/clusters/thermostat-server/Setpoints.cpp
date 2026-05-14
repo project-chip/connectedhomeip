@@ -21,6 +21,7 @@
 #include <clusters/Thermostat/Metadata.h>
 
 #include "SetpointAttributes.h"
+#include "SetpointLimits.h"
 #include "Setpoints.h"
 
 using namespace chip;
@@ -36,56 +37,189 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-SetpointRange Setpoints::GetRange(OccupancyBitmap occupancy)
+SetpointRange & Setpoints::GetRange(OccupancyBitmap occupancy)
 {
     if (occupancy == OccupancyBitmap::kOccupied)
     {
-        return SetpointRange(*this, occupiedHeatingSetpoint, occupiedCoolingSetpoint, SetpointAttributes::kOccupiedHeating,
-                             SetpointAttributes::kOccupiedCooling);
+        return occupied;
     }
-    return SetpointRange(*this, unoccupiedHeatingSetpoint, unoccupiedCoolingSetpoint, SetpointAttributes::kUnoccupiedHeating,
-                         SetpointAttributes::kUnoccupiedCooling);
+    return unoccupied;
 }
 
 bool Setpoints::Valid()
 {
     if (heatSupported)
     {
-        if (!heatLimitsOverride.Valid(occupiedHeatingSetpoint))
+        if (!userHeatLimits.Valid(occupied.heating))
         {
+            ChipLogError(Zcl, "Thermostat: Setpoints::Valid: occupied heating setpoint %" PRId16 " is outside the allowed limits", occupied.heating);
             return false;
         }
-        if (occupancySupported && !heatLimitsOverride.Valid(unoccupiedHeatingSetpoint))
-        {
+        if (occupancySupported && !userHeatLimits.Valid(unoccupied.heating)) {
+            ChipLogError(Zcl, "Thermostat: Setpoints::Valid: unoccupied heating setpoint %" PRId16 " is outside the allowed limits", unoccupied.heating);
             return false;
         }
     }
     if (coolSupported)
     {
-        if (!coolLimitsOverride.Valid(occupiedCoolingSetpoint))
+        if (!userCoolLimits.Valid(occupied.cooling))
         {
+            ChipLogError(Zcl, "Thermostat: Setpoints::Valid: occupied cooling setpoint %" PRId16 " is outside the allowed limits", occupied.cooling);
             return false;
         }
-        if (occupancySupported && !coolLimitsOverride.Valid(unoccupiedCoolingSetpoint))
-        {
+        if (occupancySupported && !userCoolLimits.Valid(unoccupied.cooling)) {
+            ChipLogError(Zcl, "Thermostat: Setpoints::Valid: unoccupied cooling setpoint %" PRId16 " is outside the allowed limits", unoccupied.cooling);
             return false;
         }
     }
     if (autoSupported)
     {
-        if (static_cast<int16_t>(occupiedCoolingSetpoint - occupiedHeatingSetpoint) < deadBand)
+        if (static_cast<int16_t>(occupied.cooling - occupied.heating) < deadBand)
         {
+            ChipLogError(Zcl, "Thermostat: Setpoints::Valid: occupied setpoints difference %d is smaller than min setpoint deadband %d", static_cast<int16_t>(occupied.cooling - occupied.heating), deadBand);
             return false;
         }
-        if (occupancySupported)
+        if (occupancySupported && static_cast<int16_t>(unoccupied.cooling - unoccupied.heating) < deadBand)
         {
-            if (static_cast<int16_t>(unoccupiedCoolingSetpoint - unoccupiedHeatingSetpoint) < deadBand)
-            {
-                return false;
-            }
+            ChipLogError(Zcl, "Thermostat: Setpoints::Valid: unoccupied setpoints difference %d is smaller than min setpoint deadband %d", static_cast<int16_t>(unoccupied.cooling - unoccupied.heating), deadBand);
+            return false;
         }
     }
     return true;
+}
+
+Status Setpoints::FixUserLimits(SetpointLimits & absoluteLimits, 
+    UserSetpointLimits & userLimits, 
+    SetpointAttributes minAttribute,
+    SetpointAttributes maxAttribute,
+    chip::BitFlags<SetpointAttributes> & changedAttributes,
+    chip::BitFlags<SetpointAttributes> & fixedAttributes)
+{
+    if (!absoluteLimits.IsValid()) {
+        // Would only happen if the host fed us bad limits, as these are not user-settable
+        return Status::ConstraintError;
+    }
+    if (!absoluteLimits.Valid(userLimits.Minimum())) {
+        userLimits.userMinimum.SetValue(absoluteLimits.Minimum());
+        fixedAttributes.Set(minAttribute);
+    }
+    if (!absoluteLimits.Valid(userLimits.Maximum())) {
+        userLimits.userMaximum.SetValue(absoluteLimits.Maximum());
+        fixedAttributes.Set(maxAttribute);
+    }
+    if (!userLimits.IsValid()) {
+        // We somehow ended up with a user limit maximum that's less than the minimum
+        if (changedAttributes.Has(minAttribute)) {
+            userLimits.userMaximum.SetValue(userLimits.Minimum());
+            fixedAttributes.Set(maxAttribute);
+        } else if (changedAttributes.Has(maxAttribute)) {
+            userLimits.userMinimum.SetValue(userLimits.Maximum());
+            fixedAttributes.Set(minAttribute);
+        }
+    }
+    return userLimits.IsValid() ? Status::Success : Status::ConstraintError;
+}
+
+void Setpoints::FixUserLimitDeadband( 
+    Optional<temperature> & heatLimit, 
+    Optional<temperature> & coolLimit,
+    temperature absoluteHeatLimit,
+    temperature absoluteCoolLimit,
+    SetpointAttributes heatAttribute,
+    SetpointAttributes coolAttribute,
+    chip::BitFlags<SetpointAttributes> & changedAttributes,
+    chip::BitFlags<SetpointAttributes> & fixedAttributes)
+{
+    temperature effectiveHeatLimit = heatLimit.HasValue() ? heatLimit.Value() : absoluteHeatLimit;
+    temperature effectiveCoolLimit = coolLimit.HasValue() ? coolLimit.Value() : absoluteCoolLimit;
+    if (effectiveCoolLimit - effectiveHeatLimit >= deadBand) {
+        return;
+    }
+    // Our new limits violate the deadband
+    if (changedAttributes.Has(heatAttribute)) {
+        // If the user was adjusting the heat limit, then we assume they 
+        // want to keep it at that value, and we'll move the cool
+        // limit up...
+        temperature newCoolLimit = heatLimit.Value() + deadBand;
+        if (absoluteCoolLimits.Valid(newCoolLimit)) {
+            coolLimit.SetValue(newCoolLimit);
+            fixedAttributes.Set(coolAttribute);
+        } else {
+            // ...unless that violates the absolute maximum, in which case we set the cool max to the absolute max,
+            // and adjust the heat max downwards to maintain the deadband
+            coolLimit.SetValue(absoluteCoolLimit);
+            heatLimit.SetValue(absoluteCoolLimit - deadBand);
+            fixedAttributes.Set(coolAttribute);
+            fixedAttributes.Set(heatAttribute);
+        }
+    } else if (changedAttributes.Has(coolAttribute)) {
+        // If the user was adjusting the cool limit, then we assume they 
+        // want to keep it at that value, and we'll move the heat
+        // limit down...
+        temperature newHeatLimit = coolLimit.Value() - deadBand;
+        if (absoluteHeatLimits.Valid(newHeatLimit)) {
+            heatLimit.SetValue(newHeatLimit);
+            fixedAttributes.Set(heatAttribute);
+        } else {
+            // ...unless that violates the absolute maximum, in which case we set the heat max to the absolute max,
+            // and adjust the cool max upwards to maintain the deadband
+            heatLimit.SetValue(absoluteHeatLimit);
+            coolLimit.SetValue(absoluteHeatLimit + deadBand);
+            fixedAttributes.Set(coolAttribute);
+            fixedAttributes.Set(heatAttribute);
+        }
+    }
+}
+
+Status Setpoints::Fix(chip::BitFlags<SetpointAttributes> & changedAttributes)
+{
+    if (Valid()) {
+        return Status::Success;
+    }
+    chip::BitFlags<SetpointAttributes> fixedAttributes;
+    if (heatSupported)
+    {
+        auto status = FixUserLimits(absoluteHeatLimits,
+            userHeatLimits, 
+            SetpointAttributes::kMinHeatSetpointLimit,
+            SetpointAttributes::kMaxHeatSetpointLimit,
+            changedAttributes,
+            fixedAttributes);
+        if (status != Status::Success) {
+            return status;
+        }
+    }
+    if (coolSupported) {
+        auto status = FixUserLimits(absoluteCoolLimits,
+            userCoolLimits, 
+            SetpointAttributes::kMinCoolSetpointLimit,
+            SetpointAttributes::kMaxCoolSetpointLimit,
+            changedAttributes,
+            fixedAttributes);
+        if (status != Status::Success) {
+            return status;
+        }
+    }
+    if (autoSupported) {
+        FixUserLimitDeadband(userHeatLimits.userMaximum, 
+            userCoolLimits.userMaximum, 
+            absoluteHeatLimits.Maximum(), 
+            absoluteCoolLimits.Maximum(), 
+            SetpointAttributes::kMaxHeatSetpointLimit, 
+            SetpointAttributes::kMaxCoolSetpointLimit, 
+            changedAttributes, 
+            fixedAttributes);
+        FixUserLimitDeadband(userHeatLimits.userMinimum, 
+            userCoolLimits.userMinimum, 
+            absoluteHeatLimits.Minimum(), 
+            absoluteCoolLimits.Minimum(), 
+            SetpointAttributes::kMinHeatSetpointLimit, 
+            SetpointAttributes::kMinCoolSetpointLimit, 
+            changedAttributes,
+            fixedAttributes);
+    }
+    changedAttributes.Set(fixedAttributes);
+    return Valid() ? Status::Success : Status::ConstraintError;
 }
 
 Status Setpoints::ChangeRange(SetpointRange range, chip::Optional<int16_t> heat, chip::Optional<int16_t> cool, ClampMode clamp,
@@ -95,14 +229,14 @@ Status Setpoints::ChangeRange(SetpointRange range, chip::Optional<int16_t> heat,
     {
         return Status::InvalidValue;
     }
-    ChipLogProgress(Zcl, "Thermostat: ChangeRange: heat: %d, cool: %d, clamp: %d", heat.HasValue() ? heat.Value() : 0, cool.HasValue() ? cool.Value() : 0, to_underlying(clamp));
+    ChipLogProgress(Zcl, "Thermostat: ChangeRange (%d-%d): heat: %d, cool: %d, clamp: %d", range.heating, range.cooling, heat.HasValue() ? heat.Value() : 0, cool.HasValue() ? cool.Value() : 0, to_underlying(clamp));
     auto heatLimits = EffectiveSetpointLimits(*this, SystemModeEnum::kHeat);
     auto coolLimits = EffectiveSetpointLimits(*this, SystemModeEnum::kCool);
     if (heatSupported && heat.HasValue())
     {
         if (clamp == ClampMode::kClamp)
         {
-            range.heatingSetpoint = heatLimits.Clamp(heat.Value());
+            range.heating = heatLimits.Clamp(heat.Value());
         }
         else if (!heatLimits.Valid(heat.Value()))
         {
@@ -115,7 +249,7 @@ Status Setpoints::ChangeRange(SetpointRange range, chip::Optional<int16_t> heat,
     {
         if (clamp == ClampMode::kClamp)
         {
-            range.coolingSetpoint = coolLimits.Clamp(cool.Value());
+            range.cooling = coolLimits.Clamp(cool.Value());
         }
         else if (!coolLimits.Valid(cool.Value()))
         {
@@ -129,7 +263,7 @@ Status Setpoints::ChangeRange(SetpointRange range, chip::Optional<int16_t> heat,
         return Status::Success;
     }
     // Check if we need to shift setpoints to preserve the deadband
-    int16_t diff = static_cast<int16_t>(range.coolingSetpoint - range.heatingSetpoint);
+   /* int16_t diff = static_cast<int16_t>(range.cooling - range.heating);
     if (diff >= deadBand)
     {
         return Status::Success;
@@ -137,36 +271,36 @@ Status Setpoints::ChangeRange(SetpointRange range, chip::Optional<int16_t> heat,
     if (heat.HasValue() && !cool.HasValue())
     {
         // We're only adjusting the heating setpoint, so try moving the cooling setpoint
-        ChipLogProgress(Zcl, "Thermostat: ChangeRange: adjusting cooling setpoint from %" PRId16 " to %" PRId16 " to preserve deadband", range.coolingSetpoint, coolLimits.Clamp(static_cast<int16_t>(range.heatingSetpoint + deadBand)));
-        range.coolingSetpoint = coolLimits.Clamp(static_cast<int16_t>(range.heatingSetpoint + deadBand));
+        ChipLogProgress(Zcl, "Thermostat: ChangeRange: adjusting cooling setpoint from %" PRId16 " to %" PRId16 " to preserve deadband", range.cooling, coolLimits.Clamp(static_cast<int16_t>(range.heating + deadBand)));
+        range.cooling = coolLimits.Clamp(static_cast<int16_t>(range.heating + deadBand));
         affectedAttributes.Set(range.coolingAttribute);
 
-        diff = static_cast<int16_t>(range.coolingSetpoint - range.heatingSetpoint);
+        diff = static_cast<int16_t>(range.cooling - range.heating);
         if (diff > deadBand)
         {
             return Status::Success;
         }
         // We're still invalid, presumably because we were constrained by the max cooling setpoint
         // We'll shift the heating setpoint down by the amount needed to preserve the deadband
-        range.heatingSetpoint = heatLimits.Clamp(static_cast<int16_t>(range.heatingSetpoint - diff));
+        range.heating = heatLimits.Clamp(static_cast<int16_t>(range.heating - diff));
         affectedAttributes.Set(range.heatingAttribute);
         return Status::Success;
     }
     if (cool.HasValue() && !heat.HasValue())
     {
         // We're only adjusting the cooling setpoint, so try moving the heating setpoint
-        ChipLogProgress(Zcl, "Thermostat: ChangeRange: adjusting heating setpoint from %" PRId16 " to %" PRId16 " to preserve deadband", range.heatingSetpoint, heatLimits.Clamp(static_cast<int16_t>(range.coolingSetpoint - deadBand)));
-        range.heatingSetpoint = heatLimits.Clamp(static_cast<int16_t>(range.coolingSetpoint - deadBand));
+        ChipLogProgress(Zcl, "Thermostat: ChangeRange: adjusting heating setpoint from %" PRId16 " to %" PRId16 " to preserve deadband", range.heating, heatLimits.Clamp(static_cast<int16_t>(range.cooling - deadBand)));
+        range.heating = heatLimits.Clamp(static_cast<int16_t>(range.cooling - deadBand));
         affectedAttributes.Set(range.heatingAttribute);
 
-        diff = static_cast<int16_t>(range.coolingSetpoint - range.heatingSetpoint);
+        diff = static_cast<int16_t>(range.cooling - range.heating);
         if (diff > deadBand)
         {
             return Status::Success;
         }
         // We're still invalid, presumably because we were constrained by the min heating setpoint
         // We'll shift the cooling setpoint up by the amount needed to preserve the deadband
-        range.coolingSetpoint = coolLimits.Clamp(static_cast<int16_t>(range.coolingSetpoint + diff));
+        range.cooling = coolLimits.Clamp(static_cast<int16_t>(range.cooling + diff));
         affectedAttributes.Set(range.coolingAttribute);
         return Status::Success;
     }
@@ -175,38 +309,55 @@ Status Setpoints::ChangeRange(SetpointRange range, chip::Optional<int16_t> heat,
     int16_t shiftUp   = static_cast<int16_t>(diff / 2);
     int16_t shiftDown = static_cast<int16_t>(shiftUp + (diff % 2)); // If the diff is odd, shift down by an extra 0.01C.
 
-    range.heatingSetpoint = heatLimits.Clamp(static_cast<int16_t>(range.heatingSetpoint - shiftDown));
-    range.coolingSetpoint = coolLimits.Clamp(static_cast<int16_t>(range.coolingSetpoint + shiftUp));
+    range.heating = heatLimits.Clamp(static_cast<int16_t>(range.heating - shiftDown));
+    range.cooling = coolLimits.Clamp(static_cast<int16_t>(range.cooling + shiftUp));
     affectedAttributes.Set(range.heatingAttribute);
     affectedAttributes.Set(range.coolingAttribute);
 
-    diff = static_cast<int16_t>(range.coolingSetpoint - range.heatingSetpoint);
+    diff = static_cast<int16_t>(range.cooling - range.heating);
     if (diff >= deadBand)
     {
         return Status::Success;
     }
     // We're still invalid, probably because we hit one of the limits.
-    if (range.heatingSetpoint == heatLimits.minimum) // We're at the bottom of the heat limit
+    if (range.heating == heatLimits.minimum) // We're at the bottom of the heat limit
     {
-        range.coolingSetpoint = coolLimits.Clamp(static_cast<int16_t>(range.heatingSetpoint + deadBand));
+        range.cooling = coolLimits.Clamp(static_cast<int16_t>(range.heating + deadBand));
         return Status::Success;
     }
-    if (range.coolingSetpoint == coolLimits.maximum)
+    if (range.cooling == coolLimits.maximum)
     {
-        range.heatingSetpoint = heatLimits.Clamp(static_cast<int16_t>(range.coolingSetpoint - deadBand));
+        range.heating = heatLimits.Clamp(static_cast<int16_t>(range.cooling - deadBand));
         return Status::Success;
     }
     // At this point, we're invalid because it's not possible to change to the given setpoints and maintain the deadband
     ChipLogError(Zcl, "Thermostat: ChangeRange: Not possible to change to the given setpoints and maintain the deadband");
     return Status::InvalidValue;
+    */
+    return Fix(affectedAttributes);
 }
 
-Status Setpoints::ChangeLimits(SetpointLimitOverride & limitOverride, chip::Optional<int16_t> min, chip::Optional<int16_t> max,
+Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, chip::Optional<int16_t> min, chip::Optional<int16_t> max,
                                chip::BitFlags<SetpointAttributes> & affectedAttributes)
 {
     bool settingMin = min.HasValue();
     bool settingMax = max.HasValue();
 
+    ChipLogProgress(Zcl, "Thermostat: ChangeLimits (min: %d max: %d)", min.ValueOr(userLimits.userMinimum.Value()), max.ValueOr(userLimits.userMaximum.Value()));
+
+    if (settingMin && settingMax) {
+        return Status::InvalidCommand;
+    } else if (settingMin) {
+       userLimits.userMinimum.SetValue(min.Value());
+       affectedAttributes.Set(userLimits.MinimumAttribute());
+    } else {
+        userLimits.userMaximum.SetValue(max.Value());
+        affectedAttributes.Set(userLimits.MaximumAttribute());
+    }
+
+    return Fix(affectedAttributes);
+
+    /*
     if (settingMin && settingMax)
     {
         int16_t minVal = min.Value();
@@ -338,6 +489,8 @@ Status Setpoints::ChangeLimits(SetpointLimitOverride & limitOverride, chip::Opti
                                            MakeOptional(unoccupiedRange.coolingSetpoint), ClampMode::kClamp, affectedAttributes);
     }
 
+    */
+
     return Status::Success;
 }
 
@@ -390,13 +543,13 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
     int16_t minCoolSetpointLimit;
     if (MinCoolSetpointLimit::Get(endpoint, &minCoolSetpointLimit) == Status::Success)
     {
-        setpoints.coolLimitsOverride.minimum.SetValue(minCoolSetpointLimit);
+        setpoints.userCoolLimits.userMinimum.SetValue(minCoolSetpointLimit);
     }
 
     int16_t maxCoolSetpointLimit;
     if (MaxCoolSetpointLimit::Get(endpoint, &maxCoolSetpointLimit) == Status::Success)
     {
-        setpoints.coolLimitsOverride.maximum.SetValue(maxCoolSetpointLimit);
+        setpoints.userCoolLimits.userMaximum.SetValue(maxCoolSetpointLimit);
     }
 
     if (AbsMinHeatSetpointLimit::Get(endpoint, &setpoints.absoluteHeatLimits.minimum) != Status::Success)
@@ -412,18 +565,18 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
     int16_t minHeatSetpointLimit;
     if (MinHeatSetpointLimit::Get(endpoint, &minHeatSetpointLimit) == Status::Success)
     {
-        setpoints.heatLimitsOverride.minimum.SetValue(minHeatSetpointLimit);
+        setpoints.userHeatLimits.userMinimum.SetValue(minHeatSetpointLimit);
     }
 
     int16_t maxHeatSetpointLimit;
     if (MaxHeatSetpointLimit::Get(endpoint, &maxHeatSetpointLimit) == Status::Success)
     {
-        setpoints.heatLimitsOverride.maximum.SetValue(maxHeatSetpointLimit);
+        setpoints.userHeatLimits.userMaximum.SetValue(maxHeatSetpointLimit);
     }
 
     if (setpoints.coolSupported)
     {
-        if (OccupiedCoolingSetpoint::Get(endpoint, &setpoints.occupiedCoolingSetpoint) != Status::Success)
+        if (OccupiedCoolingSetpoint::Get(endpoint, &setpoints.occupied.cooling) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
@@ -433,7 +586,7 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
 
     if (setpoints.heatSupported)
     {
-        if (OccupiedHeatingSetpoint::Get(endpoint, &setpoints.occupiedHeatingSetpoint) != Status::Success)
+        if (OccupiedHeatingSetpoint::Get(endpoint, &setpoints.occupied.heating) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
@@ -443,7 +596,7 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
 
     if (setpoints.coolSupported && setpoints.occupancySupported)
     {
-        if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpoints.unoccupiedCoolingSetpoint) != Status::Success)
+        if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpoints.unoccupied.cooling) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
@@ -453,13 +606,23 @@ Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
 
     if (setpoints.heatSupported && setpoints.occupancySupported)
     {
-        if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpoints.unoccupiedHeatingSetpoint) != Status::Success)
+        if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpoints.unoccupied.heating) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
             return Status::Failure;
         }
     }
+
+    ChipLogProgress(Zcl, "Thermostat: Loaded Setpoints");
+    ChipLogProgress(Zcl, "Thermostat: Auto: %s Heat: %s Cool: %s Occupancy: %s Events: %s", setpoints.autoSupported ? "True" : "False", setpoints.heatSupported ? "True" : "False", setpoints.coolSupported ? "True" : "False", setpoints.occupancySupported ? "True" : "False", setpoints.eventsSupported ? "True" : "False");
+    ChipLogProgress(Zcl, "Thermostat: Heat Limits: min %" PRIi16 " max %" PRIi16, setpoints.userHeatLimits.userMinimum.Value(), setpoints.userHeatLimits.userMaximum.Value());
+    ChipLogProgress(Zcl, "Thermostat: Cool Limits: min %" PRIi16 " max %" PRIi16, setpoints.userCoolLimits.userMinimum.Value(), setpoints.userCoolLimits.userMaximum.Value());
+    ChipLogProgress(Zcl, "Thermostat: Dead Band: %" PRIi16, setpoints.deadBand);
+    ChipLogProgress(Zcl, "Thermostat: Occupied Heating Setpoint: %" PRIi16, setpoints.occupied.heating);
+    ChipLogProgress(Zcl, "Thermostat: Occupied Cooling Setpoint: %" PRIi16, setpoints.occupied.cooling);
+    ChipLogProgress(Zcl, "Thermostat: Unoccupied Heating Setpoint: %" PRIi16, setpoints.unoccupied.heating);
+    ChipLogProgress(Zcl, "Thermostat: Unoccupied Cooling Setpoint: %" PRIi16, setpoints.unoccupied.cooling);
     return Status::Success;
 }
 
@@ -468,28 +631,28 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints setpoints, chip::BitFlags<Se
     Status status;
     if (affectedAttributes.Has(SetpointAttributes::kOccupiedHeating))
     {
-        if ((status = OccupiedHeatingSetpoint::Set(endpoint, setpoints.occupiedHeatingSetpoint)) != Status::Success)
+        if ((status = OccupiedHeatingSetpoint::Set(endpoint, setpoints.occupied.heating)) != Status::Success)
         {
             return status;
         }
     }
     if (affectedAttributes.Has(SetpointAttributes::kOccupiedCooling))
     {
-        if ((status = OccupiedCoolingSetpoint::Set(endpoint, setpoints.occupiedCoolingSetpoint)) != Status::Success)
+        if ((status = OccupiedCoolingSetpoint::Set(endpoint, setpoints.occupied.cooling)) != Status::Success)
         {
             return status;
         }
     }
     if (affectedAttributes.Has(SetpointAttributes::kUnoccupiedHeating))
     {
-        if ((status = UnoccupiedHeatingSetpoint::Set(endpoint, setpoints.unoccupiedHeatingSetpoint)) != Status::Success)
+        if ((status = UnoccupiedHeatingSetpoint::Set(endpoint, setpoints.unoccupied.heating)) != Status::Success)
         {
             return status;
         }
     }
     if (affectedAttributes.Has(SetpointAttributes::kUnoccupiedCooling))
     {
-        if ((status = UnoccupiedCoolingSetpoint::Set(endpoint, setpoints.unoccupiedCoolingSetpoint)) != Status::Success)
+        if ((status = UnoccupiedCoolingSetpoint::Set(endpoint, setpoints.unoccupied.cooling)) != Status::Success)
         {
             return status;
         }
@@ -502,30 +665,30 @@ Status SaveSetpoints(EndpointId endpoint, Setpoints setpoints, chip::BitFlags<Se
             return status;
         }
     }
-    if (affectedAttributes.Has(SetpointAttributes::kMinHeatSetpointLimit) && setpoints.heatLimitsOverride.minimum.HasValue())
+    if (affectedAttributes.Has(SetpointAttributes::kMinHeatSetpointLimit) && setpoints.userHeatLimits.userMinimum.HasValue())
     {
-        if ((status = MinHeatSetpointLimit::Set(endpoint, setpoints.heatLimitsOverride.minimum.Value())) != Status::Success)
+        if ((status = MinHeatSetpointLimit::Set(endpoint, setpoints.userHeatLimits.userMinimum.Value())) != Status::Success)
         {
             return status;
         }
     }
-    if (affectedAttributes.Has(SetpointAttributes::kMaxHeatSetpointLimit) && setpoints.heatLimitsOverride.maximum.HasValue())
+    if (affectedAttributes.Has(SetpointAttributes::kMaxHeatSetpointLimit) && setpoints.userHeatLimits.userMaximum.HasValue())
     {
-        if ((status = MaxHeatSetpointLimit::Set(endpoint, setpoints.heatLimitsOverride.maximum.Value())) != Status::Success)
+        if ((status = MaxHeatSetpointLimit::Set(endpoint, setpoints.userHeatLimits.userMaximum.Value())) != Status::Success)
         {
             return status;
         }
     }
-    if (affectedAttributes.Has(SetpointAttributes::kMinCoolSetpointLimit) && setpoints.coolLimitsOverride.minimum.HasValue())
+    if (affectedAttributes.Has(SetpointAttributes::kMinCoolSetpointLimit) && setpoints.userCoolLimits.userMinimum.HasValue())
     {
-        if ((status = MinCoolSetpointLimit::Set(endpoint, setpoints.coolLimitsOverride.minimum.Value())) != Status::Success)
+        if ((status = MinCoolSetpointLimit::Set(endpoint, setpoints.userCoolLimits.userMinimum.Value())) != Status::Success)
         {
             return status;
         }
     }
-    if (affectedAttributes.Has(SetpointAttributes::kMaxCoolSetpointLimit) && setpoints.coolLimitsOverride.maximum.HasValue())
+    if (affectedAttributes.Has(SetpointAttributes::kMaxCoolSetpointLimit) && setpoints.userCoolLimits.userMaximum.HasValue())
     {
-        if ((status = MaxCoolSetpointLimit::Set(endpoint, setpoints.coolLimitsOverride.maximum.Value())) != Status::Success)
+        if ((status = MaxCoolSetpointLimit::Set(endpoint, setpoints.userCoolLimits.userMaximum.Value())) != Status::Success)
         {
             return status;
         }

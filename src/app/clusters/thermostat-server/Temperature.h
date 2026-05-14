@@ -26,13 +26,15 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-constexpr int16_t kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
-constexpr int16_t kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
-constexpr int16_t kDefaultAbsMinCoolSetpointLimit = 1600; // 16C (61 F) is the default
-constexpr int16_t kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is the default
-constexpr int16_t kDefaultDeadBand        = 200; // 2.0C is the default; this changed from 2.5C in revision 8 of this cluster
-constexpr int16_t kDefaultHeatingSetpoint = 2000;
-constexpr int16_t kDefaultCoolingSetpoint = 2600;
+using temperature = int16_t;
+
+constexpr temperature kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
+constexpr temperature kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
+constexpr temperature kDefaultAbsMinCoolSetpointLimit = 1600; // 16C (61 F) is the default
+constexpr temperature kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is the default
+constexpr temperature kDefaultDeadBand        = 200; // 2.0C is the default; this changed from 2.5C in revision 8 of this cluster
+constexpr temperature kDefaultHeatingSetpoint = 2000;
+constexpr temperature kDefaultCoolingSetpoint = 2600;
 
 } // namespace Thermostat
 } // namespace Clusters

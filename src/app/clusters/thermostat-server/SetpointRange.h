@@ -22,6 +22,8 @@
 #include <protocols/interaction_model/Constants.h>
 
 #include "SetpointAttributes.h"
+#include "Temperature.h"
+
 
 namespace chip {
 namespace app {
@@ -32,14 +34,17 @@ class Setpoints;
 
 struct SetpointRange
 {
-    Setpoints & setpoints;
-    int16_t & heatingSetpoint;
-    int16_t & coolingSetpoint;
     SetpointAttributes heatingAttribute;
     SetpointAttributes coolingAttribute;
+    temperature heating;
+    temperature cooling;
 
-    SetpointRange(Setpoints & sp, int16_t & heat, int16_t & cool, SetpointAttributes ha, SetpointAttributes ca) :
-        setpoints(sp), heatingSetpoint(heat), coolingSetpoint(cool), heatingAttribute(ha), coolingAttribute(ca)
+    SetpointRange(SetpointAttributes heatAtt, SetpointAttributes coolAtt, temperature heat, temperature cool) :
+        heatingAttribute(heatAtt), coolingAttribute(coolAtt), heating(heat), cooling(cool)
+    {}
+
+    SetpointRange(const SetpointRange & spr) :
+        heatingAttribute(spr.heatingAttribute), coolingAttribute(spr.coolingAttribute), heating(spr.heating), cooling(spr.cooling)
     {}
 };
 

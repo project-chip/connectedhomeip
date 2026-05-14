@@ -59,6 +59,29 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+char const * AttributeIdToText(chip::AttributeId id) {
+    switch (id) {
+        case OccupiedHeatingSetpoint::Id:
+            return "OccupiedHeatingSetpoint";
+        case OccupiedCoolingSetpoint::Id:
+            return "OccupiedCoolingSetpoint";
+        case UnoccupiedHeatingSetpoint::Id:
+            return "UnoccupiedHeatingSetpoint";
+        case UnoccupiedCoolingSetpoint::Id:
+            return "UnoccupiedCoolingSetpoint";
+        case MinHeatSetpointLimit::Id:
+            return "MinHeatSetpointLimit";
+        case MaxHeatSetpointLimit::Id:
+            return "MaxHeatSetpointLimit";
+        case MinCoolSetpointLimit::Id:
+            return "MinCoolSetpointLimit";
+        case MaxCoolSetpointLimit::Id:
+            return "MaxCoolSetpointLimit";
+        default:
+            return "Unknown";
+    }
+}
+
 ThermostatAttrAccess gThermostatAttrAccess;
 
 Delegate * GetDelegate(EndpointId endpoint)
@@ -480,40 +503,40 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
     {
         return status;
     }
-    int16_t temp = 0;
+    temperature temp = 0;
     SetpointAttributes attribute;
     switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id:
-        temp = setpoints.occupiedHeatingSetpoint;
+        temp = setpoints.occupied.heating;
         attribute = SetpointAttributes::kOccupiedHeating;
         break;
     case OccupiedCoolingSetpoint::Id:
-        temp = setpoints.occupiedCoolingSetpoint;
+        temp = setpoints.occupied.cooling;
         attribute = SetpointAttributes::kOccupiedCooling;
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        temp = setpoints.unoccupiedHeatingSetpoint;
+        temp = setpoints.unoccupied.heating;
         attribute = SetpointAttributes::kUnoccupiedHeating;
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        temp = setpoints.unoccupiedCoolingSetpoint;
+        temp = setpoints.unoccupied.cooling;
         attribute = SetpointAttributes::kUnoccupiedCooling;
         break;
     case MinHeatSetpointLimit::Id:
-        temp = setpoints.heatLimitsOverride.minimum.Value();
+        temp = setpoints.userHeatLimits.userMinimum.Value();
         attribute = SetpointAttributes::kMinHeatSetpointLimit;
         break;
     case MaxHeatSetpointLimit::Id:
-        temp = setpoints.heatLimitsOverride.maximum.Value();
+        temp = setpoints.userHeatLimits.userMaximum.Value();
         attribute = SetpointAttributes::kMaxHeatSetpointLimit;
         break;
     case MinCoolSetpointLimit::Id:
-        temp = setpoints.coolLimitsOverride.minimum.Value();
+        temp = setpoints.userCoolLimits.userMinimum.Value();
         attribute = SetpointAttributes::kMinCoolSetpointLimit;
         break;
     case MaxCoolSetpointLimit::Id:
-        temp = setpoints.coolLimitsOverride.maximum.Value();
+        temp = setpoints.userCoolLimits.userMaximum.Value();
         attribute = SetpointAttributes::kMaxCoolSetpointLimit;
         break;
     default:
@@ -631,7 +654,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
     case MinCoolSetpointLimit::Id:
     case MaxCoolSetpointLimit::Id: {
         int16_t temperature = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        ChipLogProgress(Zcl, "Thermostat: HandlePreAttributeChange: attribute: 0x%x, temp: %" PRIi16, attributePath.mAttributeId, temperature);
+        ChipLogProgress(Zcl, "Thermostat: HandlePreAttributeChange: attribute: 0x%x, %s temp: %" PRIi16, attributePath.mAttributeId, AttributeIdToText(attributePath.mAttributeId), temperature);
         Setpoints setpoints;
         auto status = LoadSetpoints(attributePath.mEndpointId, setpoints);
         if (status != Status::Success)

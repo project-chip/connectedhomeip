@@ -22,7 +22,7 @@
 #include <protocols/interaction_model/Constants.h>
 
 #include "SetpointAttributes.h"
-#include "SetpointDefaults.h"
+#include "Temperature.h"
 #include "SetpointLimits.h"
 #include "SetpointRange.h"
 
@@ -50,43 +50,61 @@ public:
     SetpointLimits absoluteHeatLimits;
     SetpointLimits absoluteCoolLimits;
 
-    SetpointLimitOverride heatLimitsOverride;
-    SetpointLimitOverride coolLimitsOverride;
+    UserSetpointLimits userHeatLimits;
+    UserSetpointLimits userCoolLimits;
 
-    int16_t deadBand = 0;
+    SetpointRange occupied;
+    SetpointRange unoccupied;
 
-    int16_t occupiedCoolingSetpoint;
-    int16_t occupiedHeatingSetpoint;
-    int16_t unoccupiedCoolingSetpoint;
-    int16_t unoccupiedHeatingSetpoint;
+    int16_t deadBand;
 
     Setpoints() :
-        absoluteHeatLimits(SystemModeEnum::kHeat), absoluteCoolLimits(SystemModeEnum::kCool),
-        heatLimitsOverride(absoluteHeatLimits), coolLimitsOverride(absoluteCoolLimits), deadBand(kDefaultDeadBand),
-        occupiedCoolingSetpoint(kDefaultCoolingSetpoint), occupiedHeatingSetpoint(kDefaultHeatingSetpoint),
-        unoccupiedCoolingSetpoint(kDefaultCoolingSetpoint), unoccupiedHeatingSetpoint(kDefaultHeatingSetpoint)
+        absoluteHeatLimits(SystemModeEnum::kHeat, kDefaultAbsMinHeatSetpointLimit, kDefaultAbsMaxHeatSetpointLimit),
+        absoluteCoolLimits(SystemModeEnum::kCool, kDefaultAbsMinCoolSetpointLimit, kDefaultAbsMaxCoolSetpointLimit),
+        userHeatLimits(absoluteHeatLimits), userCoolLimits(absoluteCoolLimits),
+        occupied(SetpointAttributes::kOccupiedHeating, SetpointAttributes::kOccupiedCooling, kDefaultHeatingSetpoint, kDefaultCoolingSetpoint),
+        unoccupied(SetpointAttributes::kUnoccupiedHeating, SetpointAttributes::kUnoccupiedCooling, kDefaultHeatingSetpoint, kDefaultCoolingSetpoint), 
+        deadBand(kDefaultDeadBand)
     {}
 
     Setpoints(const Setpoints & spl) :
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
         occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
         absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
-        heatLimitsOverride(absoluteHeatLimits, spl.heatLimitsOverride),
-        coolLimitsOverride(absoluteCoolLimits, spl.coolLimitsOverride), deadBand(spl.deadBand),
-        occupiedCoolingSetpoint(spl.occupiedCoolingSetpoint), occupiedHeatingSetpoint(spl.occupiedHeatingSetpoint),
-        unoccupiedCoolingSetpoint(spl.unoccupiedCoolingSetpoint), unoccupiedHeatingSetpoint(spl.unoccupiedHeatingSetpoint)
+        userHeatLimits(absoluteHeatLimits, spl.userHeatLimits),
+        userCoolLimits(absoluteCoolLimits, spl.userCoolLimits), 
+        occupied(spl.occupied), unoccupied(spl.unoccupied),
+        deadBand(spl.deadBand)
     {}
 
     bool Valid();
 
-    SetpointRange GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy);
+    SetpointRange & GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy);
 
     Protocols::InteractionModel::Status ChangeRange(SetpointRange range, chip::Optional<int16_t> heat, chip::Optional<int16_t> cool,
                                                     ClampMode clamp, chip::BitFlags<SetpointAttributes> & affectedAttributes);
 
-    Protocols::InteractionModel::Status ChangeLimits(SetpointLimitOverride & limitOverride, chip::Optional<int16_t> min,
+    Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limitOverride, chip::Optional<int16_t> min,
                                                      chip::Optional<int16_t> max,
                                                      chip::BitFlags<SetpointAttributes> & affectedAttributes);
+
+private: 
+Protocols::InteractionModel::Status Fix(chip::BitFlags<SetpointAttributes> & changedAttributes);
+void FixUserLimitDeadband( 
+    Optional<temperature> & heatLimit, 
+    Optional<temperature> & coolLimit,
+    temperature absoluteHeatLimit,
+    temperature absoluteCoolLimit,
+    SetpointAttributes heatAttribute,
+    SetpointAttributes coolAttribute,
+    chip::BitFlags<SetpointAttributes> & changedAttributes,
+    chip::BitFlags<SetpointAttributes> & fixedAttributes);
+Protocols::InteractionModel::Status FixUserLimits(SetpointLimits & absoluteLimits, 
+    UserSetpointLimits & userLimits, 
+    SetpointAttributes minAttribute,
+    SetpointAttributes maxAttribute,
+    chip::BitFlags<SetpointAttributes> & changedAttributes,
+    chip::BitFlags<SetpointAttributes> & fixedAttributes);
 };
 
 Protocols::InteractionModel::Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints);

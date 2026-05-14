@@ -89,7 +89,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         {
             return Status::UnsupportedAttribute;
         }
-        status = setpoints.ChangeLimits(setpoints.heatLimitsOverride, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
+        status = setpoints.ChangeLimits(setpoints.userHeatLimits, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
                                affectedAttributes);
     }
     break;
@@ -98,7 +98,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         {
             return Status::UnsupportedAttribute;
         }
-        status = setpoints.ChangeLimits(setpoints.heatLimitsOverride, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
+        status = setpoints.ChangeLimits(setpoints.userHeatLimits, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
                                affectedAttributes);
     }
     break;
@@ -107,7 +107,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         {
             return Status::UnsupportedAttribute;
         }
-        status = setpoints.ChangeLimits(setpoints.coolLimitsOverride, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
+        status = setpoints.ChangeLimits(setpoints.userCoolLimits, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
                                affectedAttributes);
     }
     break;
@@ -116,7 +116,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         {
             return Status::UnsupportedAttribute;
         }
-        status = setpoints.ChangeLimits(setpoints.coolLimitsOverride, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
+        status = setpoints.ChangeLimits(setpoints.userCoolLimits, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
                                affectedAttributes);
     }
     break;
@@ -166,23 +166,23 @@ Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointR
     case SetpointRaiseLowerModeEnum::kBoth:
         if (setpoints.heatSupported)
         {
-            heat.SetValue(static_cast<int16_t>(range.heatingSetpoint + amount));
+            heat.SetValue(static_cast<int16_t>(range.heating + amount));
         }
         if (setpoints.coolSupported)
         {
-            cool.SetValue(static_cast<int16_t>(range.coolingSetpoint + amount));
+            cool.SetValue(static_cast<int16_t>(range.cooling + amount));
         }
         break;
     case SetpointRaiseLowerModeEnum::kHeat:
         if (setpoints.heatSupported)
         {
-            heat.SetValue(static_cast<int16_t>(range.heatingSetpoint + amount));
+            heat.SetValue(static_cast<int16_t>(range.heating + amount));
         }
         break;
     case SetpointRaiseLowerModeEnum::kCool:
         if (setpoints.coolSupported)
         {
-            cool.SetValue(static_cast<int16_t>(range.coolingSetpoint + amount));
+            cool.SetValue(static_cast<int16_t>(range.cooling + amount));
         }
         break;
     default:

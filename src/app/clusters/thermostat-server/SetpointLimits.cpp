@@ -39,10 +39,10 @@ namespace Thermostat {
 EffectiveSetpointLimits::EffectiveSetpointLimits(const Setpoints & sp, SystemModeEnum systemMode) :
     SetpointLimits(systemMode), setpoints(sp)
 {
-    int16_t minHeat = setpoints.heatLimitsOverride.Minimum();
-    int16_t maxHeat = setpoints.heatLimitsOverride.Maximum();
-    int16_t minCool = setpoints.coolLimitsOverride.Minimum();
-    int16_t maxCool = setpoints.coolLimitsOverride.Maximum();
+    int16_t minHeat = setpoints.userHeatLimits.Minimum();
+    int16_t maxHeat = setpoints.userHeatLimits.Maximum();
+    int16_t minCool = setpoints.userCoolLimits.Minimum();
+    int16_t maxCool = setpoints.userCoolLimits.Maximum();
 
     switch (systemMode)
     {
