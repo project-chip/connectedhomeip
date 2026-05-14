@@ -750,8 +750,9 @@ void DoorLockServer::setCredentialCommandHandler(
         }
         if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
             currentCredential.credentialData.size() == credentialData.size() &&
-            chip::Crypto::IsBufferContentEqualConstantTime(currentCredential.credentialData.data(), credentialData.data(),
-                                                           credentialData.size()))
+            (credentialData.empty() ||
+             chip::Crypto::IsBufferContentEqualConstantTime(currentCredential.credentialData.data(), credentialData.data(),
+                                                            credentialData.size())))
         {
             ChipLogProgress(Zcl,
                             "[SetCredential] Credential with the same data and type already exist "
@@ -1948,8 +1949,9 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
             }
 
             if (credentialInfo.credentialData.size() == credentialData.size() &&
-                chip::Crypto::IsBufferContentEqualConstantTime(credentialInfo.credentialData.data(), credentialData.data(),
-                                                               credentialData.size()))
+                (credentialData.empty() ||
+                 chip::Crypto::IsBufferContentEqualConstantTime(credentialInfo.credentialData.data(), credentialData.data(),
+                                                                credentialData.size())))
             {
                 userIndex       = i;
                 credentialIndex = credential.credentialIndex;
