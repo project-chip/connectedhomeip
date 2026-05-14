@@ -206,8 +206,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     if (AppOptions::GetConfig().enableGroupcast)
     {
-        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
-                                                                                            &Server::GetInstance().GetFabricTable());
+        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(
+            &gGroupDataProvider, &Server::GetInstance().GetFabricTable());
         initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
         gGroupDataProvider.SetGroupcastEnabled(true);
     }
