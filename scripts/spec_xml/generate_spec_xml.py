@@ -407,6 +407,7 @@ def dump_ids_from_data_model_dirs():
             if k not in pics_code_clusters:
                 pics_code_clusters[k] = c.pics
             elif pics_code_clusters[k] != c.pics:
+                pics_code_clusters[k] = c.pics
                 log.warning("PICS Code is inconsistent among different versions of the spec for cluster ID #%s!", k)
 
         # Device types don't currently have provisional markings in the spec
