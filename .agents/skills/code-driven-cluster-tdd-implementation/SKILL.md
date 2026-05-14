@@ -37,6 +37,8 @@ This guide is designed to be effective by providing:
 ## 2. Prerequisites
 
 -   Read `code-driven-cluster-development` for core implementation patterns.
+-   Read `matter-specification-access` for instructions on how to access the
+    Matter specification and test plans, so that tests can be based on the spec.
 -   If performing a **migration**, read `code-driven-cluster-migration` for
     general migration steps (renaming, directory layout). We assume you have
     already completed Phase 1 (Renames) and Phase 2 (Moves) before starting the
