@@ -601,8 +601,8 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
             mUploader->Start();
         }
         {
-          std::lock_guard<std::mutex> lock(mRecorderMutex);
-          InitializeRecorder();
+            std::lock_guard<std::mutex> lock(mRecorderMutex);
+            InitializeRecorder();
         }
         if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
         {
