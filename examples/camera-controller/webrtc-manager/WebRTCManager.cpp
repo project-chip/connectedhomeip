@@ -177,13 +177,8 @@ CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, cons
     mPendingSdpContext.sessionId = session.id;
 
     // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
-    SuccessOrDie(DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(300),
-        [](chip::System::Layer * systemLayer, void * appState) {
-            auto * self = static_cast<WebRTCManager *>(appState);
-            LogErrorOnFailure(self->ProvideICECandidates(self->mPendingSdpContext.sessionId));
-        },
-        this));
+    SuccessOrDie(
+        DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(300), OnDelayedProvideICECandidates, this));
 
     return CHIP_NO_ERROR;
 }
@@ -244,6 +239,9 @@ void WebRTCManager::CloseRTPSockets()
 void WebRTCManager::Disconnect()
 {
     ChipLogProgress(Camera, "Disconnecting WebRTC session");
+
+    // Cancel any pending ProvideICECandidates timer
+    DeviceLayer::SystemLayer().CancelTimer(OnDelayedProvideICECandidates, this);
 
     // Close the peer connection
     if (mPeerConnection)
@@ -594,4 +592,11 @@ void WebRTCManager::OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConne
         return;
     }
     ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
+}
+
+void WebRTCManager::OnDelayedProvideICECandidates(chip::System::Layer * systemLayer, void * appState)
+{
+    auto * self = static_cast<WebRTCManager *>(appState);
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDelayedProvideICECandidates: appState is null"));
+    LogErrorOnFailure(self->ProvideICECandidates(self->mPendingSdpContext.sessionId));
 }

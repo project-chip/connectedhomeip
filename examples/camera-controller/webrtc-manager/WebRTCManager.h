@@ -85,6 +85,8 @@ private:
     WebRTCManager();
     ~WebRTCManager();
 
+    static void OnDelayedProvideICECandidates(chip::System::Layer * systemLayer, void * appState);
+
     // Close and reset the RTP sockets
     void CloseRTPSockets();
 
