@@ -22,10 +22,8 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
-#include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/attribute-table.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -57,10 +55,13 @@ static FanControlManager * mFanControlManager = nullptr;
 
 CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
+    // Legacy stub: PercentCurrent reads track PercentSetting (all-clusters has no separate current model).
+    DataModel::Nullable<Percent> percentSetting;
+    PercentSetting::Get(mEndpoint, percentSetting);
     Percent ret = 0;
-    if (FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpoint); cluster != nullptr)
+    if (!percentSetting.IsNull())
     {
-        ret = cluster->GetPercentCurrent();
+        ret = percentSetting.Value();
     }
 
     return aEncoder.Encode(ret);
@@ -68,11 +69,13 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 
 CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
+    // Legacy stub: SpeedCurrent reads track SpeedSetting.
+    DataModel::Nullable<uint8_t> speedSetting;
+    SpeedSetting::Get(mEndpoint, speedSetting);
     uint8_t ret = 0;
-    if (FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpoint);
-        cluster != nullptr && cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    if (!speedSetting.IsNull())
     {
-        ret = cluster->GetSpeedCurrent();
+        ret = speedSetting.Value();
     }
 
     return aEncoder.Encode(ret);
@@ -85,16 +88,13 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpoint);
-    uint8_t speedMax            = 0;
-    DataModel::Nullable<uint8_t> speedSetting;
-    if (cluster != nullptr && cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        speedMax     = cluster->GetSpeedMax();
-        speedSetting = cluster->GetSpeedSetting();
-    }
+    uint8_t speedMax = 0;
+    SpeedMax::Get(mEndpoint, &speedMax);
 
-    uint8_t newSpeedSetting = speedSetting.ValueOr(0);
+    DataModel::Nullable<uint8_t> speedSetting;
+    SpeedSetting::Get(mEndpoint, speedSetting);
+
+    uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
     if (aDirection == StepDirectionEnum::kIncrease)
     {
@@ -148,11 +148,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
         }
     }
 
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return cluster->SetSpeedSetting(DataModel::MakeNullable(newSpeedSetting)).GetStatusCode().GetStatus();
+    return SpeedSetting::Set(mEndpoint, newSpeedSetting);
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
