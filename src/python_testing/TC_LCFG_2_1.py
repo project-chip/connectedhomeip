@@ -55,11 +55,11 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
     def pics_TC_LCFG_2_1(self) -> list[str]:
         return ["LCFG.S"]
 
-    def has_repeated_values(self, list):  # noqa: A002
-        return len(list) != len(set(list))  # noqa: A001
+    def has_repeated_values(self, lst):
+        return len(lst) != len(set(lst))
 
-    def supported_locales_has_active_locale(self, list, s):  # noqa: A002
-        return s in list  # noqa: A001
+    def supported_locales_has_active_locale(self, lst, s):
+        return s in lst
 
     def steps_TC_LCFG_2_1(self) -> list[TestStep]:
         return [
