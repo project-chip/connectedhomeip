@@ -90,6 +90,7 @@ LEDWidget sLightLED;
 
 bool sLightOn           = false;
 osTimerId_t sLightTimer = nullptr;
+bool sOffEffectArmed    = false;
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 uint8_t sCurrentLevel      = 254;
@@ -123,6 +124,12 @@ void PostLightControlColorEvent(ColorAction_t action, const RGBLEDWidget::ColorD
 
 void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 {
+    if (!sOffEffectArmed)
+    {
+        return;
+    }
+    sOffEffectArmed = false; 
+
     sLightOn = false;
     sLightLED.Set(false);
 #ifdef DISPLAY_ENABLED
@@ -169,6 +176,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     sLightOn = !sLightOn;
     sLightLED.Set(sLightOn);
 
+    sOffEffectArmed = false;
     if (osTimerIsRunning(sLightTimer))
     {
         if (osTimerStop(sLightTimer) == osError)
@@ -405,8 +413,22 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
         }
     }
 
+    if (offEffectDuration == 0)
+    {
+        ChipLogProgress(Zcl, "OffWithEffect: unsupported effect, completing immediately");
+        sOffEffectArmed = true;
+        AppEvent event{};
+        event.Type               = AppEvent::kEventType_Timer;
+        event.TimerEvent.Context = nullptr;
+        event.Handler            = &OffEffectTimerEventHandler;
+        appInstance().PostEvent(&event);
+        return;
+    }
+
+    sOffEffectArmed = true;
     if (osTimerStart(sLightTimer, pdMS_TO_TICKS(offEffectDuration)) != osOK)
     {
+        sOffEffectArmed = false;
         SILABS_LOG("sLightTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
@@ -428,12 +450,22 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
             ChipLogProgress(Zcl, "sending light state update");
             MatterAwsSendMsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
 #endif // SL_MATTER_ENABLE_AWS
-            sLightOn = (*value != 0);
+            const bool lightOn = (*value != 0);
+            if (!lightOn && sOffEffectArmed)
+            {
+                break;
+            }
+            if (lightOn)
+            {
+                sOffEffectArmed = false;
+            }
+
+            sLightOn = lightOn;
             sLightLED.Set(sLightOn);
 #ifdef DISPLAY_ENABLED
             BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
-            if (sLightOn && osTimerIsRunning(sLightTimer))
+            if (lightOn && osTimerIsRunning(sLightTimer))
             {
                 if (osTimerStop(sLightTimer) == osError)
                 {
