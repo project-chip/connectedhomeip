@@ -746,7 +746,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
-        '''
+        """
         if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
             return desc_method()
         test_method = getattr(self, test)
