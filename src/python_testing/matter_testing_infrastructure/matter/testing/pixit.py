@@ -66,7 +66,7 @@ class PixitDefinition:
     default: Any = _PIXIT_NO_DEFAULT
 
 
-def pixit(name: str, type: Type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
+def pixit(name: str, value_type: Type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
     """Decorator that declares a PIXIT parameter requirement for a test method.
 
     This decorator attaches PIXIT metadata to the test method. When the test runs,
@@ -81,7 +81,7 @@ def pixit(name: str, type: Type, description: str, required: bool = True, defaul
 
     Args:
         name: The parameter name (key in user_params).
-        type: Expected Python type (str, int, bool, float).
+        value_type: Expected Python type (str, int, bool, float).
         description: Human-readable description for error messages.
         required: Whether this PIXIT must be provided. Defaults to True.
         default: Default value when not provided. Only used when required=False.
@@ -97,7 +97,7 @@ def pixit(name: str, type: Type, description: str, required: bool = True, defaul
     """
     pixit_def = PixitDefinition(
         name=name,
-        type=type,
+        type=value_type,
         description=description,
         required=required,
         default=default,
