@@ -11,5 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("mode-base-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("mode-base-server") {
+  sources = [
+    "AppDelegate.h",
+    "mode-base-cluster-objects.cpp",
+    "mode-base-cluster-objects.h",
+    "ModeBaseCluster.cpp",
+    "ModeBaseCluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app:attribute-persistence",
+  ]
 }

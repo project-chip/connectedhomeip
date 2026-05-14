@@ -96,7 +96,7 @@ void MicrowaveOvenMode::Shutdown()
     }
 }
 
-void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
     gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::ExampleMicrowaveOvenModeDelegate;
@@ -104,7 +104,7 @@ void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gMicrowaveOvenModeInstance->Init();
 }
 
-void emberAfMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gMicrowaveOvenModeInstance)
     {

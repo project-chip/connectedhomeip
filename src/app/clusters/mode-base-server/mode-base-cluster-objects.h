@@ -41,6 +41,9 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SupportedModes
 
 namespace CurrentMode {
@@ -54,6 +57,8 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace CurrentMode
 
 namespace StartUpMode {
@@ -67,6 +72,8 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace StartUpMode
 
 namespace OnMode {
@@ -80,7 +87,15 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OnMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace OnMode
+
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SupportedModes::kMetadataEntry,
+    CurrentMode::kMetadataEntry,
+
+};
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -182,6 +197,10 @@ public:
     uint8_t newMode = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
+
 }; // namespace ChangeToMode
 
 } // namespace Commands
