@@ -257,10 +257,7 @@ public:
     GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
-    uint16_t GetMaxGroupsPerFabric()
-    {
-        return IsGroupcastEnabled() ? (getMaxMembershipCount() / 2) : mMaxGroupsPerFabric;
-    }
+    uint16_t GetMaxGroupsPerFabric() { return IsGroupcastEnabled() ? (getMaxMembershipCount() / 2) : mMaxGroupsPerFabric; }
     uint16_t GetMaxGroupKeysPerFabric() const { return mMaxGroupKeysPerFabric; }
 
     /**
