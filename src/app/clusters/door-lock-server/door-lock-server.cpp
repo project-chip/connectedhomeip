@@ -35,6 +35,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -748,7 +749,9 @@ void DoorLockServer::setCredentialCommandHandler(
             return;
         }
         if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
-            currentCredential.credentialData.data_equal(credentialData))
+            currentCredential.credentialData.size() == credentialData.size() &&
+            chip::Crypto::IsBufferContentEqualConstantTime(currentCredential.credentialData.data(), credentialData.data(),
+                                                           credentialData.size()))
         {
             ChipLogProgress(Zcl,
                             "[SetCredential] Credential with the same data and type already exist "
@@ -1944,7 +1947,9 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
                 return false;
             }
 
-            if (credentialInfo.credentialData.data_equal(credentialData))
+            if (credentialInfo.credentialData.size() == credentialData.size() &&
+                chip::Crypto::IsBufferContentEqualConstantTime(credentialInfo.credentialData.data(), credentialData.data(),
+                                                               credentialData.size()))
             {
                 userIndex       = i;
                 credentialIndex = credential.credentialIndex;
