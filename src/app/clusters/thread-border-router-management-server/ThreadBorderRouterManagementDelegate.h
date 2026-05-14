@@ -22,10 +22,8 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ThreadBorderRouterManagement {} // namespace ThreadBorderRouterManagement
+namespace chip::app::Clusters {
+
 
 class ThreadBorderRouterManagementDelegate
 {
@@ -109,6 +107,4 @@ public:
     virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;
 };
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters
