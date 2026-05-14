@@ -200,6 +200,8 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
             break;
         }
 
+        // TODO: Consider making a future delimited version to support payloads > 256.
+
         // Null-terminate for processing (not guaranteed by writer).
         readbuf[numBytesRead] = '\0';
 
