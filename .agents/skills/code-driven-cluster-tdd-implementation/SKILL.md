@@ -8,10 +8,13 @@ description: >
 # Code-Driven Cluster TDD Implementation
 
 ## When to use this skill
-Use this skill when implementing or migrating Matter server clusters to the code-driven pattern using Test-Driven Development (TDD).
 
-> [!IMPORTANT]
-> **Preserve Legacy Behavior**: If migrating an existing cluster, constantly refer to the legacy code to ensure no functional drop or unexpected behavior changes.
+Use this skill when implementing or migrating Matter server clusters to the
+code-driven pattern using Test-Driven Development (TDD).
+
+> [!IMPORTANT] > **Preserve Legacy Behavior**: If migrating an existing cluster,
+> constantly refer to the legacy code to ensure no functional drop or unexpected
+> behavior changes.
 
 ## 1. Prerequisites
 
@@ -65,29 +68,37 @@ Follow these steps for the substantive implementation using TDD:
 For each writable attribute or command, follow this cycle:
 
 1.  **Write a Failing Test**:
-    -   **Attributes**: Use `tester.WriteAttribute()` and expect failure or success based on setup.
-    -   **Commands**: Invoke via `tester.Invoke()` and assert failure (e.g., `UnsupportedCommand`).
+    -   **Attributes**: Use `tester.WriteAttribute()` and expect failure or
+        success based on setup.
+    -   **Commands**: Invoke via `tester.Invoke()` and assert failure (e.g.,
+        `UnsupportedCommand`).
 2.  **Implement**:
     -   Add the case in `WriteAttribute` or `InvokeCommand` switch.
     -   Decode the payload.
     -   Execute logic (update state or call delegate).
-    -   Return `UnsupportedAttribute` or `UnsupportedCommand` in the `default` case.
+    -   Return `UnsupportedAttribute` or `UnsupportedCommand` in the `default`
+        case.
 3.  **Verify Success**: Run tests and ensure they pass.
 
 ### Step 5: Create CodegenIntegration Layer
 
 1.  Create or update `CodegenIntegration.h` and `.cpp` in the cluster folder.
-2.  Provide implementations for generated callbacks (e.g., `Matter<ClusterName>ClusterInitCallback`).
-3.  Use `CodegenClusterIntegration::RegisterServer` to bridge ZAP defaults to the new cluster instance.
-4.  Maintain legacy classes (e.g., `ChimeServer`) as proxy wrappers if needed for backward compatibility.
+2.  Provide implementations for generated callbacks (e.g.,
+    `Matter<ClusterName>ClusterInitCallback`).
+3.  Use `CodegenClusterIntegration::RegisterServer` to bridge ZAP defaults to
+    the new cluster instance.
+4.  Maintain legacy classes (e.g., `ChimeServer`) as proxy wrappers if needed
+    for backward compatibility.
 
 ### Step 6: Verification & ZAP Regen
 
 1.  Run all unit tests.
-2.  Update `config-data.yaml` and `zcl.json` as per `code-driven-cluster-migration` skill.
+2.  Update `config-data.yaml` and `zcl.json` as per
+    `code-driven-cluster-migration` skill.
 3.  Run `zap_regen_all.py` and commit all generated files.
 4.  **Integration Testing**: Build an example app and test against `chip-tool`.
-5.  **Verify Spec Conformance**: Refer to the relevant cluster specification `.adoc` file.
+5.  **Verify Spec Conformance**: Refer to the relevant cluster specification
+    `.adoc` file.
 6.  **Verify Against Test Plan**: Refer to the relevant test plan `.adoc` file.
 
 ## 4. Common TDD Scenarios
