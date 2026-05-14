@@ -81,32 +81,28 @@ CHIP_ERROR cmd_otcli_help(int argc, char ** argv)
 
 CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    chip::StringBuilder<kMaxLineLength> builder;
 
+    for (int i = 0; i < argc; i++)
     {
-        chip::StringBuilder<kMaxLineLength> builder;
-
-        for (int i = 0; i < argc; i++)
-        {
-            builder.Add(argv[i]);
-            builder.Add(" ");
-        }
-
-        VerifyOrExit(builder.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
-#if OPENTHREAD_API_VERSION >= 85
-        otCliInputLine(const_cast<char *>(builder.c_str()));
-#else
-        otCliConsoleInputLine(const_cast<char *>(builder.c_str()), strlen(builder.c_str()));
-#endif
-        chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+        builder.Add(argv[i]);
+        builder.Add(" ");
     }
 
-exit:
-    return error;
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+#if OPENTHREAD_API_VERSION >= 85
+    otCliInputLine(const_cast<char *>(builder.c_str()));
+#else
+    otCliConsoleInputLine(const_cast<char *>(builder.c_str()), strlen(builder.c_str()));
+#endif
+
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+
+    return CHIP_NO_ERROR;
 }
 
 #elif CHIP_TARGET_STYLE_UNIX
