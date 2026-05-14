@@ -21,6 +21,7 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -38,7 +39,7 @@ public:
     CHIP_ERROR Init();
 
 private:
-    RegisteredServerCluster<ThreadBorderRouterManagementCluster> mCluster;
+    chip::app::RegisteredServerCluster<ThreadBorderRouterManagementCluster> mCluster;
 };
 
 } // namespace ThreadBorderRouterManagement
