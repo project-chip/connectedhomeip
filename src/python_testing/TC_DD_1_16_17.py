@@ -112,7 +112,7 @@ class TC_DD_1_16_17(MatterBaseTest):
         self.step(2)
         if parsed.commissioning_flow == 0:
             # Standard commissioning flow - this should be advertising
-            await self.ensure_advertising(filter_type=matter.discovery.FilterType.LONG_DISCRIMINATOR, filter=parsed.long_discriminator)
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.LONG_DISCRIMINATOR, filter_data=parsed.long_discriminator)
         else:
             self.mark_current_step_skipped()
 
@@ -135,8 +135,8 @@ class TC_DD_1_16_17(MatterBaseTest):
                          "Device is advertising as commissionable"),
                 ]
 
-    async def ensure_advertising(self, filter_type: matter.discovery.FilterType, filter: int):
-        responses = await self.default_controller.DiscoverCommissionableNodes(filterType=filter_type, filter=filter, stopOnFirst=True)
+    async def ensure_advertising(self, filter_type: matter.discovery.FilterType, filter_data: int):
+        responses = await self.default_controller.DiscoverCommissionableNodes(filterType=filter_type, filter=filter_data, stopOnFirst=True)
         asserts.assert_greater_equal(len(responses), 1, "Device should be advertising as commissionable")
 
     @async_test_body
@@ -153,7 +153,7 @@ class TC_DD_1_16_17(MatterBaseTest):
         self.step(2)
         if standard_flow:
             # Device should be advertising
-            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter=parsed.short_discriminator)
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter_data=parsed.short_discriminator)
         else:
             self.mark_current_step_skipped()
 
@@ -169,7 +169,7 @@ class TC_DD_1_16_17(MatterBaseTest):
 
         self.step(4)
         if not standard_flow:
-            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter=parsed.short_discriminator)
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter_data=parsed.short_discriminator)
         else:
             self.mark_current_step_skipped()
 

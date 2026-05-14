@@ -84,7 +84,7 @@ class GlobMatcher:
         return fnmatch.fnmatch(s, self.pattern)
 
 
-def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]], filter: TargetFilter, runner):
+def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]], tgt_filter: TargetFilter, runner):
     """Finds all relevand pre-generation targets in the given
        SDK root.
 
@@ -104,11 +104,11 @@ def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]],
         ZapApplicationPregenerator(sdk_root),
     ]
 
-    path_matchers = [GlobMatcher(pattern) for pattern in filter.path_glob]
+    path_matchers = [GlobMatcher(pattern) for pattern in tgt_filter.path_glob]
 
     for idl in _FindAllIdls(sdk_root, external_roots):
-        if filter.file_type is not None:
-            if idl.file_type != filter.file_type:
+        if tgt_filter.file_type is not None:
+            if idl.file_type != tgt_filter.file_type:
                 log.debug("Will not process file of type '%s': '%s'", idl.file_type, idl.relative_path)
                 continue
 

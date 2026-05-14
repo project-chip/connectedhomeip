@@ -1020,11 +1020,11 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         return matter_time + MATTER_UNIX_EPOCH_OFFSET
 
-    async def get_day_pattern_IDs_for_active_calendar_period(self, next: bool = False) -> List[int]:
+    async def get_day_pattern_IDs_for_active_calendar_period(self, next_day: bool = False) -> List[int]:
         """Define active calendar period based on CurrentDayEntryDateValue or NextDayEntryDateValue and extract DayPatternIDs field.
 
         Args:
-            next (bool, optional): If True, use NextDayEntryDateValue. Defaults to False (Use CurrentDayEntryDateValue).
+            next_day (bool, optional): If True, use NextDayEntryDateValue. Defaults to False (Use CurrentDayEntryDateValue).
 
         Returns:
             List[int]: DayPatternIDs field of active calendar period.
@@ -1032,7 +1032,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         day_patterns_IDs = []
 
-        if not next:
+        if not next_day:
             date = self.currentDayEntryDateValue
         else:
             date = self.nextDayEntryDateValue
