@@ -1,1 +1,1 @@
-195 : [crosscompile] Remove executables from armhf and aarch64 sysroots
+196 : [crosscompile] Don't duplicate minimization done by create_sysroot.py in the Dockerfile
