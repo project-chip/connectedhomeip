@@ -113,8 +113,8 @@ CodeDrivenClusters:
     - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
-    - Dishwasher Mode
     - Diagnostic Logs
+    - Dishwasher Mode
     - Electrical Power Measurement
     - Energy EVSE
     - Energy EVSE Mode
@@ -142,10 +142,10 @@ CodeDrivenClusters:
     - Power Topology
     - Pressure Measurement
     - Push AV Stream Transport
-    - Refrigerator And Temperature Controlled Cabinet Mode
-    - Relative Humidity Measurement
     - RVC Clean Mode
     - RVC Run Mode
+    - Refrigerator And Temperature Controlled Cabinet Mode
+    - Relative Humidity Measurement
     - Scenes Management
     - Software Diagnostics
     - Switch
