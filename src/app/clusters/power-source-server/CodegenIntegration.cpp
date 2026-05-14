@@ -76,7 +76,7 @@ CharSpan GetCharStringDefaultValueDirectlyFromEndpointConfig(EndpointId endpoint
 }
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
-// This function can handle non nullable signed integer and boolean attributes, up to uint32_t.
+// This function can handle non nullable unsigned integer and boolean attributes, up to uint32_t.
 uint32_t GetSimpleIntegerDefaultValueDirectlyFromEndpointConfig(EndpointId endpointId, AttributeId attributeId)
 {
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpointId, PowerSource::Id, attributeId);
@@ -381,7 +381,8 @@ void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
 
     if (features.HasAll(Feature::kWired, Feature::kBattery))
     {
-        // both wired and battery are specified, it is likely this is a disabled configuration for dynamic endpoints
+        // Both wired and battery are specified, it is likely this is a configuration from a disabled
+        // endpoint used for dynamic endpoints.
         return;
     }
 

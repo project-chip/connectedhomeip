@@ -93,99 +93,70 @@ CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueLi
     });
 }
 
-// all bits are 0 except mandatory attributes whose related features are in the `features`
-constexpr static AttributeSet MandatoryAttributeSetFromFeatures(BitFlags<PowerSource::Feature> features)
+constexpr static AttributeSet GetValidOptionalAttributeSet(AttributeSet optionalAttributeSet,
+                                                           BitFlags<PowerSource::Feature> features)
 {
     using namespace PowerSource::Attributes;
+
     constexpr uint32_t wiredMandatoryAttributeBits = OptionalAttributeSet<WiredCurrentType::Id>::All();
-
-    constexpr uint32_t batteryMandatoryAttributeBits =
-        OptionalAttributeSet<BatChargeLevel::Id, BatReplacementNeeded::Id, BatReplaceability::Id>::All();
-
-    constexpr uint32_t replaceableBatteryMandatoryAttributeBits =
-        OptionalAttributeSet<BatReplacementDescription::Id, BatQuantity::Id>::All();
-
-    constexpr uint32_t rechargeableBatteryMandatoryAttributeBits =
-        OptionalAttributeSet<BatChargeState::Id, BatFunctionalWhileCharging::Id>::All();
-
-    uint32_t attributeBits = 0;
-
-    if (features.Has(Feature::kWired))
-    {
-        attributeBits |= wiredMandatoryAttributeBits;
-    }
-    if (features.Has(Feature::kBattery))
-    {
-        attributeBits |= batteryMandatoryAttributeBits;
-    }
-    if (features.Has(Feature::kReplaceable))
-    {
-        attributeBits |= replaceableBatteryMandatoryAttributeBits;
-    }
-    if (features.Has(Feature::kRechargeable))
-    {
-        attributeBits |= rechargeableBatteryMandatoryAttributeBits;
-    }
-
-    return AttributeSet(attributeBits);
-}
-
-// all bits are 1 expect attributes related to features that are not in the `features`
-// used as a mask, to disable all non-supported attributes
-constexpr static AttributeSet DisabledAttributeSetFromFeatures(BitFlags<PowerSource::Feature> features)
-{
-    using namespace PowerSource::Attributes;
     constexpr uint32_t wiredAttributeBits =
         OptionalAttributeSet<WiredAssessedInputVoltage::Id, WiredAssessedInputFrequency::Id, WiredCurrentType::Id,
                              WiredAssessedCurrent::Id, WiredNominalVoltage::Id, WiredMaximumCurrent::Id, WiredPresent::Id,
                              ActiveWiredFaults::Id>::All();
 
+    constexpr uint32_t batteryMandatoryAttributeBits =
+        OptionalAttributeSet<BatChargeLevel::Id, BatReplacementNeeded::Id, BatReplaceability::Id>::All();
     constexpr uint32_t batteryAttributeBits =
         OptionalAttributeSet<BatVoltage::Id, BatPercentRemaining::Id, BatTimeRemaining::Id, BatChargeLevel::Id,
                              BatReplacementNeeded::Id, BatReplaceability::Id, BatPresent::Id, ActiveBatFaults::Id>::All();
 
+    constexpr uint32_t replaceableBatteryMandatoryAttributeBits =
+        OptionalAttributeSet<BatReplacementDescription::Id, BatQuantity::Id>::All();
     constexpr uint32_t replaceableBatteryAttributeBits =
         OptionalAttributeSet<BatReplacementDescription::Id, BatCommonDesignation::Id, BatANSIDesignation::Id, BatIECDesignation::Id,
                              BatApprovedChemistry::Id, BatQuantity::Id>::All();
 
+    constexpr uint32_t rechargeableBatteryMandatoryAttributeBits =
+        OptionalAttributeSet<BatChargeState::Id, BatFunctionalWhileCharging::Id>::All();
     constexpr uint32_t rechargeableBatteryAttributeBits =
         OptionalAttributeSet<BatChargeState::Id, BatTimeToFullCharge::Id, BatFunctionalWhileCharging::Id, BatChargingCurrent::Id,
                              ActiveBatChargeFaults::Id>::All();
 
     constexpr uint32_t capacityAttributeBit = OptionalAttributeSet<BatCapacity::Id>::All();
 
+    uint32_t mandatoryBits = 0;
     uint32_t disabledBits = 0;
 
-    if (!features.Has(PowerSource::Feature::kWired))
-    {
+    if (features.Has(PowerSource::Feature::kWired)) {
+        mandatoryBits |= wiredMandatoryAttributeBits;
+    } else {
         disabledBits |= wiredAttributeBits;
     }
-    if (!features.Has(PowerSource::Feature::kBattery))
-    {
+
+    if (features.Has(PowerSource::Feature::kBattery)) {
+        mandatoryBits |= batteryMandatoryAttributeBits;
+    } else {
         disabledBits |= batteryAttributeBits;
     }
-    if (!features.Has(PowerSource::Feature::kReplaceable))
-    {
+
+    if (features.Has(PowerSource::Feature::kReplaceable)) {
+        mandatoryBits |= replaceableBatteryMandatoryAttributeBits;
+    } else {
         disabledBits |= replaceableBatteryAttributeBits;
     }
-    if (!features.Has(PowerSource::Feature::kRechargeable))
-    {
+
+    if (features.Has(PowerSource::Feature::kRechargeable)) {
+        mandatoryBits |= rechargeableBatteryMandatoryAttributeBits;
+    } else {
         disabledBits |= rechargeableBatteryAttributeBits;
     }
-    if (!(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable)))
-    {
+
+    if (!(features.Has(PowerSource::Feature::kReplaceable) || features.Has(PowerSource::Feature::kRechargeable))) {
         disabledBits |= capacityAttributeBit;
     }
 
-    return AttributeSet(~disabledBits);
-}
-
-constexpr static AttributeSet GetValidOptionalAttributeSet(AttributeSet optionalAttributeSet,
-                                                           BitFlags<PowerSource::Feature> features)
-{
-    uint32_t bits = (optionalAttributeSet.Raw() | MandatoryAttributeSetFromFeatures(features).Raw()) &
-        DisabledAttributeSetFromFeatures(features).Raw();
-    return AttributeSet(bits);
+    uint32_t finalBits = (optionalAttributeSet.Raw() | mandatoryBits) & ~disabledBits;
+    return AttributeSet(finalBits);
 }
 
 } // namespace PowerSource::detail
@@ -816,8 +787,9 @@ public:
     // Setters
 
     /// Attributes marked with the `Fixed` quality do not have setters.
-    /// They can be only set during construction using the `WiredPowerSourceCluster::Configuration` class.
-    /// `Fixed` attributes are `Description`, `WiredCurrentType`, `WiredNominalVoltage`, `WiredMaximumCurrent`
+    /// They can be only set during construction using the `PowerSourceClusterConfig` class.
+    /// `Fixed` attributes are `Description`, `WiredCurrentType`, `WiredNominalVoltage`, `WiredMaximumCurrent`,
+    /// `BatReplaceability`, `BatReplacementDescription`, `BatCommonDesignation`, `BatANSIDesignation`, `BatIECDesignation`, `BatApprovedChemistry`, `BatCapacity`, `BatQuantity`.
 
     CHIP_ERROR SetStatus(PowerSourceStatusEnum val)
     {
