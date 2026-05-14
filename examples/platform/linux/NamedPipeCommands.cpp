@@ -32,7 +32,9 @@
 
 #include <string>
 
-static constexpr const size_t kChipEventCmdBufSize = 256;
+namespace {
+constexpr size_t kChipEventCmdBufSize = 256;
+} // namespace
 
 CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::string & outPath, NamedPipeCommandDelegate * delegate)
 {
@@ -175,7 +177,7 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
     if (fd == -1)
     {
         ChipLogError(NotSpecified, "Failed to open Event FIFO");
-        self->mRunning = false;
+        return nullptr;
     }
 
     while (self->mRunning)

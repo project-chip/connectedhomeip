@@ -59,6 +59,9 @@ public:
  * Example of a typical command written to inPath of `/tmp/chip_all_clusters_fifo_1146610`:
  *
  *   echo '{"Name": "SimulateSwitchIdle", "EndpointId": 3}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * Note: Instances of NamedPipeCommands are one-time use. Once Stop() is called,
+ * the instance cannot be restarted.
  */
 class NamedPipeCommands
 {
