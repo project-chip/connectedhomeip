@@ -137,7 +137,7 @@ class TC_ICDB_2_5(ICDBaseTest):
                      Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH1's node ID."""),
             TestStep(2, "TH2 reads from the DUT the RegisteredClients attribute.", """
                      Verify RegisteredClients is empty (TH2 did not register an ICD client during commissioning)."""),
-            TestStep(3, "TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ActiveModeThreshold attributes.",
+            TestStep(3, "TH1 reads from the DUT the IdleModeDuration attribute.",
                      "Store values for later use."),
             TestStep(4, "TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor and MaxIntervalCeiling.", """
                      Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
@@ -190,7 +190,7 @@ class TC_ICDB_2_5(ICDBaseTest):
                              f"Expected 0 RegisteredClients entries for TH2 (unregistered), got {len(th2_registered_clients)}")
 
         # *** STEP 3 ***
-        # TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ActiveModeThreshold attributes
+        # TH1 reads from the DUT the IdleModeDuration attribute
         self.step(3)
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
