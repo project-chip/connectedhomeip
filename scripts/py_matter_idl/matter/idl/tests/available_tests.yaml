@@ -24,12 +24,14 @@ java-class:
 
 cpp-app:
     inputs/several_clusters.matter:
+        app/ApplicationDataSizes.h: outputs/several_clusters/cpp-app/ApplicationDataSizes.h
         app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/several_clusters/cpp-app/callback-stub.cpp
         app/cluster-callbacks.cpp: outputs/several_clusters/cpp-app/cluster-callbacks.cpp
         app/static-cluster-config/Third.h: outputs/several_clusters/cpp-app/static-cluster-config/Third.h
 
     inputs/large_all_clusters_app.matter:
+        app/ApplicationDataSizes.h: outputs/large_all_clusters_app/cpp-app/ApplicationDataSizes.h
         app/PluginApplicationCallbacks.h: outputs/large_all_clusters_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_all_clusters_app/cpp-app/callback-stub.cpp
         app/cluster-callbacks.cpp: outputs/large_all_clusters_app/cpp-app/cluster-callbacks.cpp
@@ -128,6 +130,7 @@ cpp-app:
         app/static-cluster-config/WindowCovering.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/WindowCovering.h
 
     inputs/large_lighting_app.matter:
+        app/ApplicationDataSizes.h: outputs/large_lighting_app/cpp-app/ApplicationDataSizes.h
         app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
         app/cluster-callbacks.cpp: outputs/large_lighting_app/cpp-app/cluster-callbacks.cpp

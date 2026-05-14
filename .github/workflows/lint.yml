@@ -61,9 +61,10 @@ jobs:
               run: |
                   # These ARE actually orphaned but due to dynamic-server we have code paths
                   # for them. Keeping them as a list as they still need review ...
-                  #   --known-failure app/util/attribute-table.cpp \
-                  #   --known-failure app/util/ember-io-storage.cpp \
-                  #   --known-failure app/util/attribute-storage.cpp \
+                  #   --known-failure app/util/attribute-storage.cpp      \
+                  #   --known-failure app/util/attribute-table.cpp        \
+                  #   --known-failure app/util/ember-io-storage.cpp       \
+                  #   --known-failure app/util/generic-callback-stubs.cpp \
                   scripts/tools/not_known_to_gn.py \
                      --skip-dir app/clusters \
                      --skip-dir darwin \
@@ -112,7 +113,6 @@ jobs:
                      --known-failure app/util/ember-io-storage.h \
                      --known-failure app/util/endpoint-config-api.h \
                      --known-failure app/util/generic-callbacks.h \
-                     --known-failure app/util/generic-callback-stubs.cpp \
                      --known-failure app/util/im-client-callbacks.h \
                      --known-failure app/util/IMClusterCommandHandler.h \
                      --known-failure app/util/util.cpp \

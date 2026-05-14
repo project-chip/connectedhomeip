@@ -43,7 +43,7 @@ namespace app {
 /// Given that this relies on global data at link time, there generally can be
 /// only one CodegenDataModelProvider per application. Per-cluster CodegenIntegration
 /// functions access the global singleton instance via `CodegenDataModelProvider::Instance()`.
-class CodegenDataModelProvider : public DataModel::Provider
+class CodegenDataModelProvider : public DataModel::Provider, public DataModel::AttributeChangeListener
 {
 public:
     // access to the typed global singleton of this class.
@@ -89,6 +89,9 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    // AttributeChangeListener implementation
+    void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override;
 
 protected:
     // Temporary hack for a test: Initializes the data model for testing purposes only.

@@ -23,6 +23,8 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/CodegenDataModelProvider_Write.cpp"
   "${BASE_DIR}/EmberAttributeDataBuffer.cpp"
   "${BASE_DIR}/EmberAttributeDataBuffer.h"
+  "${BASE_DIR}/EmberAttributeDecoder.cpp"
+  "${BASE_DIR}/EmberAttributeDecoder.h"
   "${BASE_DIR}/Instance.cpp"
 
   # These are dependencies from model.gni that are not included directly in cmake

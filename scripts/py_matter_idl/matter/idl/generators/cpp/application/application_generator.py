@@ -19,7 +19,8 @@ from typing import List, Mapping, Optional
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.cluster_selection import server_side_clusters
 from matter.idl.generators.storage import GeneratorStorage
-from matter.idl.generators.type_definitions import TypeLookupContext
+from matter.idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType,
+                                                    IdlItemType, IdlType, ParseDataType, TypeLookupContext)
 from matter.idl.matter_idl_types import Bitmap, Idl, ServerClusterInstantiation
 
 
@@ -150,15 +151,67 @@ class CppApplicationGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
-        Inintialization is specific for java generation and will add
-        filters as required by the java .jinja templates to function.
+        Initialization for application generator.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
+
+    def compute_max_attribute_tlv_size(self) -> int:
+        max_size = 0
+        # Overhead in EmberAttributeDecoder.cpp:
+        #   - Outer structure and Array of AttributeReportIBs: ~5 bytes
+        #   - AttributeReportIB and AttributeDataIB structures: ~5 bytes
+        #   - Path (Endpoint, Cluster, Attribute) tags and values: ~15 bytes
+        #   - Data version: ~5 bytes
+        # Total overhead is around 30-40 bytes, so 64 is safe and allows some wiggleroom.
+        tlv_overhead = 64
+
+        for name, config in cluster_instances(self.idl).items():
+            # Find the full cluster definition
+            cluster = [c for c in self.idl.clusters if c.name == name][0]
+            lookup = TypeLookupContext(self.idl, cluster)
+
+            for attr in cluster.attributes:
+                # Filter out lists and structs
+                if attr.definition.is_list:
+                    continue
+
+                parsed_type = ParseDataType(attr.definition.data_type, lookup)
+
+                # If it's a struct, we ignore it as we only need sizing for non-list/non-struct attributes.
+                if isinstance(parsed_type, IdlType) and parsed_type.item_type == IdlItemType.STRUCT:
+                    continue
+
+                size = 0
+                if isinstance(parsed_type, (BasicInteger, FundamentalType, IdlEnumType, IdlBitmapType)):
+                    size = parsed_type.byte_count
+                elif isinstance(parsed_type, BasicString):
+                    if parsed_type.max_length is not None:
+                        size = parsed_type.max_length
+                    else:
+                        # All non-list string attributes are expected to have a defined max length
+                        # in the IDL to be compatible with Ember storage/callbacks.
+                        raise Exception(
+                            f"Attribute {attr.definition.name} in cluster {cluster.name} is a string without max_length")
+                else:
+                    # Fallback for unknown types or types we don't handle
+                    continue
+
+                if size > max_size:
+                    max_size = size
+
+        return max_size + tlv_overhead
 
     def internal_render_all(self):
         """
         Renders the cpp and header files required for applications
         """
+
+        # Header containing data sizes computed from the IDL
+        self.internal_render_one_output(
+            template_path="ApplicationDataSizesHeader.jinja",
+            output_file_name="app/ApplicationDataSizes.h",
+            vars={"max_tlv_size": self.compute_max_attribute_tlv_size()},
+        )
 
         # Header containing a macro to initialize all cluster plugins
         self.internal_render_one_output(

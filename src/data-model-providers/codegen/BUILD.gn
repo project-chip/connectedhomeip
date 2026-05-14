@@ -53,6 +53,8 @@ source_set("processing-config") {
 #   CodegenDataModelProvider_Write.cpp
 #   EmberAttributeDataBuffer.cpp
 #   EmberAttributeDataBuffer.h
+#   EmberAttributeDecoder.cpp
+#   EmberAttributeDecoder.h
 #   Instance.cpp
 #
 # The above list of files exists to satisfy the "dependency linter"

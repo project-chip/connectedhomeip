@@ -14,7 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/EmberAttributeDecoder.h>
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -39,6 +41,7 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/ember-io-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -126,6 +129,7 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
+    UnregisterAttributeChangeListener(*this);
     Reset();
     mContext.reset();
     mRegistry.ClearContext();
@@ -154,6 +158,8 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     }
 
     InitDataModelForTesting();
+
+    RegisterAttributeChangeListener(*this);
 
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = *this,
@@ -538,6 +544,49 @@ CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, Mut
     return emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueId);
 }
 #endif
+
+void CodegenDataModelProvider::OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type)
+{
+    // Only process attributes handled by ServerClusterInterface
+    if (mRegistry.Get(path) == nullptr)
+    {
+        return;
+    }
+
+    const EmberAfAttributeMetadata * metadata =
+        emberAfLocateAttributeMetadata(path.mEndpointId, path.mClusterId, path.mAttributeId);
+    if (metadata == nullptr)
+    {
+        return;
+    }
+
+    // Ignore Structs and Lists as they were never supported in legacy callbacks.
+    if (metadata->attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE || metadata->attributeType == ZCL_STRUCT_ATTRIBUTE_TYPE)
+    {
+        return;
+    }
+
+    // Use the global Ember IO buffer.
+    MutableByteSpan outBuffer = Compatibility::Internal::gEmberAttributeIOBufferSpan;
+
+    AttributeDecoderParams params{ .path       = path,
+                                   .cluster    = *mRegistry.Get(path),
+                                   .emberType  = metadata->attributeType,
+                                   .emberSize  = metadata->size,
+                                   .isNullable = metadata->IsNullable() };
+
+    CHIP_ERROR err = DecodeAttributeToEmberBuffer(params, outBuffer);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to decode attribute for legacy callback: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
+    // NOTE: this passes in gEmberAttributeIOBufferSpan as a buffer. This is shared for EmberAfAttributeWrite, so if that is ever
+    //       performed, data will overlap.
+    // This is done to save some RAM/stack space and do not expect too much recursive calls.
+    MatterPostAttributeChangeCallback(path, metadata->attributeType, metadata->size, outBuffer.data());
+}
 
 } // namespace app
 } // namespace chip

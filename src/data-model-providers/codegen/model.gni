@@ -33,6 +33,8 @@ codegen_data_model_SOURCES = [
   "${chip_root}/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp",
   "${chip_root}/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp",
   "${chip_root}/src/data-model-providers/codegen/EmberAttributeDataBuffer.h",
+  "${chip_root}/src/data-model-providers/codegen/EmberAttributeDecoder.cpp",
+  "${chip_root}/src/data-model-providers/codegen/EmberAttributeDecoder.h",
   "${chip_root}/src/data-model-providers/codegen/Instance.cpp",
 ]
 

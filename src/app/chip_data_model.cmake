@@ -126,6 +126,7 @@ function(chip_configure_data_model APP_TARGET)
             INPUT "${ARG_IDL}"
             GENERATOR "cpp-app"
             OUTPUTS
+            "app/ApplicationDataSizes.h"
             "app/PluginApplicationCallbacks.h"
             "app/callback-stub.cpp"
             "app/cluster-callbacks.cpp"

@@ -96,6 +96,7 @@ template("chip_data_model") {
     generator = "cpp-app"
 
     outputs = [
+      "app/ApplicationDataSizes.h",
       "app/PluginApplicationCallbacks.h",
       "app/callback-stub.cpp",
       "app/cluster-callbacks.cpp",
@@ -116,7 +117,10 @@ template("chip_data_model") {
   source_set("${_data_model_name}-endpoint-metadata") {
     sources = filter_include(
             get_target_outputs(":${_data_model_name}_codegen_generate"),
-            [ "*/PluginApplicationCallbacks.h" ])
+            [
+              "*/PluginApplicationCallbacks.h",
+              "*/ApplicationDataSizes.h",
+            ])
     sources += filter_include(
             get_target_outputs(":${_data_model_name}_zapgen_generate"),
             [
@@ -137,7 +141,7 @@ template("chip_data_model") {
     sources = filter_include(
             get_target_outputs(":${_data_model_name}_codegen_generate"),
             [
-              "*/callback-stup.cpp",
+              "*/callback-stub.cpp",
               "*/cluster-callbacks.cpp",
             ])
 

@@ -3,6 +3,7 @@ import("//build_overrides/chip.gni")
 
 # Templates used for generation
 matter_idl_generator_templates = [
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/ApplicationDataSizesHeader.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/CallbackStubSource.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/ClusterCallbacksSource.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/application/PluginApplicationCallbacksHeader.jinja",
