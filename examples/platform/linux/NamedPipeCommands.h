@@ -76,5 +76,6 @@ private:
     std::string mFifoOutPath;
     NamedPipeCommandDelegate * mDelegate = nullptr;
 
+    void Unlink();
     static void * EventCommandListenerTask(void * arg);
 };

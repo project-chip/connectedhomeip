@@ -60,6 +60,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         mRunning = false;
+        Unlink();
     }
     return err;
 }
@@ -71,33 +72,29 @@ CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, NamedPipeCommand
 
 CHIP_ERROR NamedPipeCommands::Stop()
 {
-    VerifyOrReturnError(mRunning.exchange(false), CHIP_NO_ERROR);
-
-    // Unblock the listener thread by writing a placeholder byte to the FIFO.
-    int fd = open(mFifoInPath.c_str(), O_WRONLY | O_NONBLOCK);
-    if (fd != -1)
+    if (mRunning.exchange(false))
     {
-        char placeholder = '\0';
-        if (write(fd, &placeholder, 1) != 1)
+        // Unblock the listener thread by writing a placeholder byte to the FIFO.
+        int fd = open(mFifoInPath.c_str(), O_WRONLY | O_NONBLOCK);
+        if (fd != -1)
         {
-            ChipLogError(NotSpecified, "Failed to write placeholder byte to unblock listener");
+            char placeholder = '\0';
+            if (write(fd, &placeholder, 1) != 1)
+            {
+                ChipLogError(NotSpecified, "Failed to write placeholder byte to unblock listener");
+            }
+            close(fd);
         }
-        close(fd);
-    }
 
-    // Wait further for the thread to terminate if we had previously created it.
-    VerifyOrReturnError(pthread_join(mChipEventCommandListener, nullptr) == 0, CHIP_ERROR_SHUT_DOWN);
+        // Wait further for the thread to terminate if we had previously created it.
+        if (pthread_join(mChipEventCommandListener, nullptr) != 0)
+        {
+            ChipLogError(NotSpecified, "Failed to join listener thread");
+        }
+    }
 
     mDelegate = nullptr;
-
-    VerifyOrReturnError(unlink(mFifoInPath.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
-    mFifoInPath.clear();
-
-    if (!mFifoOutPath.empty())
-    {
-        VerifyOrReturnError(unlink(mFifoOutPath.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
-        mFifoOutPath.clear();
-    }
+    Unlink();
 
     return CHIP_NO_ERROR;
 }
@@ -146,6 +143,21 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
     }
 
     close(fd);
+}
+
+void NamedPipeCommands::Unlink()
+{
+    if (!mFifoInPath.empty())
+    {
+        unlink(mFifoInPath.c_str());
+        mFifoInPath.clear();
+    }
+
+    if (!mFifoOutPath.empty())
+    {
+        unlink(mFifoOutPath.c_str());
+        mFifoOutPath.clear();
+    }
 }
 
 void * NamedPipeCommands::EventCommandListenerTask(void * arg)
