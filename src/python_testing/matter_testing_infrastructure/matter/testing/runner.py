@@ -367,7 +367,7 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
 
 
 def read_global_wildcard(event_loop, default_controller, node_id):
-    stored_global_wildcard = event_loop.run_until_complete(
+    return event_loop.run_until_complete(
         asyncio.wait_for(
             default_controller.Read(
                 node_id,
@@ -382,7 +382,6 @@ def read_global_wildcard(event_loop, default_controller, node_id):
             timeout=60,
         )
     )
-    return stored_global_wildcard
 
 
 def run_tests_no_exit(
