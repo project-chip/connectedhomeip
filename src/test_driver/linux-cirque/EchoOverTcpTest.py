@@ -81,9 +81,9 @@ class TestEchoOverTCP(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        for id in resp_ids:
+        for _id in resp_ids:
             self.execute_device_cmd(
-                id,
+                _id,
                 "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt --args {}".format(
                     os.path.join(CHIP_REPO, "out/debug/linux_x64_gcc/chip-echo-responder --tcp")))
 

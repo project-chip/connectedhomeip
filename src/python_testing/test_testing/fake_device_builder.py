@@ -46,15 +46,15 @@ def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int
 
     revision = xml_clusters[cluster_id].revision
     info = ConformanceAssessmentData(feature_map, [], [], revision)
-    mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items(
+    mandatory_attributes = [_id for _id, a in xml_clusters[cluster_id].attributes.items(
     ) if a.conformance(info).decision == ConformanceDecision.MANDATORY]
     mandatory_attributes.extend(additional_attributes)
 
-    mandatory_accepted_commands = [id for id, c in xml_clusters[cluster_id].accepted_commands.items(
+    mandatory_accepted_commands = [_id for _id, c in xml_clusters[cluster_id].accepted_commands.items(
     ) if c.conformance(info).decision == ConformanceDecision.MANDATORY]
     mandatory_accepted_commands.extend(additional_commands)
 
-    mandatory_generated_commands = [id for id, c in xml_clusters[cluster_id].generated_commands.items(
+    mandatory_generated_commands = [_id for _id, c in xml_clusters[cluster_id].generated_commands.items(
     ) if c.conformance(info).decision == ConformanceDecision.MANDATORY]
 
     if is_tlv_endpoint:
@@ -85,14 +85,14 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
         Does NOT take into account overrides yet.
     '''
     endpoint = {}
-    mandatory_servers = [id for id, c in xml_device_types[device_type_id].server_clusters.items()
+    mandatory_servers = [_id for _id, c in xml_device_types[device_type_id].server_clusters.items()
                          if _is_mandatory(c.conformance)]
     if server_override:
         required_servers = server_override
     else:
         required_servers = mandatory_servers
 
-    required_clients = [id for id, c in xml_device_types[device_type_id].client_clusters.items()
+    required_clients = [_id for _id, c in xml_device_types[device_type_id].client_clusters.items()
                         if _is_mandatory(c.conformance)]
     device_type_revision = xml_device_types[device_type_id].revision
 
@@ -101,11 +101,11 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
         additional_attributes = []
         additional_commands = []
         if apply_dt_element_overrides and s in mandatory_servers:
-            additional_features = [id for id, conformance in xml_device_types[device_type_id]
+            additional_features = [_id for _id, conformance in xml_device_types[device_type_id]
                                    .server_clusters[s].feature_overrides.items() if _is_mandatory(conformance, revision=device_type_revision)]
-            additional_attributes = [id for id, conformance in xml_device_types[device_type_id]
+            additional_attributes = [_id for _id, conformance in xml_device_types[device_type_id]
                                      .server_clusters[s].attribute_overrides.items() if _is_mandatory(conformance, revision=device_type_revision)]
-            additional_commands = [id for id, conformance in xml_device_types[device_type_id]
+            additional_commands = [_id for _id, conformance in xml_device_types[device_type_id]
                                    .server_clusters[s].command_overrides.items() if _is_mandatory(conformance, revision=device_type_revision)]
         endpoint[s if is_tlv_endpoint else Clusters.ClusterObjects.ALL_CLUSTERS[s]
                  ] = create_minimal_cluster(xml_clusters, s, is_tlv_endpoint, additional_features=additional_features, additional_attributes=additional_attributes, additional_commands=additional_commands)
