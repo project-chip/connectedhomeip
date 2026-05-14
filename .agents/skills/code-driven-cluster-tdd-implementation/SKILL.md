@@ -14,8 +14,7 @@ strictly to the specification and maintains full feature parity if migrating an
 existing cluster. By writing failing tests first, we validate our understanding
 of the requirements before implementing them.
 
-> [!IMPORTANT]
-> **Preserve Legacy Behavior**: If you are migrating an existing
+> [!IMPORTANT] > **Preserve Legacy Behavior**: If you are migrating an existing
 > cluster or implementing a new version that has an existing implementation,
 > constantly refer to the legacy code (e.g., by keeping a `.legacy` copy of the
 > original file) to ensure you are not dropping existing functionality or
