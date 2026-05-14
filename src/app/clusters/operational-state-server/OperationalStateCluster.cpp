@@ -45,6 +45,7 @@ OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, ClusterI
 {
     mCountdownTime.policy()
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement)
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
 }
 
@@ -181,8 +182,7 @@ void OperationalStateCluster::UpdateCountdownTime(bool fromDelegate)
     }
     else
     {
-        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
-        markDirty      = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+        markDirty = (mCountdownTime.SetValue(newCountdownTime, now) == AttributeDirtyState::kMustReport);
     }
 
     if (markDirty)
@@ -484,7 +484,7 @@ RvcOperationalState::RvcOperationalStateCluster::HandleGoHomeCommand(const DataM
         mRvcDelegate->HandleGoHomeCommandCallback(err);
     }
 
-    RvcOperationalState::Commands::OperationalCommandResponse::Type response;
+    OperationalState::Commands::OperationalCommandResponse::Type response;
     response.commandResponseState = err;
     handler->AddResponse(request.path, response);
     return std::nullopt;
