@@ -116,6 +116,11 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & c
     return CHIP_NO_ERROR;
 }
 
+ThreadBorderRouterManagementCluster::~ThreadBorderRouterManagementCluster()
+{
+    (void) mDelegate.Init(nullptr);
+}
+
 void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
 {
     DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
