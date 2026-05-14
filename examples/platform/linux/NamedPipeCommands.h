@@ -71,6 +71,7 @@ public:
 
 private:
     std::atomic<bool> mRunning{ false };
+    std::atomic<bool> mDone{ false };
     pthread_t mChipEventCommandListener;
     std::string mFifoInPath;
     std::string mFifoOutPath;

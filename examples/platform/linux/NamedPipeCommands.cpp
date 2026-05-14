@@ -37,6 +37,7 @@ static constexpr const size_t kChipEventCmdBufSize = 256;
 CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::string & outPath, NamedPipeCommandDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!mDone, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mRunning.exchange(true), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -74,6 +75,7 @@ CHIP_ERROR NamedPipeCommands::Stop()
 {
     if (mRunning.exchange(false))
     {
+        mDone = true;
         // Unblock the listener thread by writing a placeholder byte to the FIFO.
         int fd = open(mFifoInPath.c_str(), O_WRONLY | O_NONBLOCK);
         if (fd != -1)
@@ -178,32 +180,49 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
 
     while (self->mRunning)
     {
-        ssize_t readBytes = read(fd, readbuf, sizeof(readbuf) - 1);
-        if (readBytes > 0)
+        ssize_t numBytesRead = read(fd, readbuf, sizeof(readbuf) - 1);
+        if (numBytesRead <= 0)
         {
-            // Null-terminate for processing (not guaranteed by writer).
-            readbuf[readBytes] = '\0';
-
-            // Strip trailing newline if present
-            if (readbuf[readBytes - 1] == '\n')
-            {
-                readbuf[readBytes - 1] = '\0';
-            }
-
-            if (readbuf[0] == '\0')
+            // If the read was interrupted by a signal before any data was available,
+            // we should retry the read operation.
+            if (numBytesRead < 0 && errno == EINTR)
             {
                 continue;
             }
 
-            ChipLogProgress(NotSpecified, "Received payload: '%s'", readbuf);
-
-            // Process the received command request from event fifo
-            if (self->mDelegate)
+            // For any other read failure (including EOF where numBytesRead == 0), we exit the loop.
+            // Note: Since the FIFO is opened with O_RDWR, we don't expect to receive EOF
+            // when all external writers disconnect.
+            if (numBytesRead < 0)
             {
-                self->mDelegate->OnEventCommandReceived(readbuf);
+                ChipLogError(NotSpecified, "Error reading from FIFO: %d", errno);
             }
+            break;
+        }
+
+        // Null-terminate for processing (not guaranteed by writer).
+        readbuf[numBytesRead] = '\0';
+
+        // Strip trailing newline if present
+        if (readbuf[numBytesRead - 1] == '\n')
+        {
+            readbuf[numBytesRead - 1] = '\0';
+        }
+
+        if (readbuf[0] == '\0')
+        {
+            continue;
+        }
+
+        ChipLogProgress(NotSpecified, "Received payload: '%s'", readbuf);
+
+        // Process the received command request from event fifo
+        if (self->mDelegate)
+        {
+            self->mDelegate->OnEventCommandReceived(readbuf);
         }
     }
+
     if (fd != -1)
     {
         close(fd);
