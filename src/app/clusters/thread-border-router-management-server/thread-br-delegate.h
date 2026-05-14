@@ -16,6 +16,11 @@
  */
 
 #pragma once
+
+// NOTE: This file exists for backward compatibility only.
+// New code should include the new CodeDriven files directly:
+// #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
+
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 
 namespace chip {
