@@ -19,13 +19,13 @@
 #include "NamedPipeCommands.h"
 
 #include <chrono>
-#include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <poll.h>
 #include <pthread.h>
+#include <signal.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <thread>
@@ -223,9 +223,8 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
         readbuf[numBytesRead] = '\0';
 
         // Strip any trailing \0 (placeholder bytes), \n, or \r before processing.
-        while (numBytesRead > 0 && (readbuf[numBytesRead - 1] == '\n' ||
-                                    readbuf[numBytesRead - 1] == '\r' ||
-                                    readbuf[numBytesRead - 1] == '\0'))
+        while (numBytesRead > 0 &&
+               (readbuf[numBytesRead - 1] == '\n' || readbuf[numBytesRead - 1] == '\r' || readbuf[numBytesRead - 1] == '\0'))
         {
             numBytesRead--;
             readbuf[numBytesRead] = '\0';
