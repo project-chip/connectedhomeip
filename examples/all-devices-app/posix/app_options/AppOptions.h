@@ -36,8 +36,21 @@ public:
      */
     struct DeviceConfig
     {
+<<<<<<< HEAD
         std::string type;
         chip::EndpointId endpoint;
+=======
+        std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
+        uint32_t bleController = 0;
+        bool enableWiFi        = false;
+        std::string kvsPath;
+        std::optional<uint16_t> discriminator;
+        std::optional<uint16_t> vendorId;
+        std::optional<uint16_t> productId;
+        std::optional<uint16_t> port;
+        std::optional<uint32_t> interfaceId;
+        bool enableGroupcast = false;
+>>>>>>> 4350eea68b (Disable All Groupcast Functionality by Default (#72047))
     };
 
     static chip::ArgParser::OptionSet * GetOptions();

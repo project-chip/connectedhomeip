@@ -28,9 +28,22 @@ using namespace chip;
 using namespace chip::ArgParser;
 
 // App custom argument handling
+<<<<<<< HEAD
 constexpr uint16_t kOptionDeviceType = 0xffd0;
 constexpr uint16_t kOptionEndpoint   = 0xffd1;
 constexpr uint16_t kOptionWiFi       = 0xffd2;
+=======
+constexpr uint16_t kOptionDeviceType    = 0xffd0;
+constexpr uint16_t kOptionWiFi          = 0xffd2;
+constexpr uint16_t kOptionKVS           = 0xffd3;
+constexpr uint16_t kOptionDiscriminator = 0xffd4;
+constexpr uint16_t kOptionVendorId      = 0xffd5;
+constexpr uint16_t kOptionProductId     = 0xffd6;
+constexpr uint16_t kOptionPort          = 0xffd7;
+constexpr uint16_t kOptionInterfaceId   = 0xffd8;
+constexpr uint16_t kOptionBLE           = 0xffd9;
+constexpr uint16_t kOptionGroupcast     = 0xffda;
+>>>>>>> 4350eea68b (Disable All Groupcast Functionality by Default (#72047))
 
 std::vector<AppOptions::DeviceConfig> AppOptions::mDeviceConfigs;
 bool AppOptions::mEnableWiFi = false;
@@ -135,6 +148,48 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mEnableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
         return true;
+<<<<<<< HEAD
+=======
+    case kOptionKVS:
+        mConfig.kvsPath = value;
+        return true;
+    case kOptionDiscriminator: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFF)
+        {
+            ChipLogError(Support, "Invalid discriminator: %s", value);
+            return false;
+        }
+        mConfig.discriminator = static_cast<uint16_t>(val);
+        return true;
+    }
+    case kOptionVendorId:
+        mConfig.vendorId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionProductId:
+        mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionPort: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFFF)
+        {
+            ChipLogError(Support, "Invalid port: %s", value);
+            return false;
+        }
+        mConfig.port = static_cast<uint16_t>(val);
+        ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
+        return true;
+    }
+    case kOptionInterfaceId:
+        mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionGroupcast:
+        mConfig.enableGroupcast = true;
+        ChipLogProgress(AppServer, "Groupcast usage enabled");
+        return true;
+>>>>>>> 4350eea68b (Disable All Groupcast Functionality by Default (#72047))
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -151,6 +206,16 @@ OptionSet * AppOptions::GetOptions()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
+<<<<<<< HEAD
+=======
+        { "KVS", kArgumentRequired, kOptionKVS },
+        { "discriminator", kArgumentRequired, kOptionDiscriminator },
+        { "vendor-id", kArgumentRequired, kOptionVendorId },
+        { "product-id", kArgumentRequired, kOptionProductId },
+        { "port", kArgumentRequired, kOptionPort },
+        { "interface-id", kArgumentRequired, kOptionInterfaceId },
+        { "groupcast", kNoArgument, kOptionGroupcast },
+>>>>>>> 4350eea68b (Disable All Groupcast Functionality by Default (#72047))
         {}, // need empty terminator
     };
 

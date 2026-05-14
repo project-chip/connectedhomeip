@@ -2398,6 +2398,7 @@ provisional cluster ScenesManagement = 98 {
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
+<<<<<<< HEAD
 /** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
 provisional cluster Groupcast = 101 {
   revision 1;
@@ -2508,6 +2509,8 @@ provisional cluster Groupcast = 101 {
   fabric command access(invoke: administer) GroupcastTesting(GroupcastTestingRequest): DefaultSuccess = 5;
 }
 
+=======
+>>>>>>> 4350eea68b (Disable All Groupcast Functionality by Default (#72047))
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
   revision 9;
@@ -3144,26 +3147,6 @@ endpoint 0 {
     callback attribute labelList;
     callback attribute featureMap;
     callback attribute clusterRevision;
-  }
-
-  server cluster Groupcast {
-    emits event GroupcastTesting;
-    callback attribute membership;
-    callback attribute maxMembershipCount;
-    callback attribute maxMcastAddrCount;
-    callback attribute usedMcastAddrCount;
-    callback attribute fabricUnderTest;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    callback attribute clusterRevision default = 1;
-
-    handle command JoinGroup;
-    handle command LeaveGroup;
-    handle command UpdateGroupKey;
-    handle command ConfigureAuxiliaryACL;
-    handle command GroupcastTesting;
   }
 }
 endpoint 1 {
