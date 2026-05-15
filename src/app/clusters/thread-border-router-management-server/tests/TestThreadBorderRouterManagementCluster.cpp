@@ -48,7 +48,7 @@ public:
     bool GetPanChangeSupported() override { return mPanChangeSupported; }
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        (void) CopyCharSpanToMutableCharSpan("MockBR"_span, borderRouterName);
+        EXPECT_EQ(CopyCharSpanToMutableCharSpan("MockBR"_span, borderRouterName), CHIP_NO_ERROR);
     }
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override { return CHIP_NO_ERROR; }
     uint16_t GetThreadVersion() override { return kMockThreadVersion; }
@@ -61,7 +61,7 @@ public:
         }
         if (type == DatasetType::kActive)
         {
-            (void) dataset.SetActiveTimestamp(kMockActiveDatasetTimestamp);
+            EXPECT_EQ(dataset.SetActiveTimestamp(kMockActiveDatasetTimestamp), CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }

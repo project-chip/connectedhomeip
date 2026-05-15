@@ -282,7 +282,7 @@ void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLay
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        (void) _this->mDelegate.CommitActiveDataset();
+        LogErrorOnFailure(_this->mDelegate.CommitActiveDataset());
     }
 }
 
