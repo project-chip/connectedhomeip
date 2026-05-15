@@ -955,7 +955,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     {
         // Insert last
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
 
@@ -1077,7 +1077,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
@@ -1477,7 +1477,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabric.map_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(fabric.map_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1652,7 +1652,8 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
                                             const KeySet & in_keyset)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
-
+    VerifyOrReturnError(in_keyset.num_keys_used >= 1 && in_keyset.num_keys_used <= KeySet::kEpochKeysMax,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     FabricData fabric(fabric_index);
     KeySetData keyset;
 
@@ -1667,13 +1668,11 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     keyset.policy     = in_keyset.policy;
     keyset.keys_count = in_keyset.num_keys_used;
     memset(keyset.operational_keys, 0x00, sizeof(keyset.operational_keys));
-    keyset.operational_keys[0].start_time = in_keyset.epoch_keys[0].start_time;
-    keyset.operational_keys[1].start_time = in_keyset.epoch_keys[1].start_time;
-    keyset.operational_keys[2].start_time = in_keyset.epoch_keys[2].start_time;
 
     // Store the operational keys and hash instead of the epoch keys
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
+        keyset.operational_keys[i].start_time = in_keyset.epoch_keys[i].start_time;
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         ReturnErrorOnFailure(
             Crypto::DeriveGroupOperationalCredentials(epoch_key, compressed_fabric_id, keyset.operational_keys[i]));

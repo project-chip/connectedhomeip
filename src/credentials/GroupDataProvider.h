@@ -171,9 +171,11 @@ public:
     {
         static constexpr size_t kEpochKeysMax = 3;
 
-        KeySet() = default;
+        KeySet() { ClearKeys(); }
         KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
-        {}
+        {
+            ClearKeys();
+        }
 
         // The actual keys for the group key set
         EpochKey epoch_keys[kEpochKeysMax];
@@ -255,7 +257,12 @@ public:
     GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
-    uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
+    // TODO(#72056): Once groupcast is enabled by default, this should just return mMaxGroupsPerFabric. See GroupDataProviderImpl()
+    // constructor.
+    uint16_t GetMaxGroupsPerFabric()
+    {
+        return static_cast<uint16_t>(IsGroupcastEnabled() ? (getMaxMembershipCount() / 2) : mMaxGroupsPerFabric);
+    }
     uint16_t GetMaxGroupKeysPerFabric() const { return mMaxGroupKeysPerFabric; }
 
     /**

@@ -75,8 +75,8 @@ def CMakeTargetEscape(a):
     return ''.join(map(Escape, a))
 
 
-def RemoveByPrefix(list, prefixs):
-    ret = list
+def RemoveByPrefix(str_list, prefixs):
+    ret = str_list
     for pre in prefixs:
         ret = [x for x in ret if not x.startswith(pre)]
 
@@ -261,7 +261,7 @@ class Target(object):
         self.properties = project.targets[self.gn_name]
         self.cmake_name = project.GetCMakeTargetName(self.gn_name)
         self.gn_type = self.properties.get('type', None)
-        self.cmake_type = cmake_target_types.get(self.gn_type, None)
+        self.cmake_type = cmake_target_types.get(self.gn_type)
 
 
 def WriteAction(out, target, project, sources, synthetic_dependencies):

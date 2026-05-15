@@ -76,6 +76,14 @@ CHIP_ERROR DimmableLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
                           });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
+    // We have scenes enabled, so make sure handlers are registered so we can
+    // save and recall scenes.
+    {
+        Clusters::ScopedSceneTable table(mScenesTableProvider);
+        table->RegisterHandler(&mOnOffCluster.Cluster());
+        table->RegisterHandler(&mLevelControlCluster.Cluster());
+    }
+
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
@@ -91,6 +99,11 @@ void DimmableLightDevice::Unregister(CodeDrivenDataModelProvider & provider)
 
     if (mLevelControlCluster.IsConstructed())
     {
+        if (static_cast<scenes::DefaultSceneHandlerImpl &>(mLevelControlCluster.Cluster()).IsInList())
+        {
+            Clusters::ScopedSceneTable table(mScenesTableProvider);
+            table->UnregisterHandler(&mLevelControlCluster.Cluster());
+        }
         if (mOnOffCluster.IsConstructed())
         {
             mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
@@ -101,6 +114,12 @@ void DimmableLightDevice::Unregister(CodeDrivenDataModelProvider & provider)
 
     if (mOnOffCluster.IsConstructed())
     {
+        if (mOnOffCluster.Cluster().IsInList())
+        {
+            Clusters::ScopedSceneTable table(mScenesTableProvider);
+            table->UnregisterHandler(&mOnOffCluster.Cluster());
+        }
+
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
         mOnOffCluster.Destroy();

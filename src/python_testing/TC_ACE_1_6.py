@@ -50,7 +50,7 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device on-off-light:1 --discriminator 1234
+#     app-args: --device on-off-light:1 --discriminator 1234 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -68,7 +68,8 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_on_root_node
+from TC_GC_common import (get_feature_map, get_iana_multicast_address, get_operate_only_commands, get_per_group_multicast_address,
+                          is_groupcast_on_root_node)
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -167,7 +168,8 @@ class TC_ACE_1_6(MatterBaseTest):
         else:
             # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later. This is an endpoint that must have at least
             # one cluster with a command that has operate priviliege.
-            operate_only_command_list = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, self.get_endpoint())
+            endpoint_to_search = self.get_endpoint() or None
+            operate_only_command_list = await get_operate_only_commands(self.default_controller, self.dut_node_id, True, endpoint_to_search)
             asserts.assert_greater(len(operate_only_command_list), 0,
                                    "DUT must have at least 1 non-root endpoint with a cluster with commands requiring operate privilege.")
             operate_only_command = operate_only_command_list[0]
@@ -374,6 +376,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 12: Group command to Group 0x0102
             self.step(12)
@@ -386,6 +390,9 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth)
+            expected_dest_addr = get_per_group_multicast_address(
+                self.default_controller.fabricId, groupID2) if pga_enabled else get_iana_multicast_address()
+            asserts.assert_equal(event_data.destinationIpAddress, expected_dest_addr, "Incorrect destination IP address in event")
 
         # Step 14: Revoke group access
         self.step(14)
@@ -410,6 +417,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 17: ConfigureAuxiliaryACL
             self.step(17)
@@ -426,6 +435,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
 
             # Step 20: DisableTesting
             self.step(20)

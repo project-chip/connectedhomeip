@@ -71,7 +71,3 @@ class PeriodicStatusThread(threading.Thread):
             log.info("", extra={"status": status_message, "count": False})
 
         log.debug("Status overview thread has stopped")
-
-    def terminate(self) -> None:
-        # The status thread is the only consumer of the log counter, so we can use it to cancel the thread.
-        self.log_counter.cancel()

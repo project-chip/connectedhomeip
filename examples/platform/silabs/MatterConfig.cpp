@@ -36,18 +36,19 @@
 #endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#include <sl_component_catalog.h>
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+#include <sl_watchdog_manager.h>
+#endif // SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
-#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-// TODO: We shouldn't need any platform specific includes in this file
-#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
-#include <platform/silabs/SiWx/SiWxPlatformInterface.h>
-#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
@@ -71,7 +72,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include <app/InteractionModelEngine.h>
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <data-model-providers/codegen/Instance.h>
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <headers/ProvisionManager.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -90,6 +93,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #ifdef PERFORMANCE_TEST_ENABLED
 #include <performance_test_commands.h>
 #endif
+
+#if SILABS_LOG_OUT_UART
+#include "uart.h"
+#endif // SILABS_LOG_OUT_UART
 
 #include <AppTask.h>
 
@@ -207,6 +214,9 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
+#if SILABS_LOG_OUT_UART
+    sendLogImmediately(false);
+#endif                                                       // SILABS_LOG_OUT_UART
     VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
     sMainTaskHandle = nullptr;
 }
@@ -417,17 +427,17 @@ void OnEM4Trigger(uint32_t duration)
 // FreeRTOS Callbacks
 // ================================================================================
 
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+void sl_watchdog_manager_user_idle_hook(void)
+#else
 extern "C" void vApplicationIdleHook(void)
+#endif
 {
 #if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_btn_event_handler();
+    GetPlatform().SleepButtonActionHandler();
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
-#endif
-#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
-    GetPlatform().WatchdogFeed();
-#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
+#endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER

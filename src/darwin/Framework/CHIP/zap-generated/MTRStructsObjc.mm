@@ -8502,6 +8502,90 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDynamicLightingClusterEffectColorStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _level = nil;
+
+        _x = nil;
+
+        _y = nil;
+
+        _hue = nil;
+
+        _enhancedHue = nil;
+
+        _saturation = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDynamicLightingClusterEffectColorStruct alloc] init];
+
+    other.level = self.level;
+    other.x = self.x;
+    other.y = self.y;
+    other.hue = self.hue;
+    other.enhancedHue = self.enhancedHue;
+    other.saturation = self.saturation;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: level:%@; x:%@; y:%@; hue:%@; enhancedHue:%@; saturation:%@; >", NSStringFromClass([self class]), _level, _x, _y, _hue, _enhancedHue, _saturation];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDynamicLightingClusterEffectStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _effectID = @(0);
+
+        _source = @(0);
+
+        _label = @"";
+
+        _maxSpeed = @(0);
+
+        _defaultSpeed = @(0);
+
+        _supportsColorPalette = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDynamicLightingClusterEffectStruct alloc] init];
+
+    other.effectID = self.effectID;
+    other.source = self.source;
+    other.label = self.label;
+    other.maxSpeed = self.maxSpeed;
+    other.defaultSpeed = self.defaultSpeed;
+    other.supportsColorPalette = self.supportsColorPalette;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectID:%@; source:%@; label:%@; maxSpeed:%@; defaultSpeed:%@; supportsColorPalette:%@; >", NSStringFromClass([self class]), _effectID, _source, _label, _maxSpeed, _defaultSpeed, _supportsColorPalette];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROccupancySensingClusterHoldTimeLimitsStruct
 - (instancetype)init
 {
@@ -9145,6 +9229,81 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; status:%@; >", NSStringFromClass([self class]), _sessionID, _status];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterActiveNetworkIdentityStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _index = @(0);
+
+        _type = @(0);
+
+        _identifier = [NSData data];
+
+        _createdTimestamp = @(0);
+
+        _current = @(0);
+
+        _remainingClients = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRNetworkIdentityManagementClusterActiveNetworkIdentityStruct alloc] init];
+
+    other.index = self.index;
+    other.type = self.type;
+    other.identifier = self.identifier;
+    other.createdTimestamp = self.createdTimestamp;
+    other.current = self.current;
+    other.remainingClients = self.remainingClients;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: index:%@; type:%@; identifier:%@; createdTimestamp:%@; current:%@; remainingClients:%@; >", NSStringFromClass([self class]), _index, _type, [_identifier base64EncodedStringWithOptions:0], _createdTimestamp, _current, _remainingClients];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterClientStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIndex = @(0);
+
+        _clientIdentifier = [NSData data];
+
+        _networkIdentityIndex = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRNetworkIdentityManagementClusterClientStruct alloc] init];
+
+    other.clientIndex = self.clientIndex;
+    other.clientIdentifier = self.clientIdentifier;
+    other.networkIdentityIndex = self.networkIdentityIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; clientIdentifier:%@; networkIdentityIndex:%@; >", NSStringFromClass([self class]), _clientIndex, [_clientIdentifier base64EncodedStringWithOptions:0], _networkIdentityIndex];
     return descriptionString;
 }
 
@@ -12336,42 +12495,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _endpointID = @(0);
-
-        _nodeID = @(0);
-
-        _friendlyName = @"";
-
-        _statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct alloc] init];
-
-    other.endpointID = self.endpointID;
-    other.nodeID = self.nodeID;
-    other.friendlyName = self.friendlyName;
-    other.statusEntry = self.statusEntry;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; nodeID:%@; friendlyName:%@; statusEntry:%@; >", NSStringFromClass([self class]), _endpointID, _nodeID, _friendlyName, _statusEntry];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRJointFabricDatastoreClusterDatastoreBindingTargetStruct
 - (instancetype)init
 {
@@ -12583,6 +12706,39 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: nodeID:%@; friendlyName:%@; vendorID:%@; icac:%@; >", NSStringFromClass([self class]), _nodeID, _friendlyName, _vendorID, [_icac base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpointID = @(0);
+
+        _nodeID = @(0);
+
+        _friendlyName = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct alloc] init];
+
+    other.endpointID = self.endpointID;
+    other.nodeID = self.nodeID;
+    other.friendlyName = self.friendlyName;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; nodeID:%@; friendlyName:%@; >", NSStringFromClass([self class]), _endpointID, _nodeID, _friendlyName];
     return descriptionString;
 }
 
