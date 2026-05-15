@@ -63,8 +63,6 @@ On a real DUT:
 
 import logging
 
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
 from support_modules.icd_support import ICDBaseTest, ICDTestEventTriggerOperations
 
@@ -81,27 +79,6 @@ modes = cluster.Enums.OperatingModeEnum
 
 
 class TC_ICDB_3_2(ICDBaseTest):
-
-    def get_dut_instance_name(self) -> str:
-        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        return f'{compressed_fabric_id:016X}-{self.dut_node_id:016X}'
-
-    async def get_icd_txt_key(self) -> int:
-        """Retrieve the ICD DNS-SD TXT key from the DUT's operational service record."""
-        mdns = MdnsDiscovery()
-
-        dut_instance_name = self.get_dut_instance_name()
-        instance_qname = f"{dut_instance_name}.{MdnsServiceType.OPERATIONAL.value}"
-
-        txt_record = await mdns.get_txt_record(
-            service_name=instance_qname,
-            service_type=MdnsServiceType.OPERATIONAL.value,
-            log_output=True
-        )
-
-        icd_value = txt_record.txt['ICD']
-        assert_valid_icd_key(icd_value)
-        return int(icd_value)
 
     def desc_TC_ICDB_3_2(self) -> str:
         return "[TC-ICDB-3.2] ICD Dynamic SIT/LIT - Verify OperatingMode does not transition between LIT and SIT when there is no client registration [DUT as Server]"
