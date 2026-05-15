@@ -80,10 +80,23 @@ using chip::app::DataModel::MakeNullable;
 namespace {
 
 using namespace SilabsDoorLockConfig::ResourceRanges;
+using SilabsDoorLockConfig::kLockEndpointId;
 
 CustomerAppTask & appInstance()
 {
     return CustomerAppTask::GetAppTask();
+}
+
+bool RejectIfWrongEndpoint(chip::EndpointId endpointId, OperationErrorEnum & err)
+{
+    if (endpointId != kLockEndpointId)
+    {
+        ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %u (only %u supported)", endpointId,
+                     kLockEndpointId);
+        err = OperationErrorEnum::kUnspecified;
+        return true;
+    }
+    return false;
 }
 
 // `CredentialStruct` is the spec/cluster type from `door-lock-server.h`; the
@@ -216,6 +229,10 @@ void StartUnlatchTimer(uint32_t timeoutMs)
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
+AppTask::LockRequest AppTask::sStagedLockRequest{};
+bool AppTask::sStagedLockRequestValid                = false;
+osMutexId_t AppTask::sStagedLockRequestMutex         = nullptr;
+
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -252,7 +269,7 @@ CHIP_ERROR AppTask::AppInit()
 CHIP_ERROR AppTask::InitLock()
 {
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
-    chip::EndpointId endpointId{ 1 };
+    chip::EndpointId endpointId{ kLockEndpointId };
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
 
@@ -384,11 +401,12 @@ void AppTask::LockButtonActionHandler(AppEvent * aEvent)
         return;
     }
 
-    LockAction action = appInstance().NextState() ? LockAction::kLock : LockAction::kUnlock;
-    if (!appInstance().InitiateLockAction(AppEvent::kEventType_Button, action))
-    {
-        SILABS_LOG("Action is already in progress or active.");
-    }
+    LockRequest req;
+    req.endpointId     = kLockEndpointId;
+    req.action         = appInstance().NextState() ? LockAction::kLock : LockAction::kUnlock;
+    req.isButtonAction = true;
+
+    appInstance().HandleLockRequestOnAppTask(req);
 }
 
 void AppTask::PostLockActionEvent(int32_t actor, LockAction action)
@@ -439,7 +457,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     using DlLockStateUnderlying = std::underlying_type_t<DlLockState>;
     DlLockState newState        = static_cast<DlLockState>(static_cast<DlLockStateUnderlying>(context));
 
-    Protocols::InteractionModel::Status status = DoorLockServer::Instance().SetLockState(1, newState)
+    Protocols::InteractionModel::Status status = DoorLockServer::Instance().SetLockState(kLockEndpointId, newState)
         ? Protocols::InteractionModel::Status::Success
         : Protocols::InteractionModel::Status::Failure;
 
@@ -469,22 +487,38 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
     }
 }
 
-// AppTask::DM* — default DoorLock cluster data-model behavior. Customers
-// override per-callback behavior via `AppTaskImpl<>::DM*Impl()` hooks.
-
 bool AppTask::DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
                                           const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
                                           OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
-    bool status = appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kLocked, pinCode, err);
-    if (status == true)
+
+    if (RejectIfWrongEndpoint(endpointId, err))
     {
-        // Marshal the actuator transition onto the AppTask thread so that
-        // mLockActuatorState is only ever touched from a single thread.
-        PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kLock);
+        return false;
     }
-    return status;
+
+    Nullable<uint16_t> userIndex;
+    LockOpCredentials cred{};
+    bool hasCred = false;
+    if (!appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err))
+    {
+        return false;
+    }
+
+    LockRequest req;
+    req.endpointId         = endpointId;
+    req.action             = LockAction::kLock;
+    req.targetClusterState = DlLockState::kLocked;
+    req.fabricIdx          = fabricIdx;
+    req.nodeId             = nodeId;
+    req.userIndex          = userIndex;
+    req.credential         = cred;
+    req.hasCredential      = hasCred;
+    req.isUnboltUnlatch    = false;
+    req.isButtonAction     = false;
+    EnqueueLockRequest(req);
+    return true;
 }
 
 bool AppTask::DMDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
@@ -493,26 +527,33 @@ bool AppTask::DMDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const N
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
 
-    if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
-    {
-        // TODO: Our current implementation does not support multiple endpoints. This needs to be fixed in the future.
-        if (endpointId != mUnlatchContext.mEndpointId)
-        {
-            mUnlatchContext.Update(endpointId, fabricIdx, nodeId, pinCode, err);
-        }
-        if (!appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pinCode, err))
-        {
-            return false;
-        }
-        PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlatch);
-        return true;
-    }
-
-    if (!appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pinCode, err))
+    if (RejectIfWrongEndpoint(endpointId, err))
     {
         return false;
     }
-    PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+
+    const bool supportsUnbolt = DoorLockServer::Instance().SupportsUnbolt(endpointId);
+
+    Nullable<uint16_t> userIndex;
+    LockOpCredentials cred{};
+    bool hasCred = false;
+    if (!appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err))
+    {
+        return false;
+    }
+
+    LockRequest req;
+    req.endpointId         = endpointId;
+    req.action             = supportsUnbolt ? LockAction::kUnlatch : LockAction::kUnlock;
+    req.targetClusterState = supportsUnbolt ? DlLockState::kUnlatched : DlLockState::kUnlocked;
+    req.fabricIdx          = fabricIdx;
+    req.nodeId             = nodeId;
+    req.userIndex          = userIndex;
+    req.credential         = cred;
+    req.hasCredential      = hasCred;
+    req.isUnboltUnlatch    = supportsUnbolt;
+    req.isButtonAction     = false;
+    EnqueueLockRequest(req);
     return true;
 }
 
@@ -522,14 +563,31 @@ bool AppTask::DMDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const N
 {
     ChipLogProgress(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
 
-    // Per spec, `UnboltDoor` retracts the bolt without pulling the latch and
-    // ends at `LockState = Unlocked` (the cluster emits a single
-    // `LockOperation{Unlock}` event). No latch stage, no `mUnlatchContext`.
-    if (!appInstance().SetLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pinCode, err))
+    if (RejectIfWrongEndpoint(endpointId, err))
     {
         return false;
     }
-    PostLockActionEvent(AppEvent::kEventType_Lock, AppTask::LockAction::kUnlock);
+
+    Nullable<uint16_t> userIndex;
+    LockOpCredentials cred{};
+    bool hasCred = false;
+    if (!appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err))
+    {
+        return false;
+    }
+
+    LockRequest req;
+    req.endpointId         = endpointId;
+    req.action             = LockAction::kUnlock;
+    req.targetClusterState = DlLockState::kUnlocked;
+    req.fabricIdx          = fabricIdx;
+    req.nodeId             = nodeId;
+    req.userIndex          = userIndex;
+    req.credential         = cred;
+    req.hasCredential      = hasCred;
+    req.isUnboltUnlatch    = false;
+    req.isButtonAction     = false;
+    EnqueueLockRequest(req);
     return true;
 }
 
@@ -698,6 +756,16 @@ CHIP_ERROR AppTask::InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clu
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
+    if (sStagedLockRequestMutex == nullptr)
+    {
+        sStagedLockRequestMutex = osMutexNew(nullptr);
+        if (sStagedLockRequestMutex == nullptr)
+        {
+            SILABS_LOG("sStagedLockRequestMutex create failed");
+            return APP_ERROR_ALLOCATION_FAILED;
+        }
+    }
+
     if (!state.IsNull() && state.Value() == DlLockState::kUnlocked)
     {
         mLockActuatorState = LockActuatorState::kUnlockCompleted;
@@ -712,6 +780,15 @@ CHIP_ERROR AppTask::InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clu
 bool AppTask::NextState()
 {
     return (mLockActuatorState == LockActuatorState::kUnlockCompleted);
+}
+
+bool AppTask::IsActuatorBusy() const
+{
+    // kUnlatchCompleted as "still in progress" for command-queueing purposes.
+    return (mLockActuatorState == LockActuatorState::kLockInitiated ||
+            mLockActuatorState == LockActuatorState::kUnlockInitiated ||
+            mLockActuatorState == LockActuatorState::kUnlatchInitiated ||
+            mLockActuatorState == LockActuatorState::kUnlatchCompleted);
 }
 
 bool AppTask::InitiateLockAction(int32_t aActor, LockAction aAction)
@@ -789,22 +866,24 @@ void AppTask::TimerEventHandler(void * timerCbArg)
 }
 void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
 {
-    // write the new lock value
-    bool succes = false;
-    if (appInstance().mUnlatchContext.mEndpointId != kInvalidEndpointId)
+    auto & ctx = appInstance().mUnlatchContext;
+    if (ctx.mEndpointId == kInvalidEndpointId)
     {
-        Optional<chip::ByteSpan> pin = (appInstance().mUnlatchContext.mPinLength)
-            ? MakeOptional(chip::ByteSpan(appInstance().mUnlatchContext.mPinBuffer, appInstance().mUnlatchContext.mPinLength))
-            : Optional<chip::ByteSpan>::Missing();
-        succes = appInstance().SetLockState(appInstance().mUnlatchContext.mEndpointId, appInstance().mUnlatchContext.mFabricIdx,
-                                            appInstance().mUnlatchContext.mNodeId, DlLockState::kUnlocked, pin,
-                                            appInstance().mUnlatchContext.mErr);
+        SILABS_LOG("UnlockAfterUnlatch: no valid unlatch context, skipping auto-unlock");
+        return;
     }
 
-    if (!succes)
+    Protocols::InteractionModel::Status status =
+        DoorLockServer::Instance().SetLockState(ctx.mEndpointId, DlLockState::kUnlocked, OperationSourceEnum::kRemote,
+                                                NullNullable, NullNullable, ctx.mFabricIdx, ctx.mNodeId)
+        ? Protocols::InteractionModel::Status::Success
+        : Protocols::InteractionModel::Status::Failure;
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        SILABS_LOG("Failed to update the lock state after Unlatch");
+        SILABS_LOG("ERR: setting lock state %x (auto-unlock after unlatch)", chip::to_underlying(status));
     }
+
+    ctx.mEndpointId = chip::kInvalidEndpointId;
 
     PostLockActionEvent(AppEvent::kEventType_Lock, LockAction::kUnlock);
 }
@@ -875,6 +954,153 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
             }
             lock->mSyncClusterToButtonAction = false;
         }
+
+        if (lock->mPendingCommand.mValid &&
+            (lock->mLockActuatorState == LockActuatorState::kLockCompleted ||
+             lock->mLockActuatorState == LockActuatorState::kUnlockCompleted))
+        {
+            PendingCommand pc            = lock->mPendingCommand;
+            lock->mPendingCommand.mValid = false;
+
+            ChipLogProgress(Zcl, "Door Lock App: replaying queued %s (action=%u, target=%s)",
+                            pc.mIsButtonAction ? "button" : "remote", chip::to_underlying(pc.mAction),
+                            LockStateToString(pc.mTargetClusterState));
+
+            LockRequest req;
+            req.endpointId         = kLockEndpointId;
+            req.action             = pc.mAction;
+            req.targetClusterState = pc.mTargetClusterState;
+            req.fabricIdx          = pc.mFabricIdx;
+            req.nodeId             = pc.mNodeId;
+            req.userIndex          = pc.mUserIndex;
+            req.credential         = pc.mCredential;
+            req.hasCredential      = pc.mHasCredential;
+            req.isUnboltUnlatch    = pc.mIsUnboltUnlatch;
+            req.isButtonAction     = pc.mIsButtonAction;
+            lock->HandleLockRequestOnAppTask(req);
+        }
+
+        if (lock->mLockActuatorState == LockActuatorState::kLockCompleted ||
+            lock->mLockActuatorState == LockActuatorState::kUnlockCompleted)
+        {
+            LockRequest stagedReq;
+            if (TryDrainStagedLockRequest(stagedReq))
+            {
+                ChipLogProgress(Zcl, "Door Lock App: draining staged lock request from action-complete fallback");
+                lock->HandleLockRequestOnAppTask(stagedReq);
+            }
+        }
+    }
+}
+
+// ---- Cross-thread `LockRequest` handoff -----------------------------------
+
+void AppTask::EnqueueLockRequest(const LockRequest & request)
+{
+    if (sStagedLockRequestMutex == nullptr)
+    {
+        ChipLogError(Zcl, "Door Lock App: staging mutex not initialized; dropping LockRequest");
+        return;
+    }
+
+    // Stage the request under the mutex (newest-wins coalescing).
+    osStatus_t mutexStatus = osMutexAcquire(sStagedLockRequestMutex, osWaitForever);
+    if (mutexStatus != osOK)
+    {
+        ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest",
+                     static_cast<int>(mutexStatus));
+        return;
+    }
+    sStagedLockRequest      = request;
+    sStagedLockRequestValid = true;
+    osMutexRelease(sStagedLockRequestMutex);
+
+    AppEvent event                   = {};
+    event.Type                       = AppEvent::kEventType_LockRequest;
+    event.LockRequestEvent.Request   = nullptr;
+    event.Handler                    = &CustomerAppTask::LockRequestEventHandler;
+    appInstance().PostEvent(&event);
+}
+
+bool AppTask::TryDrainStagedLockRequest(LockRequest & out)
+{
+    if (sStagedLockRequestMutex == nullptr)
+    {
+        return false;
+    }
+    if (osMutexAcquire(sStagedLockRequestMutex, osWaitForever) != osOK)
+    {
+        return false;
+    }
+    bool drained = sStagedLockRequestValid;
+    if (drained)
+    {
+        out                     = sStagedLockRequest;
+        sStagedLockRequestValid = false;
+    }
+    osMutexRelease(sStagedLockRequestMutex);
+    return drained;
+}
+
+void AppTask::LockRequestEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type != AppEvent::kEventType_LockRequest)
+    {
+        ChipLogError(NotSpecified, "LockRequestEventHandler: unexpected event type %u", aEvent->Type);
+        return;
+    }
+
+    LockRequest req;
+    if (!TryDrainStagedLockRequest(req))
+    {
+        return;
+    }
+
+    appInstance().HandleLockRequestOnAppTask(req);
+}
+
+void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
+{
+
+    if (IsActuatorBusy())
+    {
+        ChipLogProgress(NotSpecified, "Door Lock App: actuator busy; queueing %s (replacing any prior pending)",
+                        request.isButtonAction ? "button" : "remote");
+        mPendingCommand                     = {};
+        mPendingCommand.mValid              = true;
+        mPendingCommand.mAction             = request.action;
+        mPendingCommand.mTargetClusterState = request.targetClusterState;
+        mPendingCommand.mFabricIdx          = request.fabricIdx;
+        mPendingCommand.mNodeId             = request.nodeId;
+        mPendingCommand.mUserIndex          = request.userIndex;
+        mPendingCommand.mCredential         = request.credential;
+        mPendingCommand.mHasCredential      = request.hasCredential;
+        mPendingCommand.mIsUnboltUnlatch    = request.isUnboltUnlatch;
+        mPendingCommand.mIsButtonAction     = request.isButtonAction;
+        return;
+    }
+
+    if (request.isButtonAction)
+    {
+        if (!InitiateLockAction(AppEvent::kEventType_Button, request.action))
+        {
+            SILABS_LOG("Action is already in progress or active.");
+        }
+        return;
+    }
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    if (request.isUnboltUnlatch)
+    {
+        mUnlatchContext.Update(request.endpointId, request.fabricIdx, request.nodeId);
+    }
+    PushClusterLockState(request.endpointId, request.targetClusterState, request.fabricIdx, request.nodeId, request.userIndex,
+                         request.hasCredential ? &request.credential : nullptr, request.hasCredential);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    if (!InitiateLockAction(AppEvent::kEventType_Lock, request.action))
+    {
+        SILABS_LOG("Action is already in progress or active.");
     }
 }
 
@@ -1413,10 +1639,12 @@ DlStatus AppTask::DMDoorLockSetHolidaySchedule(chip::EndpointId endpointId, uint
     return DlStatus::kSuccess;
 }
 
-bool AppTask::SetLockState(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                           const Nullable<chip::NodeId> & nodeId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
-                           OperationErrorEnum & err)
+bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin,
+                          Nullable<uint16_t> & outUserIndex, LockOpCredentials & outCred, bool & outHasCred,
+                          OperationErrorEnum & err)
 {
+    outUserIndex.SetNull();
+    outHasCred = false;
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
@@ -1424,29 +1652,21 @@ bool AppTask::SetLockState(chip::EndpointId endpointId, const Nullable<chip::Fab
     bool requirePin = true;
     chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(endpointId, &requirePin);
 
-    // If a pin code is not given
     if (!pin.HasValue())
     {
         ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified [endpointId=%d]", endpointId);
 
-        // If a pin code is not required
         if (!requirePin)
         {
-            ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", LockStateToString(lockState),
-                          endpointId);
-
-            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable,
-                                                    fabricIdx, nodeId);
-
             return true;
         }
 
         ChipLogError(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", endpointId);
-
+        err = OperationErrorEnum::kInvalidCredential;
         return false;
     }
 
-    // Check all pin codes associated to all users to see if this pin code exists
+    // Check all pin codes associated to all users to see if this pin code exists.
     for (uint32_t userIndex = 1; userIndex <= kMaxUsers; userIndex++)
     {
         EmberAfPluginDoorLockUserInfo user;
@@ -1457,55 +1677,82 @@ bool AppTask::SetLockState(chip::EndpointId endpointId, const Nullable<chip::Fab
             return false;
         }
 
-        if (user.userStatus == UserStatusEnum::kOccupiedEnabled)
+        if (user.userStatus != UserStatusEnum::kOccupiedEnabled)
         {
-            // Loop through each credential attached to the user
-            for (auto & userCredential : user.credentials)
+            continue;
+        }
+
+        for (auto & userCredential : user.credentials)
+        {
+            if (userCredential.credentialType != CredentialTypeEnum::kPin)
             {
-                // If the current credential is a pin type, then check it against pin input. Otherwise ignore
-                if (userCredential.credentialType == CredentialTypeEnum::kPin)
-                {
-                    EmberAfPluginDoorLockCredentialInfo credential;
+                continue;
+            }
 
-                    if (!DMDoorLockGetCredential(endpointId, userCredential.credentialIndex, userCredential.credentialType,
-                                                 credential))
-                    {
-                        ChipLogError(Zcl,
-                                     "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
-                                     endpointId, to_underlying(userCredential.credentialType), userCredential.credentialIndex);
-                        return false;
-                    }
+            EmberAfPluginDoorLockCredentialInfo credential;
 
-                    if (credential.status == DlCredentialStatus::kOccupied)
-                    {
+            if (!DMDoorLockGetCredential(endpointId, userCredential.credentialIndex, userCredential.credentialType, credential))
+            {
+                ChipLogError(Zcl, "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
+                             endpointId, to_underlying(userCredential.credentialType), userCredential.credentialIndex);
+                return false;
+            }
 
-                        // See if credential retrieved from storage matches the provided PIN
-                        if (credential.credentialData.data_equal(pin.Value()))
-                        {
-                            ChipLogDetail(Zcl,
-                                          "Lock App: specified PIN code was found in the database, setting lock state to "
-                                          "\"%s\" [endpointId=%d]",
-                                          LockStateToString(lockState), endpointId);
+            if (credential.status != DlCredentialStatus::kOccupied)
+            {
+                continue;
+            }
 
-                            LockOpCredentials userCred[] = { { CredentialTypeEnum::kPin, userCredential.credentialIndex } };
-                            auto userCredentials         = MakeNullable<List<const LockOpCredentials>>(userCred);
+            if (credential.credentialData.data_equal(pin.Value()))
+            {
+                ChipLogDetail(Zcl, "Lock App: specified PIN code was found in the database [endpointId=%d]", endpointId);
 
-                            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, userIndex,
-                                                                    userCredentials, fabricIdx, nodeId);
-
-                            return true;
-                        }
-                    }
-                }
+                outUserIndex.SetNonNull(static_cast<uint16_t>(userIndex));
+                outCred.credentialType  = CredentialTypeEnum::kPin;
+                outCred.credentialIndex = userCredential.credentialIndex;
+                outHasCred              = true;
+                return true;
             }
         }
     }
 
-    ChipLogDetail(Zcl,
-                  "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
-                  "[endpointId=%d]",
-                  LockStateToString(lockState), endpointId);
-
+    ChipLogDetail(Zcl, "Door Lock App: specified PIN code was not found in the database [endpointId=%d]", endpointId);
     err = OperationErrorEnum::kInvalidCredential;
     return false;
+}
+
+void AppTask::PushClusterLockState(chip::EndpointId endpointId, DlLockState lockState, const Nullable<chip::FabricIndex> & fabricIdx,
+                                   const Nullable<chip::NodeId> & nodeId, const Nullable<uint16_t> & userIndex,
+                                   const LockOpCredentials * cred, bool hasCred)
+{
+    ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", LockStateToString(lockState), endpointId);
+
+    if (hasCred && cred != nullptr)
+    {
+        LockOpCredentials userCred[] = { *cred };
+        auto userCredentials         = MakeNullable<List<const LockOpCredentials>>(userCred);
+        DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, userIndex, userCredentials,
+                                                fabricIdx, nodeId);
+        return;
+    }
+
+    DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable,
+                                            fabricIdx, nodeId);
+}
+
+bool AppTask::SetLockState(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                           const Nullable<chip::NodeId> & nodeId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
+                           OperationErrorEnum & err)
+{
+    Nullable<uint16_t> userIndex;
+    LockOpCredentials cred{};
+    bool hasCred = false;
+
+    if (!ValidatePin(endpointId, pin, userIndex, cred, hasCred, err))
+    {
+        return false;
+    }
+
+    PushClusterLockState(endpointId, lockState, fabricIdx, nodeId, userIndex, hasCred ? &cred : nullptr, hasCred);
+    return true;
 }

@@ -71,6 +71,11 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockActionEventHandlerImpl, aEvent);
     }
 
+    static void LockRequestEventHandler(AppEvent * aEvent)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockRequestEventHandlerImpl, aEvent);
+    }
+
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -215,6 +220,8 @@ private:
     void ActuatorMovementEventHandlerImpl(AppEvent * aEvent) { AppTask::ActuatorMovementEventHandler(aEvent); }
 
     void LockActionEventHandlerImpl(AppEvent * aEvent) { AppTask::LockActionEventHandler(aEvent); }
+
+    void LockRequestEventHandlerImpl(AppEvent * aEvent) { AppTask::LockRequestEventHandler(aEvent); }
 
     void DMPostAttributeChangeCallbackImpl(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                            uint8_t * value)

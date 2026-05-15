@@ -30,6 +30,8 @@
 
 #include <stdint.h>
 
+#include <lib/core/DataModelTypes.h>
+
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -104,6 +106,9 @@
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
 
 namespace SilabsDoorLockConfig {
+
+static constexpr chip::EndpointId kLockEndpointId = 1;
+
 namespace ResourceRanges {
 // Used to size arrays
 static constexpr uint16_t kMaxUsers                  = 10;

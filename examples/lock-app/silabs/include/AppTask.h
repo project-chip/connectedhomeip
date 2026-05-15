@@ -168,20 +168,13 @@ public:
      */
     static void LockActionEventHandler(AppEvent * aEvent);
 
-    /**
-     * @brief DoorLock-cluster post-attribute-change callback.
-     *        Routes e.g. `LockState` updates to telemetry / UI side-effects.
-     */
+    static void LockRequestEventHandler(AppEvent * aEvent);
+
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
     // ---------------------------------------------------------------------
     // DoorLock cluster data-model entry points.
-    //
-    // Each `DM*` mirrors the corresponding `emberAfPluginDoorLock*` weak
-    // callback. The free callbacks in `AppTask.cpp` are 1-line forwarders
-    // into these hooks, so customers can intercept data-model behavior by
-    // overriding `AppTaskImpl<>::DM*Impl()` in `CustomerAppTask`.
     // ---------------------------------------------------------------------
 
     bool DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId,
@@ -234,6 +227,16 @@ public:
                       chip::app::Clusters::DoorLock::DlLockState lockState, const chip::Optional<chip::ByteSpan> & pin,
                       chip::app::Clusters::DoorLock::OperationErrorEnum & err);
 
+    bool ValidatePin(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pin,
+                     chip::app::DataModel::Nullable<uint16_t> & outUserIndex, LockOpCredentials & outCred, bool & outHasCred,
+                     chip::app::Clusters::DoorLock::OperationErrorEnum & err);
+
+    void PushClusterLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState lockState,
+                              const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
+                              const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex, const LockOpCredentials * cred,
+                              bool hasCred);
+
     /** Door-lock actuator / cluster actions. */
     enum class LockAction : uint8_t
     {
@@ -243,25 +246,28 @@ public:
         kInvalid,
     };
 
+    struct LockRequest
+    {
+        chip::EndpointId endpointId = chip::kInvalidEndpointId;
+        LockAction action           = LockAction::kInvalid;
+        chip::app::Clusters::DoorLock::DlLockState targetClusterState =
+            chip::app::Clusters::DoorLock::DlLockState::kLocked;
+        chip::app::DataModel::Nullable<chip::FabricIndex> fabricIdx;
+        chip::app::DataModel::Nullable<chip::NodeId> nodeId;
+        chip::app::DataModel::Nullable<uint16_t> userIndex;
+        LockOpCredentials credential{};
+        bool hasCredential   = false;
+        bool isUnboltUnlatch = false;
+        bool isButtonAction  = false;
+    };
+
     bool InitiateLockAction(int32_t aActor, LockAction aAction);
 
-    /**
-     * @brief Finalize the unlatch sequence: push `kUnlocked` to the cluster
-     *        using `mUnlatchContext`, then initiate the `kUnlock` actuator
-     *        action. Static + addressable so it can be scheduled directly by
-     *        the unlatch FreeRTOS timer helper (anonymous namespace, no
-     *        private-member access).
-     */
     static void UnlockAfterUnlatch(intptr_t context);
 
 protected:
     // ---------------------------------------------------------------------
     // Persistent-storage record layouts.
-    //
-    // These are protected (not public) because they are on-disk binary
-    // record types — only consumed by `AppTask::DM*` storage round-trips.
-    // Customer overrides that use `mStorage` can reference them via the
-    // `AppTask` base class; the rest of the codebase has no reason to.
     // ---------------------------------------------------------------------
 
     struct WeekDayScheduleInfo
@@ -331,35 +337,32 @@ private:
 
     struct UnlatchContext
     {
-        static constexpr uint8_t kMaxPinLength = UINT8_MAX;
-        uint8_t mPinBuffer[kMaxPinLength];
-        uint8_t mPinLength           = 0;
         chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
         chip::app::DataModel::Nullable<chip::FabricIndex> mFabricIdx;
         chip::app::DataModel::Nullable<chip::NodeId> mNodeId;
-        chip::app::Clusters::DoorLock::OperationErrorEnum mErr;
 
         void Update(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
-                    const chip::app::DataModel::Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pin,
-                    chip::app::Clusters::DoorLock::OperationErrorEnum & err)
+                    const chip::app::DataModel::Nullable<chip::NodeId> & nodeId)
         {
             mEndpointId = endpointId;
             mFabricIdx  = fabricIdx;
             mNodeId     = nodeId;
-            mErr        = err;
-
-            if (pin.HasValue())
-            {
-                const size_t copyLen = std::min(pin.Value().size(), static_cast<size_t>(kMaxPinLength));
-                memcpy(mPinBuffer, pin.Value().data(), copyLen);
-                mPinLength = static_cast<uint8_t>(copyLen);
-            }
-            else
-            {
-                memset(mPinBuffer, 0, kMaxPinLength);
-                mPinLength = 0;
-            }
         }
+    };
+
+    struct PendingCommand
+    {
+        bool mValid                                                = false;
+        LockAction mAction                                         = LockAction::kInvalid;
+        chip::app::Clusters::DoorLock::DlLockState mTargetClusterState =
+            chip::app::Clusters::DoorLock::DlLockState::kLocked;
+        chip::app::DataModel::Nullable<chip::FabricIndex> mFabricIdx;
+        chip::app::DataModel::Nullable<chip::NodeId> mNodeId;
+        chip::app::DataModel::Nullable<uint16_t> mUserIndex;
+        LockOpCredentials mCredential{};
+        bool mHasCredential   = false;
+        bool mIsUnboltUnlatch = false;
+        bool mIsButtonAction  = false;
     };
 
     // ---- Lock-domain bring-up / state machine ----
@@ -370,14 +373,28 @@ private:
 
     bool NextState();
 
+    /** @brief true while the actuator (or unlatch timer) is mid-transition. */
+    bool IsActuatorBusy() const;
+
     static void TimerEventHandler(void * timerCbArg);
 
     static void UpdateClusterState(intptr_t context);
 
+    static void EnqueueLockRequest(const LockRequest & request);
+
+    void HandleLockRequestOnAppTask(const LockRequest & request);
+
+    static bool TryDrainStagedLockRequest(LockRequest & out);
+
     static void PostLockActionEvent(int32_t actor, LockAction action);
+
+    static LockRequest sStagedLockRequest;
+    static bool sStagedLockRequestValid;
+    static osMutexId_t sStagedLockRequestMutex;
 
     // ---- State ----
     UnlatchContext mUnlatchContext;
+    PendingCommand mPendingCommand;
     chip::EndpointId mCurrentEndpointId = chip::kInvalidEndpointId;
 
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
