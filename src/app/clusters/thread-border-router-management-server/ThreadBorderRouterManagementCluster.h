@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <lib/support/BitFlags.h>
 #include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
@@ -52,9 +53,15 @@ public:
         DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate),
         mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker),
         mPlatformManager(config.mPlatformManager)
-    {}
+    {
+        if (mDelegate.GetPanChangeSupported())
+        {
+            mFeatureMap.Set(ThreadBorderRouterManagement::Feature::kPANChange);
+        }
+    }
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    void ReportAttributeChanged(AttributeId attributeId) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
@@ -71,14 +78,12 @@ public:
     // ThreadBorderRouterManagementDelegate::ActivateDatasetCallback
     void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
 
-    // ThreadBorderRouterManagementDelegate::AttributeChangeCallback
-    void ReportAttributeChanged(AttributeId attributeId) override;
-
     // Platform event handler
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 protected:
     ThreadBorderRouterManagementDelegate & mDelegate;
+    BitFlags<ThreadBorderRouterManagement::Feature> mFeatureMap;
     FailSafeContext & mFailSafeContext;
     BreadCrumbTracker & mBreadcrumbTracker;
     DeviceLayer::PlatformManager & mPlatformManager;

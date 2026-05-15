@@ -35,14 +35,8 @@ DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute
     {
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(ThreadBorderRouterManagement::kRevision);
-    case Globals::Attributes::FeatureMap::Id: {
-        BitFlags<Feature> featureMap;
-        if (mDelegate.GetPanChangeSupported())
-        {
-            featureMap.Set(Feature::kPANChange);
-        }
-        return encoder.Encode(featureMap);
-    }
+    case Globals::Attributes::FeatureMap::Id:
+        return encoder.Encode(mFeatureMap);
     case ThreadBorderRouterManagement::Attributes::BorderRouterName::Id: {
         char buffer[ThreadBorderRouterManagementDelegate::kBorderRouterNameMaxLength];
         MutableCharSpan name(buffer, sizeof(buffer));
@@ -109,8 +103,8 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::AcceptedCommands(const ConcreteC
 
 CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & context)
 {
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    ReturnErrorOnFailure(mDelegate.Init(this));
+    ReturnErrorOnFailure(app::DefaultServerCluster::Startup(context));
+    ReturnErrorOnFailure(mDelegate.Init(static_cast<ThreadBorderRouterManagementDelegate::AttributeChangeCallback *>(this)));
     ReturnErrorOnFailure(mPlatformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     return CHIP_NO_ERROR;
 }
@@ -119,7 +113,7 @@ void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
 {
     (void) mDelegate.Init(nullptr);
     mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
-    DefaultServerCluster::Shutdown(reason);
+    app::DefaultServerCluster::Shutdown(reason);
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -214,7 +208,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         mBreadcrumb         = req.breadcrumb;
         mSetActiveDatasetSequenceNumber++;
 
-        mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, this);
+        mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, static_cast<ThreadBorderRouterManagementDelegate::ActivateDatasetCallback *>(this));
 
         return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success));
     }
@@ -289,7 +283,7 @@ void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLay
 
 void ThreadBorderRouterManagementCluster::ReportAttributeChanged(AttributeId attributeId)
 {
-    NotifyAttributeChanged(attributeId);
+    app::DefaultServerCluster::NotifyAttributeChanged(attributeId);
 }
 
 } // namespace chip::app::Clusters
