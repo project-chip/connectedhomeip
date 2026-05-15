@@ -149,6 +149,8 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         ThreadBorderRouterManagement::Commands::DatasetResponse::Type response;
         response.dataset = dataset.AsByteSpan();
         ctx->AddResponse(request.path, response);
+        // Return nullopt because we already added the response via ctx->AddResponse.
+        // Returning a status here would cause a duplicate response.
         return std::nullopt;
     }
     case ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id: {
@@ -172,6 +174,8 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         ThreadBorderRouterManagement::Commands::DatasetResponse::Type response;
         response.dataset = dataset.AsByteSpan();
         ctx->AddResponse(request.path, response);
+        // Return nullopt because we already added the response via ctx->AddResponse.
+        // Returning a status here would cause a duplicate response.
         return std::nullopt;
     }
     case ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id: {
@@ -209,6 +213,8 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
         mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, static_cast<ThreadBorderRouterManagementDelegate::ActivateDatasetCallback *>(this));
 
+        // Return nullopt because this is an async operation. The response will be sent
+        // later in the OnActivateDatasetComplete callback.
         return std::nullopt;
     }
     case ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id: {
