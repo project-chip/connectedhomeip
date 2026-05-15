@@ -171,6 +171,9 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
 
