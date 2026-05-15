@@ -134,23 +134,22 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
         Thread::OperationalDataset dataset;
         CHIP_ERROR err = mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kActive);
-        if (err == CHIP_ERROR_NOT_FOUND)
+        if (err != CHIP_NO_ERROR)
         {
-            CHIP_ERROR initErr = dataset.Init(ByteSpan());
-            if (initErr != CHIP_NO_ERROR)
+            if (err == CHIP_ERROR_NOT_FOUND)
             {
-                return std::make_optional(DataModel::ActionReturnStatus(StatusIB(initErr).mStatus));
+                ReturnErrorOnFailure(dataset.Init(ByteSpan()));
             }
-        }
-        else if (err != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(StatusIB(err).mStatus));
+            else
+            {
+                ReturnErrorOnFailure(err);
+            }
         }
 
         ThreadBorderRouterManagement::Commands::DatasetResponse::Type response;
         response.dataset = dataset.AsByteSpan();
         ctx->AddResponse(request.path, response);
-        return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success));
+        return std::nullopt;
     }
     case ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id: {
         ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::DecodableType req;
@@ -158,23 +157,22 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
         Thread::OperationalDataset dataset;
         CHIP_ERROR err = mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kPending);
-        if (err == CHIP_ERROR_NOT_FOUND)
+        if (err != CHIP_NO_ERROR)
         {
-            CHIP_ERROR initErr = dataset.Init(ByteSpan());
-            if (initErr != CHIP_NO_ERROR)
+            if (err == CHIP_ERROR_NOT_FOUND)
             {
-                return std::make_optional(DataModel::ActionReturnStatus(StatusIB(initErr).mStatus));
+                ReturnErrorOnFailure(dataset.Init(ByteSpan()));
             }
-        }
-        else if (err != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(StatusIB(err).mStatus));
+            else
+            {
+                ReturnErrorOnFailure(err);
+            }
         }
 
         ThreadBorderRouterManagement::Commands::DatasetResponse::Type response;
         response.dataset = dataset.AsByteSpan();
         ctx->AddResponse(request.path, response);
-        return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success));
+        return std::nullopt;
     }
     case ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id: {
         ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::DecodableType req;
@@ -211,7 +209,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
         mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, static_cast<ThreadBorderRouterManagementDelegate::ActivateDatasetCallback *>(this));
 
-        return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success));
+        return std::nullopt;
     }
     case ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id: {
         ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::DecodableType req;
