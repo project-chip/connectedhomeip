@@ -47,6 +47,10 @@ DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute
         uint8_t buffer[ThreadBorderRouterManagementDelegate::kBorderAgentIdLength];
         MutableByteSpan agentId(buffer, sizeof(buffer));
         ReturnErrorOnFailure(mDelegate.GetBorderAgentId(agentId));
+        if (agentId.size() != ThreadBorderRouterManagementDelegate::kBorderAgentIdLength)
+        {
+            return CHIP_ERROR_READ_FAILED;
+        }
         return encoder.Encode(agentId);
     }
     case ThreadBorderRouterManagement::Attributes::ThreadVersion::Id:
