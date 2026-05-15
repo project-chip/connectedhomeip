@@ -136,10 +136,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
     {
     case ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::Id: {
         ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::DecodableType req;
-        if (DataModel::Decode(payload, req) != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
-        }
+        ReturnErrorOnFailure(DataModel::Decode(payload, req));
 
         Thread::OperationalDataset dataset;
         CHIP_ERROR err = mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kActive);
@@ -163,10 +160,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
     }
     case ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id: {
         ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::DecodableType req;
-        if (DataModel::Decode(payload, req) != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
-        }
+        ReturnErrorOnFailure(DataModel::Decode(payload, req));
 
         Thread::OperationalDataset dataset;
         CHIP_ERROR err = mDelegate.GetDataset(dataset, ThreadBorderRouterManagementDelegate::DatasetType::kPending);
@@ -190,10 +184,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
     }
     case ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id: {
         ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::DecodableType req;
-        if (DataModel::Decode(payload, req) != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
-        }
+        ReturnErrorOnFailure(DataModel::Decode(payload, req));
 
         if (!mFailSafeContext.IsFailSafeArmed(ctx->GetAccessingFabricIndex()))
         {
@@ -230,10 +221,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
     }
     case ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id: {
         ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::DecodableType req;
-        if (DataModel::Decode(payload, req) != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
-        }
+        ReturnErrorOnFailure(DataModel::Decode(payload, req));
 
         if (!mDelegate.GetPanChangeSupported())
         {
