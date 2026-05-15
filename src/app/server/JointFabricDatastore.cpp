@@ -29,9 +29,8 @@ void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
 {
     auto & storage = mGroupKeySetStorage[source.groupKeySetID];
 
-    destination.groupKeySetID           = source.groupKeySetID;
-    destination.groupKeySecurityPolicy  = source.groupKeySecurityPolicy;
-    destination.groupKeyMulticastPolicy = source.groupKeyMulticastPolicy;
+    destination.groupKeySetID          = source.groupKeySetID;
+    destination.groupKeySecurityPolicy = source.groupKeySecurityPolicy;
 
     CopyByteSpanWithOwnedStorage(source.epochKey0, storage.epochKey0, destination.epochKey0);
     CopyByteSpanWithOwnedStorage(source.epochKey1, storage.epochKey1, destination.epochKey1);
