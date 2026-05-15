@@ -200,8 +200,12 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeSupporte
 TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSupported)
 {
     delegate.mPanChangeSupported = false;
-    chip::Testing::ClusterTester tester(cluster);
-    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    
+    ThreadBorderRouterManagementCluster::Config localConfig(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
+    ThreadBorderRouterManagementCluster localCluster(kTestEndpointId, localConfig);
+
+    chip::Testing::ClusterTester tester(localCluster);
+    EXPECT_EQ(localCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint32_t featureMap;
     EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
