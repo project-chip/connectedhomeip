@@ -11602,7 +11602,7 @@ cluster CommissionerControl = 1873 {
 }
 
 /** The Joint Fabric Datastore Cluster is a cluster that provides a mechanism for the Joint Fabric Administrators to manage the set of Nodes, Groups, and Group membership among Nodes in the Joint Fabric. */
-provisional cluster JointFabricDatastore = 1874 {
+cluster JointFabricDatastore = 1874 {
   revision 1;
 
   enum DatastoreAccessControlEntryAuthModeEnum : enum8 {
@@ -11725,23 +11725,22 @@ provisional cluster JointFabricDatastore = 1874 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    optional DatastoreGroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
-  provisional readonly attribute access(read: administer) long_octet_string<400> anchorRootCA = 0;
-  provisional readonly attribute access(read: administer) node_id anchorNodeID = 1;
-  provisional readonly attribute access(read: administer) vendor_id anchorVendorID = 2;
-  provisional readonly attribute access(read: administer) char_string<32> friendlyName = 3;
-  provisional readonly attribute access(read: administer) DatastoreGroupKeySetStruct groupKeySetList[] = 4;
-  provisional readonly attribute access(read: administer) DatastoreGroupInformationEntryStruct groupList[] = 5;
-  provisional readonly attribute access(read: administer) DatastoreNodeInformationEntryStruct nodeList[] = 6;
-  provisional readonly attribute access(read: administer) DatastoreAdministratorInformationEntryStruct adminList[] = 7;
-  provisional readonly attribute access(read: administer) DatastoreStatusEntryStruct status = 8;
-  provisional readonly attribute access(read: administer) DatastoreEndpointGroupIDEntryStruct endpointGroupIDList[] = 9;
-  provisional readonly attribute access(read: administer) DatastoreEndpointBindingEntryStruct endpointBindingList[] = 10;
-  provisional readonly attribute access(read: administer) DatastoreNodeKeySetEntryStruct nodeKeySetList[] = 11;
-  provisional readonly attribute access(read: administer) DatastoreACLEntryStruct nodeACLList[] = 12;
-  provisional readonly attribute access(read: administer) DatastoreEndpointEntryStruct nodeEndpointList[] = 13;
+  readonly attribute access(read: administer) long_octet_string<400> anchorRootCA = 0;
+  readonly attribute access(read: administer) node_id anchorNodeID = 1;
+  readonly attribute access(read: administer) vendor_id anchorVendorID = 2;
+  readonly attribute access(read: administer) char_string<32> friendlyName = 3;
+  readonly attribute access(read: administer) DatastoreGroupKeySetStruct groupKeySetList[] = 4;
+  readonly attribute access(read: administer) DatastoreGroupInformationEntryStruct groupList[] = 5;
+  readonly attribute access(read: administer) DatastoreNodeInformationEntryStruct nodeList[] = 6;
+  readonly attribute access(read: administer) DatastoreAdministratorInformationEntryStruct adminList[] = 7;
+  readonly attribute access(read: administer) DatastoreStatusEntryStruct status = 8;
+  readonly attribute access(read: administer) DatastoreEndpointGroupIDEntryStruct endpointGroupIDList[] = 9;
+  readonly attribute access(read: administer) DatastoreEndpointBindingEntryStruct endpointBindingList[] = 10;
+  readonly attribute access(read: administer) DatastoreNodeKeySetEntryStruct nodeKeySetList[] = 11;
+  readonly attribute access(read: administer) DatastoreACLEntryStruct nodeACLList[] = 12;
+  readonly attribute access(read: administer) DatastoreEndpointEntryStruct nodeEndpointList[] = 13;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

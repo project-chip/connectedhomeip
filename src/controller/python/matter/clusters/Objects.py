@@ -54370,7 +54370,6 @@ class JointFabricDatastore(Cluster):
                         ClusterObjectFieldDescriptor(Label="epochStartTime1", Tag=5, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="epochKey2", Tag=6, Type=typing.Union[Nullable, bytes]),
                         ClusterObjectFieldDescriptor(Label="epochStartTime2", Tag=7, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="groupKeyMulticastPolicy", Tag=8, Type=typing.Optional[JointFabricDatastore.Enums.DatastoreGroupKeyMulticastPolicyEnum]),
                     ])
 
             groupKeySetID: 'uint' = 0
@@ -54381,7 +54380,6 @@ class JointFabricDatastore(Cluster):
             epochStartTime1: 'typing.Union[Nullable, uint]' = NullValue
             epochKey2: 'typing.Union[Nullable, bytes]' = NullValue
             epochStartTime2: 'typing.Union[Nullable, uint]' = NullValue
-            groupKeyMulticastPolicy: 'typing.Optional[JointFabricDatastore.Enums.DatastoreGroupKeyMulticastPolicyEnum]' = None
 
     class Commands:
         @dataclass
