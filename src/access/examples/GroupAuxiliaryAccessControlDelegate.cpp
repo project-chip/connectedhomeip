@@ -268,6 +268,22 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
+CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Initialize(Credentials::GroupDataProvider * groupDataProvider,
+                                                           FabricTable * fabricTable)
+{
+    VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mGroupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mGroupDataProvider = groupDataProvider;
+    mFabricTable       = fabricTable;
+    return CHIP_NO_ERROR;
+}
+
+void GroupAuxiliaryAccessControlDelegate::Shutdown()
+{
+    mGroupDataProvider = nullptr;
+    mFabricTable       = nullptr;
+}
+
 /*
  * This function (in conjunction with Next() from the AuxiliaryEntryIteratorDelegate) will create an auxiliary
  * ACL entry for every <fabric index, group ID, endpoint ID> that belongs based on the information from
@@ -278,6 +294,7 @@ namespace Examples {
 CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
                                                                  const FabricIndex * fabricIndex) const
 {
+    VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>();
     if (delegate)
     {

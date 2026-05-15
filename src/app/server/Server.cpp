@@ -317,9 +317,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
     {
-        if (!initParams.groupAuxiliaryAccessControlDelegate->HasFabricTable())
+        // If the application handed us an uninitialized delegate (e.g. the default owned by
+        // CommonCaseDeviceServerInitParams), Initialize it now with the Server's FabricTable
+        // so auxiliary-entry iteration walks only provisioned fabric indices.
+        if (!initParams.groupAuxiliaryAccessControlDelegate->IsInitialized())
         {
-            initParams.groupAuxiliaryAccessControlDelegate->SetFabricTable(&mFabrics);
+            SuccessOrExit(err = initParams.groupAuxiliaryAccessControlDelegate->Initialize(mGroupsProvider, &mFabrics));
         }
         SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
     }

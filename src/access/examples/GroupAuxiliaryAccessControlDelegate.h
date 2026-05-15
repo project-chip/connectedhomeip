@@ -33,13 +33,38 @@ namespace Examples {
 class GroupAuxiliaryAccessControlDelegate : public AccessControl::Delegate
 {
 public:
-    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider, FabricTable * fabricTable = nullptr) :
-        mGroupDataProvider(groupDataProvider), mFabricTable(fabricTable)
-    {}
+    GroupAuxiliaryAccessControlDelegate()           = default;
     ~GroupAuxiliaryAccessControlDelegate() override = default;
 
-    bool HasFabricTable() const override { return mFabricTable != nullptr; }
-    void SetFabricTable(FabricTable * fabricTable) override { mFabricTable = fabricTable; }
+    /**
+     * Wires the delegate to its collaborators. Must be called exactly once before the
+     * delegate is registered with AccessControl or otherwise used.
+     *
+     * Named Initialize (not Init) to avoid hiding the no-op AccessControl::Delegate::Init()
+     * virtual that the access-control framework may invoke through the base pointer.
+     *
+     * @param groupDataProvider Required. Source of group / endpoint membership data.
+     * @param fabricTable       Required. Pass a valid FabricTable so that auxiliary-entry
+     *                          iteration walks only provisioned fabric indices. Passing
+     *                          nullptr is allowed but discouraged: iteration then walks
+     *                          [kMinValidFabricIndex, kMaxValidFabricIndex] linearly.
+     *
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if @a groupDataProvider is null.
+     * @retval CHIP_ERROR_INCORRECT_STATE  if Initialize has already been called.
+     */
+    CHIP_ERROR Initialize(Credentials::GroupDataProvider * groupDataProvider, FabricTable * fabricTable);
+
+    /**
+     * Resets the delegate to its uninitialized state, releasing references to the
+     * GroupDataProvider and FabricTable. Idempotent (no-op when already uninitialized).
+     * After Shutdown, Initialize may be called again. Callers are responsible for
+     * unregistering the delegate from AccessControl before Shutdown if it was registered.
+     */
+    void Shutdown();
+
+    /** @return true if Initialize has completed successfully. */
+    bool IsInitialized() const { return mGroupDataProvider != nullptr; }
+
     // Delegate implementation
     CHIP_ERROR AuxiliaryEntries(AccessControl::EntryIterator & iterator, const FabricIndex * fabricIndex) const override;
 
@@ -47,8 +72,8 @@ public:
                      Privilege requestPrivilege) override;
 
 private:
-    Credentials::GroupDataProvider * mGroupDataProvider;
-    FabricTable * mFabricTable;
+    Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
+    FabricTable * mFabricTable                          = nullptr;
 };
 
 } // namespace Examples

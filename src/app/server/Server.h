@@ -191,8 +191,10 @@ struct ServerInitParams
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
     // Access control auxiliary delegate: Optional. Used to look up auxiliary access control rules.
-    // If provided, must be initialized before being provided.
-    Access::AccessControl::Delegate * groupAuxiliaryAccessControlDelegate = nullptr;
+    // May be either pre-initialized (Initialize already called) or default-constructed:
+    // Server::Init will call Initialize with its own FabricTable on a not-yet-initialized
+    // delegate before registering it.
+    Access::Examples::GroupAuxiliaryAccessControlDelegate * groupAuxiliaryAccessControlDelegate = nullptr;
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
@@ -369,9 +371,12 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #if CHIP_CONFIG_ENABLE_GROUPCAST
         if (this->groupAuxiliaryAccessControlDelegate == nullptr)
         {
+            // The delegate is left uninitialized here on purpose: Server::Init will call
+            // Initialize on it with the Server-owned FabricTable, which is not reachable
+            // from this scope.
             this->groupAuxiliaryAccessControlDelegate = &mGroupAuxiliaryAccessControlDelegate;
         }
-#endif  // CHIP_CONFIG_ENABLE_GROUPCAST
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
         return CHIP_NO_ERROR;
     }
@@ -403,10 +408,8 @@ private:
 #endif
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
-    // Default delegate used when the application does not provide its own. The Server's
-    // FabricTable is not reachable from here, so the delegate iterates fabric indices
-    // linearly instead of via FabricTable iteration; functionally equivalent.
-    Access::Examples::GroupAuxiliaryAccessControlDelegate mGroupAuxiliaryAccessControlDelegate{ &mGroupDataProvider };
+    // Default delegate used when the application does not provide its own.
+    Access::Examples::GroupAuxiliaryAccessControlDelegate mGroupAuxiliaryAccessControlDelegate;
 #endif
 };
 
