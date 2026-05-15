@@ -109,8 +109,6 @@ class TC_ICDB_3_2(ICDBaseTest):
     @async_test_body
     async def test_TC_ICDB_3_2(self):
 
-        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-
         # *** PRECONDITION ***
         # Commissioning, already done
         self.step("precondition")
@@ -142,7 +140,7 @@ class TC_ICDB_3_2(ICDBaseTest):
         # *** STEP 2a ***
         # Apply vendor specific mechanism to transition DUT from SIT to LIT operating mode
         self.step("2a")
-        if is_ci:
+        if self.is_pics_sdk_ci_only:
             await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kDSLSWithdrawSitMode)
         else:
             self.wait_for_user_input(
