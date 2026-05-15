@@ -19,9 +19,11 @@ cmake_minimum_required(VERSION 3.20)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
+get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
 
 include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
+include(${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake)
 
 add_compile_definitions(IDENTIFY_CLUSTER_DISABLED=1)
 
@@ -36,7 +38,8 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/zephyr_ext
                            ${CHIP_ROOT}/examples/all-devices-app/all-devices-common
                            ${CHIP_ROOT}/src/data-model-providers/codedriven
-                           ${CHIP_ROOT}/src/data-model-providers)
+                           ${CHIP_ROOT}/src/data-model-providers
+                           ${CMAKE_CURRENT_BINARY_DIR}) # for generated app_config/enabled_devices.h
 
 target_sources(app PRIVATE
                # Code-driven data model
@@ -46,25 +49,8 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
                ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 
-               # all-devices common interfaces
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/interface/DeviceInterface.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/interface/SingleEndpointDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/RootNodeDevice.cpp
-
-               # supported devices
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/on-off-light/LoggingOnOffLightDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/dimmable-light/DimmableLightDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/OccupancySensorDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/temperature-sensor/TemperatureSensorDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/soil-sensor/SoilSensorDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/chime/ChimeDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/speaker/SpeakerDevice.cpp
-               ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/speaker/impl/LoggingSpeakerDevice.cpp)
+               # all-devices common sources (interfaces, root node base, supported devices)
+               ${ALL_DEVICES_DEVICE_SOURCES})
 
 target_sources(app PRIVATE
                src/AppTask.cpp

@@ -22,6 +22,7 @@
 #
 # Exports:
 #   ALL_DEVICES_DEVICE_SRCDIRS  — list of device module source directories
+#   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files (for non-component builds)
 #
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
 # to their include-directory list so that the generated
@@ -48,6 +49,32 @@ set(ALL_DEVICES_DEVICE_SRCDIRS
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl"
+    # keep-sorted: end
+)
+
+# ---------------------------------------------------------------------------
+# Source files for devices and common interfaces (for non-component CMake builds).
+# Excludes root-node specialization files (Thread/WiFi) which require platform
+# specific selection.
+# ---------------------------------------------------------------------------
+set(ALL_DEVICES_DEVICE_SOURCES
+    # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
     # keep-sorted: end
 )
 
