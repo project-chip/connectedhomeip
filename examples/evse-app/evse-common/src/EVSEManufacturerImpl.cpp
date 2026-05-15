@@ -465,7 +465,7 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
     Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
 
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
-    // since it takes a copy (see power-source-server/CodegenIntegration.cpp)
+    // since it takes a copy (see power-source-server/codegen/power-source-server.cpp)
     return PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
 }
 

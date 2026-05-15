@@ -29,9 +29,8 @@ void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
 {
     auto & storage = mGroupKeySetStorage[source.groupKeySetID];
 
-    destination.groupKeySetID           = source.groupKeySetID;
-    destination.groupKeySecurityPolicy  = source.groupKeySecurityPolicy;
-    destination.groupKeyMulticastPolicy = source.groupKeyMulticastPolicy;
+    destination.groupKeySetID          = source.groupKeySetID;
+    destination.groupKeySecurityPolicy = source.groupKeySecurityPolicy;
 
     CopyByteSpanWithOwnedStorage(source.epochKey0, storage.epochKey0, destination.epochKey0);
     CopyByteSpanWithOwnedStorage(source.epochKey1, storage.epochKey1, destination.epochKey1);
@@ -996,9 +995,7 @@ JointFabricDatastore::UpdateGroupKeySetEntry(
             LogErrorOnFailure(UpdateNodeKeySetList(groupKeySet));
 
             VerifyOrReturnValue(groupKeySet.groupKeySecurityPolicy <
-                                        Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue &&
-                                    groupKeySet.groupKeyMulticastPolicy <
-                                        Clusters::JointFabricDatastore::DatastoreGroupKeyMulticastPolicyEnum::kUnknownEnumValue,
+                                    Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue,
                                 CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
             CopyGroupKeySetWithOwnedSpans(groupKeySet, entry);
@@ -1081,9 +1078,7 @@ JointFabricDatastore::UpdateNodeKeySetList(Clusters::JointFabricDatastore::Struc
         if (entry.groupKeySetID == groupKeySet.groupKeySetID)
         {
             if (groupKeySet.groupKeySecurityPolicy <
-                    Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue &&
-                groupKeySet.groupKeyMulticastPolicy <
-                    Clusters::JointFabricDatastore::DatastoreGroupKeyMulticastPolicyEnum::kUnknownEnumValue)
+                Clusters::JointFabricDatastore::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue)
             {
 
                 size_t index = i;
