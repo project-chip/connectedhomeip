@@ -138,11 +138,6 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void WindowCoveringCluster::Shutdown(ClusterShutdownType shutdownType)
-{
-    DefaultServerCluster::Shutdown(shutdownType);
-}
-
 void WindowCoveringCluster::SetNumberOfActuationsLift(uint16_t numOfLifts)
 {
     VerifyOrReturn(SetAttributeValue(mNumberOfActuationsLift, numOfLifts, Attributes::NumberOfActuationsLift::Id));
@@ -362,7 +357,8 @@ CHIP_ERROR WindowCoveringCluster::Attributes(const ConcreteClusterPath & path,
         { mOptionalAttributes.IsSet(Attributes::SafetyStatus::Id), Attributes::SafetyStatus::kMetadataEntry },
     };
     return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
-} // namespace WindowCovering
+}
+
 CHIP_ERROR WindowCoveringCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {

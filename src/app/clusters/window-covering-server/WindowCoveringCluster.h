@@ -132,7 +132,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown(ClusterShutdownType) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
@@ -258,8 +257,8 @@ private:
     EndpointId GetEndpointId() { return mPath.mEndpointId; }
 
     WindowCoveringDelegate * mDelegate = nullptr;
-    BitFlags<WindowCovering::Feature> mFeatureMap;
-    OptionalAttributeSet mOptionalAttributes;
+    const BitFlags<WindowCovering::Feature> mFeatureMap;
+    const OptionalAttributeSet mOptionalAttributes;
 
     // Attributes
     Type mType                       = Type::kRollerShade;
