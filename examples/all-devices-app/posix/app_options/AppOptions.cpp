@@ -36,7 +36,6 @@ constexpr uint16_t kOptionVendorId      = 0xffd5;
 constexpr uint16_t kOptionProductId     = 0xffd6;
 constexpr uint16_t kOptionPort          = 0xffd7;
 constexpr uint16_t kOptionInterfaceId   = 0xffd8;
-constexpr uint16_t kOptionBLE           = 0xffd9;
 constexpr uint16_t kOptionGroupcast     = 0xffda;
 
 DeviceTypeParser AppOptions::sParser;
