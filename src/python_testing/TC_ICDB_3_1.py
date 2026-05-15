@@ -282,7 +282,10 @@ class TC_ICDB_3_1(ICDBaseTest):
         # *** STEP 6a ***
         # TH sends UnregisterClient command with the CheckInNodeID
         self.step("6a")
-        await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=check_in_node_id))
+        try:
+            await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=check_in_node_id))
+        except InteractionModelError as e:
+            asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
         log.info(f"UnregisterClient SUCCESS for checkInNodeID={check_in_node_id}")
 
         # *** STEP 6b ***
