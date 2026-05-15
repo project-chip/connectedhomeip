@@ -1610,7 +1610,7 @@ cluster ThreadNetworkDirectory = 1107 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
 
 
   server cluster Descriptor {
@@ -1785,7 +1785,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_network_infrastructure_manager = 144, version 1;
+  device type ma_network_infrastructure_manager = 144, version 2;
 
 
   server cluster Descriptor {

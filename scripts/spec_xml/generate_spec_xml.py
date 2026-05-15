@@ -46,21 +46,7 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
-    "ambient-context-sensor",
-    "ambientsensing",
-    "cameras",
-    "cameras-image-rotation",
     "groupcast",
-    "hrap-pdc",
-    "hrap-tbrd",
-    "hvac-thermostat-events",
-    "hvac-thermostat-suggestions",
-    "improved-capabilities-tcr",
-    "partitioned-crl",
-    "security-sensor-events-tcr",
-    "tcr-smokeco-unmounted-state",
-    "temperature-alarm",
-    "thread-commissioning",
 ]
 
 
@@ -417,12 +403,10 @@ def dump_ids_from_data_model_dirs():
         version_clusters[dir] = {id: cluster_support_str(c) for id, c in clusters.items()}
 
         # Update the PICS Codes
-        for id, c in clusters.items():
-            if id not in pics_code_clusters:
-                pics_code_clusters[id] = c.pics
-            elif pics_code_clusters[id] != c.pics:
-                log.warning("PICS Code is inconsistent among different versions of the spec for cluster ID #%s!", id)
-
+        for k, c in clusters.items():
+            if k in pics_code_clusters and pics_code_clusters[k] != c.pics:
+                log.warning("PICS Code is inconsistent among different versions of the spec for cluster ID #%s!", k)
+            pics_code_clusters[k] = c.pics
         # Device types don't currently have provisional markings in the spec
         # But a device type can't be certified if it has mandatory clusters that are provisional
         # TODO: create provisional
