@@ -230,8 +230,8 @@ using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
 AppTask::LockRequest AppTask::sStagedLockRequest{};
-bool AppTask::sStagedLockRequestValid                = false;
-osMutexId_t AppTask::sStagedLockRequestMutex         = nullptr;
+bool AppTask::sStagedLockRequestValid        = false;
+osMutexId_t AppTask::sStagedLockRequestMutex = nullptr;
 
 CHIP_ERROR AppTask::AppInit()
 {
@@ -785,8 +785,7 @@ bool AppTask::NextState()
 bool AppTask::IsActuatorBusy() const
 {
     // kUnlatchCompleted as "still in progress" for command-queueing purposes.
-    return (mLockActuatorState == LockActuatorState::kLockInitiated ||
-            mLockActuatorState == LockActuatorState::kUnlockInitiated ||
+    return (mLockActuatorState == LockActuatorState::kLockInitiated || mLockActuatorState == LockActuatorState::kUnlockInitiated ||
             mLockActuatorState == LockActuatorState::kUnlatchInitiated ||
             mLockActuatorState == LockActuatorState::kUnlatchCompleted);
 }
@@ -874,8 +873,8 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
     }
 
     Protocols::InteractionModel::Status status =
-        DoorLockServer::Instance().SetLockState(ctx.mEndpointId, DlLockState::kUnlocked, OperationSourceEnum::kRemote,
-                                                NullNullable, NullNullable, ctx.mFabricIdx, ctx.mNodeId)
+        DoorLockServer::Instance().SetLockState(ctx.mEndpointId, DlLockState::kUnlocked, OperationSourceEnum::kRemote, NullNullable,
+                                                NullNullable, ctx.mFabricIdx, ctx.mNodeId)
         ? Protocols::InteractionModel::Status::Success
         : Protocols::InteractionModel::Status::Failure;
     if (status != Protocols::InteractionModel::Status::Success)
@@ -1007,18 +1006,17 @@ void AppTask::EnqueueLockRequest(const LockRequest & request)
     osStatus_t mutexStatus = osMutexAcquire(sStagedLockRequestMutex, osWaitForever);
     if (mutexStatus != osOK)
     {
-        ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest",
-                     static_cast<int>(mutexStatus));
+        ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest", static_cast<int>(mutexStatus));
         return;
     }
     sStagedLockRequest      = request;
     sStagedLockRequestValid = true;
     osMutexRelease(sStagedLockRequestMutex);
 
-    AppEvent event                   = {};
-    event.Type                       = AppEvent::kEventType_LockRequest;
-    event.LockRequestEvent.Request   = nullptr;
-    event.Handler                    = &CustomerAppTask::LockRequestEventHandler;
+    AppEvent event                 = {};
+    event.Type                     = AppEvent::kEventType_LockRequest;
+    event.LockRequestEvent.Request = nullptr;
+    event.Handler                  = &CustomerAppTask::LockRequestEventHandler;
     appInstance().PostEvent(&event);
 }
 
@@ -1639,9 +1637,8 @@ DlStatus AppTask::DMDoorLockSetHolidaySchedule(chip::EndpointId endpointId, uint
     return DlStatus::kSuccess;
 }
 
-bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin,
-                          Nullable<uint16_t> & outUserIndex, LockOpCredentials & outCred, bool & outHasCred,
-                          OperationErrorEnum & err)
+bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, Nullable<uint16_t> & outUserIndex,
+                          LockOpCredentials & outCred, bool & outHasCred, OperationErrorEnum & err)
 {
     outUserIndex.SetNull();
     outHasCred = false;
@@ -1721,11 +1718,12 @@ bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::Byte
     return false;
 }
 
-void AppTask::PushClusterLockState(chip::EndpointId endpointId, DlLockState lockState, const Nullable<chip::FabricIndex> & fabricIdx,
-                                   const Nullable<chip::NodeId> & nodeId, const Nullable<uint16_t> & userIndex,
-                                   const LockOpCredentials * cred, bool hasCred)
+void AppTask::PushClusterLockState(chip::EndpointId endpointId, DlLockState lockState,
+                                   const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                                   const Nullable<uint16_t> & userIndex, const LockOpCredentials * cred, bool hasCred)
 {
-    ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", LockStateToString(lockState), endpointId);
+    ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", LockStateToString(lockState),
+                  endpointId);
 
     if (hasCred && cred != nullptr)
     {

@@ -248,10 +248,9 @@ public:
 
     struct LockRequest
     {
-        chip::EndpointId endpointId = chip::kInvalidEndpointId;
-        LockAction action           = LockAction::kInvalid;
-        chip::app::Clusters::DoorLock::DlLockState targetClusterState =
-            chip::app::Clusters::DoorLock::DlLockState::kLocked;
+        chip::EndpointId endpointId                                   = chip::kInvalidEndpointId;
+        LockAction action                                             = LockAction::kInvalid;
+        chip::app::Clusters::DoorLock::DlLockState targetClusterState = chip::app::Clusters::DoorLock::DlLockState::kLocked;
         chip::app::DataModel::Nullable<chip::FabricIndex> fabricIdx;
         chip::app::DataModel::Nullable<chip::NodeId> nodeId;
         chip::app::DataModel::Nullable<uint16_t> userIndex;
@@ -352,10 +351,9 @@ private:
 
     struct PendingCommand
     {
-        bool mValid                                                = false;
-        LockAction mAction                                         = LockAction::kInvalid;
-        chip::app::Clusters::DoorLock::DlLockState mTargetClusterState =
-            chip::app::Clusters::DoorLock::DlLockState::kLocked;
+        bool mValid                                                    = false;
+        LockAction mAction                                             = LockAction::kInvalid;
+        chip::app::Clusters::DoorLock::DlLockState mTargetClusterState = chip::app::Clusters::DoorLock::DlLockState::kLocked;
         chip::app::DataModel::Nullable<chip::FabricIndex> mFabricIdx;
         chip::app::DataModel::Nullable<chip::NodeId> mNodeId;
         chip::app::DataModel::Nullable<uint16_t> mUserIndex;
