@@ -62,7 +62,7 @@
       ],
       "deviceVersions": [
         1,
-        5
+        4
       ],
       "deviceIdentifiers": [
         17,
@@ -10660,7 +10660,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        3
       ],
       "deviceIdentifiers": [
         257
