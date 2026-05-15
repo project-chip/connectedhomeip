@@ -197,9 +197,6 @@ public:
     Protocols::InteractionModel::Status HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields);
 
     // Setters and Getters
-    bool HasFeature(Feature feature) const { return mFeatureMap.Has(feature); }
-    bool HasFeaturePaLift() const;
-    bool HasFeaturePaTilt() const;
     BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
 
     void SetType(Type type) { SetAttributeValue(mType, type, Attributes::Type::Id); }
