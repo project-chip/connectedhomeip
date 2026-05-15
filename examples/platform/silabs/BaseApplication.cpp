@@ -289,8 +289,6 @@ CHIP_ERROR BaseApplication::Init()
         appError(err);
         return err;
     }
-
-    GetPlatform().WatchdogInit();
     return err;
 }
 
