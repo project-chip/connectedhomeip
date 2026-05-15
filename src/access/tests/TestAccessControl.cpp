@@ -1312,7 +1312,7 @@ public: // protected
         ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
         chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 
-        // Register group auxilary access control delegate. 
+        // Register group auxilary access control delegate.
         // The shared global delegate is not tied to a FabricTable.
         SuccessOrDie(gGroupAuxiliaryAccessControlDelegate.Initialize(&gGroupsProvider, nullptr));
         SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate));
