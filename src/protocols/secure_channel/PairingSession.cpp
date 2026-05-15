@@ -21,6 +21,7 @@
 #include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceEvent.h>
@@ -44,6 +45,16 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
     // Prepare SecureSession fields, including key derivation, first, before activation
     Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
     ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
+
+#if CHIP_CONFIG_LOG_SESSION_KEYS
+    {
+        ChipLogProgress(SecureChannel, "Session keys: Type=%s LSID=%u PSID=%u Role=%s",
+                        secureSession->GetSecureSessionType() == Transport::SecureSession::Type::kPASE ? "PASE" : "CASE",
+                        secureSession->GetLocalSessionId(), GetPeerSessionId(),
+                        mRole == CryptoContext::SessionRole::kInitiator ? "Initiator" : "Responder");
+        Encoding::LogBufferAsHex("Session keys: Challenge", secureSession->GetCryptoContext().GetAttestationChallenge());
+    }
+#endif // CHIP_CONFIG_LOG_SESSION_KEYS
 
     uint16_t peerSessionId = GetPeerSessionId();
     secureSession->SetPeerAddress(peerAddress);

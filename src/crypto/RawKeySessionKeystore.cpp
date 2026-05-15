@@ -17,7 +17,9 @@
 
 #include <crypto/RawKeySessionKeystore.h>
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/BufferReader.h>
+#include <lib/support/BytesToHex.h>
 
 #include <cstdint>
 
@@ -77,6 +79,16 @@ CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const ByteSpan & secret, con
 
     ReturnErrorOnFailure(hkdf.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info.data(), info.size(),
                                           keyMaterial, sizeof(keyMaterial)));
+
+#if CHIP_CONFIG_LOG_SESSION_KEYS
+    {
+        constexpr size_t kKeyLen       = sizeof(Symmetric128BitsKeyByteArray);
+        constexpr size_t kChallengeLen = AttestationChallenge::Capacity();
+        Encoding::LogBufferAsHex("Session keys: I2R", ByteSpan(keyMaterial, kKeyLen));
+        Encoding::LogBufferAsHex("Session keys: R2I", ByteSpan(keyMaterial + kKeyLen, kKeyLen));
+        Encoding::LogBufferAsHex("Session keys: Challenge", ByteSpan(keyMaterial + 2 * kKeyLen, kChallengeLen));
+    }
+#endif // CHIP_CONFIG_LOG_SESSION_KEYS
 
     Encoding::LittleEndian::Reader reader(keyMaterial, sizeof(keyMaterial));
 
