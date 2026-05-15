@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ class TelinkApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     BRIDGE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
@@ -55,6 +56,8 @@ class TelinkApp(Enum):
             return 'all-clusters-app'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'bridge-app'
         if self == TelinkApp.CONTACT_SENSOR:
@@ -90,6 +93,8 @@ class TelinkApp(Enum):
             return 'chip-telink-all-clusters-example'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'chip-telink-bridge-example'
         if self == TelinkApp.CONTACT_SENSOR:
