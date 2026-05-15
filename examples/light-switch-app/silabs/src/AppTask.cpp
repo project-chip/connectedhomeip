@@ -22,6 +22,7 @@
  *********************************************************/
 
 #include "AppTask.h"
+#include "CustomerAppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
@@ -83,6 +84,11 @@ using namespace chip::TLV;
 
 namespace {
 
+CustomerAppTask & appInstance()
+{
+    return CustomerAppTask::GetAppTask();
+}
+
 using StepModeEnum = chip::app::Clusters::LevelControl::StepModeEnum;
 
 chip::EndpointId gLightSwitchEndpoint   = chip::kInvalidEndpointId;
@@ -94,45 +100,46 @@ bool sActionButtonPressed    = false;
 bool sActionButtonSuppressed = false;
 bool sIsButtonEventTriggered = false;
 
+osTimerId_t sLongPressTimer = nullptr;
+
+void PostLevelControlActionEvent(void * /* context */)
+{
+    AppEvent event;
+    event.Handler = &CustomerAppTask::AppEventHandler;
+    if (sActionButtonPressed)
+    {
+        sActionButtonSuppressed = true;
+        event.Type              = AppEvent::kEventType_TriggerLevelControlAction;
+        appInstance().PostEvent(&event);
+    }
+}
+
+void LightSwitchContextReleaseHandler(void * context)
+{
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "LightSwitchContextReleaseHandler: context is null"));
+    Platform::Delete(static_cast<BindingCommandData *>(context));
+}
+
 } // namespace
 
 /**********************************************************
  * AppTask Definitions
  *********************************************************/
 
-AppTask AppTask::sAppTask;
-
-void AppTask::PostLevelControlActionEvent(void * context)
-{
-    AppTask * app = static_cast<AppTask *>(context);
-    if (!app)
-    {
-        return;
-    }
-    AppEvent event;
-    event.Handler = AppTask::AppEventHandler;
-    if (sActionButtonPressed)
-    {
-        sActionButtonSuppressed = true;
-        event.Type              = AppEvent::kEventType_TriggerLevelControlAction;
-        app->PostEvent(&event);
-    }
-}
-
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
 
-    err = InitLightSwitch(kLightSwitchEndpoint, kGenericSwitchEndpoint);
+    err = appInstance().InitLightSwitch(kLightSwitchEndpoint, kGenericSwitchEndpoint);
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("InitLightSwitch failed!");
         appError(err);
     }
 
-    longPressTimer = osTimerNew(PostLevelControlActionEvent, osTimerOnce, this, NULL);
-    if (longPressTimer == NULL)
+    sLongPressTimer = osTimerNew(PostLevelControlActionEvent, osTimerOnce, nullptr, NULL);
+    if (sLongPressTimer == NULL)
     {
         SILABS_LOG("Timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
@@ -151,7 +158,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
     osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
 
-    CHIP_ERROR err = sAppTask.Init();
+    CHIP_ERROR err = appInstance().Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("AppTask.Init() failed");
@@ -159,7 +166,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sAppTask.StartStatusLEDTimer();
+    appInstance().StartStatusLEDTimer();
 #endif
 
     SILABS_LOG("App Task started");
@@ -168,7 +175,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
         while (eventReceived == osOK)
         {
-            sAppTask.DispatchEvent(&event);
+            appInstance().DispatchEvent(&event);
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
         }
     }
@@ -177,7 +184,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent event = {};
-    event.Handler  = AppTask::AppEventHandler;
+    event.Handler  = &CustomerAppTask::AppEventHandler;
     if (btnAction == to_underlying(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         event.Type = (button ? AppEvent::kEventType_ActionButtonPressed : AppEvent::kEventType_FunctionButtonPressed);
@@ -186,7 +193,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         event.Type = (button ? AppEvent::kEventType_ActionButtonReleased : AppEvent::kEventType_FunctionButtonReleased);
     }
-    sAppTask.PostEvent(&event);
+    appInstance().PostEvent(&event);
 }
 
 void AppTask::AppEventHandler(AppEvent * aEvent)
@@ -210,7 +217,7 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
             button_event.Type               = AppEvent::kEventType_Button;
             button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed);
             button_event.Handler            = BaseApplication::ButtonHandler;
-            sAppTask.PostEvent(&button_event);
+            appInstance().PostEvent(&button_event);
         }
         break;
 
@@ -224,7 +231,7 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
             button_event.Type               = AppEvent::kEventType_Button;
             button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased);
             button_event.Handler            = BaseApplication::ButtonHandler;
-            sAppTask.PostEvent(&button_event);
+            appInstance().PostEvent(&button_event);
         }
         break;
 
@@ -244,9 +251,9 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
             ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
                             ((gStepDirection == StepModeEnum::kUp) ? "kUp" : "kDown"));
         }
-        else if (sAppTask.longPressTimer)
+        else if (sLongPressTimer)
         {
-            osStatus_t status = osTimerStart(sAppTask.longPressTimer, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT_MS));
+            osStatus_t status = osTimerStart(sLongPressTimer, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT_MS));
             if (status != osOK)
             {
                 SILABS_LOG("Timer start() failed with error code : %lx", status);
@@ -257,9 +264,9 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
 
     case AppEvent::kEventType_ActionButtonReleased:
         sActionButtonPressed = false;
-        if (sAppTask.longPressTimer)
+        if (sLongPressTimer)
         {
-            if (osTimerStop(sAppTask.longPressTimer) == osError)
+            if (osTimerStop(sLongPressTimer) == osError)
             {
                 SILABS_LOG("Timer stop() failed");
                 appError(APP_ERROR_STOP_TIMER_FAILED);
@@ -319,7 +326,8 @@ CHIP_ERROR AppTask::InitLightSwitch(EndpointId lightSwitchEndpoint, EndpointId g
     gLightSwitchEndpoint   = lightSwitchEndpoint;
     gGenericSwitchEndpoint = genericSwitchEndpoint;
 
-    CHIP_ERROR scheduleErr = chip::DeviceLayer::PlatformMgr().ScheduleWork(&AppTask::InitBindingHandler, 0);
+    CHIP_ERROR scheduleErr =
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(&CustomerAppTask::InitBindingHandler, 0);
     if (scheduleErr != CHIP_NO_ERROR)
     {
         SILABS_LOG("InitBindingHandler() failed! Error: %" CHIP_ERROR_FORMAT, scheduleErr.Format());
@@ -721,12 +729,6 @@ void AppTask::LightSwitchChangedHandler(const Binding::TableEntry & binding, Ope
     }
 }
 
-void AppTask::LightSwitchContextReleaseHandler(void * context)
-{
-    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "LightSwitchContextReleaseHandler: context is null"));
-    Platform::Delete(static_cast<BindingCommandData *>(context));
-}
-
 void AppTask::InitBindingHandler(intptr_t arg)
 {
     (void) arg;
@@ -734,7 +736,7 @@ void AppTask::InitBindingHandler(intptr_t arg)
     auto & server = chip::Server::GetInstance();
     LogErrorOnFailure(Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }));
-    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(&CustomerAppTask::LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
@@ -752,8 +754,8 @@ void AppTask::SwitchWorkerFunction(intptr_t context)
     }
 }
 
-void AppTask::PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                          uint8_t * value)
+void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                            uint8_t * value)
 {
     ClusterId clusterId                      = attributePath.mClusterId;
     [[maybe_unused]] AttributeId attributeId = attributePath.mAttributeId;
@@ -764,15 +766,4 @@ void AppTask::PostAttributeChangeCallback(const chip::app::ConcreteAttributePath
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
-}
-
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
-{
-    AppTask::PostAttributeChangeCallback(attributePath, type, size, value);
-}
-
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    (void) endpoint;
 }
