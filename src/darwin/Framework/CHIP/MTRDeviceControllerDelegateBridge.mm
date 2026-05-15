@@ -205,7 +205,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
 
                 // If the client implements the context delegate, prefer that over others
                 if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:context:)]) {
-                    [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics context:@{}];
+                    [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics context:@ {}];
                 } else if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
                 } else {
