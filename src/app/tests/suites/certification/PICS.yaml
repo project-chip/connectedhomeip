@@ -600,11 +600,6 @@ PICS:
       id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
 
     - label:
-          "Is the device a Server and capable of generating large data which is
-          greater than 1 MTU(1280 bytes)"
-      id: MCORE.IDM.S.LargeData
-
-    - label:
           "Is the device a Client and supports subscribing to an individual
           Event"
       id: MCORE.IDM.C.SubscribeEvent

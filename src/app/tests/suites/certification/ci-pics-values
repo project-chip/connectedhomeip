@@ -2229,7 +2229,6 @@ MCORE.IDM.C.WriteRequest.Attribute.DataType_Enum=1
 MCORE.IDM.C.WriteRequest.Attribute.DataType_Bitmap=1
 MCORE.IDM.C.SubscribeRequest.Attribute.DataType_Bool=1
 MCORE.IDM.C.SubscribeRequest.MultipleAttributes=1
-MCORE.IDM.S.LargeData=1
 MCORE.IDM.S.PersistentSubscription=1
 
 # Time Synchronization
