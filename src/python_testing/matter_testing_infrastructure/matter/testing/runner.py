@@ -367,6 +367,24 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
+def read_global_wildcard(event_loop, default_controller, node_id):
+    return event_loop.run_until_complete(
+        asyncio.wait_for(
+            default_controller.Read(
+                node_id,
+                [
+                    (Clusters.Descriptor),
+                    (Clusters.BasicInformation),
+                    Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                    Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                    Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                ],
+            ),
+            timeout=60,
+        )
+    )
+
+
 def run_tests_no_exit(
         test_class,
         matter_test_config,
@@ -486,21 +504,7 @@ def run_tests_no_exit(
                         )
                     )
                     if commissionee is not None:
-                        stored_global_wildcard = event_loop.run_until_complete(
-                            asyncio.wait_for(
-                                default_controller.Read(
-                                    node_id,
-                                    [
-                                        (Clusters.Descriptor),
-                                        (Clusters.BasicInformation),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                    ],
-                                ),
-                                timeout=60,
-                            )
-                        )
+                        stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                     else:
                         LOGGER.error("FindOrEstablishPASESession returned None")
@@ -514,21 +518,7 @@ def run_tests_no_exit(
                             )
                         )
                         if commissionee is not None:
-                            stored_global_wildcard = event_loop.run_until_complete(
-                                asyncio.wait_for(
-                                    default_controller.Read(
-                                        node_id,
-                                        [
-                                            (Clusters.Descriptor),
-                                            (Clusters.BasicInformation),
-                                            Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                            Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                            Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                        ],
-                                    ),
-                                    timeout=60,
-                                )
-                            )
+                            stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                             test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                     except Exception:
                         LOGGER.warning("Could not pre-populate global wildcard via PASE")
@@ -536,21 +526,7 @@ def run_tests_no_exit(
                 else:
                     # Path 3: CASE (already commissioned, no setup code)
                     try:
-                        stored_global_wildcard = event_loop.run_until_complete(
-                            asyncio.wait_for(
-                                default_controller.Read(
-                                    node_id,
-                                    [
-                                        (Clusters.Descriptor),
-                                        (Clusters.BasicInformation),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-                                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
-                                    ],
-                                ),
-                                timeout=60,
-                            )
-                        )
+                        stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
                     except Exception:
                         LOGGER.warning("Could not pre-populate global wildcard via CASE")
@@ -1035,9 +1011,9 @@ def root_index(s: str) -> int:
         "gamma": 3
     }
 
-    for name, id in CHIP_TOOL_COMPATIBILITY.items():
+    for name, _id in CHIP_TOOL_COMPATIBILITY.items():
         if s.lower() == name:
-            return id
+            return _id
     else:
         root_index = int(s)
         if root_index == 0:

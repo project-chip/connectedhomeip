@@ -556,8 +556,8 @@ private:
             }
 
             const Transport::PeerAddress & address = new_group.UsePerGroupAddress()
-                ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id)
-                : Transport::PeerAddress::Groupcast();
+                ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), new_group.group_id)
+                : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
 
             if (CHIP_NO_ERROR != mServer->GetTransportManager().MulticastGroupJoinLeave(address, true))
             {
@@ -577,7 +577,7 @@ private:
                     return;
                 }
                 const Transport::PeerAddress & address =
-                    Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id);
+                    Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), old_group.group_id);
                 VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
             }
             else
@@ -603,7 +603,7 @@ private:
                 if (!in_use)
                 {
                     // Groupcast address no longer in use, unsubscribe
-                    const Transport::PeerAddress & address = Transport::PeerAddress::Groupcast();
+                    const Transport::PeerAddress & address = Transport::PeerAddress::BuildMatterIanaMulticastAddress();
                     VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
                 }
             }

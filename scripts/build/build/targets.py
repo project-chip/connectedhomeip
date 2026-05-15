@@ -118,6 +118,8 @@ def BuildHostTarget():
     if cross_compile:
         board_parts.append(TargetPart(
             'arm64', board=HostBoard.ARM64).OnlyIfRe('-(clang|nodeps)'))
+        board_parts.append(TargetPart(
+            'arm', board=HostBoard.ARM).OnlyIfRe('-(clang|nodeps)'))
 
     target.AppendFixedTargets(board_parts)
 

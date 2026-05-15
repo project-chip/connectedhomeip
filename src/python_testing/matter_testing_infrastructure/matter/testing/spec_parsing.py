@@ -206,13 +206,13 @@ class XmlDeviceTypeClusterRequirements:
             ret += f'-- Feature overrides: {overrides}'
         if self.attribute_overrides:
             overrides = ""
-            for id, conformance in self.attribute_overrides.items():
-                overrides += f'{id:04X}: {str(conformance)} '
+            for aid, conformance in self.attribute_overrides.items():
+                overrides += f'{aid:04X}: {str(conformance)} '
             ret += f'-- Attribute overrides: {overrides}'
         if self.command_overrides:
             overrides = ""
-            for id, conformance in self.command_overrides.items():
-                overrides += f'{id:04X}: {str(conformance)} '
+            for cid, conformance in self.command_overrides.items():
+                overrides += f'{cid:04X}: {str(conformance)} '
             ret += f'-- Command overrides: {overrides}'
 
         return ret
@@ -264,11 +264,11 @@ class XmlDeviceType:
         if self.superset_of_device_type_name:
             msg += f'superset of {self.superset_of_device_type_name} ({self.superset_of_device_type_id})'
         msg += '    Server clusters\n'
-        for id, c in self.server_clusters.items():
-            msg = msg + f'      {id}: {str(c)}\n'
+        for cid, c in self.server_clusters.items():
+            msg = msg + f'      {cid}: {str(c)}\n'
         msg += '    Client clusters\n'
-        for id, c in self.client_clusters.items():
-            msg = msg + f'      {id}: {str(c)}\n'
+        for cid, c in self.client_clusters.items():
+            msg = msg + f'      {cid}: {str(c)}\n'
         return msg
 
 
@@ -377,8 +377,8 @@ class ClusterParser:
             self._derived = None
 
         for ids in cluster.iter('clusterIds'):
-            for id in ids.iter('clusterId'):
-                if id.attrib['name'] == name and list(id.iter('provisionalConform')):
+            for cid in ids.iter('clusterId'):
+                if cid.attrib['name'] == name and list(cid.iter('provisionalConform')):
                     self._is_provisional = True
 
         self._pics: Optional[str] = None
@@ -542,8 +542,8 @@ class ClusterParser:
             name = xml_field.attrib['name']
             # base=0 enables automatic number format detection: "10" -> 10, "0x10" -> 16, etc.
             # This handles XML attributes that can be in decimal, hex, octal, or binary format
-            id = uint(int(xml_field.attrib[component_tags[component_type].id_attrib], 0))
-            return (name, id)
+            aid = uint(int(xml_field.attrib[component_tags[component_type].id_attrib], 0))
+            return (name, aid)
         except (KeyError, ValueError):
             return None
 
@@ -698,17 +698,17 @@ class ClusterParser:
                 self._problems.append(p)
                 continue
 
-            name, id = field_attrs
+            name, aid = field_attrs
 
             # Extract additional field attributes
             summary = xml_field.attrib.get('summary', None)
             type_info = xml_field.attrib.get('type', None) if component_type == DataTypeEnum.kStruct else None
 
             # Check for duplicate IDs to detect invalid XML data
-            if id in components:
+            if aid in components:
                 p = ProblemNotice("Spec XML Parsing", location=location,
                                   severity=ProblemSeverity.WARNING,
-                                  problem=f"Duplicate {component_type.value} ID {id} in {struct_name} - overwriting previous entry")
+                                  problem=f"Duplicate {component_type.value} ID {aid} in {struct_name} - overwriting previous entry")
                 self._problems.append(p)
 
             # Determine field properties using helper methods
@@ -718,8 +718,8 @@ class ClusterParser:
             conformance = self._parse_field_conformance(xml_field)
 
             # Create component with all extracted attributes
-            components[id] = XmlDataTypeComponent(
-                value=id,
+            components[aid] = XmlDataTypeComponent(
+                value=aid,
                 name=name,
                 conformance=conformance,
                 summary=summary,
@@ -800,9 +800,9 @@ class ClusterParser:
                                             write_access=get_access_privilege_or_unknown(write_access),
                                             write_optional=write_optional)
         # Add in the global attributes for the base class
-        for id in GlobalAttributeIds:
+        for aid in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
-            attributes[uint(id)] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
+            attributes[uint(aid)] = XmlAttribute(name=aid.to_name(), datatype="", conformance=mandatory(
             ), read_access=ACCESS_CONTROL_PRIVILEGE_ENUM.kView, write_access=ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue, write_optional=False)
         return attributes
 
@@ -900,9 +900,9 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[uint, Xml
     cluster = xml.iter('cluster')
     for c in cluster:
         ids = c.iter('clusterId')
-        for id in ids:
-            name = id.get('name')
-            cluster_id_str = id.get('id')
+        for cid in ids:
+            name = cid.get('name')
+            cluster_id_str = cid.get('id')
             cluster_id: Optional[uint] = None
             if cluster_id_str:
                 cluster_id = uint(int(cluster_id_str, 0))
@@ -929,10 +929,10 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[uint, Xml
 
 
 def check_clusters_for_unknown_commands(clusters: dict[uint, XmlCluster], problems: list[ProblemNotice]):
-    for id, cluster in clusters.items():
+    for cid, cluster in clusters.items():
         for cmd in cluster.unknown_commands:
             problems.append(ProblemNotice(test_name="Spec XML parsing", location=CommandPathLocation(
-                endpoint_id=0, cluster_id=id, command_id=cmd.id), severity=ProblemSeverity.WARNING, problem="Command with unknown direction"))
+                endpoint_id=0, cluster_id=cid, command_id=cmd.id), severity=ProblemSeverity.WARNING, problem="Command with unknown direction"))
 
 
 class PrebuiltDataModelDirectory(Enum):
@@ -1151,13 +1151,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
         extras = {k: v for k, v in derived.items() if k not in base}
         overrides = {k: v for k, v in derived.items() if k in base}
         ret.update(extras)
-        for id, override in overrides.items():
+        for _id, override in overrides.items():
             if override.conformance is not None:
-                ret[id].conformance = override.conformance
+                ret[_id].conformance = override.conformance
             if override.read_access:
-                ret[id].read_access = override.read_access
+                ret[_id].read_access = override.read_access
             if override.write_access:
-                ret[id].write_access = override.write_access
+                ret[_id].write_access = override.write_access
 
         for attr_id, attribute in ret.items():
             if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
@@ -1168,7 +1168,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
 
     # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
     # then add the specific cluster overtop
-    for id, c in xml_clusters.items():
+    for cid, c in xml_clusters.items():
         if c.derived:
             base_name = c.derived
             if base_name in ids_by_name:
@@ -1184,7 +1184,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             command_map.update(c.command_map)
             features = deepcopy(base.features)
             features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, id, problems)
+            attributes = combine_attributes(base.attributes, c.attributes, cid, problems)
             accepted_commands = deepcopy(base.accepted_commands)
             accepted_commands.update(c.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)
@@ -1213,7 +1213,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, structs=structs,
                              enums=enums, bitmaps=bitmaps, pics=c.pics, is_provisional=provisional, revision_desc=revision_desc)
-            xml_clusters[id] = new
+            xml_clusters[cid] = new
 
 
 def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:
@@ -1371,15 +1371,15 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 severity=ProblemSeverity.WARNING, problem=f"Device type {device_name} does not have an ID listed"))
                 return device_types, problems
         try:
-            id = int(str_id, 0)
+            tid = int(str_id, 0)
             revision = int(d.attrib['revision'], 0)
         except ValueError:
             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                             severity=ProblemSeverity.WARNING,
                             problem=f"Device type {device_name} does not a valid ID or revision. ID: {str_id} revision: {d.get('revision', 'UNKNOWN')}"))
             return device_types, problems
-        if id in DEVICE_TYPE_NAME_FIXES:
-            device_name = DEVICE_TYPE_NAME_FIXES[id]
+        if tid in DEVICE_TYPE_NAME_FIXES:
+            device_name = DEVICE_TYPE_NAME_FIXES[tid]
 
         revision_desc, rev_problems = parse_revision_history(d)
         problems.extend(rev_problems)
@@ -1391,18 +1391,18 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
             superset_of_device_type_name = classification.attrib.get('superset', None)
         except (KeyError, StopIteration):
             # this is fine for base device type
-            if id == -1:
+            if tid == -1:
                 scope = 'BASE'
                 device_class = 'BASE'
                 superset_of_device_type_name = None
             else:
-                location = DeviceTypePathLocation(device_type_id=id)
+                location = DeviceTypePathLocation(device_type_id=tid)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
                 return device_types, problems
-        device_types[id] = XmlDeviceType(name=device_name, revision=revision, server_clusters={}, client_clusters={},
-                                         classification_class=device_class, revision_desc=revision_desc,
-                                         classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
+        device_types[tid] = XmlDeviceType(name=device_name, revision=revision, server_clusters={}, client_clusters={},
+                                          classification_class=device_class, revision_desc=revision_desc,
+                                          classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
         try:
             main_endpoint_clusters = next(d.iter('clusters'))
             clusters = main_endpoint_clusters.findall('cluster')
@@ -1414,7 +1414,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 try:
                     cid = uint(int(c.attrib['id'], 0))
                 except ValueError:
-                    location = DeviceTypePathLocation(device_type_id=id)
+                    location = DeviceTypePathLocation(device_type_id=tid)
                     problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                     severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
                     continue
@@ -1440,7 +1440,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 def append_overrides(override_element_type: str):
                     if override_element_type == 'feature':
                         # The device types use feature name rather than feature code. So we need to build a new map.
-                        name_to_id_map = {f.name: id for id, f in cluster_definition_xml[cid].features.items()}
+                        name_to_id_map = {f.name: _id for _id, f in cluster_definition_xml[cid].features.items()}
                         # But also...that's not universal, so let's be tolerant to using the code too.
                         name_to_id_map.update(cluster_definition_xml[cid].feature_map)
                         override = cluster.feature_overrides
@@ -1506,12 +1506,12 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 append_overrides('command')
 
                 if side == ClusterSide.SERVER:
-                    device_types[id].server_clusters[cid] = cluster
+                    device_types[tid].server_clusters[cid] = cluster
                 else:
-                    device_types[id].client_clusters[cid] = cluster
+                    device_types[tid].client_clusters[cid] = cluster
 
             except ConformanceException as ex:
-                location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
+                location = DeviceTypePathLocation(device_type_id=tid, cluster_id=cid)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem=f"Unable to parse conformance for cluster - {ex}"))
             # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
@@ -1554,16 +1554,16 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     device_types.pop(-1)
 
     # Fix up supersets
-    for id, d in device_types.items():
+    for tid, d in device_types.items():
         def standardize_name(name: str):
             return name.replace(' ', '').replace('/', '').lower()
         if d.superset_of_device_type_name is None:
             continue
         name = standardize_name(d.superset_of_device_type_name)
-        matches = [id for id, d in device_types.items() if standardize_name(d.name) == name]
+        matches = [_id for _id, d in device_types.items() if standardize_name(d.name) == name]
         if len(matches) != 1:
             problems.append(ProblemNotice('Device types parsing', location=DeviceTypePathLocation(
-                id), severity=ProblemSeverity.ERROR, problem=f"No unique match found for superset {d.superset_of_device_type_name}"))
+                tid), severity=ProblemSeverity.ERROR, problem=f"No unique match found for superset {d.superset_of_device_type_name}"))
             break
         d.superset_of_device_type_id = matches[0]
 

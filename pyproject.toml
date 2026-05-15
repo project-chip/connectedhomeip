@@ -48,6 +48,8 @@ select = [
     "LOG",
     # Check for common optimization issues
     "SLOT",
+    # Check for builtin symbols aliasing
+    "A",
 ]
 ignore = [
     "ASYNC109", # Sometimes we use "timeout" argument in async functions
