@@ -24,6 +24,9 @@
 #include "AccessControl.h"
 
 #include <lib/core/Global.h>
+#include <lib/support/TypeTraits.h>
+
+#include <credentials/GroupDataProvider.h>
 
 namespace chip {
 namespace Access {
@@ -173,6 +176,19 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
+char GetAuxiliaryTypeStringForLogging(AuxiliaryType auxiliaryType)
+{
+    switch (auxiliaryType)
+    {
+    case AuxiliaryType::kSystem:
+        return 's';
+    case AuxiliaryType::kGroupcast:
+        return 'g';
+    default:
+        return 'u';
+    }
+}
+
 char GetRequestTypeStringForLogging(RequestType requestType)
 {
     switch (requestType)
@@ -220,6 +236,12 @@ void AccessControl::Finish()
     ChipLogProgress(DataManagement, "AccessControl: finishing");
     mDelegate->Finish();
     mDelegate = nullptr;
+
+    if (IsGroupAuxiliaryDelegateRegistered())
+    {
+        mGroupAuxDelegate->Finish();
+        UnregisterGroupAuxiliaryDelegate();
+    }
 }
 
 CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index,
@@ -348,6 +370,21 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         result = CheckARL(subjectDescriptor, requestPath, requestPrivilege);
     }
 #endif
+
+    if ((CHIP_NO_ERROR != result) && (Access::AuthMode::kGroup == subjectDescriptor.authMode) &&
+        (Access::RequestType::kCommandInvokeRequest == requestPath.requestType) &&
+        (Access::Privilege::kOperate == requestPrivilege) && IsGroupId(subjectDescriptor.subject))
+    {
+        Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, result);
+        Credentials::GroupDataProvider::GroupInfo info;
+        GroupId gid = GroupIdFromNodeId(subjectDescriptor.subject);
+        ReturnErrorOnFailure(groups->GetGroupInfo(subjectDescriptor.fabricIndex, gid, info));
+        if (info.HasAuxiliaryACL() && IsGroupAuxiliaryDelegateRegistered())
+        {
+            return mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
+        }
+    }
 
     return result;
 }
@@ -575,6 +612,19 @@ CHIP_ERROR AccessControl::Dump(const Entry & entry)
     }
 
     {
+        AuxiliaryType auxiliaryType;
+        // Auxiliary type is optional, so it not being implemented
+        // is still a valid configuration, all other errors should
+        // be handled appropriately.
+        err = GetAuxiliaryType(auxiliaryType);
+        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            SuccessOrExit(err);
+            ChipLogDetail(DataManagement, "auxiliaryType: %d", to_underlying(auxiliaryType));
+        }
+    }
+
+    {
         size_t count;
         SuccessOrExit(err = entry.GetSubjectCount(count));
         if (count)
@@ -632,11 +682,12 @@ bool AccessControl::Entry::IsValid() const
     const char * log = "unexpected error";
     IgnoreUnusedVariable(log); // logging may be disabled
 
-    AuthMode authMode       = AuthMode::kNone;
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    Privilege privilege     = static_cast<Privilege>(0);
-    size_t subjectCount     = 0;
-    size_t targetCount      = 0;
+    AuthMode authMode           = AuthMode::kNone;
+    FabricIndex fabricIndex     = kUndefinedFabricIndex;
+    Privilege privilege         = static_cast<Privilege>(0);
+    AuxiliaryType auxiliaryType = AuxiliaryType::kSystem;
+    size_t subjectCount         = 0;
+    size_t targetCount          = 0;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     SuccessOrExit(err = GetAuthMode(authMode));
@@ -645,10 +696,19 @@ bool AccessControl::Entry::IsValid() const
     SuccessOrExit(err = GetSubjectCount(subjectCount));
     SuccessOrExit(err = GetTargetCount(targetCount));
 
+    // Auxiliary type is optional, so it not being implemented
+    // is still a valid configuration, all other errors should
+    // be handled appropriately.
+    err = GetAuxiliaryType(auxiliaryType);
+    if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        SuccessOrExit(err);
+    }
+
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
-    ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
-                    GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
-                    static_cast<int>(targetCount));
+    ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c x=%d s=%d t=%d", fabricIndex,
+                    GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode),
+                    GetAuxiliaryTypeStringForLogging(auxiliaryType), static_cast<int>(subjectCount), static_cast<int>(targetCount));
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
     // Fabric index must be defined.

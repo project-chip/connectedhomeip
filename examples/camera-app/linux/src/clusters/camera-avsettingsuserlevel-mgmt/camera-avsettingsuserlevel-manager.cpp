@@ -289,18 +289,6 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
     return Status::NotFound;
 }
 
-CHIP_ERROR CameraAVSettingsUserLevelManager::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
-{
-    mptzPresetHelpers.clear();
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams)
-{
-    dptzStreams.clear();
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback()
 {
     ChipLogDetail(Camera, "CameraAvSettingsUserLevelManagement: Persistent attributes loaded");

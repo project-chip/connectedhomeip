@@ -16,7 +16,9 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/WindowCoveringCluster.h"
+    "${CLUSTER_DIR}/WindowCoveringDelegate.h"
     "${CLUSTER_DIR}/window-covering-delegate.h"
-    "${CLUSTER_DIR}/window-covering-server.cpp"
+    "${CLUSTER_DIR}/WindowCoveringCluster.cpp"
     "${CLUSTER_DIR}/window-covering-server.h"
 )

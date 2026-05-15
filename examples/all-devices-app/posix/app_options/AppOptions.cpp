@@ -18,46 +18,105 @@
 
 #include <app_options/AppOptions.h>
 #include <devices/device-factory/DeviceFactory.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
+
+#include <cstdlib>
+#include <cstring>
 
 using namespace chip;
 using namespace chip::ArgParser;
 
 // App custom argument handling
-constexpr uint16_t kOptionDeviceType = 0xffd0;
-constexpr uint16_t kOptionEndpoint   = 0xffd1;
-constexpr uint16_t kOptionWiFi       = 0xffd2;
+constexpr uint16_t kOptionDeviceType    = 0xffd0;
+constexpr uint16_t kOptionWiFi          = 0xffd2;
+constexpr uint16_t kOptionKVS           = 0xffd3;
+constexpr uint16_t kOptionDiscriminator = 0xffd4;
+constexpr uint16_t kOptionVendorId      = 0xffd5;
+constexpr uint16_t kOptionProductId     = 0xffd6;
+constexpr uint16_t kOptionPort          = 0xffd7;
+constexpr uint16_t kOptionInterfaceId   = 0xffd8;
+constexpr uint16_t kOptionBLE           = 0xffd9;
+constexpr uint16_t kOptionGroupcast     = 0xffda;
 
-const char * AppOptions::mDeviceTypeName     = "contact-sensor"; // defaulting to contact sensor if not specified
-chip::EndpointId AppOptions::mDeviceEndpoint = 1;                // defaulting to endpoint 1 if not specified
-bool AppOptions::mEnableWiFi                 = false;
+DeviceTypeParser AppOptions::sParser;
+AppOptions::AppConfig AppOptions::mConfig;
+
+const AppOptions::AppConfig & AppOptions::GetConfig()
+{
+    if (mConfig.deviceTypeEntries.empty())
+    {
+        mConfig.deviceTypeEntries.push_back({
+            .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
+            .endpoint = 1,
+            .parentId = chip::kInvalidEndpointId,
+        });
+    }
+    return mConfig;
+}
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
 {
     switch (identifier)
     {
-    case kOptionDeviceType:
-        if (value == nullptr)
+    case kOptionDeviceType: {
+        if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
-            ChipLogError(Support, "INTERNAL ERROR: No device type value passed in.\n");
             return false;
         }
-        ChipLogProgress(AppServer, "Using the device type of %s", value);
-        mDeviceTypeName = value;
+        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
         return true;
-    case kOptionEndpoint:
-        if (value == nullptr)
+    }
+    case kOptionBLE:
+        if (!ParseInt(value, mConfig.bleController))
         {
-            ChipLogError(Support, "INTERNAL ERROR: No endpoint ID value passed in.\n");
+            ChipLogError(Support, "Invalid BLE controller specified: %s", value);
             return false;
         }
-        mDeviceEndpoint = static_cast<EndpointId>(atoi(value));
-        ChipLogProgress(AppServer, "Using endpoint %d for the device.", mDeviceEndpoint);
         return true;
     case kOptionWiFi:
-        mEnableWiFi = true;
+        mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
+        return true;
+    case kOptionKVS:
+        mConfig.kvsPath = value;
+        return true;
+    case kOptionDiscriminator: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFF)
+        {
+            ChipLogError(Support, "Invalid discriminator: %s", value);
+            return false;
+        }
+        mConfig.discriminator = static_cast<uint16_t>(val);
+        return true;
+    }
+    case kOptionVendorId:
+        mConfig.vendorId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionProductId:
+        mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionPort: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFFF)
+        {
+            ChipLogError(Support, "Invalid port: %s", value);
+            return false;
+        }
+        mConfig.port = static_cast<uint16_t>(val);
+        ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
+        return true;
+    }
+    case kOptionInterfaceId:
+        mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionGroupcast:
+        mConfig.enableGroupcast = true;
+        ChipLogProgress(AppServer, "Groupcast usage enabled");
         return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
@@ -71,10 +130,19 @@ OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
-        { "endpoint", kArgumentRequired, kOptionEndpoint },
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        { "ble-controller", kArgumentRequired, kOptionBLE },
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
+        { "KVS", kArgumentRequired, kOptionKVS },
+        { "discriminator", kArgumentRequired, kOptionDiscriminator },
+        { "vendor-id", kArgumentRequired, kOptionVendorId },
+        { "product-id", kArgumentRequired, kOptionProductId },
+        { "port", kArgumentRequired, kOptionPort },
+        { "interface-id", kArgumentRequired, kOptionInterfaceId },
+        { "groupcast", kNoArgument, kOptionGroupcast },
         {}, // need empty terminator
     };
 
@@ -88,11 +156,14 @@ OptionSet * AppOptions::GetOptions()
         }
         result.replace(result.length() - 1, 1, ">");
         result += "\n";
-        result += "       Select the device to start up\n\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'\n";
+        result += "       Can be specified multiple times for multi-endpoint devices.\n";
+        result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
 
-        // rest of the help
-        result += "  --endpoint <endpoint-number>\n";
-        result += "       Define the endpoint to start on (default 1)\n\n";
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        result += "  --ble-controller <number>\n";
+        result += "       Select the BLE controller to use (default: 0)\n\n";
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";

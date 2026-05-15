@@ -110,7 +110,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(6)
         # Read DPTZStreams and verify that the stream and viewport are present
-        if not self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
+        if not await self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
             asserts.assert_fail("No matching stream id and viewport found in DPTZStreams for the allocated video stream")
 
         self.step(7)
@@ -139,7 +139,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(12)
         # Verify the viewport has been updated in DPTZStreams
-        if not self.dptzstreamentryvalid(endpoint, videoStreamID, passingviewport):
+        if not await self.dptzstreamentryvalid(endpoint, videoStreamID, passingviewport):
             asserts.assert_fail("Viewport has not been updated in DPTZStreams")
 
         self.step(13)

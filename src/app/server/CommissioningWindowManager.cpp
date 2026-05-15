@@ -77,9 +77,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role);
-        });
+        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
+        mPublishId = WiFiPAF::kUndefinedWiFiPafSessionId;
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
@@ -192,6 +191,9 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 
 void CommissioningWindowManager::OnSessionEstablishmentStarted()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    DeviceLayer::ThreadStackMgr().CancelRendezvousAnnouncement();
+#endif
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout,
@@ -334,6 +336,9 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 co
 #else
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    SetWiFiPAF(advertisementMode == chip::CommissioningWindowAdvertisement::kAllSupported);
+#endif
 
     mFailedCommissioningAttempts = 0;
 
@@ -424,6 +429,9 @@ void CommissioningWindowManager::CloseCommissioningWindow()
             mServer->GetBleLayerObject()->CloseAllBleConnections();
         }
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+        DeviceLayer::ThreadStackMgr().RendezvousStop();
+#endif
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
     }
@@ -504,6 +512,18 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
         ReturnErrorOnFailure(err);
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (mIsWiFiPAF)
+    {
+        ChipLogProgress(WiFiPAF, "Starting Wi-Fi PAF publish");
+        auto err = DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(true, mPublishId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(WiFiPAF, "Failed to start Wi-Fi PAF publish: %" CHIP_ERROR_FORMAT, err.Format());
+            mPublishId = WiFiPAF::kUndefinedWiFiPafSessionId;
+        }
+    }
+#endif
 
     if (mUseECM)
     {
@@ -552,6 +572,14 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         (void) chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Cancel PAF advertisement if PAF is selected and publishId is valid
+    if ((mIsWiFiPAF) && (aShuttingDown) && (mPublishId != 0) && (mPublishId != WiFiPAF::kUndefinedWiFiPafSessionId))
+    {
+        ChipLogProgress(WiFiPAF, "Canceling Wi-Fi PAF publish");
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false, mPublishId);
+    }
+#endif
 
     if (mAppDelegate != nullptr)
     {

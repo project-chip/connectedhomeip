@@ -23,9 +23,8 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("system.gni")
 
-assert(
-    chip_enable_openthread || !chip_system_config_use_openthread_inet_endpoints,
-    "OpenThread Endpoint is only available when Thread is enabled")
+assert(chip_enable_thread || !chip_system_config_use_openthread_inet_endpoints,
+       "OpenThread Endpoint is only available when Thread is enabled")
 
 if (chip_system_config_use_lwip) {
   import("//build_overrides/lwip.gni")
@@ -288,7 +287,6 @@ static_library("system") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform:platform_config_header",
-    "${nlassert_root}:nlassert",
   ]
 
   allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
@@ -306,6 +304,9 @@ static_library("system") {
       "SystemFaultInjection.cpp",
       "SystemFaultInjection.h",
     ]
-    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+    public_deps += [
+      "${nlassert_root}:nlassert",
+      "${nlfaultinjection_root}:nlfaultinjection",
+    ]
   }
 }

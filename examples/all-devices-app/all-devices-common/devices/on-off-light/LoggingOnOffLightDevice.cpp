@@ -159,15 +159,42 @@ CHIP_ERROR LoggingOnOffLightDevice::Register(chip::EndpointId endpoint, CodeDriv
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
+    mGroupsCluster.Create(endpoint,
+                          GroupsCluster::Context{
+                              .groupDataProvider   = mContext.groupDataProvider,
+                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
+                              .identifyIntegration = &mIdentifyCluster.Cluster(),
+                          });
+    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
+
+    // We have scenes enabled, so make sure handlers are registered so we can
+    // save and recall scenes.
+    {
+        Clusters::ScopedSceneTable table(mScenesTableProvider);
+        table->RegisterHandler(&mOnOffCluster.Cluster());
+    }
+
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void LoggingOnOffLightDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void LoggingOnOffLightDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
 
+    if (mGroupsCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
+        mGroupsCluster.Destroy();
+    }
+
     if (mOnOffCluster.IsConstructed())
     {
+        if (mOnOffCluster.Cluster().IsInList())
+        {
+            Clusters::ScopedSceneTable table(mScenesTableProvider);
+            table->UnregisterHandler(&mOnOffCluster.Cluster());
+        }
+
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
         mOnOffCluster.Destroy();

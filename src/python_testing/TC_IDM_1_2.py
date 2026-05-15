@@ -34,12 +34,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import inspect
 import logging
 import random
 from dataclasses import dataclass
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest, client_cmd, get_all_cmds_for_cluster_id
 
 import matter.clusters as Clusters
 import matter.discovery as Discovery
@@ -48,27 +48,9 @@ from matter import ChipUtility
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
-
-
-def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
-    cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-    try:
-        return inspect.getmembers(cluster.Commands, inspect.isclass)
-    except AttributeError:
-        return []
-
-
-def client_cmd(cmd_class):
-    # Inspect returns all the classes, not just the ones we want, so use a try
-    # here incase we're inspecting a builtin class
-    try:
-        return cmd_class if cmd_class.is_client else None
-    except AttributeError:
-        return None
 
 # one of the steps in this test requires sending a command that requires a timed interaction
 # without first sending the TimedRequest action
@@ -83,7 +65,7 @@ class FakeRevokeCommissioning(Clusters.AdministratorCommissioning.Commands.Revok
         return False
 
 
-class TC_IDM_1_2(MatterBaseTest):
+class TC_IDM_1_2(IDMBaseTest):
 
     @async_test_body
     async def test_TC_IDM_1_2(self):
@@ -165,8 +147,8 @@ class TC_IDM_1_2(MatterBaseTest):
                     continue
 
                 # Let's just use the first unsupported command
-                id = unsupported_commands[0]
-                cmd = next(filter(lambda x: x.command_id == id, all_supported_cmds))
+                _id = unsupported_commands[0]
+                cmd = next(filter(lambda x: x.command_id == _id, all_supported_cmds))
                 try:
                     ret = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail(f'Unexpected success sending unsupported cmd {cmd} to {cluster} cluster on ep {i}')

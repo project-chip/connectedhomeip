@@ -91,7 +91,7 @@ satisfied with the following command:
 sudo apt-get install git gcc g++ pkg-config cmake curl libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
-     default-jre
+     libevent-dev default-jre
 ```
 
 #### Upgrading Python on Ubuntu 22.04
@@ -234,7 +234,7 @@ up in `$PATH`.
 
 ZAP releases are copied to CIPD by an automated bot. You can check if a release
 was copied by looking at tags created for
-[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/3pp/zap)
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/experimental/matter/zap)
 in various platforms.
 
 ### Custom ZAP

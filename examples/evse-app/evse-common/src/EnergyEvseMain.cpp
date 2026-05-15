@@ -21,23 +21,18 @@
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
-#include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalSensorManager.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementAppCmdLineOptions.h>
-#include <PowerTopologyDelegate.h>
-#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -47,18 +42,29 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::EnergyEvse;
-using namespace chip::app::Clusters::PowerTopology;
 
 namespace {
+
+const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type kMeasurementAccuracyRanges[] = {
+    { .rangeMin   = 0,
+      .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+      .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
+};
+
+const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type kMeasurementAccuracy = {
+    .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 1'000'000'000'000'000, // 1 million Mwh
+    .accuracyRanges   = DataModel::List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(
+        kMeasurementAccuracyRanges)
+};
 
 // Common cluster instances
 std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
 std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
-std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
-std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
-std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
-std::unique_ptr<PowerTopologyInstance> gPTInstance;
-std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
+std::unique_ptr<ElectricalSensorManager> gESManager;
 bool gCommonClustersInitialized = false;
 
 // EVSE-specific instances
@@ -123,6 +129,9 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         return err;
     }
 
+    // Link the delegate to the instance for attribute access
+    gEvseDelegate->SetInstance(gEvseInstance.get());
+
     err = gEvseTargetsDelegate->LoadTargets();
     if (err != CHIP_NO_ERROR)
     {
@@ -171,8 +180,7 @@ CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    gEvseManufacturer =
-        std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get(), gPTInstance.get(), gDEMInstance.get());
+    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gESManager.get(), gDEMInstance.get());
     if (!gEvseManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
@@ -207,16 +215,18 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
     if (!gCommonClustersInitialized)
     {
         chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
-        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap);
-        // These features and optional attributes are used to make the app pass certification
-        // We recommend implementers of the app to modify these to fit their needs
-        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(
-            endpointId, gEPMDelegate, gEPMInstance,
-            BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
+        ReturnErrorOnFailure(DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap));
+
+        // Initialize ElectricalSensorManager (owns both EPM and EEM)
+        gESManager = std::make_unique<ElectricalSensorManager>();
+        VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        ElectricalSensorManager::EpmConfig epmConfig{
+            .features = BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
                 ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
                 ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
                 ElectricalPowerMeasurement::Feature::kPowerQuality),
-            BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+            .optionalAttributes = BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
@@ -229,65 +239,57 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
-                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
-        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId, gPTDelegate, gPTInstance);
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent),
+        };
+
+        ElectricalSensorManager::EemConfig eemConfig{
+            .features = BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
+                ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
+                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy),
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet()
+                                      .Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(),
+            .accuracyStruct = kMeasurementAccuracy,
+        };
+
+        ElectricalSensorManager::PtConfig ptConfig{
+            .features = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+        };
+
+        ReturnErrorOnFailure(gESManager->Init(endpointId, epmConfig, eemConfig, ptConfig));
+
+        // Set CumulativeEnergyReset struct on the EEM cluster
+        ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
+            .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+            .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+            .importedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+            .exportedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+        };
+        if (auto * eemCluster = gESManager->GetEEMCluster())
+        {
+            // We can ignore the error here as the only reason for error is if the feature is not supported
+            // and the feature is enabled
+            RETURN_SAFELY_IGNORED eemCluster->SetCumulativeEnergyReset(
+                DataModel::Nullable<ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type>(resetStruct));
+        }
     }
+
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(gEPMDelegate && gEPMInstance, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(gPTDelegate && gPTInstance, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(gEEMAttrAccess, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     gCommonClustersInitialized = true;
     return CHIP_NO_ERROR;
 }
 
 } // namespace
 
-void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(!gEEMAttrAccess);
-
-    gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
-        BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
-            ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
-            ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy),
-        BitMask<ElectricalEnergyMeasurement::OptionalAttributes, uint32_t>(
-            ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
-
-    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type energyAccuracyRanges[] = {
-        { .rangeMin   = 0,
-          .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
-          .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
-          .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
-    };
-
-    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type accuracy = {
-        .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
-        .measured         = true,
-        .minMeasuredValue = 0,
-        .maxMeasuredValue = 1'000'000'000'000'000,
-        .accuracyRanges =
-            DataModel::List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(energyAccuracyRanges)
-    };
-
-    ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
-        .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
-        .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
-        .importedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
-        .exportedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
-    };
-
-    if (gEEMAttrAccess)
-    {
-        TEMPORARY_RETURN_IGNORED gEEMAttrAccess->Init();
-        TEMPORARY_RETURN_IGNORED SetMeasurementAccuracy(endpointId, accuracy);
-        TEMPORARY_RETURN_IGNORED SetCumulativeReset(endpointId, MakeOptional(resetStruct));
-    }
-}
-
 DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate()
 {
     VerifyOrDieWithMsg(gDEMDelegate.get() != nullptr, AppServer, "DEM Delegate is null");
     return gDEMDelegate.get();
+}
+
+ElectricalSensorManager * GetESManager()
+{
+    return gESManager.get();
 }
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
@@ -305,12 +307,15 @@ void EvseApplicationInit()
 
 void EvseApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App (EVSE): EvseApplicationShutdown()");
+    ChipLogDetail(AppServer, "Evse App: EvseApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
     TEMPORARY_RETURN_IGNORED EVSEManufacturerShutdown();
-    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown(gPTInstance, gPTDelegate);
-    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(gEPMInstance, gEPMDelegate);
+    if (gESManager)
+    {
+        gESManager->Shutdown();
+        gESManager.reset();
+    }
     TEMPORARY_RETURN_IGNORED EnergyEvseShutdown();
     DeviceEnergyManagementShutdown(gDEMInstance, gDEMDelegate);
 

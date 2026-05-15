@@ -37,7 +37,7 @@ DEFAULT_TARGETS = [
 DEFAULT_TESTS = ["TC_DeviceBasicComposition", "TC_DeviceConformance"]
 TMP_RESULTS_DIR = "/tmp/conformance_report"
 OUT_DIR = "./out"
-TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00 --bool-arg ignore_in_progress:True allow_provisional:True\"'"
+TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00 --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True\"'"
 BUILD_COMMAND = "python3 scripts/build/build_examples.py --ninja-jobs {} --target {} build"
 NINJA_JOBS = max(os.cpu_count() - 2, 1)  # Limit # of jobs to avoid using too much CPU and RAM
 
@@ -67,11 +67,11 @@ def find_executables(dirs):
       A list of paths to the first executable found in each directory.
     """
     executables = []
-    for dir in dirs:
-        if not os.path.isdir(dir):
+    for directory in dirs:
+        if not os.path.isdir(directory):
             continue
-        for filename in os.listdir(dir):
-            filepath = os.path.join(dir, filename)
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
             if os.path.isfile(filepath) and os.access(filepath, os.X_OK):
                 executables.append(filepath)
                 break  # Move to the next directory

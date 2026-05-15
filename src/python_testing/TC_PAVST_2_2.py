@@ -70,6 +70,11 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+        super().teardown_test()
+
     def steps_TC_PAVST_2_2(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
@@ -99,7 +104,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
 
         self.step(1)
@@ -113,9 +118,9 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         asserts.assert_greater_equal(len(supported_formats), 1, "SupportedFormats must not be empty!")
-        for format in supported_formats:
-            validContainerformat = format.containerFormat == pvcluster.Enums.ContainerFormatEnum.kCmaf
-            isValidIngestMethod = format.ingestMethod == pvcluster.Enums.IngestMethodsEnum.kCMAFIngest
+        for fmt in supported_formats:
+            validContainerformat = fmt.containerFormat == pvcluster.Enums.ContainerFormatEnum.kCmaf
+            isValidIngestMethod = fmt.ingestMethod == pvcluster.Enums.IngestMethodsEnum.kCMAFIngest
             asserts.assert_true((validContainerformat & isValidIngestMethod),
                                 "(ContainerFormat & IngestMethod) must be defined values!")
 
@@ -136,7 +141,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(5)
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )

@@ -200,6 +200,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -358,6 +361,12 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DynamicLighting::Structs::EffectStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -372,7 +381,47 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
          const chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ProximityRanging::Structs::RDRStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::DecodableType & value);
@@ -626,10 +675,6 @@ LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::DecodableType & value);
-
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
          const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::DecodableType & value);
 
 static CHIP_ERROR
@@ -651,6 +696,10 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
@@ -956,8 +1005,16 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Events::ActivePresetChange::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetectStarted::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetectEnded::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetected::DecodableType & value);
+                           const chip::app::Clusters::ProximityRanging::Events::RangingResult::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ProximityRanging::Events::RangingSessionStatus::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TargetNavigator::Events::TargetUpdated::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1132,6 +1189,17 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Commands::AtomicResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType & value);

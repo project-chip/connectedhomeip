@@ -47,22 +47,30 @@ public:
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
+        // Try to read the default value for these mandatory attributes but do not fail if the operation is not successful.
+        // This is because not all apps are setting a default value for them in ember.
         DataModel::Nullable<uint16_t> minMeasuredValue{};
-        VerifyOrDie(MinMeasuredValue::Get(endpointId, minMeasuredValue) == Status::Success);
+        if (MinMeasuredValue::GetDefault(endpointId, minMeasuredValue) != Status::Success)
+        {
+            minMeasuredValue.SetNull();
+        }
 
         DataModel::Nullable<uint16_t> maxMeasuredValue{};
-        VerifyOrDie(MaxMeasuredValue::Get(endpointId, maxMeasuredValue) == Status::Success);
+        if (MaxMeasuredValue::GetDefault(endpointId, maxMeasuredValue) != Status::Success)
+        {
+            maxMeasuredValue.SetNull();
+        }
 
         uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
-            VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
         }
 
         DataModel::Nullable<LightSensorTypeEnum> lightSensorType{};
         if (optionalAttributeSet.IsSet(LightSensorType::Id))
         {
-            VerifyOrDie(LightSensorType::Get(endpointId, lightSensorType) == Status::Success);
+            VerifyOrDie(LightSensorType::GetDefault(endpointId, lightSensorType) == Status::Success);
         }
 
         gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,
@@ -132,6 +140,23 @@ IlluminanceMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId)
         integrationDelegate);
 
     return static_cast<IlluminanceMeasurementCluster *>(illuminanceMeasurement);
+}
+
+CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t> measuredValue)
+{
+    auto illuminanceMeasurement = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(illuminanceMeasurement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return illuminanceMeasurement->SetMeasuredValue(measuredValue);
+}
+
+CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<uint16_t> minMeasuredValue,
+                                 DataModel::Nullable<uint16_t> maxMeasuredValue)
+{
+    auto illuminanceMeasurement = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(illuminanceMeasurement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return illuminanceMeasurement->SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue);
 }
 
 } // namespace chip::app::Clusters::IlluminanceMeasurement

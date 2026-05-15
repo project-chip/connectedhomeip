@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -139,7 +140,8 @@ void InitializeOTARequestor(void)
     SetRequestorInstance(&sRequestorCore);
 
     sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader, GetOTARequestorAttributes(),
+                        GetDefaultOTARequestorEventGenerator());
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);

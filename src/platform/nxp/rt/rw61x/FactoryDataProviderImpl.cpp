@@ -63,8 +63,6 @@ using namespace ::chip::Crypto;
 namespace chip {
 namespace DeviceLayer {
 
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
-
 static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
 CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * source)
@@ -94,7 +92,8 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
 
-    while (index < factoryDataSize)
+    /* index will be incremented later, we have to be sure we have enough space for a new TLV entry */
+    while (index + sizeof(type) + sizeof(currentLen) < factoryDataSize)
     {
         /* Read the type */
         memcpy((uint8_t *) &type, factoryDataAddress + index, sizeof(type));
@@ -418,10 +417,13 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
     return CHIP_NO_ERROR;
 }
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
-    return FactoryDataProviderImpl::sInstance;
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

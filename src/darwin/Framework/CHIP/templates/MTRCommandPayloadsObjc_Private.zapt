@@ -3,7 +3,7 @@
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRStructsObjc.h>
-#import "MTRStructsObjc_Private.h"
+#import <Matter/MTRStructsObjc_Private.h>
 
 NS_ASSUME_NONNULL_BEGIN
 {{> placeholder_comment}}

@@ -20,7 +20,7 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1: # Runs through all tests
+#   run1: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -29,6 +29,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --debug
 #     factory-reset: true
 #     quiet: true
 #   run2: # tests PASE connection using manual code (12.1 only)
@@ -185,26 +186,12 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run18: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --debug
-#     factory-reset: true
-#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 import os
 from dataclasses import dataclass
 from typing import Any, Callable
-
-from test_testing.DeviceConformanceTests import get_supersets
 
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects
@@ -217,6 +204,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
+from matter.testing.device_conformance_tests import get_supersets
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
@@ -351,6 +339,54 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
                 self.fail_current_test()
+
+        # NOTE: This was provisional in 1.6.0, but due to issues with reaching the finish line,
+        #       this step was punted to a later release to reduce friction for SVE participants.
+        self.print_step(6, "Verify that the specification version is above 1.6.0 for the next steps")
+        specification_version = root[Clusters.BasicInformation].get(Clusters.BasicInformation.Attributes.SpecificationVersion, 0)
+        # Gate Groupcast requirements on Matter > 1.6.0
+        if specification_version > 0x01060000:
+            groupcast_feature_map = 0
+            if Clusters.Groupcast in root:
+                groupcast_feature_map = root[Clusters.Groupcast][Clusters.Groupcast.Attributes.FeatureMap]
+            has_groupcast_listener = bool(groupcast_feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener)
+            has_groupcast_sender = bool(groupcast_feature_map & Clusters.Groupcast.Bitmaps.Feature.kSender)
+
+            self.print_step(7, "Verify GroupcastListenerCond: if any endpoint has Groups server, "
+                            "Groupcast with Listener feature must be on EP0")
+            has_groups_server = any(
+                Clusters.Groups in self.endpoints[ep_id]
+                for ep_id in self.endpoints if ep_id != 0
+            )
+            log.info(f"has_groups_server: {has_groups_server}, has_groupcast_listener: {has_groupcast_listener}")
+            if has_groups_server and not has_groupcast_listener:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem="Groups server found on an endpoint but Groupcast cluster with Listener "
+                                  "feature is not present on the root node (EP0)",
+                                  spec_location="Root node device type - GroupcastListenerCond")
+                self.fail_current_test()
+
+            self.print_step(8, "Verify GroupcastSenderCond: if any endpoint has Binding server, "
+                            "Groupcast with Sender feature must be on EP0")
+            has_binding_server = any(
+                Clusters.Binding in self.endpoints[ep_id]
+                for ep_id in self.endpoints if ep_id != 0
+            )
+            log.info(f"has_binding_server: {has_binding_server}, has_groupcast_sender: {has_groupcast_sender}")
+            if has_binding_server and not has_groupcast_sender:
+                self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                  problem="Binding server found on an endpoint but Groupcast cluster with Sender "
+                                  "feature is not present on the root node (EP0)",
+                                  spec_location="Root node device type - GroupcastSenderCond")
+                self.fail_current_test()
+            if has_groupcast_listener:
+                acl_feature_map = root[Clusters.AccessControl][Clusters.AccessControl.Attributes.FeatureMap]
+                has_acl_aux = bool(acl_feature_map & Clusters.AccessControl.Bitmaps.Feature.kAuxiliary)
+                if not has_acl_aux:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                      problem="Groupcast with Listener feature is on EP0 but Access Control cluster does not have Auxiliary feature",
+                                      spec_location="Root node device type - GroupcastListenerCond")
+                    self.fail_current_test()
 
     def test_TC_DT_1_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
@@ -520,8 +556,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         mei_range_min = 0x0001_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                globals = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
-                unexpected_globals = sorted(set(globals) - set(allowed_globals))
+                endpoint_globals = filter(lambda a: a >= global_range_min and a < mei_range_min,
+                                          cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID])
+                unexpected_globals = sorted(set(endpoint_globals) - set(allowed_globals))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -819,10 +856,10 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         self.print_step(5, "Check for cycles in the tree endpoints")
         part_list_errors = parts_list_problems(tree, self.endpoints)
         if len(part_list_errors) != 0:
-            for id in part_list_errors:
-                location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
+            for _id in part_list_errors:
+                location = AttributePathLocation(endpoint_id=_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f"Endpoint {id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
+                                  problem=f"Endpoint {_id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
             self.fail_current_test()
 
         self.print_step(6, "Check flat lists include all sub ids")
@@ -905,7 +942,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                          [Clusters.Descriptor.Attributes.DeviceTypeList]]
             parts_list[endpoint_id] = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        bridged_nodes = [id for (id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
+        bridged_nodes = [_id for (_id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
 
         for endpoint_id in bridged_nodes:
             if Clusters.PowerSource not in self.endpoints[endpoint_id]:
@@ -1175,7 +1212,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if len(taglist) not in range(TAG_LIST_EP_RANGE_MIN, TAG_LIST_EP_RANGE_MAX):
                     self.fail_current_test("Number of tagList is not in the range of 1 to 6")
 
-            no_duplicate_tag = []
+            no_duplicate_tag_keys = set()
             for tag_struct in taglist:
                 self.print_step(5.1, "verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
@@ -1186,12 +1223,13 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if not isinstance(tag_struct.tag, int):
                     self.fail_current_test("Atleast 1 Tag is not present")
 
-                if tag_struct.tag in no_duplicate_tag:
+                mfg_code_key = None if isinstance(tag_struct.mfgCode, Nullable) else int(tag_struct.mfgCode)
+                tag_key = (mfg_code_key, int(tag_struct.namespaceID), int(tag_struct.tag))
+                if tag_key in no_duplicate_tag_keys:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
-                                      problem="duplicate Tags found in taglist struct", spec_location="TagList")
-                    self.fail_current_test("Duplicate tag found")
-                no_duplicate_tag.append(tag_struct.tag)
-
+                                      problem=f"duplicate Tag found in taglist struct: {tag_key}", spec_location="TagList")
+                    self.fail_current_test(f"Duplicate tag found: {tag_key}")
+                no_duplicate_tag_keys.add(tag_key)
                 self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
 

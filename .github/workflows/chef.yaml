@@ -27,7 +27,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     chef_linux_all_devices:
@@ -37,14 +37,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:194
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -60,7 +60,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:194
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -69,7 +69,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -98,14 +98,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:181
+            image: ghcr.io/project-chip/chip-build-esp32:194
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -122,14 +122,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:181
+            image: ghcr.io/project-chip/chip-build-nrf-platform:194
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -145,14 +145,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:181
+            image: ghcr.io/project-chip/chip-build-telink:194
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

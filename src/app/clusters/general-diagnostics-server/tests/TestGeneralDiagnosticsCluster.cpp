@@ -163,6 +163,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                                                 GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
                                                 GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
                                                 GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
                                             }));
     }
 
@@ -212,9 +213,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         ScopedDiagnosticsProvider<AllProvider> allProvider;
 
-        // Create cluster with LOAD feature flag enabled
-        BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
-        GeneralDiagnosticsCluster cluster(allOptionalAttributesSet, features,
+        GeneralDiagnosticsCluster cluster(allOptionalAttributesSet, BitFlags<GeneralDiagnostics::Feature>(0),
                                           GeneralDiagnosticsCluster::Context{
                                               .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
                                               .diagnosticDataProvider   = *allProvider.GetProvider(),

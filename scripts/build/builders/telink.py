@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +19,22 @@ from enum import Enum, auto
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
+
+class TelinkLogLevel(Enum):
+    DEFAULT = auto()  # default everything
+    ALL = auto()  # enable all logging
+    PROGRESS = auto()  # progress and above
+    ERROR = auto()  # error and above
+    NONE = auto()  # no chip_logging at all
+
 
 class TelinkApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     BRIDGE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
@@ -45,6 +56,8 @@ class TelinkApp(Enum):
             return 'all-clusters-app'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'bridge-app'
         if self == TelinkApp.CONTACT_SENSOR:
@@ -80,6 +93,8 @@ class TelinkApp(Enum):
             return 'chip-telink-all-clusters-example'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'chip-telink-bridge-example'
         if self == TelinkApp.CONTACT_SENSOR:
@@ -170,6 +185,7 @@ class TelinkBuilder(Builder):
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
                  chip_enable_nfc_onboarding_payload: bool = False,
+                 log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -187,6 +203,7 @@ class TelinkBuilder(Builder):
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
         self.chip_enable_nfc_onboarding_payload = chip_enable_nfc_onboarding_payload
+        self.log_level = log_level
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -203,8 +220,7 @@ class TelinkBuilder(Builder):
         return cmd
 
     def generate(self):
-        if os.path.exists(self.output_dir):
-            return
+        os.makedirs(self.output_dir, exist_ok=True)
 
         flags = []
         if self.enable_ota:
@@ -249,6 +265,19 @@ class TelinkBuilder(Builder):
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
+        if self.log_level == TelinkLogLevel.DEFAULT:
+            pass
+        elif self.log_level == TelinkLogLevel.ALL:
+            flags.append("-DTLNK_LOG_LEVEL=all")
+        elif self.log_level == TelinkLogLevel.PROGRESS:
+            flags.append("-DTLNK_LOG_LEVEL=progress")
+        elif self.log_level == TelinkLogLevel.ERROR:
+            flags.append("-DTLNK_LOG_LEVEL=error")
+        elif self.log_level == TelinkLogLevel.NONE:
+            flags.append("-DTLNK_LOG_LEVEL=none")
+        else:
+            raise Exception("Unknown log level: %r" % self.log_level)
+
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
         cmd = self.get_cmd_prefixes()
@@ -264,7 +293,7 @@ class TelinkBuilder(Builder):
                       title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling Telink at %s', self.output_dir)
+        log.info('Compiling Telink at %s', self.output_dir)
 
         cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
 

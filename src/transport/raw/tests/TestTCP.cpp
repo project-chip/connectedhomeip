@@ -936,11 +936,11 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
 
-    // Test a single packet buffer with zero message size.
+    // Test a single packet buffer with zero message size - should be rejected.
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, 4);
     ASSERT_NE(&buf, nullptr);
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
@@ -995,6 +995,33 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     // The receipt of a message exceeding the allowed size should have
     // closed the connection.
     EXPECT_TRUE(TestAccess::GetEndpoint(state).IsNull());
+}
+
+TEST_F(TestTCP, RepeatedImmediateConnectFailuresDoNotExhaustEndpoints)
+{
+    TCPImpl tcp;
+    auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
+
+    uint16_t chosenPort;
+    ASSERT_SUCCESS(RetryPortSetup(chosenPort, [&](uint16_t port) {
+        return tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(port).SetServerListenEnabled(false));
+    }));
+
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("fe80::1", addr));
+
+    constexpr uint16_t kTestPort = 5540;
+    constexpr size_t kAttempts   = kMaxTcpActiveConnectionCount * 3;
+
+    for (size_t i = 0; i < kAttempts; ++i)
+    {
+        ActiveTCPConnectionHandle conn;
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, kTestPort, InterfaceId::Null()), nullptr, conn);
+
+        EXPECT_NE(err, CHIP_NO_ERROR);
+        EXPECT_NE(err, CHIP_ERROR_NO_MEMORY);
+        EXPECT_TRUE(conn.IsNull());
+    }
 }
 
 } // namespace

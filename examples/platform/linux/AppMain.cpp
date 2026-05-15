@@ -39,7 +39,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/ConnectivityManager.h>
@@ -154,6 +154,8 @@
 #include <openthread-system.h>
 #include <openthread/instance.h>
 #endif
+
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -729,10 +731,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(WiFiPAF, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
 
-            args.enable        = LinuxDeviceOptions::GetInstance().mWiFiPAF;
             args.freq_list_len = WiFiPAFGet_FreqList(LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, args.freq_list);
-            TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFPublish(args);
-            LinuxDeviceOptions::GetInstance().mPublishId = args.publish_id;
+            DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(args);
         }
     }
 #endif
@@ -741,8 +741,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
     {
-        std::string nodeid = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        char * args[]      = { argv[0], nodeid.data() };
+        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        std::string logfile = "--log-file=thread.log";
+        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
 
         otSysInit(MATTER_ARRAY_SIZE(args), args);
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
@@ -982,6 +983,17 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    initParams.groupDataProvider->SetGroupcastEnabled(true);
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(initParams.groupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
+    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+#endif
+
+    // Set DAC provider before server init because Operational Credentials may snapshot
+    // the provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
@@ -1003,17 +1015,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         SuccessOrDie(exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value()));
     }
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
-        // TODO #40789: Should we just NOT call WiFiPAFShutdown at startup and instead make sure that WiFiPAF is not published at
-        // all? or Change the handling within WiFiPAFShutdown?
-        // TODO #40814: Check the Return Value of the call to WiFiPAFShutdown
-        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
-                                                                                chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
-    }
-#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions
@@ -1033,9 +1034,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");

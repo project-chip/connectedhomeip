@@ -129,7 +129,8 @@ public:
     }
 
     /**
-     * @brief Define the copy constructor
+     * @brief Copy constructor. Deep-copies Endpoint objects so that each Endpoint's
+     * mCastingPlayer raw pointer points to this new CastingPlayer instance.
      */
     CastingPlayer(const CastingPlayer & other);
 
@@ -332,16 +333,19 @@ public:
     void OnCommissioningWindowOpened() override;
     void OnCommissioningWindowClosed() override;
 
-private:
-    std::vector<memory::Strong<Endpoint>> mEndpoints;
-    ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-    CastingPlayerAttributes mAttributes;
-    IdentificationDeclarationOptions mIdOptions;
+protected:
+    // Exposed for testing - allows test code to simulate the crash scenario
     // This is a std::weak_ptr. A std::weak_ptr is a non-owning reference to an object managed by one
     // or more std::shared_ptr instances. When the last std::shared_ptr instance that owns the managed
     // object is destroyed or reset, the object itself is automatically destroyed, and all
     // std::weak_ptr instances that reference that object become expired.
     static memory::Weak<CastingPlayer> mTargetCastingPlayer;
+
+private:
+    std::vector<memory::Strong<Endpoint>> mEndpoints;
+    ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+    CastingPlayerAttributes mAttributes;
+    IdentificationDeclarationOptions mIdOptions;
     uint16_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted            = {};
     bool mClientProvidedCommissionerDeclarationCallback;

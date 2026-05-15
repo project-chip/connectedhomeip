@@ -51,7 +51,7 @@ public:
     }
 
     // this attribute should only be enabled for app platform instance (endpoint 1)
-    CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
+    virtual CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
 
     virtual CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) = 0;
 

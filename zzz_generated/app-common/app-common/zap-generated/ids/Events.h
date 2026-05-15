@@ -59,6 +59,7 @@
 #include <clusters/DishwasherAlarm/EventIds.h>
 #include <clusters/DishwasherMode/EventIds.h>
 #include <clusters/DoorLock/EventIds.h>
+#include <clusters/DynamicLighting/EventIds.h>
 #include <clusters/EcosystemInformation/EventIds.h>
 #include <clusters/ElectricalEnergyMeasurement/EventIds.h>
 #include <clusters/ElectricalGridConditions/EventIds.h>
@@ -78,6 +79,7 @@
 #include <clusters/Groupcast/EventIds.h>
 #include <clusters/Groups/EventIds.h>
 #include <clusters/HepaFilterMonitoring/EventIds.h>
+#include <clusters/Humidistat/EventIds.h>
 #include <clusters/IcdManagement/EventIds.h>
 #include <clusters/Identify/EventIds.h>
 #include <clusters/IlluminanceMeasurement/EventIds.h>
@@ -98,6 +100,7 @@
 #include <clusters/MicrowaveOvenMode/EventIds.h>
 #include <clusters/ModeSelect/EventIds.h>
 #include <clusters/NetworkCommissioning/EventIds.h>
+#include <clusters/NetworkIdentityManagement/EventIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EventIds.h>
 #include <clusters/OccupancySensing/EventIds.h>
 #include <clusters/OnOff/EventIds.h>
@@ -115,6 +118,7 @@
 #include <clusters/PowerSourceConfiguration/EventIds.h>
 #include <clusters/PowerTopology/EventIds.h>
 #include <clusters/PressureMeasurement/EventIds.h>
+#include <clusters/ProximityRanging/EventIds.h>
 #include <clusters/ProxyConfiguration/EventIds.h>
 #include <clusters/ProxyDiscovery/EventIds.h>
 #include <clusters/ProxyValid/EventIds.h>

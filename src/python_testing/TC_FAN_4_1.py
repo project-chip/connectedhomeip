@@ -287,7 +287,7 @@ class TC_FAN_4_1(MatterBaseTest):
             await verify_onoff_off(attr=fan.Attributes.SpeedSetting(speed_max), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=speed_max)
             await verify_onoff_off(attr=fan.Attributes.SpeedSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
         else:
-            for i in range(2*num_substeps + 1):
+            for i in range(2*num_substeps):
                 self.skip_step(step_num + i)
             step_num += 2 * num_substeps
 

@@ -26,16 +26,15 @@
 
 #include <platform/ThreadStackManager.h>
 
+#include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/OpenthreadLauncher.h>
 #include <platform/ESP32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include "driver/uart.h"
 #include "esp_err.h"
-#include "esp_netif.h"
 #include "esp_openthread.h"
 #include "esp_openthread_lock.h"
-#include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_vfs_eventfd.h"
 #include "lib/core/CHIPError.h"
@@ -52,8 +51,10 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    openthread_init_stack();
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    esp_err_t espErr = openthread_init_stack();
+    VerifyOrReturnError(espErr == ESP_OK, ESP32Utils::MapError(espErr));
+
     _LockThreadStack();
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
     _UnlockThreadStack();

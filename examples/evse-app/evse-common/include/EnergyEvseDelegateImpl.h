@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "app/clusters/energy-evse-server/energy-evse-server.h"
 #include <EVSECallbacks.h>
 #include <EnergyEvseTargetsStore.h>
 #include <EvseTargetsConfig.h>
+#include <app/clusters/energy-evse-server/CodegenIntegration.h>
+#include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
 
 #include <app/util/config.h>
 #include <cstring>
@@ -48,58 +49,56 @@ enum EVSEStateMachineEvent
 };
 
 /**
- * Helper class to handle all of the session related info
+ * Helper class to handle session timing and energy meter deltas.
+ * Session attribute values are stored in the cluster (EnergyEvseCluster) and
+ * updated through Instance setters. This class only tracks the internal
+ * computation state (start time, energy meter baselines).
  */
 class EvseSession
 {
 public:
     EvseSession() {}
+
     /**
-     * @brief This function records the start time and provided energy meter values as part of the new session.
+     * @brief Start a new session: assigns a session ID, resets duration/energy counters.
      *
-     * @param endpointId            - The endpoint to report the update on
+     * @param instance              - The cluster Instance to update attributes on
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StartSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
-     * @brief This function updates the session information at the unplugged event
+     * @brief Stop the current session: recalculates duration and energy values.
      *
-     * @param endpointId            - The endpoint to report the update on
+     * @param instance              - The cluster Instance to update attributes on
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StopSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StopSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
-     * @brief This function updates the session Duration to allow read attributes to return latest values
+     * @brief Recalculate session duration from start time to now.
      *
-     * @param endpointId            - The endpoint to report the update on
+     * @param instance - The cluster Instance to update attributes on
      */
-    void RecalculateSessionDuration(EndpointId endpointId);
+    void RecalculateSessionDuration(Instance * instance);
 
     /**
-     * @brief This function updates the EnergyCharged meter value
+     * @brief Update the session's charged energy delta.
      *
-     * @param endpointId            - The endpoint to report the update on
-     * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
+     * @param instance           - The cluster Instance to update attributes on
+     * @param chargingMeterValue - The current value of the energy meter (charging) in mWh
      */
-    void UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMeterValue);
+    void UpdateEnergyCharged(Instance * instance, int64_t chargingMeterValue);
 
     /**
-     * @brief This function updates the EnergyDischarged meter value
+     * @brief Update the session's discharged energy delta.
      *
-     * @param endpointId            - The endpoint to report the update on
-     * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
+     * @param instance              - The cluster Instance to update attributes on
+     * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void UpdateEnergyDischarged(EndpointId endpointId, int64_t dischargingMeterValue);
-
-    /* Public members - represent attributes in the cluster */
-    DataModel::Nullable<uint32_t> mSessionID;
-    DataModel::Nullable<uint32_t> mSessionDuration;
-    DataModel::Nullable<int64_t> mSessionEnergyCharged;
-    DataModel::Nullable<int64_t> mSessionEnergyDischarged;
+    void UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue);
 
 private:
     uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
@@ -239,69 +238,61 @@ public:
     Status SendFaultEvent(FaultStateEnum newFaultState);
 
     // ------------------------------------------------------------------
-    // Get attribute methods
-    StateEnum GetState() override;
-    CHIP_ERROR SetState(StateEnum);
+    // Attribute methods - called by cluster to propagate attribute changes to the delegate
+    void OnStateChanged(StateEnum newValue) override;
+    void OnSupplyStateChanged(SupplyStateEnum newValue) override;
+    void OnFaultStateChanged(FaultStateEnum newValue) override;
+    void OnChargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnCircuitCapacityChanged(int64_t newValue) override;
+    void OnMinimumChargeCurrentChanged(int64_t newValue) override;
+    void OnMaximumChargeCurrentChanged(int64_t newValue) override;
+    void OnMaximumDischargeCurrentChanged(int64_t newValue) override;
+    void OnUserMaximumChargeCurrentChanged(int64_t newValue) override;
+    void OnRandomizationDelayWindowChanged(uint32_t newValue) override;
+    void OnNextChargeStartTimeChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnNextChargeTargetTimeChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnNextChargeRequiredEnergyChanged(DataModel::Nullable<int64_t> newValue) override;
+    void OnNextChargeTargetSoCChanged(DataModel::Nullable<Percent> newValue) override;
+    void OnApproximateEVEfficiencyChanged(DataModel::Nullable<uint16_t> newValue) override;
+    void OnStateOfChargeChanged(DataModel::Nullable<Percent> newValue) override;
+    void OnBatteryCapacityChanged(DataModel::Nullable<int64_t> newValue) override;
+    void OnVehicleIDChanged(DataModel::Nullable<CharSpan> newValue) override;
+    void OnSessionIDChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnSessionEnergyChargedChanged(DataModel::Nullable<int64_t> newValue) override;
+    void OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue) override;
 
-    SupplyStateEnum GetSupplyState() override;
-    CHIP_ERROR SetSupplyState(SupplyStateEnum);
+    // ------------------------------------------------------------------
+    // Instance management for codegen integration
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+    Instance * GetInstance() { return mInstance; }
 
-    FaultStateEnum GetFaultState() override;
-    CHIP_ERROR SetFaultState(FaultStateEnum);
-
-    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() override;
-    CHIP_ERROR SetChargingEnabledUntil(DataModel::Nullable<uint32_t>);
-
-    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() override;
-    CHIP_ERROR SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>);
-
-    int64_t GetCircuitCapacity() override;
-    CHIP_ERROR SetCircuitCapacity(int64_t);
-
-    int64_t GetMinimumChargeCurrent() override;
-    CHIP_ERROR SetMinimumChargeCurrent(int64_t);
-
-    int64_t GetMaximumChargeCurrent() override;
-    CHIP_ERROR SetMaximumChargeCurrent(int64_t);
-
-    int64_t GetMaximumDischargeCurrent() override;
-    CHIP_ERROR SetMaximumDischargeCurrent(int64_t);
-
-    int64_t GetUserMaximumChargeCurrent() override;
-    CHIP_ERROR SetUserMaximumChargeCurrent(int64_t) override;
-
-    uint32_t GetRandomizationDelayWindow() override;
-    CHIP_ERROR SetRandomizationDelayWindow(uint32_t) override;
-
-    /* PREF attributes */
-    DataModel::Nullable<uint32_t> GetNextChargeStartTime() override;
-    CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> newNextChargeStartTimeUtc);
-
-    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() override;
-    CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newNextChargeTargetTimeUtc);
-
-    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() override;
-    CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newNextChargeRequiredEnergyMilliWattH);
-
-    DataModel::Nullable<Percent> GetNextChargeTargetSoC() override;
-    CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue);
-
-    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() override;
-    CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t>) override;
-
-    /* SOC attributes */
-    DataModel::Nullable<Percent> GetStateOfCharge() override;
-    CHIP_ERROR SetStateOfCharge(DataModel::Nullable<Percent>);
-    DataModel::Nullable<int64_t> GetBatteryCapacity() override;
-    CHIP_ERROR SetBatteryCapacity(DataModel::Nullable<int64_t>);
-
-    /* PNC attributes*/
-    DataModel::Nullable<CharSpan> GetVehicleID() override;
-    /* Session SESS attributes */
-    DataModel::Nullable<uint32_t> GetSessionID() override;
-    DataModel::Nullable<uint32_t> GetSessionDuration() override;
-    DataModel::Nullable<int64_t> GetSessionEnergyCharged() override;
-    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() override;
+    // ------------------------------------------------------------------
+    // Local getters for internal delegate use - delegates to cluster instance
+    StateEnum GetState() const;
+    SupplyStateEnum GetSupplyState() const;
+    FaultStateEnum GetFaultState() const;
+    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() const;
+    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() const;
+    int64_t GetCircuitCapacity() const;
+    int64_t GetMinimumChargeCurrent() const;
+    int64_t GetMaximumChargeCurrent() const;
+    int64_t GetMaximumDischargeCurrent() const;
+    int64_t GetUserMaximumChargeCurrent() const;
+    uint32_t GetRandomizationDelayWindow() const;
+    DataModel::Nullable<uint32_t> GetNextChargeStartTime() const;
+    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() const;
+    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() const;
+    DataModel::Nullable<Percent> GetNextChargeTargetSoC() const;
+    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() const;
+    DataModel::Nullable<Percent> GetStateOfCharge() const;
+    DataModel::Nullable<int64_t> GetBatteryCapacity() const;
+    DataModel::Nullable<CharSpan> GetVehicleID() const;
+    DataModel::Nullable<uint32_t> GetSessionID() const;
+    DataModel::Nullable<uint32_t> GetSessionDuration() const;
+    DataModel::Nullable<int64_t> GetSessionEnergyCharged() const;
+    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const;
 
 private:
     /* Constants */
@@ -362,39 +353,18 @@ private:
      */
     static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
 
-    /* Attributes */
-    StateEnum mState             = StateEnum::kNotPluggedIn;
-    SupplyStateEnum mSupplyState = SupplyStateEnum::kDisabled;
-    FaultStateEnum mFaultState   = FaultStateEnum::kNoError;
-    DataModel::Nullable<uint32_t> mChargingEnabledUntil;    // TODO Default to 0 to indicate disabled
-    DataModel::Nullable<uint32_t> mDischargingEnabledUntil; // TODO Default to 0 to indicate disabled
-    int64_t mCircuitCapacity           = 0;
-    int64_t mMinimumChargeCurrent      = kDefaultMinChargeCurrent_mA;
-    int64_t mMaximumChargeCurrent      = 0;
-    int64_t mMaximumDischargeCurrent   = 0;
-    int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent_mA; // TODO update spec
-    uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow_sec;
-    /* PREF attributes */
-    DataModel::Nullable<uint32_t> mNextChargeStartTime;
-    DataModel::Nullable<uint32_t> mNextChargeTargetTime;
-    DataModel::Nullable<int64_t> mNextChargeRequiredEnergy;
-    DataModel::Nullable<Percent> mNextChargeTargetSoC;
-    DataModel::Nullable<uint16_t> mApproximateEVEfficiency;
+    /* Instance pointer for accessing cluster */
+    Instance * mInstance = nullptr;
 
-    /* SOC attributes */
-    DataModel::Nullable<Percent> mStateOfCharge;
-    DataModel::Nullable<int64_t> mBatteryCapacity;
-
-    /* PNC attributes*/
-    DataModel::Nullable<CharSpan> mVehicleID;
-    char mVehicleIDBuf[kMaxVehicleIDBufSize];
-
-    /* Session Object */
+    /* Session Object - delegate owns session state management */
     EvseSession mSession = EvseSession();
 
     /* Helper variables to hold meter val since last EnergyTransferStarted event */
-    int64_t mImportedMeterValueAtEnergyTransferStart; // Charging
-    int64_t mExportedMeterValueAtEnergyTransferStart; // Discharging
+    int64_t mImportedMeterValueAtEnergyTransferStart;
+    int64_t mExportedMeterValueAtEnergyTransferStart;
+
+    /* VehicleID buffer for delegate use */
+    char mVehicleIDBuf[kMaxVehicleIDBufSize];
 
     /* Targets Delegate */
     EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;

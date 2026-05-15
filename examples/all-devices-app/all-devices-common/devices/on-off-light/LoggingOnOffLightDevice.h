@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffLightingCluster.h>
@@ -44,7 +45,7 @@ public:
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
-    void UnRegister(CodeDrivenDataModelProvider & provider) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 private:
     class OnOffDelegate : public Clusters::OnOffDelegate
@@ -77,6 +78,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
+    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 
 } // namespace chip::app
