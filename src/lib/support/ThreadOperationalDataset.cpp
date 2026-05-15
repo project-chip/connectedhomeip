@@ -23,14 +23,6 @@
 #include <cstring>
 
 namespace chip {
-namespace Crypto {
-// Forward declaration: implementation lives in src/crypto/, linked at final binary.
-// Avoids a header dependency from src/lib/support/ on src/crypto/.
-void ClearSecretData(uint8_t * buf, size_t len);
-} // namespace Crypto
-} // namespace chip
-
-namespace chip {
 namespace Thread {
 
 /**
@@ -507,7 +499,7 @@ CHIP_ERROR OperationalDataset::SetDelayTimer(uint32_t aDelayMillis)
 
 void OperationalDataset::Clear()
 {
-    Crypto::ClearSecretData(mBuffer, sizeof(mBuffer));
+    memset(mBuffer, 0, sizeof(mBuffer));
     mData = ByteSpan(mBuffer, 0);
 }
 
