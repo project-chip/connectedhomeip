@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${chip_root}/build/config/compiler/compiler.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
@@ -116,10 +117,18 @@ config("efr32-common-config") {
     defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
   }
 
-  ldflags = [
-    "-Wl,--no-warn-rwx-segment",
-    "-fno-lto",
-  ]
+  ldflags = [ "-fno-lto" ]
+  if (!is_clang) {
+    ldflags += [ "-Wl,--no-warn-rwx-segment" ]
+  } else {
+    ldflags += [
+      "-Wl,--allow-multiple-definition",  # to allow our overrides from memory
+                                          # manager
+      "-lc_nano",  # for C stdlib functions (e.g.snprintf)
+      "-lstdc++_nano",  # for C++ stdlib functions (e.g. sprintf)
+      "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
+    ]
+  }
 }
 
 source_set("efr32-common") {

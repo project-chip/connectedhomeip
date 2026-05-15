@@ -13,6 +13,8 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "WindowCoveringCluster.cpp",
+  "WindowCoveringCluster.h",
+  "WindowCoveringDelegate.h",
   "window-covering-delegate.h",
   "window-covering-server.h",
 ]

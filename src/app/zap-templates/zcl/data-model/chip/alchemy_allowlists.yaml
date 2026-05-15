@@ -1,0 +1,110 @@
+# Allowlists for check_alchemy_metadata.py
+#
+# MANUAL_ALLOWLIST
+#   XML files that pre-date Alchemy adoption and are intentionally maintained
+#   by hand. They are not expected to carry the Alchemy metadata marker.
+#   Do NOT add new entries here — all new data-model XML files must be
+#   generated using Alchemy (https://github.com/project-chip/alchemy).
+#
+# INCOMPLETE_METADATA_ALLOWLIST
+#   Alchemy-generated files that pre-date the full metadata header. Older
+#   Alchemy versions omitted the "Alchemy: v..." line or left "Git:" empty.
+#   These files must be regenerated with a current Alchemy release and then
+#   removed from this list. Do NOT add new entries here.
+
+MANUAL_ALLOWLIST:
+    - access-control-definitions.xml
+    - ballast-configuration-cluster.xml
+    - channel-cluster.xml
+    - chip-ota.xml
+    - chip-types.xml
+    - clusters-extensions.xml
+    - content-launch-cluster.xml
+    - fault-injection-cluster.xml
+    - global-attributes.xml
+    - global-bitmaps.xml
+    - matter-devices.xml
+    - measurement-and-sensing.xml
+    - media-playback-cluster.xml
+    - mode-base-cluster.xml
+    - proxy-configuration-cluster.xml
+    - proxy-discovery-cluster.xml
+    - proxy-valid-cluster.xml
+    - pwm-cluster.xml
+    - sample-mei-cluster.xml
+    - semantic-tag-namespace-enums.xml
+    - test-cluster.xml
+    - timer-cluster.xml
+    - wake-on-lan-cluster.xml
+
+INCOMPLETE_METADATA_ALLOWLIST:
+    - account-login-cluster.xml
+    - access-control-cluster.xml
+    - actions-cluster.xml
+    - air-quality-cluster.xml
+    - audio-output-cluster.xml
+    - binding-cluster.xml
+    - camera-av-stream-management-cluster.xml
+    - closure-control-cluster.xml
+    - closure-dimension-cluster.xml
+    - commissioner-control-cluster.xml
+    - commodity-price-cluster.xml
+    - concentration-measurement-cluster.xml
+    - descriptor-cluster.xml
+    - device-energy-management-cluster.xml
+    - device-energy-management-mode-cluster.xml
+    - diagnostic-logs-cluster.xml
+    - dishwasher-alarm-cluster.xml
+    - electrical-energy-measurement-cluster.xml
+    - electrical-grid-conditions-cluster.xml
+    - electrical-power-measurement-cluster.xml
+    - energy-evse-cluster.xml
+    - energy-evse-mode-cluster.xml
+    - energy-preference-cluster.xml
+    - ethernet-network-diagnostics-cluster.xml
+    - fan-control-cluster.xml
+    - flow-measurement-cluster.xml
+    - general-commissioning-cluster.xml
+    - general-diagnostics-cluster.xml
+    - global-structs.xml
+    - group-key-mgmt-cluster.xml
+    - groupcast-cluster.xml
+    - illuminance-measurement-cluster.xml
+    - joint-fabric-administrator-cluster.xml
+    - joint-fabric-datastore-cluster.xml
+    - laundry-dryer-controls-cluster.xml
+    - localization-configuration-cluster.xml
+    - media-input-cluster.xml
+    - microwave-oven-control-cluster.xml
+    - mode-select-cluster.xml
+    - power-source-configuration-cluster.xml
+    - pressure-measurement-cluster.xml
+    - pump-configuration-and-control-cluster.xml
+    - push-av-stream-transport-cluster.xml
+    - refrigerator-alarm.xml
+    - relative-humidity-measurement-cluster.xml
+    - scene.xml
+    - service-area-cluster.xml
+    - smoke-co-alarm-cluster.xml
+    - software-diagnostics-cluster.xml
+    - soil-measurement-cluster.xml
+    - switch-cluster.xml
+    - temperature-control-cluster.xml
+    - temperature-measurement-cluster.xml
+    - thermostat-cluster.xml
+    - thermostat-user-interface-configuration-cluster.xml
+    - thread-border-router-management-cluster.xml
+    - thread-network-diagnostics-cluster.xml
+    - thread-network-directory-cluster.xml
+    - time-format-localization-cluster.xml
+    - tls-certificate-management-cluster.xml
+    - tls-client-management-cluster.xml
+    - unit-localization-cluster.xml
+    - valve-configuration-and-control-cluster.xml
+    - water-heater-management-cluster.xml
+    - water-heater-mode-cluster.xml
+    - webrtc-provider-cluster.xml
+    - webrtc-requestor-cluster.xml
+    - wifi-network-diagnostics-cluster.xml
+    - wifi-network-management-cluster.xml
+    - zone-management-cluster.xml

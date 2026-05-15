@@ -525,7 +525,11 @@ Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::Decod
         // Apply changes to all groups
         GroupInfoIterator * iter = groups.IterateGroupInfo(fabricIndex);
         VerifyOrReturnError(nullptr != iter, Status::ResourceExhausted);
-        VerifyOrReturnError(iter->Count() > 0, Status::NotFound);
+        if (iter->Count() == 0)
+        {
+            iter->Release();
+            return Status::NotFound;
+        }
 
         GroupInfo info;
         while (iter->Next(info) && (Status::Success == err))

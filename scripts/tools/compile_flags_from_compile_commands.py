@@ -60,10 +60,10 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 class CompileCommand:
-    def __init__(self, dir, file, command):
+    def __init__(self, directory, file, command):
         args = shlex.split(command)
 
-        self.dir = dir
+        self.directory = directory
         self.file = file
         self.compiler = args[0]
         self.args = []
@@ -87,7 +87,7 @@ class CompileCommand:
                 if arg.startswith(p + "/"):
                     continue
                 path = arg[len(p):]  # full path
-                path = os.path.abspath(os.path.join(self.dir, path))
+                path = os.path.abspath(os.path.join(self.directory, path))
                 arg = f"{p}{path}"
                 break
 
@@ -105,7 +105,7 @@ class CompileCommand:
 
     def __str__(self):
         prefix = "\n      "  # have all args on newlines with an indent
-        return f"[{self.dir}: {self.file}] -> {prefix}{prefix.join(self.args)}"
+        return f"[{self.directory}: {self.file}] -> {prefix}{prefix.join(self.args)}"
 
 
 class ParsedCommands:
