@@ -34,7 +34,6 @@ DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute
     switch (request.path.mAttributeId)
     {
     case Globals::Attributes::ClusterRevision::Id:
-        // Return cluster revision 1 as boilerplate.
         return encoder.Encode(ThreadBorderRouterManagement::kRevision);
     case Globals::Attributes::FeatureMap::Id: {
         BitFlags<Feature> featureMap;
