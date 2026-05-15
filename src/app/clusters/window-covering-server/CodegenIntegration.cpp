@@ -269,13 +269,13 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
     VerifyOrDie(cluster != nullptr);
     chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
 
-    configStatus.Set(ConfigStatus::kLiftPositionAware, cluster->HasFeaturePaLift());
-    configStatus.Set(ConfigStatus::kTiltPositionAware, cluster->HasFeaturePaTilt());
+    configStatus.Set(ConfigStatus::kLiftPositionAware, cluster->GetFeatureMap().Has(Feature::kPositionAwareLift));
+    configStatus.Set(ConfigStatus::kTiltPositionAware, cluster->GetFeatureMap().Has(Feature::kPositionAwareTilt));
 
-    if (!cluster->HasFeaturePaLift())
+    if (!cluster->GetFeatureMap().Has(Feature::kPositionAwareLift))
         configStatus.Clear(ConfigStatus::kLiftEncoderControlled);
 
-    if (!cluster->HasFeaturePaTilt())
+    if (!cluster->GetFeatureMap().Has(Feature::kPositionAwareTilt))
         configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
 
     ConfigStatusSet(endpoint, configStatus);

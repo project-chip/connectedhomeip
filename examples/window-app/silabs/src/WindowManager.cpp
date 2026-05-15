@@ -620,6 +620,7 @@ void WindowManager::UpdateLED()
 {
     Cover & cover = GetCover();
     auto wc       = FindClusterOnEndpoint(cover.mEndpoint);
+    VerifyOrDie(wc != nullptr);
     if (mResetWarning)
     {
         mActionLED.Set(false);

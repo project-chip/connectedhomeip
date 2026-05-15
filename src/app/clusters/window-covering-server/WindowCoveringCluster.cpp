@@ -353,12 +353,12 @@ CHIP_ERROR WindowCoveringCluster::Attributes(const ConcreteClusterPath & path,
         { mOptionalAttributes.IsSet(Attributes::NumberOfActuationsTilt::Id), Attributes::NumberOfActuationsTilt::kMetadataEntry },
         { mOptionalAttributes.IsSet(Attributes::CurrentPositionLiftPercentage::Id),
           Attributes::CurrentPositionLiftPercentage::kMetadataEntry },
-        { HasFeaturePaLift(), Attributes::TargetPositionLiftPercent100ths::kMetadataEntry },
-        { HasFeaturePaLift(), Attributes::CurrentPositionLiftPercent100ths::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareLift), Attributes::TargetPositionLiftPercent100ths::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareLift), Attributes::CurrentPositionLiftPercent100ths::kMetadataEntry },
         { mOptionalAttributes.IsSet(Attributes::CurrentPositionTiltPercentage::Id),
           Attributes::CurrentPositionTiltPercentage::kMetadataEntry },
-        { HasFeaturePaTilt(), Attributes::TargetPositionTiltPercent100ths::kMetadataEntry },
-        { HasFeaturePaTilt(), Attributes::CurrentPositionTiltPercent100ths::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareTilt), Attributes::TargetPositionTiltPercent100ths::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareTilt), Attributes::CurrentPositionTiltPercent100ths::kMetadataEntry },
         { mOptionalAttributes.IsSet(Attributes::SafetyStatus::Id), Attributes::SafetyStatus::kMetadataEntry },
     };
     return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
@@ -380,14 +380,14 @@ CHIP_ERROR WindowCoveringCluster::AcceptedCommands(const ConcreteClusterPath & p
         Commands::GoToTiltPercentage::kMetadataEntry,
     };
 
-    if (HasFeaturePaLift())
+    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kGoToLiftPercentageCommand));
     }
 
     ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
 
-    if (HasFeaturePaTilt())
+    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kGoToTiltPercentageCommand));
     }
@@ -460,16 +460,6 @@ Status WindowCoveringCluster::GetMotionLockStatus() const
     return Status::Success;
 }
 
-bool WindowCoveringCluster::HasFeaturePaLift() const
-{
-    return (HasFeature(Feature::kLift) && HasFeature(Feature::kPositionAwareLift));
-}
-
-bool WindowCoveringCluster::HasFeaturePaTilt() const
-{
-    return (HasFeature(Feature::kTilt) && HasFeature(Feature::kPositionAwareTilt));
-}
-
 void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus)
 {
     ChipLogProgress(Zcl, "ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
@@ -495,7 +485,6 @@ void ModePrint(const chip::BitMask<Mode> & mode)
                     mode.Has(Mode::kCalibrationMode));
 }
 
-// Utility functions
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
 {
 
@@ -601,7 +590,7 @@ Status WindowCoveringCluster::HandleUpOrOpen()
     Status lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    if (HasFeaturePaLift())
+    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
         SetTargetPositionLiftPercent100ths(NPercent100ths(WC_PERCENT100THS_MIN_OPEN));
     }
@@ -633,11 +622,11 @@ Status WindowCoveringCluster::HandleDownOrClose()
     Status lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    if (HasFeaturePaLift())
+    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
         SetTargetPositionLiftPercent100ths(NPercent100ths(WC_PERCENT100THS_MAX_CLOSED));
     }
-    if (HasFeaturePaTilt())
+    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
         SetTargetPositionTiltPercent100ths(NPercent100ths(WC_PERCENT100THS_MAX_CLOSED));
     }
@@ -645,11 +634,11 @@ Status WindowCoveringCluster::HandleDownOrClose()
     WindowCoveringDelegate * delegate = GetDelegate();
     if (delegate != nullptr)
     {
-        if (HasFeaturePaLift())
+        if (GetFeatureMap().Has(Feature::kPositionAwareLift))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
-        if (HasFeaturePaTilt())
+        if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -692,11 +681,11 @@ Status WindowCoveringCluster::HandleStopMotion(const Commands::StopMotion::Decod
 
     if (changeTarget)
     {
-        if (HasFeaturePaLift())
+        if (GetFeatureMap().Has(Feature::kPositionAwareLift))
         {
             SetTargetPositionLiftPercent100ths(GetCurrentPositionLiftPercentage100ths());
         }
-        if (HasFeaturePaTilt())
+        if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
         {
             SetTargetPositionTiltPercent100ths(GetCurrentPositionTiltPercentage100ths());
         }
@@ -714,8 +703,8 @@ Status WindowCoveringCluster::HandleGoToLiftValue(const Commands::GoToLiftValue:
     Status lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    VerifyOrReturnValue(HasFeature(Feature::kAbsolutePosition) && HasFeaturePaLift(), Status::Failure,
-                        ChipLogProgress(Zcl, "Err Device is not PA LF"));
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kAbsolutePosition) && GetFeatureMap().Has(Feature::kPositionAwareLift),
+                        Status::Failure, ChipLogProgress(Zcl, "Err Device is not PA LF"));
 
     SetTargetPositionLiftPercent100ths(NPercent100ths(LiftToPercent100ths(GetEndpointId(), liftValue)));
 
@@ -741,7 +730,8 @@ Status WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftP
     Status lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    VerifyOrReturnValue(HasFeaturePaLift(), Status::Failure, ChipLogProgress(Zcl, "Err Device is not PA LF"));
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kPositionAwareLift), Status::Failure,
+                        ChipLogProgress(Zcl, "Err Device is not PA LF"));
     VerifyOrReturnValue(IsPercent100thsValid(percent100ths), Status::ConstraintError);
 
     SetTargetPositionLiftPercent100ths(NPercent100ths(percent100ths));
@@ -768,8 +758,8 @@ Status WindowCoveringCluster::HandleGoToTiltValue(const Commands::GoToTiltValue:
     Status lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    VerifyOrReturnValue(HasFeature(Feature::kAbsolutePosition) && HasFeaturePaTilt(), Status::Failure,
-                        ChipLogProgress(Zcl, "Err Device is not PA TL"));
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kAbsolutePosition) && GetFeatureMap().Has(Feature::kPositionAwareTilt),
+                        Status::Failure, ChipLogProgress(Zcl, "Err Device is not PA TL"));
 
     SetTargetPositionTiltPercent100ths(NPercent100ths(TiltToPercent100ths(GetEndpointId(), tiltValue)));
 
@@ -795,7 +785,8 @@ Status WindowCoveringCluster::HandleGoToTiltPercentage(const Commands::GoToTiltP
     Status lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    VerifyOrReturnValue(HasFeaturePaTilt(), Status::Failure, ChipLogProgress(Zcl, "Err Device is not PA TL"));
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kPositionAwareTilt), Status::Failure,
+                        ChipLogProgress(Zcl, "Err Device is not PA TL"));
     VerifyOrReturnValue(IsPercent100thsValid(percent100ths), Status::ConstraintError);
 
     SetTargetPositionTiltPercent100ths(NPercent100ths(percent100ths));
