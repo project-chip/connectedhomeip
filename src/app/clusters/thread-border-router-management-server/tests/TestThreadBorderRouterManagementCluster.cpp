@@ -17,6 +17,7 @@
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <pw_unit_test/framework.h>
 
+#include <iterator>
 #include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
@@ -136,6 +137,19 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadClusterRevision)
 }
 
 
+
+TEST_F(TestThreadBorderRouterManagementCluster, TestAttributesList)
+{
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    std::vector<app::DataModel::AttributeEntry> expected(
+        Attributes::kMandatoryMetadata.begin(),
+        Attributes::kMandatoryMetadata.end()
+    );
+
+    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, expected));
+}
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
 {
