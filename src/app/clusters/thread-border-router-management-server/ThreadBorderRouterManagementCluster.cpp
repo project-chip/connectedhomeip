@@ -243,13 +243,14 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
 void ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error)
 {
-    auto commandHandleRef = std::move(mAsyncCommandHandle);
-    auto commandHandle    = commandHandleRef.Get();
-    if (commandHandle == nullptr)
+    if (mSetActiveDatasetSequenceNumber != sequenceNum)
     {
         return;
     }
-    if (mSetActiveDatasetSequenceNumber != sequenceNum)
+
+    auto commandHandleRef = std::move(mAsyncCommandHandle);
+    auto commandHandle    = commandHandleRef.Get();
+    if (commandHandle == nullptr)
     {
         return;
     }
