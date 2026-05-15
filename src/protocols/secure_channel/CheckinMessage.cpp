@@ -146,8 +146,8 @@ CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyH
     Encoding::LittleEndian::Put32(counterBuffer, counter);
 
     chip::Crypto::HMAC_sha shaHandler;
-    ReturnErrorOnFailure(
-        shaHandler.HMAC_SHA256(hmacKeyHandle, counterBuffer, sizeof(CounterType), hashWorkBuffer.Bytes(), hashWorkBuffer.Capacity()));
+    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(hmacKeyHandle, counterBuffer, sizeof(CounterType), hashWorkBuffer.Bytes(),
+                                                hashWorkBuffer.Capacity()));
 
     writer.Put(hashWorkBuffer.Bytes(), CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
     VerifyOrReturnError(writer.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
