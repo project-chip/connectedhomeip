@@ -34,6 +34,10 @@ using namespace chip::app::Clusters::ThreadBorderRouterManagement;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
+constexpr uint16_t kMockThreadVersion = 1;
+constexpr uint64_t kMockActiveDatasetTimestamp = 12345ULL;
+constexpr FabricIndex kTestFabricIndex = 1;
+constexpr uint16_t kTestFailSafeTimeout = 60;
 
 class MockDelegate : public ThreadBorderRouterManagementDelegate
 {
@@ -47,7 +51,7 @@ public:
         (void) CopyCharSpanToMutableCharSpan("MockBR"_span, borderRouterName);
     }
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override { return CHIP_NO_ERROR; }
-    uint16_t GetThreadVersion() override { return 1; }
+    uint16_t GetThreadVersion() override { return kMockThreadVersion; }
     bool GetInterfaceEnabled() override { return true; }
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override
     {
@@ -57,7 +61,7 @@ public:
         }
         if (type == DatasetType::kActive)
         {
-            (void) dataset.SetActiveTimestamp(12345ULL);
+            (void) dataset.SetActiveTimestamp(kMockActiveDatasetTimestamp);
         }
         return CHIP_NO_ERROR;
     }
@@ -166,7 +170,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
 
     uint16_t version;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::ThreadVersion::Id, version).IsSuccess());
-    EXPECT_EQ(version, 1u);
+    EXPECT_EQ(version, kMockThreadVersion);
 
     bool enabled;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::InterfaceEnabled::Id, enabled).IsSuccess());
@@ -175,7 +179,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
     DataModel::Nullable<uint64_t> activeTimestamp;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::ActiveDatasetTimestamp::Id, activeTimestamp).IsSuccess());
     EXPECT_FALSE(activeTimestamp.IsNull());
-    EXPECT_EQ(activeTimestamp.Value(), 12345ULL);
+    EXPECT_EQ(activeTimestamp.Value(), kMockActiveDatasetTimestamp);
 
     DataModel::Nullable<uint64_t> pendingTimestamp;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::PendingDatasetTimestamp::Id, pendingTimestamp).IsSuccess());
@@ -190,7 +194,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeSupporte
 
     uint32_t featureMap;
     EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
-    EXPECT_EQ(featureMap, 1u);
+    EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kPANChange));
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSupported)
@@ -237,7 +241,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequest)
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Arm FailSafe (required by spec)
-    EXPECT_EQ(failSafeContext.ArmFailSafe(1, System::Clock::Seconds16(60)), CHIP_NO_ERROR);
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestFabricIndex, System::Clock::Seconds16(kTestFailSafeTimeout)), CHIP_NO_ERROR);
 
     Commands::SetActiveDatasetRequest::Type request;
     uint8_t validDataset[] = { 0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x0b, 0x35, 0x06,
