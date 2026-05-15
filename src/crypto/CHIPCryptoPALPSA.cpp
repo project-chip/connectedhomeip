@@ -909,7 +909,7 @@ void P256Keypair::Clear()
     {
         PsaP256KeypairContext & context = ToPsaContext(mKeypair);
         psa_destroy_key(context.key_id);
-        memset(&context, 0, sizeof(context));
+        ClearSecretData(reinterpret_cast<uint8_t *>(&context), sizeof(context));
         mInitialized = false;
     }
 }
@@ -1025,6 +1025,10 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
+
+    ClearSecretData(Kcab);
+    ClearSecretData(Kae);
+
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
