@@ -528,7 +528,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 #endif // SL_MATTER_RGB_LED_ENABLED
         break;
 
-    case Identify::Id:
+    case Clusters::Identify::Id:
         if (value != nullptr && size == sizeof(uint8_t))
         {
             ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
