@@ -111,7 +111,8 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & c
 
 void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
 {
-    (void) mDelegate.Init(nullptr);
+    // clearing the delegate MUST always succeed.
+    RETURN_SAFELY_IGNORED mDelegate.Init(nullptr);
     mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     app::DefaultServerCluster::Shutdown(reason);
 }
