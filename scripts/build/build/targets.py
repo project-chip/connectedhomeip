@@ -217,6 +217,8 @@ def BuildHostTarget():
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier("msan", use_msan=True).OnlyIfRe("-clang").OnlyIfRe("-x64").ExceptIfRe(
+        "-(asan|tsan|ubsan|libfuzzer|ossfuzz|pw-fuzztest)")
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
     target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(

@@ -22,11 +22,6 @@ RUN set -x \
   && echo "experimental/matter/sysroot/ubuntu-24.04-aarch64 version:${SYSROOT_VERSION}" > ensure_file.txt \
   && echo "experimental/matter/sysroot/ubuntu-24.04-armhf version:${SYSROOT_VERSION}" >> ensure_file.txt \
   && ./depot_tools/cipd ensure -ensure-file ensure_file.txt -root ./ \
-  && for arch in aarch64 armhf; do \
-       for d in usr/bin usr/lib/firmware usr/lib/git-core usr/lib/modules lib/firmware lib/git-core lib/modules; do \
-         rm -rf "/opt/ubuntu-24.04-${arch}-sysroot/${d}"; \
-       done; \
-     done \
   && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

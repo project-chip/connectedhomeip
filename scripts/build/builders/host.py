@@ -14,12 +14,62 @@
 
 import os
 import shlex
+import subprocess
+import sys
+
+from pathlib import Path
 from enum import Enum, auto
 from platform import uname
 from typing import Optional
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
+
+_MSAN_DEFAULT_SYSROOT = Path.home() / '.cache/matter/msan_sysroot'
+_MSAN_BUILD_SCRIPT = 'scripts/build/build_msan_sysroot.sh'
+
+
+def _msan_sysroot_path() -> Path:
+    """Resolve the MSAN sysroot path that GN will reference.
+    """
+    return Path(os.getenv('SYSROOT_MSAN', _MSAN_DEFAULT_SYSROOT)).absolute()
+
+
+def _msan_validate_sysroot(chip_root: str) -> None:
+    """Fail fast if the MSAN sysroot is missing or stale.
+
+    Delegates the freshness check to build_msan_sysroot.sh --check so the
+    hash logic has a single source of truth in bash. Passes the resolved
+    sysroot path explicitly so the script checks the same one GN will use.
+
+    Exits via sys.exit() rather than raising so the user sees a clean
+    actionable message instead of a click/builder traceback.
+    """
+    sysroot = _msan_sysroot_path()
+    script = Path(chip_root) / _MSAN_BUILD_SCRIPT
+    result = subprocess.run(
+        [script, '--out-dir', sysroot, '--check'],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        return
+
+    detail = result.stderr.strip() or result.stdout.strip() or '<no output>'
+    print(
+        '\n'
+        f'MSAN sysroot check failed: {detail}\n'
+        '\n'
+        'MSAN needs every dependency (libc++, libc++abi, OpenSSL, etc.) compiled \n'
+        'with -fsanitize=memory; uninstrumented code triggers false positives.\n'
+        '\n'
+        'Build it with:\n'
+        f'    {_MSAN_BUILD_SCRIPT}\n'
+        '\n'
+        'First-time build: 5-15 min, ~4 GB on disk during build\n'
+        'Override path with: export SYSROOT_MSAN=<path>',
+        file=sys.stderr,
+    )
+    sys.exit(result.returncode)
 
 
 class HostCryptoLibrary(Enum):
@@ -405,7 +455,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
-                 enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
+                 enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False, use_msan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
@@ -431,6 +481,9 @@ class HostBuilder(GnBuilder):
                       into per-target directories. Directory name will be "unified"
         """
 
+        # Save before `root` is mutated below (used by MSAN validation later).
+        chip_root = os.path.abspath(root)
+
         # Unified builds use the top level root for compilation
         if not unified:
             root = os.path.join(root, 'examples', app.ExamplePath())
@@ -443,6 +496,7 @@ class HostBuilder(GnBuilder):
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
         self.unified = unified
+        self.use_msan = use_msan
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -485,6 +539,13 @@ class HostBuilder(GnBuilder):
 
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
+
+        if use_msan:
+            if not runner.dry_run:
+                _msan_validate_sysroot(chip_root)
+            self.extra_gn_options.append('is_msan=true')
+            # Tell GN to build against the same sysroot we just validated.
+            self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
@@ -694,11 +755,20 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_ARMHF'), 'lib/arm-linux-gnueabihf/pkgconfig')
+        if self.use_msan:
+            # make pkg-config use the instrumented OpenSSL/zlib/glib/etc. in the MSAN sysroot.
+            # Without this, Matter's GN config picks up the system's libs, and MSAN reports endless
+            # false positives from uninstrumented dependencies at runtime.
+            sysroot = _msan_sysroot_path()
+            self.build_env['PKG_CONFIG_PATH'] = ':'.join([
+                f'{sysroot}/lib/pkgconfig',
+                f'{sysroot}/lib64/pkgconfig',
+            ])
         if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
             # Every test is expected to have a distinct build ID, so `%m` will be
             # distinct.
             #
-            # Output is relative to "oputput_dir" since that is where GN executs
+            # Output is relative to "output_dir" since that is where GN executes
             self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
 
         return self.build_env

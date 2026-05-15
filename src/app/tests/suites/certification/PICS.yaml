@@ -123,10 +123,6 @@ PICS:
     - label: "Does the commissioner support Discovery Capability over BLE?"
       id: MCORE.DD.DISCOVERY_BLE
 
-    - label:
-          "Does the commissioner support Discovery Capability over IP Network?"
-      id: MCORE.DD.DISCOVERY_IP
-
     - label: "Does the commissioner support Discovery Capability over Wifi-PAF?"
       id: MCORE.DD.DISCOVERY_PAF
 
