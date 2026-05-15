@@ -104,6 +104,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
 chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
 {
     auto wc = FindClusterOnEndpoint(Endpoint());
+    VerifyOrDie(wc != nullptr);
     chip::Percent100ths percent100ths{};
     NPercent100ths current{};
     OperationalState opState{};
@@ -120,14 +121,14 @@ chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
-    if ((status == chip::Protocols::InteractionModel::Status::Success) && !current.IsNull())
+    if (!current.IsNull())
     {
         static constexpr auto sPercentDelta{ WC_PERCENT100THS_MAX_CLOSED / 20 };
         percent100ths = ComputePercent100thsStep(opState, current.Value(), sPercentDelta);
     }
     else
     {
-        LOG_ERR("Cannot read the current lift position. Error: %d", static_cast<uint8_t>(status));
+        LOG_ERR("Cannot read the current lift position.");
     }
 
     return percent100ths;
@@ -275,11 +276,6 @@ void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percen
     else if (Instance().mCurrentUIMoveType == MoveType::TILT)
     {
         wc->SetTargetPositionTiltPercent100ths(aPosition);
-    }
-
-    if (status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        LOG_ERR("Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
     }
 }
 
