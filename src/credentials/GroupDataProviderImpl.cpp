@@ -672,7 +672,7 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
     {
         policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
         keys_count = 0;
-        memset(operational_keys, 0x00, sizeof(operational_keys));
+        Crypto::ClearSecretData(reinterpret_cast<uint8_t *>(operational_keys), sizeof(operational_keys));
         next = kInvalidKeysetId;
     }
 
