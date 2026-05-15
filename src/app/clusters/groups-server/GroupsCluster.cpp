@@ -45,6 +45,9 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip::app::Clusters {
 namespace {
 
+constexpr AttributePathParams kGroupKeyGroupTableAttributePath{ kRootEndpointId, GroupKeyManagement::Id,
+                                                            GroupKeyManagement::Attributes::GroupTable::Id };
+
 void NotifyGroupTableChanged(ServerClusterContext * context)
 {
     // TODO: This seems a bit coupled: we are notifying in this cluster that ANOTHER cluster
