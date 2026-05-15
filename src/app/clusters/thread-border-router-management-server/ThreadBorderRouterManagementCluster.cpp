@@ -106,7 +106,7 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::AcceptedCommands(const ConcreteC
 }
 
 CHIP_ERROR ThreadBorderRouterManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
-                                                                 ReadOnlyBufferBuilder<CommandId> & builder)
+                                                                  ReadOnlyBufferBuilder<CommandId> & builder)
 {
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     ReturnErrorOnFailure(builder.Append(ThreadBorderRouterManagement::Commands::DatasetResponse::Id));
@@ -224,7 +224,8 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         mSetActiveDatasetSequenceNumber++;
 
         ctx->FlushAcksRightAwayOnSlowCommand();
-        mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, static_cast<ThreadBorderRouterManagementDelegate::ActivateDatasetCallback *>(this));
+        mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber,
+                                   static_cast<ThreadBorderRouterManagementDelegate::ActivateDatasetCallback *>(this));
 
         // Return nullopt because this is an async operation. The response will be sent
         // later in the OnActivateDatasetComplete callback.

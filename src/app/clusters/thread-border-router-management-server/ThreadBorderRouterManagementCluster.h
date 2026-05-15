@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <lib/support/BitFlags.h>
 #include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
+#include <lib/support/BitFlags.h>
 #include <platform/PlatformManager.h>
 
 namespace chip::app::Clusters {
@@ -65,8 +65,7 @@ public:
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path,
-                                 ReadOnlyBufferBuilder<CommandId> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType reason) override;

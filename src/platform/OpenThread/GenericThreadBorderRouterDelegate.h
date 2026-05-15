@@ -38,7 +38,8 @@ class GenericOpenThreadBorderRouterDelegate : public Delegate
 public:
     static constexpr char kFailsafeActiveDatasetConfigured[] = "g/fs/tbradc";
     GenericOpenThreadBorderRouterDelegate(PersistentStorageDelegate * storage) : mStorage(storage) {}
-    ~GenericOpenThreadBorderRouterDelegate() {
+    ~GenericOpenThreadBorderRouterDelegate()
+    {
         DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     }
 

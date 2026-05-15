@@ -17,7 +17,6 @@
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <iterator>
 #include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
@@ -25,6 +24,7 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/ThreadBorderRouterManagement/Metadata.h>
+#include <iterator>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,16 +33,16 @@ using namespace chip::app::Clusters::ThreadBorderRouterManagement;
 
 namespace {
 
-constexpr EndpointId kTestEndpointId = 1;
-constexpr uint16_t kMockThreadVersion = 1;
+constexpr EndpointId kTestEndpointId           = 1;
+constexpr uint16_t kMockThreadVersion          = 1;
 constexpr uint64_t kMockActiveDatasetTimestamp = 12345ULL;
-constexpr FabricIndex kTestFabricIndex = 1;
-constexpr uint16_t kTestFailSafeTimeout = 60;
+constexpr FabricIndex kTestFabricIndex         = 1;
+constexpr uint16_t kTestFailSafeTimeout        = 60;
 
 class MockDelegate : public ThreadBorderRouterManagementDelegate
 {
 public:
-    bool mPanChangeSupported = true;
+    bool mPanChangeSupported        = true;
     size_t mMockBorderAgentIdLength = 16;
 
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override { return CHIP_NO_ERROR; }
@@ -145,17 +145,13 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadClusterRevision)
     EXPECT_EQ(clusterRevision, ThreadBorderRouterManagement::kRevision);
 }
 
-
-
 TEST_F(TestThreadBorderRouterManagementCluster, TestAttributesList)
 {
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    std::vector<app::DataModel::AttributeEntry> expected(
-        Attributes::kMandatoryMetadata.begin(),
-        Attributes::kMandatoryMetadata.end()
-    );
+    std::vector<app::DataModel::AttributeEntry> expected(Attributes::kMandatoryMetadata.begin(),
+                                                         Attributes::kMandatoryMetadata.end());
 
     EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, expected));
 }
@@ -234,8 +230,9 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeSupporte
 TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSupported)
 {
     delegate.mPanChangeSupported = false;
-    
-    ThreadBorderRouterManagementCluster::Config localConfig(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
+
+    ThreadBorderRouterManagementCluster::Config localConfig(delegate, failSafeContext, breadcrumbTracker,
+                                                            DeviceLayer::PlatformMgr());
     ThreadBorderRouterManagementCluster localCluster(kTestEndpointId, localConfig);
 
     chip::Testing::ClusterTester tester(localCluster);
