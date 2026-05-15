@@ -51,6 +51,7 @@ import asyncio
 import logging
 
 from mobly import asserts
+from time import monotonic_ns
 from TC_SUTestBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
@@ -202,24 +203,79 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.step(0)
 
         self.step(1)
+
+        # Global Listener
+        requestor_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+        )
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
+
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
+        await requestor_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                      fabric_filtered=False, min_interval_sec=0, max_interval_sec=1)
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+            lambda report:  report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        requestor_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+        requestor_handler.reset()
 
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is Applying",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.ota_image_download_timeout)
+        # Use global listener to check the transition from 99% to kApplying then count the time and check
+        # the transition from downloading from kApplying was almost inmmediatly or without delay
+        download_progress = 0
+        progress_seen = False
+        download_complete = False
+        # set to none to verify after that it was udpated to int value
+        download_complete_time = 0
+        applying_state_time = 0
+
+        def check_download_apply_transition(report):
+            """Check for the UpdateStateProgress and confirms it downloaded the image, then check for kApplying and if the 
+            download was complete pass the matcher. Additionally save the monotonic_ns when those event happens.
+            Args:
+                report : Report value
+            """
+            nonlocal download_progress, progress_seen, download_complete, download_complete_time, applying_state_time
+            value = report.value
+            attribute = report.attribute
+
+            # Set the value of the download progress is a report for this attribute is seen
+            if attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
+                download_progress = value
+                # check the progress
+                if value is not NullValue and isinstance(value, int) and 1 <= value <= 100:
+                    # Just check if we see some progress to confirm is downloading
+                    if not progress_seen:
+                        progress_seen = True
+                if value is NullValue and progress_seen:
+                    # download complete
+                    download_complete_time = monotonic_ns()
+                    download_complete = True
+            # If we have report for UpdateState check if value is kApplying and Download is complete to exit this matcher. Save time to further compare.
+            if attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying and download_complete:
+                # Complete the listener and save the time
+                applying_state_time = monotonic_ns()
+                return True
+
+        download_apply_matcher = AttributeMatcher.from_callable(
+            description="Waiting Download to Complete  and check transiton to kApplyingState", matcher=check_download_apply_transition)
+
+        requestor_handler.await_all_expected_report_matches(
+            [download_apply_matcher], timeout_sec=self.ota_image_download_timeout)
+        requestor_handler.reset()
+        requestor_handler.cancel()
+        transition_time = abs(applying_state_time - download_complete_time)//1000
+        logger.info(
+            f"Transition time, Download complete at:  {download_complete_time }, kApplying Started at: {applying_state_time } , total microseconds taken: {transition_time}")
+        # Verify transition to kApplying is instant (or almost) as delayed action time is set to 0
+        asserts.assert_less_equal(transition_time, 1000000,
+                                  "Transition from kDownload to kApplying took more that one second. Did not start inmmediatly.")
 
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
