@@ -54,8 +54,6 @@ public:
         mPlatformManager(config.mPlatformManager)
     {}
 
-
-
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,

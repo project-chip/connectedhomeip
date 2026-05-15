@@ -112,14 +112,10 @@ struct TestThreadBorderRouterManagementCluster : public ::testing::Test
     }
 
     TestThreadBorderRouterManagementCluster() :
-        config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr()),
-        cluster(kTestEndpointId, config)
+        config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr()), cluster(kTestEndpointId, config)
     {}
 
-    void TearDown() override
-    {
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
+    void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     FailSafeContext failSafeContext;
     MockBreadcrumbTracker breadcrumbTracker;
