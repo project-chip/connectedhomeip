@@ -44,13 +44,13 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(revision)
         self.xml_device_types, self.xml_device_types_problems = build_xml_device_types(revision)
         # Let's just build a dictionary of device types to IDs because I need them and we don't have codegen
-        self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): id for id, dt in self.xml_device_types.items()}
+        self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): tid for tid, dt in self.xml_device_types.items()}
 
     # This just tests that the prebuilt specs can be parsed without failures
 
     @run_against_all_spec_revisions
     def test_spec_device_parsing(self):
-        for id, d in self.xml_device_types.items():
+        for _, d in self.xml_device_types.items():
             print(str(d))
 
     def teardown_test(self):
@@ -124,9 +124,9 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         asserts.assert_equal(device_type[self.device_type_id].revision, self.revision, "Unexpected revision")
         asserts.assert_equal(len(device_type[self.device_type_id].server_clusters),
                              len(self.clusters), "Unexpected number of clusters")
-        for id, name in self.clusters.items():
-            asserts.assert_equal(device_type[self.device_type_id].server_clusters[id].name, name, "Incorrect cluster name")
-            asserts.assert_equal(str(device_type[self.device_type_id].server_clusters[id].conformance),
+        for cid, name in self.clusters.items():
+            asserts.assert_equal(device_type[self.device_type_id].server_clusters[cid].name, name, "Incorrect cluster name")
+            asserts.assert_equal(str(device_type[self.device_type_id].server_clusters[cid].conformance),
                                  'M', 'Incorrect cluster conformance')
 
     def test_no_clusters(self):
@@ -430,19 +430,19 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
 
     @run_against_all_spec_revisions
     def test_all_device_types(self):
-        for id in self.xml_device_types:
-            self.create_good_device(id)
+        for tid in self.xml_device_types:
+            self.create_good_device(tid)
             success, problems = self.check_device_type(fail_on_extra_clusters=True)
             for p in problems:
                 print(p)
-            asserts.assert_false(problems, f"Unexpected problems on device type {id}")
-            asserts.assert_true(success, f"Unexpected failure on device type {id}")
+            asserts.assert_false(problems, f"Unexpected problems on device type {tid}")
+            asserts.assert_true(success, f"Unexpected failure on device type {tid}")
 
     @run_against_all_spec_revisions
     def test_disallowed_cluster(self):
-        for id, dt in self.xml_device_types.items():
+        for tid, dt in self.xml_device_types.items():
             expected_problems = 0
-            self.create_good_device(id)
+            self.create_good_device(tid)
             for cluster_id, cluster in dt.server_clusters.items():
                 if not conformance_allowed(cluster.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES), False):
                     self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList].append(cluster_id)

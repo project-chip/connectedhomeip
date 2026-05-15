@@ -556,8 +556,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         mei_range_min = 0x0001_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                globals = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
-                unexpected_globals = sorted(set(globals) - set(allowed_globals))
+                endpoint_globals = filter(lambda a: a >= global_range_min and a < mei_range_min,
+                                          cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID])
+                unexpected_globals = sorted(set(endpoint_globals) - set(allowed_globals))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -855,10 +856,10 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         self.print_step(5, "Check for cycles in the tree endpoints")
         part_list_errors = parts_list_problems(tree, self.endpoints)
         if len(part_list_errors) != 0:
-            for id in part_list_errors:
-                location = AttributePathLocation(endpoint_id=id, cluster_id=cluster_id, attribute_id=attribute_id)
+            for _id in part_list_errors:
+                location = AttributePathLocation(endpoint_id=_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem=f"Endpoint {id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
+                                  problem=f"Endpoint {_id} parts list includes a cycle or endpoint with multiple paths to the root or non-existent endpoint", spec_location="PartsList Attribute")
             self.fail_current_test()
 
         self.print_step(6, "Check flat lists include all sub ids")
@@ -941,7 +942,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                          [Clusters.Descriptor.Attributes.DeviceTypeList]]
             parts_list[endpoint_id] = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        bridged_nodes = [id for (id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
+        bridged_nodes = [_id for (_id, dev_type) in device_types.items() if BRIDGED_NODE_DEVICE_TYPE_ID in dev_type]
 
         for endpoint_id in bridged_nodes:
             if Clusters.PowerSource not in self.endpoints[endpoint_id]:

@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import defaultdict
+from collections.abc import Iterator
+import contextlib
+import functools
+import threading
 import logging
 import os
 import shutil
@@ -19,6 +24,9 @@ import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Callable, Concatenate, ParamSpec, TypeVar
+
+from runner.runner import Runner
 
 
 class BuildProfile(StrEnum):
@@ -53,6 +61,54 @@ class BuilderOutput:
     target: str  # Target file to be copied to
 
 
+class OutDirLock:
+    """Lock to provide mutual exclusion for operations on output directories."""
+
+    def __init__(self) -> None:
+        self._dir_locks: dict[str, threading.RLock] = defaultdict(threading.RLock)
+        self._dict_lock: threading.Lock = threading.Lock()
+
+    @contextlib.contextmanager
+    def lock_dir(self, dir_path: str | None) -> Iterator[None]:
+        # No directory to lock, just yield
+        if dir_path is None:
+            yield
+            return
+
+        with self._dict_lock:
+            dir_lock = self._dir_locks[dir_path]
+
+        with dir_lock:
+            yield
+
+
+S = TypeVar('S', bound='Builder')
+P = ParamSpec('P')
+R = TypeVar('R')
+
+
+def lock_output_dir(func: Callable[Concatenate[S, P], R | Iterator[R]]) -> Callable[Concatenate[S, P], R | Iterator[R]]:
+    """Decorator to wrap build steps with output directory lock."""
+
+    @functools.wraps(func)
+    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R | Iterator[R]:
+        if self.output_dir_lock is None:
+            return func(self, *args, **kwargs)
+
+        output_dir_lock = self.output_dir_lock
+
+        # Keep the lock held while an iterator result is consumed. This is needed for build_outputs and bundle_outputs which are
+        # generators yielding BuilderOutput objects.
+        def iterator_with_lock(result: Iterator[R]) -> Iterator[R]:
+            with output_dir_lock.lock_dir(self.output_dir):
+                yield from result
+
+        with output_dir_lock.lock_dir(self.output_dir):
+            return iterator_with_lock(result) if isinstance(result := func(self, *args, **kwargs), Iterator) else result
+
+    return wrapper
+
+
 class Builder(ABC):
     """Generic builder base class for CHIP.
 
@@ -61,9 +117,10 @@ class Builder(ABC):
 
     """
 
-    def __init__(self, root, runner):
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock | None = None):
         self.root = os.path.abspath(root)
         self._runner = runner
+        self.output_dir_lock = output_dir_lock
 
         # Set post-init once actual build target is known
         self.identifier = None

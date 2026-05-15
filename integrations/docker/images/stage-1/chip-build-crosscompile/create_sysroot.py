@@ -208,6 +208,7 @@ def cleanup_sysroot(sysroot_dir):
 
     # Clean up large unneeded subdirectories inside usr/lib to save space
     # Remove executables as we don't need them for the build and they just confuse `cmake`
+    # Remove docs, info/man pages, shell completions, i18n, fonts, icons, X11 and MIME data, timezone data, etc.
     excludes = [
         "usr/lib/*/dri",
         "usr/lib/firmware",
@@ -217,7 +218,26 @@ def cleanup_sysroot(sysroot_dir):
         "usr/lib/systemd",
 
         "usr/bin",
-        "usr/sbin"
+        "usr/sbin",
+
+        "usr/share/doc",
+        "usr/share/gtk-doc",
+        "usr/share/common-licenses",
+        "usr/share/info",
+        "usr/share/man",
+        "usr/share/bash-completion",
+        "usr/share/i18n",
+        "usr/share/locale",
+        "usr/share/iso-codes",
+        "usr/share/fonts",
+        "usr/share/fontconfig",
+        "usr/share/consolefonts",
+        "usr/share/icons",
+        "usr/share/pixmaps",
+        "usr/share/X11",
+        "usr/share/mime",
+        "usr/share/zoneinfo",
+        "usr/share/ca-certificates",
     ]
     for pattern in excludes:
         full_pattern = os.path.join(sysroot_dir, pattern)

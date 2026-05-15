@@ -33,13 +33,15 @@ public:
     struct AppConfig
     {
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
-        bool enableWiFi = false;
+        uint32_t bleController = 0;
+        bool enableWiFi        = false;
         std::string kvsPath;
         std::optional<uint16_t> discriminator;
         std::optional<uint16_t> vendorId;
         std::optional<uint16_t> productId;
         std::optional<uint16_t> port;
         std::optional<uint32_t> interfaceId;
+        bool enableGroupcast = false;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();

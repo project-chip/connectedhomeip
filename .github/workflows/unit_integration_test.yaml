@@ -33,7 +33,7 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls, rotating_device_id, icd]
+                type: [main, mbedtls, all_features]
         env:
             BUILD_TYPE: ${{ matrix.type }}
 
@@ -63,14 +63,12 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Setup Build
-              # TODO: If rotating_device_id is ever removed/combined, we have to cover boringssl otherwise
+              # all_features bundles ICD, ARL and rotating-device-id (with clang/asan/boringssl) into one matrix row
               run: |
                   case $BUILD_TYPE in
                      "main") GN_ARGS='chip_build_all_platform_tests=true';;
-                     "clang") GN_ARGS='is_clang=true chip_build_all_platform_tests=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls" chip_build_all_platform_tests=true';;
-                     "rotating_device_id") GN_ARGS='chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_build_all_platform_tests=true';;
-                     "icd") GN_ARGS='chip_enable_icd_server=true chip_enable_icd_lit=true chip_build_all_platform_tests=true';;
+                     "all_features") GN_ARGS='is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true';;
                      *) ;;
                   esac
 

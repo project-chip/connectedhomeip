@@ -928,9 +928,9 @@ def root_index(s: str) -> int:
         "gamma": 3
     }
 
-    for name, id in CHIP_TOOL_COMPATIBILITY.items():
+    for name, _id in CHIP_TOOL_COMPATIBILITY.items():
         if s.lower() == name:
-            return id
+            return _id
     else:
         root_index = int(s)
         if root_index == 0:

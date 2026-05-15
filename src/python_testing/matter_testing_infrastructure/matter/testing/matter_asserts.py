@@ -290,66 +290,66 @@ def assert_string_matches_pattern(value: str, description: str, pattern: str) ->
                         f"{description} must match pattern: {pattern}")
 
 
-def assert_valid_attribute_id(id: int, allow_test: bool = False) -> None:
+def assert_valid_attribute_id(aid: int, allow_test: bool = False) -> None:
     """
     Asserts that the given ID is a valid attribute ID.
 
     Args:
-        id: The attribute ID to validate
+        aid: The attribute ID to validate
         allow_test: Whether to allow test attribute IDs
 
     Raises:
         AssertionError: If the ID is not a valid attribute ID
     """
     from matter.testing.global_attribute_ids import is_valid_attribute_id
-    asserts.assert_true(is_valid_attribute_id(id, allow_test),
-                        f"Invalid attribute ID: {hex(id)}")
+    asserts.assert_true(is_valid_attribute_id(aid, allow_test),
+                        f"Invalid attribute ID: {hex(aid)}")
 
 
-def assert_standard_attribute_id(id: int) -> None:
+def assert_standard_attribute_id(aid: int) -> None:
     """
     Asserts that the given ID is a standard attribute ID.
 
     Args:
-        id: The attribute ID to validate
+        aid: The attribute ID to validate
 
     Raises:
         AssertionError: If the ID is not a standard attribute ID
     """
     from matter.testing.global_attribute_ids import is_standard_attribute_id
-    asserts.assert_true(is_standard_attribute_id(id),
-                        f"Not a standard attribute ID: {hex(id)}")
+    asserts.assert_true(is_standard_attribute_id(aid),
+                        f"Not a standard attribute ID: {hex(aid)}")
 
 
-def assert_valid_command_id(id: int, allow_test: bool = False) -> None:
+def assert_valid_command_id(cid: int, allow_test: bool = False) -> None:
     """
     Asserts that the given ID is a valid command ID.
 
     Args:
-        id: The command ID to validate
+        cid: The command ID to validate
         allow_test: Whether to allow test command IDs
 
     Raises:
         AssertionError: If the ID is not a valid command ID
     """
     from matter.testing.global_attribute_ids import is_valid_command_id
-    asserts.assert_true(is_valid_command_id(id, allow_test),
-                        f"Invalid command ID: {hex(id)}")
+    asserts.assert_true(is_valid_command_id(cid, allow_test),
+                        f"Invalid command ID: {hex(cid)}")
 
 
-def assert_standard_command_id(id: int) -> None:
+def assert_standard_command_id(cid: int) -> None:
     """
     Asserts that the given ID is a standard command ID.
 
     Args:
-        id: The command ID to validate
+        cid: The command ID to validate
 
     Raises:
         AssertionError: If the ID is not a standard command ID
     """
     from matter.testing.global_attribute_ids import is_standard_command_id
-    asserts.assert_true(is_standard_command_id(id),
-                        f"Not a standard command ID: {hex(id)}")
+    asserts.assert_true(is_standard_command_id(cid),
+                        f"Not a standard command ID: {hex(cid)}")
 
 
 def assert_valid_enum(value: Any, description: str, enum_type: type) -> None:
