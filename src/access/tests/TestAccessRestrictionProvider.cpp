@@ -29,7 +29,6 @@
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 namespace chip {
@@ -48,9 +47,9 @@ TestAccessRestrictionProvider accessRestrictionProvider;
 
 constexpr uint16_t kMaxGroupsPerFabric    = 4;
 constexpr uint16_t kMaxGroupKeysPerFabric = 4;
-TestPersistentStorageDelegate                 gGroupStorage;
-Crypto::DefaultSessionKeystore                gGroupSessionKeystore;
-Credentials::GroupDataProviderImpl            gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+TestPersistentStorageDelegate gGroupStorage;
+Crypto::DefaultSessionKeystore gGroupSessionKeystore;
+Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 Examples::GroupAuxiliaryAccessControlDelegate gGroupAuxDelegate(&gGroupsProvider);
 
 constexpr ClusterId kNetworkCommissioningCluster = app::Clusters::NetworkCommissioning::Id;
@@ -743,15 +742,14 @@ TEST_F(TestAccessRestriction, ListSelectiondDuringCommissioningTest)
     RunChecks(listSelectionDuringCommissioningData, MATTER_ARRAY_SIZE(listSelectionDuringCommissioningData));
 }
 
-// ARL kCommandForbidden must deny a group-multicast Operate Invoke whose
-// privilege is granted via the GroupAuxiliary delegate fallback (not via main
-// ACL). Exercises that ARL is consulted after every privilege grant, including
-// grants that originate from the auxiliary path.
+// ARL kCommandForbidden must deny a group-multicast Operate Invoke whose privilege is granted
+// via the GroupAuxiliary delegate fallback (not via main ACL).
+// Exercises that ARL is consulted after every privilege grant, including grants that originate from the auxiliary path.
 TEST_F(TestAccessRestriction, GroupMulticastInvokeCommandForbiddenByArl)
 {
-    constexpr EndpointId  kRestrictedEndpoint = 1;
-    constexpr FabricIndex kFabric             = 1;
-    constexpr GroupId     kGroup              = 0x5555;
+    constexpr EndpointId kRestrictedEndpoint = 1;
+    constexpr FabricIndex kFabric            = 1;
+    constexpr GroupId kGroup                 = 0x5555;
 
     // Bind group -> endpoint and flag HasAuxiliaryACL so the aux delegate
     // grants Operate on this (group, endpoint) pair.
@@ -763,15 +761,6 @@ TEST_F(TestAccessRestriction, GroupMulticastInvokeCommandForbiddenByArl)
         ASSERT_EQ(gGroupsProvider.SetGroupInfo(kFabric, info), CHIP_NO_ERROR);
         ASSERT_EQ(gGroupsProvider.AddEndpoint(kFabric, kGroup, kRestrictedEndpoint), CHIP_NO_ERROR);
     }
-
-    AccessControl::Entry aclEntry;
-    ASSERT_EQ(accessControl.PrepareEntry(aclEntry), CHIP_NO_ERROR);
-    ASSERT_EQ(aclEntry.SetFabricIndex(kFabric), CHIP_NO_ERROR);
-    ASSERT_EQ(aclEntry.SetPrivilege(Privilege::kOperate), CHIP_NO_ERROR);
-    ASSERT_EQ(aclEntry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
-    ASSERT_EQ(aclEntry.AddSubject(nullptr, NodeIdFromGroupId(kGroup)), CHIP_NO_ERROR);
-    size_t addedAclIndex = std::numeric_limits<size_t>::max();
-    ASSERT_EQ(accessControl.CreateEntry(&addedAclIndex, aclEntry), CHIP_NO_ERROR);
 
     // ARL: forbid commands on (restrictable cluster, non-root endpoint).
     {
@@ -796,10 +785,7 @@ TEST_F(TestAccessRestriction, GroupMulticastInvokeCommandForbiddenByArl)
     restricted.requestType = RequestType::kCommandInvokeRequest;
     restricted.entityId    = 1;
 
-    EXPECT_EQ(accessControl.Check(groupSubject, restricted, Privilege::kOperate),
-              CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL);
-
-    EXPECT_EQ(accessControl.DeleteEntry(addedAclIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(accessControl.Check(groupSubject, restricted, Privilege::kOperate), CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL);
 }
 
 } // namespace Access
