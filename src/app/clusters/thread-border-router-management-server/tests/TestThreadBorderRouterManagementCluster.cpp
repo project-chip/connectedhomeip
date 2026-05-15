@@ -133,7 +133,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadClusterRevision)
 
     uint16_t clusterRevision{};
     EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision).IsSuccess());
-    EXPECT_EQ(clusterRevision, 1u);
+    EXPECT_EQ(clusterRevision, ThreadBorderRouterManagement::kRevision);
 }
 
 
