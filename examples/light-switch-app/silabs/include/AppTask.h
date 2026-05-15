@@ -109,7 +109,7 @@ public:
     CHIP_ERROR StartAppTask();
 
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-    
+
     static void AppEventHandler(AppEvent * aEvent);
 
     static void SwitchWorkerFunction(intptr_t context);
