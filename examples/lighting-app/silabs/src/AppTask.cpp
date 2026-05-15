@@ -92,6 +92,18 @@ bool sLightOn           = false;
 osTimerId_t sLightTimer = nullptr;
 bool sOffEffectArmed    = false;
 
+void StopLightTimerIfRunning()
+{
+    if (osTimerIsRunning(sLightTimer))
+    {
+        if (osTimerStop(sLightTimer) == osError)
+        {
+            SILABS_LOG("sLightTimer stop() failed");
+            appError(APP_ERROR_STOP_TIMER_FAILED);
+        }
+    }
+}
+
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 uint8_t sCurrentLevel      = 254;
 uint8_t sCurrentHue        = 0;
@@ -124,11 +136,9 @@ void PostLightControlColorEvent(ColorAction_t action, const RGBLEDWidget::ColorD
 
 void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 {
-    if (!sOffEffectArmed)
-    {
-        return;
-    }
+    VerifyOrReturn(sOffEffectArmed);
     sOffEffectArmed = false;
+    StopLightTimerIfRunning();
 
     sLightOn = false;
     sLightLED.Set(false);
@@ -177,14 +187,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     sLightLED.Set(sLightOn);
 
     sOffEffectArmed = false;
-    if (osTimerIsRunning(sLightTimer))
-    {
-        if (osTimerStop(sLightTimer) == osError)
-        {
-            SILABS_LOG("sLightTimer stop() failed");
-            appError(APP_ERROR_STOP_TIMER_FAILED);
-        }
-    }
+    StopLightTimerIfRunning();
 
 #ifdef DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(sLightOn);
@@ -417,10 +420,7 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
     {
         ChipLogDetail(Zcl, "OffWithEffect: unsupported effect, completing immediately");
         sOffEffectArmed = false;
-        if (osTimerIsRunning(sLightTimer))
-        {
-            osTimerStop(sLightTimer);
-        }
+        StopLightTimerIfRunning();
         return;
     }
 
@@ -428,6 +428,7 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
     if (osTimerStart(sLightTimer, pdMS_TO_TICKS(offEffectDuration)) != osOK)
     {
         sOffEffectArmed = false;
+        StopLightTimerIfRunning();
         SILABS_LOG("sLightTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
@@ -457,6 +458,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
             if (lightOn)
             {
                 sOffEffectArmed = false;
+                StopLightTimerIfRunning();
             }
 
             sLightOn = lightOn;
@@ -464,14 +466,6 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 #ifdef DISPLAY_ENABLED
             BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
-            if (lightOn && osTimerIsRunning(sLightTimer))
-            {
-                if (osTimerStop(sLightTimer) == osError)
-                {
-                    SILABS_LOG("sLightTimer stop() failed");
-                    appError(APP_ERROR_STOP_TIMER_FAILED);
-                }
-            }
         }
         break;
 
