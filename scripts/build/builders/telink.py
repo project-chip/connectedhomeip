@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -168,8 +170,9 @@ class TelinkBoard(Enum):
 class TelinkBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard,
                  enable_ota: bool = False,
@@ -187,7 +190,7 @@ class TelinkBuilder(Builder):
                  chip_enable_nfc_onboarding_payload: bool = False,
                  log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
                  ):
-        super(TelinkBuilder, self).__init__(root, runner)
+        super(TelinkBuilder, self).__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_ota = enable_ota
@@ -219,6 +222,7 @@ class TelinkBuilder(Builder):
 
         return cmd
 
+    @lock_output_dir
     def generate(self):
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -292,6 +296,7 @@ class TelinkBuilder(Builder):
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         log.info('Compiling Telink at %s', self.output_dir)
 
@@ -302,6 +307,7 @@ class TelinkBuilder(Builder):
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
             os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),

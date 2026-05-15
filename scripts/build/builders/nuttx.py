@@ -16,7 +16,9 @@ import logging
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import Builder
 
 log = logging.getLogger(__name__)
@@ -49,8 +51,9 @@ class NuttXBoard(Enum):
 class NuttXBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: NuttXApp = NuttXApp.LIGHT,
                  board: NuttXBoard = NuttXBoard.SIM,
                  ):
@@ -60,13 +63,15 @@ class NuttXBuilder(Builder):
         super(NuttXBuilder, self).__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), nuttx_chip),
-            runner=runner
+            runner=runner,
+            output_dir_lock=output_dir_lock
         )
 
         self.chip_name = nuttx_chip
         self.app = app
         self.board = board
 
+    @lock_output_dir
     def generate(self):
         self._Execute(['mkdir', '-p', self.output_dir], title='Preparing output directory for ' + self.identifier)
         nuttx_dir = os.path.join(os.sep, 'opt', 'nuttx', 'nuttx')
@@ -78,11 +83,13 @@ class NuttXBuilder(Builder):
                        '-GNinja'],
                       title='Configuring ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         log.info('Compiling NuttX %s at %s, ',
                  self.board.board_config, self.output_dir)
         self._Execute(['cmake', '--build', self.output_dir])
 
+    @lock_output_dir
     def build_outputs(self):
         log.info('Compiling outputs NuttX at %s', self.output_dir)
         extensions = ["out"]
