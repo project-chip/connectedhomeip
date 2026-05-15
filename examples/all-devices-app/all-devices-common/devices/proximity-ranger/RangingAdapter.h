@@ -35,14 +35,42 @@ namespace ProximityRanging {
 /**
  * Interface for a single ranging technology (BLE RSSI, Channel Sounding, Wi-Fi USD, etc.).
  *
- * Platform-specific adapters implement this and are registered with a
- * RangingTechnologyController. Adapters must outlive the controller.
- * All methods are called from the Matter main thread.
+ * Lifecycle: platform-specific adapters are owned by the application and must
+ * be registered with the RangingTechnologyController before the Proximity
+ * Ranging cluster is initialized. Adapters must outlive the controller, or be
+ * unregistered before destruction.
+ *
+ * Session model: the cluster allocates 1-byte session IDs and passes them to
+ * StartSession. The adapter tracks which IDs are currently active, exposes
+ * them via GetActiveSessionIds, and is responsible for reporting termination
+ * of every session it has accepted — whether requested via StopSession or
+ * driven by the underlying technology — through OnRangingSessionStopped.
+ *
+ * StartSession / StopSession semantics: both return synchronously with the
+ * status of the start/stop request. An adapter MAY return success early if
+ * the underlying start takes too long; in that case it must subsequently
+ * deliver OnRangingSessionStopped with HardwareError if the session fails to
+ * come up.
+ *
+ * Async events:
+ *   - OnMeasurementData: emitted per the session's measurement parameters
+ *     (interval, peer config) for the lifetime of the session.
+ *   - OnAttributeChanged: called when a runtime configuration value the
+ *     adapter exposes as an attribute changes, so the cluster can mark it
+ *     dirty.
+ *   - OnRangingSessionStopped: emitted when a ranging session has stopped
+ *     either by timeout, request, or from a hardware failure.
+ *
+ * Threading: methods on this interface are called from the Matter main
+ * thread. The Callback is thread-safe; adapters MAY invoke it from any
+ * thread.
+ *
+ * Optional capabilities: GetDeviceId defaults to std::nullopt; override only
+ * when the adapter exposes a stable per-device identifier (e.g. BLE Device ID).
  */
 class RangingAdapter
 {
 public:
-    /** Receives async results from ranging sessions. */
     class Callback
     {
     public:
@@ -56,47 +84,19 @@ public:
     virtual ~RangingAdapter() = default;
 
     /**
-     * Set the callback for async event delivery (measurements, session stops).
-     * Called by RangingTechnologyController during RegisterAdapter.
      * The callback must remain valid until the adapter is unregistered or destroyed.
      */
     void SetCallback(Callback * callback) { mCallback = callback; }
 
-    /**
-     * Returns the ranging technology this adapter implements.
-     */
-    virtual RangingTechEnum GetTechnology() const = 0;
-
-    /**
-     * Returns the ranging capabilities this adapter supports.
-     */
+    virtual RangingTechEnum GetTechnology() const                            = 0;
     virtual Structs::RangingCapabilitiesStruct::Type GetCapabilities() const = 0;
 
-    /**
-     * Start a ranging session synchronously. Measurement data and unsolicited
-     * session stops are still delivered asynchronously via the Callback
-     * registered with SetCallback.
-     */
     virtual ResultCodeEnum StartSession(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) = 0;
+    virtual CHIP_ERROR StopSession(uint8_t sessionId)                                                                    = 0;
+    virtual void StopAllSessions()                                                                                       = 0;
 
-    /**
-     * Stop an active ranging session synchronously.
-     */
-    virtual CHIP_ERROR StopSession(uint8_t sessionId) = 0;
-
-    /**
-     * Stop all active ranging sessions.
-     */
-    virtual void StopAllSessions() = 0;
-
-    /**
-     * Collect active session IDs managed by this adapter.
-     */
     virtual CHIP_ERROR GetActiveSessionIds(std::vector<uint8_t> & sessionIds) = 0;
 
-    /**
-     * Get the unique Device ID for this adapter if supported.
-     */
     virtual std::optional<uint64_t> GetDeviceId() { return std::nullopt; }
 
 protected:

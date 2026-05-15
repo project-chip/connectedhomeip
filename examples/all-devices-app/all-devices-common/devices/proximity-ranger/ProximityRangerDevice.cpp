@@ -45,11 +45,7 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
     for (auto * adapter : mAdapters)
     {
         VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        CHIP_ERROR err = GetRangingController().RegisterAdapter(*adapter);
-        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_DUPLICATE_KEY_ID)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(GetRangingController().RegisterAdapter(*adapter).NoErrorIf(CHIP_ERROR_DUPLICATE_KEY_ID));
     }
 
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));

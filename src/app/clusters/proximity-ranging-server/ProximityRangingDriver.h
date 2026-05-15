@@ -47,6 +47,10 @@ namespace ProximityRanging {
  * HandleStopRanging. Async results — measurement data and unsolicited
  * session terminations — flow back through the Callback registered in Init().
  *
+ * Threading: methods on this interface are called from the Matter main
+ * thread. The registered Callback is thread-safe; drivers MAY invoke it from
+ * any thread.
+ *
  * Optional attributes: the Get*DevIK / GetBleDeviceId / GetBLTCS* methods
  * default to returning CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, which the cluster
  * maps to UnsupportedAttribute. Override the ones whose features are present
@@ -86,8 +90,13 @@ public:
     virtual size_t GetNumActiveSessionIds()                            = 0;
     virtual CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) = 0;
 
+    /// Override if the BLERBC feature is supported.
     virtual CHIP_ERROR GetBleDeviceId(uint64_t & bleDeviceId) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    /// Override if the WFUSDPD feature is supported.
     virtual CHIP_ERROR GetWiFiDevIK(MutableByteSpan & wifiDevIK) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    /// Override if the BLTCS feature is supported.
     virtual CHIP_ERROR GetBLTDevIK(MutableByteSpan & bltDevIK) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     virtual CHIP_ERROR GetBLTCSSecurityLevel(BLTCSSecurityLevelEnum & securityLevel) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     virtual CHIP_ERROR GetBLTCSModeCapability(BLTCSModeEnum & modeCapability) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
