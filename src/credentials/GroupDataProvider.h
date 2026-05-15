@@ -406,7 +406,7 @@ public:
 
     // Groupcast
     virtual uint16_t getMaxMembershipCount() const = 0;
-    virtual uint16_t getMaxMcastAddrCount() const = 0;
+    virtual uint16_t getMaxMcastAddrCount() const  = 0;
 
     /**
      * @brief Check if a notification is needed for Auxiliary ACL changes and reset the flag.
