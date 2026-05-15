@@ -92,8 +92,9 @@ bool sLightOn           = false;
 osTimerId_t sLightTimer = nullptr;
 bool sOffEffectArmed    = false;
 
-void StopLightTimerIfRunning()
+void DisarmOffWithEffectTimer()
 {
+    sOffEffectArmed = false;
     if (osTimerIsRunning(sLightTimer))
     {
         if (osTimerStop(sLightTimer) == osError)
@@ -137,8 +138,7 @@ void PostLightControlColorEvent(ColorAction_t action, const RGBLEDWidget::ColorD
 void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 {
     VerifyOrReturn(sOffEffectArmed);
-    sOffEffectArmed = false;
-    StopLightTimerIfRunning();
+    DisarmOffWithEffectTimer();
 
     sLightOn = false;
     sLightLED.Set(false);
@@ -186,8 +186,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     sLightOn = !sLightOn;
     sLightLED.Set(sLightOn);
 
-    sOffEffectArmed = false;
-    StopLightTimerIfRunning();
+    DisarmOffWithEffectTimer();
 
 #ifdef DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(sLightOn);
@@ -419,16 +418,14 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
     else
     {
         ChipLogDetail(Zcl, "OffWithEffect: unsupported effect, completing immediately");
-        sOffEffectArmed = false;
-        StopLightTimerIfRunning();
+        DisarmOffWithEffectTimer();
         return;
     }
 
     sOffEffectArmed = true;
     if (osTimerStart(sLightTimer, pdMS_TO_TICKS(offEffectDuration)) != osOK)
     {
-        sOffEffectArmed = false;
-        StopLightTimerIfRunning();
+        DisarmOffWithEffectTimer();
         SILABS_LOG("sLightTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
@@ -457,8 +454,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
             }
             if (lightOn)
             {
-                sOffEffectArmed = false;
-                StopLightTimerIfRunning();
+                DisarmOffWithEffectTimer();
             }
 
             sLightOn = lightOn;
