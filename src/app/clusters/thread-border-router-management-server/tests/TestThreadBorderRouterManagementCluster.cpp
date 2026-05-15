@@ -111,15 +111,26 @@ struct TestThreadBorderRouterManagementCluster : public ::testing::Test
         Platform::MemoryShutdown();
     }
 
+    TestThreadBorderRouterManagementCluster() :
+        config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr()),
+        cluster(kTestEndpointId, config)
+    {}
+
+    void TearDown() override
+    {
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
     FailSafeContext failSafeContext;
     MockBreadcrumbTracker breadcrumbTracker;
+    MockDelegate delegate;
+    ThreadBorderRouterManagementCluster::Config config;
+    ThreadBorderRouterManagementCluster cluster;
 };
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestReadClusterRevision)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -130,9 +141,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadClusterRevision)
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestAttributesList)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -145,9 +154,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestAttributesList)
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -176,42 +183,31 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
     EXPECT_TRUE(pendingTimestamp.IsNull());
 }
 
-TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap)
+TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeSupported)
 {
-    // Case 1: PANChange feature is supported
-    {
-        MockDelegate delegate;
-        delegate.mPanChangeSupported = true;
-        ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-        ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
-        chip::Testing::ClusterTester tester(cluster);
-        EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    delegate.mPanChangeSupported = true;
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-        uint32_t featureMap;
-        EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
-        EXPECT_EQ(featureMap, 1u);
-    }
+    uint32_t featureMap;
+    EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
+    EXPECT_EQ(featureMap, 1u);
+}
 
-    // Case 2: PANChange feature is NOT supported
-    {
-        MockDelegate delegate;
-        delegate.mPanChangeSupported = false;
-        ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-        ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
-        chip::Testing::ClusterTester tester(cluster);
-        EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSupported)
+{
+    delegate.mPanChangeSupported = false;
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-        uint32_t featureMap;
-        EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
-        EXPECT_EQ(featureMap, 0u);
-    }
+    uint32_t featureMap;
+    EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
+    EXPECT_EQ(featureMap, 0u);
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequest)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -224,9 +220,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequest)
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestGetPendingDatasetRequest)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -239,10 +233,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetPendingDatasetRequest)
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequest)
 {
-    MockDelegate delegate;
     delegate.mReturnNotFoundForDataset = true;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -266,9 +257,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequest)
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestSetPendingDatasetRequest)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -286,44 +275,33 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetPendingDatasetRequest)
     EXPECT_TRUE(result.IsSuccess());
 }
 
-TEST_F(TestThreadBorderRouterManagementCluster, TestAcceptedCommandsList)
+TEST_F(TestThreadBorderRouterManagementCluster, TestAcceptedCommandsList_PanChangeSupported)
 {
-    // Case 1: PANChange feature is supported, expect all commands including SetPendingDataset
-    {
-        MockDelegate delegate;
-        delegate.mPanChangeSupported = true;
-        ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-        ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
-        chip::Testing::ClusterTester tester(cluster);
-        EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    delegate.mPanChangeSupported = true;
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-        EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(
-            cluster,
-            { Commands::GetActiveDatasetRequest::kMetadataEntry, Commands::GetPendingDatasetRequest::kMetadataEntry,
-              Commands::SetActiveDatasetRequest::kMetadataEntry, Commands::SetPendingDatasetRequest::kMetadataEntry }));
-    }
+    EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(
+        cluster,
+        { Commands::GetActiveDatasetRequest::kMetadataEntry, Commands::GetPendingDatasetRequest::kMetadataEntry,
+          Commands::SetActiveDatasetRequest::kMetadataEntry, Commands::SetPendingDatasetRequest::kMetadataEntry }));
+}
 
-    // Case 2: PANChange feature is NOT supported, expect SetPendingDataset to be omitted
-    {
-        MockDelegate delegate;
-        delegate.mPanChangeSupported = false;
-        ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-        ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
-        chip::Testing::ClusterTester tester(cluster);
-        EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+TEST_F(TestThreadBorderRouterManagementCluster, TestAcceptedCommandsList_PanChangeNotSupported)
+{
+    delegate.mPanChangeSupported = false;
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-        EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster,
-                                                                 { Commands::GetActiveDatasetRequest::kMetadataEntry,
-                                                                   Commands::GetPendingDatasetRequest::kMetadataEntry,
-                                                                   Commands::SetActiveDatasetRequest::kMetadataEntry }));
-    }
+    EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster,
+                                                             { Commands::GetActiveDatasetRequest::kMetadataEntry,
+                                                               Commands::GetPendingDatasetRequest::kMetadataEntry,
+                                                               Commands::SetActiveDatasetRequest::kMetadataEntry }));
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequestFailsafeRequired)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -339,9 +317,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequestFails
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestFailSafeTimerExpired)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -356,10 +332,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFailSafeTimerExpired)
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestBreadcrumbHandling)
 {
-    MockDelegate delegate;
     delegate.mReturnNotFoundForDataset = true;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -383,9 +356,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestBreadcrumbHandling)
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestRequiresCASE)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -406,10 +377,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestRequi
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestNotFoundReturnsEmpty)
 {
-    MockDelegate delegate;
     delegate.mReturnNotFoundForDataset = true;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -426,9 +394,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequestNotFo
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequestInvalidInState)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -453,9 +419,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetRequestInval
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestCommissioningComplete)
 {
-    MockDelegate delegate;
-    ThreadBorderRouterManagementCluster::Config config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster cluster(kTestEndpointId, config);
+
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
