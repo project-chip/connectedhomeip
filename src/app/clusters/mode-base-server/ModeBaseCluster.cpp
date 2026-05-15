@@ -249,7 +249,7 @@ DataModel::ActionReturnStatus ModeBaseCluster::ReadAttribute(const DataModel::Re
     case ClusterRevision::Id:
         // TODO: We need a way to know the current revision of the cluster.
         // For now, we are returning a hardcoded value of 1.
-        return encoder.Encode(1);
+        return encoder.Encode<uint16_t>(1);
     case SupportedModes::Id:
         return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR { return EncodeSupportedModes(encod); });
     case CurrentMode::Id:
