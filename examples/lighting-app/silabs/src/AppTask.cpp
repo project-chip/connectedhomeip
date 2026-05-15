@@ -413,9 +413,9 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
         }
     }
 
-    if (offEffectDuration == 0)
+    else
     {
-        ChipLogProgress(Zcl, "OffWithEffect: unsupported effect, completing immediately");
+        ChipLogDetail(Zcl, "OffWithEffect: unsupported effect, completing immediately");
         sOffEffectArmed = false;
         if (osTimerIsRunning(sLightTimer))
         {
