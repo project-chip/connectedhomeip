@@ -46,7 +46,7 @@ namespace chip::app::Clusters {
 namespace {
 
 constexpr AttributePathParams kGroupKeyGroupTableAttributePath{ kRootEndpointId, GroupKeyManagement::Id,
-                                                            GroupKeyManagement::Attributes::GroupTable::Id };
+                                                                GroupKeyManagement::Attributes::GroupTable::Id };
 
 void NotifyGroupTableChanged(ServerClusterContext * context)
 {
