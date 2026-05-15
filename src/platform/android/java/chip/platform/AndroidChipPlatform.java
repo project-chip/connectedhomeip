@@ -20,6 +20,7 @@ package chip.platform;
 public final class AndroidChipPlatform {
   private BleManager mBleManager = null;
   private NfcCommissioningManager mNfcCommissioningManager = null;
+  private WifiPafManager mWifiPafManager = null;
 
   public AndroidChipPlatform(
       BleManager ble,
@@ -77,6 +78,20 @@ public final class AndroidChipPlatform {
 
   private native void nativeSetBLEManager(BleManager manager);
 
+  public WifiPafManager getWifiPafManager() {
+    return mWifiPafManager;
+  }
+
+  public void setWifiPafManager(WifiPafManager manager) {
+    if (manager != null) {
+      mWifiPafManager = manager;
+      manager.setAndroidChipPlatform(this);
+      nativeSetWifiPafManager(manager);
+    }
+  }
+
+  private native void nativeSetWifiPafManager(WifiPafManager manager);
+
   // apis in BleLayer.h called by Platform
   // write success
   public native void handleWriteConfirmation(
@@ -95,6 +110,21 @@ public final class AndroidChipPlatform {
 
   // connection status changed
   public native void handleConnectionError(int connId);
+
+  // apis for WiFi PAF
+  public native void handleDiscoveryResult(
+      int subscribeId,
+      int peerPublishId,
+      String peerAddr,
+      int discriminator,
+      int productId,
+      int vendorId);
+
+  public native void handleReceive(int id, int peerId, String peerAddr, byte[] data);
+
+  public native void handleSubscribeTerminated(int subscribeId, String reason);
+
+  public native void handleSendWriteDone(int id, int peerId, String peerAddr, boolean success);
 
   // for KeyValueStoreManager
   private native void setKeyValueStoreManager(KeyValueStoreManager manager);

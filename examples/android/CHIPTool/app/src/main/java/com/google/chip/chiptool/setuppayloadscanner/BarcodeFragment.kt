@@ -186,8 +186,9 @@ class BarcodeFragment : Fragment() {
           OnboardingPayloadParser().parseManualPairingCode(code)
         }
 
+      val deviceInfo = CHIPDeviceInfo.fromSetupPayload(payload, isLIT).copy(setupCode = code)
       FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
+        ?.onCHIPDeviceInfoReceived(deviceInfo)
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized Code", ex)
       Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
@@ -205,11 +206,12 @@ class BarcodeFragment : Fragment() {
     val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
     Handler(Looper.getMainLooper()).post {
       try {
-        val payload =
-          barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
+        val qrCode = barcode.displayValue ?: return@post
+        val payload = OnboardingPayloadParser().parseQrCode(qrCode)
+        val deviceInfo = CHIPDeviceInfo.fromSetupPayload(payload, isLIT).copy(setupCode = qrCode)
 
         FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-          ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
+          ?.onCHIPDeviceInfoReceived(deviceInfo)
       } catch (ex: UnrecognizedQrCodeException) {
         Log.e(TAG, "Unrecognized QR Code", ex)
         Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()

@@ -137,6 +137,21 @@ private:
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
+    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
+    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
+    CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                                 OnConnectionErrorFunct onError);
+    CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
+    CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
+    CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf);
+    void _WiFiPafSetApFreq(const uint16_t freq);
+    CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+    bool _WiFiPAFResourceAvailable();
+#endif
 #endif
 
     // ==================== ConnectivityManager Private Methods ====================
@@ -163,6 +178,26 @@ private:
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+public:
+    void InitializeWifiPafManager(jobject manager);
+    void HandleDiscoveryResult(int subscribeId, int peerPublishId, const char * peerAddr, int discriminator, int productId,
+                               int vendorId);
+    void HandleReceive(int id, int peerId, const char * peerAddr, const uint8_t * data, size_t len);
+    void HandleSubscribeTerminated(int subscribeId, const char * reason);
+    void HandleSendWriteDone(int id, int peerId, const char * peerAddr, bool success);
+
+private:
+    jobject mWifiPafManagerObject = nullptr;
+    jmethodID mWifiPafSubscribeMethod = nullptr;
+    jmethodID mWifiPafCancelSubscribeMethod = nullptr;
+    jmethodID mWifiPafSendMethod = nullptr;
+
+    void * mAppState = nullptr;
+    OnConnectionCompleteFunct mOnPafSubscribeComplete = nullptr;
+    OnConnectionErrorFunct mOnPafSubscribeError = nullptr;
+#endif
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

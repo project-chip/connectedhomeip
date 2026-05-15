@@ -26,6 +26,7 @@ import chip.devicecontroller.ICDCheckInDelegate
 import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
+import chip.platform.AndroidWifiPafManager
 import chip.platform.AndroidNfcCommissioningManager
 import chip.platform.ChipMdnsCallbackImpl
 import chip.platform.DiagnosticDataProviderImpl
@@ -109,6 +110,7 @@ object ChipClient {
           ChipMdnsCallbackImpl(),
           DiagnosticDataProviderImpl(context)
         )
+      androidPlatform.setWifiPafManager(AndroidWifiPafManager(context))
     }
 
     return androidPlatform

@@ -22,6 +22,10 @@
 #include <platform/internal/BLEManager.h>
 #include <platform/internal/NFCCommissioningManager.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <wifipaf/WiFiPAFLayer.h>
+#endif
+
 #include <cstdlib>
 #include <new>
 
@@ -48,6 +52,9 @@
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+using namespace ::chip::WiFiPAF;
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,10 +63,53 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    return WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
+#else
     return CHIP_NO_ERROR;
+#endif
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoWiFiPAFReceived: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFReceived");
+        WiFiPAFSession RxInfo;
+        memcpy(&RxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        WiFiPafLayer.OnWiFiPAFMessageReceived(RxInfo, System::PacketBufferHandle::Adopt(event->CHIPoWiFiPAFReceived.Data));
+        break;
+    }
+    case DeviceEventType::kCHIPoWiFiPAFConnected: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFConnected");
+        WiFiPAF::WiFiPAFSession SessionInfo;
+        memcpy(&SessionInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        TEMPORARY_RETURN_IGNORED WiFiPafLayer.HandleTransportConnectionInitiated(SessionInfo, mOnPafSubscribeComplete, mAppState,
+                                                                                 mOnPafSubscribeError);
+        break;
+    }
+    case DeviceEventType::kCHIPoWiFiPAFCancelConnect: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFCancelConnect");
+        if (mOnPafSubscribeError != nullptr)
+        {
+            mOnPafSubscribeError(mAppState, CHIP_ERROR_CANCELLED);
+            mOnPafSubscribeError = nullptr;
+        }
+        break;
+    }
+    case DeviceEventType::kCHIPoWiFiPAFWriteDone: {
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteDone");
+        WiFiPAF::WiFiPAFSession TxInfo;
+        memcpy(&TxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
+        TEMPORARY_RETURN_IGNORED WiFiPafLayer.HandleWriteConfirmed(TxInfo, event->CHIPoWiFiPAFReceived.result);
+        break;
+    }
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 

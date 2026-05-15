@@ -288,6 +288,59 @@ JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 #endif
 }
 
+JNI_METHOD(void, nativeSetWifiPafManager)(JNIEnv *, jobject, jobject manager)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::DeviceLayer::StackLock lock;
+    chip::DeviceLayer::ConnectivityMgrImpl().InitializeWifiPafManager(manager);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+}
+
+JNI_METHOD(void, handleDiscoveryResult)
+(JNIEnv * env, jobject self, jint subscribeId, jint peerPublishId, jstring peerAddr, jint discriminator, jint productId, jint vendorId)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::DeviceLayer::StackLock lock;
+    JniUtfString addrStr(env, peerAddr);
+    chip::DeviceLayer::ConnectivityMgrImpl().HandleDiscoveryResult(
+        subscribeId, peerPublishId, addrStr.c_str(), discriminator, productId, vendorId);
+#endif
+}
+
+JNI_METHOD(void, handleReceive)
+(JNIEnv * env, jobject self, jint id, jint peerId, jstring peerAddr, jbyteArray value)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::DeviceLayer::StackLock lock;
+    JniUtfString addrStr(env, peerAddr);
+    const auto valueBegin  = env->GetByteArrayElements(value, nullptr);
+    const auto valueLength = env->GetArrayLength(value);
+
+    chip::DeviceLayer::ConnectivityMgrImpl().HandleReceive(
+        id, peerId, addrStr.c_str(), reinterpret_cast<const uint8_t *>(valueBegin), static_cast<size_t>(valueLength));
+
+    env->ReleaseByteArrayElements(value, valueBegin, 0);
+#endif
+}
+
+JNI_METHOD(void, handleSubscribeTerminated)(JNIEnv * env, jobject self, jint subscribeId, jstring reason)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::DeviceLayer::StackLock lock;
+    JniUtfString reasonStr(env, reason);
+    chip::DeviceLayer::ConnectivityMgrImpl().HandleSubscribeTerminated(subscribeId, reasonStr.c_str());
+#endif
+}
+
+JNI_METHOD(void, handleSendWriteDone)(JNIEnv * env, jobject self, jint id, jint peerId, jstring peerAddr, jboolean success)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::DeviceLayer::StackLock lock;
+    JniUtfString addrStr(env, peerAddr);
+    chip::DeviceLayer::ConnectivityMgrImpl().HandleSendWriteDone(id, peerId, addrStr.c_str(), success);
+#endif
+}
+
 // for KeyValueStoreManager
 JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject manager)
 {

@@ -48,6 +48,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
+import matter.onboardingpayload.DiscoveryCapability
 
 @ExperimentalCoroutinesApi
 class DeviceProvisioningFragment : Fragment() {
@@ -82,6 +83,8 @@ class DeviceProvisioningFragment : Fragment() {
       if (savedInstanceState == null) {
         if (deviceInfo.ipAddress != null) {
           pairDeviceWithAddress()
+        } else if (deviceInfo.discoveryCapabilities.contains(DiscoveryCapability.WIFI_PAF)) {
+          pairDeviceWithWifiPaf()
         } else {
           startConnectingToDevice()
         }
@@ -346,6 +349,63 @@ class DeviceProvisioningFragment : Fragment() {
 
   private fun ByteArray.toHex(): String =
     joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
+
+  private fun showMessage(msg: String) {
+    requireActivity().runOnUiThread {
+      Log.i(TAG, "showMessage:$msg")
+      Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  private fun pairDeviceWithWifiPaf() {
+    val setupCode = deviceInfo.setupCode
+    if (setupCode == null) {
+      Log.e(TAG, "Setup code is null, cannot pair with PAF")
+      showMessage("Setup code is null, cannot pair with PAF")
+      return
+    }
+
+    showMessage("Starting pairing over Wi-Fi PAF...")
+    deviceController.setCompletionListener(ConnectionCallback())
+
+    val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
+    var network: NetworkCredentials? = null
+    val networkParcelable = networkCredentialsParcelable
+
+    if (networkParcelable != null) {
+      val wifi = networkParcelable.wiFiCredentials
+      if (wifi != null) {
+        network =
+          NetworkCredentials.forWiFi(NetworkCredentials.WiFiCredentials(wifi.ssid, wifi.password))
+      }
+      val thread = networkParcelable.threadCredentials
+      if (thread != null) {
+        network =
+          NetworkCredentials.forThread(
+            NetworkCredentials.ThreadCredentials(thread.operationalDataset)
+          )
+      }
+    }
+
+    setAttestationDelegate()
+
+    val icdRegistrationInfo =
+      if (deviceInfo.isLIT) {
+        ICDRegistrationInfo.createForDeferredConfiguration()
+      } else {
+        null
+      }
+
+    val params =
+      CommissionParameters.Builder()
+        .setCsrNonce(null)
+        .setNetworkCredentials(network)
+        .setICDRegistrationInfo(icdRegistrationInfo)
+        .build()
+
+    deviceController.pairDeviceWithCode(deviceId, setupCode, true, false, params)
+    DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
+  }
 
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
   interface Callback {
