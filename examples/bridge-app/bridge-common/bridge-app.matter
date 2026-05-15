@@ -2293,7 +2293,7 @@ cluster TemperatureMeasurement = 1026 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
 
 
   server cluster Descriptor {
@@ -2673,7 +2673,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_dimmablelight = 257, version 1;
+  device type ma_dimmablelight = 257, version 3;
 
 
   server cluster OnOff {
