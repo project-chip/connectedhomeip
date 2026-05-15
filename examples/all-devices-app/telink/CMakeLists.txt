@@ -45,7 +45,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
                ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
                ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
-               ${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp
 
                # all-devices common interfaces
                ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/interface/DeviceInterface.cpp
