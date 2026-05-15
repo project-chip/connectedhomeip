@@ -708,10 +708,10 @@ void AppTask::LightSwitchChangedHandler(const Binding::TableEntry & binding, Ope
     }
     else if (binding.type == Binding::MATTER_UNICAST_BINDING && !data->isGroup)
     {
+        VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
         switch (data->clusterId)
         {
         case Clusters::OnOff::Id:
-            VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
             ProcessOnOffBindingCommand(data->commandId, binding, peer_device);
             break;
         case Clusters::LevelControl::Id:
