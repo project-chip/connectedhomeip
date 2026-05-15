@@ -43,6 +43,7 @@ class MockDelegate : public ThreadBorderRouterManagementDelegate
 {
 public:
     bool mPanChangeSupported = true;
+    size_t mMockBorderAgentIdLength = 16;
 
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override { return CHIP_NO_ERROR; }
     bool GetPanChangeSupported() override { return mPanChangeSupported; }
@@ -50,7 +51,11 @@ public:
     {
         EXPECT_EQ(CopyCharSpanToMutableCharSpan("MockBR"_span, borderRouterName), CHIP_NO_ERROR);
     }
-    CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override
+    {
+        borderAgentId.reduce_size(mMockBorderAgentIdLength);
+        return CHIP_NO_ERROR;
+    }
     uint16_t GetThreadVersion() override { return kMockThreadVersion; }
     bool GetInterfaceEnabled() override { return true; }
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override
@@ -184,6 +189,27 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
     DataModel::Nullable<uint64_t> pendingTimestamp;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::PendingDatasetTimestamp::Id, pendingTimestamp).IsSuccess());
     EXPECT_TRUE(pendingTimestamp.IsNull());
+}
+
+TEST_F(TestThreadBorderRouterManagementCluster, TestReadBorderAgentID_InvalidLength)
+{
+    delegate.mMockBorderAgentIdLength = 10; // Invalid length!
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    chip::ByteSpan agentId;
+    EXPECT_FALSE(tester.ReadAttribute(Attributes::BorderAgentID::Id, agentId).IsSuccess());
+}
+
+TEST_F(TestThreadBorderRouterManagementCluster, TestReadBorderAgentID_ValidLength)
+{
+    delegate.mMockBorderAgentIdLength = 16; // Valid length!
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    chip::ByteSpan agentId;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::BorderAgentID::Id, agentId).IsSuccess());
+    EXPECT_EQ(agentId.size(), 16u);
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeSupported)
