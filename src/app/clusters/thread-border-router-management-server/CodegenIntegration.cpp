@@ -54,6 +54,8 @@ ServerInstance::ServerInstance(EndpointId endpointId, Delegate * delegate, FailS
 
 ServerInstance::~ServerInstance()
 {
+    // Note: Unregister always errors out if Init() was never called.
+    // We expect Init() to essentially be always called if the instance is used.
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     if (err != CHIP_NO_ERROR)
     {
