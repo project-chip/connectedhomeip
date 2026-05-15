@@ -84,19 +84,9 @@ public:
         return CHIP_NO_ERROR;
     }
     size_t GetNumActiveSessionIds() override { return mActiveSessionIds.size(); }
-    CHIP_ERROR GetBleDeviceId(uint64_t & bleDeviceId) override
-    {
-        VerifyOrReturnError(mBleDeviceIdSupported, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        bleDeviceId = mBleDeviceId;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR GetWiFiDevIK(MutableByteSpan & wifiDevIK) override
-    {
-        VerifyOrReturnError(mWiFiDevIKSupported, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        memcpy(wifiDevIK.data(), mWiFiDevIK, sizeof(mWiFiDevIK));
-        wifiDevIK.reduce_size(sizeof(mWiFiDevIK));
-        return CHIP_NO_ERROR;
-    }
+    std::optional<BleRbcConfig> GetBleRbcConfig() override { return mBleRbcConfig; }
+    std::optional<WiFiUsdConfig> GetWiFiUsdConfig() override { return mWiFiUsdConfig; }
+    std::optional<BltcsConfig> GetBltcsConfig() override { return mBltcsConfig; }
 
     // Test control
     CHIP_ERROR mInitError                = CHIP_NO_ERROR;
@@ -107,11 +97,10 @@ public:
     std::vector<uint8_t> mActiveSessionIds;
     uint8_t mLastStartSessionId = 0;
     uint8_t mLastStopSessionId  = 0;
-    bool mBleDeviceIdSupported  = false;
-    uint64_t mBleDeviceId       = 0;
-    bool mWiFiDevIKSupported    = false;
-    uint8_t mWiFiDevIK[16]      = {};
-    Callback * mCallback        = nullptr;
+    std::optional<BleRbcConfig> mBleRbcConfig;
+    std::optional<WiFiUsdConfig> mWiFiUsdConfig;
+    std::optional<BltcsConfig> mBltcsConfig;
+    Callback * mCallback = nullptr;
 };
 
 struct TestProximityRangingCluster : public ::testing::Test
@@ -403,8 +392,7 @@ TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdSupported)
 {
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
-    driver.mBleDeviceIdSupported = true;
-    driver.mBleDeviceId          = 0x1234;
+    driver.mBleRbcConfig = BleRbcConfig{ 0x1234 };
 
     ProximityRangingCluster cluster(
         ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
@@ -440,8 +428,9 @@ TEST_F(TestProximityRangingCluster, TestReadWiFiDevIKSupported)
 {
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
-    driver.mWiFiDevIKSupported = true;
-    memset(driver.mWiFiDevIK, 0xAB, sizeof(driver.mWiFiDevIK));
+    WiFiUsdConfig wifiConfig{};
+    memset(wifiConfig.deviceIdentityKey, 0xAB, sizeof(wifiConfig.deviceIdentityKey));
+    driver.mWiFiUsdConfig = wifiConfig;
 
     ProximityRangingCluster cluster(
         ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
@@ -543,6 +532,8 @@ TEST_F(TestProximityRangingCluster, TestStartRangingCapacityExhausted)
 {
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
+    // GenerateSessionId() short-circuits when numSessions == 0, so at least one
+    // active session is needed to reach the GetActiveSessionIds error path.
     driver.mActiveSessionIds         = { 1 };
     driver.mGetActiveSessionIdsError = CHIP_ERROR_INTERNAL;
 

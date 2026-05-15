@@ -31,14 +31,17 @@ CHIP_ERROR PosixBleRssiRangingAdapter::GetActiveSessionIds(std::vector<uint8_t> 
 
 void PosixBleRssiRangingAdapter::StopAllSessions()
 {
-    if (mCallback != nullptr)
+    while (!mActiveSessions.empty())
     {
-        for (uint8_t id : mActiveSessions)
+        uint8_t id = mActiveSessions.back();
+        mActiveSessions.pop_back();
+        if (mCallback != nullptr)
         {
+            // kHardwareError is used as a placeholder for all stop reasons until the
+            // specification defines a distinct status for deliberate stops.
             mCallback->OnRangingSessionStopped(id, RangingSessionStatusEnum::kHardwareError);
         }
     }
-    mActiveSessions.clear();
 }
 
 void PosixBleRssiRangingAdapter::AddSession(uint8_t sessionId)
@@ -55,6 +58,8 @@ bool PosixBleRssiRangingAdapter::RemoveSession(uint8_t sessionId)
             mActiveSessions.erase(it);
             if (mCallback != nullptr)
             {
+                // kHardwareError is used as a placeholder for all stop reasons until the
+                // specification defines a distinct status for deliberate stops.
                 mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kHardwareError);
             }
             return true;

@@ -40,7 +40,7 @@ public:
     ResultCodeEnum HandleStartRanging(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) override;
     CHIP_ERROR HandleStopRanging(uint8_t sessionId) override;
     CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder) override;
-    CHIP_ERROR GetBleDeviceId(uint64_t & bleDeviceId) override;
+    std::optional<BleRbcConfig> GetBleRbcConfig() override;
     size_t GetNumActiveSessionIds() override { return mController.GetNumActiveSessionIds(); }
     CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override;
 

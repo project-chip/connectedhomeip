@@ -52,10 +52,9 @@ CHIP_ERROR DefaultProximityRangingDriver::GetRangingCapabilities(AttributeValueE
     return mController.GetRangingCapabilities(encoder);
 }
 
-CHIP_ERROR DefaultProximityRangingDriver::GetBleDeviceId(uint64_t & bleDeviceId)
+std::optional<BleRbcConfig> DefaultProximityRangingDriver::GetBleRbcConfig()
 {
-    bleDeviceId = mController.GetBleDeviceId();
-    return CHIP_NO_ERROR;
+    return BleRbcConfig{ mController.GetBleDeviceId() };
 }
 
 CHIP_ERROR DefaultProximityRangingDriver::GetActiveSessionIds(Span<uint8_t> & sessionIds)

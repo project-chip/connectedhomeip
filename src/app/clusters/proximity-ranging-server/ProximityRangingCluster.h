@@ -46,9 +46,6 @@ namespace ProximityRanging {
 class ProximityRangingCluster : public DefaultServerCluster, public ProximityRangingDriver::Callback
 {
 public:
-    /// Maximum Device Identity Key length for Wi-Fi USD and BTCS
-    static constexpr size_t kDeviceIdentityKeyLen = 16;
-
     /**
      * Configuration builder for ProximityRangingCluster.
      */

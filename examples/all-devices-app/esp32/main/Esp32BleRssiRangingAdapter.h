@@ -39,6 +39,8 @@ public:
         ChipLogProgress(AppServer, "Esp32BleRssiRangingAdapter: StopSession stub (session %u)", sessionId);
         if (mCallback != nullptr)
         {
+            // kHardwareError is used as a placeholder for all stop reasons until the
+            // specification defines a distinct status for deliberate stops.
             mCallback->OnRangingSessionStopped(sessionId,
                                                chip::app::Clusters::ProximityRanging::RangingSessionStatusEnum::kHardwareError);
         }

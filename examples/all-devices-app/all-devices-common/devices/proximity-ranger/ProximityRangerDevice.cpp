@@ -41,6 +41,8 @@ ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
+    VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
+
     // Register adapters with the shared controller, skipping any already registered.
     for (auto * adapter : mAdapters)
     {

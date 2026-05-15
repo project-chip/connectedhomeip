@@ -25,10 +25,37 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 
+#include <optional>
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ProximityRanging {
+
+/// Length of the Device Identity Key for Wi-Fi USD and BLTCS.
+inline constexpr size_t kDeviceIdentityKeyLen = 16;
+using DeviceIdentityKey                       = uint8_t[kDeviceIdentityKeyLen];
+
+/// Per-technology configuration exposed via the cluster's optional attributes.
+/// Drivers return one of these only when the corresponding feature is in the
+/// cluster's feature map; otherwise the matching Get accessor returns nullopt
+/// and the cluster surfaces UnsupportedAttribute.
+struct BleRbcConfig
+{
+    uint64_t deviceId;
+};
+
+struct WiFiUsdConfig
+{
+    DeviceIdentityKey deviceIdentityKey;
+};
+
+struct BltcsConfig
+{
+    DeviceIdentityKey deviceIdentityKey;
+    BLTCSSecurityLevelEnum securityLevel;
+    BLTCSModeEnum modeCapability;
+};
 
 /**
  * Driver interface for the Proximity Ranging cluster.
@@ -51,10 +78,12 @@ namespace ProximityRanging {
  * thread. The registered Callback is thread-safe; drivers MAY invoke it from
  * any thread.
  *
- * Optional attributes: the Get*DevIK / GetBleDeviceId / GetBLTCS* methods
- * default to returning CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, which the cluster
- * maps to UnsupportedAttribute. Override the ones whose features are present
- * in the cluster's feature map.
+ * Optional feature configuration: the Get*Config accessors return one
+ * std::optional per supported technology and default to std::nullopt, which
+ * the cluster maps to UnsupportedAttribute. Override the ones whose features
+ * are present in the cluster's feature map. Adding new attributes within an
+ * existing technology is a struct-field change rather than a new virtual on
+ * every implementor.
  */
 class ProximityRangingDriver
 {
@@ -91,15 +120,13 @@ public:
     virtual CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) = 0;
 
     /// Override if the BLERBC feature is supported.
-    virtual CHIP_ERROR GetBleDeviceId(uint64_t & bleDeviceId) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    virtual std::optional<BleRbcConfig> GetBleRbcConfig() { return std::nullopt; }
 
     /// Override if the WFUSDPD feature is supported.
-    virtual CHIP_ERROR GetWiFiDevIK(MutableByteSpan & wifiDevIK) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    virtual std::optional<WiFiUsdConfig> GetWiFiUsdConfig() { return std::nullopt; }
 
     /// Override if the BLTCS feature is supported.
-    virtual CHIP_ERROR GetBLTDevIK(MutableByteSpan & bltDevIK) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    virtual CHIP_ERROR GetBLTCSSecurityLevel(BLTCSSecurityLevelEnum & securityLevel) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    virtual CHIP_ERROR GetBLTCSModeCapability(BLTCSModeEnum & modeCapability) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    virtual std::optional<BltcsConfig> GetBltcsConfig() { return std::nullopt; }
 };
 
 } // namespace ProximityRanging

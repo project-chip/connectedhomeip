@@ -66,46 +66,34 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
     case Attributes::RangingCapabilities::Id:
         return mDriver->GetRangingCapabilities(encoder);
 
-    case Attributes::WiFiDevIK::Id: {
-        uint8_t buf[kDeviceIdentityKeyLen] = { 0 };
-        MutableByteSpan span(buf);
-        CHIP_ERROR err = mDriver->GetWiFiDevIK(span);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        ReturnErrorOnFailure(err);
-        return encoder.Encode(span);
+    case Attributes::BLEDeviceID::Id: {
+        auto config = mDriver->GetBleRbcConfig();
+        VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
+        return encoder.Encode(config->deviceId);
     }
 
-    case Attributes::BLEDeviceID::Id: {
-        uint64_t bleDeviceId = 0;
-        CHIP_ERROR err       = mDriver->GetBleDeviceId(bleDeviceId);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        ReturnErrorOnFailure(err);
-        return encoder.Encode(bleDeviceId);
+    case Attributes::WiFiDevIK::Id: {
+        auto config = mDriver->GetWiFiUsdConfig();
+        VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
+        return encoder.Encode(ByteSpan(config->deviceIdentityKey));
     }
 
     case Attributes::BLTDevIK::Id: {
-        uint8_t buf[kDeviceIdentityKeyLen] = { 0 };
-        MutableByteSpan span(buf);
-        CHIP_ERROR err = mDriver->GetBLTDevIK(span);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        ReturnErrorOnFailure(err);
-        return encoder.Encode(span);
+        auto config = mDriver->GetBltcsConfig();
+        VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
+        return encoder.Encode(ByteSpan(config->deviceIdentityKey));
     }
 
     case Attributes::BLTCSSecurityLevel::Id: {
-        BLTCSSecurityLevelEnum securityLevel;
-        CHIP_ERROR err = mDriver->GetBLTCSSecurityLevel(securityLevel);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        ReturnErrorOnFailure(err);
-        return encoder.Encode(securityLevel);
+        auto config = mDriver->GetBltcsConfig();
+        VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
+        return encoder.Encode(config->securityLevel);
     }
 
     case Attributes::BLTCSModeCapability::Id: {
-        BLTCSModeEnum modeCapability = BLTCSModeEnum::kUnknownEnumValue;
-        CHIP_ERROR err               = mDriver->GetBLTCSModeCapability(modeCapability);
-        VerifyOrReturnError(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Status::UnsupportedAttribute);
-        ReturnErrorOnFailure(err);
-        return encoder.Encode(modeCapability);
+        auto config = mDriver->GetBltcsConfig();
+        VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
+        return encoder.Encode(config->modeCapability);
     }
 
     case Attributes::SessionIDList::Id: {

@@ -60,22 +60,21 @@ The application is responsible for:
 ## Features
 
 The cluster supports the following optional features, configured at construction
-time via `Config` builder methods:
+time via `Config::WithFeatures()`:
 
 -   **Wi-Fi USD Proximity Detection (WFUSDPD)**:
-    `Config::WithWiFiUSDProximityDetection()` — enables ranging based on Wi-Fi
-    USD and the `WiFiDevIK` attribute.
--   **Bluetooth Channel Sounding (BLTCS)**:
-    `Config::WithBluetoothChannelSounding()` — enables ranging based on
-    Bluetooth Channel Sounding and the `BLTDevIK`, `BLTCSSecurityLevel`, and
-    `BLTCSModeCapability` attributes.
--   **BLE Beacon RSSI (BLERBC)**: `Config::WithBleBeaconRssi()` — enables
-    ranging based on BLE Beacon RSSI and the `BLEDeviceId` attribute.
--   **UWB Ranging (UWB)**: `Config::WithUWBRanging()` — enables ranging based on
+    `Feature::kWiFiUsdProximityDetection` — enables ranging based on Wi-Fi USD
+    and the `WiFiDevIK` attribute.
+-   **Bluetooth Channel Sounding (BLTCS)**: `Feature::kBluetoothChannelSounding`
+    — enables ranging based on Bluetooth Channel Sounding and the `BLTDevIK`,
+    `BLTCSSecurityLevel`, and `BLTCSModeCapability` attributes.
+-   **BLE Beacon RSSI (BLERBC)**: `Feature::kBleBeaconRssi` — enables ranging
+    based on BLE Beacon RSSI and the `BLEDeviceId` attribute.
+-   **UWB Ranging (UWB)**: `Feature::kUwbRanging` — enables ranging based on
     UWB.
 
-Each `With...()` method atomically sets the feature bit and marks the mandatory
-associated attributes as present. At least one feature must be enabled.
+`WithFeatures()` sets the feature bits and marks the mandatory associated
+attributes as present. At least one feature must be enabled.
 
 ## CodegenIntegration
 
@@ -83,18 +82,12 @@ The cluster uses `CodegenIntegration.cpp` to bridge between ZAP-generated
 endpoint configuration and the code-driven cluster. The framework calls
 `MatterProximityRangingClusterInitCallback` which registers the cluster via
 `LazyRegisteredServerCluster`. The bridge reads the feature map from ember
-attribute storage and translates it into `Config` builder calls:
+attribute storage and passes it directly to `Config::WithFeatures()`:
 
 ```cpp
 // Inside CodegenIntegration.cpp — CreateRegistration()
 ProximityRangingCluster::Config config(endpointId);
-BitMask<Feature> features(featureMap);
-
-if (features.Has(Feature::kBleBeaconRssi))
-    config.WithBleBeaconRssi();
-if (features.Has(Feature::kBluetoothChannelSounding))
-    config.WithBluetoothChannelSounding();
-// ...
+config.WithFeatures(BitMask<Feature>(featureMap));
 
 gServers[idx].Create(config);
 ```
@@ -120,31 +113,31 @@ platform-specific code owns the ranging infrastructure.
 ### 1. Cluster Construction
 
 The cluster is constructed with a `Config` that declares supported features. In
-the CodeDriven path, the application iterates its adapters to configure features
-directly — no intermediate feature map computation needed:
+the CodeDriven path, the application iterates its adapters to build the feature
+mask, then passes it to `Config::WithFeatures()`:
 
 ```cpp
-ProximityRanging::ProximityRangingCluster::Config config(endpoint);
+BitMask<ProximityRanging::Feature> features;
 for (auto * adapter : adapters)
 {
     switch (adapter->GetTechnology())
     {
     case RangingTechEnum::kBluetoothChannelSounding:
-        config.WithBluetoothChannelSounding();
+        features.Set(Feature::kBluetoothChannelSounding);
         break;
     case RangingTechEnum::kWiFiRoundTripTimeRanging:
     case RangingTechEnum::kWiFiNextGenerationRanging:
-        config.WithWiFiUSDProximityDetection();
+        features.Set(Feature::kWiFiUsdProximityDetection);
         break;
     case RangingTechEnum::kBLEBeaconRSSIRanging:
-        config.WithBleBeaconRssi();
+        features.Set(Feature::kBleBeaconRssi);
         break;
     default:
         break;
     }
 }
 
-mCluster.Create(config);
+mCluster.Create(ProximityRanging::ProximityRangingCluster::Config(endpoint).WithFeatures(features));
 mCluster.Cluster().SetDriver(&myDriver);
 ```
 
@@ -224,11 +217,9 @@ program exit.
 | `HandleStopRanging()`      | Stop a ranging session (synchronous)                  |
 | `GetRangingCapabilities()` | Encode the list of supported capabilities             |
 | `GetActiveSessionIds()`    | Return active session IDs (for session ID generation) |
-| `GetBleDeviceId()`         | Return BLE Device ID (optional, BLERBC feature)       |
-| `GetWiFiDevIK()`           | Return Wi-Fi Device Identity Key (optional, WFUSDPD)  |
-| `GetBLTDevIK()`            | Return BLT Device Identity Key (optional, BLTCS)      |
-| `GetBLTCSSecurityLevel()`  | Return BLTCS security level (optional, BLTCS)         |
-| `GetBLTCSModeCapability()` | Return BLTCS mode capability (optional, BLTCS)        |
+| `GetBleRbcConfig()`        | Return `BleRbcConfig` (optional, BLERBC feature)      |
+| `GetWiFiUsdConfig()`       | Return `WiFiUsdConfig` (optional, WFUSDPD feature)    |
+| `GetBltcsConfig()`         | Return `BltcsConfig` (optional, BLTCS feature)        |
 
 ## Attribute Change Notifications
 
