@@ -146,13 +146,4 @@ void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(ch
     TEMPORARY_RETURN_IGNORED gTccModeInstance->Init();
 }
 
-void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId,
-                                                                                  MatterClusterShutdownType)
-{
-    if (gTccModeInstance)
-    {
-        gTccModeInstance->Shutdown();
-    }
-    RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
-}
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER

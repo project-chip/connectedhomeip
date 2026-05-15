@@ -158,13 +158,4 @@ void MatterDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gDishwasherModeInstance->Init();
 }
 
-void MatterDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
-{
-    if (gDishwasherModeInstance)
-    {
-        gDishwasherModeInstance->Shutdown();
-    }
-    DishwasherMode::Shutdown();
-}
-
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER

@@ -159,12 +159,4 @@ void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gLaundryWasherModeInstance->Init();
 }
 
-void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
-{
-    if (gLaundryWasherModeInstance)
-    {
-        gLaundryWasherModeInstance->Shutdown();
-    }
-    LaundryWasherMode::Shutdown();
-}
 #endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER

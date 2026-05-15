@@ -198,14 +198,6 @@ void MatterRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
 }
 
-void MatterRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
-{
-    if (gRvcRunModeInstance)
-    {
-        gRvcRunModeInstance->Shutdown();
-    }
-    RvcRunMode::Shutdown();
-}
 #endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 
 #ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
@@ -342,12 +334,4 @@ void MatterRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
 }
 
-void MatterRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
-{
-    if (gRvcCleanModeInstance)
-    {
-        gRvcCleanModeInstance->Shutdown();
-    }
-    RvcCleanMode::Shutdown();
-}
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
