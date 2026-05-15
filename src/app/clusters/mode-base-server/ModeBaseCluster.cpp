@@ -196,14 +196,20 @@ void ModeBaseCluster::ReportSupportedModesChange()
 bool ModeBaseCluster::IsSupportedMode(uint8_t modeValue)
 {
     uint8_t value;
-    for (uint8_t i = 0; mAppDelegate.GetModeValueByIndex(i, value) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    CHIP_ERROR err;
+    for (uint8_t i = 0; (err = mAppDelegate.GetModeValueByIndex(i, value)) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
     {
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "ModeBase: Failed to get the mode value by index %u: %" CHIP_ERROR_FORMAT, i, err.Format());
+            return false;
+        }
         if (value == modeValue)
         {
             return true;
         }
     }
-    ChipLogDetail(Zcl, "Cannot find a mode with value %u", modeValue);
+    ChipLogDetail(Zcl, "ModeBase: Cannot find a mode with value %u", modeValue);
     return false;
 }
 
@@ -211,8 +217,10 @@ CHIP_ERROR ModeBaseCluster::GetModeValueByModeTag(uint16_t modeTagValue, uint8_t
 {
     ModeTagStructType tagsBuffer[kMaxNumOfModeTags];
     DataModel::List<ModeTagStructType> mTags(tagsBuffer);
-    for (uint8_t i = 0; mAppDelegate.GetModeTagsByIndex(i, mTags) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    CHIP_ERROR err;
+    for (uint8_t i = 0; (err = mAppDelegate.GetModeTagsByIndex(i, mTags)) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
     {
+        ReturnErrorOnFailure(err);
         for (size_t ii = 0; ii < mTags.size(); ii++)
         {
             if (mTags[ii].value == modeTagValue)
@@ -222,7 +230,7 @@ CHIP_ERROR ModeBaseCluster::GetModeValueByModeTag(uint16_t modeTagValue, uint8_t
         }
         mTags = tagsBuffer;
     }
-    ChipLogDetail(Zcl, "Cannot find a mode with mode tag %x", modeTagValue);
+    ChipLogDetail(Zcl, "ModeBase: Cannot find a mode with mode tag %x", modeTagValue);
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
@@ -346,8 +354,15 @@ ModeBaseCluster::HandleChangeToMode(CommandHandler & commandObj, const ConcreteC
 
     if (response.status == to_underlying(StatusCode::kSuccess))
     {
-        TEMPORARY_RETURN_IGNORED UpdateCurrentMode(newMode);
-        ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
+        Status status = UpdateCurrentMode(newMode);
+        if (status != Status::Success)
+        {
+            response.status = to_underlying(StatusCode::kGenericFailure);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
+        }
     }
 
     commandObj.AddResponse(commandPath, response);
