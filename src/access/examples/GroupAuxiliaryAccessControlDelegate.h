@@ -40,9 +40,6 @@ public:
      * Wires the delegate to its collaborators. Must be called exactly once before the
      * delegate is registered with AccessControl or otherwise used.
      *
-     * Named Initialize (not Init) to avoid hiding the no-op AccessControl::Delegate::Init()
-     * virtual that the access-control framework may invoke through the base pointer.
-     *
      * @param groupDataProvider Required. Source of group / endpoint membership data.
      * @param fabricTable       Required. Pass a valid FabricTable so that auxiliary-entry
      *                          iteration walks only provisioned fabric indices. Passing
@@ -50,7 +47,7 @@ public:
      *                          [kMinValidFabricIndex, kMaxValidFabricIndex] linearly.
      *
      * @retval CHIP_ERROR_INVALID_ARGUMENT if @a groupDataProvider is null.
-     * @retval CHIP_ERROR_INCORRECT_STATE  if Initialize has already been called.
+     * @retval CHIP_ERROR_INCORRECT_STATE  if provider is already initialized.
      */
     CHIP_ERROR Initialize(Credentials::GroupDataProvider * groupDataProvider, FabricTable * fabricTable);
 
