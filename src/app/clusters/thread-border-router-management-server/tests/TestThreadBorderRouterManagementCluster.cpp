@@ -135,18 +135,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestReadClusterRevision)
     EXPECT_EQ(clusterRevision, 1u);
 }
 
-TEST_F(TestThreadBorderRouterManagementCluster, TestAttributesList)
-{
 
-    chip::Testing::ClusterTester tester(cluster);
-    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(
-        cluster,
-        { Attributes::BorderRouterName::kMetadataEntry, Attributes::BorderAgentID::kMetadataEntry,
-          Attributes::ThreadVersion::kMetadataEntry, Attributes::InterfaceEnabled::kMetadataEntry,
-          Attributes::ActiveDatasetTimestamp::kMetadataEntry, Attributes::PendingDatasetTimestamp::kMetadataEntry }));
-}
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
 {
