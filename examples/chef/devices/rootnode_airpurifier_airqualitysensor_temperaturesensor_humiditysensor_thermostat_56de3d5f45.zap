@@ -2173,7 +2173,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        2
       ],
       "deviceIdentifiers": [
         45
