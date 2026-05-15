@@ -16,6 +16,8 @@
  */
 #include <PosixBleRssiRangingAdapter.h>
 
+using namespace chip::app::Clusters::ProximityRanging;
+
 PosixBleRssiRangingAdapter::~PosixBleRssiRangingAdapter() = default;
 
 CHIP_ERROR PosixBleRssiRangingAdapter::GetActiveSessionIds(std::vector<uint8_t> & sessionIds)
@@ -29,6 +31,13 @@ CHIP_ERROR PosixBleRssiRangingAdapter::GetActiveSessionIds(std::vector<uint8_t> 
 
 void PosixBleRssiRangingAdapter::StopAllSessions()
 {
+    if (mCallback != nullptr)
+    {
+        for (uint8_t id : mActiveSessions)
+        {
+            mCallback->OnRangingSessionStopped(id, RangingSessionStatusEnum::kHardwareError);
+        }
+    }
     mActiveSessions.clear();
 }
 
@@ -44,6 +53,10 @@ bool PosixBleRssiRangingAdapter::RemoveSession(uint8_t sessionId)
         if (*it == sessionId)
         {
             mActiveSessions.erase(it);
+            if (mCallback != nullptr)
+            {
+                mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kHardwareError);
+            }
             return true;
         }
     }

@@ -149,17 +149,14 @@ ResultCodeEnum RangingTechnologyController::StartSession(uint8_t sessionId,
 
 CHIP_ERROR RangingTechnologyController::StopSession(uint8_t sessionId)
 {
-    for (auto it = mSessions.begin(); it != mSessions.end(); ++it)
+    // Bookkeeping (mSessions erase + SessionIDList notification) happens in
+    // OnRangingSessionStopped, which adapters are required to invoke for any
+    // session removal.
+    for (auto & entry : mSessions)
     {
-        if (it->sessionId == sessionId)
+        if (entry.sessionId == sessionId)
         {
-            CHIP_ERROR err = it->adapter->StopSession(sessionId);
-            if (err == CHIP_NO_ERROR)
-            {
-                mSessions.erase(it);
-                OnAttributeChanged(Attributes::SessionIDList::Id);
-            }
-            return err;
+            return entry.adapter->StopSession(sessionId);
         }
     }
     return CHIP_ERROR_NOT_FOUND;
@@ -167,11 +164,13 @@ CHIP_ERROR RangingTechnologyController::StopSession(uint8_t sessionId)
 
 void RangingTechnologyController::StopAllSessions()
 {
-    for (auto & entry : mSessions)
+    // Take a snapshot first: adapter->StopSession will fire OnRangingSessionStopped
+    // synchronously, which mutates mSessions.
+    std::vector<SessionEntry> snapshot = mSessions;
+    for (auto & entry : snapshot)
     {
         LogErrorOnFailure(entry.adapter->StopSession(entry.sessionId));
     }
-    mSessions.clear();
 }
 
 CHIP_ERROR RangingTechnologyController::GetActiveSessionIds(Span<uint8_t> & sessionIds)

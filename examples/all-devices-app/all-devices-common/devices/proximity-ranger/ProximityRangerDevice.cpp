@@ -31,6 +31,8 @@ ProximityRanging::RangingTechnologyController & GetRangingController()
 namespace chip {
 namespace app {
 
+size_t ProximityRangerDevice::sActiveCount = 0;
+
 ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
                                              Span<ProximityRanging::RangingAdapter * const> adapters) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
@@ -56,31 +58,34 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // Configure cluster features based on registered adapters' technologies.
-    ProximityRanging::ProximityRangingCluster::Config config(endpoint);
+    BitMask<ProximityRanging::Feature> features;
     for (auto * adapter : mAdapters)
     {
         switch (adapter->GetTechnology())
         {
         case ProximityRanging::RangingTechEnum::kBluetoothChannelSounding:
-            config.WithBluetoothChannelSounding();
+            features.Set(ProximityRanging::Feature::kBluetoothChannelSounding);
             break;
         case ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging:
         case ProximityRanging::RangingTechEnum::kWiFiNextGenerationRanging:
-            config.WithWiFiUSDProximityDetection();
+            features.Set(ProximityRanging::Feature::kWiFiUsdProximityDetection);
             break;
         case ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging:
-            config.WithBleBeaconRssi();
+            features.Set(ProximityRanging::Feature::kBleBeaconRssi);
             break;
         default:
             break;
         }
     }
 
-    mProximityRangingCluster.Create(config);
+    mProximityRangingCluster.Create(ProximityRanging::ProximityRangingCluster::Config(endpoint).WithFeatures(features));
     mProximityRangingCluster.Cluster().SetDriver(&mRangingDriver);
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    mRegistered = true;
+    sActiveCount++;
+    return CHIP_NO_ERROR;
 }
 
 void ProximityRangerDevice::Unregister(CodeDrivenDataModelProvider & provider)
@@ -99,7 +104,17 @@ void ProximityRangerDevice::Unregister(CodeDrivenDataModelProvider & provider)
         mIdentifyCluster.Destroy();
     }
 
-    // Unregister adapters from the shared controller.
+    if (!mRegistered)
+    {
+        return;
+    }
+    mRegistered = false;
+
+    if (--sActiveCount != 0)
+    {
+        return;
+    }
+
     for (auto * adapter : mAdapters)
     {
         if (adapter != nullptr)

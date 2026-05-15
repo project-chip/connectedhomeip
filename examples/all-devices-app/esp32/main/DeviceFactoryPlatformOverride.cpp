@@ -28,7 +28,7 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
     if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
     {
         static Esp32BleRssiRangingAdapter sBleAdapter;
-        LogErrorOnFailure(sBleAdapter.Init(storageDelegate));
+        VerifyOrDie(sBleAdapter.Init(storageDelegate) == CHIP_NO_ERROR);
         DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
             static Clusters::ProximityRanging::RangingAdapter * adapters[] = { &sBleAdapter };
             return std::make_unique<ProximityRangerDevice>(timerDelegate,

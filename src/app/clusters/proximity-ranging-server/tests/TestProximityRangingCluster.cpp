@@ -133,10 +133,10 @@ TEST_F(TestProximityRangingCluster, TestAttributeListMandatoryOnly)
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithAllFeatures)
 {
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId)
-                                        .WithWiFiUSDProximityDetection()
-                                        .WithBleBeaconRssi()
-                                        .WithBluetoothChannelSounding());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId)
+            .WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection, Feature::kBleBeaconRssi,
+                                            Feature::kBluetoothChannelSounding }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -152,7 +152,8 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithAllFeatures)
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithBleBeaconRssi)
 {
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -164,7 +165,8 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithBleBeaconRssi)
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithBluetoothChannelSounding)
 {
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBluetoothChannelSounding());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kBluetoothChannelSounding }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -178,7 +180,8 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithBluetoothChannelSoundin
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithWiFiUSDProximityDetection)
 {
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -190,7 +193,8 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithWiFiUSDProximityDetecti
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithUWBRanging)
 {
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithUWBRanging());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kUwbRanging }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -204,11 +208,10 @@ TEST_F(TestProximityRangingCluster, TestFeatureMapMultipleFeatures)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId)
-                                        .WithBleBeaconRssi()
-                                        .WithBluetoothChannelSounding()
-                                        .WithWiFiUSDProximityDetection()
-                                        .WithUWBRanging());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId)
+            .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi, Feature::kBluetoothChannelSounding,
+                                            Feature::kWiFiUsdProximityDetection, Feature::kUwbRanging }));
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -228,7 +231,8 @@ TEST_F(TestProximityRangingCluster, TestReadAttributeNotInFeatureMap)
     MockProximityRangingDriver driver;
 
     // Only WiFi feature enabled — BLEDeviceID should not be readable
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -296,7 +300,8 @@ TEST_F(TestProximityRangingCluster, TestReadFeatureMap)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -401,7 +406,8 @@ TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdSupported)
     driver.mBleDeviceIdSupported = true;
     driver.mBleDeviceId          = 0x1234;
 
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -418,7 +424,8 @@ TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdUnsupported)
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
 
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithBleBeaconRssi());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -436,7 +443,8 @@ TEST_F(TestProximityRangingCluster, TestReadWiFiDevIKSupported)
     driver.mWiFiDevIKSupported = true;
     memset(driver.mWiFiDevIK, 0xAB, sizeof(driver.mWiFiDevIK));
 
-    ProximityRangingCluster cluster(ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection());
+    ProximityRangingCluster cluster(
+        ProximityRangingCluster::Config(kTestEndpointId).WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -455,7 +463,8 @@ TEST_F(TestProximityRangingCluster, TestReadOptionalAttributeUnsupportedByDriver
     MockProximityRangingDriver driver;
 
     ProximityRangingCluster cluster(
-        ProximityRangingCluster::Config(kTestEndpointId).WithWiFiUSDProximityDetection().WithBluetoothChannelSounding());
+        ProximityRangingCluster::Config(kTestEndpointId)
+            .WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection, Feature::kBluetoothChannelSounding }));
     cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
@@ -534,6 +543,7 @@ TEST_F(TestProximityRangingCluster, TestStartRangingCapacityExhausted)
 {
     TestServerClusterContext context;
     MockProximityRangingDriver driver;
+    driver.mActiveSessionIds         = { 1 };
     driver.mGetActiveSessionIdsError = CHIP_ERROR_INTERNAL;
 
     ProximityRangingCluster cluster{ ProximityRangingCluster::Config(kTestEndpointId) };

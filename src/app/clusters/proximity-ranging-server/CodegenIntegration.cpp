@@ -40,24 +40,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         ProximityRangingCluster::Config config(endpointId);
-        BitMask<Feature> features(featureMap);
-
-        if (features.Has(Feature::kBleBeaconRssi))
-        {
-            config.WithBleBeaconRssi();
-        }
-        if (features.Has(Feature::kBluetoothChannelSounding))
-        {
-            config.WithBluetoothChannelSounding();
-        }
-        if (features.Has(Feature::kWiFiUsdProximityDetection))
-        {
-            config.WithWiFiUSDProximityDetection();
-        }
-        if (features.Has(Feature::kUwbRanging))
-        {
-            config.WithUWBRanging();
-        }
+        config.WithFeatures(BitMask<Feature>(featureMap));
 
         gServers[clusterInstanceIndex].Create(config);
         return gServers[clusterInstanceIndex].Registration();

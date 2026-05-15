@@ -44,6 +44,19 @@ private:
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ProximityRanging::ProximityRangingCluster> mProximityRangingCluster;
+
+    bool mRegistered = false;
+
+    // Ref-counts ProximityRangerDevice instances that have completed Register so the
+    // shared adapters remain registered with the singleton RangingTechnologyController
+    // as long as at least one device is registered. Adapters are unregistered only
+    // when the last ProximityRangerDevice is unregistered.
+    //
+    // ASSUMES every ProximityRangerDevice instance is constructed with the same adapter
+    // set. A heterogeneous configuration (e.g. one device with BLE+UWB, another with
+    // BLE only) could leak adapters from the larger span if the last device of that
+    // flavor unregisters while a smaller-span device is still active.
+    static size_t sActiveCount;
 };
 
 } // namespace app

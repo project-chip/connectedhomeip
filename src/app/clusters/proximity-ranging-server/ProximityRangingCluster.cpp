@@ -110,6 +110,10 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
 
     case Attributes::SessionIDList::Id: {
         const size_t numSessions = mDriver->GetNumActiveSessionIds();
+        if (numSessions == 0)
+        {
+            return encoder.EncodeEmptyList();
+        }
         Platform::ScopedMemoryBuffer<uint8_t> buf;
         VerifyOrReturnError(buf.Calloc(numSessions), Status::ResourceExhausted);
         Span<uint8_t> sessionIds(buf.Get(), numSessions);
@@ -257,6 +261,15 @@ uint8_t ProximityRangingCluster::GenerateSessionId()
 {
     VerifyOrReturnValue(mDriver != nullptr, kInvalidSessionId);
     const size_t numSessions = mDriver->GetNumActiveSessionIds();
+    if (numSessions == 0)
+    {
+        uint8_t candidate = mNextSessionId++;
+        if (candidate == kInvalidSessionId)
+        {
+            candidate = mNextSessionId++;
+        }
+        return candidate;
+    }
     Platform::ScopedMemoryBuffer<uint8_t> buf;
     VerifyOrReturnValue(buf.Calloc(numSessions), kInvalidSessionId);
     Span<uint8_t> activeSessions(buf.Get(), numSessions);

@@ -37,6 +37,11 @@ public:
     CHIP_ERROR StopSession(uint8_t sessionId) override
     {
         ChipLogProgress(AppServer, "Esp32BleRssiRangingAdapter: StopSession stub (session %u)", sessionId);
+        if (mCallback != nullptr)
+        {
+            mCallback->OnRangingSessionStopped(sessionId,
+                                               chip::app::Clusters::ProximityRanging::RangingSessionStatusEnum::kHardwareError);
+        }
         return CHIP_NO_ERROR;
     }
 

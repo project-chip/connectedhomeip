@@ -19,6 +19,7 @@
 
 #include <crypto/RandUtils.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <string.h>
 
 BleRssiRangingAdapter::~BleRssiRangingAdapter() = default;
@@ -27,10 +28,12 @@ CHIP_ERROR BleRssiRangingAdapter::Init(chip::PersistentStorageDelegate * store)
 {
     mpStore = store;
 
+    const char * keyName = chip::DefaultStorageKeyAllocator::ProximityRangingBleDeviceId().KeyName();
+
     if (mpStore != nullptr)
     {
         uint16_t size = sizeof(mBleDeviceId);
-        if (mpStore->SyncGetKeyValue(kBleDeviceIdKeyName, &mBleDeviceId, size) != CHIP_NO_ERROR || size != sizeof(mBleDeviceId))
+        if (mpStore->SyncGetKeyValue(keyName, &mBleDeviceId, size) != CHIP_NO_ERROR || size != sizeof(mBleDeviceId))
         {
             mBleDeviceId = kInvalidBleDeviceId;
         }
@@ -42,7 +45,7 @@ CHIP_ERROR BleRssiRangingAdapter::Init(chip::PersistentStorageDelegate * store)
         // Persist newly generated BLE Device ID if storage is provided
         if (mpStore != nullptr)
         {
-            ReturnErrorOnFailure(mpStore->SyncSetKeyValue(kBleDeviceIdKeyName, &mBleDeviceId, sizeof(mBleDeviceId)));
+            ReturnErrorOnFailure(mpStore->SyncSetKeyValue(keyName, &mBleDeviceId, sizeof(mBleDeviceId)));
         }
     }
 

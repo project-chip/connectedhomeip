@@ -98,6 +98,4 @@ protected:
 
 private:
     CHIP_ERROR GenerateBleDeviceId();
-
-    static constexpr const char * kBleDeviceIdKeyName = "g/pr/bledevid";
 };

@@ -51,40 +51,16 @@ public:
 
     /**
      * Configuration builder for ProximityRangingCluster.
-     *
-     * Each With...() method sets the corresponding feature bit.
      */
-    class Config
+    struct Config
     {
-    public:
         explicit Config(EndpointId endpoint) : mEndpointId(endpoint) {}
 
-        Config & WithBleBeaconRssi()
+        Config & WithFeatures(BitMask<Feature> features)
         {
-            mFeatureMap.Set(Feature::kBleBeaconRssi);
+            mFeatureMap = features;
             return *this;
         }
-
-        Config & WithBluetoothChannelSounding()
-        {
-            mFeatureMap.Set(Feature::kBluetoothChannelSounding);
-            return *this;
-        }
-
-        Config & WithWiFiUSDProximityDetection()
-        {
-            mFeatureMap.Set(Feature::kWiFiUsdProximityDetection);
-            return *this;
-        }
-
-        Config & WithUWBRanging()
-        {
-            mFeatureMap.Set(Feature::kUwbRanging);
-            return *this;
-        }
-
-    private:
-        friend class ProximityRangingCluster;
 
         BitMask<Feature> mFeatureMap;
         EndpointId mEndpointId;
