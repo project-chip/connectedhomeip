@@ -29,9 +29,9 @@
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include <app/ConcreteAttributePath.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/data-model/Nullable.h>
 #include <ble/Ble.h>
@@ -115,8 +115,7 @@ public:
     static void SwitchWorkerFunction(intptr_t context);
     static void GenericSwitchWorkerFunction(intptr_t context);
 
-    static void ProcessOnOffBindingCommand(chip::CommandId commandId,
-                                           const chip::app::Clusters::Binding::TableEntry & binding,
+    static void ProcessOnOffBindingCommand(chip::CommandId commandId, const chip::app::Clusters::Binding::TableEntry & binding,
                                            chip::OperationalDeviceProxy * peer_device);
 
     static void ProcessLevelControlBindingCommand(BindingCommandData * data,
