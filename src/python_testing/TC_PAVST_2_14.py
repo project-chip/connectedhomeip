@@ -113,14 +113,10 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.Success, "Failed to clear existing connections")
 
         self.step(2)
-        video_stream_id = await self.allocate_one_video_stream()
-        if isinstance(video_stream_id, list):
-            video_stream_id = video_stream_id[0]
+        await self.allocate_one_video_stream()
 
         self.step(3)
-        audio_stream_id = await self.allocate_one_audio_stream()
-        if isinstance(audio_stream_id, list):
-            audio_stream_id = audio_stream_id[0]
+        await self.allocate_one_audio_stream()
 
         self.step(4)
         status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
