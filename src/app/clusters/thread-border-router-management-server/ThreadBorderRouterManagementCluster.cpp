@@ -211,6 +211,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         mBreadcrumb         = req.breadcrumb;
         mSetActiveDatasetSequenceNumber++;
 
+        ctx->FlushAcksRightAwayOnSlowCommand();
         mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, static_cast<ThreadBorderRouterManagementDelegate::ActivateDatasetCallback *>(this));
 
         // Return nullopt because this is an async operation. The response will be sent
