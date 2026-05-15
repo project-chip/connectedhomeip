@@ -1,1 +1,1 @@
-194 : [crosscompile] Add armhf sysroot, update aarch64 sysroot to build-2026.05.07
+196 : [crosscompile] Don't duplicate minimization done by create_sysroot.py in the Dockerfile
