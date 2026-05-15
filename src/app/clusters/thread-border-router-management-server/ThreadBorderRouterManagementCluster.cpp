@@ -236,7 +236,7 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
         return std::make_optional(DataModel::ActionReturnStatus(app::StatusIB(err).mStatus));
     }
     default:
-        return std::nullopt;
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 }
 
