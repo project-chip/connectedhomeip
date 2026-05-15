@@ -103,28 +103,25 @@ class AppTask : public BaseApplication
 {
 
 public:
-    AppTask() = default;
-
     static AppTask & GetAppTask() { return sAppTask; }
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
 
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-
+    
     static void AppEventHandler(AppEvent * aEvent);
-
-    CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
-
-    static void InitBindingHandler(intptr_t arg);
 
     static void SwitchWorkerFunction(intptr_t context);
 
     static void GenericSwitchWorkerFunction(intptr_t context);
 
     static void PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                            uint8_t * value);
+        uint8_t * value);
 
+
+    static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
+                                          chip::OperationalDeviceProxy * peer_device, void * context);
     static void ProcessOnOffBindingCommand(chip::CommandId commandId,
                                            const chip::app::Clusters::Binding::TableEntry & binding,
                                            chip::OperationalDeviceProxy * peer_device);
@@ -136,15 +133,16 @@ public:
 protected:
     CHIP_ERROR AppInit() override;
 
+    CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
+
+    static void InitBindingHandler(intptr_t arg);
+
 private:
     static AppTask sAppTask;
 
     osTimerId_t longPressTimer = nullptr;
 
     static void PostLevelControlActionEvent(void * context);
-
-    static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
-                                          chip::OperationalDeviceProxy * peer_device, void * context);
 
     static void LightSwitchContextReleaseHandler(void * context);
 };
