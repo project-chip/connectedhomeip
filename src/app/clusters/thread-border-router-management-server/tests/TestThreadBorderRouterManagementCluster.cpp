@@ -160,6 +160,14 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestAttributesList)
     EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, expected));
 }
 
+TEST_F(TestThreadBorderRouterManagementCluster, TestGeneratedCommandsList)
+{
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(chip::Testing::IsGeneratedCommandsListEqualTo(cluster, { Commands::DatasetResponse::Id }));
+}
+
 TEST_F(TestThreadBorderRouterManagementCluster, TestReadAttributes)
 {
 

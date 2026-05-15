@@ -105,6 +105,14 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::AcceptedCommands(const ConcreteC
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ThreadBorderRouterManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                                 ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+    ReturnErrorOnFailure(builder.Append(ThreadBorderRouterManagement::Commands::DatasetResponse::Id));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(app::DefaultServerCluster::Startup(context));
