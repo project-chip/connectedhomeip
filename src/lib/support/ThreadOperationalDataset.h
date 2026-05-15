@@ -314,7 +314,11 @@ public:
     /**
      * This method clears all data stored in the dataset.
      */
+<<<<<<< HEAD
     void Clear(void) { mLength = 0; }
+=======
+    void Clear();
+>>>>>>> fa18120562 (apply ClearSecretData and SensitiveDataFixedBuffer consistently (#71994))
 
     /**
      * This method checks if the dataset is ready for creating Thread network.

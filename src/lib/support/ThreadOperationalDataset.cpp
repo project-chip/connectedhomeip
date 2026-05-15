@@ -523,5 +523,11 @@ ThreadTLV * OperationalDataset::MakeRoom(uint8_t aType, size_t aSize)
     return &End();
 }
 
+void OperationalDataset::Clear()
+{
+    memset(mBuffer, 0, sizeof(mBuffer));
+    mData = ByteSpan(mBuffer, 0);
+}
+
 } // namespace Thread
 } // namespace chip
