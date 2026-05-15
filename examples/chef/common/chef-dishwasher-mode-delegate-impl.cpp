@@ -147,7 +147,7 @@ chip::Protocols::InteractionModel::Status chefDishwasherModeReadCallback(chip::E
     return ret;
 }
 
-void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(!gDishwasherModeDelegate && !gDishwasherModeInstance);
@@ -157,4 +157,14 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
         std::make_unique<ModeBase::Instance>(gDishwasherModeDelegate.get(), endpointId, DishwasherMode::Id, 0);
     TEMPORARY_RETURN_IGNORED gDishwasherModeInstance->Init();
 }
+
+void MatterDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+{
+    if (gDishwasherModeInstance)
+    {
+        gDishwasherModeInstance->Shutdown();
+    }
+    DishwasherMode::Shutdown();
+}
+
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER

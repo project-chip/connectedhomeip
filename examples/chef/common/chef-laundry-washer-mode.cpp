@@ -150,12 +150,21 @@ chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip
     return ret;
 }
 
-void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gLaundryWasherModeDelegate == nullptr && gLaundryWasherModeInstance == nullptr);
     gLaundryWasherModeDelegate = new LaundryWasherMode::LaundryWasherModeDelegate;
     gLaundryWasherModeInstance = new ModeBase::Instance(gLaundryWasherModeDelegate, 0x1, LaundryWasherMode::Id, 0);
     TEMPORARY_RETURN_IGNORED gLaundryWasherModeInstance->Init();
+}
+
+void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+{
+    if (gLaundryWasherModeInstance)
+    {
+        gLaundryWasherModeInstance->Shutdown();
+    }
+    LaundryWasherMode::Shutdown();
 }
 #endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER

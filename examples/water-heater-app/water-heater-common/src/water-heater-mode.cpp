@@ -98,7 +98,7 @@ void WaterHeaterMode::Shutdown()
     }
 }
 
-void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(gWaterHeaterModeDelegate == nullptr && gWaterHeaterModeInstance == nullptr);
     gWaterHeaterModeDelegate = new WaterHeaterMode::ExampleWaterHeaterModeDelegate;
@@ -106,7 +106,7 @@ void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gWaterHeaterModeInstance->Init();
 }
 
-void emberAfWaterHeaterModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterWaterHeaterModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gWaterHeaterModeInstance)
     {
