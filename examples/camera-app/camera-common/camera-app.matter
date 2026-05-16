@@ -3106,6 +3106,18 @@ endpoint 0 {
     callback attribute clusterRevision;
   }
 
+  server cluster PowerSource {
+    ram      attribute status;
+    ram      attribute order;
+    ram      attribute description;
+    callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
+    callback attribute clusterRevision;
+  }
+
   server cluster GeneralCommissioning {
     callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
