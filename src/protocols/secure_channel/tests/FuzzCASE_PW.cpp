@@ -156,8 +156,8 @@ CHIP_ERROR EncodeSigma1Helper(PacketBufferHandle & msg, FuzzCASESession::EncodeS
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(kInitiatorEphPubKeyTag), initiatorEphPubKey.data(), initiatorEphPubKey.size()));
 
-    ReturnErrorOnFailure(
-        CASESession::EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag), inputParams.initiatorSessionParams, tlvWriter));
+    ReturnErrorOnFailure(CASESession::EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag),
+                                                              inputParams.initiatorSessionParams, tlvWriter));
 
     if (inputParams.sessionResumptionRequested)
     {

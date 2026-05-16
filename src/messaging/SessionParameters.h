@@ -128,10 +128,10 @@ public:
     static constexpr size_t kSizeOfSupportedTransports = sizeof(uint16_t);
     static constexpr size_t kSizeOfMaxTCPPayloadSize   = sizeof(uint32_t);
 
-    static constexpr size_t kEstimatedTLVSize = TLV::EstimateStructOverhead(
-        kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold, kSizeOfDataModelRevision,
-        kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion, kSizeOfMaxPathsPerInvoke,
-        kSizeOfSupportedTransports, kSizeOfMaxTCPPayloadSize);
+    static constexpr size_t kEstimatedTLVSize =
+        TLV::EstimateStructOverhead(kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold,
+                                    kSizeOfDataModelRevision, kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion,
+                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kSizeOfMaxTCPPayloadSize);
 
     uint16_t GetSupportedTransports() const { return mSupportedTransports; }
     void SetSupportedTransports(const uint16_t supportedTransports) { mSupportedTransports = supportedTransports; }
