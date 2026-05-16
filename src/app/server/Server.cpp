@@ -577,7 +577,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     localSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
-        static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+                                              static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
     localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
 #endif
 

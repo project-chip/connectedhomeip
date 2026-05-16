@@ -26,9 +26,9 @@
 
 #include "SessionManager.h"
 
+#include <algorithm>
 #include <inttypes.h>
 #include <string.h>
-#include <algorithm>
 
 #include "transport/TraceMessage.h"
 #include <app/util/basic-types.h>
