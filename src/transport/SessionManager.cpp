@@ -28,6 +28,7 @@
 
 #include <inttypes.h>
 #include <string.h>
+#include <algorithm>
 
 #include "transport/TraceMessage.h"
 #include <app/util/basic-types.h>
@@ -188,19 +189,13 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     if (sessionHandle->AllowsLargePayload())
     {
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
         uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+        uint32_t limit      = kMaxLargeAppMessageLen;
         if (maxPayload > 0)
         {
-            VerifyOrReturnError(message->TotalLength() <= maxPayload, CHIP_ERROR_MESSAGE_TOO_LONG);
+            limit = std::min(maxPayload, static_cast<uint32_t>(kMaxLargeAppMessageLen));
         }
-        else
-        {
-            VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
-        }
-#else
-        VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
-#endif
+        VerifyOrReturnError(message->TotalLength() <= limit, CHIP_ERROR_MESSAGE_TOO_LONG);
     }
     else
     {

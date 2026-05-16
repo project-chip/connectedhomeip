@@ -219,14 +219,12 @@ public:
 
     const SessionParameters & GetRemoteSessionParameters() const override { return mRemoteSessionParams; }
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     bool SupportsLargePayload() const
     {
         return (mRemoteSessionParams.GetSupportedTransports() &
                 (static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
                  static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer))) != 0;
     }
-#endif
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
