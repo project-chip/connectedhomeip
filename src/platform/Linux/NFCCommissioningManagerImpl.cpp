@@ -30,6 +30,13 @@
 #include <lib/support/SafeInt.h>
 #include <platform/internal/NFCCommissioningManager.h>
 
+#ifdef __APPLE__
+#include <PCSC/winscard.h>
+#include <PCSC/wintypes.h>
+#else
+#include <winscard.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
 using namespace chip;
@@ -396,7 +403,7 @@ public:
 
     void ResetChainedResponseBuffer(void) { mChainedResponseLength = 0; }
 
-    CHIP_ERROR AddDataToChainedResponseBuffer(uint8_t * data, int dataLen)
+    CHIP_ERROR AddDataToChainedResponseBuffer(uint8_t * data, uint32_t dataLen)
     {
         // Check that mChainedResponseBuffer will not overflow
         VerifyOrReturnLogError((mChainedResponseLength + dataLen) <= sizeof(mChainedResponseBuffer), CHIP_ERROR_MESSAGE_TOO_LONG);
@@ -476,18 +483,42 @@ public:
 
     /////////////////////////////////////////////////////////////////
 
+    struct NfcResponseContext
+    {
+        Transport::NFCBase * nfcBase;
+        Transport::PeerAddress peerAddress;
+        System::PacketBufferHandle buffer;
+    };
+
+    static void DispatchNfcTagResponse(intptr_t arg)
+    {
+        auto * ctx = reinterpret_cast<NfcResponseContext *>(arg);
+        ctx->nfcBase->OnNfcTagResponse(ctx->peerAddress, std::move(ctx->buffer));
+        delete ctx;
+    }
+
+    static void DispatchNfcTagError(intptr_t arg)
+    {
+        auto * ctx = reinterpret_cast<NfcResponseContext *>(arg);
+        ctx->nfcBase->OnNfcTagError(ctx->peerAddress);
+        delete ctx;
+    }
+
     CHIP_ERROR SendOnNfcTagResponse(System::PacketBufferHandle && buffer)
     {
-        chip::DeviceLayer::StackLock lock;
-        nfcBase->OnNfcTagResponse(peerAddress, std::move(buffer));
-        return CHIP_NO_ERROR;
+        auto * ctx       = new NfcResponseContext();
+        ctx->nfcBase     = nfcBase;
+        ctx->peerAddress = peerAddress;
+        ctx->buffer      = std::move(buffer);
+        return DeviceLayer::PlatformMgr().ScheduleWork(DispatchNfcTagResponse, reinterpret_cast<intptr_t>(ctx));
     }
 
     CHIP_ERROR SendOnNfcTagError()
     {
-        chip::DeviceLayer::StackLock lock;
-        nfcBase->OnNfcTagError(peerAddress);
-        return CHIP_NO_ERROR;
+        auto * ctx       = new NfcResponseContext();
+        ctx->nfcBase     = nfcBase;
+        ctx->peerAddress = peerAddress;
+        return DeviceLayer::PlatformMgr().ScheduleWork(DispatchNfcTagError, reinterpret_cast<intptr_t>(ctx));
     }
 };
 
@@ -534,7 +565,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureProcessingThreadStarted()
     }
 
     // Creates an Application Context to the PC/SC Resource Manager.
-    long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
+    LONG result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
     CHECK_FOR_SCARD_SUCCESS("SCardEstablishContext", result)
 
     lastTagInstanceUsed = nullptr;
@@ -690,7 +721,7 @@ void NFCCommissioningManagerImpl::NfcThreadMain()
 // Start scan on all available readers and scan for NFC Tags.
 CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
 {
-    long result;
+    LONG result;
     LPTSTR mszReaders; // LPTSTR is a "typedef char *"
     DWORD dwReaders;
 
@@ -748,18 +779,18 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
     // Before launching a new scan of a reader, we should discard all the saved instances using this readerName
     EraseAllTagInstancesUsingReaderName(readerName);
 
-    long result = SCardConnect(hPcscContext, readerName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &cardHandle,
+    LONG result = SCardConnect(hPcscContext, readerName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &cardHandle,
                                &dwActiveProtocol);
     switch (result)
     {
-    case SCARD_S_SUCCESS:
+    case static_cast<LONG>(SCARD_S_SUCCESS):
         switch (dwActiveProtocol)
         {
-        case SCARD_PROTOCOL_T0:
+        case static_cast<DWORD>(SCARD_PROTOCOL_T0):
             pioSendPci = *SCARD_PCI_T0;
             break;
 
-        case SCARD_PROTOCOL_T1:
+        case static_cast<DWORD>(SCARD_PROTOCOL_T1):
             pioSendPci = *SCARD_PCI_T1;
             break;
         }
@@ -782,7 +813,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
         }
         break;
 
-    case SCARD_E_NO_SMARTCARD:
+    case static_cast<LONG>(SCARD_E_NO_SMARTCARD):
         ChipLogProgress(DeviceLayer, "No NFC Tag detected");
         break;
 

@@ -34,7 +34,11 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#ifdef __APPLE__
+#include <PCSC/pcsclite.h>
+#else
 #include <winscard.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
