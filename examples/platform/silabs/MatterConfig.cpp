@@ -36,6 +36,11 @@
 #endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#include <sl_component_catalog.h>
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+#include <sl_watchdog_manager.h>
+#endif // SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
@@ -422,16 +427,17 @@ void OnEM4Trigger(uint32_t duration)
 // FreeRTOS Callbacks
 // ================================================================================
 
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+void sl_watchdog_manager_user_idle_hook(void)
+#else
 extern "C" void vApplicationIdleHook(void)
+#endif
 {
 #if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     GetPlatform().SleepButtonActionHandler();
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
-    GetPlatform().WatchdogFeed();
-#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER

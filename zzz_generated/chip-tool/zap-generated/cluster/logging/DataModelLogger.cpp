@@ -8985,14 +8985,6 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
-    {
-        CHIP_ERROR err = LogValue("GroupKeyMulticastPolicy", indent + 1, value.groupKeyMulticastPolicy);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupKeyMulticastPolicy'");
-            return err;
-        }
-    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -23249,6 +23241,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::Globals::ThreeLevelAutoEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StatusLightBrightness", 1, value);
+        }
+        case CameraAvStreamManagement::Attributes::ImageRotationDiscreteAngles::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ImageRotationDiscreteAngles", 1, value);
         }
         case CameraAvStreamManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

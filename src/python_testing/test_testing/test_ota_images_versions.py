@@ -102,9 +102,9 @@ def main(otaimages: str, otaimagesversions: int):
         status = run_single_test(otaimage=otaimage, otaimage_version=otaimage_version)
         passes.append((otaimage, otaimage_version, status))
 
-    for iter in passes:
-        if iter[2] != 0:
-            log.error(f"Image version missmatched for ota image: {iter[0]} expected: {iter[1]}")
+    for it in passes:
+        if it[2] != 0:
+            log.error(f"Image version missmatched for ota image: {it[0]} expected: {it[1]}")
             main_status = 1
 
     sys.exit(main_status)

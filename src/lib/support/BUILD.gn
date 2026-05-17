@@ -75,10 +75,9 @@ source_set("attributes") {
   ]
 }
 
-source_set("verifymacros_no_logging") {
-  sources = [ "VerificationMacrosNoLogging.h" ]
-
-  public_deps = [ "${nlassert_root}:nlassert" ]
+source_set("assertions") {
+  sources = [ "Assertions.h" ]
+  public_deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
 }
 
 source_set("safeint") {
@@ -105,7 +104,6 @@ source_set("arg_parser") {
     "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/core:types",
-    "${nlassert_root}:nlassert",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
@@ -144,8 +142,8 @@ source_set("memory") {
   public_deps = [ "${chip_root}/src/lib/core:error" ]
 
   deps = [
+    ":assertions",
     ":safeint",
-    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
   ]
 }
@@ -157,9 +155,9 @@ source_set("text_only_logging") {
   ]
 
   public_deps = [
+    ":assertions",
     ":attributes",
     ":logging_constants",
-    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
   ]
 
@@ -174,19 +172,18 @@ source_set("text_only_logging") {
   ]
 }
 
-source_set("verifymacros") {
+source_set("codeutils") {
   sources = [
     "CodeUtils.h",
     "ObjectDump.h",
   ]
 
   public_deps = [
+    ":assertions",
     ":attributes",
     ":text_only_logging",
-    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:error",
-    "${nlassert_root}:nlassert",
   ]
 }
 
@@ -194,7 +191,7 @@ source_set("span") {
   sources = [ "Span.h" ]
 
   public_deps = [
-    ":verifymacros",
+    ":codeutils",
     "${chip_root}/src/lib/core:types",
   ]
 }
@@ -350,8 +347,10 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":assertions",
     ":attributes",
     ":chip_version_header",
+    ":codeutils",
     ":fixedbuffer",
     ":logging_constants",
     ":memory",
@@ -359,8 +358,6 @@ static_library("support") {
     ":span",
     ":text_only_logging",
     ":type-traits",
-    ":verifymacros",
-    ":verifymacros_no_logging",
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:encoding",
@@ -368,7 +365,6 @@ static_library("support") {
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/system:system_config_header",
-    "${nlassert_root}:nlassert",
   ]
 
   # These are needed because we include CHIPCore.h, which uses config
@@ -397,7 +393,10 @@ static_library("support") {
       "CHIPFaultInjection.cpp",
       "CHIPFaultInjection.h",
     ]
-    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+    public_deps += [
+      "${nlassert_root}:nlassert",
+      "${nlfaultinjection_root}:nlfaultinjection",
+    ]
   }
 
   if (chip_pw_tokenizer_logging) {

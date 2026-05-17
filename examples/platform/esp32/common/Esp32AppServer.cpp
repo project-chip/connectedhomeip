@@ -29,6 +29,11 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <platform/ESP32/ThreadStackManagerImpl.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
@@ -227,9 +232,23 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     {
         initParams.appDelegate = sAppDelegate;
     }
-    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     ESPOpenThreadInit();
+
+    static chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = [] { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrDie(nativeParams.openThreadInstancePtr != nullptr);
+    initParams.endpointNativeParams = static_cast<void *>(&nativeParams);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    ESPOpenThreadInit();
+#endif
+
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #ifdef CONFIG_ENABLE_CHIP_SHELL
