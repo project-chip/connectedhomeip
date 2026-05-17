@@ -219,12 +219,14 @@ public:
 
     const SessionParameters & GetRemoteSessionParameters() const override { return mRemoteSessionParams; }
 
-    bool SupportsLargePayload() const
+    bool PeerAdvertisedTcpSupport() const
     {
         return (mRemoteSessionParams.GetSupportedTransports() &
                 (static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
                  static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer))) != 0;
     }
+
+    bool SupportsLargePayload() const { return PeerAdvertisedTcpSupport(); }
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }

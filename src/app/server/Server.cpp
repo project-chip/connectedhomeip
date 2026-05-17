@@ -554,8 +554,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Enable the TCP Server based on the TCPListenParameters setting.
     app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
 
-    localSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
-                                              static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+    if (tcpListenParams.IsServerListenEnabled())
+    {
+        supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+    }
+    localSessionParams.SetSupportedTransports(supportedTransports);
     localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
