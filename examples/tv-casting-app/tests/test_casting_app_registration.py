@@ -53,6 +53,7 @@ def _read_file(path: str) -> str:
     with open(path, "r") as f:
         return f.read()
 
+
 def _extract_initialize_method_body(content: str) -> str:
     """
     Extract the body of the `initializeWithDataSource:` method from
@@ -77,7 +78,7 @@ def _extract_initialize_method_body(content: str) -> str:
         elif content[i] == "}":
             brace_count -= 1
             if brace_count == 0:
-                return content[body_start : i + 1]
+                return content[body_start: i + 1]
 
     raise AssertionError(
         "Could not find matching closing brace for initializeWithDataSource:"

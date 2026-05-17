@@ -157,7 +157,7 @@ def _extract_string_getter_body(content: str, getter: str) -> str:
         elif content[pos] == "}":
             depth -= 1
         pos += 1
-    return content[start : pos - 1]  # exclude the final }
+    return content[start: pos - 1]  # exclude the final }
 
 
 def _verify_string_getter_override_branch(content: str, getter: str, flag: str, buffer: str):
@@ -240,7 +240,7 @@ def _extract_numeric_getter_body_and_param(content: str, getter: str):
         elif content[pos] == "}":
             depth -= 1
         pos += 1
-    return content[start : pos - 1], param_name
+    return content[start: pos - 1], param_name
 
 
 def _verify_numeric_getter_override_branch(content: str, getter: str, optional_member: str):
