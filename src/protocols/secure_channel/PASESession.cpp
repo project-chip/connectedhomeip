@@ -140,19 +140,20 @@ void PASESession::Clear()
     MATTER_TRACE_SCOPE("Clear", "PASESession");
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
-    memset(&mPASEVerifier, 0, sizeof(mPASEVerifier));
+    ClearSecretData(reinterpret_cast<uint8_t *>(&mPASEVerifier), sizeof(mPASEVerifier));
     mNextExpectedMsg.ClearValue();
 
     mSpake2p.Clear();
     mCommissioningHash.Clear();
 
     mIterationCount = 0;
-    mSaltLength     = 0;
     if (mSalt != nullptr)
     {
+        ClearSecretData(mSalt, mSaltLength);
         chip::Platform::MemoryFree(mSalt);
         mSalt = nullptr;
     }
+    mSaltLength      = 0;
     mPairingComplete = false;
     PairingSession::Clear();
 }
@@ -534,7 +535,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     uint8_t random[kPBKDFParamRandomNumberSize];
 
     ByteSpan salt;
-    uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
+    SensitiveDataFixedBuffer<kSpake2p_WS_Length * 2> serializedWS;
 
     ChipLogDetail(SecureChannel, "Received PBKDF param response");
 
@@ -603,11 +604,11 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     err = SetupSpake2p();
     SuccessOrExit(err);
 
-    err = Spake2pVerifier::ComputeWS(mIterationCount, salt, mSetupPINCode, serializedWS, sizeof(serializedWS));
+    err = Spake2pVerifier::ComputeWS(mIterationCount, salt, mSetupPINCode, serializedWS.Bytes(), serializedWS.Capacity());
     SuccessOrExit(err);
 
-    err = mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length, &serializedWS[kSpake2p_WS_Length],
-                               kSpake2p_WS_Length);
+    err = mSpake2p.BeginProver(nullptr, 0, nullptr, 0, serializedWS.Bytes(), kSpake2p_WS_Length,
+                               serializedWS.Bytes() + kSpake2p_WS_Length, kSpake2p_WS_Length);
     SuccessOrExit(err);
 
     err = SendMsg1();
@@ -660,7 +661,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     uint8_t Y[kMAX_Point_Length];
     size_t Y_len = sizeof(Y);
 
-    uint8_t verifier[kMAX_Hash_Length];
+    SensitiveDataFixedBuffer<kMAX_Hash_Length> verifier;
     size_t verifier_len = kMAX_Hash_Length;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg1");
@@ -688,7 +689,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
 
     SuccessOrExit(err = mSpake2p.ComputeRoundOne(X, X_len, Y, &Y_len));
     VerifyOrReturnError(Y_len == sizeof(Y), CHIP_ERROR_INTERNAL);
-    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(X, X_len, verifier, &verifier_len));
+    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(X, X_len, verifier.Bytes(), &verifier_len));
     msg1 = nullptr;
 
     {
@@ -703,7 +704,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kPb), ByteSpan(Y)));
-        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kCb), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kCb), ByteSpan(verifier.Bytes(), verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg2));
 
@@ -731,7 +732,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     MATTER_TRACE_SCOPE("HandleMsg2_and_SendMsg3", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint8_t verifier[kMAX_Hash_Length];
+    SensitiveDataFixedBuffer<kMAX_Hash_Length> verifier;
     size_t verifier_len = kMAX_Hash_Length;
 
     System::PacketBufferHandle resp;
@@ -767,7 +768,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
     SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
-    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
+    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier.Bytes(), &verifier_len));
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
     msg2 = nullptr;
@@ -783,7 +784,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake3Tags::kCa), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake3Tags::kCa), ByteSpan(verifier.Bytes(), verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg3));
 
@@ -796,7 +797,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     ChipLogDetail(SecureChannel, "Sent spake2p msg3");
 
 exit:
-
     if (err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
