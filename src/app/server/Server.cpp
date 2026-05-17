@@ -553,6 +553,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Enable the TCP Server based on the TCPListenParameters setting.
     app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+
+    localSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
+                                              static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
@@ -573,12 +577,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if !CHIP_DEVICE_LAYER_TARGET_ESP32 && (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
     // StartServer only enables commissioning mode if device has not been commissioned
     app::DnssdServer::Instance().StartServer();
-#endif
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    localSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
-                                              static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
-    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
 #endif
 
     caseSessionManagerConfig = {
