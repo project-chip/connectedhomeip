@@ -100,6 +100,7 @@
         MCDeviceInstanceInfo * deviceInstanceInfo = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfo:self];
         if (deviceInstanceInfo != nil) {
             ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() creating MCDeviceInstanceInfoProvider");
+            delete _deviceInstanceInfoProvider;
             _deviceInstanceInfoProvider = new matter::casting::support::MCDeviceInstanceInfoProvider();
             VerifyOrReturnValue(_deviceInstanceInfoProvider->Initialize(deviceInstanceInfo) == CHIP_NO_ERROR,
                 [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);

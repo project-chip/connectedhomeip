@@ -33,22 +33,22 @@ namespace casting {
             VerifyOrReturnError(deviceInstanceInfo != nil, CHIP_ERROR_INVALID_ARGUMENT);
 
             if (deviceInstanceInfo.vendorName != nil) {
-                chip::Platform::CopyString(mVendorName, [deviceInstanceInfo.vendorName UTF8String]);
+                chip::Platform::CopyString(mVendorName, sizeof(mVendorName), [deviceInstanceInfo.vendorName UTF8String]);
                 mHasVendorName = true;
             }
 
             if (deviceInstanceInfo.productName != nil) {
-                chip::Platform::CopyString(mProductName, [deviceInstanceInfo.productName UTF8String]);
+                chip::Platform::CopyString(mProductName, sizeof(mProductName), [deviceInstanceInfo.productName UTF8String]);
                 mHasProductName = true;
             }
 
             if (deviceInstanceInfo.serialNumber != nil) {
-                chip::Platform::CopyString(mSerialNumber, [deviceInstanceInfo.serialNumber UTF8String]);
+                chip::Platform::CopyString(mSerialNumber, sizeof(mSerialNumber), [deviceInstanceInfo.serialNumber UTF8String]);
                 mHasSerialNumber = true;
             }
 
             if (deviceInstanceInfo.hardwareVersionString != nil) {
-                chip::Platform::CopyString(mHardwareVersionString, [deviceInstanceInfo.hardwareVersionString UTF8String]);
+                chip::Platform::CopyString(mHardwareVersionString, sizeof(mHardwareVersionString), [deviceInstanceInfo.hardwareVersionString UTF8String]);
                 mHasHardwareVersionString = true;
             }
 

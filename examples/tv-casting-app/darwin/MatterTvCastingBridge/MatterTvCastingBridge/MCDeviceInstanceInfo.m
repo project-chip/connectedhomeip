@@ -33,16 +33,16 @@ static const NSUInteger kMaxHardwareVersionStringLength = 64;
                              hardwareVersion:(NSNumber * _Nullable)hardwareVersion
                        hardwareVersionString:(NSString * _Nullable)hardwareVersionString
 {
-    if (vendorName != nil && vendorName.length > kMaxVendorNameLength) {
+    if (vendorName != nil && [vendorName lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxVendorNameLength) {
         return nil;
     }
-    if (productName != nil && productName.length > kMaxProductNameLength) {
+    if (productName != nil && [productName lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxProductNameLength) {
         return nil;
     }
-    if (serialNumber != nil && serialNumber.length > kMaxSerialNumberLength) {
+    if (serialNumber != nil && [serialNumber lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxSerialNumberLength) {
         return nil;
     }
-    if (hardwareVersionString != nil && hardwareVersionString.length > kMaxHardwareVersionStringLength) {
+    if (hardwareVersionString != nil && [hardwareVersionString lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxHardwareVersionStringLength) {
         return nil;
     }
 
