@@ -22463,7 +22463,7 @@ typedef NS_OPTIONS(uint32_t, MTRProximityRangingRangingBandwidthBitmap) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRNetworkIdentityManagementIdentityType) {
-    MTRNetworkIdentityManagementIdentityTypeECDSA MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRNetworkIdentityManagementIdentityTypeECDSA MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRThreadBorderRouterManagementFeature) {
