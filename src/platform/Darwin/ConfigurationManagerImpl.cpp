@@ -261,7 +261,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, siz
 #if CHIP_DISABLE_PLATFORM_KVS
     return GenericConfigurationManagerImpl<Internal::PosixConfig>::GetCommissionableDeviceName(buf, bufSize);
 #else  // CHIP_DISABLE_PLATFORM_KVS
-    size_t outLen = 0;
+    size_t outLen  = 0;
     CHIP_ERROR err = ReadConfigValueStr(Internal::PosixConfig::kConfigKey_DeviceName, buf, bufSize, outLen);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
