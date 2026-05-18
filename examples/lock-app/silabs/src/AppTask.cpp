@@ -864,12 +864,12 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
         SILABS_LOG("ERR: setting transitional NotFullyLocked %x (auto-unlock after unlatch)", chip::to_underlying(status));
     }
 
-    LockRequest unlockLeg        = {};
-    unlockLeg.endpointId         = appInstance().mUnlatchContext.mEndpointId;
-    unlockLeg.action             = LockAction::kUnlock;
-    unlockLeg.targetClusterState = DlLockState::kUnlocked;
-    unlockLeg.fabricIdx          = appInstance().mUnlatchContext.mFabricIdx;
-    unlockLeg.nodeId             = appInstance().mUnlatchContext.mNodeId;
+    LockRequest unlockLeg                = {};
+    unlockLeg.endpointId                 = appInstance().mUnlatchContext.mEndpointId;
+    unlockLeg.action                     = LockAction::kUnlock;
+    unlockLeg.targetClusterState         = DlLockState::kUnlocked;
+    unlockLeg.fabricIdx                  = appInstance().mUnlatchContext.mFabricIdx;
+    unlockLeg.nodeId                     = appInstance().mUnlatchContext.mNodeId;
     appInstance().mActiveRemoteAction    = unlockLeg;
     appInstance().mHasActiveRemoteAction = true;
 
@@ -1055,8 +1055,7 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
 
         if (request.targetClusterState == currentTerminal)
         {
-            ChipLogProgress(NotSpecified,
-                            "Door Lock App: remote request target (%s) matches current LockState; skipping no-op",
+            ChipLogProgress(NotSpecified, "Door Lock App: remote request target (%s) matches current LockState; skipping no-op",
                             LockStateToString(request.targetClusterState));
             return;
         }
