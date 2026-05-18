@@ -507,4 +507,13 @@ config CHIP_QSPI_NOR_POWER_MANAGEMENT_SUPPORT
 	  Enables management of nRF QSPI NOR external flash power state
 	  transitions during Matter operations.
 
+config CHIP_BLE_MULTI_IDENTITY_SUPPORT
+  bool "Support for multiple BLE identities"
+  depends on BT
+  help
+    Enables support for multiple BLE identities, allowing the device to maintain separate BLE
+    advertisements and connections for different purposes. When this option is enabled, Matter
+    connection handlers will ignore events for connections established with a different local
+    identity.
+
 endif # CHIP

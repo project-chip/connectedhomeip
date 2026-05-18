@@ -51,6 +51,22 @@ const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
     return *static_cast<const BLEAdvertisingArbiter::Request *>(node);
 }
 
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
+// Check if connection identity matches the identity used for advertising
+bool IsOurIdentity(const bt_conn * conn)
+{
+    VerifyOrReturnValue(conn, false);
+
+    bt_conn_info info{};
+    const int err = bt_conn_get_info(conn, &info);
+    VerifyOrReturnValue(err == 0, false);
+
+    return info.id == sBtId;
+}
+
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
 // Notify application about stopped advertising if the callback has been provided
 void NotifyAdvertisingStopped(const sys_snode_t * node)
 {
@@ -94,8 +110,13 @@ CHIP_ERROR RestartAdvertising()
 BT_CONN_CB_DEFINE(conn_callbacks) = {
     .disconnected =
         [](struct bt_conn * conn, uint8_t reason) {
-            (void) conn;
             (void) reason;
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+            // Ignore disconnections from other identities
+            VerifyOrReturn(IsOurIdentity(conn));
+#else
+            (void) conn;
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
             sWasDisconnection = true;
         },
     .recycled =
