@@ -128,47 +128,20 @@ public:
 
     CHIP_ERROR StartAppTask();
 
-    /**
-     * @brief Button ISR callback: `APP_LOCK_SWITCH` or `APP_FUNCTION_BUTTON`.
-     *
-     * @param button    APP_LOCK_SWITCH or APP_FUNCTION_BUTTON.
-     * @param btnAction SL_SIMPLE_BUTTON_PRESSED / RELEASED / DISABLED.
-     */
+
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-    /**
-     * @brief AppTask-thread handler for a queued button-driven lock toggle
-     *        (`kEventType_Button`, posted by `ButtonEventHandler` when
-     *        `APP_LOCK_SWITCH` is pressed). Resolves direction via
-     *        `NextState()` and drives `InitiateLockAction`.
-     */
     static void LockButtonActionHandler(AppEvent * aEvent);
 
-    /**
-     * @brief FreeRTOS unlatch-timer expiry callback. Runs in the timer task,
-     *        schedules `UnlockAfterUnlatch` onto the Matter platform thread.
-     */
     static void UnlatchCallback(TimerHandle_t xTimer);
 
-    /**
-     * @brief AppTask-thread handler for a queued actuator-movement timer event
-     *        (`kEventType_Timer`, posted by `TimerEventHandler` when the lock
-     *        actuator timer fires). Advances `mLockActuatorState` and pushes
-     *        the resulting cluster state.
-     */
     static void ActuatorMovementEventHandler(AppEvent * aEvent);
 
-    /**
-     * @brief AppTask-thread handler for a queued lock-action event
-     *        (`kEventType_Lock`, posted by `PostLockActionEvent` from the
-     *        Matter / DoorLock cluster-callback thread, or from the FreeRTOS
-     *        unlatch-timer trampoline). Calls `InitiateLockAction()` so that
-     *        all transitions of `mLockActuatorState` are serialized on the
-     *        AppTask event loop.
-     */
     static void LockActionEventHandler(AppEvent * aEvent);
 
     static void LockRequestEventHandler(AppEvent * aEvent);
+
+    void HandleLockRequestOnAppTask(const LockRequest & request);
 
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
@@ -257,16 +230,6 @@ public:
 
     bool InitiateLockAction(LockAction aAction, bool fromButton = false);
 
-    /**
-     * @brief Public injection point for a `LockRequest` from any thread.
-     *
-     * Stages the request and wakes the AppTask thread to drain it via
-     * `LockRequestEventHandler` → `HandleLockRequestOnAppTask`. Use this for
-     * non-Matter triggers (NFC, BLE side-channel, occupancy sensor, etc.) so
-     * they share the same router as DM* commands and the lock button.
-     */
-    void SubmitLockRequest(const LockRequest & request);
-
     static void UnlockAfterUnlatch(intptr_t context);
 
 protected:
@@ -346,11 +309,8 @@ protected:
 
     static void EnqueueLockRequest(const LockRequest & request);
 
-    void HandleLockRequestOnAppTask(const LockRequest & request);
-
     static bool TryDrainStagedLockRequest(LockRequest & out);
 
-private:
     struct UnlatchContext
     {
         chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
@@ -373,6 +333,14 @@ private:
         }
     };
 
+    UnlatchContext mUnlatchContext;
+    LockRequest mPendingRequest;
+    bool mHasPendingRequest = false;
+    LockRequest mActiveRemoteAction;
+    bool mHasActiveRemoteAction          = false;
+    LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
+
+private:
     // ---- Lock-domain bring-up / state machine ----
     CHIP_ERROR InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam,
                               chip::PersistentStorageDelegate * storage);
@@ -389,15 +357,7 @@ private:
     static bool sStagedLockRequestValid;
     static osMutexId_t sStagedLockRequestMutex;
 
-    // ---- State ----
-    UnlatchContext mUnlatchContext;
-    LockRequest mPendingRequest;
-    bool mHasPendingRequest = false;
-    LockRequest mActiveRemoteAction;
-    bool mHasActiveRemoteAction = false;
-
-    LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
-    osTimerId_t mLockTimer               = nullptr;
+    osTimerId_t mLockTimer = nullptr;
 
     LockParam mLockParams;
     chip::PersistentStorageDelegate * mStorage = nullptr;

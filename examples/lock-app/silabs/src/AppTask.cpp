@@ -888,7 +888,7 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
 void AppTask::UnlatchCallback(TimerHandle_t xTimer)
 {
     (void) xTimer;
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::UnlockAfterUnlatch,
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(&CustomerAppTask::UnlockAfterUnlatch,
                                                                            reinterpret_cast<intptr_t>(nullptr));
 }
 
@@ -980,7 +980,7 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
                             req.isButtonAction ? "button" : "remote", chip::to_underlying(req.action),
                             LockStateToString(req.targetClusterState));
 
-            lock->HandleLockRequestOnAppTask(req);
+            appInstance().HandleLockRequestOnAppTask(req);
         }
 
         if (lock->mLockActuatorState == LockActuatorState::kLockCompleted ||
@@ -990,18 +990,13 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
             if (TryDrainStagedLockRequest(stagedReq))
             {
                 ChipLogProgress(Zcl, "Door Lock App: draining staged lock request from action-complete fallback");
-                lock->HandleLockRequestOnAppTask(stagedReq);
+                appInstance().HandleLockRequestOnAppTask(stagedReq);
             }
         }
     }
 }
 
 // ---- Cross-thread `LockRequest` handoff -----------------------------------
-
-void AppTask::SubmitLockRequest(const LockRequest & request)
-{
-    EnqueueLockRequest(request);
-}
 
 void AppTask::EnqueueLockRequest(const LockRequest & request)
 {

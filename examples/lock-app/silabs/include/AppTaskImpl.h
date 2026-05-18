@@ -76,6 +76,16 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockRequestEventHandlerImpl, aEvent);
     }
 
+    void HandleLockRequestOnAppTask(const AppTask::LockRequest & request)
+    {
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, HandleLockRequestOnAppTaskImpl, request);
+    }
+
+    static void UnlockAfterUnlatch(intptr_t context)
+    {
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlockAfterUnlatchImpl, context);
+    }
+
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -214,6 +224,10 @@ private:
     void LockActionEventHandlerImpl(AppEvent * aEvent) { AppTask::LockActionEventHandler(aEvent); }
 
     void LockRequestEventHandlerImpl(AppEvent * aEvent) { AppTask::LockRequestEventHandler(aEvent); }
+
+    void HandleLockRequestOnAppTaskImpl(const AppTask::LockRequest & request) { AppTask::HandleLockRequestOnAppTask(request); }
+
+    void UnlockAfterUnlatchImpl(intptr_t context) { AppTask::UnlockAfterUnlatch(context); }
 
     void DMPostAttributeChangeCallbackImpl(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                            uint8_t * value)
