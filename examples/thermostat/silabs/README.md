@@ -4,29 +4,35 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
--   [Matter EFR32 Thermostat Example](#matter-efr32-thermostat-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-        -   [Linux](#linux)
-        -   [Mac OS X](#mac-os-x)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-        -   [SEGGER RTT](#segger-rtt)
-        -   [Console Log](#console-log)
-            -   [Configuring the VCOM](#configuring-the-vcom)
-        -   [Using the console](#using-the-console)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-            -   [On Border Router:](#on-border-router)
-            -   [On PC(Linux):](#on-pclinux)
-    -   [Running RPC console](#running-rpc-console)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling LCD](#disabling-lcd)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter EFR32 Thermostat Example](#matter-efr32-thermostat-example)
+    - [Introduction](#introduction)
+    - [Extending Base App Implementation](#extending-base-app-implementation)
+        - [CustomerAppTask](#customerapptask)
+        - [How to Override APIs](#how-to-override-apis)
+        - [DataModelCallbacks and CustomerAppTask](#datamodelcallbacks-and-customerapptask)
+        - [Sample Implementation](#sample-implementation)
+        - [Override API Reference](#override-api-reference)
+    - [Building](#building)
+        - [Linux](#linux)
+        - [Mac OS X](#mac-os-x)
+    - [Flashing the Application](#flashing-the-application)
+    - [Viewing Logging Output](#viewing-logging-output)
+        - [SEGGER RTT](#segger-rtt)
+        - [Console Log](#console-log)
+            - [Configuring the VCOM](#configuring-the-vcom)
+        - [Using the console](#using-the-console)
+    - [Running the Complete Example](#running-the-complete-example)
+        - [Notes](#notes)
+            - [On Border Router:](#on-border-router)
+            - [On PC(Linux):](#on-pclinux)
+    - [Running RPC console](#running-rpc-console)
+    - [Memory settings](#memory-settings)
+    - [OTA Software Update](#ota-software-update)
+    - [Building options](#building-options)
+        - [Disabling logging](#disabling-logging)
+        - [Debug build / release build](#debug-build--release-build)
+        - [Disabling LCD](#disabling-lcd)
+        - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -55,19 +61,163 @@ The thermostat example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
 
+## Extending Base App Implementation
+
+### CustomerAppTask
+
+To implement custom app behavior you can override any Silicon Labs implemented
+API in the CustomerAppTask file. This example provides
+[`CustomerAppTask.h`](../../platform/silabs/customer/CustomerAppTask.h) and
+[`CustomerAppTask.cpp`](../../platform/silabs/customer/CustomerAppTask.cpp) for
+that purpose. The base implementation and the full set of overridable `*Impl()`
+APIs live in this example's source tree under
+[`include/AppTaskImpl.h`](include/AppTaskImpl.h) and
+[`src/AppTask.cpp`](src/AppTask.cpp). Any `*Impl()` you do not override keeps
+the Silicon Labs default behavior. To customize behavior, copy
+[`CustomerAppTask.h`](../../platform/silabs/customer/CustomerAppTask.h) and
+[`CustomerAppTask.cpp`](../../platform/silabs/customer/CustomerAppTask.cpp) from
+`examples/platform/silabs/customer/` into this app's `include/` and `src/`
+folders, then update the corresponding paths in `BUILD.gn`.
+
+### How to Override APIs
+
+`CustomerAppTask` derives from the base AppTask through the Curiously Recurring
+Template Pattern (CRTP). You override only the `*Impl()` methods you need, the
+base declares one `*Impl()` per overridable API. Steps:
+
+1. Find the method to override in the base API (see
+   [Override API reference](#override-api-reference) below).
+2. Declare the same method signature in `CustomerAppTask` in your
+   `CustomerAppTask.h` under `private:`. Match the base `*Impl()` signature
+   exactly — note that `*Impl()` overrides are **non-static instance methods**
+   even when the public dispatcher (e.g. `ButtonEventHandler`) is `static`.
+3. Implement the method in `CustomerAppTask.cpp`.
+4. Build. The CRTP layer automatically routes each call to your `*Impl()` if
+   present, otherwise to the Silicon Labs default.
+
+### DataModelCallbacks and CustomerAppTask
+
+What used to live in `DataModelCallbacks.cpp` now lives in `AppTask.cpp`. The
+Matter SDK's `MatterPostAttributeChangeCallback` is implemented in
+`examples/platform/silabs/BaseApplication.cpp` and forwards to
+`AppTask::DMPostAttributeChangeCallback` (defined in `AppTask.cpp`), which you
+can customize via `DMPostAttributeChangeCallbackImpl()` in `CustomerAppTask`.
+
+Forwarding into `AppTask` still goes through CRTP as in
+[How to Override APIs](#how-to-override-apis).
+
+-   **Methods that already exist in the AppTask** — Customize them by overriding
+    the matching `*Impl()` method in `CustomerAppTask`. Do not edit the
+    `AppTask.cpp` for app-specific behavior.
+
+-   **New custom data model methods** — Add them in `CustomerAppTask` directly.
+    Do not add new application logic in autogenerated sources; those edits will
+    not survive regeneration or project upgrades.
+
+### Sample Implementation
+
+The following shows a minimal example `CustomerAppTask` that overrides
+`AppInitImpl()` and `ButtonEventHandlerImpl()`.
+
+**CustomerAppTask.h**
+
+```cpp
+#pragma once
+#include "AppTaskImpl.h"
+
+/**
+ * Minimal AppTaskImpl-derived class. Override only the *Impl() methods you need;
+ */
+class CustomerAppTask : public AppTaskImpl<CustomerAppTask>
+{
+public:
+    static CustomerAppTask & GetAppTask() { return sAppTask; }
+
+private:
+    friend class AppTaskImpl<CustomerAppTask>;
+    CHIP_ERROR AppInitImpl();
+    void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction);
+    static CustomerAppTask sAppTask;
+};
+```
+
+**CustomerAppTask.cpp**
+
+```cpp
+#include "CustomerAppTask.h"
+#include "AppTask.h"
+#include "AppConfig.h"
+#include "AppEvent.h"
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+using namespace ::chip::DeviceLayer::Silabs;
+
+#define APP_FUNCTION_BUTTON 0
+
+CustomerAppTask CustomerAppTask::sAppTask;
+
+AppTask & AppTask::GetAppTask()
+{
+    return CustomerAppTask::GetAppTask();
+}
+
+CHIP_ERROR CustomerAppTask::AppInitImpl()
+{
+    SILABS_LOG("CustomerAppTask: custom implementation (AppInitImpl)");
+    CHIP_ERROR err = this->AppTask::AppInit();
+    if (err == CHIP_NO_ERROR)
+    {
+        chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(CustomerAppTask::ButtonEventHandler);
+    }
+    return err;
+}
+
+void CustomerAppTask::ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction)
+{
+    SILABS_LOG("CustomerAppTask: custom implementation (ButtonEventHandlerImpl)");
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Action = btnAction;
+    else if (button == APP_FUNCTION_BUTTON)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        AppTask::GetAppTask().PostEvent(&button_event);
+    }
+}
+```
+
+### Override API Reference
+
+`CHIP_ERROR StartAppTask()` is declared on `AppTask` only. It is not an
+`*Impl()` hook: platform code (for example `MatterConfig`) calls
+`AppTask::GetAppTask().StartAppTask()` with static type `AppTask &`, which runs
+the implementation in `AppTask.cpp` (creating the FreeRTOS app task via
+`BaseApplication::StartAppTask(...)`). To change startup behavior, edit
+`AppTask::StartAppTask()` or `BaseApplication::StartAppTask` in your product
+sources.
+
+The base API and default AppTask behavior for this example are maintained under
+[`include/`](include/AppTaskImpl.h) and [`src/`](src/AppTask.cpp). Use them as
+the reference for overridable methods and app configuration.
+
+| File                                             | Purpose                                                                                                                                              |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`include/AppTaskImpl.h`](include/AppTaskImpl.h) | Declarations of every overridable `*Impl()` method. Copy the signatures you need from here into `CustomerAppTask.h`.                                 |
+| [`src/AppTask.cpp`](src/AppTask.cpp)             | Silicon Labs default implementation of AppTask. This is what runs for any `*Impl()` you do not override. Use as reference when customizing behavior. |
+
 ## Building
 
--   Download the
-    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
-    command line tool, and ensure that `commander` is your shell search path.
-    (For Mac OS X, `commander` is located inside
-    `Commander.app/Contents/MacOS/`.)
+- Download the
+  [Simplicity Commander](https://www.silabs.com/mcu/programming-options) command
+  line tool, and ensure that `commander` is your shell search path. (For Mac OS
+  X, `commander` is located inside `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain (For most Host, the
-    bootstrap already installs the toolchain):
-    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
+- Download and install a suitable ARM gcc tool chain (For most Host, the
+  bootstrap already installs the toolchain):
+  [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
--   Install some additional tools(likely already present for CHIP developers):
+- Install some additional tools(likely already present for CHIP developers):
 
 #### Linux
 
@@ -77,34 +227,31 @@ Silicon Labs platform.
 
     $ brew install ninja
 
--   Supported hardware:
-
-    -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
-        > in the Silicon Labs Matter Documentation
+- Supported hardware:
+    - > For the latest supported hardware please refer to the
+      > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+      > in the Silicon Labs Matter Documentation
 
     MG24 boards :
+    - BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    - BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+* Region code Setting (917 WiFi projects)
+    - In Wifi configurations, the region code can be set in this
+      [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+      The available region codes can be found
+      [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
 
-*   Region code Setting (917 WiFi projects)
-
-    -   In Wifi configurations, the region code can be set in this
-        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
-        The available region codes can be found
-        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
-
-*   Build the example application:
+* Build the example application:
 
             cd ~/connectedhomeip
             ./scripts/examples/gn_silabs_example.sh ./examples/thermostat/silabs/ ./out/thermostat-app BRD4187C
 
--   To delete generated executable, libraries and object files use:
+- To delete generated executable, libraries and object files use:
 
             $ cd ~/connectedhomeip
             $ rm -rf ./out/
@@ -118,16 +265,16 @@ Silicon Labs platform.
             $ gn gen out/debug
             $ ninja -C out/debug
 
--   To delete generated executable, libraries and object files use:
+- To delete generated executable, libraries and object files use:
 
             $ cd ~/connectedhomeip/examples/thermostat/silabs
             $ rm -rf out/
 
-*   Build the example with Matter shell
+* Build the example with Matter shell
 
             ./scripts/examples/gn_silabs_example.sh examples/thermostat/silabs/ out/thermostat-app BRD4187C chip_build_libshell=true
 
-*   Build the example as Intermittently Connected Device (ICD)
+* Build the example as Intermittently Connected Device (ICD)
 
             $ ./scripts/examples/gn_silabs_example.sh ./examples/thermostat/silabs/ ./out/thermostat-app_ICD BRD4187C --icd
 
@@ -135,7 +282,7 @@ Silicon Labs platform.
 
             $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false chip_build_libshell=true'
 
-*   Build the example with pigweed RCP
+* Build the example with pigweed RCP
 
             $ ./scripts/examples/gn_silabs_example.sh examples/thermostat/silabs/ out/thermostat-app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
@@ -155,12 +302,12 @@ arguments
 
 ## Flashing the Application
 
--   On the command line:
+- On the command line:
 
             $ cd ~/connectedhomeip/examples/thermostat/silabs
             $ python3 out/debug/matter-silabs-thermostat-switch-example.flash.py
 
--   Or with the Ozone debugger, just load the .out file.
+- Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
 info. Pre-built bootloader binaries are available on the
@@ -182,27 +329,27 @@ Software and Documentation Pack_
 Alternatively, SEGGER Ozone J-Link debugger can be used to view RTT logs too
 after flashing the .out file.
 
--   Download the J-Link installer by navigating to the appropriate URL and
-    agreeing to the license agreement.
+- Download the J-Link installer by navigating to the appropriate URL and
+  agreeing to the license agreement.
 
--   [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
--   [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
+- [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
+- [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
 
-*   Install the J-Link software
+* Install the J-Link software
 
             $ cd ~/Downloads
             $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
-*   In Linux, grant the logged in user the ability to talk to the development
-    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
-    dialout group.
+* In Linux, grant the logged in user the ability to talk to the development
+  hardware via the linux tty device (/dev/ttyACMx) by adding them to the dialout
+  group.
 
             $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
 
--   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
+- Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
     For MG24 use:
 
@@ -210,7 +357,7 @@ combination with JLinkRTTClient as follows:
             $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
             ```
 
--   In a second terminal, run the JLinkRTTClient to view logs:
+- In a second terminal, run the JLinkRTTClient to view logs:
 
             $ JLinkRTTClient
 
@@ -227,9 +374,9 @@ the verbose mode is selected (--verbose)
 
 #### Configuring the VCOM
 
--   Using (Simplicity
-    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
--   Using commander-cli
+- Using (Simplicity
+  Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+- Using commander-cli
     ```
     commander vcom config --baudrate 921600 --handshake rtscts
     ```
@@ -240,23 +387,22 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 
--   It is assumed here that you already have an OpenThread border router
-    configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
-    for more information on how to setup a border router on a raspberryPi.
+- It is assumed here that you already have an OpenThread border router
+  configured and running. If not see the following guide
+  [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
+  for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
--   For this example to work, it is necessary to have a second efr32 device
-    running the
-    [thermostat app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/thermostat/silabs/README.md)
-    commissioned on the same openthread network
+- For this example to work, it is necessary to have a second efr32 device
+  running the
+  [thermostat app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/thermostat/silabs/README.md)
+  commissioned on the same openthread network
 
--   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
-    Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
-    BLE
+- User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR Code
+  is be scanned by the CHIP Tool app For the Rendez-vous procedure over BLE
 
           * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
             a URL can be found in the RTT logs.
@@ -294,9 +440,9 @@ With any serial terminal application such as screen, putty, minicom etc.
               procedure. **LEDs** blink in unison when the factory reset procedure is
               initiated.
 
-*   You can provision and control the Chip device using the python controller,
-    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
-    standalone, Android or iOS app
+* You can provision and control the Chip device using the python controller,
+  [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+  standalone, Android or iOS app
 
     Here is an example with the CHIPTool:
 
@@ -306,10 +452,10 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ### Notes
 
--   Depending on your network settings your router might not provide native ipv6
-    addresses to your devices (Border router / PC). If this is the case, you
-    need to add a static ipv6 addresses on both device and then an ipv6 route to
-    the border router on your PC
+- Depending on your network settings your router might not provide native ipv6
+  addresses to your devices (Border router / PC). If this is the case, you need
+  to add a static ipv6 addresses on both device and then an ipv6 route to the
+  border router on your PC
 
 #### On Border Router:
 
@@ -324,20 +470,20 @@ via 2002::2
 
 ## Running RPC console
 
--   As part of building the example with RPCs enabled the chip_rpc python
-    interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/chip_rpc_console_wheels. To
-    install the wheel files without rebuilding:
+- As part of building the example with RPCs enabled the chip_rpc python
+  interactive console is installed into your venv. The python wheel files are
+  also created in the output folder: out/debug/chip_rpc_console_wheels. To
+  install the wheel files without rebuilding:
 
     `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
--   To use the chip-rpc console after it has been installed run:
+- To use the chip-rpc console after it has been installed run:
 
     `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
--   Then you can simulate a button press or release using the following command
-    where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
-    RELEASE Test toggling the LED with
+- Then you can simulate a button press or release using the following command
+  where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
+  RELEASE Test toggling the LED with
 
     `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
 
