@@ -176,7 +176,7 @@ TEST_F(TestTLVPacketBufferBackingStore, MultiBufferEncode)
     // Skipping the test for other configurations because the allocation method is unknown.
     GTEST_SKIP();
 #endif
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL ||                                  \
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL ||                                 \
     CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
     size_t checkedSize = 0;
     auto bufferTmp     = buffer.Retain();
