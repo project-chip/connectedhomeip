@@ -1,1 +1,1 @@
-191 : [Silabs] Update Docker image (25q4-patch2)
+196 : [crosscompile] Don't duplicate minimization done by create_sysroot.py in the Dockerfile

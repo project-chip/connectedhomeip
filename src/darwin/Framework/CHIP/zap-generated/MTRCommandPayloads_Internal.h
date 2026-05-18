@@ -1776,6 +1776,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRDynamicLightingClusterStartEffectParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDynamicLightingClusterStopEffectParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRProximityRangingClusterStartRangingRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

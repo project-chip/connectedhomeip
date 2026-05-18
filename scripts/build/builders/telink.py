@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +36,7 @@ class TelinkApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     BRIDGE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
@@ -55,6 +58,8 @@ class TelinkApp(Enum):
             return 'all-clusters-app'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'bridge-app'
         if self == TelinkApp.CONTACT_SENSOR:
@@ -90,6 +95,8 @@ class TelinkApp(Enum):
             return 'chip-telink-all-clusters-example'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'chip-telink-bridge-example'
         if self == TelinkApp.CONTACT_SENSOR:
@@ -163,8 +170,9 @@ class TelinkBoard(Enum):
 class TelinkBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard,
                  enable_ota: bool = False,
@@ -182,7 +190,7 @@ class TelinkBuilder(Builder):
                  chip_enable_nfc_onboarding_payload: bool = False,
                  log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
                  ):
-        super(TelinkBuilder, self).__init__(root, runner)
+        super(TelinkBuilder, self).__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_ota = enable_ota
@@ -214,6 +222,7 @@ class TelinkBuilder(Builder):
 
         return cmd
 
+    @lock_output_dir
     def generate(self):
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -287,6 +296,7 @@ class TelinkBuilder(Builder):
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         log.info('Compiling Telink at %s', self.output_dir)
 
@@ -297,6 +307,7 @@ class TelinkBuilder(Builder):
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
             os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),

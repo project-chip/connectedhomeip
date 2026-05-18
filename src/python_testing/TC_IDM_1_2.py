@@ -147,8 +147,8 @@ class TC_IDM_1_2(IDMBaseTest):
                     continue
 
                 # Let's just use the first unsupported command
-                id = unsupported_commands[0]
-                cmd = next(filter(lambda x: x.command_id == id, all_supported_cmds))
+                _id = unsupported_commands[0]
+                cmd = next(filter(lambda x: x.command_id == _id, all_supported_cmds))
                 try:
                     ret = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail(f'Unexpected success sending unsupported cmd {cmd} to {cluster} cluster on ep {i}')

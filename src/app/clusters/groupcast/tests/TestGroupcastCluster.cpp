@@ -921,6 +921,17 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
         EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
+        // Per spec 11.27.7.1.4 (JoinGroup Command/Key Field), a keyset created via JoinGroup with a Key has exactly one epoch
+        // key (num_keys_used == 1) with EpochStartTime0 = 1.
+        {
+            Credentials::GroupDataProvider::KeySet storedKeyset;
+            EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kKeyset, storedKeyset), CHIP_NO_ERROR);
+            EXPECT_EQ(storedKeyset.keyset_id, kKeyset);
+            EXPECT_EQ(storedKeyset.policy, Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst);
+            EXPECT_EQ(storedKeyset.num_keys_used, 1u);
+            EXPECT_EQ(storedKeyset.epoch_keys[0].start_time, 1u);
+        }
+
         // Join group: Existing keyset and key (invalid)
         data.groupID = 2;
         result       = tester.Invoke(Commands::JoinGroup::Id, data);

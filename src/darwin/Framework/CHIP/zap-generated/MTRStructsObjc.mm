@@ -8502,6 +8502,90 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDynamicLightingClusterEffectColorStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _level = nil;
+
+        _x = nil;
+
+        _y = nil;
+
+        _hue = nil;
+
+        _enhancedHue = nil;
+
+        _saturation = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDynamicLightingClusterEffectColorStruct alloc] init];
+
+    other.level = self.level;
+    other.x = self.x;
+    other.y = self.y;
+    other.hue = self.hue;
+    other.enhancedHue = self.enhancedHue;
+    other.saturation = self.saturation;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: level:%@; x:%@; y:%@; hue:%@; enhancedHue:%@; saturation:%@; >", NSStringFromClass([self class]), _level, _x, _y, _hue, _enhancedHue, _saturation];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDynamicLightingClusterEffectStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _effectID = @(0);
+
+        _source = @(0);
+
+        _label = @"";
+
+        _maxSpeed = @(0);
+
+        _defaultSpeed = @(0);
+
+        _supportsColorPalette = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDynamicLightingClusterEffectStruct alloc] init];
+
+    other.effectID = self.effectID;
+    other.source = self.source;
+    other.label = self.label;
+    other.maxSpeed = self.maxSpeed;
+    other.defaultSpeed = self.defaultSpeed;
+    other.supportsColorPalette = self.supportsColorPalette;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectID:%@; source:%@; label:%@; maxSpeed:%@; defaultSpeed:%@; supportsColorPalette:%@; >", NSStringFromClass([self class]), _effectID, _source, _label, _maxSpeed, _defaultSpeed, _supportsColorPalette];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROccupancySensingClusterHoldTimeLimitsStruct
 - (instancetype)init
 {
@@ -12456,42 +12540,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _endpointID = @(0);
-
-        _nodeID = @(0);
-
-        _friendlyName = @"";
-
-        _statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct new];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct alloc] init];
-
-    other.endpointID = self.endpointID;
-    other.nodeID = self.nodeID;
-    other.friendlyName = self.friendlyName;
-    other.statusEntry = self.statusEntry;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; nodeID:%@; friendlyName:%@; statusEntry:%@; >", NSStringFromClass([self class]), _endpointID, _nodeID, _friendlyName, _statusEntry];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRJointFabricDatastoreClusterDatastoreBindingTargetStruct
 - (instancetype)init
 {
@@ -12708,6 +12756,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpointID = @(0);
+
+        _nodeID = @(0);
+
+        _friendlyName = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRJointFabricDatastoreClusterDatastoreEndpointEntryStruct alloc] init];
+
+    other.endpointID = self.endpointID;
+    other.nodeID = self.nodeID;
+    other.friendlyName = self.friendlyName;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; nodeID:%@; friendlyName:%@; >", NSStringFromClass([self class]), _endpointID, _nodeID, _friendlyName];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRJointFabricDatastoreClusterDatastoreGroupInformationEntryStruct
 - (instancetype)init
 {
@@ -12770,8 +12851,6 @@ NS_ASSUME_NONNULL_BEGIN
         _epochKey2 = nil;
 
         _epochStartTime2 = nil;
-
-        _groupKeyMulticastPolicy = @(0);
     }
     return self;
 }
@@ -12788,14 +12867,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.epochStartTime1 = self.epochStartTime1;
     other.epochKey2 = self.epochKey2;
     other.epochStartTime2 = self.epochStartTime2;
-    other.groupKeyMulticastPolicy = self.groupKeyMulticastPolicy;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; groupKeyMulticastPolicy:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2, _groupKeyMulticastPolicy];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2];
     return descriptionString;
 }
 

@@ -27154,6 +27154,243 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 }
 @end
 
+@implementation MTRDynamicLightingClusterStartEffectParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _effectID = @(0);
+
+        _speed = @(0);
+
+        _colorMode = nil;
+
+        _colorPalette = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDynamicLightingClusterStartEffectParams alloc] init];
+
+    other.effectID = self.effectID;
+    other.speed = self.speed;
+    other.colorMode = self.colorMode;
+    other.colorPalette = self.colorPalette;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectID:%@; speed:%@; colorMode:%@; colorPalette:%@; >", NSStringFromClass([self class]), _effectID, _speed, _colorMode, _colorPalette];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDynamicLightingClusterStartEffectParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DynamicLighting::Commands::StartEffect::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.effectID = self.effectID.unsignedShortValue;
+    }
+    {
+        encodableStruct.speed = self.speed.unsignedShortValue;
+    }
+    {
+        if (self.colorMode == nil) {
+            encodableStruct.colorMode.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.colorMode.SetNonNull();
+            nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(self.colorMode.unsignedCharValue);
+        }
+    }
+    {
+        if (self.colorPalette == nil) {
+            encodableStruct.colorPalette.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.colorPalette.SetNonNull();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.colorPalette.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.colorPalette.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.colorPalette.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.colorPalette[i_1], MTRDynamicLightingClusterEffectColorStruct);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.colorPalette[i_1], NSStringFromClass(MTRDynamicLightingClusterEffectColorStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        if (element_1.level == nil) {
+                            listHolder_1->mList[i_1].level.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].level.SetNonNull();
+                            nonNullValue_3 = element_1.level.unsignedCharValue;
+                        }
+                        if (element_1.x == nil) {
+                            listHolder_1->mList[i_1].x.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].x.SetNonNull();
+                            nonNullValue_3 = element_1.x.unsignedShortValue;
+                        }
+                        if (element_1.y == nil) {
+                            listHolder_1->mList[i_1].y.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].y.SetNonNull();
+                            nonNullValue_3 = element_1.y.unsignedShortValue;
+                        }
+                        if (element_1.hue == nil) {
+                            listHolder_1->mList[i_1].hue.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].hue.SetNonNull();
+                            nonNullValue_3 = element_1.hue.unsignedCharValue;
+                        }
+                        if (element_1.enhancedHue == nil) {
+                            listHolder_1->mList[i_1].enhancedHue.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].enhancedHue.SetNonNull();
+                            nonNullValue_3 = element_1.enhancedHue.unsignedShortValue;
+                        }
+                        if (element_1.saturation == nil) {
+                            listHolder_1->mList[i_1].saturation.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].saturation.SetNonNull();
+                            nonNullValue_3 = element_1.saturation.unsignedCharValue;
+                        }
+                    }
+                    nonNullValue_0 = ListType_1(listHolder_1->mList, self.colorPalette.count);
+                } else {
+                    nonNullValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDynamicLightingClusterStopEffectParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDynamicLightingClusterStopEffectParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDynamicLightingClusterStopEffectParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DynamicLighting::Commands::StopEffect::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRProximityRangingClusterStartRangingRequestParams
 - (instancetype)init
 {
@@ -42691,7 +42928,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
-        encodableStruct.groupKeySet.groupKeyMulticastPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeyMulticastPolicy)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -42808,7 +43044,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
-        encodableStruct.groupKeySet.groupKeyMulticastPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeyMulticastPolicy)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -43067,7 +43302,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupCATVersion = nil;
 
-        _groupPermission = @(0);
+        _groupPermission = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -43140,7 +43375,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        encodableStruct.groupPermission = static_cast<std::remove_reference_t<decltype(encodableStruct.groupPermission)>>(self.groupPermission.unsignedCharValue);
+        if (self.groupPermission == nil) {
+            encodableStruct.groupPermission.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.groupPermission.SetNonNull();
+            nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(self.groupPermission.unsignedCharValue);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -43362,7 +43602,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _nodeID = nil;
+        _nodeID = @(0);
 
         _friendlyName = nil;
 
@@ -43401,27 +43641,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::JointFabricDatastore::Commands::UpdateAdmin::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.nodeID == nil) {
-            encodableStruct.nodeID.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.nodeID.SetNonNull();
-            nonNullValue_0 = self.nodeID.unsignedLongLongValue;
+        encodableStruct.nodeID = self.nodeID.unsignedLongLongValue;
+    }
+    {
+        if (self.friendlyName != nil) {
+            auto & definedValue_0 = encodableStruct.friendlyName.Emplace();
+            definedValue_0 = AsCharSpan(self.friendlyName);
         }
     }
     {
-        if (self.friendlyName == nil) {
-            encodableStruct.friendlyName.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.friendlyName.SetNonNull();
-            nonNullValue_0 = AsCharSpan(self.friendlyName);
-        }
-    }
-    {
-        if (self.icac == nil) {
-            encodableStruct.icac.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.icac.SetNonNull();
-            nonNullValue_0 = AsByteSpan(self.icac);
+        if (self.icac != nil) {
+            auto & definedValue_0 = encodableStruct.icac.Emplace();
+            definedValue_0 = AsByteSpan(self.icac);
         }
     }
 
@@ -44662,7 +44893,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _icaccsr = [NSData data];
+        _statusCode = @(0);
+
+        _icaccsr = nil;
     }
     return self;
 }
@@ -44671,6 +44904,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRJointFabricAdministratorClusterICACCSRResponseParams alloc] init];
 
+    other.statusCode = self.statusCode;
     other.icaccsr = self.icaccsr;
 
     return other;
@@ -44678,7 +44912,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: icaccsr:%@; >", NSStringFromClass([self class]), [_icaccsr base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; icaccsr:%@; >", NSStringFromClass([self class]), _statusCode, [_icaccsr base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -44739,7 +44973,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType &)decodableStruct
 {
     {
-        self.icaccsr = AsData(decodableStruct.icaccsr);
+        self.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.statusCode)];
+    }
+    {
+        if (decodableStruct.icaccsr.HasValue()) {
+            self.icaccsr = AsData(decodableStruct.icaccsr.Value());
+        } else {
+            self.icaccsr = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }

@@ -79,7 +79,7 @@ public:
 #ifdef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
             {
                 const WiFiPAFSession * pElmInfo = &elem->mSessionInfo;
-                ChipLogError(WiFiPAF, "EndPoint[%lu]", i);
+                ChipLogError(WiFiPAF, "EndPoint[%zu]", i);
                 ChipLogError(WiFiPAF, "Role: [%d, %d]", pElmInfo->role, pInInfo->role);
                 ChipLogError(WiFiPAF, "id: [%u, %u]", pElmInfo->id, pInInfo->id);
                 ChipLogError(WiFiPAF, "peer_id: [%d, %d]", pElmInfo->peer_id, pInInfo->peer_id);
@@ -87,7 +87,7 @@ public:
                              pElmInfo->peer_addr[2], pElmInfo->peer_addr[3], pElmInfo->peer_addr[4], pElmInfo->peer_addr[5]);
                 ChipLogError(WiFiPAF, "InMac: [%02x:%02x:%02x:%02x:%02x:%02x]", pInInfo->peer_addr[0], pInInfo->peer_addr[1],
                              pInInfo->peer_addr[2], pInInfo->peer_addr[3], pInInfo->peer_addr[4], pInInfo->peer_addr[5]);
-                ChipLogError(WiFiPAF, "nodeId: [%lu, %lu]", pElmInfo->nodeId, pInInfo->nodeId);
+                ChipLogError(WiFiPAF, "nodeId: [%" PRIu64 ", %" PRIu64 "]", pElmInfo->nodeId, pInInfo->nodeId);
                 ChipLogError(WiFiPAF, "discriminator: [%d, %d]", pElmInfo->discriminator, pInInfo->discriminator);
             }
 #endif

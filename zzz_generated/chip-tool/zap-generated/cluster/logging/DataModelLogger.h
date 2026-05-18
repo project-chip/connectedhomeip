@@ -361,6 +361,12 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DynamicLighting::Structs::EffectStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -672,10 +678,6 @@ LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::DecodableType & value);
-
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
          const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::DecodableType & value);
 
 static CHIP_ERROR
@@ -697,6 +699,10 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,

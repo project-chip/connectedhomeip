@@ -47,6 +47,7 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "dynamic-lighting-cluster.xml",
         "groupcast-cluster.xml",
         "humidistat-cluster.xml",
         "microwave-oven-mode-cluster.xml",
@@ -603,7 +604,8 @@
             "SupportedWatts",
             "SelectedWattIndex",
             "WattRating",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
@@ -906,6 +908,7 @@
             "LocalSnapshotRecordingEnabled",
             "StatusLightEnabled",
             "StatusLightBrightness",
+            "ImageRotationDiscreteAngles",
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": [

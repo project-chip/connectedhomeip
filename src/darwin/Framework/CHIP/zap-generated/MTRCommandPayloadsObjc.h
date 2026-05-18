@@ -9196,6 +9196,70 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDynamicLightingClusterStartEffectParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull effectID MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull speed MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable colorMode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSArray * _Nullable colorPalette MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDynamicLightingClusterStopEffectParams : NSObject <NSCopying>
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the server to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRProximityRangingClusterStartRangingRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull technology MTR_PROVISIONALLY_AVAILABLE;
@@ -13876,7 +13940,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nullable groupCATVersion MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupPermission MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable groupPermission MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -13972,7 +14036,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRJointFabricDatastoreClusterUpdateAdminParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable nodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nodeID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSString * _Nullable friendlyName MTR_PROVISIONALLY_AVAILABLE;
 
@@ -14422,7 +14486,9 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRJointFabricAdministratorClusterICACCSRResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull icaccsr MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable icaccsr MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRJointFabricAdministratorClusterICACCSRResponseParams with a response-value dictionary

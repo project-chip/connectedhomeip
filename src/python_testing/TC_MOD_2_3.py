@@ -67,7 +67,8 @@ class TC_MOD_2_3(MatterBaseTest):
             TestStep("0", "Commissioning, already done", is_commissioning=True),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. EpochKey0 only."),
             TestStep("0b", "If the Groupcast cluster is enabled on the root node, skip this step. Otherwise, TH binds GroupIds 0x0001, with GroupKeySetID 0x01a1 in the GroupKeyMap attribute of GroupKeyManagement cluster."),
-            TestStep("0c", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast LeaveGroup command with GroupID field as 0 to DUT. Otherwise, TH sends a RemoveAllGroups command to DUT."),
+            TestStep("0c", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH reads the Groupcast membership attribute on the DUT."),
+            TestStep("0d", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast LeaveGroup command with GroupID field as 0 to DUT. Otherwise, TH sends a RemoveAllGroups command to DUT."),
             TestStep("1a", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH sends Groupcast JoinGroup command with GroupID 1, Endpoints set with the EndpointId where ModeSelect cluster is enabled and KeySetID 0x01a1 to DUT. Otherwise, TH sends AddGroup command to DUT with the GroupID field set to 1."),
             TestStep("1b", "TH sends a _RemoveAllScenes_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _RemoveAllScenes_ command to TH with the _Status_ field set to 0x00 (SUCCESS) and _GroupID_ field set to _G~1~_."),
             TestStep("1c", "TH sends a _GetSceneMembership_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _GetSceneMembershipResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS), the _Capacity_ field recorded into _SC~0~_ for later use, the _GroupID_ field set to _G~1~_ and the _SceneList_ field containing 0 entry"),
@@ -115,15 +116,29 @@ class TC_MOD_2_3(MatterBaseTest):
             result = await self.TH1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
+        membership = None
         self.step("0c")
         if self.groupcast_enabled:
-            # Check if there are any groups on the DUT.
-            membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership
+            )
+
+        self.step("0d")
+        if self.groupcast_enabled:
             if membership:
-                # LeaveGroup with groupID 0 will leave all groups on the fabric.
-                await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+                await self.TH1.SendCommand(
+                    self.dut_node_id,
+                    0,
+                    Clusters.Groupcast.Commands.LeaveGroup(groupID=0)
+                )
         else:
-            await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
+            await self.TH1.SendCommand(
+                self.dut_node_id,
+                self.matter_test_config.endpoint,
+                Clusters.Groups.Commands.RemoveAllGroups()
+            )
 
         self.step("1a")
         if self.groupcast_enabled:

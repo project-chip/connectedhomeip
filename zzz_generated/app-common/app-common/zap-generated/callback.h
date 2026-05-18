@@ -937,6 +937,16 @@ void emberAfBallastConfigurationClusterShutdownCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfDynamicLightingClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDynamicLightingClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -4983,6 +4993,45 @@ chip::Protocols::InteractionModel::Status MatterBallastConfigurationClusterServe
 void emberAfBallastConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Dynamic Lighting Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDynamicLightingClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDynamicLightingClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDynamicLightingClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDynamicLightingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterDynamicLightingClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDynamicLightingClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Illuminance Measurement Cluster
 //
 
@@ -7273,12 +7322,6 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
- * @brief Bridged Device Basic Information Cluster KeepActive Command callback (from client)
- */
-bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
-/**
  * @brief Timer Cluster SetTimer Command callback (from client)
  */
 bool emberAfTimerClusterSetTimerCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -7690,6 +7733,18 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(
 bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
+/**
+ * @brief Dynamic Lighting Cluster StartEffect Command callback (from client)
+ */
+bool emberAfDynamicLightingClusterStartEffectCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DynamicLighting::Commands::StartEffect::DecodableType & commandData);
+/**
+ * @brief Dynamic Lighting Cluster StopEffect Command callback (from client)
+ */
+bool emberAfDynamicLightingClusterStopEffectCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DynamicLighting::Commands::StopEffect::DecodableType & commandData);
 /**
  * @brief Proximity Ranging Cluster StartRangingRequest Command callback (from client)
  */
