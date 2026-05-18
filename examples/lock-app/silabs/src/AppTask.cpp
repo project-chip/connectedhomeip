@@ -1097,12 +1097,11 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
             chip::DeviceLayer::PlatformMgr().LockChipStack();
             if (request.isUnboltUnlatch)
             {
-                mUnlatchContext.Update(request.endpointId, request.fabricIdx, request.nodeId, request.userIndex,
-                                       request.credential, request.hasCredential);
+                mUnlatchContext.Update(request.endpointId, request.fabricIdx, request.nodeId, request.userIndex, request.credential,
+                                       request.hasCredential);
             }
             PushClusterLockState(request.endpointId, DlLockState::kNotFullyLocked, request.fabricIdx, request.nodeId,
-                                 request.userIndex, request.hasCredential ? &request.credential : nullptr,
-                                 request.hasCredential);
+                                 request.userIndex, request.hasCredential ? &request.credential : nullptr, request.hasCredential);
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
             mActiveRemoteAction    = request;
             mHasActiveRemoteAction = true;
