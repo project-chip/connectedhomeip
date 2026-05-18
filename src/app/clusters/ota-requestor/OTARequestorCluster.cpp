@@ -20,6 +20,7 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server/Server.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
@@ -43,10 +44,37 @@ OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorComm
     mOtaCommands(otaCommands), mAttributes(attributes)
 {}
 
+OTARequestorCluster::~OTARequestorCluster()
+{
+    // Defensive: ensure we're unregistered from the global FabricTable even if Shutdown()
+    // was never called (LazyRegisteredServerCluster::Destroy calls the destructor directly
+    // without first calling Shutdown). RemoveFabricDelegate is a no-op if not registered.
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+}
+
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    return mAttributes.SetInteractionModelContext(mPath.mEndpointId, *this, context.interactionContext.eventsGenerator);
+    ReturnErrorOnFailure(
+        mAttributes.SetInteractionModelContext(mPath.mEndpointId, *this, context.interactionContext.eventsGenerator));
+    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+}
+
+void OTARequestorCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
+void OTARequestorCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    (void) fabricTable;
+    CHIP_ERROR err = mAttributes.RemoveDefaultOtaProvider(fabricIndex);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OTA Requestor: failed to clear DefaultOTAProviders for removed fabric %u: %" CHIP_ERROR_FORMAT,
+                     static_cast<unsigned>(fabricIndex), err.Format());
+    }
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

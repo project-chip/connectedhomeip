@@ -22,17 +22,23 @@
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <credentials/FabricTable.h>
 
 namespace chip::app::Clusters {
 
 class OTARequestorCluster : public DefaultServerCluster,
                             public DefaultOTARequestorEventGenerator,
-                            public OTARequestorAttributes::AttributeChangeListener
+                            public OTARequestorAttributes::AttributeChangeListener,
+                            public FabricTable::Delegate
 {
 public:
     OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands, OTARequestorAttributes & attributes);
+    ~OTARequestorCluster() override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
