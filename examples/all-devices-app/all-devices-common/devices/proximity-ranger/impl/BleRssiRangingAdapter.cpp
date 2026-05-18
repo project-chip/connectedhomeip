@@ -28,12 +28,12 @@ CHIP_ERROR BleRssiRangingAdapter::Init(chip::PersistentStorageDelegate * store)
 {
     mpStore = store;
 
-    const char * keyName = chip::DefaultStorageKeyAllocator::ProximityRangingBleDeviceId().KeyName();
+    chip::StorageKeyName key = chip::DefaultStorageKeyAllocator::ProximityRangingBleDeviceId();
 
     if (mpStore != nullptr)
     {
         uint16_t size = sizeof(mBleDeviceId);
-        if (mpStore->SyncGetKeyValue(keyName, &mBleDeviceId, size) != CHIP_NO_ERROR || size != sizeof(mBleDeviceId))
+        if (mpStore->SyncGetKeyValue(key.KeyName(), &mBleDeviceId, size) != CHIP_NO_ERROR || size != sizeof(mBleDeviceId))
         {
             mBleDeviceId = kInvalidBleDeviceId;
         }
@@ -45,7 +45,7 @@ CHIP_ERROR BleRssiRangingAdapter::Init(chip::PersistentStorageDelegate * store)
         // Persist newly generated BLE Device ID if storage is provided
         if (mpStore != nullptr)
         {
-            ReturnErrorOnFailure(mpStore->SyncSetKeyValue(keyName, &mBleDeviceId, sizeof(mBleDeviceId)));
+            ReturnErrorOnFailure(mpStore->SyncSetKeyValue(key.KeyName(), &mBleDeviceId, sizeof(mBleDeviceId)));
         }
     }
 
