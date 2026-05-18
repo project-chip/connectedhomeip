@@ -502,7 +502,9 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
         // New candidates may have arrived during transmission, so we remove from the front
         if (mLocalCandidates.size() > candidateCount)
         {
-            mLocalCandidates.erase(mLocalCandidates.begin(), mLocalCandidates.begin() + candidateCount);
+            using DiffType = std::vector<ICECandidateInfo>::difference_type;
+            mLocalCandidates.erase(mLocalCandidates.begin(),
+                                   mLocalCandidates.begin() + static_cast<DiffType>(candidateCount));
             if (!mLocalCandidates.empty())
             {
                 ChipLogProgress(Camera, "%zu new candidate(s) arrived during transmission, keeping for next batch",
