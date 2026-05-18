@@ -257,6 +257,16 @@ public:
 
     bool InitiateLockAction(LockAction aAction, bool fromButton = false);
 
+    /**
+     * @brief Public injection point for a `LockRequest` from any thread.
+     *
+     * Stages the request and wakes the AppTask thread to drain it via
+     * `LockRequestEventHandler` → `HandleLockRequestOnAppTask`. Use this for
+     * non-Matter triggers (NFC, BLE side-channel, occupancy sensor, etc.) so
+     * they share the same router as DM* commands and the lock button.
+     */
+    void SubmitLockRequest(const LockRequest & request);
+
     static void UnlockAfterUnlatch(intptr_t context);
 
 protected:
@@ -318,7 +328,7 @@ protected:
     /** Bring up the lock domain: cluster limits, storage, timers, LED. */
     CHIP_ERROR InitLock();
 
-private:
+
     enum class LockActuatorState : uint8_t
     {
         kLockInitiated = 0,
@@ -329,18 +339,38 @@ private:
         kUnlatchCompleted,
     };
 
+    LockActuatorState GetActuatorState() const { return mLockActuatorState; }
+
+    bool IsActuatorBusy() const;
+
+    bool NextState();
+
+    static void EnqueueLockRequest(const LockRequest & request);
+
+    void HandleLockRequestOnAppTask(const LockRequest & request);
+
+    static bool TryDrainStagedLockRequest(LockRequest & out);
+
+private:
     struct UnlatchContext
     {
         chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
         chip::app::DataModel::Nullable<chip::FabricIndex> mFabricIdx;
         chip::app::DataModel::Nullable<chip::NodeId> mNodeId;
+        chip::app::DataModel::Nullable<uint16_t> mUserIndex;
+        LockOpCredentials mCredential{};
+        bool mHasCredential = false;
 
         void Update(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
-                    const chip::app::DataModel::Nullable<chip::NodeId> & nodeId)
+                    const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
+                    const chip::app::DataModel::Nullable<uint16_t> & userIndex, const LockOpCredentials & cred, bool hasCred)
         {
-            mEndpointId = endpointId;
-            mFabricIdx  = fabricIdx;
-            mNodeId     = nodeId;
+            mEndpointId    = endpointId;
+            mFabricIdx     = fabricIdx;
+            mNodeId        = nodeId;
+            mUserIndex     = userIndex;
+            mCredential    = cred;
+            mHasCredential = hasCred;
         }
     };
 
@@ -350,20 +380,9 @@ private:
 
     bool MigrateLockConfig(const LockParam & params);
 
-    bool NextState();
-
-    /** @brief true while the actuator (or unlatch timer) is mid-transition. */
-    bool IsActuatorBusy() const;
-
     static void TimerEventHandler(void * timerCbArg);
 
     static void UpdateClusterState(intptr_t context);
-
-    static void EnqueueLockRequest(const LockRequest & request);
-
-    void HandleLockRequestOnAppTask(const LockRequest & request);
-
-    static bool TryDrainStagedLockRequest(LockRequest & out);
 
     static void PostLockActionEvent(int32_t actor, LockAction action);
 

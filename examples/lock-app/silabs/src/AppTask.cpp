@@ -870,10 +870,16 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
     unlockLeg.targetClusterState = DlLockState::kUnlocked;
     unlockLeg.fabricIdx          = appInstance().mUnlatchContext.mFabricIdx;
     unlockLeg.nodeId             = appInstance().mUnlatchContext.mNodeId;
+    unlockLeg.userIndex          = appInstance().mUnlatchContext.mUserIndex;
+    unlockLeg.credential         = appInstance().mUnlatchContext.mCredential;
+    unlockLeg.hasCredential      = appInstance().mUnlatchContext.mHasCredential;
     appInstance().mActiveRemoteAction    = unlockLeg;
     appInstance().mHasActiveRemoteAction = true;
 
     appInstance().mUnlatchContext.mEndpointId = chip::kInvalidEndpointId;
+    appInstance().mUnlatchContext.mUserIndex.SetNull();
+    appInstance().mUnlatchContext.mCredential    = {};
+    appInstance().mUnlatchContext.mHasCredential = false;
 
     PostLockActionEvent(AppEvent::kEventType_Lock, LockAction::kUnlock);
 }
@@ -927,8 +933,26 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 
         if (lock->mSyncClusterToButtonAction)
         {
-            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                UpdateClusterState, static_cast<intptr_t>(to_underlying(actionCompleted)));
+            DlLockState stateToReport = DlLockState::kUnknownEnumValue;
+            switch (actionCompleted)
+            {
+            case LockAction::kLock:
+                stateToReport = DlLockState::kLocked;
+                break;
+            case LockAction::kUnlock:
+                stateToReport = DlLockState::kUnlocked;
+                break;
+            case LockAction::kUnlatch:
+                stateToReport = DlLockState::kUnlatched;
+                break;
+            case LockAction::kInvalid:
+                break;
+            }
+            if (stateToReport != DlLockState::kUnknownEnumValue)
+            {
+                TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                    UpdateClusterState, static_cast<intptr_t>(chip::to_underlying(stateToReport)));
+            }
             lock->mSyncClusterToButtonAction = false;
         }
 
@@ -973,6 +997,11 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 
 // ---- Cross-thread `LockRequest` handoff -----------------------------------
 
+void AppTask::SubmitLockRequest(const LockRequest & request)
+{
+    EnqueueLockRequest(request);
+}
+
 void AppTask::EnqueueLockRequest(const LockRequest & request)
 {
     if (sStagedLockRequestMutex == nullptr)
@@ -981,7 +1010,6 @@ void AppTask::EnqueueLockRequest(const LockRequest & request)
         return;
     }
 
-    // Stage the request under the mutex (newest-wins coalescing).
     osStatus_t mutexStatus = osMutexAcquire(sStagedLockRequestMutex, osWaitForever);
     if (mutexStatus != osOK)
     {
@@ -1064,7 +1092,8 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         if (request.isUnboltUnlatch)
         {
-            mUnlatchContext.Update(request.endpointId, request.fabricIdx, request.nodeId);
+            mUnlatchContext.Update(request.endpointId, request.fabricIdx, request.nodeId, request.userIndex, request.credential,
+                                   request.hasCredential);
         }
         PushClusterLockState(request.endpointId, DlLockState::kNotFullyLocked, request.fabricIdx, request.nodeId, request.userIndex,
                              request.hasCredential ? &request.credential : nullptr, request.hasCredential);
@@ -1616,6 +1645,10 @@ DlStatus AppTask::DMDoorLockSetHolidaySchedule(chip::EndpointId endpointId, uint
 bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, Nullable<uint16_t> & outUserIndex,
                           LockOpCredentials & outCred, bool & outHasCred, OperationErrorEnum & err)
 {
+    char userNameBuffer[DOOR_LOCK_MAX_USER_NAME_SIZE];
+    CredentialStruct credentialsBuffer[kMaxCredentialsPerUser];
+    uint8_t credentialDataBuffer[kMaxCredentialSize];
+
     outUserIndex.SetNull();
     outHasCred = false;
 
@@ -1643,6 +1676,8 @@ bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::Byte
     for (uint32_t userIndex = 1; userIndex <= kMaxUsers; userIndex++)
     {
         EmberAfPluginDoorLockUserInfo user;
+        user.userName    = chip::MutableCharSpan(userNameBuffer);
+        user.credentials = chip::Span<CredentialStruct>(credentialsBuffer);
 
         if (!DMDoorLockGetUser(endpointId, userIndex, user))
         {
@@ -1663,6 +1698,7 @@ bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::Byte
             }
 
             EmberAfPluginDoorLockCredentialInfo credential;
+            credential.credentialData = chip::MutableByteSpan(credentialDataBuffer);
 
             if (!DMDoorLockGetCredential(endpointId, userCredential.credentialIndex, userCredential.credentialType, credential))
             {
