@@ -43,6 +43,8 @@ using Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
 
+static constexpr System::Clock::Seconds32 kImportAdminSecretMaxClockSkew(60); // per Matter spec
+
 NetworkIdentityManagementCluster::NetworkIdentityManagementCluster(EndpointId endpoint, NetworkIdentityStorage & storage,
                                                                    Crypto::NetworkIdentityKeystore & keystore,
                                                                    NetworkIdentityManagement::AuthenticatorDriver & authenticator) :
@@ -260,7 +262,8 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
     uint32_t currentTime;
     if ((err = System::Clock::GetClock_MatterEpochS(currentTime)) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnValue(newSecretData.created.count() <= currentTime + 60, Status::DynamicConstraintError);
+        VerifyOrReturnValue(newSecretData.created <= System::Clock::Seconds32(currentTime) + kImportAdminSecretMaxClockSkew,
+                            Status::DynamicConstraintError);
     }
     else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
