@@ -122,8 +122,7 @@ CHIP_ERROR AppTask::InitThermostat()
     }
 
     CHIP_ERROR err = appInstance().InitSensor();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
-                        SILABS_LOG("InitSensor() failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, SILABS_LOG("InitSensor() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
     PlatformMgr().LockChipStack();
     AppTask::UpdateThermoStatUI();
@@ -277,7 +276,7 @@ CHIP_ERROR AppTask::GetTemperature(int16_t & temperature)
     temperature = static_cast<int16_t>(tempSum / 100);
 #else
     // Simulated readings for boards without an Si70xx.
-    static constexpr int16_t kSimulatedTemp[] = { 2300, 2400, 2800, 2550, 2200, 2125, 2100, 2600, 1800, 2700 };
+    static constexpr int16_t kSimulatedTemp[]            = { 2300, 2400, 2800, 2550, 2200, 2125, 2100, 2600, 1800, 2700 };
     static constexpr uint16_t kSimulatedReadingFrequency = (60000 / kSensorTimerPeriodMs);
     static uint8_t sSimulatedIndex                       = 0;
     static uint8_t sNbOfRepetition                       = 0;
