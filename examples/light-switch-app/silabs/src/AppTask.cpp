@@ -238,9 +238,8 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     case AppEvent::kEventType_ActionButtonPressed:
         sActionButtonPressed = true;
         {
-            auto * switchData    = Platform::New<GenericSwitchEventData>();
-            VerifyOrReturn(switchData != nullptr,
-                           ChipLogError(AppServer, "GenericSwitchEventData allocation failed"));
+            auto * switchData = Platform::New<GenericSwitchEventData>();
+            VerifyOrReturn(switchData != nullptr, ChipLogError(AppServer, "GenericSwitchEventData allocation failed"));
             switchData->endpoint = gGenericSwitchEndpoint;
             switchData->event    = Switch::Events::InitialPress::Id;
             if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
@@ -305,9 +304,8 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
             }
         }
         {
-            auto * switchData    = Platform::New<GenericSwitchEventData>();
-            VerifyOrReturn(switchData != nullptr,
-                           ChipLogError(AppServer, "GenericSwitchEventData allocation failed"));
+            auto * switchData = Platform::New<GenericSwitchEventData>();
+            VerifyOrReturn(switchData != nullptr, ChipLogError(AppServer, "GenericSwitchEventData allocation failed"));
             switchData->endpoint = gGenericSwitchEndpoint;
             switchData->event    = Switch::Events::ShortRelease::Id;
             if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
@@ -322,10 +320,10 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     case AppEvent::kEventType_TriggerLevelControlAction: {
         BindingCommandData * data = Platform::New<BindingCommandData>();
         VerifyOrReturn(data != nullptr, ChipLogError(AppServer, "BindingCommandData allocation failed"));
-        data->localEndpointId     = gLightSwitchEndpoint;
-        data->clusterId           = Clusters::LevelControl::Id;
-        data->isGroup             = false;
-        data->commandId           = LevelControl::Commands::StepWithOnOff::Id;
+        data->localEndpointId = gLightSwitchEndpoint;
+        data->clusterId       = Clusters::LevelControl::Id;
+        data->isGroup         = false;
+        data->commandId       = LevelControl::Commands::StepWithOnOff::Id;
         BindingCommandData::Step stepData{ .stepMode       = gStepDirection,
                                            .stepSize       = kStepCommand.stepSize,
                                            .transitionTime = kStepCommand.transitionTime };
