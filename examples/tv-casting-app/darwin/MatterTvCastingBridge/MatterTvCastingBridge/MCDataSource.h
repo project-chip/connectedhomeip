@@ -58,10 +58,15 @@
 @optional
 
 /**
- * @brief Provides MCDeviceInstanceInfo (such as vendorName, productName, etc) used to override device instance info fields during commissioning
- * Fields set to nil will fall back to compile-time defaults.
+ * @brief Provides an object conforming to MCDeviceInstanceInfoProvider that the platform
+ * will query at runtime for device instance info fields (vendorName, productName, etc.)
+ * used during Matter commissioning.
+ *
+ * The platform pulls values from the returned provider each time they are needed,
+ * allowing the app to return dynamic data. Methods not implemented or returning nil
+ * will fall back to compile-time defaults.
  */
-- (MCDeviceInstanceInfo * _Nullable)castingAppDidReceiveRequestForDeviceInstanceInfo:(id _Nonnull)sender;
+- (id<MCDeviceInstanceInfoProvider> _Nullable)castingAppDidReceiveRequestForDeviceInstanceInfoProvider:(id _Nonnull)sender;
 
 @end
 

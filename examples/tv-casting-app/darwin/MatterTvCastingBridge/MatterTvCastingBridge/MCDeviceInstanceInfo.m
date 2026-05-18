@@ -15,47 +15,5 @@
  *    limitations under the License.
  */
 
-#import "MCDeviceInstanceInfo.h"
-#import <Foundation/Foundation.h>
-
-static const NSUInteger kMaxVendorNameLength = 32;
-static const NSUInteger kMaxProductNameLength = 32;
-static const NSUInteger kMaxSerialNumberLength = 32;
-static const NSUInteger kMaxHardwareVersionStringLength = 64;
-
-@implementation MCDeviceInstanceInfo
-
-- (instancetype _Nullable)initWithVendorName:(NSString * _Nullable)vendorName
-                                 productName:(NSString * _Nullable)productName
-                                    vendorId:(NSNumber * _Nullable)vendorId
-                                   productId:(NSNumber * _Nullable)productId
-                                serialNumber:(NSString * _Nullable)serialNumber
-                             hardwareVersion:(NSNumber * _Nullable)hardwareVersion
-                       hardwareVersionString:(NSString * _Nullable)hardwareVersionString
-{
-    if (vendorName != nil && [vendorName lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxVendorNameLength) {
-        return nil;
-    }
-    if (productName != nil && [productName lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxProductNameLength) {
-        return nil;
-    }
-    if (serialNumber != nil && [serialNumber lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxSerialNumberLength) {
-        return nil;
-    }
-    if (hardwareVersionString != nil && [hardwareVersionString lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > kMaxHardwareVersionStringLength) {
-        return nil;
-    }
-
-    if (self = [super init]) {
-        _vendorName = vendorName;
-        _productName = productName;
-        _vendorId = vendorId;
-        _productId = productId;
-        _serialNumber = serialNumber;
-        _hardwareVersion = hardwareVersion;
-        _hardwareVersionString = hardwareVersionString;
-    }
-    return self;
-}
-
-@end
+// MCDeviceInstanceInfo.h now defines a protocol (@protocol MCDeviceInstanceInfoProvider).
+// No implementation file is needed for a protocol definition.

@@ -20,29 +20,26 @@
 #ifndef MCDeviceInstanceInfo_h
 #define MCDeviceInstanceInfo_h
 
-@interface MCDeviceInstanceInfo : NSObject
+/**
+ * @brief Pull-based protocol for providing device instance info at runtime.
+ *
+ * Implement this protocol to supply device instance information fields
+ * used during Matter commissioning. The platform layer queries these methods
+ * when it needs each value, allowing the app to return dynamic/current data.
+ *
+ * All methods are optional. If a method is not implemented or returns nil,
+ * the platform falls back to compile-time defaults.
+ */
+@protocol MCDeviceInstanceInfoProvider <NSObject>
+@optional
 
-@property (nonatomic, strong, readonly) NSString * _Nullable vendorName;
-
-@property (nonatomic, strong, readonly) NSString * _Nullable productName;
-
-@property (nonatomic, strong, readonly) NSNumber * _Nullable vendorId;
-
-@property (nonatomic, strong, readonly) NSNumber * _Nullable productId;
-
-@property (nonatomic, strong, readonly) NSString * _Nullable serialNumber;
-
-@property (nonatomic, strong, readonly) NSNumber * _Nullable hardwareVersion;
-
-@property (nonatomic, strong, readonly) NSString * _Nullable hardwareVersionString;
-
-- (instancetype _Nullable)initWithVendorName:(NSString * _Nullable)vendorName
-                                 productName:(NSString * _Nullable)productName
-                                    vendorId:(NSNumber * _Nullable)vendorId
-                                   productId:(NSNumber * _Nullable)productId
-                                serialNumber:(NSString * _Nullable)serialNumber
-                             hardwareVersion:(NSNumber * _Nullable)hardwareVersion
-                       hardwareVersionString:(NSString * _Nullable)hardwareVersionString;
+- (NSString * _Nullable)vendorName;
+- (NSNumber * _Nullable)vendorId;
+- (NSString * _Nullable)productName;
+- (NSNumber * _Nullable)productId;
+- (NSString * _Nullable)serialNumber;
+- (NSNumber * _Nullable)hardwareVersion;
+- (NSString * _Nullable)hardwareVersionString;
 
 @end
 

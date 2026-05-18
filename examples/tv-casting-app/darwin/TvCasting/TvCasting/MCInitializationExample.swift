@@ -67,18 +67,8 @@ class MCAppParametersDataSource : NSObject, MCDataSource
         return commissionableData
     }
     
-    func castingAppDidReceiveRequestForDeviceInstanceInfo(_ sender: Any) -> MCDeviceInstanceInfo? {
-        // Sample values for demonstration only. Provide vendorName and productName to override the
-        // compile-time defaults shown on the casting target's PIN prompt during commissioning.
-        return MCDeviceInstanceInfo(
-            vendorName: "Test Vendor",
-            productName: "Test Casting App",
-            vendorId: nil,      // use default
-            productId: nil,      // use default
-            serialNumber: nil,   // use default
-            hardwareVersion: nil,
-            hardwareVersionString: nil
-        )
+    func castingAppDidReceiveRequestForDeviceInstanceInfoProvider(_ sender: Any) -> (any MCDeviceInstanceInfoProvider)? {
+        return SampleDeviceInstanceInfoProvider()
     }
     
     // dummy DAC values for demonstration only
@@ -131,6 +121,19 @@ class MCAppParametersDataSource : NSObject, MCDataSource
         return MCCryptoUtils.ecdsaAsn1SignatureToRaw(withFeLengthBytes: 32,
                                                     asn1Signature: asn1SignatureData!,
                                                          outRawSignature: &outRawSignature.pointee)
+    }
+}
+
+// Sample implementation of MCDeviceInstanceInfoProvider (pull-based).
+// The platform queries these methods at runtime whenever it needs a value.
+// Return nil from any method to fall back to compile-time defaults.
+class SampleDeviceInstanceInfoProvider: NSObject, MCDeviceInstanceInfoProvider {
+    func vendorName() -> String? {
+        return "Test Vendor"
+    }
+
+    func productName() -> String? {
+        return "Test Casting App"
     }
 }
 

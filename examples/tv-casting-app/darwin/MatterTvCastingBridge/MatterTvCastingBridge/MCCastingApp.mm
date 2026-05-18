@@ -37,7 +37,7 @@
 @property matter::casting::support::MCRotatingDeviceIdUniqueIdProvider uniqueIdProvider;
 @property matter::casting::support::MCCommissionableDataProvider * commissionableDataProvider;
 @property matter::casting::support::MCDeviceAttestationCredentialsProvider * dacProvider;
-@property matter::casting::support::MCDeviceInstanceInfoProvider * deviceInstanceInfoProvider;
+@property matter::casting::support::MCDeviceInstanceInfoProviderBridge * deviceInstanceInfoProvider;
 @property MCCommonCaseDeviceServerInitParamsProvider * serverInitParamsProvider;
 
 // queue used when calling the client code on completion blocks from any MatterTvCastingBridge API
@@ -95,15 +95,14 @@
 
     _serverInitParamsProvider = new MCCommonCaseDeviceServerInitParamsProvider();
 
-    // Initialize MCDeviceInstanceInfoProvider if the dataSource provides device instance info
-    if ([dataSource respondsToSelector:@selector(castingAppDidReceiveRequestForDeviceInstanceInfo:)]) {
-        MCDeviceInstanceInfo * deviceInstanceInfo = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfo:self];
-        if (deviceInstanceInfo != nil) {
-            ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() creating MCDeviceInstanceInfoProvider");
+    // Initialize MCDeviceInstanceInfoProviderBridge if the dataSource provides a delegate
+    if ([dataSource respondsToSelector:@selector(castingAppDidReceiveRequestForDeviceInstanceInfoProvider:)]) {
+        id<MCDeviceInstanceInfoProvider> infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
+        if (infoProvider != nil) {
+            ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting up pull-based MCDeviceInstanceInfoProviderBridge");
             delete _deviceInstanceInfoProvider;
-            _deviceInstanceInfoProvider = new matter::casting::support::MCDeviceInstanceInfoProvider();
-            VerifyOrReturnValue(_deviceInstanceInfoProvider->Initialize(deviceInstanceInfo) == CHIP_NO_ERROR,
-                [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
+            _deviceInstanceInfoProvider = new matter::casting::support::MCDeviceInstanceInfoProviderBridge();
+            _deviceInstanceInfoProvider->SetDelegate(infoProvider);
         }
     }
 

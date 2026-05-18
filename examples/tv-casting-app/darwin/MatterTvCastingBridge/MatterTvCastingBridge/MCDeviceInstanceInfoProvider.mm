@@ -28,135 +28,120 @@ namespace matter {
 namespace casting {
     namespace support {
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::Initialize(MCDeviceInstanceInfo * _Nonnull deviceInstanceInfo)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetVendorName(char * buf, size_t bufSize)
         {
-            VerifyOrReturnError(deviceInstanceInfo != nil, CHIP_ERROR_INVALID_ARGUMENT);
-
-            if (deviceInstanceInfo.vendorName != nil) {
-                chip::Platform::CopyString(mVendorName, sizeof(mVendorName), [deviceInstanceInfo.vendorName UTF8String]);
-                mHasVendorName = true;
-            }
-
-            if (deviceInstanceInfo.productName != nil) {
-                chip::Platform::CopyString(mProductName, sizeof(mProductName), [deviceInstanceInfo.productName UTF8String]);
-                mHasProductName = true;
-            }
-
-            if (deviceInstanceInfo.serialNumber != nil) {
-                chip::Platform::CopyString(mSerialNumber, sizeof(mSerialNumber), [deviceInstanceInfo.serialNumber UTF8String]);
-                mHasSerialNumber = true;
-            }
-
-            if (deviceInstanceInfo.hardwareVersionString != nil) {
-                chip::Platform::CopyString(mHardwareVersionString, sizeof(mHardwareVersionString), [deviceInstanceInfo.hardwareVersionString UTF8String]);
-                mHasHardwareVersionString = true;
-            }
-
-            if (deviceInstanceInfo.vendorId != nil) {
-                mVendorId.SetValue([deviceInstanceInfo.vendorId unsignedShortValue]);
-            }
-
-            if (deviceInstanceInfo.productId != nil) {
-                mProductId.SetValue([deviceInstanceInfo.productId unsignedShortValue]);
-            }
-
-            if (deviceInstanceInfo.hardwareVersion != nil) {
-                mHardwareVersion.SetValue([deviceInstanceInfo.hardwareVersion unsignedShortValue]);
-            }
-
-            return CHIP_NO_ERROR;
-        }
-
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetVendorName(char * buf, size_t bufSize)
-        {
-            if (mHasVendorName) {
-                VerifyOrReturnError(bufSize >= strlen(mVendorName) + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-                chip::Platform::CopyString(buf, bufSize, mVendorName);
-                return CHIP_NO_ERROR;
+            id<MCDeviceInstanceInfoProvider> delegate = mDelegate;
+            if (delegate != nil && [delegate respondsToSelector:@selector(vendorName)]) {
+                NSString * value = [delegate vendorName];
+                if (value != nil) {
+                    chip::Platform::CopyString(buf, bufSize, [value UTF8String]);
+                    return CHIP_NO_ERROR;
+                }
             }
             return mDefaultProvider.GetVendorName(buf, bufSize);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetProductName(char * buf, size_t bufSize)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetVendorId(uint16_t & vendorId)
         {
-            if (mHasProductName) {
-                VerifyOrReturnError(bufSize >= strlen(mProductName) + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-                chip::Platform::CopyString(buf, bufSize, mProductName);
-                return CHIP_NO_ERROR;
-            }
-            return mDefaultProvider.GetProductName(buf, bufSize);
-        }
-
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetVendorId(uint16_t & vendorId)
-        {
-            if (mVendorId.HasValue()) {
-                vendorId = mVendorId.Value();
-                return CHIP_NO_ERROR;
+            id<MCDeviceInstanceInfoProvider> delegate = mDelegate;
+            if (delegate != nil && [delegate respondsToSelector:@selector(vendorId)]) {
+                NSNumber * value = [delegate vendorId];
+                if (value != nil) {
+                    vendorId = [value unsignedShortValue];
+                    return CHIP_NO_ERROR;
+                }
             }
             return mDefaultProvider.GetVendorId(vendorId);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetProductId(uint16_t & productId)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetProductName(char * buf, size_t bufSize)
         {
-            if (mProductId.HasValue()) {
-                productId = mProductId.Value();
-                return CHIP_NO_ERROR;
+            id<MCDeviceInstanceInfoProvider> delegate = mDelegate;
+            if (delegate != nil && [delegate respondsToSelector:@selector(productName)]) {
+                NSString * value = [delegate productName];
+                if (value != nil) {
+                    chip::Platform::CopyString(buf, bufSize, [value UTF8String]);
+                    return CHIP_NO_ERROR;
+                }
+            }
+            return mDefaultProvider.GetProductName(buf, bufSize);
+        }
+
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetProductId(uint16_t & productId)
+        {
+            id<MCDeviceInstanceInfoProvider> delegate = mDelegate;
+            if (delegate != nil && [delegate respondsToSelector:@selector(productId)]) {
+                NSNumber * value = [delegate productId];
+                if (value != nil) {
+                    productId = [value unsignedShortValue];
+                    return CHIP_NO_ERROR;
+                }
             }
             return mDefaultProvider.GetProductId(productId);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetSerialNumber(char * buf, size_t bufSize)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetSerialNumber(char * buf, size_t bufSize)
         {
-            if (mHasSerialNumber) {
-                VerifyOrReturnError(bufSize >= strlen(mSerialNumber) + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-                chip::Platform::CopyString(buf, bufSize, mSerialNumber);
-                return CHIP_NO_ERROR;
+            id<MCDeviceInstanceInfoProvider> delegate = mDelegate;
+            if (delegate != nil && [delegate respondsToSelector:@selector(serialNumber)]) {
+                NSString * value = [delegate serialNumber];
+                if (value != nil) {
+                    chip::Platform::CopyString(buf, bufSize, [value UTF8String]);
+                    return CHIP_NO_ERROR;
+                }
             }
             return mDefaultProvider.GetSerialNumber(buf, bufSize);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetHardwareVersion(uint16_t & hardwareVersion)
         {
-            if (mHardwareVersion.HasValue()) {
-                hardwareVersion = mHardwareVersion.Value();
-                return CHIP_NO_ERROR;
+            id<MCDeviceInstanceInfoProvider> delegate = mDelegate;
+            if (delegate != nil && [delegate respondsToSelector:@selector(hardwareVersion)]) {
+                NSNumber * value = [delegate hardwareVersion];
+                if (value != nil) {
+                    hardwareVersion = [value unsignedShortValue];
+                    return CHIP_NO_ERROR;
+                }
             }
             return mDefaultProvider.GetHardwareVersion(hardwareVersion);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetHardwareVersionString(char * buf, size_t bufSize)
         {
-            if (mHasHardwareVersionString) {
-                VerifyOrReturnError(bufSize >= strlen(mHardwareVersionString) + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-                chip::Platform::CopyString(buf, bufSize, mHardwareVersionString);
-                return CHIP_NO_ERROR;
+            id<MCDeviceInstanceInfoProvider> delegate = mDelegate;
+            if (delegate != nil && [delegate respondsToSelector:@selector(hardwareVersionString)]) {
+                NSString * value = [delegate hardwareVersionString];
+                if (value != nil) {
+                    chip::Platform::CopyString(buf, bufSize, [value UTF8String]);
+                    return CHIP_NO_ERROR;
+                }
             }
             return mDefaultProvider.GetHardwareVersionString(buf, bufSize);
         }
 
         // Delegated methods — always forward to default provider
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetPartNumber(char * buf, size_t bufSize)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetPartNumber(char * buf, size_t bufSize)
         {
             return mDefaultProvider.GetPartNumber(buf, bufSize);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetProductURL(char * buf, size_t bufSize)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetProductURL(char * buf, size_t bufSize)
         {
             return mDefaultProvider.GetProductURL(buf, bufSize);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetProductLabel(char * buf, size_t bufSize)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetProductLabel(char * buf, size_t bufSize)
         {
             return mDefaultProvider.GetProductLabel(buf, bufSize);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
         {
             return mDefaultProvider.GetManufacturingDate(year, month, day);
         }
 
-        CHIP_ERROR MCDeviceInstanceInfoProvider::GetRotatingDeviceIdUniqueId(chip::MutableByteSpan & uniqueIdSpan)
+        CHIP_ERROR MCDeviceInstanceInfoProviderBridge::GetRotatingDeviceIdUniqueId(chip::MutableByteSpan & uniqueIdSpan)
         {
             return mDefaultProvider.GetRotatingDeviceIdUniqueId(uniqueIdSpan);
         }

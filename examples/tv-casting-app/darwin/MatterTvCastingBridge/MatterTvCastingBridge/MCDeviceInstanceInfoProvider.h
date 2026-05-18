@@ -33,12 +33,16 @@ namespace matter {
 namespace casting {
 namespace support {
 
-class MCDeviceInstanceInfoProvider : public chip::DeviceLayer::DeviceInstanceInfoProvider
+/**
+ * Pull-based DeviceInstanceInfoProvider that queries an ObjC delegate
+ * each time the platform layer requests a value.
+ */
+class MCDeviceInstanceInfoProviderBridge : public chip::DeviceLayer::DeviceInstanceInfoProvider
 {
 public:
-    CHIP_ERROR Initialize(MCDeviceInstanceInfo * _Nonnull deviceInstanceInfo);
+    void SetDelegate(id<MCDeviceInstanceInfoProvider> _Nullable delegate) { mDelegate = delegate; }
 
-    // Overridden methods — return app value if provided, else delegate to default
+    // Overridden methods — query delegate if available, else fall back to default
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
@@ -55,22 +59,7 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(chip::MutableByteSpan & uniqueIdSpan) override;
 
 private:
-    bool mHasVendorName = false;
-    char mVendorName[chip::DeviceLayer::ConfigurationManager::kMaxVendorNameLength + 1];
-
-    bool mHasProductName = false;
-    char mProductName[chip::DeviceLayer::ConfigurationManager::kMaxProductNameLength + 1];
-
-    bool mHasSerialNumber = false;
-    char mSerialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-
-    bool mHasHardwareVersionString = false;
-    char mHardwareVersionString[chip::DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength + 1];
-
-    chip::Optional<uint16_t> mVendorId;
-    chip::Optional<uint16_t> mProductId;
-    chip::Optional<uint16_t> mHardwareVersion;
-
+    __weak id<MCDeviceInstanceInfoProvider> _Nullable mDelegate = nil;
     chip::DeviceLayer::DeviceInstanceInfoProviderImpl mDefaultProvider;
 };
 
