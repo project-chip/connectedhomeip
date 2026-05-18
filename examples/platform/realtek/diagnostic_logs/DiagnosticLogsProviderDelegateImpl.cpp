@@ -84,6 +84,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 
     outHandle                          = mLogSessionHandle;
     mSessionSpanMap[mLogSessionHandle] = MutableByteSpan(diagData, diagSize);
+    mSessionDataMap[mLogSessionHandle] = diagData;
 
     return CHIP_NO_ERROR;
 }
@@ -93,8 +94,9 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionSpanMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    free(mSessionSpanMap[sessionHandle].data());
+    free(mSessionDataMap[sessionHandle]);
     mSessionSpanMap.erase(sessionHandle);
+    mSessionDataMap.erase(sessionHandle);
 
     return CHIP_NO_ERROR;
 }

@@ -66,6 +66,7 @@ private:
     LogProvider & operator=(const LogProvider &) = delete;
 
     std::map<LogSessionHandle, MutableByteSpan> mSessionSpanMap;
+    std::map<LogSessionHandle, uint8_t *> mSessionDataMap;
     LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
 
     StorageKeyName GetKeyForIntent(IntentEnum intent) const;
