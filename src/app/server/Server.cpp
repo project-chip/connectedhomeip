@@ -916,6 +916,12 @@ void Server::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // EventManagement::Init() guards against double-init with a state check.
+    // Reset it here (after IME shutdown, which may trigger cluster shutdowns
+    // that access EventManagement) so a subsequent Server::Init() can re-initialize it.
+    app::EventManagement::DestroyEventManagement();
+
     // Shut down any remaining sessions (and hence exchanges) before we do any
     // futher teardown.  CASE handshakes have been shut down already via
     // shutting down mCASESessionManager and mCASEServer above; shutting
