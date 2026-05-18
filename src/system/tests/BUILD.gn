@@ -42,7 +42,7 @@ chip_test_suite("tests") {
   # SystemPacketBuffer on nrfconnect/esp32 uses LwIP buffers, which ignore the
   #  requested allocation size and always allocate at max-size.  So our test,
   #  which tries to size-limit the buffers, does not work correctly there.
-  if ((chip_device_platform != "nrfconnect") && (chip_device_platform != "esp32")) {
+  if (chip_device_platform != "nrfconnect" && chip_device_platform != "esp32") {
     test_sources += [ "TestTLVPacketBufferBackingStore.cpp" ]
   }
 
