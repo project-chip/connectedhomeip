@@ -328,7 +328,6 @@ protected:
     /** Bring up the lock domain: cluster limits, storage, timers, LED. */
     CHIP_ERROR InitLock();
 
-
     enum class LockActuatorState : uint8_t
     {
         kLockInitiated = 0,

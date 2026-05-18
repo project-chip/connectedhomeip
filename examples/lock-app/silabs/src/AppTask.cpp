@@ -865,15 +865,15 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
         SILABS_LOG("ERR: setting transitional NotFullyLocked %x (auto-unlock after unlatch)", chip::to_underlying(status));
     }
 
-    LockRequest unlockLeg        = {};
-    unlockLeg.endpointId         = appInstance().mUnlatchContext.mEndpointId;
-    unlockLeg.action             = LockAction::kUnlock;
-    unlockLeg.targetClusterState = DlLockState::kUnlocked;
-    unlockLeg.fabricIdx          = appInstance().mUnlatchContext.mFabricIdx;
-    unlockLeg.nodeId             = appInstance().mUnlatchContext.mNodeId;
-    unlockLeg.userIndex          = appInstance().mUnlatchContext.mUserIndex;
-    unlockLeg.credential         = appInstance().mUnlatchContext.mCredential;
-    unlockLeg.hasCredential      = appInstance().mUnlatchContext.mHasCredential;
+    LockRequest unlockLeg                = {};
+    unlockLeg.endpointId                 = appInstance().mUnlatchContext.mEndpointId;
+    unlockLeg.action                     = LockAction::kUnlock;
+    unlockLeg.targetClusterState         = DlLockState::kUnlocked;
+    unlockLeg.fabricIdx                  = appInstance().mUnlatchContext.mFabricIdx;
+    unlockLeg.nodeId                     = appInstance().mUnlatchContext.mNodeId;
+    unlockLeg.userIndex                  = appInstance().mUnlatchContext.mUserIndex;
+    unlockLeg.credential                 = appInstance().mUnlatchContext.mCredential;
+    unlockLeg.hasCredential              = appInstance().mUnlatchContext.mHasCredential;
     appInstance().mActiveRemoteAction    = unlockLeg;
     appInstance().mHasActiveRemoteAction = true;
 
