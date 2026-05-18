@@ -125,8 +125,8 @@ CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::OnOff::Commands::On::Id;
-    data->clusterId = Clusters::OnOff::Id;
+    data->commandId           = Clusters::OnOff::Commands::On::Id;
+    data->clusterId           = Clusters::OnOff::Id;
 
     return ScheduleSwitchWorker(data);
 }
@@ -134,8 +134,8 @@ CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId = Clusters::OnOff::Id;
+    data->commandId           = Clusters::OnOff::Commands::Off::Id;
+    data->clusterId           = Clusters::OnOff::Id;
 
     return ScheduleSwitchWorker(data);
 }
@@ -143,8 +143,8 @@ CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId = Clusters::OnOff::Id;
+    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
+    data->clusterId           = Clusters::OnOff::Id;
 
     return ScheduleSwitchWorker(data);
 }
@@ -230,9 +230,9 @@ CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::OnOff::Commands::On::Id;
-    data->clusterId = Clusters::OnOff::Id;
-    data->isGroup   = true;
+    data->commandId           = Clusters::OnOff::Commands::On::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isGroup             = true;
 
     return ScheduleSwitchWorker(data);
 }
@@ -240,9 +240,9 @@ CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId = Clusters::OnOff::Id;
-    data->isGroup   = true;
+    data->commandId           = Clusters::OnOff::Commands::Off::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isGroup             = true;
 
     return ScheduleSwitchWorker(data);
 }
@@ -250,9 +250,9 @@ CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId = Clusters::OnOff::Id;
-    data->isGroup   = true;
+    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isGroup             = true;
 
     return ScheduleSwitchWorker(data);
 }
@@ -285,9 +285,9 @@ CHIP_ERROR MoveToLevelSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::MoveToLevel::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::MoveToLevel{};
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -307,9 +307,9 @@ CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::Move::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::Move{};
+    data->commandId           = Clusters::LevelControl::Commands::Move::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -330,8 +330,8 @@ CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::Step::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::Step::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -353,8 +353,8 @@ CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::Stop::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
@@ -374,9 +374,9 @@ CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::MoveToLevel{};
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -397,9 +397,9 @@ CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::Move{};
+    data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -420,8 +420,8 @@ CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::StepWithOnOff::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -444,8 +444,8 @@ CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::StopWithOnOff::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
@@ -644,9 +644,9 @@ CHIP_ERROR GroupsMoveToLevelSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::MoveToLevel::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::MoveToLevel{};
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -668,9 +668,9 @@ CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::Move::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::Move{};
+    data->commandId           = Clusters::LevelControl::Commands::Move::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -692,8 +692,8 @@ CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::Step::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::Step::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -717,8 +717,8 @@ CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::Stop::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
@@ -739,9 +739,9 @@ CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::MoveToLevel{};
+    data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::MoveToLevel{};
     char * endPtr;
     if (auto * moveToLevel = std::get_if<BindingCommandData::MoveToLevel>(&data->commandData))
     {
@@ -763,9 +763,9 @@ CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId   = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
-    data->clusterId   = Clusters::LevelControl::Id;
-    data->commandData = BindingCommandData::Move{};
+    data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->commandData         = BindingCommandData::Move{};
     char * endPtr;
     if (auto * move = std::get_if<BindingCommandData::Move>(&data->commandData))
     {
@@ -787,8 +787,8 @@ CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::StepWithOnOff::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Step{};
     if (auto * step = std::get_if<BindingCommandData::Step>(&data->commandData))
@@ -812,8 +812,8 @@ CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId = Clusters::LevelControl::Commands::StopWithOnOff::Id;
-    data->clusterId = Clusters::LevelControl::Id;
+    data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
     data->commandData = BindingCommandData::Stop{};
     if (auto * stop = std::get_if<BindingCommandData::Stop>(&data->commandData))
