@@ -210,12 +210,12 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         asserts.assert_greater_equal(
             len(supportedFormats), 1, "SupportedFormats must not be empty"
         )
-        for format in supportedFormats:
+        for fmt in supportedFormats:
             validContainerformat = (
-                format.containerFormat == pushavCluster.Enums.ContainerFormatEnum.kCmaf
+                fmt.containerFormat == pushavCluster.Enums.ContainerFormatEnum.kCmaf
             )
             isValidIngestMethod = (
-                format.ingestMethod == pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest
+                fmt.ingestMethod == pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest
             )
             asserts.assert_true(
                 (validContainerformat and isValidIngestMethod),

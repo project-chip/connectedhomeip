@@ -61,6 +61,7 @@
 #include <clusters/DishwasherAlarm/Enums.h>
 #include <clusters/DishwasherMode/Enums.h>
 #include <clusters/DoorLock/Enums.h>
+#include <clusters/DynamicLighting/Enums.h>
 #include <clusters/EcosystemInformation/Enums.h>
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
 #include <clusters/ElectricalGridConditions/Enums.h>

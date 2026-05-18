@@ -49,6 +49,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/DishwasherAlarm" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/DishwasherMode" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/DoorLock" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/DynamicLighting" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/EcosystemInformation" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ElectricalEnergyMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ElectricalGridConditions" + invoker.target,
