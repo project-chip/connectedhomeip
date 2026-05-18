@@ -30,8 +30,6 @@
 
 #include <stdint.h>
 
-#include <lib/core/DataModelTypes.h>
-
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -106,9 +104,6 @@
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
 
 namespace SilabsDoorLockConfig {
-
-static constexpr chip::EndpointId kLockEndpointId = 1;
-
 namespace ResourceRanges {
 // Used to size arrays
 static constexpr uint16_t kMaxUsers                  = 10;
@@ -147,6 +142,3 @@ static constexpr uint8_t kNumCredentialTypes         = 6;
 #ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 #endif
-
-// Route BaseApplication data-model posts and Rpc button path through CustomerAppTask / AppTaskImpl (CRTP).
-#define CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

@@ -26,7 +26,6 @@ struct AppEvent : public BaseAppEvent
     enum AppEventTypes
     {
         kEventType_Lock = BaseAppEvent::kEventType_Max + 1,
-        kEventType_LockRequest,
     };
 
     union
@@ -36,9 +35,5 @@ struct AppEvent : public BaseAppEvent
             uint8_t Action;
             int32_t Actor;
         } LockEvent;
-        struct
-        {
-            void * Request;
-        } LockRequestEvent;
     };
 };
