@@ -88,6 +88,8 @@
 #include <clusters/DishwasherMode/MetadataProvider.h>
 #include <clusters/DoorLock/Ids.h>
 #include <clusters/DoorLock/MetadataProvider.h>
+#include <clusters/DynamicLighting/Ids.h>
+#include <clusters/DynamicLighting/MetadataProvider.h>
 #include <clusters/EcosystemInformation/Ids.h>
 #include <clusters/EcosystemInformation/MetadataProvider.h>
 #include <clusters/ElectricalEnergyMeasurement/Ids.h>
@@ -514,6 +516,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == DoorLock::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DoorLock::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == DynamicLighting::Id) || ...))
+    {
+        if (id == DynamicLighting::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, DynamicLighting::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == EcosystemInformation::Id) || ...))
     {

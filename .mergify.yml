@@ -53,8 +53,10 @@ pull_request_rules:
           backport:
               branches:
                   - v1.6-sve-branch
+              labels:
+                  - backport-v1.6-sve-branch
 
-    - name: Backport to supported branches
+    - name: Backport to v1.5-branch
       conditions:
           - merged
           - base=master
@@ -63,10 +65,22 @@ pull_request_rules:
           backport:
               branches:
                   - v1.5-branch
+              labels:
+                  - backport-v1.5-branch
+
+    - name: Backport to v1.4.2-branch
+      conditions:
+          - merged
+          - base=master
+          - label="request-backport-supported"
+      actions:
+          backport:
+              branches:
                   - v1.4.2-branch
+              labels:
+                  - backport-v1.4.2-branch
 
     # Auto-merge backport PRs when CI is green and there are no conflicts.
-    # Mergify automatically labels backport PRs it creates as backport-{target-branch}.
     # If a cherry-pick has conflicts or CI fails, the PR is left open for manual resolution.
     # WARNING: If the rule name below is changed, you must also update the
     # condition `check-failure~=Auto-merge clean backport PRs` to match the new name.

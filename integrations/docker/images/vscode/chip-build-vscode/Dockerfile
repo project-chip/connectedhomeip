@@ -43,6 +43,7 @@ COPY --from=telink /opt/telink/zephyr-sdk-0.17.0 /opt/telink/zephyr-sdk-0.17.0
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
 COPY --from=crosscompile /opt/ubuntu-24.04-aarch64-sysroot /opt/ubuntu-24.04-aarch64-sysroot
+COPY --from=crosscompile /opt/ubuntu-24.04-armhf-sysroot /opt/ubuntu-24.04-armhf-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
@@ -115,6 +116,7 @@ ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
+ENV SYSROOT_ARMHF=/opt/ubuntu-24.04-armhf-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.22.0

@@ -74,7 +74,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         uint16_t endpointTableSize = 0;
-        VerifyOrDie(Attributes::SceneTableSize::Get(endpointId, &endpointTableSize) ==
+        VerifyOrDie(Attributes::SceneTableSize::GetDefault(endpointId, &endpointTableSize) ==
                     Protocols::InteractionModel::Status::Success);
 
         // Guaranteed non-null: if CreateRegistration is called, this means the ember cluster

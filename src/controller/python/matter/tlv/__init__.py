@@ -242,16 +242,16 @@ class TLVWriter(object):
     def putSignedInt(self, tag, val):
         """Write a value as a TLV signed integer with the specified TLV tag."""
         if val >= INT8_MIN and val <= INT8_MAX:
-            format = "<b"
+            fmt = "<b"
         elif val >= INT16_MIN and val <= INT16_MAX:
-            format = "<h"
+            fmt = "<h"
         elif val >= INT32_MIN and val <= INT32_MAX:
-            format = "<l"
+            fmt = "<l"
         elif val >= INT64_MIN and val <= INT64_MAX:
-            format = "<q"
+            fmt = "<q"
         else:
             raise ValueError("Integer value out of range")
-        val = struct.pack(format, val)
+        val = struct.pack(fmt, val)
         controlAndTag = self._encodeControlAndTag(
             TLV_TYPE_SIGNED_INTEGER, tag, lenOfLenOrVal=len(val)
         )
@@ -309,10 +309,10 @@ class TLVWriter(object):
     def putBool(self, tag, val):
         """Write a value as a TLV boolean with the specified TLV tag."""
         if val:
-            type = TLVBoolean_True
+            tlv_type = TLVBoolean_True
         else:
-            type = TLVBoolean_False
-        controlAndTag = self._encodeControlAndTag(type, tag)
+            tlv_type = TLVBoolean_False
+        controlAndTag = self._encodeControlAndTag(tlv_type, tag)
         self._encoding.extend(controlAndTag)
 
     def putNull(self, tag):
@@ -349,8 +349,8 @@ class TLVWriter(object):
         controlAndTag = self._encodeControlAndTag(TLVEndOfContainer, None)
         self._encoding.extend(controlAndTag)
 
-    def _encodeControlAndTag(self, type, tag, lenOfLenOrVal=0):
-        controlByte = type
+    def _encodeControlAndTag(self, ctl, tag, lenOfLenOrVal=0):
+        controlByte = ctl
         if lenOfLenOrVal == 2:
             controlByte |= 1
         elif lenOfLenOrVal == 4:
@@ -359,7 +359,7 @@ class TLVWriter(object):
             controlByte |= 3
         if tag is None:
             if (
-                type != TLVEndOfContainer
+                ctl != TLVEndOfContainer
                 and len(self._containerStack) != 0
                 and self._containerStack[0] == TLV_TYPE_STRUCTURE
             ):
@@ -425,16 +425,16 @@ class TLVWriter(object):
         if val < 0:
             raise ValueError("Integer value out of range")
         if val <= UINT8_MAX:
-            format = "<B"
+            fmt = "<B"
         elif val <= UINT16_MAX:
-            format = "<H"
+            fmt = "<H"
         elif val <= UINT32_MAX:
-            format = "<L"
+            fmt = "<L"
         elif val <= UINT64_MAX:
-            format = "<Q"
+            fmt = "<Q"
         else:
             raise ValueError("Integer value out of range")
-        return struct.pack(format, val)
+        return struct.pack(fmt, val)
 
     @staticmethod
     def _verifyValidContainerType(containerType):

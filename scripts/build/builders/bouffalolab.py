@@ -18,7 +18,9 @@ import re
 import time
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 log = logging.getLogger(__name__)
@@ -77,8 +79,9 @@ class BouffalolabThreadType(Enum):
 class BouffalolabBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: BouffalolabApp = BouffalolabApp.LIGHT,
                  board: BouffalolabBoard = BouffalolabBoard.BL616DK,
                  enable_rpcs: bool = False,
@@ -114,7 +117,8 @@ class BouffalolabBuilder(GnBuilder):
         super(BouffalolabBuilder, self).__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), 'bouffalolab', bouffalo_chip),
-            runner=runner
+            runner=runner,
+            output_dir_lock=output_dir_lock
         )
 
         self.argsOpt = []
@@ -288,6 +292,7 @@ class BouffalolabBuilder(GnBuilder):
         args.extend(self.argsOpt)
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out"]
         if self.options.enable_link_map_file:
@@ -296,12 +301,14 @@ class BouffalolabBuilder(GnBuilder):
             name = f"{self.app.AppNamePrefix(self.chip_name)}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
+    @lock_output_dir
     def PreBuildCommand(self):
         os.system("rm -rf {}/config".format(self.output_dir))
         os.system("rm -rf {}/ota_images".format(self.output_dir))
         os.system("rm -rf {}".format(os.path.join(self.output_dir, 'boot2*.bin')))
         os.system("rm -rf {}".format(os.path.join(self.output_dir, '%s*' % self.app.AppNamePrefix(self.chip_name))))
 
+    @lock_output_dir
     def PostBuildCommand(self):
 
         if self.chip_name in ["bl616"]:

@@ -113,6 +113,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Bridged Device Basic Information
     - Camera AV Stream Management
     - Chime
     - Closure Control
