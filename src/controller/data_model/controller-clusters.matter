@@ -9160,15 +9160,15 @@ provisional cluster AmbientSensingUnion = 1074 {
     UnionContributorHealthEum contributorHealth = 3;
   }
 
-  info event UnionContributorAdded = 0 {
+  provisional info event UnionContributorAdded = 0 {
     UnionContributorStruct addedContributor = 0;
   }
 
-  info event UnionContributorRemoved = 1 {
+  provisional info event UnionContributorRemoved = 1 {
     UnionContributorStruct removedContributor = 0;
   }
 
-  info event UnionContributorHealthChanged = 2 {
+  provisional info event UnionContributorHealthChanged = 2 {
     UnionContributorStruct contributorHealth = 0;
   }
 
