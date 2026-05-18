@@ -1633,7 +1633,7 @@ bool AppTask::ValidatePin(chip::EndpointId endpointId, const Optional<chip::Byte
     }
 
     // Check all pin codes associated to all users to see if this pin code exists.
-    for (uint32_t userIndex = 1; userIndex <= kMaxUsers; userIndex++)
+    for (uint32_t userIndex = 1; userIndex <= mLockParams.numberOfUsers; userIndex++)
     {
         EmberAfPluginDoorLockUserInfo user;
         user.userName    = chip::MutableCharSpan(userNameBuffer);
