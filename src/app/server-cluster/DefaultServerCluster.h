@@ -18,6 +18,7 @@
 
 #include <access/Privilege.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
@@ -118,36 +119,40 @@ protected:
     ///
     /// This increases cluster data version and if a cluster context is available it will
     /// notify that the attribute has changed.
-    void NotifyAttributeChanged(AttributeId attributeId);
+    void NotifyAttributeChanged(AttributeId attributeId,
+                                DataModel::AttributeChangeType type = DataModel::AttributeChangeType::kReportable);
 
     /// Apply the very common pattern of:
     ///   - if a variable value needs changing, update and NotifyAttributeChanged
     ///
     /// Returns true if the value has been updated to a new value.
     template <typename T, typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
-    bool SetAttributeValue(T & dest, const U & value, AttributeId attributeId)
+    bool SetAttributeValue(T & dest, const U & value, AttributeId attributeId,
+                           DataModel::AttributeChangeType type = DataModel::AttributeChangeType::kReportable)
     {
         VerifyOrReturnValue(dest != value, false);
         dest = value;
-        NotifyAttributeChanged(attributeId);
+        NotifyAttributeChanged(attributeId, type);
         return true;
     }
 
     template <typename T>
-    bool SetAttributeValue(DataModel::Nullable<T> & dest, decltype(DataModel::NullNullable), AttributeId attributeId)
+    bool SetAttributeValue(DataModel::Nullable<T> & dest, decltype(DataModel::NullNullable), AttributeId attributeId,
+                           DataModel::AttributeChangeType type = DataModel::AttributeChangeType::kReportable)
     {
         VerifyOrReturnValue(!dest.IsNull(), false);
         dest.SetNull();
-        NotifyAttributeChanged(attributeId);
+        NotifyAttributeChanged(attributeId, type);
         return true;
     }
 
     template <typename T, typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
-    bool SetAttributeValue(DataModel::Nullable<T> & dest, const U & value, AttributeId attributeId)
+    bool SetAttributeValue(DataModel::Nullable<T> & dest, const U & value, AttributeId attributeId,
+                           DataModel::AttributeChangeType type = DataModel::AttributeChangeType::kReportable)
     {
         VerifyOrReturnValue(dest != static_cast<T>(value), false);
         dest.SetNonNull(value);
-        NotifyAttributeChanged(attributeId);
+        NotifyAttributeChanged(attributeId, type);
         return true;
     }
 

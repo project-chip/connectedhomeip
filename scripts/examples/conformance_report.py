@@ -67,11 +67,11 @@ def find_executables(dirs):
       A list of paths to the first executable found in each directory.
     """
     executables = []
-    for dir in dirs:
-        if not os.path.isdir(dir):
+    for directory in dirs:
+        if not os.path.isdir(directory):
             continue
-        for filename in os.listdir(dir):
-            filepath = os.path.join(dir, filename)
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
             if os.path.isfile(filepath) and os.access(filepath, os.X_OK):
                 executables.append(filepath)
                 break  # Move to the next directory
