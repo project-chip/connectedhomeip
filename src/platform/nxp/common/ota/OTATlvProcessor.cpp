@@ -96,13 +96,16 @@ void OTADataAccumulator::Clear()
 
 CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 {
-    // Init() may have left mBuffer null on alloc failure.
-    VerifyOrReturnError(mBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
-
     uint32_t numBytes = std::min(mThreshold - mBufferOffset, static_cast<uint32_t>(block.size()));
-    memcpy(&mBuffer[mBufferOffset], block.data(), numBytes);
-    mBufferOffset += numBytes;
-    block = block.SubSpan(numBytes);
+    // Init() returns void; an alloc failure leaves mBuffer null.
+    // Only enforce the precondition when there is data to copy.
+    if (numBytes > 0)
+    {
+        VerifyOrReturnError(mBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        memcpy(&mBuffer[mBufferOffset], block.data(), numBytes);
+        mBufferOffset += numBytes;
+        block = block.SubSpan(numBytes);
+    }
 
     if (mBufferOffset < mThreshold)
     {
