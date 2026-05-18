@@ -96,7 +96,7 @@ void MicrowaveOvenMode::Shutdown()
     }
 }
 
-void MatterOvenModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
     gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::ExampleMicrowaveOvenModeDelegate;
@@ -104,7 +104,7 @@ void MatterOvenModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gMicrowaveOvenModeInstance->Init();
 }
 
-void MatterOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+void MatterMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gMicrowaveOvenModeInstance)
     {
