@@ -239,10 +239,15 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         sActionButtonPressed = true;
         {
             auto * switchData    = Platform::New<GenericSwitchEventData>();
+            VerifyOrReturn(switchData != nullptr, ChipLogError(NotSpecified, "GenericSwitchEventData allocation failed"));
             switchData->endpoint = gGenericSwitchEndpoint;
             switchData->event    = Switch::Events::InitialPress::Id;
-            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
-                                                                             reinterpret_cast<intptr_t>(switchData));
+            if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
+                                                        reinterpret_cast<intptr_t>(switchData)) != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed to schedule generic switch work");
+                Platform::Delete(switchData);
+            }
         }
         if (sFunctionButtonPressed)
         {
@@ -279,24 +284,35 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         else
         {
             BindingCommandData * toggleData = Platform::New<BindingCommandData>();
+            VerifyOrReturn(toggleData != nullptr, ChipLogError(NotSpecified, "BindingCommandData allocation failed"));
             toggleData->localEndpointId     = gLightSwitchEndpoint;
             toggleData->clusterId           = Clusters::OnOff::Id;
             toggleData->isGroup             = false;
             toggleData->commandId           = OnOff::Commands::Toggle::Id;
-            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction,
-                                                                             reinterpret_cast<intptr_t>(toggleData));
+            if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction,
+                                                        reinterpret_cast<intptr_t>(toggleData)) != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed to schedule switch worker");
+                Platform::Delete(toggleData);
+            }
         }
         {
             auto * switchData    = Platform::New<GenericSwitchEventData>();
+            VerifyOrReturn(switchData != nullptr, ChipLogError(NotSpecified, "GenericSwitchEventData allocation failed"));
             switchData->endpoint = gGenericSwitchEndpoint;
             switchData->event    = Switch::Events::ShortRelease::Id;
-            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
-                                                                             reinterpret_cast<intptr_t>(switchData));
+            if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
+                                                        reinterpret_cast<intptr_t>(switchData)) != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed to schedule generic switch work");
+                Platform::Delete(switchData);
+            }
         }
         break;
 
     case AppEvent::kEventType_TriggerLevelControlAction: {
         BindingCommandData * data = Platform::New<BindingCommandData>();
+        VerifyOrReturn(data != nullptr, ChipLogError(NotSpecified, "BindingCommandData allocation failed"));
         data->localEndpointId     = gLightSwitchEndpoint;
         data->clusterId           = Clusters::LevelControl::Id;
         data->isGroup             = false;
@@ -307,8 +323,12 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         stepData.optionsMask.Set(kStepCommand.optionsMask);
         stepData.optionsOverride.Set(kStepCommand.optionsOverride);
         data->commandData = stepData;
-        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction,
-                                                                         reinterpret_cast<intptr_t>(data));
+        if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)) !=
+            CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to schedule switch worker");
+            Platform::Delete(data);
+        }
     }
     break;
 
@@ -341,6 +361,8 @@ CHIP_ERROR AppTask::InitLightSwitch(EndpointId lightSwitchEndpoint, EndpointId g
 
 void AppTask::GenericSwitchWorkerFunction(intptr_t context)
 {
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "GenericSwitchWorkerFunction - Invalid work"));
+
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
 
     switch (data->event)
