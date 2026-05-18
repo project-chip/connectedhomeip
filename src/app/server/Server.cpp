@@ -546,13 +546,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Enable the TCP Server based on the TCPListenParameters setting.
     app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
 
-    uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
-    if (tcpListenParams.IsServerListenEnabled())
     {
-        supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        if (tcpListenParams.IsServerListenEnabled())
+        {
+            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        }
+        localSessionParams.SetSupportedTransports(supportedTransports);
     }
-    localSessionParams.SetSupportedTransports(supportedTransports);
-    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
+    // Maximum size of the TCP payload that the node is capable of receiving
+    // from its peer. Make sure we subtract the framing length prefix.
+    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - sizeof(uint32_t));
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)

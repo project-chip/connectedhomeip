@@ -226,8 +226,6 @@ public:
                  static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer))) != 0;
     }
 
-    bool SupportsLargePayload() const { return PeerAdvertisedTcpSupport(); }
-
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
 
