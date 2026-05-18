@@ -20,11 +20,13 @@
 #pragma once
 
 #include "silabs_utils.h"
-#include <lib/core/DataModelTypes.h>
 
 // ---- Door lock Example App Config ----
 
+#ifdef __cplusplus
+#include <lib/core/DataModelTypes.h>
 inline constexpr chip::EndpointId kLockEndpointId = 1;
+#endif // __cplusplus
 
 #define APP_TASK_NAME "Lock"
 

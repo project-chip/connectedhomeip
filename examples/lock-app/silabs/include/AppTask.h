@@ -119,6 +119,33 @@ public:
     };
 
     // ---------------------------------------------------------------------
+    // Lock-action types (referenced by member functions below).
+    // ---------------------------------------------------------------------
+
+    /** Door-lock actuator / cluster actions. */
+    enum class LockAction : uint8_t
+    {
+        kLock = 0,
+        kUnlock,
+        kUnlatch,
+        kInvalid,
+    };
+
+    struct LockRequest
+    {
+        chip::EndpointId endpointId                                   = chip::kInvalidEndpointId;
+        LockAction action                                             = LockAction::kInvalid;
+        chip::app::Clusters::DoorLock::DlLockState targetClusterState = chip::app::Clusters::DoorLock::DlLockState::kLocked;
+        chip::app::DataModel::Nullable<chip::FabricIndex> fabricIdx;
+        chip::app::DataModel::Nullable<chip::NodeId> nodeId;
+        chip::app::DataModel::Nullable<uint16_t> userIndex;
+        LockOpCredentials credential{};
+        bool hasCredential   = false;
+        bool isUnboltUnlatch = false;
+        bool isButtonAction  = false;
+    };
+
+    // ---------------------------------------------------------------------
     // Customer-facing entry points.
     // Overridable in `CustomerAppTask` via `AppTaskImpl<>::*Impl()` hooks.
     // ---------------------------------------------------------------------
@@ -204,29 +231,6 @@ public:
                               const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                               const chip::app::DataModel::Nullable<uint16_t> & userIndex, const LockOpCredentials * cred,
                               bool hasCred);
-
-    /** Door-lock actuator / cluster actions. */
-    enum class LockAction : uint8_t
-    {
-        kLock = 0,
-        kUnlock,
-        kUnlatch,
-        kInvalid,
-    };
-
-    struct LockRequest
-    {
-        chip::EndpointId endpointId                                   = chip::kInvalidEndpointId;
-        LockAction action                                             = LockAction::kInvalid;
-        chip::app::Clusters::DoorLock::DlLockState targetClusterState = chip::app::Clusters::DoorLock::DlLockState::kLocked;
-        chip::app::DataModel::Nullable<chip::FabricIndex> fabricIdx;
-        chip::app::DataModel::Nullable<chip::NodeId> nodeId;
-        chip::app::DataModel::Nullable<uint16_t> userIndex;
-        LockOpCredentials credential{};
-        bool hasCredential   = false;
-        bool isUnboltUnlatch = false;
-        bool isButtonAction  = false;
-    };
 
     bool InitiateLockAction(LockAction aAction, bool fromButton = false);
 
