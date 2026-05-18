@@ -190,10 +190,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     if (sessionHandle->AllowsLargePayload())
     {
         uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-        uint32_t limit      = kMaxLargeAppMessageLen;
+        size_t limit        = kMaxLargeAppMessageLen;
         if (maxPayload > 0)
         {
-            limit = std::min(maxPayload, static_cast<uint32_t>(kMaxLargeAppMessageLen));
+            limit = std::min(static_cast<size_t>(maxPayload), kMaxLargeAppMessageLen);
         }
         VerifyOrReturnError(message->TotalLength() <= limit, CHIP_ERROR_MESSAGE_TOO_LONG);
     }
