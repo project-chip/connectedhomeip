@@ -172,17 +172,26 @@ public:
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
 
     typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
+    typedef void (*OnTxIdleActionFunct)(void * ctx);
     void Shutdown();
     /** Cancel all active NAN publisher sessions, leaving subscriber sessions
      *  intact.  Call after WiFi connects to release the radio for IPv6 DAD
      *  and mDNS advertising. */
     void CancelAllPublisherSessions(OnCancelDeviceHandle OnCancelDevice);
 
-    /** Arrange for CancelAllPublisherSessions(cb) to fire automatically once
-     *  the PAFTP send queue is drained and all outstanding fragment acks have
-     *  been received from the peer.  This is the earliest safe point to tear
-     *  down NAN after WiFi connects without risking loss of in-flight data. */
-    void ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb);
+    /** Arrange for CancelAllPublisherSessions(cancelCb) to fire automatically
+     *  once the PAFTP send queue is drained and all outstanding fragment acks
+     *  have been received from the peer.  This is the earliest safe point to
+     *  tear down NAN after WiFi connects without risking loss of in-flight
+     *  data.  Tearing down publish here closes the PAFTP session per Matter
+     *  spec §4.20.3.10 [4.780] and discharges any pending standalone-ACK
+     *  obligation per §4.20.3.8 [4.771].
+     *
+     *  If supplied, `afterCb(afterCtx)` runs once after the publishers have
+     *  been cancelled; used to defer mDNS / operational advertisement until
+     *  PAFTP traffic has cleared the shared radio. */
+    void ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cancelCb, OnTxIdleActionFunct afterCb = nullptr,
+                                          void * afterCtx = nullptr);
 
     /** Drive any pending standalone ACKs on all active PAFTP endpoints.
      *  Call this before blocking the event loop (e.g. synchronous D-Bus calls
@@ -225,6 +234,8 @@ private:
     chip::System::Layer * mSystemLayer;
     bool mCancelPublishersOnTxIdle          = false;
     OnCancelDeviceHandle mCancelPublishersCallback = nullptr;
+    OnTxIdleActionFunct mOnTxIdleAfterCb    = nullptr;
+    void * mOnTxIdleAfterCtx                = nullptr;
 };
 
 } /* namespace WiFiPAF */

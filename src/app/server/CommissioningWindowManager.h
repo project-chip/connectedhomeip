@@ -153,7 +153,14 @@ private:
 
     CHIP_ERROR StartAdvertisement();
 
-    CHIP_ERROR StopAdvertisement(bool aShuttingDown);
+    // aKeepPAFPublish: leave the WiFi-PAF publisher running.  Used by
+    // OnSessionEstablished so the PAFTP session that just established PASE
+    // stays alive for post-PASE commissioning traffic.  Spec §4.20.3.10 [4.780]
+    // permits the device to terminate publish at any time; the publisher is
+    // ultimately cancelled later (at PAFTP tx-idle after ConnectNetwork
+    // succeeds, via DeviceControlServer::PostConnectedToOperationalNetworkEvent)
+    // or on shutdown/cleanup.
+    CHIP_ERROR StopAdvertisement(bool aShuttingDown, bool aKeepPAFPublish = false);
 
     // Start a timer that will call HandleCommissioningWindowTimeout, and then
     // start advertising and listen for PASE.

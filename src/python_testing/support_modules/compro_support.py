@@ -261,7 +261,11 @@ class EDFixture:
         if not lines:
             raise RuntimeError(f"Remote ED start did not return a PID; output: {pid_str!r}")
         self._remote_pid = int(lines[-1])
-        await asyncio.sleep(3)
+        # 3s was racy: PAFTP handshake would succeed but the first multi-fragment
+        # SDU sent to the ED would get no reply, timing out PASE.  5s gives
+        # wpa_supplicant's NAN context enough time to be fully ready for sustained
+        # data transfer, not just handshake-sized packets.
+        await asyncio.sleep(5)
         logger.info("Remote ED fixture started (PID=%d, discriminator=%d, host=%s)",
                     self._remote_pid, self._discriminator, self._ssh_host)
 

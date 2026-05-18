@@ -286,10 +286,18 @@ bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::Pac
         endPoint->StopSendAckTimer();
 
         ChipLogProgress(WiFiPAF, "PAFTP tx idle after WiFi connect: cancelling NAN publishers");
-        mCancelPublishersOnTxIdle = false;
-        OnCancelDeviceHandle cb   = mCancelPublishersCallback;
-        mCancelPublishersCallback = nullptr;
+        mCancelPublishersOnTxIdle   = false;
+        OnCancelDeviceHandle cb     = mCancelPublishersCallback;
+        OnTxIdleActionFunct afterCb = mOnTxIdleAfterCb;
+        void * afterCtx             = mOnTxIdleAfterCtx;
+        mCancelPublishersCallback   = nullptr;
+        mOnTxIdleAfterCb            = nullptr;
+        mOnTxIdleAfterCtx           = nullptr;
         CancelAllPublisherSessions(cb);
+        if (afterCb != nullptr)
+        {
+            afterCb(afterCtx);
+        }
     }
 
     return true;
@@ -427,10 +435,12 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
     return;
 }
 
-void WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb)
+void WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cancelCb, OnTxIdleActionFunct afterCb, void * afterCtx)
 {
-    mCancelPublishersOnTxIdle  = true;
-    mCancelPublishersCallback  = cb;
+    mCancelPublishersOnTxIdle = true;
+    mCancelPublishersCallback = cancelCb;
+    mOnTxIdleAfterCb          = afterCb;
+    mOnTxIdleAfterCtx         = afterCtx;
 }
 
 void WiFiPAFLayer::FlushPendingAcks()
