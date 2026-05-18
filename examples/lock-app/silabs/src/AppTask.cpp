@@ -80,7 +80,6 @@ using chip::app::DataModel::MakeNullable;
 namespace {
 
 using namespace SilabsDoorLockConfig::ResourceRanges;
-using SilabsDoorLockConfig::kLockEndpointId;
 
 CustomerAppTask & appInstance()
 {
