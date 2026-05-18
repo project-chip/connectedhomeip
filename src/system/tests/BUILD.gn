@@ -35,8 +35,7 @@ chip_test_suite("tests") {
   # ESP32 TCP uses PBUF_RAM packet buffers, which always allocate at the TCP
   # maximum capacity. These tests assume requested sizes control buffer
   # capacity, so leave them out of the TCP-enabled QEMU configuration.
-  if (!(chip_device_platform == "esp32" &&
-        chip_inet_config_enable_tcp_endpoint)) {
+  if (!(chip_device_platform == "esp32" && chip_inet_config_enable_tcp_endpoint)) {
     test_sources += [ "TestSystemPacketBuffer.cpp" ]
   }
 
