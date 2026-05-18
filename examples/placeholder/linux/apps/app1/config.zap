@@ -62,7 +62,7 @@
       ],
       "deviceVersions": [
         1,
-        5
+        4
       ],
       "deviceIdentifiers": [
         17,
@@ -7481,7 +7481,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x19",
+              "defaultValue": "0x14",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -10594,7 +10594,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        3
       ],
       "deviceIdentifiers": [
         257
