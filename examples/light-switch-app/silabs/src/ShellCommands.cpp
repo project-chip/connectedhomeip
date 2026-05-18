@@ -125,6 +125,8 @@ CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::OnOff::Commands::On::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
@@ -134,6 +136,8 @@ CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::OnOff::Commands::Off::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
@@ -143,6 +147,8 @@ CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
@@ -175,6 +181,8 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "Binding::TableEntry allocation failed"));
     return ScheduleBindingWorker(entry);
 }
 
@@ -184,6 +192,8 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 
     Binding::TableEntry * entry =
         Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
+    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "Binding::TableEntry allocation failed"));
     return ScheduleBindingWorker(entry);
 }
 
@@ -230,6 +240,8 @@ CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::OnOff::Commands::On::Id;
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
@@ -240,6 +252,8 @@ CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::OnOff::Commands::Off::Id;
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
@@ -250,6 +264,8 @@ CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
@@ -285,6 +301,8 @@ CHIP_ERROR MoveToLevelSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::MoveToLevel{};
@@ -307,6 +325,8 @@ CHIP_ERROR MoveSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::Move::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::Move{};
@@ -330,6 +350,8 @@ CHIP_ERROR StepSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::Step::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
@@ -353,6 +375,8 @@ CHIP_ERROR StopSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
@@ -374,6 +398,8 @@ CHIP_ERROR MoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::MoveToLevel{};
@@ -397,6 +423,8 @@ CHIP_ERROR MoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::Move{};
@@ -420,6 +448,8 @@ CHIP_ERROR StepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
@@ -444,6 +474,8 @@ CHIP_ERROR StopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
@@ -481,6 +513,8 @@ CHIP_ERROR LevelControlRead(int argc, char ** argv)
 CHIP_ERROR LevelControlReadAttributeList(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::AttributeList::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -491,6 +525,8 @@ CHIP_ERROR LevelControlReadAttributeList(int argc, char ** argv)
 CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::CurrentLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -500,6 +536,8 @@ CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)
 CHIP_ERROR LevelControlReadRemainingTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::RemainingTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -509,6 +547,8 @@ CHIP_ERROR LevelControlReadRemainingTime(int argc, char ** argv)
 CHIP_ERROR LevelControlReadMinLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MinLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -518,6 +558,8 @@ CHIP_ERROR LevelControlReadMinLevel(int argc, char ** argv)
 CHIP_ERROR LevelControlReadMaxLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MaxLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -527,6 +569,8 @@ CHIP_ERROR LevelControlReadMaxLevel(int argc, char ** argv)
 CHIP_ERROR LevelControlReadCurrentFrequency(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::CurrentFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -536,6 +580,8 @@ CHIP_ERROR LevelControlReadCurrentFrequency(int argc, char ** argv)
 CHIP_ERROR LevelControlReadMinFrequency(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MinFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -545,6 +591,8 @@ CHIP_ERROR LevelControlReadMinFrequency(int argc, char ** argv)
 CHIP_ERROR LevelControlReadMaxFrequency(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::MaxFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -554,6 +602,8 @@ CHIP_ERROR LevelControlReadMaxFrequency(int argc, char ** argv)
 CHIP_ERROR LevelControlReadOptions(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::Options::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -563,6 +613,8 @@ CHIP_ERROR LevelControlReadOptions(int argc, char ** argv)
 CHIP_ERROR LevelControlReadOnOffTransitionTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OnOffTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -572,6 +624,8 @@ CHIP_ERROR LevelControlReadOnOffTransitionTime(int argc, char ** argv)
 CHIP_ERROR LevelControlReadOnLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OnLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -581,6 +635,8 @@ CHIP_ERROR LevelControlReadOnLevel(int argc, char ** argv)
 CHIP_ERROR LevelControlReadOnTransitionTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OnTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -590,6 +646,8 @@ CHIP_ERROR LevelControlReadOnTransitionTime(int argc, char ** argv)
 CHIP_ERROR LevelControlReadOffTransitionTime(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::OffTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -599,6 +657,8 @@ CHIP_ERROR LevelControlReadOffTransitionTime(int argc, char ** argv)
 CHIP_ERROR LevelControlReadDefaultMoveRate(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::DefaultMoveRate::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -608,6 +668,8 @@ CHIP_ERROR LevelControlReadDefaultMoveRate(int argc, char ** argv)
 CHIP_ERROR LevelControlReadStartUpCurrentLevel(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->attributeId         = Clusters::LevelControl::Attributes::StartUpCurrentLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
@@ -644,6 +706,8 @@ CHIP_ERROR GroupsMoveToLevelSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::MoveToLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::MoveToLevel{};
@@ -668,6 +732,8 @@ CHIP_ERROR GroupsMoveSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::Move::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::Move{};
@@ -692,6 +758,8 @@ CHIP_ERROR GroupsStepSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::Step::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
@@ -717,6 +785,8 @@ CHIP_ERROR GroupsStopSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::Stop::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
@@ -739,6 +809,8 @@ CHIP_ERROR GroupsMoveToLevelWithOnOffSwitchCommandHandler(int argc, char ** argv
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::MoveToLevel{};
@@ -763,6 +835,8 @@ CHIP_ERROR GroupsMoveWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::MoveWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->commandData         = BindingCommandData::Move{};
@@ -787,6 +861,8 @@ CHIP_ERROR GroupsStepWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::StepWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
@@ -812,6 +888,8 @@ CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(AppServer, "BindingCommandData allocation failed"));
     data->commandId           = Clusters::LevelControl::Commands::StopWithOnOff::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     char * endPtr;
