@@ -443,7 +443,8 @@ void AppTask::UpdateClusterState(intptr_t context)
     using DlLockStateUnderlying = std::underlying_type_t<DlLockState>;
     DlLockState newState        = static_cast<DlLockState>(static_cast<DlLockStateUnderlying>(context));
 
-    Protocols::InteractionModel::Status status = DoorLockServer::Instance().SetLockState(kLockEndpointId, newState)
+    Protocols::InteractionModel::Status status =
+        DoorLockServer::Instance().SetLockState(kLockEndpointId, newState, OperationSourceEnum::kManual)
         ? Protocols::InteractionModel::Status::Success
         : Protocols::InteractionModel::Status::Failure;
 
@@ -1129,9 +1130,6 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
 
     error = mStorage->SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
 
-    // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == LockUserInfoSize, false);
-
     // If no data is found at user key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -1140,8 +1138,9 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
         ChipLogDetail(Zcl, "No user data found");
         return true;
     }
-    // Else if KVS read was successful
-    else if (error == CHIP_NO_ERROR)
+
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == LockUserInfoSize, false);
+
     {
         user.userStatus = userInStorage.userStatus;
 
@@ -1186,13 +1185,11 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
 
     error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), credentials, credentialSize);
 
-    // Check size out param matches what we expect to read
-    VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount),
-                        false);
-
-    // If KVS read was successful
     if (error == CHIP_NO_ERROR)
     {
+        // Check size out param matches what we expect to read
+        VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount),
+                            false);
 
         // Copy credentials attached to user from storage to the output parameter
         memmove(user.credentials.data(), credentials, credentialSize);
@@ -1294,19 +1291,16 @@ bool AppTask::DMDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cred
 
     error = mStorage->SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
 
-    // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == LockCredentialInfoSize, false);
-
     // If no data is found at credential key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        // No credentials found
         credential.status = DlCredentialStatus::kAvailable;
-
         return true;
     }
-    // Else if KVS read was successful
-    else if (error == CHIP_NO_ERROR)
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == LockCredentialInfoSize, false);
+
     {
         credential.status = credentialInStorage.status;
         ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
@@ -1413,17 +1407,16 @@ DlStatus AppTask::DMDoorLockGetWeekDaySchedule(chip::EndpointId endpointId, uint
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, size);
 
-    // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == WeekDayScheduleInfoSize, DlStatus::kFailure);
-
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Zcl, "No schedule data found for user");
         return DlStatus::kNotFound;
     }
-    // Else if KVS read was successful
-    else if (error == CHIP_NO_ERROR)
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == WeekDayScheduleInfoSize, DlStatus::kFailure);
+
     {
         if (weekDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
         {
@@ -1501,19 +1494,17 @@ DlStatus AppTask::DMDoorLockGetYearDaySchedule(chip::EndpointId endpointId, uint
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
 
-    // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == YearDayScheduleInfoSize, DlStatus::kFailure);
-
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Zcl, "No schedule data found for user");
         return DlStatus::kNotFound;
     }
-    // Else if KVS read was successful
-    else if (error == CHIP_NO_ERROR)
-    {
 
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == YearDayScheduleInfoSize, DlStatus::kFailure);
+
+    {
         if (yearDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
         {
             return DlStatus::kNotFound;
@@ -1583,19 +1574,17 @@ DlStatus AppTask::DMDoorLockGetHolidaySchedule(chip::EndpointId endpointId, uint
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, size);
 
-    // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == HolidayScheduleInfoSize, DlStatus::kFailure);
-
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Zcl, "No schedule data found for user");
         return DlStatus::kNotFound;
     }
-    // Else if KVS read was successful
-    else if (error == CHIP_NO_ERROR)
-    {
 
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == HolidayScheduleInfoSize, DlStatus::kFailure);
+
+    {
         if (holidayScheduleInStorage.status == DlScheduleStatus::kAvailable)
         {
             return DlStatus::kNotFound;
