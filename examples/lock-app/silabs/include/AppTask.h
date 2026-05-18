@@ -295,7 +295,7 @@ protected:
     struct LockUserInfo
     {
         char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
-        size_t userNameSize;
+        uint32_t userNameSize;
         uint32_t userUniqueId;
         UserStatusEnum userStatus;
         UserTypeEnum userType;
@@ -313,7 +313,7 @@ protected:
         chip::FabricIndex createdBy;
         chip::FabricIndex lastModifiedBy;
         uint8_t credentialData[SilabsDoorLockConfig::ResourceRanges::kMaxCredentialSize];
-        size_t credentialDataSize;
+        uint32_t credentialDataSize;
     };
 
     static constexpr uint16_t LockUserInfoSize        = sizeof(LockUserInfo);

@@ -1088,20 +1088,27 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
                             LockStateToString(request.targetClusterState));
             return;
         }
-
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        if (request.isUnboltUnlatch)
-        {
-            mUnlatchContext.Update(request.endpointId, request.fabricIdx, request.nodeId, request.userIndex, request.credential,
-                                   request.hasCredential);
-        }
-        PushClusterLockState(request.endpointId, DlLockState::kNotFullyLocked, request.fabricIdx, request.nodeId, request.userIndex,
-                             request.hasCredential ? &request.credential : nullptr, request.hasCredential);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-        mActiveRemoteAction    = request;
-        mHasActiveRemoteAction = true;
     }
-    if (!InitiateLockAction(request.action, /*fromButton*/ request.isButtonAction))
+
+    if (InitiateLockAction(request.action, /*fromButton*/ request.isButtonAction))
+    {
+        if (!request.isButtonAction)
+        {
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
+            if (request.isUnboltUnlatch)
+            {
+                mUnlatchContext.Update(request.endpointId, request.fabricIdx, request.nodeId, request.userIndex,
+                                       request.credential, request.hasCredential);
+            }
+            PushClusterLockState(request.endpointId, DlLockState::kNotFullyLocked, request.fabricIdx, request.nodeId,
+                                 request.userIndex, request.hasCredential ? &request.credential : nullptr,
+                                 request.hasCredential);
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+            mActiveRemoteAction    = request;
+            mHasActiveRemoteAction = true;
+        }
+    }
+    else
     {
         SILABS_LOG("Action is already in progress or active.");
     }
@@ -1141,19 +1148,12 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
 
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == LockUserInfoSize, false);
 
-    {
-        user.userStatus = userInStorage.userStatus;
+    user.userStatus = userInStorage.userStatus;
 
-        if (userInStorage.userStatus == UserStatusEnum::kAvailable)
-        {
-            ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
-            return true;
-        }
-    }
-    else
+    if (userInStorage.userStatus == UserStatusEnum::kAvailable)
     {
-        ChipLogError(Zcl, "Error reading from KVS key");
-        return false;
+        ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
+        return true;
     }
 
     VerifyOrReturnValue(userInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
@@ -1301,19 +1301,12 @@ bool AppTask::DMDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cred
     // Check size out param matches what we expect to read
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == LockCredentialInfoSize, false);
 
+    credential.status = credentialInStorage.status;
+    ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
+    if (DlCredentialStatus::kAvailable == credential.status)
     {
-        credential.status = credentialInStorage.status;
-        ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
-        if (DlCredentialStatus::kAvailable == credential.status)
-        {
-            ChipLogDetail(Zcl, "Found unoccupied credential ");
-            return true;
-        }
-    }
-    else
-    {
-        ChipLogError(Zcl, "Error reading KVS key");
-        return false;
+        ChipLogDetail(Zcl, "Found unoccupied credential ");
+        return true;
     }
 
     VerifyOrReturnValue(credentialInStorage.credentialDataSize <= credential.credentialData.size(), false);
@@ -1417,16 +1410,9 @@ DlStatus AppTask::DMDoorLockGetWeekDaySchedule(chip::EndpointId endpointId, uint
     // Check size out param matches what we expect to read
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == WeekDayScheduleInfoSize, DlStatus::kFailure);
 
+    if (weekDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
     {
-        if (weekDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
-        {
-            return DlStatus::kNotFound;
-        }
-    }
-    else
-    {
-        ChipLogError(Zcl, "Error reading from KVS key");
-        return DlStatus::kFailure;
+        return DlStatus::kNotFound;
     }
 
     schedule = weekDayScheduleInStorage.schedule;
@@ -1504,16 +1490,9 @@ DlStatus AppTask::DMDoorLockGetYearDaySchedule(chip::EndpointId endpointId, uint
     // Check size out param matches what we expect to read
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == YearDayScheduleInfoSize, DlStatus::kFailure);
 
+    if (yearDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
     {
-        if (yearDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
-        {
-            return DlStatus::kNotFound;
-        }
-    }
-    else
-    {
-        ChipLogError(Zcl, "Error reading from KVS key");
-        return DlStatus::kFailure;
+        return DlStatus::kNotFound;
     }
 
     schedule = yearDayScheduleInStorage.schedule;
@@ -1584,16 +1563,9 @@ DlStatus AppTask::DMDoorLockGetHolidaySchedule(chip::EndpointId endpointId, uint
     // Check size out param matches what we expect to read
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == HolidayScheduleInfoSize, DlStatus::kFailure);
 
+    if (holidayScheduleInStorage.status == DlScheduleStatus::kAvailable)
     {
-        if (holidayScheduleInStorage.status == DlScheduleStatus::kAvailable)
-        {
-            return DlStatus::kNotFound;
-        }
-    }
-    else
-    {
-        ChipLogError(Zcl, "Error reading from KVS key");
-        return DlStatus::kFailure;
+        return DlStatus::kNotFound;
     }
 
     schedule = holidayScheduleInStorage.schedule;
