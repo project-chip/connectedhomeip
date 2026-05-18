@@ -179,7 +179,7 @@ void CustomerAppTask::ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction)
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-    else if (button == APP_FUNCTION_BUTTON)
+    if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         AppTask::GetAppTask().PostEvent(&button_event);

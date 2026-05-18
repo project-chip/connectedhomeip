@@ -128,7 +128,7 @@ CHIP_ERROR AppTask::InitThermostat()
     AppTask::UpdateThermoStatUI();
     PlatformMgr().UnlockChipStack();
 
-    AppTask::SensorTimerEventHandler(nullptr); // prime one sensor read so we don't wait 30s
+    CustomerAppTask::SensorTimerEventHandler(nullptr); // prime one sensor read so we don't wait 30s
     osTimerStart(sSensorTimer, pdMS_TO_TICKS(kSensorTimerPeriodMs));
 
     return CHIP_NO_ERROR;
@@ -267,9 +267,11 @@ CHIP_ERROR AppTask::GetTemperature(int16_t & temperature)
 
     for (uint8_t i = 0; i < 100; i++)
     {
-        if (SL_STATUS_OK != Si70xxSensor::GetSensorData(humidity, sample))
+        sl_status_t status = Si70xxSensor::GetSensorData(humidity, sample);
+        if (status != SL_STATUS_OK)
         {
-            SILABS_LOG("Failed to read Temperature sample");
+            SILABS_LOG("Failed to read Temperature sample: %lx", status);
+            return MATTER_PLATFORM_ERROR(status);
         }
         tempSum += sample;
     }
