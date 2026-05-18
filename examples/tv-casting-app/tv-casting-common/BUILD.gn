@@ -125,6 +125,10 @@ chip_data_model("tv-casting-common") {
     ]
   }
 
+  # Placeholder DevelopmentCerts symbols for custom (non-development) VID/PID.
+  # Compiles to nothing when using development VIDs (0xFFF1/0xFFF2/0xFFF3).
+  sources += [ "src/DevelopmentCertsPlaceholder.cpp" ]
+
   # Add simplified casting API files here
   sources += [
     "clusters/Clusters.h",
