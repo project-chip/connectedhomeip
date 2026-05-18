@@ -1,6 +1,6 @@
 |                                |   Pass Rate |
 |:-------------------------------|------------:|
-| daily-run-for-slow-tests       |           0 |
+| tests                          |           0 |
 | validate-gradle-wrapper        |         100 |
 | build-example-nrf-connect-sdk  |         100 |
 | build-example-stm32            |         100 |
@@ -17,11 +17,11 @@
 | build-example-i-mx-linux       |         100 |
 | cancel-workflows-on-failing-ci |         100 |
 | lint-code-base                 |         100 |
-| builds                         |         100 |
+| daily-run-for-slow-tests       |         100 |
 | build-example-infineon         |         100 |
+| builds                         |         100 |
 | tv-casting-example-darwin      |         100 |
 | build-example-telink           |         100 |
-| tests                          |         100 |
 | build-example-esp32            |         100 |
 | build-example-asr              |         100 |
 | zap                            |         100 |
