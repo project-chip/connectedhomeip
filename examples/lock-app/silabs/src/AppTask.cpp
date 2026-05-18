@@ -1083,8 +1083,7 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
 
         if (request.targetClusterState == currentTerminal)
         {
-            ChipLogProgress(NotSpecified,
-                            "Door Lock App: remote request target (%s) matches current LockState; skipping no-op",
+            ChipLogProgress(NotSpecified, "Door Lock App: remote request target (%s) matches current LockState; skipping no-op",
                             LockStateToString(request.targetClusterState));
             return;
         }
