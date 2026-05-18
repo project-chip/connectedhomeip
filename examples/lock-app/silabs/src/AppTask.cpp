@@ -1737,20 +1737,3 @@ void AppTask::PushClusterLockState(chip::EndpointId endpointId, DlLockState lock
     DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable,
                                             fabricIdx, nodeId);
 }
-
-bool AppTask::SetLockState(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                           const Nullable<chip::NodeId> & nodeId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
-                           OperationErrorEnum & err)
-{
-    Nullable<uint16_t> userIndex;
-    LockOpCredentials cred{};
-    bool hasCred = false;
-
-    if (!ValidatePin(endpointId, pin, userIndex, cred, hasCred, err))
-    {
-        return false;
-    }
-
-    PushClusterLockState(endpointId, lockState, fabricIdx, nodeId, userIndex, hasCred ? &cred : nullptr, hasCred);
-    return true;
-}

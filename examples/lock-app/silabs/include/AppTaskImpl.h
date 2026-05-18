@@ -194,14 +194,6 @@ public:
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMDoorLockOnAutoRelockImpl, endpointId);
     }
 
-    bool SetLockState(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
-                      const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
-                      chip::app::Clusters::DoorLock::DlLockState lockState, const chip::Optional<chip::ByteSpan> & pin,
-                      chip::app::Clusters::DoorLock::OperationErrorEnum & err)
-    {
-        CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, SetLockStateImpl, endpointId, fabricIdx, nodeId, lockState, pin, err);
-    }
-
 private:
     friend Derived;
 
@@ -324,12 +316,4 @@ private:
     }
 
     void DMDoorLockOnAutoRelockImpl(chip::EndpointId endpointId) { AppTask::DMDoorLockOnAutoRelock(endpointId); }
-
-    bool SetLockStateImpl(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
-                          const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
-                          chip::app::Clusters::DoorLock::DlLockState lockState, const chip::Optional<chip::ByteSpan> & pin,
-                          chip::app::Clusters::DoorLock::OperationErrorEnum & err)
-    {
-        return AppTask::SetLockState(endpointId, fabricIdx, nodeId, lockState, pin, err);
-    }
 };

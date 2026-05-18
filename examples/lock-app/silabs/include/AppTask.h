@@ -222,11 +222,6 @@ public:
 
     void DMDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
-    bool SetLockState(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
-                      const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
-                      chip::app::Clusters::DoorLock::DlLockState lockState, const chip::Optional<chip::ByteSpan> & pin,
-                      chip::app::Clusters::DoorLock::OperationErrorEnum & err);
-
     bool ValidatePin(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pin,
                      chip::app::DataModel::Nullable<uint16_t> & outUserIndex, LockOpCredentials & outCred, bool & outHasCred,
                      chip::app::Clusters::DoorLock::OperationErrorEnum & err);
@@ -393,7 +388,6 @@ private:
     // ---- State ----
     UnlatchContext mUnlatchContext;
     PendingCommand mPendingCommand;
-    chip::EndpointId mCurrentEndpointId = chip::kInvalidEndpointId;
 
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
     osTimerId_t mLockTimer               = nullptr;
