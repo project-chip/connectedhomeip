@@ -41,12 +41,6 @@ otError matter_cmd_handler(void * aContext, uint8_t argc, char * argv[])
 
     if (retval != CHIP_NO_ERROR)
     {
-        char errorStr[160];
-        bool errorStrFound = FormatCHIPError(errorStr, sizeof(errorStr), retval);
-        if (!errorStrFound)
-        {
-            errorStr[0] = 0;
-        }
         return OT_ERROR_FAILED;
     }
 
