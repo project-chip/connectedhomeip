@@ -168,16 +168,10 @@ TEST_F(TestTLVPacketBufferBackingStore, MultiBufferEncode)
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
     constexpr size_t bufferSizes[] = { 2, PacketBuffer::kMaxSizeWithoutReserve,
                                        totalSize - 2 - PacketBuffer::kMaxSizeWithoutReserve };
-#elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
-    // PBUF_RAM allocations use the TCP-capable maximum allocation size rather
-    // than the requested size.
-    constexpr size_t bufferSizes[] = { PacketBuffer::kMaxAllocSize, totalSize - PacketBuffer::kMaxAllocSize };
 #else
     // Skipping the test for other configurations because the allocation method is unknown.
     GTEST_SKIP();
 #endif
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL ||                                 \
-    CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
     size_t checkedSize = 0;
     auto bufferTmp     = buffer.Retain();
     for (const auto size : bufferSizes)
@@ -190,7 +184,6 @@ TEST_F(TestTLVPacketBufferBackingStore, MultiBufferEncode)
     }
     // There should be no more buffers.
     ASSERT_TRUE(bufferTmp.IsNull());
-#endif
 
     // PacketBufferTLVReader cannot handle non-contiguous buffers, and our
     // buffers are too big to stick into a single packet buffer.
