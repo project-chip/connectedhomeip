@@ -116,8 +116,8 @@ silabs_executable("thermostat_app") {
   defines = []
 
   sources = [
-    "${thermostat_common_dir}/src/thermostat-delegate-impl.cpp",
     "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
+    "${thermostat_common_dir}/src/thermostat-delegate-impl.cpp",
     "src/AppTask.cpp",
   ]
 
