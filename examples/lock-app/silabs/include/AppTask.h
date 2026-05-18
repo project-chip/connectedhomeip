@@ -128,7 +128,6 @@ public:
 
     CHIP_ERROR StartAppTask();
 
-
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     static void LockButtonActionHandler(AppEvent * aEvent);
