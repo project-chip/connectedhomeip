@@ -287,8 +287,8 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
             toggleData->clusterId           = Clusters::OnOff::Id;
             toggleData->isGroup             = false;
             toggleData->commandId           = OnOff::Commands::Toggle::Id;
-            if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction,
-                                                        reinterpret_cast<intptr_t>(toggleData)) != CHIP_NO_ERROR)
+            if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::SwitchWorkerFunction, reinterpret_cast<intptr_t>(toggleData)) !=
+                CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to schedule switch worker");
                 Platform::Delete(toggleData);
