@@ -31,11 +31,17 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/TxtFields.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/BuildTime.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+
+#ifdef __APPLE__
+#include <platform/Darwin/PosixConfig.h>
+#endif
 
 using namespace chip;
 using namespace chip::Logging;
@@ -472,5 +478,46 @@ TEST_F(TestConfigurationMgr, GetProductId)
     EXPECT_GE(productId, 1u);
     EXPECT_LE(productId, 0xffff);
 }
+
+TEST_F(TestConfigurationMgr, GetCommissionableDeviceName)
+{
+    char buf[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
+
+    if (!ConfigurationMgr().IsCommissionableDeviceNameEnabled())
+    {
+        // If device name is not enabled, skip this test
+        GTEST_SKIP();
+    }
+
+    CHIP_ERROR err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_GT(strlen(buf), 0u);
+    EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+}
+
+#ifdef __APPLE__
+TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromConfig)
+{
+    using namespace chip::DeviceLayer::Internal;
+
+    char buf[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
+    const char * testName = "My Test Device";
+
+    // Write a device name to PosixConfig
+    CHIP_ERROR err = PosixConfig::WriteConfigValueStr(PosixConfig::kConfigKey_DeviceName, testName);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify ConfigurationMgr returns the stored value
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, testName);
+
+    // Clear the config key and verify fallback to compile-time default
+    PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_DeviceName);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+}
+#endif // __APPLE__
 
 } // namespace
