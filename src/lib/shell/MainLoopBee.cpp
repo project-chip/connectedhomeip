@@ -48,9 +48,9 @@ otError matter_cmd_handler(void * aContext, uint8_t argc, char * argv[])
             errorStr[0] = 0;
         }
         return OT_ERROR_FAILED;
-      }
+    }
 
-      return OT_ERROR_NONE;
+    return OT_ERROR_NONE;
 }
 
 otCliCommand bee_cmd[] = {
