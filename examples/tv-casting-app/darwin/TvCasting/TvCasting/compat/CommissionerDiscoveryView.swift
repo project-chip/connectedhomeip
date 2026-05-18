@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import MatterTvCastingBridge
 
 extension DiscoveredNodeData : Identifiable {
     public var id: String {

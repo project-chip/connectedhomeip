@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import MatterTvCastingBridge
 
 extension ContentApp : Identifiable {
     public var id: UInt16 {

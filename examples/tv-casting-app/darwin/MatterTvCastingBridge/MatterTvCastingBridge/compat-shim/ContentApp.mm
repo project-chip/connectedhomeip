@@ -17,8 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "../MCEndpoint_Internal.h"
 #import "ContentApp.h"
+#import "MCEndpoint_Internal.h"
 
 #include <app-common/zap-generated/ids/Clusters.h>
 

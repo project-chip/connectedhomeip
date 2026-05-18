@@ -18,6 +18,7 @@
 import Foundation
 import os.log
 import UIKit
+import MatterTvCastingBridge
 
 class MCConnectionExampleViewModel: ObservableObject {
     let Log = Logger(subsystem: "com.matter.casting",

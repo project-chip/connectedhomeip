@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import MatterTvCastingBridge
 
 struct MCApplicationBasicReadVendorIDExampleView: View {
     @StateObject var viewModel = MCApplicationBasicReadVendorIDExampleViewModel()

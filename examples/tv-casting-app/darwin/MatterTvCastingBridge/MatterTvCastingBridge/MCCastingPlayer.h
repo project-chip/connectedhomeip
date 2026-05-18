@@ -200,7 +200,7 @@ typedef enum {
 - (uint16_t)productId;
 - (uint32_t)deviceType;
 - (bool)supportsCommissionerGeneratedPasscode;
-- (NSArray * _Nonnull)ipAddresses;
+- (NSArray<NSString *> * _Nonnull)ipAddresses;
 - (NSString * _Nonnull)hostName;
 - (NSString * _Nonnull)instanceName;
 

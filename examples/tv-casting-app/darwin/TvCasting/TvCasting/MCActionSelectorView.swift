@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import MatterTvCastingBridge
 
 struct MCActionSelectorView: View {
     var selectedCastingPlayer: MCCastingPlayer?

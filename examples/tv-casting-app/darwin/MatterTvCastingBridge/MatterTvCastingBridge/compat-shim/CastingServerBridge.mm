@@ -17,15 +17,15 @@
 
 #import "CastingServerBridge.h"
 
-#import "../zap-generated/MCClusterObjects.h"
-#import "../zap-generated/MCEndpointClusterType.h"
 #import "CastingPlayerDiscoveryListenerCompat.h"
 #import "DataSourceCompat.h"
 #import "MCCastingApp.h"
 #import "MCCastingPlayerDiscovery.h"
 #import "MCCastingPlayer_Internal.h"
+#import "MCClusterObjects.h"
 #import "MCConnectionCallbacks.h"
 #import "MCEndpoint.h"
+#import "MCEndpointClusterType.h"
 #import "MCErrorUtils.h"
 #import "MCIdentificationDeclarationOptions.h"
 

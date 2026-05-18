@@ -17,6 +17,7 @@
 
 
 import SwiftUI
+import MatterTvCastingBridge
 
 @available(*, deprecated, message: "Refer to MCConnectionExampleView")
 struct CommissioningView: View {

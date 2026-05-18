@@ -17,6 +17,7 @@
 
 import Foundation
 import os.log
+import MatterTvCastingBridge
 
 private class CallbackHelper {
     var testCaseName: String;

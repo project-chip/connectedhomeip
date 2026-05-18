@@ -2,11 +2,11 @@
 
 #import "MCCommandObjects.h"
 #import "MCCommandPayloads.h"
-#import "MCCommandPayloads_internal.h"
+#import "MCCommandPayloads_Internal.h"
 
-#import "../MCCastingApp.h"
-#import "../MCCommand_Internal.h"
-#import "../MCErrorUtils.h"
+#import "MCCastingApp.h"
+#import "MCCommand_Internal.h"
+#import "MCErrorUtils.h"
 
 #include "core/Command.h"
 #include <app-common/zap-generated/cluster-objects.h>

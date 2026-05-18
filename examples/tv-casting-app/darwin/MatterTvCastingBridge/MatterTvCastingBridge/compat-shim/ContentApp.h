@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "../MCEndpoint.h"
+#import "MCEndpoint.h"
 
 #ifndef ContentApp_h
 #define ContentApp_h
