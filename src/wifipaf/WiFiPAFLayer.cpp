@@ -429,8 +429,8 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
 
 void WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb)
 {
-    mCancelPublishersOnTxIdle  = true;
-    mCancelPublishersCallback  = cb;
+    mCancelPublishersOnTxIdle = true;
+    mCancelPublishersCallback = cb;
 }
 
 void WiFiPAFLayer::FlushPendingAcks()
@@ -569,8 +569,7 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 void WiFiPAFLayer::CloseEndPoint(WiFiPAFSession & SessionInfo)
 {
-    WiFiPAFEndPoint * endPoint =
-        sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&SessionInfo));
+    WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&SessionInfo));
     if (endPoint != nullptr)
     {
         ChipLogProgress(WiFiPAF, "CloseEndPoint: closing PAFTP endpoint for session id=%u", SessionInfo.id);

@@ -108,8 +108,7 @@ using DeviceTransportMgr = TransportMgr<
  * Compute the zero-based index of Transport::Proxy<> inside DeviceTransportMgr.
  * Must stay in sync with the DeviceTransportMgr type alias above.
  */
-constexpr size_t kDeviceProxyTransportIndex =
-    1 /* IPv6 UDP */
+constexpr size_t kDeviceProxyTransportIndex = 1 /* IPv6 UDP */
 #if INET_CONFIG_ENABLE_IPV4
     + 1 /* IPv4 UDP */
 #endif

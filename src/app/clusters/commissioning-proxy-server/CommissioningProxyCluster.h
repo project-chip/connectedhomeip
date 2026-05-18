@@ -36,13 +36,10 @@ namespace CommissioningProxy {
 class CommissioningProxyCluster : public DefaultServerCluster
 {
 private:
-    using OptionalAttributesSet = OptionalAttributeSet<
-        CommissioningProxy::Attributes::MaxCachedResults::Id,
-        CommissioningProxy::Attributes::NumCachedResults::Id,
-        CommissioningProxy::Attributes::CacheTimeout::Id,
-        CommissioningProxy::Attributes::CachedResults::Id,
-        CommissioningProxy::Attributes::WiFiBand::Id
-        >;
+    using OptionalAttributesSet =
+        OptionalAttributeSet<CommissioningProxy::Attributes::MaxCachedResults::Id,
+                             CommissioningProxy::Attributes::NumCachedResults::Id, CommissioningProxy::Attributes::CacheTimeout::Id,
+                             CommissioningProxy::Attributes::CachedResults::Id, CommissioningProxy::Attributes::WiFiBand::Id>;
 
 public:
     enum State_t
@@ -57,10 +54,8 @@ public:
         BitMask<CommissioningProxy::Feature> featureFlags;
         CommissioningProxy::Delegate & delegate;
 
-        Config(EndpointId aEndpointId, BitMask<CommissioningProxy::Feature> aFeatures,
-               CommissioningProxy::Delegate & aDelegate) :
-            endpointId(aEndpointId),
-            featureFlags(aFeatures), delegate(aDelegate)
+        Config(EndpointId aEndpointId, BitMask<CommissioningProxy::Feature> aFeatures, CommissioningProxy::Delegate & aDelegate) :
+            endpointId(aEndpointId), featureFlags(aFeatures), delegate(aDelegate)
         {}
     };
 
@@ -127,8 +122,8 @@ private:
                                                             TLV::TLVReader & input_arguments, CommandHandler * handler);
     DataModel::ActionReturnStatus HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleProxyScanRequest(const DataModel::InvokeRequest & request,
-                                                         TLV::TLVReader & input_arguments, CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleProxyScanRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                         CommandHandler * handler);
     DataModel::ActionReturnStatus HandleProxyBackGroundScanStartRequest(const DataModel::InvokeRequest & request,
                                                                         TLV::TLVReader & input_arguments, CommandHandler * handler);
     DataModel::ActionReturnStatus HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
@@ -146,7 +141,6 @@ private:
     const BitFlags<CommissioningProxy::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
     State_t mMainCommissioningProxyState;
-
 };
 
 } // namespace CommissioningProxy

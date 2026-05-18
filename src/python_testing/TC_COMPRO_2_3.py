@@ -65,12 +65,11 @@ import logging
 import queue
 import time
 
-from matter.clusters.Types import NullValue
-from matter.interaction_model import InteractionModelError, Status
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
-import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -457,7 +456,6 @@ class TC_COMPRO_2_3(COMPROBaseTest):
 
         # Cleanup
         await self.ensure_ed_not_commissionable(ed)
-
 
 
 if __name__ == "__main__":

@@ -18,8 +18,8 @@
 
 #include "commissioning-proxy-delegate-impl.h"
 #include <cstdint>
-#include <unordered_map>
 #include <lib/support/logging/CHIPLogging.h>
+#include <unordered_map>
 
 namespace chip {
 namespace app {
@@ -35,8 +35,8 @@ constexpr uint8_t kMaxCachedResults            = 10;
 // Store per-instance state without requiring member fields in the header.
 struct DelegateState
 {
-    uint8_t  scanMaxTime    = kDefaultScanMaxTimeSeconds;
-    uint16_t cacheTimeout   = kDefaultCacheTimeoutSeconds;
+    uint8_t scanMaxTime   = kDefaultScanMaxTimeSeconds;
+    uint16_t cacheTimeout = kDefaultCacheTimeoutSeconds;
 };
 
 static std::unordered_map<const void *, DelegateState> gState;

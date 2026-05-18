@@ -63,8 +63,8 @@ CHIP_ERROR ProxyTransportBase::SendMessage(const PeerAddress & address, System::
 
     uint16_t sessionId = address.GetProxySessionId();
 
-    ChipLogDetail(Inet, "ProxyTransport: forwarding %u bytes for session %u",
-                  static_cast<unsigned>(msgBuf->DataLength()), sessionId);
+    ChipLogDetail(Inet, "ProxyTransport: forwarding %u bytes for session %u", static_cast<unsigned>(msgBuf->DataLength()),
+                  sessionId);
 
     return mDelegate->SendProxyMessage(sessionId, ByteSpan(msgBuf->Start(), msgBuf->DataLength()));
 }
@@ -73,8 +73,8 @@ void ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, const uint8_
 {
     if (!mActive || sessionId != mSessionId)
     {
-        ChipLogError(Inet, "ProxyTransport: received message for unknown session %u (active=%d, expected=%u)",
-                     sessionId, (int) mActive, mSessionId);
+        ChipLogError(Inet, "ProxyTransport: received message for unknown session %u (active=%d, expected=%u)", sessionId,
+                     (int) mActive, mSessionId);
         return;
     }
 
@@ -85,8 +85,8 @@ void ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, const uint8_
         return;
     }
 
-    ChipLogDetail(Inet, "ProxyTransport: injecting %u bytes for session %u into Matter stack",
-                  static_cast<unsigned>(length), sessionId);
+    ChipLogDetail(Inet, "ProxyTransport: injecting %u bytes for session %u into Matter stack", static_cast<unsigned>(length),
+                  sessionId);
 
     HandleMessageReceived(PeerAddress::Proxy(sessionId), std::move(buf));
 }

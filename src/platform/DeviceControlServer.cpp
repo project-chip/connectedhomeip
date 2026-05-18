@@ -75,8 +75,7 @@ CHIP_ERROR DeviceControlServer::PostConnectedToOperationalNetworkEvent(ByteSpan 
     return DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Seconds32(5),
         [](System::Layer *, void *) {
-            ChipDeviceEvent ev{ .Type               = DeviceEventType::kOperationalNetworkEnabled,
-                                .OperationalNetwork = { .network = 0 } };
+            ChipDeviceEvent ev{ .Type = DeviceEventType::kOperationalNetworkEnabled, .OperationalNetwork = { .network = 0 } };
             CHIP_ERROR err = PlatformMgr().PostEvent(&ev);
             if (err != CHIP_NO_ERROR)
             {

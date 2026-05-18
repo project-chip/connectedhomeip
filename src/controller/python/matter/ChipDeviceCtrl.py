@@ -3434,10 +3434,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Returns:
              bytes: A bytes sentence representing the RCAC, or None if no data.
         '''
-        rcac_size = 400
-        rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
+        rcac_size=400
+        rcac_buffer=(ctypes.c_uint8 * rcac_size)()  # Allocate buffer
 
-        actual_rcac_size = ctypes.c_size_t()
+        actual_rcac_size=ctypes.c_size_t()
 
         # Now calling the C++ function with the buffer size set as an additional parameter
         self._dmLib.pychip_GetCommissioningRCACData(
@@ -3449,14 +3449,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         # Check if data is available
         if actual_rcac_size.value > 0:
             # Convert the data to a Python bytes object
-            rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
-            rcac_bytes = bytes(rcac_data)
+            rcac_data=bytearray(rcac_buffer[:actual_rcac_size.value])
+            rcac_bytes=bytes(rcac_data)
         else:
             LOGGER.exception("RCAC returned from C++ did not contain any data")
             return None
         return rcac_bytes
 
-    async def CommissionWithCode(self, setupPayload: str, nodeId: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
+    async def CommissionWithCode(self, setupPayload: str, nodeId: int, discoveryType: DiscoveryType=DiscoveryType.DISCOVERY_ALL) -> int:
         '''
         Commission with the given node ID from the setupPayload.
         setupPayload may be a QR or manual code.
@@ -3544,7 +3544,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
     '''
 
     def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
-                 icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: typing.Optional[str] = None):
+                 icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: typing.Optional[str]=None):
         '''
         Creates a controller without AutoCommissioner.
 
@@ -3566,12 +3566,12 @@ class BareChipDeviceController(ChipDeviceControllerBase):
         '''
         super().__init__(name or f"ctrl(v/{adminVendorId})")
 
-        pairingDelegate = c_void_p(None)
-        devCtrl = c_void_p(None)
+        pairingDelegate=c_void_p(None)
+        devCtrl=c_void_p(None)
 
         # Device should hold a reference to the key to avoid it being GC-ed.
-        self._externalKeyPair = operationalKey
-        nativeKey = operationalKey._create_native_object()
+        self._externalKeyPair=operationalKey
+        nativeKey=operationalKey._create_native_object()
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(

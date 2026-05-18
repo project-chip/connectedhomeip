@@ -237,8 +237,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
         }
         else
         {
-            ChipLogDetail(DeviceLayer,
-                          "WiFi-PAF: DiscoveryResult, session active (peer_id=%u), ignoring stale subscribe_id=%u",
+            ChipLogDetail(DeviceLayer, "WiFi-PAF: DiscoveryResult, session active (peer_id=%u), ignoring stale subscribe_id=%u",
                           pPafInfo->peer_id, subscribe_id);
         }
         return;
@@ -515,8 +514,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%u], freq: %u", subscribe_id, freq);
     mPendingConnectSubscribeId = subscribe_id;
-    mOnPafSubscribeComplete = onSuccess;
-    mOnPafSubscribeError    = onError;
+    mOnPafSubscribeComplete    = onSuccess;
+    mOnPafSubscribeError       = onError;
 
     WiFiPAFSession sessionInfo  = { .discriminator = PafPublish_ssi.DevInfo };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
@@ -527,12 +526,12 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
         pPafInfo->role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
     }
 
-    mConnectDiscoverySignalId = g_signal_connect(
-        mWpaSupplicant.iface.get(), "nandiscovery-result",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-            return self->OnDiscoveryResult(obj);
-        }),
-        this);
+    mConnectDiscoverySignalId =
+        g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
+                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                             return self->OnDiscoveryResult(obj);
+                         }),
+                         this);
 
     g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
                      G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
@@ -684,8 +683,8 @@ void ConnectivityManagerImpl::WiFiPAFDisconnectPublishReceiveHandler()
     // registers exactly one handler and packets are not delivered twice.
     guint sig = g_signal_lookup("nanreceive", G_OBJECT_TYPE(mWpaSupplicant.iface.get()));
     g_signal_handlers_disconnect_matched(mWpaSupplicant.iface.get(),
-                                         static_cast<GSignalMatchType>(G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA),
-                                         sig, 0, nullptr, nullptr, this);
+                                         static_cast<GSignalMatchType>(G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA), sig, 0, nullptr,
+                                         nullptr, this);
 }
 
 void ConnectivityManagerImpl::DisconnectScanSignals()
@@ -735,8 +734,8 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
         uint32_t expected = (mBgScanCb != nullptr) ? mBgScanSubscribeId : mActiveScanSubscribeId;
         if (expected == 0 || subscribe_id != expected)
         {
-            ChipLogProgress(DeviceLayer, "ScanDiscoveryResult: ignoring stale subscribe_id=%u (expected=%u)",
-                            subscribe_id, expected);
+            ChipLogProgress(DeviceLayer, "ScanDiscoveryResult: ignoring stale subscribe_id=%u (expected=%u)", subscribe_id,
+                            expected);
             return;
         }
     }
@@ -806,28 +805,26 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
         return;
     }
 
-    ChipLogProgress(DeviceLayer, "Discovered Device: %s() Subscribe_id:%u peer_publish_id:%u srv_proto_type:%u",
-        __func__, subscribe_id, peer_publish_id, srv_proto_type);
-    ChipLogProgress(DeviceLayer, "\tDiscriminator:%u Opcode:%u PID:0x%X VID:0x%X",
-        pPublishSSI->DevInfo, pPublishSSI->DevOpCode, pPublishSSI->ProductId, pPublishSSI->VendorId);
-    ChipLogProgress(DeviceLayer, "\tpeer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]",
-        peer_addr[0], peer_addr[1], peer_addr[2], peer_addr[3], peer_addr[4], peer_addr[5]);
+    ChipLogProgress(DeviceLayer, "Discovered Device: %s() Subscribe_id:%u peer_publish_id:%u srv_proto_type:%u", __func__,
+                    subscribe_id, peer_publish_id, srv_proto_type);
+    ChipLogProgress(DeviceLayer, "\tDiscriminator:%u Opcode:%u PID:0x%X VID:0x%X", pPublishSSI->DevInfo, pPublishSSI->DevOpCode,
+                    pPublishSSI->ProductId, pPublishSSI->VendorId);
+    ChipLogProgress(DeviceLayer, "\tpeer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", peer_addr[0], peer_addr[1], peer_addr[2],
+                    peer_addr[3], peer_addr[4], peer_addr[5]);
     ChipLogProgress(DeviceLayer, "\tSSI Buffer Len:%lu", bufferLen);
 
     if (peer.hasExtendedData && !peer.storage.empty())
     {
         chip::ByteSpan s(peer.storage.data(), peer.storage.size());
-        constexpr size_t kMaxBytesToPrint = 20;
-        const size_t bytesToPrint         = (s.size() > kMaxBytesToPrint) ? kMaxBytesToPrint : s.size();
+        constexpr size_t kMaxBytesToPrint     = 20;
+        const size_t bytesToPrint             = (s.size() > kMaxBytesToPrint) ? kMaxBytesToPrint : s.size();
         char hexBuf[2 * kMaxBytesToPrint + 1] = { 0 };
-        CHIP_ERROR err = chip::Encoding::BytesToHex(s.data(), bytesToPrint, hexBuf, sizeof(hexBuf),
-                                                    chip::Encoding::HexFlags::kUppercase);
+        CHIP_ERROR err =
+            chip::Encoding::BytesToHex(s.data(), bytesToPrint, hexBuf, sizeof(hexBuf), chip::Encoding::HexFlags::kUppercase);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "\tExtendedData (%lu bytes, showing %lu): %s",
-                            static_cast<unsigned long>(s.size()),
-                            static_cast<unsigned long>(bytesToPrint),
-                            hexBuf);
+            ChipLogProgress(DeviceLayer, "\tExtendedData (%lu bytes, showing %lu): %s", static_cast<unsigned long>(s.size()),
+                            static_cast<unsigned long>(bytesToPrint), hexBuf);
         }
         else
         {
@@ -869,13 +866,13 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
     guint subscribe_id;
     GAutoPtr<GError> err;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    uint8_t is_active  = false; // passive subscribe = discovery mode
+    uint8_t is_active                             = false; // passive subscribe = discovery mode
     // Set the NAN TTL to match the chip-level scan window.  A longer TTL leaves
     // subscribe_id alive in wpa_supplicant after FinishWiFiPAFScan cancels it,
     // causing stale nandiscovery-result events during the next scan that mask
     // results from the new subscribe_id (wpa_supplicant is edge-triggered).
-    unsigned int ttl   = scanMaxTime;
-    unsigned int freq  = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
+    unsigned int ttl  = scanMaxTime;
+    unsigned int freq = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     mScanFreq = static_cast<uint32_t>(freq);
@@ -901,8 +898,8 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
     }
 
     ChipLogProgress(DeviceLayer, "WiFiPAFScan: subscribe_id=%u freq=%u", subscribe_id, freq);
-    mActiveScanSubscribeId     = static_cast<uint32_t>(subscribe_id);
-    WiFiPAFSession sessionInfo = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribe_id };
+    mActiveScanSubscribeId      = static_cast<uint32_t>(subscribe_id);
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
     ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
     auto pPafInfo = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
@@ -913,15 +910,13 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
     }
 
     mScanSignalIds[0] = g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->ScanDiscoveryResult(obj);
-                     }),
-                     this);
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanDiscoveryResult(obj); }),
+                                         this);
     mScanSignalIds[1] = g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->ScanNanReceive(obj);
-                     }),
-                     this);
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanNanReceive(obj); }),
+                                         this);
     mScanSignalIds[2] = g_signal_connect(
         mWpaSupplicant.iface.get(), "nansubscribe-terminated",
         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
@@ -931,12 +926,14 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
 
     ChipLogProgress(DeviceLayer, "WiFiPAFScan: timeout in %d seconds on subscribe_id %u", scanMaxTime, subscribe_id);
     auto * ctx = new ScanTimerCtx{ this, subscribe_id };
-    SystemLayer().StartTimer(System::Clock::Milliseconds32(scanMaxTime * 1000),
+    SystemLayer().StartTimer(
+        System::Clock::Milliseconds32(scanMaxTime * 1000),
         +[](System::Layer *, void * context) {
             auto * timerCtx = static_cast<ScanTimerCtx *>(context);
             timerCtx->self->FinishWiFiPAFScan(timerCtx);
             delete timerCtx;
-        }, ctx);
+        },
+        ctx);
 
     return CHIP_NO_ERROR;
 }
@@ -996,9 +993,9 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     guint subscribe_id;
     GAutoPtr<GError> err;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    uint8_t is_active  = false; // passive subscribe = discovery mode
-    unsigned int ttl   = 0;    // 0 = infinite in wpa_supplicant
-    unsigned int freq  = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
+    uint8_t is_active                             = false; // passive subscribe = discovery mode
+    unsigned int ttl                              = 0;     // 0 = infinite in wpa_supplicant
+    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     mScanFreq = static_cast<uint32_t>(freq);
@@ -1011,8 +1008,7 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
     g_variant_builder_add(&builder, "{sv}", "discovery_only", g_variant_new_boolean(TRUE));
     GVariant * args = g_variant_builder_end(&builder);
-    wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr,
-                                                      &err.GetReceiver());
+    wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
 
     if (err.get() != nullptr)
     {
@@ -1027,15 +1023,13 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
 
     mScanSignalIds[0] = g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->ScanDiscoveryResult(obj);
-                     }),
-                     this);
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanDiscoveryResult(obj); }),
+                                         this);
     mScanSignalIds[1] = g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->ScanNanReceive(obj);
-                     }),
-                     this);
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanNanReceive(obj); }),
+                                         this);
     mScanSignalIds[2] = g_signal_connect(
         mWpaSupplicant.iface.get(), "nansubscribe-terminated",
         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {

@@ -62,11 +62,11 @@ import asyncio
 import logging
 import time
 
-from matter.interaction_model import InteractionModelError, Status
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -157,7 +157,7 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         # Step 6 — scan with ED not present
         self.step(6)
         response = await self._send_scan_request(valid_transports, valid_bands if has_wi else None,
-                                                  timeout_sec=response_deadline)
+                                                 timeout_sec=response_deadline)
         asserts.assert_equal(response.numberOfResults, 0,
                              "Expected NumberOfResults == 0 when no ED is commissionable")
         asserts.assert_equal(response.proxyScanResult, [],
@@ -170,7 +170,7 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         # Step 8 — scan with ED present
         self.step(8)
         response = await self._send_scan_request(valid_transports, valid_bands if has_wi else None,
-                                                  timeout_sec=response_deadline)
+                                                 timeout_sec=response_deadline)
         asserts.assert_greater_equal(response.numberOfResults, 1,
                                      "Expected NumberOfResults >= 1 when ED is commissionable")
         asserts.assert_greater_equal(len(response.proxyScanResult), 1,

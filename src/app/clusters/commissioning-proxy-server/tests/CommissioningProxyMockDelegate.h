@@ -42,44 +42,38 @@ public:
      */
 
     Protocols::InteractionModel::Status ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
-                        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                        uint16_t discriminator,
-                        chip::VendorId vendorid,
-                        uint16_t productid,
-                        uint16_t timeout,
-                        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
-                        app::CommandHandler * commandObj,
-                        const DataModel::InvokeRequest & request) override;
+                                                            chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+                                                            uint16_t discriminator, chip::VendorId vendorid, uint16_t productid,
+                                                            uint16_t timeout,
+                                                            chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
+                                                            app::CommandHandler * commandObj,
+                                                            const DataModel::InvokeRequest & request) override;
 
     /**
      * @brief Handle PowerAdjustRequest command
      *
      * The cluster verifies that PowerAdjustmentCapability.cause is updated to match the command's cause.
      */
-    Protocols::InteractionModel::Status ProxyScanRequest(
-        CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands, app::CommandHandler * commandObj,
-        const DataModel::InvokeRequest & request) override;
+    Protocols::InteractionModel::Status ProxyScanRequest(CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands,
+                                                         app::CommandHandler * commandObj,
+                                                         const DataModel::InvokeRequest & request) override;
 
-    Protocols::InteractionModel::Status ProxyMessageRequest(
-        uint16_t sessionId, chip::Optional<chip::ByteSpan> message, uint8_t responseTimeout,
-        app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) override;
+    Protocols::InteractionModel::Status ProxyMessageRequest(uint16_t sessionId, chip::Optional<chip::ByteSpan> message,
+                                                            uint8_t responseTimeout, app::CommandHandler * commandObj,
+                                                            const DataModel::InvokeRequest & request) override;
 
     Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex) override;
 
-    Protocols::InteractionModel::Status ProxyBackgroundScanStartRequest(
-        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-        uint16_t timeout,
-        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
-        chip::FabricIndex fabricIndex,
-        chip::NodeId nodeId,
-        app::CommandHandler * commandObj,
-        const DataModel::InvokeRequest & request) override;
+    Protocols::InteractionModel::Status
+    ProxyBackgroundScanStartRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t timeout,
+                                    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+                                    chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj,
+                                    const DataModel::InvokeRequest & request) override;
 
-    Protocols::InteractionModel::Status ProxyBackgroundScanStopRequest(
-        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
-        chip::FabricIndex fabricIndex,
-        chip::NodeId nodeId) override;
+    Protocols::InteractionModel::Status
+    ProxyBackgroundScanStopRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+                                   chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands, chip::FabricIndex fabricIndex,
+                                   chip::NodeId nodeId) override;
 
     uint8_t GetMaxSessions() override;
     uint8_t GetMaxCachedResults() override { return 10; }
@@ -170,9 +164,9 @@ public:
 
 private:
     CommissioningProxyCluster * mServer = nullptr;
-    uint8_t     mScanMaxTime        = 120;
+    uint8_t mScanMaxTime                = 120;
     chip::BitMask<WiFiBandBitmap> mSupportedWiFiBands;
-    uint8_t     mMaxSessions        = 1;
+    uint8_t mMaxSessions = 1;
     // uint8_t     mMaxCachedResult    = 1;
     // uint16_t    mCacheTimeout       = 120;
 #if 0

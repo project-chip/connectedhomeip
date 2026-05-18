@@ -118,7 +118,7 @@ Status CommandHandlerImpl::OnInvokeCommandRequest(CommandHandlerExchangeInterfac
                                                   System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     ChipLogProgress(AppServer, "===SHM %s()", __func__);
-    
+
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 
     SetExchangeInterface(&commandResponder);
@@ -613,7 +613,7 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
                                                  const Protocols::InteractionModel::ClusterStatusCode & status,
                                                  const char * context)
 {
-    ChipLogProgress(DataManagement,"===SHM %s()", __func__);
+    ChipLogProgress(DataManagement, "===SHM %s()", __func__);
     if (!status.IsSuccess())
     {
         if (context == nullptr)

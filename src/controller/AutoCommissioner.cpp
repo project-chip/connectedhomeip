@@ -663,8 +663,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     // credentials were provided.
     if (transportType == Transport::Type::kProxy)
     {
-        mNeedsNetworkSetup =
-            mParams.GetWiFiCredentials().HasValue() || mParams.GetThreadOperationalDataset().HasValue();
+        mNeedsNetworkSetup = mParams.GetWiFiCredentials().HasValue() || mParams.GetThreadOperationalDataset().HasValue();
     }
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(commissioner->GetCommissioningStage(), err);

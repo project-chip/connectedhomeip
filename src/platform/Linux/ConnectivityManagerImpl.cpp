@@ -45,12 +45,12 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #if __has_include(<app-common/zap-generated/cluster-objects.h>)
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #else
 // Some builds expose the generated headers under zzz_generated
-#include <zzz_generated/app-common/app-common/zap-generated/cluster-objects.h>
 #include <zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.h>
+#include <zzz_generated/app-common/app-common/zap-generated/cluster-objects.h>
 #endif
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 

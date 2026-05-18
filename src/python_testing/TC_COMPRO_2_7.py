@@ -74,12 +74,13 @@ For max_sessions > 1 supply additional EDs via ed2_*, ed3_*, ... arguments:
 import logging
 import typing
 
+from mobly import asserts
+from support_modules.compro_support import COMPROBaseTest, EDFixture, commission_if_needed
+
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
-from mobly import asserts
-from support_modules.compro_support import COMPROBaseTest, EDFixture, commission_if_needed
 
 logger = logging.getLogger(__name__)
 

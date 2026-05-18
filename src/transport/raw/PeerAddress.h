@@ -56,7 +56,7 @@ enum class Type : uint8_t
     kTcp,
     kWiFiPAF,
     kNfc,
-    kProxy,       // Virtual transport: packets tunnelled through ProxyMessageRequest/Response IM commands
+    kProxy, // Virtual transport: packets tunnelled through ProxyMessageRequest/Response IM commands
     kThreadMeshcop,
     kLast = kThreadMeshcop, // This is not an actual transport type, it just refers to the last transport type
 };
@@ -248,10 +248,7 @@ public:
 
     static constexpr PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
 
-    static constexpr PeerAddress Proxy(uint16_t sessionId)
-    {
-        return PeerAddress(Type::kProxy, static_cast<NodeId>(sessionId));
-    }
+    static constexpr PeerAddress Proxy(uint16_t sessionId) { return PeerAddress(Type::kProxy, static_cast<NodeId>(sessionId)); }
 
     uint16_t GetProxySessionId() const { return static_cast<uint16_t>(mId.mRemoteId); }
 

@@ -617,8 +617,7 @@ CHIP_ERROR WiFiPAFEndPoint::DriveSending()
     // are submitted to wpa_supplicant only after the channel is restored, and
     // strictly before data frames.  PAFTP_ACK_TIMEOUT (15 s) provides
     // sufficient margin for a typical WiFi scan + association (~5-10 s).
-    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() &&
-        (!mAckToSend.IsNull() || !mSendQueue.IsNull()))
+    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() && (!mAckToSend.IsNull() || !mSendQueue.IsNull()))
     {
         // Resource is currently unavailable, send packets later
         return StartWaitResourceTimer();
@@ -932,7 +931,7 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
         // Failed to get SeqNum. => Pass down to PAFTP engine directly
         return RxPacketProcess(std::move(data));
     }
-    ChipLogProgress(WiFiPAF, "===SHM %s() <==[rx] seq=%u (exp=%u)", __func__,seqNum, ExpRxNextSeqNum);
+    ChipLogProgress(WiFiPAF, "===SHM %s() <==[rx] seq=%u (exp=%u)", __func__, seqNum, ExpRxNextSeqNum);
     /*
         If reorder-queue is not empty => Need to queue the packet whose SeqNum is the next one at
         offset 0 to fill the hole.

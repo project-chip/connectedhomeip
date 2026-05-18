@@ -381,8 +381,7 @@ private:
     CHIP_ERROR PairViaProxy(NodeId remoteId);
 
     /** Called when CASE session to the proxy is established. */
-    static void OnProxyDeviceConnected(void * context,
-                                       chip::Messaging::ExchangeManager & exchangeMgr,
+    static void OnProxyDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                        const chip::SessionHandle & sessionHandle);
     static void OnProxyDeviceConnectionFailed(void * context, const chip::ScopedNodeId & nodeId, CHIP_ERROR error);
 
@@ -393,14 +392,12 @@ private:
     CHIP_ERROR SendProxyMessage(uint16_t sessionId, chip::ByteSpan message) override;
 
     // CommandSender::Callback — receives ProxyMessageResponse
-    void OnResponse(chip::app::CommandSender * client,
-                    const chip::app::ConcreteCommandPath & path,
-                    const chip::app::StatusIB & status,
-                    chip::TLV::TLVReader * data) override;
+    void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
+                    const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
     void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override;
     void OnDone(chip::app::CommandSender * client) override;
 
-    NodeId   mProxyNodeId         = chip::kUndefinedNodeId;
+    NodeId mProxyNodeId           = chip::kUndefinedNodeId;
     uint16_t mProxySessionId      = 0;
     uint16_t mProxyConnectTimeout = 0;
 
@@ -419,6 +416,6 @@ private:
     /** Send ProxyDisconnectRequest to the proxy then call SetCommandExitStatus(exitErr). */
     void SendProxyDisconnect(CHIP_ERROR exitErr);
 
-    chip::Callback::Callback<chip::OnDeviceConnected>   mOnProxyConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnProxyConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnProxyConnectionFailureCallback;
 };
