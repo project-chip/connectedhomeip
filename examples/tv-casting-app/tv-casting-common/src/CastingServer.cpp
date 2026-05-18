@@ -69,8 +69,7 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * client =
-        chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
     if (client != nullptr)
     {
         client->SetCommissionerDeclarationHandler(this);
@@ -420,7 +419,7 @@ void CastingServer::OnDescriptorReadSuccessResponse(void * context, const app::D
     }
 
     // Read WoL:MACAddress (if available from this endpoint)
-    TEMPORARY_RETURN_IGNORED CastingServer::GetInstance() -> ReadMACAddress(endpointInfo);
+    TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->ReadMACAddress(endpointInfo);
 
     if (CastingServer::GetInstance()->mOnNewOrUpdatedEndpoint)
     {
@@ -515,15 +514,15 @@ void CastingServer::VerifyOrEstablishConnectionTask(chip::System::Layer * aSyste
         [](TargetVideoPlayerInfo * videoPlayer) {
             ChipLogProgress(AppServer, "CastingServer::OnConnectionSuccess lambda called");
             CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo = *videoPlayer;
-            TEMPORARY_RETURN_IGNORED CastingServer::GetInstance() -> ReadMACAddress(
+            TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->ReadMACAddress(
                 videoPlayer->GetEndpoint(1)); // Read MACAddress from cached VideoPlayer endpoint (1) which supports WoL
             CastingServer::GetInstance()->mOnConnectionSuccessClientCallback(videoPlayer);
         },
         [](CHIP_ERROR error) {
             ChipLogProgress(AppServer, "Deleting VideoPlayer from cache after connection failure: %" CHIP_ERROR_FORMAT,
                             error.Format());
-            TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()
-                -> mPersistenceManager.DeleteVideoPlayer(&CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo);
+            TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->mPersistenceManager.DeleteVideoPlayer(
+                &CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo);
             CastingServer::GetInstance()->mOnConnectionFailureClientCallback(error);
         });
     if (err != CHIP_NO_ERROR)
