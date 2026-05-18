@@ -142,8 +142,9 @@ public:
 private:
     // Bitmap of supported transports.
     uint16_t mSupportedTransports = 0;
-    // Maximum size of the TCP payload that the node is capable of receiving from its peer.
-    uint32_t mMaxTCPPayloadSize = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES;
+    // Maximum size of the TCP payload that the node is capable of receiving
+    // from its peer.
+    uint32_t mMaxTCPPayloadSize = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - kSizeOfMaxTCPPayloadSize;
 };
 #else
 using SessionParameters = BasicSessionParameters;
