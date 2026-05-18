@@ -40,13 +40,13 @@ class PartitionCreator:
 
     """
 
-    def __init__(self, offset: int, length: int, input: str, output: str) -> None:
+    def __init__(self, offset: int, length: int, input_file: str, output: str) -> None:
         self._ih = IntelHex()
         self._length = length
         self._offset = offset
         self._data_ready = False
         self._output = output
-        self._input = input
+        self._input_file = input_file
         try:
             self.__data_to_save = self._convert_to_dict(self._load_json())
         except IOError:
@@ -118,10 +118,10 @@ class PartitionCreator:
         :raises IOError: if provided JSON file can not be read out.
         """
         try:
-            with open(self._input, "rb") as json_file:
+            with open(self._input_file, "rb") as json_file:
                 return json.loads(json_file.read())
         except IOError as e:
-            log.error("Can not read Json file '%s'", self._input)
+            log.error("Can not read Json file '%s'", self._input_file)
             raise e
 
 

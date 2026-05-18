@@ -550,7 +550,7 @@
         { (uint16_t) 0xBB8, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxHeatSetpointLimit */                                    \
         { (uint16_t) 0x640, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinCoolSetpointLimit */                                    \
         { (uint16_t) 0xC80, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxCoolSetpointLimit */                                    \
-        { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x7F },        /* MinSetpointDeadBand */                                     \
+        { (uint16_t) 0x14, (uint16_t) 0x0, (uint16_t) 0x7F },        /* MinSetpointDeadBand */                                     \
         { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },          /* ControlSequenceOfOperation */                              \
         { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },          /* SystemMode */                                              \
                                                                                                                                    \
@@ -4987,8 +4987,8 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
-    { { 0x00000011, 1 }, { 0x00000016, 5 }, { 0x00000100, 4 }, { 0x00000011, 1 },                                                  \
-      { 0x00000100, 4 }, { 0x00000011, 1 }, { 0x00000019, 1 } }
+    { { 0x00000011, 1 }, { 0x00000016, 4 }, { 0x00000100, 3 }, { 0x00000011, 1 },                                                  \
+      { 0x00000100, 3 }, { 0x00000011, 1 }, { 0x00000019, 1 } }
 
 // Array of device type offsets
 #define FIXED_DEVICE_TYPE_OFFSETS { 0, 2, 4, 6 }

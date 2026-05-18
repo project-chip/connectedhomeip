@@ -1194,8 +1194,10 @@ class ChipDeviceControllerBase():
         # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
 
-    async def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None,
-                                          stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
+    async def DiscoverCommissionableNodes(self,
+                                            filterType: discovery.FilterType = discovery.FilterType.NONE,
+                                            filter: typing.Any = None,  # noqa: A002
+                                            stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
         '''
         Discover commissionable nodes via DNS-SD with specified filters.
         Supported filters are:
@@ -1219,7 +1221,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         if isinstance(filter, int):
-            filter = str(filter)
+            filter = str(filter)  # noqa: A001
 
         # Discovery is also used during commissioning. Make sure this manual discovery
         # and commissioning attempts do not interfere with each other.
@@ -3313,7 +3315,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
                                   filterType: DiscoveryFilterType = DiscoveryFilterType.NONE,
-                                  filter: typing.Any = None,
+                                  filter: typing.Any = None,  # noqa: A002
                                   discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
@@ -3341,7 +3343,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         # Convert numerical filters to string for passing down to binding.
         if isinstance(filter, int):
-            filter = str(filter)
+            filter = str(filter)  # noqa: A001
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)

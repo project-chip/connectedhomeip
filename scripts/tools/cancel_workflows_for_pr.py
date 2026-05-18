@@ -121,8 +121,8 @@ class Canceller:
             log.info("No critical failures found")
             return
 
-        for id in in_progress_workflows:
-            workflow = self.repo.get_workflow_run(id)
+        for workflow_id in in_progress_workflows:
+            workflow = self.repo.get_workflow_run(workflow_id)
             if self.dry_run:
                 log.warning("DRY RUN: Will not stop '%s'", workflow.name)
             else:

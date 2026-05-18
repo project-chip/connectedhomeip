@@ -27,7 +27,7 @@
 #include "AppTask.h"
 #include "thermostat-delegate-impl.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/thermostat-server/thermostat-server.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 /**********************************************************
  * Defines and Constants

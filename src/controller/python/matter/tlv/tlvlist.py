@@ -102,8 +102,8 @@ class TLVList:
         Tag = 1
 
     class Iterator:
-        def __init__(self, iter: Iterator):
-            self._iterator = iter
+        def __init__(self, i: Iterator):
+            self._iterator = i
 
         def __iter__(self):
             return self

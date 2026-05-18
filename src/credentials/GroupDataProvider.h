@@ -257,7 +257,12 @@ public:
     GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
-    uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
+    // TODO(#72056): Once groupcast is enabled by default, this should just return mMaxGroupsPerFabric. See GroupDataProviderImpl()
+    // constructor.
+    uint16_t GetMaxGroupsPerFabric() const
+    {
+        return static_cast<uint16_t>(IsGroupcastEnabled() ? (getMaxMembershipCount() / 2) : mMaxGroupsPerFabric);
+    }
     uint16_t GetMaxGroupKeysPerFabric() const { return mMaxGroupKeysPerFabric; }
 
     /**
@@ -397,11 +402,11 @@ public:
 
     void SetGroupcastEnabled(bool groupcastVal) { mGroupcastEnabled = groupcastVal; }
 
-    bool IsGroupcastEnabled() { return mGroupcastEnabled; }
+    bool IsGroupcastEnabled() const { return mGroupcastEnabled; }
 
     // Groupcast
-    virtual uint16_t getMaxMembershipCount() = 0;
-    virtual uint16_t getMaxMcastAddrCount()  = 0;
+    virtual uint16_t getMaxMembershipCount() const = 0;
+    virtual uint16_t getMaxMcastAddrCount() const  = 0;
 
     /**
      * @brief Check if a notification is needed for Auxiliary ACL changes and reset the flag.

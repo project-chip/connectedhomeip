@@ -193,8 +193,11 @@ silabs_executable("air_quality_sensor_app") {
       "${chip_root}/examples/common/pigweed/efr32",
     ]
   }
-
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
 
   inputs = [ ldscript ]
 
