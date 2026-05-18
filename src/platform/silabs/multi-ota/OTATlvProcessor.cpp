@@ -126,6 +126,9 @@ void OTADataAccumulator::Clear()
 
 CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 {
+    // Init() may have left mBuffer null on alloc failure.
+    VerifyOrReturnError(mBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+
     uint32_t numBytes = std::min(mThreshold - mBufferOffset, static_cast<uint32_t>(block.size()));
     memcpy(&mBuffer[mBufferOffset], block.data(), numBytes);
     mBufferOffset += numBytes;
