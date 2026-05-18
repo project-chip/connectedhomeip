@@ -255,7 +255,7 @@ public:
         bool isButtonAction  = false;
     };
 
-    bool InitiateLockAction(int32_t aActor, LockAction aAction);
+    bool InitiateLockAction(LockAction aAction, bool fromButton = false);
 
     static void UnlockAfterUnlatch(intptr_t context);
 
@@ -344,20 +344,6 @@ private:
         }
     };
 
-    struct PendingCommand
-    {
-        bool mValid                                                    = false;
-        LockAction mAction                                             = LockAction::kInvalid;
-        chip::app::Clusters::DoorLock::DlLockState mTargetClusterState = chip::app::Clusters::DoorLock::DlLockState::kLocked;
-        chip::app::DataModel::Nullable<chip::FabricIndex> mFabricIdx;
-        chip::app::DataModel::Nullable<chip::NodeId> mNodeId;
-        chip::app::DataModel::Nullable<uint16_t> mUserIndex;
-        LockOpCredentials mCredential{};
-        bool mHasCredential   = false;
-        bool mIsUnboltUnlatch = false;
-        bool mIsButtonAction  = false;
-    };
-
     // ---- Lock-domain bring-up / state machine ----
     CHIP_ERROR InitLockDomain(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam,
                               chip::PersistentStorageDelegate * storage);
@@ -387,7 +373,10 @@ private:
 
     // ---- State ----
     UnlatchContext mUnlatchContext;
-    PendingCommand mPendingCommand;
+    LockRequest mPendingRequest;
+    bool mHasPendingRequest = false;
+    LockRequest mActiveRemoteAction;
+    bool mHasActiveRemoteAction = false;
 
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
     osTimerId_t mLockTimer               = nullptr;
