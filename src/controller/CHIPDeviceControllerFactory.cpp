@@ -341,7 +341,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         sessionInitParams.localSessionParams.SetSupportedTransports(supportedTransports);
         // Maximum size of the TCP payload that the node is capable of receiving
         // from its peer. Make sure we subtract the framing length prefix.
-        sessionInitParams.localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - sizeof(uint32_t));
+        sessionInitParams.localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                                                  sizeof(uint32_t));
     }
 #endif
 
