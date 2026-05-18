@@ -27,6 +27,7 @@
 #import "core/Types.h"
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <platform/Darwin/PosixConfig.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #import <Foundation/Foundation.h>
@@ -123,6 +124,18 @@
     if (_deviceInstanceInfoProvider != nullptr) {
         ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting custom DeviceInstanceInfoProvider");
         chip::DeviceLayer::SetDeviceInstanceInfoProvider(_deviceInstanceInfoProvider);
+
+        // Write deviceName into PosixConfig so ConfigurationManagerImpl::GetCommissionableDeviceName()
+        // returns it at runtime for UDC requests and mDNS advertisements.
+        id<MCDeviceInstanceInfoProvider> infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
+        if (infoProvider != nil && [infoProvider respondsToSelector:@selector(deviceName)]) {
+            NSString * deviceName = [infoProvider deviceName];
+            if (deviceName != nil) {
+                ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting commissionable device name");
+                chip::DeviceLayer::Internal::PosixConfig::WriteConfigValueStr(
+                    chip::DeviceLayer::Internal::PosixConfig::kConfigKey_DeviceName, [deviceName UTF8String]);
+            }
+        }
     }
 
     // Get and store the CHIP Work queue

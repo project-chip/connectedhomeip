@@ -44,6 +44,7 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetWiFiNetworkInformations(WiFiNetworkInfos & infos);

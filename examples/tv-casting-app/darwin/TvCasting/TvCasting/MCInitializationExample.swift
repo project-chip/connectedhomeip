@@ -135,6 +135,10 @@ class SampleDeviceInstanceInfoProvider: NSObject, MCDeviceInstanceInfoProvider {
     func productName() -> String? {
         return "Test Casting App"
     }
+
+    func deviceName() -> String? {
+        return "My Living Room Speaker"
+    }
 }
 
 // This class is a singleton
