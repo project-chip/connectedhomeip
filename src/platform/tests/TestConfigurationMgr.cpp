@@ -547,6 +547,79 @@ TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromProvider)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
 }
+
+static CHIP_ERROR ProviderThatReturnsNotFound(char * buf, size_t bufSize)
+{
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+
+static CHIP_ERROR ProviderWithSmallBuffer(char * buf, size_t bufSize)
+{
+    const char * name = "This name is longer than a tiny buffer";
+    if (bufSize <= strlen(name))
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    strcpy(buf, name);
+    return CHIP_NO_ERROR;
+}
+
+TEST_F(TestConfigurationMgr, DeviceNameProviderTakesPriorityOverConfig)
+{
+    using namespace chip::DeviceLayer::Internal;
+
+    char buf[64];
+    const char * configName = "Config Name";
+
+    // Write a value to PosixConfig
+    CHIP_ERROR err = PosixConfig::WriteConfigValueStr(PosixConfig::kConfigKey_DeviceName, configName);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Set a provider — it should take priority over the config value
+    ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(TestDeviceNameProvider);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, "Dynamic Device Name");
+
+    // Provider returns NOT_FOUND — should fall through to PosixConfig
+    ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(ProviderThatReturnsNotFound);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, configName);
+
+    // Clean up
+    ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(nullptr);
+    PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_DeviceName);
+}
+
+TEST_F(TestConfigurationMgr, DeviceNameProviderBufferTooSmall)
+{
+    char smallBuf[5];
+
+    ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(ProviderWithSmallBuffer);
+    CHIP_ERROR err = ConfigurationMgr().GetCommissionableDeviceName(smallBuf, sizeof(smallBuf));
+    EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Clean up
+    ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(nullptr);
+}
+
+TEST_F(TestConfigurationMgr, DeviceNameConfigBufferTooSmall)
+{
+    using namespace chip::DeviceLayer::Internal;
+
+    char smallBuf[5];
+    const char * longName = "A name that exceeds the buffer";
+
+    CHIP_ERROR err = PosixConfig::WriteConfigValueStr(PosixConfig::kConfigKey_DeviceName, longName);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetCommissionableDeviceName(smallBuf, sizeof(smallBuf));
+    EXPECT_NE(err, CHIP_NO_ERROR);
+
+    // Clean up
+    PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_DeviceName);
+}
 #endif // __APPLE__
 
 } // namespace
