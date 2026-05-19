@@ -18,7 +18,7 @@
 import json
 import logging
 import time
-from asyncio import Event, Semaphore, TimeoutError, create_task, gather, sleep, wait_for
+from asyncio import Event, Semaphore, TimeoutError, create_task, gather, sleep, wait_for  # noqa: A004
 from typing import Dict, List, Optional
 
 from mdns_discovery.data_classes.aaaa_record import AaaaRecord

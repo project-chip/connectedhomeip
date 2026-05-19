@@ -51,4 +51,4 @@ openthread_project_core_config_file = rebase_path(
         get_path_info(
             "${chip_root}/third_party/openthread/repo/examples/platforms/simulation/openthread-core-simulation-config.h",
             "abspath"))
-chip_config_enable_groupcast = true
+chip_config_enable_groupcast = false

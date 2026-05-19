@@ -41,6 +41,7 @@ public:
         std::optional<uint16_t> productId;
         std::optional<uint16_t> port;
         std::optional<uint32_t> interfaceId;
+        bool enableGroupcast = false;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
