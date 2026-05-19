@@ -155,6 +155,7 @@ void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
     mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     // clearing the delegate MUST always succeed.
     RETURN_SAFELY_IGNORED mDelegate.Init(nullptr);
+    mAsyncCommandHandle = CommandHandler::Handle();
     app::DefaultServerCluster::Shutdown(reason);
 }
 
