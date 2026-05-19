@@ -100,6 +100,8 @@ public:
 } // namespace chip
 
 namespace ChefOvenMode {
+void InitOvenModeForEndpoint(chip::EndpointId endpointId);
+void ShutdownOvenModeForEndpoint(chip::EndpointId endpointId);
 void InitChefOvenModeCluster();
 } // namespace ChefOvenMode
 

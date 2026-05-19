@@ -846,11 +846,6 @@ void ApplicationInit()
     ChefWindowCovering::InitChefWindowCoveringCluster();
 #endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
 
-#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
-    ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
-    ChefOvenMode::InitChefOvenModeCluster();
-#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
-
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
     ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenMode cluster.");
     ChefMicrowaveOvenMode::InitChefMicrowaveOvenModeCluster();

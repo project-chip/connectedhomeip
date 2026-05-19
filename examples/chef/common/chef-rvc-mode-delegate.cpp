@@ -198,6 +198,16 @@ void MatterRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
 }
 
+void MatterRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    if (gRvcRunModeInstance)
+    {
+        gRvcRunModeInstance->Shutdown();
+    }
+    RvcRunMode::Shutdown();
+}
+
 #endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 
 #ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
@@ -332,6 +342,16 @@ void MatterRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeInstance =
         std::make_unique<ModeBase::Instance>(gRvcCleanModeDelegate.get(), endpointId, RvcCleanMode::Id, 0 /* No feature bits */);
     TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
+}
+
+void MatterRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    if (gRvcCleanModeInstance)
+    {
+        gRvcCleanModeInstance->Shutdown();
+    }
+    RvcCleanMode::Shutdown();
 }
 
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
