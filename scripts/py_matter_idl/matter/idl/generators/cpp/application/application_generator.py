@@ -17,7 +17,10 @@ from dataclasses import dataclass
 from typing import List, Mapping, Optional
 
 from matter.idl.generators import CodeGenerator
-from matter.idl.generators.cluster_selection import server_side_clusters
+from matter.idl.generators.cluster_selection import (
+    ember_af_cluster_init_callback_clusters,
+    server_side_clusters,
+)
 from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.generators.type_definitions import TypeLookupContext
 from matter.idl.matter_idl_types import Bitmap, Idl, ServerClusterInstantiation
@@ -172,15 +175,17 @@ class CppApplicationGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="CallbackStubSource.jinja",
             output_file_name="app/callback-stub.cpp",
-            template_vars={"clusters": server_side_clusters(self.idl)},
+            template_vars={
+                "clusters": ember_af_cluster_init_callback_clusters(self.idl)
+            },
         )
 
         self.internal_render_one_output(
             template_path="ClusterCallbacksSource.jinja",
             output_file_name="app/cluster-callbacks.cpp",
             template_vars={
-                'clusters': server_side_clusters(self.idl)
-            }
+                "clusters": ember_af_cluster_init_callback_clusters(self.idl)
+            },
         )
 
         for name, config in cluster_instances(self.idl).items():
