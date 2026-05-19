@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0551" name="Camera AV Stream Management Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0551" name="Camera AV Stream Management Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="Add attribute ImageRotationDiscreteAngles"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0551" name="Camera AV Stream Management"/>
@@ -828,6 +829,37 @@ Davis, CA 95616, USA
       <quality persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
+    <attribute id="0x0029" name="ImageRotationDiscreteAngles" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="b" more="true" min="1">
+          <andTerm>
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+            <feature name="ICTL"/>
+            <notTerm>
+              <attribute name="ImageRotation"/>
+            </notTerm>
+          </andTerm>
+        </optionalConform>
+      </otherwiseConform>
+      <constraint>
+        <allowed value="0"/>
+      </constraint>
+      <constraint>
+        <allowed value="90"/>
+      </constraint>
+      <constraint>
+        <allowed value="180"/>
+      </constraint>
+      <constraint>
+        <allowed value="270"/>
+      </constraint>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="AudioStreamAllocate" direction="commandToServer" response="AudioStreamAllocateResponse">
@@ -1101,12 +1133,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="WatermarkEnabled" type="bool">
-        <optionalConform choice="d" more="true" min="1">
+        <optionalConform choice="c" more="true" min="1">
           <feature name="WMARK"/>
         </optionalConform>
       </field>
       <field id="2" name="OSDEnabled" type="bool">
-        <optionalConform choice="d" more="true" min="1">
+        <optionalConform choice="c" more="true" min="1">
           <feature name="OSD"/>
         </optionalConform>
       </field>

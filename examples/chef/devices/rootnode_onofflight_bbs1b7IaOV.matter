@@ -1909,7 +1909,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2095,7 +2095,7 @@ endpoint 0 {
   }
 }
 endpoint 13 {
-  device type ma_onofflight = 256, version 4;
+  device type ma_onofflight = 256, version 3;
 
   binding cluster Binding;
 

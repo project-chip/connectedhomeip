@@ -372,3 +372,45 @@ jobs:
                   publish_dir: allure-history/allure-report/nightly
                   destination_dir: allure-report/nightly
                   keep_files: true
+
+    nightly_msan_tests_linux:
+        name: Nightly MSAN Tests - Linux
+        if: github.actor != 'restyled-io[bot]'
+        timeout-minutes: 60
+
+        # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
+        # bound, we run these on larger/faster machines.
+        runs-on: namespace-profile-4x16
+
+        container:
+            image: ghcr.io/project-chip/chip-build:194
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-msan
+
+            - name: Build MSAN sysroot
+              run: ./scripts/run_in_build_env.sh "scripts/build/build_msan_sysroot.sh"
+
+            - name: Build and Run MSAN unit tests
+              run: >-
+                  ./scripts/run_in_build_env.sh "scripts/build/build_examples.py
+                  --target linux-x64-tests-msan-clang build"
