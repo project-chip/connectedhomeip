@@ -105,7 +105,7 @@ CHIP_ERROR AppTask::AppInit()
     err = appInstance().InitThermostat();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("InitThermostat() failed");
+        ChipLogError(AppServer, "InitThermostat() failed: %" CHIP_ERROR_FORMAT, err.Format());
         appError(err);
     }
 
@@ -117,12 +117,13 @@ CHIP_ERROR AppTask::InitThermostat()
     sSensorTimer = osTimerNew(&CustomerAppTask::SensorTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
     if (sSensorTimer == nullptr)
     {
-        SILABS_LOG("sSensorTimer timer create failed");
+        ChipLogError(AppServer, "sSensorTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
     CHIP_ERROR err = appInstance().InitSensor();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err, SILABS_LOG("InitSensor() failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(AppServer, "InitSensor() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
     PlatformMgr().LockChipStack();
     AppTask::UpdateThermoStatUI();
@@ -140,7 +141,7 @@ CHIP_ERROR AppTask::InitSensor()
     sl_status_t status = Si70xxSensor::Init();
     if (status != SL_STATUS_OK)
     {
-        SILABS_LOG("Failed to Init Sensor with error code: %lx", status);
+        ChipLogError(AppServer, "Failed to Init Sensor with error code: %lx", status);
         return MATTER_PLATFORM_ERROR(status);
     }
 #endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
@@ -160,7 +161,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = GetAppTask().Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogError(AppServer, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
         appError(err);
     }
 
@@ -168,7 +169,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     GetAppTask().StartStatusLEDTimer();
 #endif
 
-    SILABS_LOG("App Task started");
+    ChipLogProgress(AppServer, "App Task started");
     while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, nullptr, osWaitForever);
@@ -208,7 +209,7 @@ void AppTask::UpdateThermoStatUI()
         GetLCD().WriteDemoUI(false); // State doesn't matter
     }
 #else
-    SILABS_LOG("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", modeForUi, currentTempC, heatingC, coolingC);
+    ChipLogProgress(AppServer, "Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", modeForUi, currentTempC, heatingC, coolingC);
 #endif // DISPLAY_ENABLED
 }
 
@@ -242,9 +243,10 @@ void AppTask::TemperatureUpdateEventHandler(AppEvent * /* aEvent */)
     int16_t temperature = 0;
     CHIP_ERROR err      = appInstance().GetTemperature(temperature);
     VerifyOrReturn(err == CHIP_NO_ERROR,
-                   SILABS_LOG("GetTemperature() failed: %" CHIP_ERROR_FORMAT ", skipping LocalTemperature::Set", err.Format()));
+                   ChipLogError(AppServer, "GetTemperature() failed: %" CHIP_ERROR_FORMAT ", skipping LocalTemperature::Set",
+                                err.Format()));
 
-    SILABS_LOG("Sensor Temp is : %d", temperature);
+    ChipLogDetail(AppServer, "Sensor Temp is : %d", temperature);
 
     MarkAttributeDirty reportState = MarkAttributeDirty::kNo;
     if ((temperature >= (sLastTemperature + kMinTemperatureDelta)) || temperature <= (sLastTemperature - kMinTemperatureDelta))
@@ -270,7 +272,7 @@ CHIP_ERROR AppTask::GetTemperature(int16_t & temperature)
         sl_status_t status = Si70xxSensor::GetSensorData(humidity, sample);
         if (status != SL_STATUS_OK)
         {
-            SILABS_LOG("Failed to read Temperature sample: %lx", status);
+            ChipLogError(AppServer, "Failed to read Temperature sample: %lx", status);
             return MATTER_PLATFORM_ERROR(status);
         }
         tempSum += sample;
@@ -322,23 +324,23 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
     switch (attributeId)
     {
     case ThermAttr::LocalTemperature::Id:
-        SILABS_LOG("Local temp %d", ConvertToPrintableTemp(*reinterpret_cast<int16_t *>(value)));
+        ChipLogDetail(Zcl, "Local temp %d", ConvertToPrintableTemp(*reinterpret_cast<int16_t *>(value)));
         break;
 
     case ThermAttr::OccupiedCoolingSetpoint::Id:
-        SILABS_LOG("CoolingSetpoint %d", ConvertToPrintableTemp(*reinterpret_cast<int16_t *>(value)));
+        ChipLogDetail(Zcl, "CoolingSetpoint %d", ConvertToPrintableTemp(*reinterpret_cast<int16_t *>(value)));
         break;
 
     case ThermAttr::OccupiedHeatingSetpoint::Id:
-        SILABS_LOG("HeatingSetpoint %d", ConvertToPrintableTemp(*reinterpret_cast<int16_t *>(value)));
+        ChipLogDetail(Zcl, "HeatingSetpoint %d", ConvertToPrintableTemp(*reinterpret_cast<int16_t *>(value)));
         break;
 
     case ThermAttr::SystemMode::Id:
-        SILABS_LOG("SystemMode %d", static_cast<uint8_t>(*value));
+        ChipLogDetail(Zcl, "SystemMode %d", static_cast<uint8_t>(*value));
         break;
 
     default:
-        SILABS_LOG("Unhandled thermostat attribute %x", attributeId);
+        ChipLogDetail(Zcl, "Unhandled thermostat attribute " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
         return;
     }
 

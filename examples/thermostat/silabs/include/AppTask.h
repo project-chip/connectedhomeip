@@ -27,8 +27,6 @@
 
 struct AppEvent;
 
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-
 class AppTask : public BaseApplication
 {
 public:
