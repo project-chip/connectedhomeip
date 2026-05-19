@@ -373,7 +373,7 @@ CHIP_ERROR ServerInstance::Init()
     VerifyOrReturnError(mDelegate, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     return mDelegate->Init(this);
 }
 
