@@ -94,7 +94,6 @@ void GenericThreadDriver::OnThreadStateChangeHandler(const ChipDeviceEvent * eve
 
 void GenericThreadDriver::Shutdown()
 {
-    PlatformMgr().RemoveEventHandler(OnThreadStateChangeHandler, reinterpret_cast<intptr_t>(this));
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
