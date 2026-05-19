@@ -21,6 +21,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <app/server/Server.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/Nullable.h>
@@ -76,13 +77,24 @@ public:
         }
     }
 
+    void OnFabricRemoved(FabricIndex fabricIndex) override
+    {
+        mLastFabricRemovedIndex = fabricIndex;
+        mFabricRemovedCallCount++;
+    }
+
     std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> GetLastAnnounceCommandPayload() const
     {
         return mLastAnnounceCommandPayload;
     }
 
+    std::optional<FabricIndex> GetLastFabricRemovedIndex() const { return mLastFabricRemovedIndex; }
+    uint32_t GetFabricRemovedCallCount() const { return mFabricRemovedCallCount; }
+
 private:
     std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> mLastAnnounceCommandPayload;
+    std::optional<FabricIndex> mLastFabricRemovedIndex;
+    uint32_t mFabricRemovedCallCount = 0;
 };
 
 struct TestOTARequestorCluster : public ::testing::Test
@@ -528,6 +540,88 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventBeforeStartupFails)
     DownloadError::Type event{ 0x12345678u, 0x123456789ABCDEF0u, DataModel::NullNullable, DataModel::NullNullable };
     EXPECT_NE(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+}
+
+// OnFabricRemoved clears the removed fabric's DefaultOTAProviders entry, leaves other fabrics
+// untouched, and notifies the command interface exactly once with the removed fabricIndex.
+TEST_F(TestOTARequestorCluster, OnFabricRemovedClearsTargetFabricAndNotifiesRequestor)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Seed providers for two distinct fabrics.
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type providerA;
+    providerA.providerNodeID = 0x1111u;
+    providerA.endpoint       = 1;
+    providerA.fabricIndex    = 1;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(providerA), CHIP_NO_ERROR);
+
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type providerB;
+    providerB.providerNodeID = 0x2222u;
+    providerB.endpoint       = 2;
+    providerB.fabricIndex    = 2;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(providerB), CHIP_NO_ERROR);
+
+    // Sanity: both entries present.
+    {
+        auto it = attributes.GetDefaultOtaProviderListIterator();
+        size_t count = 0;
+        while (it.Next()) { count++; }
+        EXPECT_EQ(count, 2u);
+    }
+
+    // Remove fabric 1. Pass the global FabricTable reference the production code path uses;
+    // OTARequestorCluster::OnFabricRemoved ignores the table arg (only the fabricIndex is used).
+    cluster.OnFabricRemoved(Server::GetInstance().GetFabricTable(), /*fabricIndex=*/1);
+
+    // (a) Fabric 1's DefaultOTAProviders entry is gone; fabric 2's remains.
+    {
+        auto it = attributes.GetDefaultOtaProviderListIterator();
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue(), providerB);
+        EXPECT_FALSE(it.Next());
+    }
+
+    // (b) The command interface saw exactly one OnFabricRemoved(1) call.
+    EXPECT_EQ(otaCommands.GetFabricRemovedCallCount(), 1u);
+    ASSERT_TRUE(otaCommands.GetLastFabricRemovedIndex().has_value());
+    EXPECT_EQ(otaCommands.GetLastFabricRemovedIndex().value(), 1);
+}
+
+// Notification fires even when the removed fabric has no DefaultOTAProviders entry — in-flight
+// or persisted state may exist from an AnnounceOTAProvider-triggered OTA.
+TEST_F(TestOTARequestorCluster, OnFabricRemovedNotifiesRequestorEvenWithNoProvidersForThatFabric)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Provider exists for fabric 2 only; nothing for fabric 7.
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
+    provider.providerNodeID = 0x3333u;
+    provider.endpoint       = 1;
+    provider.fabricIndex    = 2;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(provider), CHIP_NO_ERROR);
+
+    cluster.OnFabricRemoved(Server::GetInstance().GetFabricTable(), /*fabricIndex=*/7);
+
+    // Fabric 2's entry untouched.
+    {
+        auto it = attributes.GetDefaultOtaProviderListIterator();
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue(), provider);
+        EXPECT_FALSE(it.Next());
+    }
+
+    // Notification still happened (the requestor's hook decides whether there's anything to clear).
+    EXPECT_EQ(otaCommands.GetFabricRemovedCallCount(), 1u);
+    ASSERT_TRUE(otaCommands.GetLastFabricRemovedIndex().has_value());
+    EXPECT_EQ(otaCommands.GetLastFabricRemovedIndex().value(), 7);
 }
 
 } // namespace
