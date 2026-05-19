@@ -129,7 +129,8 @@ void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(ch
     TEMPORARY_RETURN_IGNORED gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
 }
 
-void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId,
+                                                                                  MatterClusterShutdownType)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     if (gRefrigeratorAndTemperatureControlledCabinetModeInstance != nullptr)

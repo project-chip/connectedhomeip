@@ -103,7 +103,7 @@ void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gLaundryWasherModeInstance->Init();
 }
 
-void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, ClusterShutdownType clusterShutdownType)
+void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, ClusterShutdownType)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     if (gLaundryWasherModeInstance != nullptr)
