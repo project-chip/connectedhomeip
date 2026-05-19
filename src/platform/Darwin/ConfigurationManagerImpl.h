@@ -42,9 +42,19 @@ inline constexpr int kCountryCodeLength = 2;
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
 public:
+    using DeviceNameProvider = CHIP_ERROR (*)(char * buf, size_t bufSize);
+
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
     CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
+
+    /**
+     * Set a callback that provides the commissionable device name at runtime.
+     * When set, GetCommissionableDeviceName() calls through to this provider
+     * on each query, enabling dynamic values (analogous to Android's
+     * PreferencesConfigurationManager.readConfigValueStr for kConfigKey_DeviceName).
+     */
+    void SetDeviceNameProvider(DeviceNameProvider provider) { mDeviceNameProvider = provider; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetWiFiNetworkInformations(WiFiNetworkInfos & infos);
@@ -79,6 +89,8 @@ private:
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
     CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
     CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
+
+    DeviceNameProvider mDeviceNameProvider = nullptr;
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;

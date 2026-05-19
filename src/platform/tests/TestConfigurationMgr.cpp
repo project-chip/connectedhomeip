@@ -39,6 +39,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #ifdef __APPLE__
+#include <platform/Darwin/ConfigurationManagerImpl.h>
 #include <platform/Darwin/PosixConfig.h>
 #endif
 
@@ -513,6 +514,35 @@ TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromConfig)
 
     // Clear the config key and verify fallback to compile-time default
     PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_DeviceName);
+    err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+}
+
+static CHIP_ERROR TestDeviceNameProvider(char * buf, size_t bufSize)
+{
+    const char * name = "Dynamic Device Name";
+    if (bufSize <= strlen(name))
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    strcpy(buf, name);
+    return CHIP_NO_ERROR;
+}
+
+TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromProvider)
+{
+    char buf[64];
+
+    // Set a dynamic provider
+    ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(TestDeviceNameProvider);
+
+    CHIP_ERROR err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_STREQ(buf, "Dynamic Device Name");
+
+    // Clear provider, verify fallback to compile-time default
+    ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(nullptr);
     err = ConfigurationMgr().GetCommissionableDeviceName(buf, sizeof(buf));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);

@@ -27,10 +27,28 @@
 #import "core/Types.h"
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <platform/Darwin/PosixConfig.h>
+#include <lib/support/CHIPMemString.h>
+#include <platform/Darwin/ConfigurationManagerImpl.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #import <Foundation/Foundation.h>
+
+namespace {
+__weak id<MCDeviceInstanceInfoProvider> sDeviceInstanceInfoDelegate = nil;
+
+CHIP_ERROR DeviceNameProviderCallback(char * buf, size_t bufSize)
+{
+    id<MCDeviceInstanceInfoProvider> delegate = sDeviceInstanceInfoDelegate;
+    if (delegate != nil && [delegate respondsToSelector:@selector(deviceName)]) {
+        NSString * name = [delegate deviceName];
+        if (name != nil) {
+            chip::Platform::CopyString(buf, bufSize, [name UTF8String]);
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+} // namespace
 
 @interface MCCastingApp ()
 
@@ -126,22 +144,11 @@
         ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting custom DeviceInstanceInfoProvider");
         chip::DeviceLayer::SetDeviceInstanceInfoProvider(_deviceInstanceInfoProvider);
 
-        // Write deviceName into PosixConfig so ConfigurationManagerImpl::GetCommissionableDeviceName()
-        // returns it at runtime for UDC requests and mDNS advertisements.
+        // Register the runtime device name provider so GetCommissionableDeviceName()
+        // queries the delegate on every call (matching Android's pull-based model).
         if (infoProvider != nil && [infoProvider respondsToSelector:@selector(deviceName)]) {
-            NSString * deviceName = [infoProvider deviceName];
-            CHIP_ERROR err = CHIP_NO_ERROR;
-            if (deviceName != nil) {
-                ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting commissionable device name");
-                err = chip::DeviceLayer::Internal::PosixConfig::WriteConfigValueStr(
-                    chip::DeviceLayer::Internal::PosixConfig::kConfigKey_DeviceName, [deviceName UTF8String]);
-            } else {
-                err = chip::DeviceLayer::Internal::PosixConfig::ClearConfigValue(
-                    chip::DeviceLayer::Internal::PosixConfig::kConfigKey_DeviceName);
-            }
-            if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) {
-                ChipLogError(AppServer, "MCCastingApp.initializeWithDataSource() failed to update device name: %" CHIP_ERROR_FORMAT, err.Format());
-            }
+            sDeviceInstanceInfoDelegate = infoProvider;
+            chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(DeviceNameProviderCallback);
         }
     }
 
