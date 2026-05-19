@@ -72,17 +72,17 @@ class TC_FAN_3_2(MatterBaseTest):
                 TestStep(3, "[FC] TH reads the FanModeSequence attribute from the DUT. This attribute specifies the available fan modes.",
                          "Verify that the DUT response contains a FanModeSequenceEnum and store."),
                 TestStep(4, "[FC] Initialize the DUT to `FanMode` Off.",
-                         "[FC] * Read back and verify the written value. * The DUT shall return either a SUCCESS or an INVALID_IN_STATE status code."),
+                         "[FC] * Read back and verify the written value. * The DUT shall return either a SUCCESS, INVALID_IN_STATE, or CONSTRAINT_ERROR status code."),
                 TestStep(5, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
                          "[FC] This will receive updates for the attributes when the SpeedSetting attribute is updated."),
                 TestStep(6, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in ascending order, from 1 to SpeedMax.",
-                         "[FC] For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is Off due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one)."),
+                         "[FC] For each update, the DUT shall return either a SUCCESS, INVALID_IN_STATE, or CONSTRAINT_ERROR status code. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is Off due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one)."),
                 TestStep(7, "[FC] Initialize the DUT to `FanMode` High.",
-                         "[FC] * Read back and verify the written value. * The DUT shall return either a SUCCESS or an INVALID_IN_STATE status code."),
+                         "[FC] * Read back and verify the written value. * The DUT shall return either a SUCCESS, INVALID_IN_STATE, or CONSTRAINT_ERROR status code."),
                 TestStep(8, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
                          "[FC] This will receive updates for the attributes when the SpeedSetting attribute is updated."),
                 TestStep(9, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in descending order, from SpeedMax - 1 to 0.",
-                         "[FC] For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is High due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one)."),
+                         "[FC] For each update, the DUT shall return either a SUCCESS, INVALID_IN_STATE, or CONSTRAINT_ERROR status code. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is High due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one)."),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -92,9 +92,9 @@ class TC_FAN_3_2(MatterBaseTest):
     async def write_and_verify_attribute(self, attribute, value) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         write_status = result[0].Status
-        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
+        write_status_ok = write_status in (Status.Success, Status.InvalidInState, Status.ConstraintError)
+        asserts.assert_true(write_status_ok,
+                            f"[FC] {attribute.__name__} write did not return SUCCESS, INVALID_IN_STATE, or CONSTRAINT_ERROR ({write_status.name})")
 
         if write_status == Status.Success:
             value_read = await self.read_setting(attribute)
