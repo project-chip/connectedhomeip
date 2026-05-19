@@ -74,11 +74,11 @@ CHIP_ERROR
 OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                OperationalState::GenericOperationalState & operationalState)
 {
-    if (index >= mOperationalStateList.size())
+    if (index >= sizeof(kOpStateIds) / sizeof(kOpStateIds[0]))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalState = mOperationalStateList[index];
+    operationalState.Set(kOpStateIds[index]);
     return CHIP_NO_ERROR;
 }
 

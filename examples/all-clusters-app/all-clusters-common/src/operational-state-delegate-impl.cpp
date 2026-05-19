@@ -37,11 +37,11 @@ DataModel::Nullable<uint32_t> GenericOperationalStateDelegateImpl::GetCountdownT
 
 CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    if (index >= mOperationalStateList.size())
+    if (index >= mOperationalStateIds.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalState = mOperationalStateList[index];
+    operationalState.Set(mOperationalStateIds[index]);
     return CHIP_NO_ERROR;
 }
 

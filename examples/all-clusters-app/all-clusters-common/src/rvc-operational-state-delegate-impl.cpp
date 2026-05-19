@@ -26,11 +26,11 @@ using namespace chip::app::Clusters::RvcOperationalState;
 CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                    OperationalState::GenericOperationalState & operationalState)
 {
-    if (index >= mOperationalStateList.size())
+    if (index >= sizeof(kRvcOpStateIds) / sizeof(kRvcOpStateIds[0]))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalState = mOperationalStateList[index];
+    operationalState.Set(kRvcOpStateIds[index]);
     return CHIP_NO_ERROR;
 }
 
