@@ -23,6 +23,7 @@
 #include <nvm3_default.h>
 #include <platform/silabs/SilabsConfig.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer::Internal;
 using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
@@ -55,27 +56,27 @@ public:
 
 struct EmberAfPluginDoorLockUserInfo
 {
-    chip::CharSpan userName;
-    chip::Span<const Legacy::CredentialStruct> credentials;
+    CharSpan userName;
+    Span<const Legacy::CredentialStruct> credentials;
     uint32_t userUniqueId;
     UserStatusEnum userStatus = UserStatusEnum::kAvailable;
     UserTypeEnum userType;
     CredentialRuleEnum credentialRule;
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy;
+    FabricIndex createdBy;
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy;
+    FabricIndex lastModifiedBy;
 };
 
 struct EmberAfPluginDoorLockCredentialInfo
 {
     DlCredentialStatus status = DlCredentialStatus::kAvailable;
     CredentialTypeEnum credentialType;
-    chip::ByteSpan credentialData;
+    ByteSpan credentialData;
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy;
+    FabricIndex createdBy;
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy;
+    FabricIndex lastModifiedBy;
 };
 
 struct WeekDaysScheduleInfo
@@ -112,7 +113,7 @@ bool ReadKey(SilabsConfig::Key key, uint8_t *& p, size_t & size)
     uint32_t type;
     VerifyOrReturnValue(SilabsConfig::ValidConfigKey(key), false);
     VerifyOrReturnValue(0 == nvm3_getObjectInfo(nvm3_defaultHandle, key, &type, &size), false);
-    p = (uint8_t *) chip::Platform::MemoryAlloc(size);
+    p = (uint8_t *) Platform::MemoryAlloc(size);
     VerifyOrReturnValue(0 == nvm3_readData(nvm3_defaultHandle, key, p, size), false);
     return true;
 }
@@ -142,7 +143,7 @@ bool IsMigrationNeeded()
         VerifyKey(Legacy::kConfigKey_YearDaySchedules) || VerifyKey(Legacy::kConfigKey_HolidaySchedules);
 }
 
-bool MigrateCredentials(chip::EndpointId endpoint_id, const AppTask::LockParam & params)
+bool MigrateCredentials(EndpointId endpoint_id, const AppTask::LockParam & params)
 {
     const size_t kSingleTypeCredsSize = params.numberOfCredentialsPerUser * Legacy::kMaxCredentialSize;
     uint8_t * creds_data_buffer       = nullptr;
@@ -190,7 +191,7 @@ bool MigrateCredentials(chip::EndpointId endpoint_id, const AppTask::LockParam &
                 if (DlCredentialStatus::kOccupied == info.status)
                 {
                     uint8_t * data = creds_data_buffer + (type_idx * kSingleTypeCredsSize + cred_idx * Legacy::kMaxCredentialSize);
-                    const chip::ByteSpan data_span(data, info.credentialData.size());
+                    const ByteSpan data_span(data, info.credentialData.size());
                     success = AppTask::GetAppTask().DMDoorLockSetCredential(
                         endpoint_id, cred_idx, info.createdBy, info.lastModifiedBy, info.status, info.credentialType, data_span);
                 }
@@ -201,12 +202,12 @@ bool MigrateCredentials(chip::EndpointId endpoint_id, const AppTask::LockParam &
     TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_CredentialData);
     TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_Credential);
 exit:
-    chip::Platform::MemoryFree(creds_data_buffer);
-    chip::Platform::MemoryFree(creds_info_buffer);
+    Platform::MemoryFree(creds_data_buffer);
+    Platform::MemoryFree(creds_info_buffer);
     return success;
 }
 
-bool MigrateUsers(chip::EndpointId endpoint_id, const AppTask::LockParam & params)
+bool MigrateUsers(EndpointId endpoint_id, const AppTask::LockParam & params)
 {
     const size_t kSingleUserCredsSize                  = sizeof(Legacy::CredentialStruct) * params.numberOfCredentialsPerUser;
     Legacy::CredentialStruct * all_user_creds          = nullptr;
@@ -234,7 +235,7 @@ bool MigrateUsers(chip::EndpointId endpoint_id, const AppTask::LockParam & param
         user_creds_count = user_creds_size / kSingleUserCredsSize;
         VerifyOrExit(params.numberOfUsers == user_creds_count, success = false);
         all_user_creds = (Legacy::CredentialStruct *) user_creds_buffer;
-        new_creds = (CredentialStruct *) chip::Platform::MemoryAlloc(params.numberOfCredentialsPerUser * sizeof(CredentialStruct));
+        new_creds = (CredentialStruct *) Platform::MemoryAlloc(params.numberOfCredentialsPerUser * sizeof(CredentialStruct));
         VerifyOrExit(nullptr != new_creds, success = false);
         VerifyOrExit(params.numberOfUsers == user_creds_count, success = false);
     }
@@ -282,7 +283,7 @@ bool MigrateUsers(chip::EndpointId endpoint_id, const AppTask::LockParam & param
             new_creds[i].credentialIndex = creds[i].credentialIndex;
         }
         success = AppTask::GetAppTask().DMDoorLockSetUser(
-            endpoint_id, 1 + user_idx, info.createdBy, info.lastModifiedBy, chip::CharSpan(name, info.userName.size()),
+            endpoint_id, 1 + user_idx, info.createdBy, info.lastModifiedBy, CharSpan(name, info.userName.size()),
             info.userUniqueId, info.userStatus, info.userType, info.credentialRule, new_creds, info.credentials.size());
     }
 
@@ -290,14 +291,14 @@ bool MigrateUsers(chip::EndpointId endpoint_id, const AppTask::LockParam & param
     TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUserName);
     TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUser);
 exit:
-    chip::Platform::MemoryFree(user_creds_buffer);
-    chip::Platform::MemoryFree(names_buffer);
-    chip::Platform::MemoryFree(users_buffer);
-    chip::Platform::MemoryFree(new_creds);
+    Platform::MemoryFree(user_creds_buffer);
+    Platform::MemoryFree(names_buffer);
+    Platform::MemoryFree(users_buffer);
+    Platform::MemoryFree(new_creds);
     return success;
 }
 
-bool MigrateSchedules(chip::EndpointId endpoint_id, const AppTask::LockParam & params)
+bool MigrateSchedules(EndpointId endpoint_id, const AppTask::LockParam & params)
 {
     Legacy::WeekDaysScheduleInfo * week_schedules = nullptr;
     Legacy::YearDayScheduleInfo * year_schedules  = nullptr;
@@ -410,9 +411,9 @@ bool MigrateSchedules(chip::EndpointId endpoint_id, const AppTask::LockParam & p
     TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_YearDaySchedules);
     TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_HolidaySchedules);
 exit:
-    chip::Platform::MemoryFree(week_schedules_buffer);
-    chip::Platform::MemoryFree(year_schedules_buffer);
-    chip::Platform::MemoryFree(holiday_schedules_buffer);
+    Platform::MemoryFree(week_schedules_buffer);
+    Platform::MemoryFree(year_schedules_buffer);
+    Platform::MemoryFree(holiday_schedules_buffer);
     return success;
 }
 
@@ -425,14 +426,14 @@ bool AppTask::MigrateLockConfig(const LockParam & params)
         static constexpr size_t kEnpointCount =
             MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
         // Migrate old data into the FIRST endpoint found
-        for (chip::EndpointId endpoint_id = 1; endpoint_id <= kEnpointCount; ++endpoint_id)
+        for (EndpointId endpoint_id = 1; endpoint_id <= kEnpointCount; ++endpoint_id)
         {
             if (emberAfContainsServer(endpoint_id, DoorLock::Id))
             {
-                chip::DeviceLayer::PlatformMgr().LockChipStack();
+                DeviceLayer::PlatformMgr().LockChipStack();
                 bool success = MigrateCredentials(endpoint_id, params) && MigrateUsers(endpoint_id, params) &&
                     MigrateSchedules(endpoint_id, params);
-                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+                DeviceLayer::PlatformMgr().UnlockChipStack();
                 ChipLogProgress(Zcl, "LockMigration: %s", success ? "Success" : "ERROR");
                 return success;
             }

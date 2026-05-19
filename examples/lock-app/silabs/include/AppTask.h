@@ -65,6 +65,7 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
+    /** @brief Singleton accessor; returns the active `CustomerAppTask` instance. */
     static AppTask & GetAppTask();
 
     // ---------------------------------------------------------------------
@@ -153,22 +154,31 @@ public:
     /** @brief AppTask task main loop function. */
     static void AppTaskMain(void * pvParameter);
 
+    /** @brief Start the AppTask FreeRTOS thread; runs `AppTaskMain` as entry. */
     CHIP_ERROR StartAppTask();
 
+    /** @brief Platform button callback; posts an `AppEvent` to the AppTask queue. */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+    /** @brief AppTask handler for lock-button presses; dispatches via `HandleLockRequestOnAppTask`. */
     static void LockButtonActionHandler(AppEvent * aEvent);
 
+    /** @brief Unlatch timer callback; schedules `UnlockAfterUnlatch` on the chip thread. */
     static void UnlatchCallback(TimerHandle_t xTimer);
 
+    /** @brief AppTask handler for actuator-movement completion; advances state and drains pending/staged requests. */
     static void ActuatorMovementEventHandler(AppEvent * aEvent);
 
+    /** @brief AppTask handler for `kEventType_Lock`; invokes `InitiateLockAction`. */
     static void LockActionEventHandler(AppEvent * aEvent);
 
+    /** @brief AppTask handler for `kEventType_LockRequest`; drains the staged `LockRequest` and routes it. */
     static void LockRequestEventHandler(AppEvent * aEvent);
 
+    /** @brief AppTask router for `LockRequest`s; coalesces while busy, drives the actuator and cluster state. */
     void HandleLockRequestOnAppTask(const LockRequest & request);
 
+    /** @brief Ember `MatterPostAttributeChangeCallback` hook; forwards DoorLock `LockState` changes to integrations. */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
@@ -176,63 +186,135 @@ public:
     // DoorLock cluster data-model entry points.
     // ---------------------------------------------------------------------
 
+    /**
+     * @brief DoorLock cluster Lock-command entry (chip thread). Validates the
+     *        endpoint and PIN, then stages a `LockRequest{action=kLock}` via
+     *        `EnqueueLockRequest`. The `LockOperation` event is emitted later,
+     *        from `ActuatorMovementEventHandler` on the AppTask thread.
+     * @param[out] err  Cluster operation error on reject.
+     * @return true if the command is accepted and staged; false on reject.
+     */
     bool DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId,
                                      const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                      const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                                      const chip::Optional<chip::ByteSpan> & pinCode,
                                      chip::app::Clusters::DoorLock::OperationErrorEnum & err);
+
+    /**
+     * @brief DoorLock cluster Unlock-command entry (chip thread). Mirrors
+     *        `DMDoorLockOnDoorLockCommand`; if `SupportsUnbolt(endpointId)` the
+     *        staged action is `kUnlatch` (target `kUnlatched`), otherwise
+     *        `kUnlock` (target `kUnlocked`).
+     */
     bool DMDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId,
                                        const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                        const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                                        const chip::Optional<chip::ByteSpan> & pinCode,
                                        chip::app::Clusters::DoorLock::OperationErrorEnum & err);
+
+    /**
+     * @brief DoorLock cluster Unbolt-command entry (chip thread). Validates the
+     *        endpoint and PIN, then stages a `LockRequest{action=kUnlock,
+     *        target=kUnlocked}` via `EnqueueLockRequest`.
+     */
     bool DMDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId,
                                        const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                        const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                                        const chip::Optional<chip::ByteSpan> & pinCode,
                                        chip::app::Clusters::DoorLock::OperationErrorEnum & err);
 
+    /**
+     * @brief Read a credential record from persistent storage for the DoorLock cluster.
+     * @return true on success or absent slot (`credential.status=kAvailable`); false
+     *         on validation / storage error.
+     */
     bool DMDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential);
+
+    /** @brief Persist a credential record for the DoorLock cluster. */
     bool DMDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
                                  chip::FabricIndex modifier, DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                  const chip::ByteSpan & credentialData);
 
+    /**
+     * @brief Read a user record (and associated credential map) from persistent storage.
+     * @return true on success or absent slot (`user.userStatus=kAvailable`); false
+     *         on validation / storage error.
+     */
     bool DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
+
+    /** @brief Persist a user record (and its credential map) to persistent storage. */
     bool DMDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                            const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                            CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials);
 
+    /** @brief Read a weekday schedule entry from persistent storage. */
     DlStatus DMDoorLockGetWeekDaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockWeekDaySchedule & schedule);
+    /** @brief Persist a weekday schedule entry to persistent storage. */
     DlStatus DMDoorLockSetWeekDaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute);
 
+    /** @brief Read a year-day schedule entry from persistent storage. */
     DlStatus DMDoorLockGetYearDaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockYearDaySchedule & schedule);
+    /** @brief Persist a year-day schedule entry to persistent storage. */
     DlStatus DMDoorLockSetYearDaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
 
+    /** @brief Read a holiday schedule entry from persistent storage. */
     DlStatus DMDoorLockGetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
                                           EmberAfPluginDoorLockHolidaySchedule & holidaySchedule);
+    /** @brief Persist a holiday schedule entry to persistent storage. */
     DlStatus DMDoorLockSetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
                                           uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode);
 
+    /** @brief Cluster auto-relock trigger; posts a `kEventType_Lock` to re-lock the actuator. */
     void DMDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
+    /**
+     * @brief Validate a PIN against stored user credentials. If
+     *        `RequirePINforRemoteOperation` is false and `pin` is empty,
+     *        succeeds without matching a credential.
+     * @param[out] outUserIndex  Set to the matching user index on success.
+     * @param[out] outCred       Set to the matching credential descriptor.
+     * @param[out] outHasCred    True iff a credential matched.
+     * @param[out] err           Cluster operation error on rejection.
+     * @return true if accepted; false otherwise.
+     */
     bool ValidatePin(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pin,
                      chip::app::DataModel::Nullable<uint16_t> & outUserIndex, LockOpCredentials & outCred, bool & outHasCred,
                      chip::app::Clusters::DoorLock::OperationErrorEnum & err);
 
+    /**
+     * @brief Push a new `LockState` into the DoorLock cluster as a remote-sourced
+     *        change, attributing the operation to `fabricIdx` / `nodeId` /
+     *        `userIndex` / `cred`. Caller must hold the chip stack lock.
+     */
     void PushClusterLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState lockState,
                               const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                               const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                               const chip::app::DataModel::Nullable<uint16_t> & userIndex, const LockOpCredentials * cred,
                               bool hasCred);
 
+    /**
+     * @brief Start a lock/unlock/unlatch transition if the actuator is in a
+     *        valid terminal state for `aAction`. Starts the actuator-movement
+     *        timer, advances `mLockActuatorState` to the matching `*Initiated`
+     *        state, and marks `mSyncClusterToButtonAction` when `fromButton`.
+     * @return true if the action was initiated; false if rejected (busy /
+     *         invalid transition).
+     */
     bool InitiateLockAction(LockAction aAction, bool fromButton = false);
 
+    /**
+     * @brief Chip-thread continuation after the unlatch hold timer fires.
+     *        Pushes a transitional `kNotFullyLocked` to the cluster, stashes a
+     *        synthetic unlock leg in `mActiveRemoteAction`, and posts
+     *        `kEventType_Lock` to drive the actuator back to Locked.
+     * @param context  Unused; signature dictated by `PlatformMgr::ScheduleWork`.
+     */
     static void UnlockAfterUnlatch(intptr_t context);
 
 protected:
@@ -305,14 +387,32 @@ protected:
         kUnlatchCompleted,
     };
 
+    /** @brief Current actuator state (Initiated / Completed variant of Lock / Unlock / Unlatch). */
     LockActuatorState GetActuatorState() const { return mLockActuatorState; }
 
+    /** @brief True while an actuator transition is in flight (any `*Initiated` plus `kUnlatchCompleted`). */
     bool IsActuatorBusy() const;
 
+    /**
+     * @brief Returns true iff the actuator is currently in `kUnlockCompleted`
+     *        (i.e. the next button action should be Lock).
+     */
     bool NextState();
 
+    /**
+     * @brief Chip-thread producer for cross-thread `LockRequest` handoff. Takes
+     *        `sStagedLockRequestMutex`, overwrites `sStagedLockRequest`
+     *        (newest-wins), sets `sStagedLockRequestValid`, releases, and posts
+     *        `kEventType_LockRequest` to wake `LockRequestEventHandler` on the
+     *        AppTask thread.
+     */
     static void EnqueueLockRequest(const LockRequest & request);
 
+    /**
+     * @brief Consumer helper: under `sStagedLockRequestMutex`, snapshot the
+     *        staged `LockRequest` into `out` and clear `sStagedLockRequestValid`.
+     * @return true iff a staged request was drained.
+     */
     static bool TryDrainStagedLockRequest(LockRequest & out);
 
     struct UnlatchContext
