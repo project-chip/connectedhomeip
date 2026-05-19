@@ -120,7 +120,7 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::GeneratedCommands(const Concrete
 ThreadBorderRouterManagementCluster::ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
     DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate),
     mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker),
-    mPlatformManager(config.mPlatformManager)
+    mPlatformManager(config.mPlatformManager), mRegisterEventHandler(config.mRegisterEventHandler)
 {
     if (mDelegate.GetPanChangeSupported())
     {
@@ -146,13 +146,19 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & c
 {
     ReturnErrorOnFailure(app::DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(mDelegate.Init(static_cast<ThreadBorderRouterManagementDelegate::AttributeChangeCallback *>(this)));
-    ReturnErrorOnFailure(mPlatformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    if (mRegisterEventHandler)
+    {
+        ReturnErrorOnFailure(mPlatformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    }
     return CHIP_NO_ERROR;
 }
 
 void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
 {
-    mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    if (mRegisterEventHandler)
+    {
+        mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    }
     // clearing the delegate MUST always succeed.
     RETURN_SAFELY_IGNORED mDelegate.Init(nullptr);
     mAsyncCommandHandle = CommandHandler::Handle();
