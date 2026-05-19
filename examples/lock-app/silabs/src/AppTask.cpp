@@ -378,8 +378,9 @@ void AppTask::LockButtonActionHandler(AppEvent * aEvent)
                    ChipLogError(NotSpecified, "LockButtonActionHandler: unexpected event type %u", aEvent->Type));
 
     LockRequest req;
-    req.endpointId     = LOCK_ENDPOINT;
-    req.action         = (appInstance().GetActuatorState() == LockActuatorState::kUnlockCompleted) ? LockAction::kLock : LockAction::kUnlock;
+    req.endpointId = LOCK_ENDPOINT;
+    req.action =
+        (appInstance().GetActuatorState() == LockActuatorState::kUnlockCompleted) ? LockAction::kLock : LockAction::kUnlock;
     req.isButtonAction = true;
 
     appInstance().HandleLockRequestOnAppTask(req);
@@ -659,31 +660,31 @@ CHIP_ERROR AppTask::InitLockDomain(app::DataModel::Nullable<DlLockState> state, 
         mLockParams.numberOfUsers <= kMaxUsers, APP_ERROR_ALLOCATION_FAILED,
         ChipLogError(Zcl,
                      "Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                   kMaxUsers));
+                     kMaxUsers));
     VerifyOrReturnError(
         mLockParams.numberOfCredentialsPerUser <= kMaxCredentialsPerUser, APP_ERROR_ALLOCATION_FAILED,
         ChipLogError(Zcl,
                      "Max number of credentials per user is greater than %d, the maximum amount of users currently supported on "
                      "this platform",
-                   kMaxCredentialsPerUser));
+                     kMaxCredentialsPerUser));
     VerifyOrReturnError(
         mLockParams.numberOfWeekdaySchedulesPerUser <= kMaxWeekdaySchedulesPerUser, APP_ERROR_ALLOCATION_FAILED,
         ChipLogError(Zcl,
                      "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this "
                      "platform",
-                   kMaxWeekdaySchedulesPerUser));
+                     kMaxWeekdaySchedulesPerUser));
     VerifyOrReturnError(
         mLockParams.numberOfYeardaySchedulesPerUser <= kMaxYeardaySchedulesPerUser, APP_ERROR_ALLOCATION_FAILED,
         ChipLogError(Zcl,
                      "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this "
                      "platform",
-                   kMaxYeardaySchedulesPerUser));
+                     kMaxYeardaySchedulesPerUser));
     VerifyOrReturnError(
         mLockParams.numberOfHolidaySchedules <= kMaxHolidaySchedules, APP_ERROR_ALLOCATION_FAILED,
         ChipLogError(Zcl,
                      "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this "
                      "platform",
-                   kMaxHolidaySchedules));
+                     kMaxHolidaySchedules));
 
     // Migrate legacy configuration, if needed
     MigrateLockConfig(lockParam);
@@ -796,9 +797,9 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
     VerifyOrReturn(ctx.mEndpointId != kInvalidEndpointId,
                    ChipLogError(Zcl, "UnlockAfterUnlatch: no valid unlatch context, skipping auto-unlock"));
 
-    Status status = DoorLockServer::Instance().SetLockState(ctx.mEndpointId, DlLockState::kNotFullyLocked,
-                                                            OperationSourceEnum::kRemote, NullNullable, NullNullable,
-                                                            ctx.mFabricIdx, ctx.mNodeId)
+    Status status =
+        DoorLockServer::Instance().SetLockState(ctx.mEndpointId, DlLockState::kNotFullyLocked, OperationSourceEnum::kRemote,
+                                                NullNullable, NullNullable, ctx.mFabricIdx, ctx.mNodeId)
         ? Status::Success
         : Status::Failure;
     if (status != Status::Success)
@@ -818,7 +819,7 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
     app.mActiveRemoteAction          = unlockRequest;
     app.mHasActiveRemoteAction       = true;
 
-    ctx.mEndpointId    = kInvalidEndpointId;
+    ctx.mEndpointId = kInvalidEndpointId;
     ctx.mUserIndex.SetNull();
     ctx.mCredential    = {};
     ctx.mHasCredential = false;
@@ -924,9 +925,9 @@ void AppTask::EnqueueLockRequest(const LockRequest & request)
                    ChipLogError(Zcl, "Door Lock App: staging mutex not initialized; dropping LockRequest"));
 
     osStatus_t mutexStatus = osMutexAcquire(sStagedLockRequestMutex, osWaitForever);
-    VerifyOrReturn(mutexStatus == osOK,
-                   ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest",
-                                static_cast<int>(mutexStatus)));
+    VerifyOrReturn(
+        mutexStatus == osOK,
+        ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest", static_cast<int>(mutexStatus)));
     sStagedLockRequest      = request;
     sStagedLockRequestValid = true;
     osMutexRelease(sStagedLockRequestMutex);
