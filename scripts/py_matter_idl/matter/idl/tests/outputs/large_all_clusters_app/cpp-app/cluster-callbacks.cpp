@@ -61,17 +61,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::DeviceEnergyManagement::Id:
         emberAfDeviceEnergyManagementClusterInitCallback(endpoint);
         break;
-    case app::Clusters::DeviceEnergyManagementMode::Id:
-        emberAfDeviceEnergyManagementModeClusterInitCallback(endpoint);
-        break;
     case app::Clusters::DiagnosticLogs::Id:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
         break;
     case app::Clusters::DishwasherAlarm::Id:
         emberAfDishwasherAlarmClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::DishwasherMode::Id:
-        emberAfDishwasherModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::ElectricalEnergyMeasurement::Id:
         emberAfElectricalEnergyMeasurementClusterInitCallback(endpoint);
@@ -81,9 +75,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::EnergyEvse::Id:
         emberAfEnergyEvseClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::EnergyEvseMode::Id:
-        emberAfEnergyEvseModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::EnergyPreference::Id:
         emberAfEnergyPreferenceClusterInitCallback(endpoint);
@@ -133,9 +124,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::LaundryWasherControls::Id:
         emberAfLaundryWasherControlsClusterInitCallback(endpoint);
         break;
-    case app::Clusters::LaundryWasherMode::Id:
-        emberAfLaundryWasherModeClusterInitCallback(endpoint);
-        break;
     case app::Clusters::LevelControl::Id:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
@@ -144,9 +132,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::LowPower::Id:
         emberAfLowPowerClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::MicrowaveOvenMode::Id:
-        emberAfMicrowaveOvenModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::ModeSelect::Id:
         emberAfModeSelectClusterInitCallback(endpoint);
@@ -174,9 +159,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::OvenCavityOperationalState::Id:
         emberAfOvenCavityOperationalStateClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::OvenMode::Id:
-        emberAfOvenModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::OzoneConcentrationMeasurement::Id:
         emberAfOzoneConcentrationMeasurementClusterInitCallback(endpoint);
@@ -211,20 +193,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::RefrigeratorAlarm::Id:
         emberAfRefrigeratorAlarmClusterInitCallback(endpoint);
         break;
-    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(endpoint);
-        break;
     case app::Clusters::RelativeHumidityMeasurement::Id:
         emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
         break;
-    case app::Clusters::RvcCleanMode::Id:
-        emberAfRvcCleanModeClusterInitCallback(endpoint);
-        break;
     case app::Clusters::RvcOperationalState::Id:
         emberAfRvcOperationalStateClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::RvcRunMode::Id:
-        emberAfRvcRunModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::ScenesManagement::Id:
         emberAfScenesManagementClusterInitCallback(endpoint);
@@ -279,9 +252,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::WaterHeaterManagement::Id:
         emberAfWaterHeaterManagementClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::WaterHeaterMode::Id:
-        emberAfWaterHeaterModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
@@ -351,17 +321,11 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::DeviceEnergyManagement::Id:
         emberAfDeviceEnergyManagementClusterShutdownCallback(endpoint);
         break;
-    case app::Clusters::DeviceEnergyManagementMode::Id:
-        emberAfDeviceEnergyManagementModeClusterShutdownCallback(endpoint);
-        break;
     case app::Clusters::DiagnosticLogs::Id:
         emberAfDiagnosticLogsClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::DishwasherAlarm::Id:
         emberAfDishwasherAlarmClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::DishwasherMode::Id:
-        emberAfDishwasherModeClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::ElectricalEnergyMeasurement::Id:
         emberAfElectricalEnergyMeasurementClusterShutdownCallback(endpoint);
@@ -371,9 +335,6 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::EnergyEvse::Id:
         emberAfEnergyEvseClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::EnergyEvseMode::Id:
-        emberAfEnergyEvseModeClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::EnergyPreference::Id:
         emberAfEnergyPreferenceClusterShutdownCallback(endpoint);
@@ -423,9 +384,6 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::LaundryWasherControls::Id:
         emberAfLaundryWasherControlsClusterShutdownCallback(endpoint);
         break;
-    case app::Clusters::LaundryWasherMode::Id:
-        emberAfLaundryWasherModeClusterShutdownCallback(endpoint);
-        break;
     case app::Clusters::LevelControl::Id:
         emberAfLevelControlClusterShutdownCallback(endpoint);
         break;
@@ -434,9 +392,6 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::LowPower::Id:
         emberAfLowPowerClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::MicrowaveOvenMode::Id:
-        emberAfMicrowaveOvenModeClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::ModeSelect::Id:
         emberAfModeSelectClusterShutdownCallback(endpoint);
@@ -464,9 +419,6 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::OvenCavityOperationalState::Id:
         emberAfOvenCavityOperationalStateClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::OvenMode::Id:
-        emberAfOvenModeClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::OzoneConcentrationMeasurement::Id:
         emberAfOzoneConcentrationMeasurementClusterShutdownCallback(endpoint);
@@ -501,20 +453,11 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::RefrigeratorAlarm::Id:
         emberAfRefrigeratorAlarmClusterShutdownCallback(endpoint);
         break;
-    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(endpoint);
-        break;
     case app::Clusters::RelativeHumidityMeasurement::Id:
         emberAfRelativeHumidityMeasurementClusterShutdownCallback(endpoint);
         break;
-    case app::Clusters::RvcCleanMode::Id:
-        emberAfRvcCleanModeClusterShutdownCallback(endpoint);
-        break;
     case app::Clusters::RvcOperationalState::Id:
         emberAfRvcOperationalStateClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::RvcRunMode::Id:
-        emberAfRvcRunModeClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::ScenesManagement::Id:
         emberAfScenesManagementClusterShutdownCallback(endpoint);
@@ -569,9 +512,6 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::WaterHeaterManagement::Id:
         emberAfWaterHeaterManagementClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::WaterHeaterMode::Id:
-        emberAfWaterHeaterModeClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(endpoint);
