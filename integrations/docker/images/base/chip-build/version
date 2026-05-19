@@ -1,1 +1,1 @@
-193 : [Tizen] Update installer script for Tizen 10.0
+196 : [crosscompile] Don't duplicate minimization done by create_sysroot.py in the Dockerfile

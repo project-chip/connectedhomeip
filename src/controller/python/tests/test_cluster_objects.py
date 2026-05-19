@@ -23,8 +23,8 @@ def _encode_and_then_decode_to_native(data: ClusterObjects.ClusterObject):
     return TLVReader(tlv).get()['Any']
 
 
-def _encode_attribute_and_then_decode_to_native(data, type: ClusterObjects.ClusterAttributeDescriptor):
-    return TLVReader(type.ToTLV(None, data)).get()['Any']
+def _encode_attribute_and_then_decode_to_native(data, data_type: ClusterObjects.ClusterAttributeDescriptor):
+    return TLVReader(data_type.ToTLV(None, data)).get()['Any']
 
 
 def _encode_from_native_and_then_decode(data,

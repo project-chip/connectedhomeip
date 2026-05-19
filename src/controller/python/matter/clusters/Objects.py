@@ -128,6 +128,7 @@ __all__ = [
     "Humidistat",
     "ColorControl",
     "BallastConfiguration",
+    "DynamicLighting",
     "IlluminanceMeasurement",
     "TemperatureMeasurement",
     "PressureMeasurement",
@@ -37437,6 +37438,266 @@ class BallastConfiguration(Cluster):
 
 
 @dataclass
+class DynamicLighting(Cluster):
+    id: typing.ClassVar[int] = 0x00000305
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="availableEffects", Tag=0x00000000, Type=typing.List[DynamicLighting.Structs.EffectStruct]),
+                ClusterObjectFieldDescriptor(Label="currentEffectID", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="currentSpeed", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    availableEffects: typing.List[DynamicLighting.Structs.EffectStruct] = field(default_factory=lambda: [])
+    currentEffectID: typing.Union[Nullable, uint] = NullValue
+    currentSpeed: typing.Union[Nullable, uint] = NullValue
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Enums:
+        class EffectColorModeEnum(MatterIntEnum):
+            kLevel = 0x00
+            kXy = 0x01
+            kXYAndLevel = 0x02
+            kHs = 0x03
+            kHSAndLevel = 0x04
+            kEhue = 0x05
+            kEHUEAndLevel = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
+
+        class EffectSourceEnum(MatterIntEnum):
+            kInternal = 0x00
+            kSoundBased = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+    class Structs:
+        @dataclass
+        class EffectColorStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="level", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="x", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="y", Tag=2, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="hue", Tag=3, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="enhancedHue", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="saturation", Tag=5, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            level: 'typing.Union[Nullable, uint]' = NullValue
+            x: 'typing.Union[Nullable, uint]' = NullValue
+            y: 'typing.Union[Nullable, uint]' = NullValue
+            hue: 'typing.Union[Nullable, uint]' = NullValue
+            enhancedHue: 'typing.Union[Nullable, uint]' = NullValue
+            saturation: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class EffectStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="effectID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="source", Tag=1, Type=DynamicLighting.Enums.EffectSourceEnum),
+                        ClusterObjectFieldDescriptor(Label="label", Tag=2, Type=str),
+                        ClusterObjectFieldDescriptor(Label="maxSpeed", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="defaultSpeed", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="supportsColorPalette", Tag=5, Type=bool),
+                    ])
+
+            effectID: 'uint' = 0
+            source: 'DynamicLighting.Enums.EffectSourceEnum' = 0
+            label: 'str' = ""
+            maxSpeed: 'uint' = 0
+            defaultSpeed: 'uint' = 0
+            supportsColorPalette: 'bool' = False
+
+    class Commands:
+        @dataclass
+        class StartEffect(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000305
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="effectID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="colorMode", Tag=2, Type=typing.Union[Nullable, DynamicLighting.Enums.EffectColorModeEnum]),
+                        ClusterObjectFieldDescriptor(Label="colorPalette", Tag=3, Type=typing.Union[Nullable, typing.List[DynamicLighting.Structs.EffectColorStruct]]),
+                    ])
+
+            effectID: uint = 0
+            speed: uint = 0
+            colorMode: typing.Union[Nullable, DynamicLighting.Enums.EffectColorModeEnum] = NullValue
+            colorPalette: typing.Union[Nullable, typing.List[DynamicLighting.Structs.EffectColorStruct]] = NullValue
+
+        @dataclass
+        class StopEffect(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000305
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+    class Attributes:
+        @dataclass
+        class AvailableEffects(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[DynamicLighting.Structs.EffectStruct])
+
+            value: typing.List[DynamicLighting.Structs.EffectStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class CurrentEffectID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: typing.Union[Nullable, uint] = NullValue
+
+        @dataclass
+        class CurrentSpeed(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: typing.Union[Nullable, uint] = NullValue
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000305
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+
+@dataclass
 class IlluminanceMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000400
 
@@ -49547,6 +49808,7 @@ class CameraAvStreamManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="localSnapshotRecordingEnabled", Tag=0x00000026, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="statusLightEnabled", Tag=0x00000027, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="statusLightBrightness", Tag=0x00000028, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                ClusterObjectFieldDescriptor(Label="imageRotationDiscreteAngles", Tag=0x00000029, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -49595,6 +49857,7 @@ class CameraAvStreamManagement(Cluster):
     localSnapshotRecordingEnabled: typing.Optional[bool] = None
     statusLightEnabled: typing.Optional[bool] = None
     statusLightBrightness: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
+    imageRotationDiscreteAngles: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -50775,6 +51038,22 @@ class CameraAvStreamManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum])
 
             value: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
+
+        @dataclass
+        class ImageRotationDiscreteAngles(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000551
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000029
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -53846,25 +54125,25 @@ class JointFabricDatastore(Cluster):
 
     class Enums:
         class DatastoreAccessControlEntryAuthModeEnum(MatterIntEnum):
-            kPase = 0x00
-            kCase = 0x01
-            kGroup = 0x02
+            kPase = 0x01
+            kCase = 0x02
+            kGroup = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
+            kUnknownEnumValue = 0
 
         class DatastoreAccessControlEntryPrivilegeEnum(MatterIntEnum):
-            kView = 0x00
-            kOperate = 0x02
-            kManage = 0x03
-            kAdminister = 0x04
+            kView = 0x01
+            kOperate = 0x03
+            kManage = 0x04
+            kAdminister = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1
+            kUnknownEnumValue = 0
 
         class DatastoreGroupKeyMulticastPolicyEnum(MatterIntEnum):
             kPerGroupID = 0x00
@@ -53963,10 +54242,10 @@ class JointFabricDatastore(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="node", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="group", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="cluster", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="node", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="group", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="cluster", Tag=4, Type=typing.Optional[uint]),
                     ])
 
             node: 'typing.Optional[uint]' = None
@@ -54014,10 +54293,10 @@ class JointFabricDatastore(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="privilege", Tag=0, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum),
-                        ClusterObjectFieldDescriptor(Label="authMode", Tag=1, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryAuthModeEnum),
-                        ClusterObjectFieldDescriptor(Label="subjects", Tag=2, Type=typing.Union[Nullable, typing.List[uint]]),
-                        ClusterObjectFieldDescriptor(Label="targets", Tag=3, Type=typing.Union[Nullable, typing.List[JointFabricDatastore.Structs.DatastoreAccessControlTargetStruct]]),
+                        ClusterObjectFieldDescriptor(Label="privilege", Tag=1, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum),
+                        ClusterObjectFieldDescriptor(Label="authMode", Tag=2, Type=JointFabricDatastore.Enums.DatastoreAccessControlEntryAuthModeEnum),
+                        ClusterObjectFieldDescriptor(Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[JointFabricDatastore.Structs.DatastoreAccessControlTargetStruct]]),
                     ])
 
             privilege: 'JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum' = 0
@@ -54109,7 +54388,6 @@ class JointFabricDatastore(Cluster):
                         ClusterObjectFieldDescriptor(Label="epochStartTime1", Tag=5, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="epochKey2", Tag=6, Type=typing.Union[Nullable, bytes]),
                         ClusterObjectFieldDescriptor(Label="epochStartTime2", Tag=7, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="groupKeyMulticastPolicy", Tag=8, Type=JointFabricDatastore.Enums.DatastoreGroupKeyMulticastPolicyEnum),
                     ])
 
             groupKeySetID: 'uint' = 0
@@ -54120,7 +54398,6 @@ class JointFabricDatastore(Cluster):
             epochStartTime1: 'typing.Union[Nullable, uint]' = NullValue
             epochKey2: 'typing.Union[Nullable, bytes]' = NullValue
             epochStartTime2: 'typing.Union[Nullable, uint]' = NullValue
-            groupKeyMulticastPolicy: 'JointFabricDatastore.Enums.DatastoreGroupKeyMulticastPolicyEnum' = 0
 
     class Commands:
         @dataclass
