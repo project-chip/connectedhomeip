@@ -703,7 +703,8 @@ class AttributeSubscriptionHandler:
                     f"Forbidden state {val!r} observed at +{elapsed:.1f}s "
                     f"(guard window = {guard_window:.1f}s of {duration_sec:.1f}s interval)"
                 )
-      
+
+
 class WildcardAttributeSubscriptionHandler:
     """
     Callback class to handle wildcard attribute subscription reports.
@@ -864,4 +865,3 @@ class WildcardAttributeSubscriptionHandler:
         """Shutdown the subscription."""
         if self._subscription:
             self._subscription.Shutdown()
-
