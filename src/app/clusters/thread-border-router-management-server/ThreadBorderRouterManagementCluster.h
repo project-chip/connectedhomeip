@@ -49,16 +49,8 @@ public:
         DeviceLayer::PlatformManager & mPlatformManager;
     };
 
-    ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
-        DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate),
-        mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker),
-        mPlatformManager(config.mPlatformManager)
-    {
-        if (mDelegate.GetPanChangeSupported())
-        {
-            mFeatureMap.Set(ThreadBorderRouterManagement::Feature::kPANChange);
-        }
-    }
+    ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config);
+    ~ThreadBorderRouterManagementCluster();
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     void ReportAttributeChanged(AttributeId attributeId) override;

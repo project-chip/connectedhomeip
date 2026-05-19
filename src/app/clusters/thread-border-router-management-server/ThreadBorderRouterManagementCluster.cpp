@@ -24,8 +24,13 @@
 #include <clusters/ThreadBorderRouterManagement/Commands.h>
 #include <clusters/ThreadBorderRouterManagement/Metadata.h>
 #include <lib/support/BitMask.h>
+#include <set>
 
 namespace chip::app::Clusters {
+
+namespace {
+std::set<ThreadBorderRouterManagementCluster *> sInstances;
+}
 using namespace ThreadBorderRouterManagement;
 
 DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -111,6 +116,23 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::GeneratedCommands(const Concrete
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     ReturnErrorOnFailure(builder.Append(ThreadBorderRouterManagement::Commands::DatasetResponse::Id));
     return CHIP_NO_ERROR;
+}
+
+ThreadBorderRouterManagementCluster::ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
+    DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate),
+    mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker),
+    mPlatformManager(config.mPlatformManager)
+{
+    if (mDelegate.GetPanChangeSupported())
+    {
+        mFeatureMap.Set(ThreadBorderRouterManagement::Feature::kPANChange);
+    }
+    sInstances.insert(this);
+}
+
+ThreadBorderRouterManagementCluster::~ThreadBorderRouterManagementCluster()
+{
+    sInstances.erase(this);
 }
 
 CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & context)
@@ -281,23 +303,28 @@ void ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(uint32_t seq
 
 void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ThreadBorderRouterManagementCluster * _this = reinterpret_cast<ThreadBorderRouterManagementCluster *>(arg);
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
-        (void) _this->mDelegate.RevertActiveDataset();
-
-        auto commandHandleRef = std::move(_this->mAsyncCommandHandle);
-        auto commandHandle    = commandHandleRef.Get();
-        if (commandHandle != nullptr)
+        for (auto * cluster : sInstances)
         {
-            commandHandle->AddStatus(ConcreteCommandPath(_this->mPath.mEndpointId, _this->mPath.mClusterId,
-                                                         ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id),
-                                     Protocols::InteractionModel::Status::Timeout);
+            (void) cluster->mDelegate.RevertActiveDataset();
+
+            auto commandHandleRef = std::move(cluster->mAsyncCommandHandle);
+            auto commandHandle    = commandHandleRef.Get();
+            if (commandHandle != nullptr)
+            {
+                commandHandle->AddStatus(ConcreteCommandPath(cluster->mPath.mEndpointId, cluster->mPath.mClusterId,
+                                                             ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id),
+                                         Protocols::InteractionModel::Status::Timeout);
+            }
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        LogErrorOnFailure(_this->mDelegate.CommitActiveDataset());
+        for (auto * cluster : sInstances)
+        {
+            LogErrorOnFailure(cluster->mDelegate.CommitActiveDataset());
+        }
     }
 }
 
