@@ -39,10 +39,10 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ProximityRangingCluster::Config config(endpointId);
+        ProximityRangingCluster::Config config;
         config.WithFeatures(BitMask<Feature>(featureMap));
 
-        gServers[clusterInstanceIndex].Create(config);
+        gServers[clusterInstanceIndex].Create(endpointId, config);
         return gServers[clusterInstanceIndex].Registration();
     }
 

@@ -76,7 +76,7 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
         }
     }
 
-    mProximityRangingCluster.Create(ProximityRanging::ProximityRangingCluster::Config(endpoint).WithFeatures(features));
+    mProximityRangingCluster.Create(endpoint, ProximityRanging::ProximityRangingCluster::Config().WithFeatures(features));
     mProximityRangingCluster.Cluster().SetDriver(&mRangingDriver);
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 

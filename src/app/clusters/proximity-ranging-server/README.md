@@ -137,7 +137,7 @@ for (auto * adapter : adapters)
     }
 }
 
-mCluster.Create(ProximityRanging::ProximityRangingCluster::Config(endpoint).WithFeatures(features));
+mCluster.Create(endpoint, ProximityRanging::ProximityRangingCluster::Config().WithFeatures(features));
 mCluster.Cluster().SetDriver(&myDriver);
 ```
 

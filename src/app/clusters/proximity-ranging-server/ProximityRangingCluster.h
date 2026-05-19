@@ -51,7 +51,7 @@ public:
      */
     struct Config
     {
-        explicit Config(EndpointId endpoint) : mEndpointId(endpoint) {}
+        Config() = default;
 
         Config & WithFeatures(BitMask<Feature> features)
         {
@@ -60,11 +60,10 @@ public:
         }
 
         BitMask<Feature> mFeatureMap;
-        EndpointId mEndpointId;
     };
 
-    explicit ProximityRangingCluster(const Config & config) :
-        DefaultServerCluster({ config.mEndpointId, ProximityRanging::Id }), mFeatureMap(config.mFeatureMap)
+    ProximityRangingCluster(EndpointId endpoint, const Config & config) :
+        DefaultServerCluster({ endpoint, ProximityRanging::Id }), mFeatureMap(config.mFeatureMap)
     {}
 
     void SetDriver(ProximityRangingDriver * driver) { mDriver = driver; }
