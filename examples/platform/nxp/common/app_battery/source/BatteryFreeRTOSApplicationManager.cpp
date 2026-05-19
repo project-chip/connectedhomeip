@@ -21,10 +21,10 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 
-#include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/power-source-server/power-source-server.h>
+#include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 
 extern "C" {
 #include "sensors.h"
@@ -44,10 +44,10 @@ BatteryApplicationManager BatteryApplicationManager::sInstance;
 #define BATTERY_UPDATE_INTERVAL_MS 300000
 
 // Battery voltage thresholds (in mV)
-#define APP_BATTERY_FULL_THRESHOLD      3000    // 3.0 V = 100%
-#define APP_BATTERY_MEDIUM_THRESHOLD    2600    // 2.6 V = 66%
-#define APP_BATTERY_LOW_THRESHOLD       2200    // 2.2 V = 33%
-#define APP_BATTERY_CRITICAL_THRESHOLD  1800    // 1.8 V = 0%
+#define APP_BATTERY_FULL_THRESHOLD 3000     // 3.0 V = 100%
+#define APP_BATTERY_MEDIUM_THRESHOLD 2600   // 2.6 V = 66%
+#define APP_BATTERY_LOW_THRESHOLD 2200      // 2.2 V = 33%
+#define APP_BATTERY_CRITICAL_THRESHOLD 1800 // 1.8 V = 0%
 
 // Battery percentage levels
 #define APP_BATTERY_MEDIUM 66
@@ -64,15 +64,13 @@ void BatteryApplicationManager::Init()
     SENSORS_Init();
 
     // Create FreeRTOS timer for periodic battery updates (5 minutes)
-    mBatteryTimer = xTimerCreate(
-        "BatteryTimer",                             // Timer name
-        pdMS_TO_TICKS(BATTERY_UPDATE_INTERVAL_MS),  // Timer period (5 minutes)
-        pdTRUE,                                     // Auto-reload timer
-        nullptr,                                    // Timer ID (not used)
-        [](TimerHandle_t xTimer) {                  // Callback function
-            BatteryAppMgr().UpdateBatteryStatus();
-        }
-    );
+    mBatteryTimer = xTimerCreate("BatteryTimer",                            // Timer name
+                                 pdMS_TO_TICKS(BATTERY_UPDATE_INTERVAL_MS), // Timer period (5 minutes)
+                                 pdTRUE,                                    // Auto-reload timer
+                                 nullptr,                                   // Timer ID (not used)
+                                 [](TimerHandle_t xTimer) {                 // Callback function
+                                     BatteryAppMgr().UpdateBatteryStatus();
+                                 });
 
     if (mBatteryTimer == nullptr)
     {
@@ -168,9 +166,7 @@ void BatteryApplicationManager::UpdateBatteryStatus()
     SENSORS_TriggerBatteryMeasurement();
 
     // Schedule refresh on CHIP task context to ensure thread safety
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t arg) {
-        BatteryAppMgr().RefreshBatteryLevel();
-    }, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t arg) { BatteryAppMgr().RefreshBatteryLevel(); }, 0);
 }
 
 void BatteryApplicationManager::RefreshBatteryLevel()
@@ -189,8 +185,8 @@ void BatteryApplicationManager::UpdatePowerSourceCluster(uint8_t batteryPercenta
     // Convert percentage to doubled percentage (0.5% units, 0-200 range)
     uint8_t doubledPercentage = batteryPercentage * 2;
     // Battery voltage in mV
-    uint32_t batteryVoltage = APP_BATTERY_CRITICAL_THRESHOLD +
-        ((APP_BATTERY_FULL_THRESHOLD - APP_BATTERY_CRITICAL_THRESHOLD) * batteryPercentage / 100);
+    uint32_t batteryVoltage =
+        APP_BATTERY_CRITICAL_THRESHOLD + ((APP_BATTERY_FULL_THRESHOLD - APP_BATTERY_CRITICAL_THRESHOLD) * batteryPercentage / 100);
 
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
 

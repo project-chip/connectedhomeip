@@ -40,7 +40,7 @@ private:
     void RefreshBatteryLevel();
     void UpdatePowerSourceCluster(uint8_t batteryLevel);
 
-    void* mBatteryTimer;
+    void * mBatteryTimer;
 
     friend BatteryApplicationManager & BatteryAppMgr();
     static BatteryApplicationManager sInstance;
