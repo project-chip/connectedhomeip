@@ -231,7 +231,8 @@ class TC_FAN_4_1(MatterBaseTest):
             nonlocal step_num
             self.step(step_num)
             resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
-            asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState, Status.ConstraintError], "Unexpected status returned")
+            asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState,
+                              Status.ConstraintError], "Unexpected status returned")
             if resp[0].Status != Status.Success:
                 self.skip_step(step_num + 1)
                 self.skip_step(step_num + 2)
@@ -317,7 +318,8 @@ class TC_FAN_4_1(MatterBaseTest):
         self.step(step_num)
         attr = fan.Attributes.PercentSetting(50)
         resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
-        asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState, Status.ConstraintError], "Invalid response from writing PercentSetting")
+        asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState, Status.ConstraintError],
+                          "Invalid response from writing PercentSetting")
         step_num += 1
 
         # we want to see a change on percent setting and percent current to 1
