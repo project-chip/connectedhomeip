@@ -174,6 +174,7 @@ public:
 private:
     NetworkCommissioningStatusEnum mAddOrUpdateStatus = NetworkCommissioningStatusEnum::kUnknownError;
     bool mEnabledAllowed                              = false;
+
 public:
     bool mRevertConfigurationCalled = false;
 };

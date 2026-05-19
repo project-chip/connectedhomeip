@@ -130,7 +130,7 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    
+
     // Positive test: handler is active and reacts to event
     {
         NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
@@ -142,16 +142,18 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
 
         // Post the event
         DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired };
-        
+
         ASSERT_EQ(DeviceLayer::PlatformMgr().PostEvent(&event), CHIP_NO_ERROR);
 
         // Run event loop to process the event
         ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }, (intptr_t) nullptr), CHIP_NO_ERROR);
+                      [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); },
+                      (intptr_t) nullptr),
+                  CHIP_NO_ERROR);
         DeviceLayer::PlatformMgr().RunEventLoop();
 
         EXPECT_TRUE(fakeWifiDriver.mRevertConfigurationCalled);
-        
+
         cluster.Deinit();
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -175,11 +177,13 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
 
         // Run event loop to process the event
         ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }, (intptr_t) nullptr), CHIP_NO_ERROR);
+                      [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); },
+                      (intptr_t) nullptr),
+                  CHIP_NO_ERROR);
         DeviceLayer::PlatformMgr().RunEventLoop();
 
         EXPECT_FALSE(fakeWifiDriver.mRevertConfigurationCalled);
-        
+
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
