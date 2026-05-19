@@ -205,7 +205,6 @@ CHIP_ERROR NetworkCommissioningCluster::Init()
 
 void NetworkCommissioningCluster::Deinit()
 {
-    mClusterContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (sInstances.Contains(this))
     {
