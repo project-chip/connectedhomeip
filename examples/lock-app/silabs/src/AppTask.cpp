@@ -89,7 +89,7 @@ CustomerAppTask & appInstance()
 }
 
 LEDWidget sLockLED;
-TimerHandle_t sUnlatchTimer;
+osTimerId_t sUnlatchTimer;
 
 // ---- Index / type validators ------------------------------------------------
 
@@ -183,27 +183,24 @@ StorageKeyName LockHolidayScheduleEndpoint(EndpointId endpoint, uint16_t schedul
 
 void CancelUnlatchTimer(void)
 {
-    if (xTimerStop(sUnlatchTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (osTimerStop(sUnlatchTimer) != osOK)
     {
-        SILABS_LOG("sUnlatchTimer stop() failed");
+        ChipLogError(NotSpecified, "sUnlatchTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
 
 void StartUnlatchTimer(uint32_t timeoutMs)
 {
-    if (xTimerIsTimerActive(sUnlatchTimer))
+    if (osTimerIsRunning(sUnlatchTimer))
     {
-        SILABS_LOG("app timer already started!");
+        ChipLogDetail(NotSpecified, "app timer already started!");
         CancelUnlatchTimer();
     }
 
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ms if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerStart(sUnlatchTimer, pdMS_TO_TICKS(timeoutMs)) != pdPASS)
+    if (osTimerStart(sUnlatchTimer, pdMS_TO_TICKS(timeoutMs)) != osOK)
     {
-        SILABS_LOG("sUnlatchTimer timer start() failed");
+        ChipLogError(NotSpecified, "sUnlatchTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -224,7 +221,7 @@ CHIP_ERROR AppTask::AppInit()
     err = RegisterLockEvents();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("RegisterLockEvents() failed");
+        ChipLogError(NotSpecified, "RegisterLockEvents() failed");
         appError(err);
     }
 #endif // ENABLE_CHIP_SHELL
@@ -234,11 +231,12 @@ CHIP_ERROR AppTask::AppInit()
     err = appInstance().InitLock();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("InitLock() failed");
+        ChipLogError(NotSpecified, "InitLock() failed");
         appError(err);
     }
 
-    DlLockState bootState = appInstance().NextState() ? DlLockState::kUnlocked : DlLockState::kLocked;
+    DlLockState bootState =
+        (appInstance().GetActuatorState() == LockActuatorState::kUnlockCompleted) ? DlLockState::kUnlocked : DlLockState::kLocked;
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
                                                                            static_cast<intptr_t>(to_underlying(bootState)));
 
@@ -319,8 +317,8 @@ CHIP_ERROR AppTask::InitLock()
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
 
-    sUnlatchTimer =
-        xTimerCreate("UnlatchTimer", pdMS_TO_TICKS(UNLATCH_TIME_MS), pdFALSE, (void *) 0, &CustomerAppTask::UnlatchCallback);
+    osTimerAttr_t unlatchTimerAttr = { .name = "UnlatchTimer" };
+    sUnlatchTimer                  = osTimerNew(&CustomerAppTask::UnlatchCallback, osTimerOnce, nullptr, &unlatchTimerAttr);
 
     // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
@@ -353,7 +351,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = appInstance().Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogError(NotSpecified, "AppTask.Init() failed");
         appError(err);
     }
 
@@ -361,7 +359,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     appInstance().StartStatusLEDTimer();
 #endif
 
-    SILABS_LOG("App Task started");
+    ChipLogProgress(NotSpecified, "App Task started");
 
     while (true)
     {
@@ -376,15 +374,12 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockButtonActionHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type != AppEvent::kEventType_Button)
-    {
-        ChipLogError(NotSpecified, "LockButtonActionHandler: unexpected event type %u", aEvent->Type);
-        return;
-    }
+    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button,
+                   ChipLogError(NotSpecified, "LockButtonActionHandler: unexpected event type %u", aEvent->Type));
 
     LockRequest req;
     req.endpointId     = LOCK_ENDPOINT;
-    req.action         = appInstance().NextState() ? LockAction::kLock : LockAction::kUnlock;
+    req.action         = (appInstance().GetActuatorState() == LockActuatorState::kUnlockCompleted) ? LockAction::kLock : LockAction::kUnlock;
     req.isButtonAction = true;
 
     appInstance().HandleLockRequestOnAppTask(req);
@@ -402,16 +397,13 @@ void AppTask::PostLockActionEvent(int32_t actor, LockAction action)
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type != AppEvent::kEventType_Lock)
-    {
-        ChipLogError(NotSpecified, "LockActionEventHandler: unexpected event type %u", aEvent->Type);
-        return;
-    }
+    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Lock,
+                   ChipLogError(NotSpecified, "LockActionEventHandler: unexpected event type %u", aEvent->Type));
 
     const LockAction action = static_cast<LockAction>(aEvent->LockEvent.Action);
     if (!appInstance().InitiateLockAction(action, aEvent->LockEvent.Actor == AppEvent::kEventType_Button))
     {
-        SILABS_LOG("Action is already in progress or active.");
+        ChipLogDetail(NotSpecified, "Action is already in progress or active.");
     }
 }
 
@@ -443,7 +435,7 @@ void AppTask::UpdateClusterState(intptr_t context)
         : Status::Failure;
     if (status != Status::Success)
     {
-        SILABS_LOG("ERR: updating lock state %x", to_underlying(status));
+        ChipLogError(Zcl, "ERR: updating lock state %x", to_underlying(status));
     }
 }
 
@@ -479,10 +471,7 @@ bool AppTask::DMDoorLockOnDoorLockCommand(EndpointId endpointId, const Nullable<
     Nullable<uint16_t> userIndex;
     LockOpCredentials cred{};
     bool hasCred = false;
-    if (!appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err))
-    {
-        return false;
-    }
+    VerifyOrReturnValue(appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err), false);
 
     LockRequest req;
     req.endpointId         = endpointId;
@@ -512,10 +501,7 @@ bool AppTask::DMDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Nullabl
     Nullable<uint16_t> userIndex;
     LockOpCredentials cred{};
     bool hasCred = false;
-    if (!appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err))
-    {
-        return false;
-    }
+    VerifyOrReturnValue(appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err), false);
 
     LockRequest req;
     req.endpointId         = endpointId;
@@ -545,10 +531,7 @@ bool AppTask::DMDoorLockOnDoorUnboltCommand(EndpointId endpointId, const Nullabl
     Nullable<uint16_t> userIndex;
     LockOpCredentials cred{};
     bool hasCred = false;
-    if (!appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err))
-    {
-        return false;
-    }
+    VerifyOrReturnValue(appInstance().ValidatePin(endpointId, pinCode, userIndex, cred, hasCred, err), false);
 
     LockRequest req;
     req.endpointId         = endpointId;
@@ -674,40 +657,35 @@ CHIP_ERROR AppTask::InitLockDomain(app::DataModel::Nullable<DlLockState> state, 
     mStorage = storage;
 
     mLockParams = lockParam;
-    if (mLockParams.numberOfUsers > kMaxUsers)
-    {
-        SILABS_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                   kMaxUsers);
-        return APP_ERROR_ALLOCATION_FAILED;
-    }
-    if (mLockParams.numberOfCredentialsPerUser > kMaxCredentialsPerUser)
-    {
-        SILABS_LOG("Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
-                   "platform",
-                   kMaxCredentialsPerUser);
-        return APP_ERROR_ALLOCATION_FAILED;
-    }
-    if (mLockParams.numberOfWeekdaySchedulesPerUser > kMaxWeekdaySchedulesPerUser)
-    {
-        SILABS_LOG(
-            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            kMaxWeekdaySchedulesPerUser);
-        return APP_ERROR_ALLOCATION_FAILED;
-    }
-    if (mLockParams.numberOfYeardaySchedulesPerUser > kMaxYeardaySchedulesPerUser)
-    {
-        SILABS_LOG(
-            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            kMaxYeardaySchedulesPerUser);
-        return APP_ERROR_ALLOCATION_FAILED;
-    }
-    if (mLockParams.numberOfHolidaySchedules > kMaxHolidaySchedules)
-    {
-        SILABS_LOG(
-            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            kMaxHolidaySchedules);
-        return APP_ERROR_ALLOCATION_FAILED;
-    }
+    VerifyOrReturnError(
+        mLockParams.numberOfUsers <= kMaxUsers, APP_ERROR_ALLOCATION_FAILED,
+        ChipLogError(Zcl,
+                     "Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
+                   kMaxUsers));
+    VerifyOrReturnError(
+        mLockParams.numberOfCredentialsPerUser <= kMaxCredentialsPerUser, APP_ERROR_ALLOCATION_FAILED,
+        ChipLogError(Zcl,
+                     "Max number of credentials per user is greater than %d, the maximum amount of users currently supported on "
+                     "this platform",
+                   kMaxCredentialsPerUser));
+    VerifyOrReturnError(
+        mLockParams.numberOfWeekdaySchedulesPerUser <= kMaxWeekdaySchedulesPerUser, APP_ERROR_ALLOCATION_FAILED,
+        ChipLogError(Zcl,
+                     "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this "
+                     "platform",
+                   kMaxWeekdaySchedulesPerUser));
+    VerifyOrReturnError(
+        mLockParams.numberOfYeardaySchedulesPerUser <= kMaxYeardaySchedulesPerUser, APP_ERROR_ALLOCATION_FAILED,
+        ChipLogError(Zcl,
+                     "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this "
+                     "platform",
+                   kMaxYeardaySchedulesPerUser));
+    VerifyOrReturnError(
+        mLockParams.numberOfHolidaySchedules <= kMaxHolidaySchedules, APP_ERROR_ALLOCATION_FAILED,
+        ChipLogError(Zcl,
+                     "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this "
+                     "platform",
+                   kMaxHolidaySchedules));
 
     // Migrate legacy configuration, if needed
     MigrateLockConfig(lockParam);
@@ -718,19 +696,13 @@ CHIP_ERROR AppTask::InitLockDomain(app::DataModel::Nullable<DlLockState> state, 
                             (void *) this,     // pass the app task obj context
                             NULL               // No osTimerAttr_t to provide.
     );
-    if (mLockTimer == NULL)
-    {
-        SILABS_LOG("mLockTimer timer create failed");
-        return APP_ERROR_CREATE_TIMER_FAILED;
-    }
+    VerifyOrReturnError(mLockTimer != NULL, APP_ERROR_CREATE_TIMER_FAILED,
+                        ChipLogError(NotSpecified, "mLockTimer timer create failed"));
     if (sStagedLockRequestMutex == nullptr)
     {
         sStagedLockRequestMutex = osMutexNew(nullptr);
-        if (sStagedLockRequestMutex == nullptr)
-        {
-            SILABS_LOG("sStagedLockRequestMutex create failed");
-            return APP_ERROR_ALLOCATION_FAILED;
-        }
+        VerifyOrReturnError(sStagedLockRequestMutex != nullptr, APP_ERROR_ALLOCATION_FAILED,
+                            ChipLogError(NotSpecified, "sStagedLockRequestMutex create failed"));
     }
     if (!state.IsNull() && state.Value() == DlLockState::kUnlocked)
     {
@@ -741,11 +713,6 @@ CHIP_ERROR AppTask::InitLockDomain(app::DataModel::Nullable<DlLockState> state, 
         mLockActuatorState = LockActuatorState::kLockCompleted;
     }
     return CHIP_NO_ERROR;
-}
-
-bool AppTask::NextState()
-{
-    return (mLockActuatorState == LockActuatorState::kUnlockCompleted);
 }
 
 bool AppTask::IsActuatorBusy() const
@@ -784,7 +751,7 @@ bool AppTask::InitiateLockAction(LockAction aAction, bool fromButton)
     {
         if (osTimerStart(mLockTimer, pdMS_TO_TICKS(ACTUATOR_MOVEMENT_PERIOS_MS)) != osOK)
         {
-            SILABS_LOG("mLockTimer timer start() failed");
+            ChipLogError(NotSpecified, "mLockTimer timer start() failed");
             appError(APP_ERROR_START_TIMER_FAILED);
         }
 
@@ -792,7 +759,7 @@ bool AppTask::InitiateLockAction(LockAction aAction, bool fromButton)
         if (aAction == LockAction::kUnlock || aAction == LockAction::kLock)
         {
             bool locked = (aAction == LockAction::kLock);
-            SILABS_LOG("%s Action has been initiated", locked ? "Lock" : "Unlock");
+            ChipLogProgress(Zcl, "%s Action has been initiated", locked ? "Lock" : "Unlock");
             sLockLED.Set(!locked);
 
 #ifdef DISPLAY_ENABLED
@@ -801,7 +768,7 @@ bool AppTask::InitiateLockAction(LockAction aAction, bool fromButton)
         }
         else if (aAction == LockAction::kUnlatch)
         {
-            SILABS_LOG("Unlatch Action has been initiated");
+            ChipLogProgress(Zcl, "Unlatch Action has been initiated");
         }
         if (fromButton)
         {
@@ -822,48 +789,47 @@ void AppTask::TimerEventHandler(void * timerCbArg)
     event.Handler            = &CustomerAppTask::ActuatorMovementEventHandler;
     appInstance().PostEvent(&event);
 }
+
 void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
 {
-    if (appInstance().mUnlatchContext.mEndpointId == kInvalidEndpointId)
-    {
-        SILABS_LOG("UnlockAfterUnlatch: no valid unlatch context, skipping auto-unlock");
-        return;
-    }
+    auto & app = appInstance();
+    auto & ctx = app.mUnlatchContext;
 
-    Status status =
-        DoorLockServer::Instance().SetLockState(appInstance().mUnlatchContext.mEndpointId, DlLockState::kNotFullyLocked,
-                                                OperationSourceEnum::kRemote, NullNullable, NullNullable,
-                                                appInstance().mUnlatchContext.mFabricIdx, appInstance().mUnlatchContext.mNodeId)
+    VerifyOrReturn(ctx.mEndpointId != kInvalidEndpointId,
+                   ChipLogError(Zcl, "UnlockAfterUnlatch: no valid unlatch context, skipping auto-unlock"));
+
+    Status status = DoorLockServer::Instance().SetLockState(ctx.mEndpointId, DlLockState::kNotFullyLocked,
+                                                            OperationSourceEnum::kRemote, NullNullable, NullNullable,
+                                                            ctx.mFabricIdx, ctx.mNodeId)
         ? Status::Success
         : Status::Failure;
     if (status != Status::Success)
     {
-        SILABS_LOG("ERR: setting transitional NotFullyLocked %x (auto-unlock after unlatch)", to_underlying(status));
+        ChipLogError(Zcl, "ERR: setting transitional NotFullyLocked %x (auto-unlock after unlatch)", to_underlying(status));
     }
 
-    LockRequest unlockLeg                = {};
-    unlockLeg.endpointId                 = appInstance().mUnlatchContext.mEndpointId;
-    unlockLeg.action                     = LockAction::kUnlock;
-    unlockLeg.targetClusterState         = DlLockState::kUnlocked;
-    unlockLeg.fabricIdx                  = appInstance().mUnlatchContext.mFabricIdx;
-    unlockLeg.nodeId                     = appInstance().mUnlatchContext.mNodeId;
-    unlockLeg.userIndex                  = appInstance().mUnlatchContext.mUserIndex;
-    unlockLeg.credential                 = appInstance().mUnlatchContext.mCredential;
-    unlockLeg.hasCredential              = appInstance().mUnlatchContext.mHasCredential;
-    appInstance().mActiveRemoteAction    = unlockLeg;
-    appInstance().mHasActiveRemoteAction = true;
+    LockRequest unlockRequest        = {};
+    unlockRequest.endpointId         = ctx.mEndpointId;
+    unlockRequest.action             = LockAction::kUnlock;
+    unlockRequest.targetClusterState = DlLockState::kUnlocked;
+    unlockRequest.fabricIdx          = ctx.mFabricIdx;
+    unlockRequest.nodeId             = ctx.mNodeId;
+    unlockRequest.userIndex          = ctx.mUserIndex;
+    unlockRequest.credential         = ctx.mCredential;
+    unlockRequest.hasCredential      = ctx.mHasCredential;
+    app.mActiveRemoteAction          = unlockRequest;
+    app.mHasActiveRemoteAction       = true;
 
-    appInstance().mUnlatchContext.mEndpointId = kInvalidEndpointId;
-    appInstance().mUnlatchContext.mUserIndex.SetNull();
-    appInstance().mUnlatchContext.mCredential    = {};
-    appInstance().mUnlatchContext.mHasCredential = false;
-
+    ctx.mEndpointId    = kInvalidEndpointId;
+    ctx.mUserIndex.SetNull();
+    ctx.mCredential    = {};
+    ctx.mHasCredential = false;
     PostLockActionEvent(AppEvent::kEventType_Lock, LockAction::kUnlock);
 }
 
-void AppTask::UnlatchCallback(TimerHandle_t xTimer)
+void AppTask::UnlatchCallback(void * argument)
 {
-    (void) xTimer;
+    (void) argument;
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(&CustomerAppTask::UnlockAfterUnlatch,
                                                                            reinterpret_cast<intptr_t>(nullptr));
 }
@@ -871,8 +837,7 @@ void AppTask::UnlatchCallback(TimerHandle_t xTimer)
 void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 {
     LockAction actionCompleted = LockAction::kInvalid;
-
-    AppTask * lock = static_cast<AppTask *>(aEvent->TimerEvent.Context);
+    AppTask * lock             = static_cast<AppTask *>(aEvent->TimerEvent.Context);
     if (lock->mLockActuatorState == LockActuatorState::kLockInitiated)
     {
         lock->mLockActuatorState = LockActuatorState::kLockCompleted;
@@ -890,38 +855,27 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
     }
     if (actionCompleted != LockAction::kInvalid)
     {
+        DlLockState stateToReport = DlLockState::kUnknownEnumValue;
         switch (actionCompleted)
         {
         case LockAction::kLock:
-            SILABS_LOG("Lock Action has been completed");
+            ChipLogProgress(Zcl, "Lock Action has been completed");
+            stateToReport = DlLockState::kLocked;
             break;
         case LockAction::kUnlatch:
-            SILABS_LOG("Unlatch Action has been completed");
+            ChipLogProgress(Zcl, "Unlatch Action has been completed");
             StartUnlatchTimer(UNLATCH_TIME_MS);
+            stateToReport = DlLockState::kUnlatched;
             break;
         case LockAction::kUnlock:
-            SILABS_LOG("Unlock Action has been completed");
+            ChipLogProgress(Zcl, "Unlock Action has been completed");
+            stateToReport = DlLockState::kUnlocked;
             break;
         case LockAction::kInvalid:
             break;
         }
         if (lock->mSyncClusterToButtonAction)
         {
-            DlLockState stateToReport = DlLockState::kUnknownEnumValue;
-            switch (actionCompleted)
-            {
-            case LockAction::kLock:
-                stateToReport = DlLockState::kLocked;
-                break;
-            case LockAction::kUnlock:
-                stateToReport = DlLockState::kUnlocked;
-                break;
-            case LockAction::kUnlatch:
-                stateToReport = DlLockState::kUnlatched;
-                break;
-            case LockAction::kInvalid:
-                break;
-            }
             if (stateToReport != DlLockState::kUnknownEnumValue)
             {
                 TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(
@@ -946,11 +900,9 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
         {
             LockRequest req          = lock->mPendingRequest;
             lock->mHasPendingRequest = false;
-
             ChipLogProgress(Zcl, "Door Lock App: replaying queued %s (action=%u, target=%s)",
                             req.isButtonAction ? "button" : "remote", to_underlying(req.action),
                             LockStateToString(req.targetClusterState));
-
             appInstance().HandleLockRequestOnAppTask(req);
         }
         if (lock->mLockActuatorState == LockActuatorState::kLockCompleted ||
@@ -970,18 +922,13 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 
 void AppTask::EnqueueLockRequest(const LockRequest & request)
 {
-    if (sStagedLockRequestMutex == nullptr)
-    {
-        ChipLogError(Zcl, "Door Lock App: staging mutex not initialized; dropping LockRequest");
-        return;
-    }
+    VerifyOrReturn(sStagedLockRequestMutex != nullptr,
+                   ChipLogError(Zcl, "Door Lock App: staging mutex not initialized; dropping LockRequest"));
 
     osStatus_t mutexStatus = osMutexAcquire(sStagedLockRequestMutex, osWaitForever);
-    if (mutexStatus != osOK)
-    {
-        ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest", static_cast<int>(mutexStatus));
-        return;
-    }
+    VerifyOrReturn(mutexStatus == osOK,
+                   ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest",
+                                static_cast<int>(mutexStatus)));
     sStagedLockRequest      = request;
     sStagedLockRequestValid = true;
     osMutexRelease(sStagedLockRequestMutex);
@@ -995,14 +942,8 @@ void AppTask::EnqueueLockRequest(const LockRequest & request)
 
 bool AppTask::TryDrainStagedLockRequest(LockRequest & out)
 {
-    if (sStagedLockRequestMutex == nullptr)
-    {
-        return false;
-    }
-    if (osMutexAcquire(sStagedLockRequestMutex, osWaitForever) != osOK)
-    {
-        return false;
-    }
+    VerifyOrReturnValue(sStagedLockRequestMutex != nullptr, false);
+    VerifyOrReturnValue(osMutexAcquire(sStagedLockRequestMutex, osWaitForever) == osOK, false);
     bool drained = sStagedLockRequestValid;
     if (drained)
     {
@@ -1015,17 +956,11 @@ bool AppTask::TryDrainStagedLockRequest(LockRequest & out)
 
 void AppTask::LockRequestEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type != AppEvent::kEventType_LockRequest)
-    {
-        ChipLogError(NotSpecified, "LockRequestEventHandler: unexpected event type %u", aEvent->Type);
-        return;
-    }
+    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_LockRequest,
+                   ChipLogError(NotSpecified, "LockRequestEventHandler: unexpected event type %u", aEvent->Type));
 
     LockRequest req;
-    if (!TryDrainStagedLockRequest(req))
-    {
-        return;
-    }
+    VerifyOrReturn(TryDrainStagedLockRequest(req));
 
     appInstance().HandleLockRequestOnAppTask(req);
 }
@@ -1070,7 +1005,7 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
     }
     else
     {
-        SILABS_LOG("Action is already in progress or active.");
+        ChipLogDetail(NotSpecified, "Action is already in progress or active.");
     }
 }
 
@@ -1078,27 +1013,21 @@ bool AppTask::DMDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Ember
 {
     CHIP_ERROR error;
     VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed
-
     userIndex--;
     VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
-
     ChipLogProgress(Zcl, "Door Lock App: AppTask::DMDoorLockGetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
 
     // Get User struct from nvm3
-    StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
-
     uint16_t size = kLockUserInfoSize;
-
     LockUserInfo userInStorage;
-
-    error = mStorage->SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
+    StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
+    error                  = mStorage->SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
 
     // If no data is found at user key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         user.userStatus = UserStatusEnum::kAvailable;
-
         ChipLogDetail(Zcl, "No user data found");
         return true;
     }
@@ -1112,10 +1041,8 @@ bool AppTask::DMDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Ember
     }
     VerifyOrReturnValue(userInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
     VerifyOrReturnValue(userInStorage.userNameSize <= user.userName.size(), false);
-
     // Copy username data from storage to the output parameter
     memmove(user.userName.data(), userInStorage.userName, userInStorage.userNameSize);
-
     // Resize Span to match the actual username size retrieved from storage
     user.userName.reduce_size(userInStorage.userNameSize);
 
@@ -1139,10 +1066,8 @@ bool AppTask::DMDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Ember
         // Check size out param matches what we expect to read
         VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(kCredentialStructSize * userInStorage.currentCredentialCount),
                             false);
-
         // Copy credentials attached to user from storage to the output parameter
         memmove(user.credentials.data(), credentials, credentialSize);
-
         // Resize Span to match the actual size of credentials attached to user
         user.credentials.reduce_size(userInStorage.currentCredentialCount);
     }
@@ -1172,20 +1097,14 @@ bool AppTask::DMDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, Fabri
 
     userIndex--;
     VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
-    if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
-    {
-        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d]", endpointId, userIndex);
-        return false;
-    }
-    if (totalCredentials > mLockParams.numberOfCredentialsPerUser)
-    {
+    VerifyOrReturnValue(userName.size() <= DOOR_LOCK_MAX_USER_NAME_SIZE, false,
+                        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d]", endpointId, userIndex));
+    VerifyOrReturnValue(
+        totalCredentials <= mLockParams.numberOfCredentialsPerUser, false,
         ChipLogError(Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,totalCredentials=%u]",
-                     endpointId, userIndex, totalCredentials);
-        return false;
-    }
+                     endpointId, userIndex, totalCredentials));
 
     LockUserInfo userInStorage = {};
-
     memmove(userInStorage.userName, userName.data(), userName.size());
     userInStorage.userNameSize           = userName.size();
     userInStorage.userUniqueId           = uniqueId;
@@ -1245,10 +1164,8 @@ bool AppTask::DMDoorLockGetCredential(EndpointId endpointId, uint16_t credential
         return true;
     }
     VerifyOrReturnValue(credentialInStorage.credentialDataSize <= credential.credentialData.size(), false);
-
     // Copy credential data from storage to the output parameter
     memmove(credential.credentialData.data(), credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
-
     // Resize Span to match the actual size of the credential data retrieved from storage
     credential.credentialData.reduce_size(credentialInStorage.credentialDataSize);
 
@@ -1279,24 +1196,17 @@ bool AppTask::DMDoorLockSetCredential(EndpointId endpointId, uint16_t credential
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
     LockCredentialInfo credentialInStorage = {};
-
     credentialInStorage.status             = credentialStatus;
     credentialInStorage.credentialType     = credentialType;
     credentialInStorage.createdBy          = creator;
     credentialInStorage.lastModifiedBy     = modifier;
     credentialInStorage.credentialDataSize = credentialData.size();
-
     // Copy credential data to the storage struct
     memmove(credentialInStorage.credentialData, credentialData.data(), credentialInStorage.credentialDataSize);
 
     StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
-
-    error = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, kLockCredentialInfoSize);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Error reading from KVS key");
-        return false;
-    }
+    error              = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, kLockCredentialInfoSize);
+    VerifyOrReturnValue(error == CHIP_NO_ERROR, false, ChipLogError(Zcl, "Error reading from KVS key"));
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
     return true;
 }
@@ -1305,37 +1215,25 @@ DlStatus AppTask::DMDoorLockGetWeekDaySchedule(EndpointId endpointId, uint8_t we
                                                EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
     CHIP_ERROR error;
-
     WeekDayScheduleInfo weekDayScheduleInStorage;
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
-
     weekdayIndex--;
     userIndex--;
     VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
     // Get schedule data from nvm3
+    uint16_t size                  = kWeekDayScheduleInfoSize;
     StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(endpointId, userIndex, weekdayIndex);
-
-    uint16_t size = kWeekDayScheduleInfoSize; // Create a non-const variable
-
-    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, size);
-
-    // If no data is found at scheduleDataKey
-    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        ChipLogError(Zcl, "No schedule data found for user");
-        return DlStatus::kNotFound;
-    }
+    error                          = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, size);
+    VerifyOrReturnValue(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, DlStatus::kNotFound,
+                        ChipLogError(Zcl, "No schedule data found for user"));
 
     // Check size out param matches what we expect to read
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kWeekDayScheduleInfoSize, DlStatus::kFailure);
-    if (weekDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
-    {
-        return DlStatus::kNotFound;
-    }
+    VerifyOrReturnValue(weekDayScheduleInStorage.status != DlScheduleStatus::kAvailable, DlStatus::kNotFound);
     schedule = weekDayScheduleInStorage.schedule;
     return DlStatus::kSuccess;
 }
@@ -1344,12 +1242,10 @@ DlStatus AppTask::DMDoorLockSetWeekDaySchedule(EndpointId endpointId, uint8_t we
                                                DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
                                                uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
-
     WeekDayScheduleInfo weekDayScheduleInStorage = {};
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
-
     weekdayIndex--;
     userIndex--;
     VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
@@ -1375,36 +1271,25 @@ DlStatus AppTask::DMDoorLockGetYearDaySchedule(EndpointId endpointId, uint8_t ye
                                                EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
     CHIP_ERROR error;
-
     YearDayScheduleInfo yearDayScheduleInStorage;
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
-
     yearDayIndex--;
     userIndex--;
     VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
     // Get schedule data from nvm3
+    uint16_t size                  = kYearDayScheduleInfoSize;
     StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
-    uint16_t size = kYearDayScheduleInfoSize;
-    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
-
-    // If no data is found at scheduleDataKey
-    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        ChipLogError(Zcl, "No schedule data found for user");
-        return DlStatus::kNotFound;
-    }
+    error                          = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
+    VerifyOrReturnValue(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, DlStatus::kNotFound,
+                        ChipLogError(Zcl, "No schedule data found for user"));
 
     // Check size out param matches what we expect to read
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kYearDayScheduleInfoSize, DlStatus::kFailure);
-    if (yearDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
-    {
-        return DlStatus::kNotFound;
-    }
-
+    VerifyOrReturnValue(yearDayScheduleInStorage.status != DlScheduleStatus::kAvailable, DlStatus::kNotFound);
     schedule = yearDayScheduleInStorage.schedule;
     return DlStatus::kSuccess;
 }
@@ -1412,12 +1297,10 @@ DlStatus AppTask::DMDoorLockGetYearDaySchedule(EndpointId endpointId, uint8_t ye
 DlStatus AppTask::DMDoorLockSetYearDaySchedule(EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                                DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
-
     YearDayScheduleInfo yearDayScheduleInStorage = {};
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
-
     yearDayIndex--;
     userIndex--;
     VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
@@ -1447,28 +1330,16 @@ DlStatus AppTask::DMDoorLockGetHolidaySchedule(EndpointId endpointId, uint8_t ho
     VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
 
     // Get schedule data from nvm3
+    uint16_t size                  = kHolidayScheduleInfoSize;
     StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(endpointId, holidayIndex);
-
-    uint16_t size = kHolidayScheduleInfoSize;
-
-    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, size);
-
-    // If no data is found at scheduleDataKey
-    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        ChipLogError(Zcl, "No schedule data found for user");
-        return DlStatus::kNotFound;
-    }
+    error                          = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, size);
+    VerifyOrReturnValue(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, DlStatus::kNotFound,
+                        ChipLogError(Zcl, "No schedule data found for user"));
 
     // Check size out param matches what we expect to read
     VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kHolidayScheduleInfoSize, DlStatus::kFailure);
-    if (holidayScheduleInStorage.status == DlScheduleStatus::kAvailable)
-    {
-        return DlStatus::kNotFound;
-    }
-
+    VerifyOrReturnValue(holidayScheduleInStorage.status != DlScheduleStatus::kAvailable, DlStatus::kNotFound);
     schedule = holidayScheduleInStorage.schedule;
-
     return DlStatus::kSuccess;
 }
 
@@ -1478,7 +1349,6 @@ DlStatus AppTask::DMDoorLockSetHolidaySchedule(EndpointId endpointId, uint8_t ho
     HolidayScheduleInfo holidayScheduleInStorage = {};
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
     VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure);
-
     holidayIndex--;
     VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
 
@@ -1527,11 +1397,9 @@ bool AppTask::ValidatePin(EndpointId endpointId, const Optional<ByteSpan> & pin,
         EmberAfPluginDoorLockUserInfo user;
         user.userName    = MutableCharSpan(userNameBuffer);
         user.credentials = Span<CredentialStruct>(credentialsBuffer);
-        if (!DMDoorLockGetUser(endpointId, userIndex, user))
-        {
-            ChipLogError(Zcl, "Unable to get the user - internal error [endpointId=%d,userIndex=%lu]", endpointId, userIndex);
-            return false;
-        }
+        VerifyOrReturnValue(
+            DMDoorLockGetUser(endpointId, userIndex, user), false,
+            ChipLogError(Zcl, "Unable to get the user - internal error [endpointId=%d,userIndex=%lu]", endpointId, userIndex));
         if (user.userStatus != UserStatusEnum::kOccupiedEnabled)
         {
             continue;
@@ -1546,12 +1414,11 @@ bool AppTask::ValidatePin(EndpointId endpointId, const Optional<ByteSpan> & pin,
 
             EmberAfPluginDoorLockCredentialInfo credential;
             credential.credentialData = MutableByteSpan(credentialDataBuffer);
-            if (!DMDoorLockGetCredential(endpointId, userCredential.credentialIndex, userCredential.credentialType, credential))
-            {
+            VerifyOrReturnValue(
+                DMDoorLockGetCredential(endpointId, userCredential.credentialIndex, userCredential.credentialType, credential),
+                false,
                 ChipLogError(Zcl, "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
-                             endpointId, to_underlying(userCredential.credentialType), userCredential.credentialIndex);
-                return false;
-            }
+                             endpointId, to_underlying(userCredential.credentialType), userCredential.credentialIndex));
             if (credential.status != DlCredentialStatus::kOccupied)
             {
                 continue;
