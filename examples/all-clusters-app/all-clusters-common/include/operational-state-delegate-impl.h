@@ -111,10 +111,7 @@ private:
     const uint32_t kExampleCountDown = 30;
 
 public:
-    OperationalStateDelegate()
-    {
-        GenericOperationalStateDelegateImpl::mOperationalStateIds = Span<const uint8_t>(kOpStateIds);
-    }
+    OperationalStateDelegate() { GenericOperationalStateDelegateImpl::mOperationalStateIds = Span<const uint8_t>(kOpStateIds); }
 
     /**
      * Handle Command Callback in application: Start
