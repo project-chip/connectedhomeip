@@ -52,6 +52,8 @@ public:
     ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config);
     ~ThreadBorderRouterManagementCluster();
 
+    static void ShutdownAllInstances();
+
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     void ReportAttributeChanged(AttributeId attributeId) override;
 
@@ -83,6 +85,8 @@ protected:
     CommandHandler::Handle mAsyncCommandHandle;
     uint32_t mSetActiveDatasetSequenceNumber = 0;
     Optional<uint64_t> mBreadcrumb;
+
+    static std::set<ThreadBorderRouterManagementCluster *> sInstances;
 };
 
 } // namespace chip::app::Clusters

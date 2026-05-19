@@ -28,10 +28,9 @@
 
 namespace chip::app::Clusters {
 
-namespace {
-std::set<ThreadBorderRouterManagementCluster *> sInstances;
-}
 using namespace ThreadBorderRouterManagement;
+
+std::set<ThreadBorderRouterManagementCluster *> ThreadBorderRouterManagementCluster::sInstances;
 
 DataModel::ActionReturnStatus ThreadBorderRouterManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                                  AttributeValueEncoder & encoder)
@@ -133,6 +132,14 @@ ThreadBorderRouterManagementCluster::ThreadBorderRouterManagementCluster(Endpoin
 ThreadBorderRouterManagementCluster::~ThreadBorderRouterManagementCluster()
 {
     sInstances.erase(this);
+}
+
+void ThreadBorderRouterManagementCluster::ShutdownAllInstances()
+{
+    for (auto * cluster : sInstances)
+    {
+        cluster->Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
 }
 
 CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & context)

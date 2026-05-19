@@ -85,14 +85,11 @@ CHIP_ERROR ServerInstance::Init()
 } // namespace chip
 
 void MatterThreadBorderRouterManagementPluginServerInitCallback() {}
-void MatterThreadBorderRouterManagementPluginServerShutdownCallback() {}
+void MatterThreadBorderRouterManagementPluginServerShutdownCallback()
+{
+    ThreadBorderRouterManagementCluster::ShutdownAllInstances();
+}
 
 void MatterThreadBorderRouterManagementClusterInitCallback(chip::EndpointId endpointId) {}
 void MatterThreadBorderRouterManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
-{
-    auto * cluster = CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(endpointId, Id));
-    if (cluster != nullptr)
-    {
-        cluster->Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-}
+{}
