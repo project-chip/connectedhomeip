@@ -39,6 +39,7 @@ source_set("evse-common-lib") {
     "${chip_root}/examples/energy-management/utils:energy-management-utils",
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/energy-evse-server",
+    "${chip_root}/src/app/clusters/mode-base-server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/system",
