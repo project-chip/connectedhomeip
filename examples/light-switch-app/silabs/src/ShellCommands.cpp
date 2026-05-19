@@ -53,6 +53,16 @@ CHIP_ERROR ScheduleSwitchWorker(BindingCommandData * data)
     return err;
 }
 
+CHIP_ERROR ScheduleBindingCommand(ClusterId clusterId, CommandId commandId, bool isGroupCommand)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
+    data->clusterId = clusterId;
+    data->commandId = commandId;
+    data->isGroup   = isGroupCommand;
+    return ScheduleSwitchWorker(data);
+}
+
 CHIP_ERROR ScheduleBindingWorker(Binding::TableEntry * entry)
 {
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
@@ -124,32 +134,17 @@ CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
-    data->commandId = Clusters::OnOff::Commands::On::Id;
-    data->clusterId = Clusters::OnOff::Id;
-
-    return ScheduleSwitchWorker(data);
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id, false);
 }
 
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
-    data->commandId = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId = Clusters::OnOff::Id;
-
-    return ScheduleSwitchWorker(data);
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id, false);
 }
 
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
-    data->commandId = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId = Clusters::OnOff::Id;
-
-    return ScheduleSwitchWorker(data);
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id, false);
 }
 
 /********************************************************
@@ -234,35 +229,17 @@ CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
-    data->commandId = Clusters::OnOff::Commands::On::Id;
-    data->clusterId = Clusters::OnOff::Id;
-    data->isGroup   = true;
-
-    return ScheduleSwitchWorker(data);
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::On::Id, true);
 }
 
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
-    data->commandId = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId = Clusters::OnOff::Id;
-    data->isGroup   = true;
-
-    return ScheduleSwitchWorker(data);
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Off::Id, true);
 }
 
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "BindingCommandData allocation failed"));
-    data->commandId = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId = Clusters::OnOff::Id;
-    data->isGroup   = true;
-
-    return ScheduleSwitchWorker(data);
+    return ScheduleBindingCommand(Clusters::OnOff::Id, Clusters::OnOff::Commands::Toggle::Id, true);
 }
 
 /********************************************************
