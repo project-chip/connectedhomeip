@@ -239,14 +239,20 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         sActionButtonPressed = true;
         {
             auto * switchData = Platform::New<GenericSwitchEventData>();
-            VerifyOrReturn(switchData != nullptr, ChipLogError(AppServer, "GenericSwitchEventData allocation failed"));
-            switchData->endpoint = gGenericSwitchEndpoint;
-            switchData->event    = Switch::Events::InitialPress::Id;
-            if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
-                                                        reinterpret_cast<intptr_t>(switchData)) != CHIP_NO_ERROR)
+            if (switchData != nullptr)
             {
-                ChipLogError(AppServer, "Failed to schedule generic switch work");
-                Platform::Delete(switchData);
+                switchData->endpoint = gGenericSwitchEndpoint;
+                switchData->event    = Switch::Events::InitialPress::Id;
+                if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
+                                                            reinterpret_cast<intptr_t>(switchData)) != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to schedule generic switch work");
+                    Platform::Delete(switchData);
+                }
+            }
+            else
+            {
+                ChipLogError(AppServer, "GenericSwitchEventData allocation failed");
             }
         }
         if (sFunctionButtonPressed)
@@ -305,14 +311,20 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         }
         {
             auto * switchData = Platform::New<GenericSwitchEventData>();
-            VerifyOrReturn(switchData != nullptr, ChipLogError(AppServer, "GenericSwitchEventData allocation failed"));
-            switchData->endpoint = gGenericSwitchEndpoint;
-            switchData->event    = Switch::Events::ShortRelease::Id;
-            if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
-                                                        reinterpret_cast<intptr_t>(switchData)) != CHIP_NO_ERROR)
+            if (switchData != nullptr)
             {
-                ChipLogError(AppServer, "Failed to schedule generic switch work");
-                Platform::Delete(switchData);
+                switchData->endpoint = gGenericSwitchEndpoint;
+                switchData->event    = Switch::Events::ShortRelease::Id;
+                if (DeviceLayer::PlatformMgr().ScheduleWork(AppTask::GenericSwitchWorkerFunction,
+                                                            reinterpret_cast<intptr_t>(switchData)) != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to schedule generic switch work");
+                    Platform::Delete(switchData);
+                }
+            }
+            else
+            {
+                ChipLogError(AppServer, "GenericSwitchEventData allocation failed");
             }
         }
         break;
