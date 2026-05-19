@@ -40,7 +40,7 @@ public:
     GenericOpenThreadBorderRouterDelegate(PersistentStorageDelegate * storage) : mStorage(storage) {}
     ~GenericOpenThreadBorderRouterDelegate()
     {
-        DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+        DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     }
 
     CHIP_ERROR Init(AttributeChangeCallback * callback) override;
