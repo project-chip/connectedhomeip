@@ -163,6 +163,8 @@
 #endif
 #include <third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h>
 
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -1006,6 +1008,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     static chip::PersistentStorageOpKeystorese05x se05xInstance;
     initParams.operationalKeystore = &se05xInstance;
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    initParams.groupDataProvider->SetGroupcastEnabled(true);
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(initParams.groupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
+    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+#endif
+
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.
 #if ENABLE_SE05X_DEVICE_ATTESTATION
@@ -1035,17 +1044,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         // This example use of the ARL feature proactively installs the provided entries on fabric index 1
         SuccessOrDie(exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value()));
-    }
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
-        // TODO #40789: Should we just NOT call WiFiPAFShutdown at startup and instead make sure that WiFiPAF is not published at
-        // all? or Change the handling within WiFiPAFShutdown?
-        // TODO #40814: Check the Return Value of the call to WiFiPAFShutdown
-        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
-                                                                                chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
     }
 #endif
 
