@@ -729,30 +729,28 @@ void AppTask::LightSwitchChangedHandler(const Binding::TableEntry & binding, Ope
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == Binding::MATTER_MULTICAST_BINDING && data->isGroup)
-    {
-        switch (data->clusterId)
-        {
-        case Clusters::OnOff::Id:
-            ProcessOnOffBindingCommand(data->commandId, binding, nullptr);
-            break;
-        case Clusters::LevelControl::Id:
-            ProcessLevelControlBindingCommand(data, binding, nullptr);
-            break;
-        }
-    }
-    else if (binding.type == Binding::MATTER_UNICAST_BINDING && !data->isGroup)
+    const bool isMulticast = binding.type == Binding::MATTER_MULTICAST_BINDING && data->isGroup;
+    const bool isUnicast = binding.type == Binding::MATTER_UNICAST_BINDING && !data->isGroup;
+
+    VerifyOrReturn(isMulticast || isUnicast);
+
+    OperationalDeviceProxy * device = nullptr;
+    if (isUnicast)
     {
         VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
-        switch (data->clusterId)
-        {
-        case Clusters::OnOff::Id:
-            ProcessOnOffBindingCommand(data->commandId, binding, peer_device);
-            break;
-        case Clusters::LevelControl::Id:
-            ProcessLevelControlBindingCommand(data, binding, peer_device);
-            break;
-        }
+        device = peer_device;
+    }
+
+    switch (data->clusterId)
+    {
+    case Clusters::OnOff::Id:
+        ProcessOnOffBindingCommand(data->commandId, binding, device);
+        break;
+    case Clusters::LevelControl::Id:
+        ProcessLevelControlBindingCommand(data, binding, device);
+        break;
+    default:
+        break;
     }
 }
 
