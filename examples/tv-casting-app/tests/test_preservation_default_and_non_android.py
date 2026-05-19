@@ -14,7 +14,7 @@ Observations (on consolidated code):
 - android/args.gni optimize_apk_size block: sets chip_data_model_overrides_dir.
 - linux/args.gni: does NOT set chip_data_model_overrides_dir unconditionally.
 - darwin/args.gni: chip_data_model_overrides_dir points to tv-casting-common/.
-- casting-cluster-objects.cpp exists and contains ~117 .ipp includes
+- cluster-objects-override.cpp exists and contains ~117 .ipp includes
   spanning ~29 cluster directories plus the shared utilities directory.
 """
 
@@ -46,7 +46,7 @@ SLIM_CLUSTER_FILE = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-cluster-objects.cpp",
+    "cluster-objects-override.cpp",
 )
 
 # ---------------------------------------------------------------------------
@@ -323,13 +323,13 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     """
     **Validates: Requirements 14.4**
 
-    Property 2c (Preservation): The slim `casting-cluster-objects.cpp` file
+    Property 2c (Preservation): The slim `cluster-objects-override.cpp` file
     SHALL exist and include .ipp files for the expected set of casting-relevant
     and infrastructure clusters (~29 cluster directories plus shared utilities,
     totalling ~117 .ipp includes).
     """
     assert os.path.isfile(SLIM_CLUSTER_FILE), (
-        f"REGRESSION: casting-cluster-objects.cpp not found at {SLIM_CLUSTER_FILE}"
+        f"REGRESSION: cluster-objects-override.cpp not found at {SLIM_CLUSTER_FILE}"
     )
 
     content = _read_file(SLIM_CLUSTER_FILE)
@@ -337,7 +337,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     # Count .ipp includes
     ipp_count = _count_ipp_includes(content)
     assert 100 <= ipp_count <= 200, (
-        f"REGRESSION: casting-cluster-objects.cpp has {ipp_count} .ipp includes. "
+        f"REGRESSION: cluster-objects-override.cpp has {ipp_count} .ipp includes. "
         f"Expected ~117 (between 100 and 200). If this is much larger, the slim "
         f"file may have been replaced with the full cluster-objects.cpp."
     )
@@ -345,7 +345,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     # Verify unique cluster directories
     cluster_dirs = _unique_cluster_dirs(content)
     assert 30 <= len(cluster_dirs) <= 50, (
-        f"REGRESSION: casting-cluster-objects.cpp references {len(cluster_dirs)} "
+        f"REGRESSION: cluster-objects-override.cpp references {len(cluster_dirs)} "
         f"unique cluster directories. Expected ~30 (between 30 and 50)."
     )
 
@@ -370,7 +370,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     }
     missing = expected_casting_clusters - cluster_dirs
     assert not missing, (
-        f"REGRESSION: casting-cluster-objects.cpp is missing casting-specific "
+        f"REGRESSION: cluster-objects-override.cpp is missing casting-specific "
         f"clusters: {missing}"
     )
 
@@ -386,7 +386,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     }
     missing_infra = expected_infra_clusters - cluster_dirs
     assert not missing_infra, (
-        f"REGRESSION: casting-cluster-objects.cpp is missing infrastructure "
+        f"REGRESSION: cluster-objects-override.cpp is missing infrastructure "
         f"clusters: {missing_infra}"
     )
 
@@ -407,7 +407,7 @@ if __name__ == "__main__":
          test_non_android_builds_use_overrides_dir),
         ("2b-linux: Linux args.gni does not set unconditional overrides dir",
          test_linux_args_gni_does_not_set_unconditional_overrides_dir),
-        ("2c: casting-cluster-objects.cpp exists with expected includes",
+        ("2c: cluster-objects-override.cpp exists with expected includes",
          test_casting_cluster_objects_file_exists_with_expected_includes),
     ]
     all_passed = True

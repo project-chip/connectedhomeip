@@ -16,7 +16,7 @@
  */
 
 /**
- * @file casting-Accessors.cpp
+ * @file Accessors-override.cpp
  *
  * Slim replacement for the full zap-generated Accessors.cpp that includes
  * only the attribute accessor functions needed by the TV Casting App.

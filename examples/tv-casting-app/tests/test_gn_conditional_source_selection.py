@@ -43,9 +43,9 @@ def _read_file(path: str) -> str:
 
 # Override filenames paired with their zap-generated fallback filenames
 OVERRIDE_CONFIGS = [
-    ("casting-CHIPAttributeTLVValueDecoder.cpp",
+    ("CHIPAttributeTLVValueDecoder-override.cpp",
      "zap-generated/CHIPAttributeTLVValueDecoder.cpp"),
-    ("casting-CHIPEventTLVValueDecoder.cpp",
+    ("CHIPEventTLVValueDecoder-override.cpp",
      "zap-generated/CHIPEventTLVValueDecoder.cpp"),
 ]
 

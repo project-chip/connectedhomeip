@@ -26,8 +26,8 @@ Casting App on Android (arm64-v8a).
 | Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                             | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                            |
 | Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                         | ~10–20 % further `.so` reduction                                                                          |
 | R8 Java shrinking                      | `minifyEnabled true` in Gradle debug build                                                              | Reduces DEX size (Java / Kotlin)                                                                          |
-| Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_data_model_overrides_dir` + `casting-cluster-servers.gni` | ~1.1 MB `.o` savings                                                                                      |
-| Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_data_model_overrides_dir` + `casting-Accessors.cpp`    | ~826 KB `.o` savings                                                                                      |
+| Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB `.o` savings                                                                                      |
+| Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_data_model_overrides_dir` + `Accessors-override.cpp`    | ~826 KB `.o` savings                                                                                      |
 | jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime         | ~350 KB (not achievable)                                                                                  |
 
 ---
@@ -79,8 +79,8 @@ TargetNavigator, WakeOnLan
 ### Java controller interaction model
 
 -   `android_chip_im_jni` — interaction model JNI bindings
--   Slim TLV decoders (`casting-CHIPAttributeTLVValueDecoder.cpp`,
-    `casting-CHIPEventTLVValueDecoder.cpp`) — hand-maintained files covering
+-   Slim TLV decoders (`CHIPAttributeTLVValueDecoder-override.cpp`,
+    `CHIPEventTLVValueDecoder-override.cpp`) — hand-maintained files covering
     only the 18 casting clusters, selected at build time via
     `chip_data_model_overrides_dir`. These keep `ChipClusters.java`
     read/subscribe APIs functional at runtime while avoiding link-time
@@ -112,7 +112,7 @@ TargetNavigator, WakeOnLan
 -   Full zap-generated TLV decoder files for all ~200+ clusters (replaced by
     slim 18-cluster versions)
 -   Full zap-generated Accessors.cpp for all ~200+ clusters (phase 3 — replaced
-    by slim 29-cluster `casting-Accessors.cpp`)
+    by slim 29-cluster `Accessors-override.cpp`)
 -   Legacy chip-tool command sources (`Command.cpp`, `Commands.cpp`,
     `CHIPCommand.cpp`, `RemoteDataModelLogger.cpp`, etc.)
 -   Tracing dependencies (`commandline`, `json`, `jsoncpp`)
@@ -250,7 +250,7 @@ Expected results (arm64-v8a, March 2026):
 ### Desktop — Build with slim cluster set (for cluster vetting)
 
 The tv-casting-app desktop build already uses the slim
-`casting-cluster-objects.cpp` (set via `chip_data_model_overrides_dir` in the
+`cluster-objects-override.cpp` (set via `chip_data_model_overrides_dir` in the
 platform `args.gni`). This makes it a fast way to verify that the reduced
 cluster set compiles and links correctly without needing the Android SDK.
 
@@ -273,7 +273,7 @@ registers all cluster commands (including UnitTesting) and will fail to link
 against the slim cluster file.
 
 The resulting `chip-tv-casting-app` binary uses the same
-`casting-cluster-objects.cpp` that the optimized Android build now uses, so a
+`cluster-objects-override.cpp` that the optimized Android build now uses, so a
 successful build confirms the slim cluster file is self-consistent and no
 required symbols are missing.
 
@@ -283,7 +283,7 @@ To run it:
 out/darwin-arm64-tv-casting-app-chip-casting-simplified/chip-tv-casting-app
 ```
 
-If you modify `casting-cluster-objects.cpp` (e.g. adding or removing cluster
+If you modify `cluster-objects-override.cpp` (e.g. adding or removing cluster
 `.ipp` includes), rebuild the desktop target first — it compiles in seconds and
 will surface any missing-symbol errors immediately, before waiting for a full
 Android build.
@@ -340,7 +340,7 @@ already-slim binary. All changes are gated behind `optimize_apk_size=true`.
 
 | Optimization                     | Mechanism                                                                                                                                                                | Estimated savings |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
-| Cluster trimming (10 clusters)   | Remove `.ipp` includes for 10 non-essential infrastructure clusters from `casting-cluster-objects.cpp` and disable their server-side definitions in `tv-casting-app.zap` | ~400–500 KB       |
+| Cluster trimming (10 clusters)   | Remove `.ipp` includes for 10 non-essential infrastructure clusters from `cluster-objects-override.cpp` and disable their server-side definitions in `tv-casting-app.zap` | ~400–500 KB       |
 | Disable extra data-model logging | Set `chip_data_model_extra_logging=false` — excludes verbose log-formatting code and string tables for attribute/command path names                                      | ~100–150 KB       |
 | Disable host unit-test hooks     | Set `CONFIG_BUILD_FOR_HOST_UNIT_TEST=0` — excludes test-only code paths in CASESession, ExchangeContext, FabricTable, and MRP configuration                              | ~50–100 KB        |
 | Disable RTTI                     | Set `enable_rtti=false` — removes `type_info` structures and vtable metadata generated by the C++ compiler                                                               | ~100–200 KB       |
@@ -433,8 +433,8 @@ non-casting-app targets remain unaffected.
 
 | Optimization              | Mechanism                                                       | `.o` file savings | Status       |
 | ------------------------- | --------------------------------------------------------------- | ----------------- | ------------ |
-| Cluster server exclusion  | `chip_data_model_overrides_dir` + `casting-cluster-servers.gni` | ~1.1 MB           | Implemented  |
-| Slim Accessors.cpp        | `chip_data_model_overrides_dir` + `casting-Accessors.cpp`       | ~826 KB           | Implemented  |
+| Cluster server exclusion  | `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB           | Implemented  |
+| Slim Accessors.cpp        | `chip_data_model_overrides_dir` + `Accessors-override.cpp`       | ~826 KB           | Implemented  |
 | jsoncpp/jsontlv removal   | Conditional dep in `src/controller/java/BUILD.gn`               | ~350 KB           | Not feasible |
 | Controller code reduction | Requires controller library refactoring                         | ~1.3 MB           | Future work  |
 | **Total implemented**     |                                                                 | **~1.9 MB (.o)**  |              |
@@ -460,13 +460,13 @@ cluster server directories are compiled unnecessarily.
 **Mechanism:** The `chip_data_model_overrides_dir` GN argument in
 `src/app/common_flags.gni` points to a directory containing well-known override
 files. When set to a non-empty path, the `chip_data_model` template imports
-`casting-cluster-servers.gni` from the override directory and uses its cluster
+`cluster-servers-override.gni` from the override directory and uses its cluster
 list instead of calling `zap_cluster_list.py`. Both `public_deps` (cluster
 server sources) and `_app_config_dependent_sources` are scoped to the override
 clusters only.
 
 **Override file:**
-`examples/tv-casting-app/tv-casting-common/casting-cluster-servers.gni` defines
+`examples/tv-casting-app/tv-casting-common/cluster-servers-override.gni` defines
 exactly 13 cluster server directories:
 
 -   `access-control-server`, `administrator-commissioning-server`,
@@ -491,11 +491,11 @@ casting).
 **Mechanism:** The `chip_data_model_overrides_dir` GN argument in
 `src/app/common_flags.gni` points to a directory containing well-known override
 files. When set to a non-empty path, the `chip_data_model` template compiles
-`casting-Accessors.cpp` from the override directory instead of the full
+`Accessors-override.cpp` from the override directory instead of the full
 generated Accessors.cpp.
 
 **Override file:**
-`examples/tv-casting-app/tv-casting-common/casting-Accessors.cpp` is a
+`examples/tv-casting-app/tv-casting-common/Accessors-override.cpp` is a
 hand-maintained slim file containing attribute accessor functions for only the
 29 casting-relevant clusters. It includes the same `Accessors.h` header and
 provides identical function signatures for the retained clusters.
@@ -679,11 +679,11 @@ zap-generated sources.
 
 | Well-known filename                        | Purpose                                     | Consumer                       |
 | ------------------------------------------ | ------------------------------------------- | ------------------------------ |
-| `casting-cluster-objects.cpp`              | Slim cluster objects (~29 clusters)         | `src/app/common/BUILD.gn`      |
-| `casting-CHIPAttributeTLVValueDecoder.cpp` | Slim attribute TLV decoder (18 clusters)    | `src/controller/java/BUILD.gn` |
-| `casting-CHIPEventTLVValueDecoder.cpp`     | Slim event TLV decoder (18 clusters)        | `src/controller/java/BUILD.gn` |
-| `casting-cluster-servers.gni`              | Cluster server directory list (13 clusters) | `src/app/chip_data_model.gni`  |
-| `casting-Accessors.cpp`                    | Slim attribute accessors (29 clusters)      | `src/app/chip_data_model.gni`  |
+| `cluster-objects-override.cpp`              | Slim cluster objects (~29 clusters)         | `src/app/common/BUILD.gn`      |
+| `CHIPAttributeTLVValueDecoder-override.cpp` | Slim attribute TLV decoder (18 clusters)    | `src/controller/java/BUILD.gn` |
+| `CHIPEventTLVValueDecoder-override.cpp`     | Slim event TLV decoder (18 clusters)        | `src/controller/java/BUILD.gn` |
+| `cluster-servers-override.gni`              | Cluster server directory list (13 clusters) | `src/app/chip_data_model.gni`  |
+| `Accessors-override.cpp`                    | Slim attribute accessors (29 clusters)      | `src/app/chip_data_model.gni`  |
 
 All GN arguments have inert defaults (empty string) so that non-casting builds
 are unaffected.
@@ -692,9 +692,9 @@ are unaffected.
 
 | File                          | Location             | Purpose                                                  |
 | ----------------------------- | -------------------- | -------------------------------------------------------- |
-| `casting-cluster-servers.gni` | `tv-casting-common/` | Lists the 13 required cluster server directories         |
-| `casting-Accessors.cpp`       | `tv-casting-common/` | Slim accessors for 29 casting-relevant clusters          |
-| `casting-cluster-objects.cpp` | `tv-casting-common/` | (existing, phase 1) Slim cluster objects for 29 clusters |
+| `cluster-servers-override.gni` | `tv-casting-common/` | Lists the 13 required cluster server directories         |
+| `Accessors-override.cpp`       | `tv-casting-common/` | Slim accessors for 29 casting-relevant clusters          |
+| `cluster-objects-override.cpp` | `tv-casting-common/` | (existing, phase 1) Slim cluster objects for 29 clusters |
 
 ### Regenerating slim override files
 
@@ -712,10 +712,10 @@ python3 examples/tv-casting-app/tv-casting-common/generate_slim_overrides.py \
 The script reads `casting-cluster-config.yaml` which defines three cluster
 lists:
 
--   `casting_clusters` (29 clusters) — used for `casting-cluster-objects.cpp`
-    and `casting-Accessors.cpp`
+-   `casting_clusters` (29 clusters) — used for `cluster-objects-override.cpp`
+    and `Accessors-override.cpp`
 -   `tlv_decoder_clusters` (18 clusters) — used for the slim TLV decoder files
--   `cluster_servers` (13 directories) — used for `casting-cluster-servers.gni`
+-   `cluster_servers` (13 directories) — used for `cluster-servers-override.gni`
 
 To add or remove clusters, edit the YAML config and re-run the script. The
 script produces byte-identical output when run with the same inputs
@@ -744,7 +744,7 @@ Additional unit-level validations:
 
 ### When to run phase 3 tests
 
--   After modifying `casting-Accessors.cpp` or `casting-cluster-servers.gni`
+-   After modifying `Accessors-override.cpp` or `cluster-servers-override.gni`
 -   After changing `chip_data_model.gni`, `common_flags.gni`, `android.py`, or
     `src/controller/java/BUILD.gn`
 -   Before pushing a commit that touches any phase 3 files

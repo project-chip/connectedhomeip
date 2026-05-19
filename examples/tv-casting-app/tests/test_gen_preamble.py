@@ -130,7 +130,7 @@ def test_cluster_objects_has_copyright_and_includes(subset):
     header and contain the required #include directive.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-cluster-objects.cpp")
+        output_path = os.path.join(tmpdir, "cluster-objects-override.cpp")
         generate_cluster_objects(FULL_CLUSTER_OBJECTS, subset, output_path)
 
         with open(output_path, "r") as f:
@@ -167,7 +167,7 @@ def test_attr_decoder_has_copyright_and_includes(subset):
     header and contain the required #include directives.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-CHIPAttributeTLVValueDecoder.cpp")
+        output_path = os.path.join(tmpdir, "CHIPAttributeTLVValueDecoder-override.cpp")
         generate_tlv_decoder(FULL_ATTR_DECODER, subset, output_path, "attribute")
 
         with open(output_path, "r") as f:
@@ -201,7 +201,7 @@ def test_event_decoder_has_copyright_and_includes(subset):
     header and contain the required #include directives.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-CHIPEventTLVValueDecoder.cpp")
+        output_path = os.path.join(tmpdir, "CHIPEventTLVValueDecoder-override.cpp")
         generate_tlv_decoder(FULL_EVENT_DECODER, subset, output_path, "event")
 
         with open(output_path, "r") as f:
@@ -235,7 +235,7 @@ def test_accessors_has_copyright_and_includes(subset):
     header and contain the required #include directives.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-Accessors.cpp")
+        output_path = os.path.join(tmpdir, "Accessors-override.cpp")
         generate_accessors(FULL_ACCESSORS, subset, output_path)
 
         with open(output_path, "r") as f:
@@ -268,7 +268,7 @@ def test_cluster_servers_gni_has_copyright(servers):
     header (GNI format with # comments).
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-cluster-servers.gni")
+        output_path = os.path.join(tmpdir, "cluster-servers-override.gni")
         generate_cluster_servers_gni(servers, output_path)
 
         with open(output_path, "r") as f:

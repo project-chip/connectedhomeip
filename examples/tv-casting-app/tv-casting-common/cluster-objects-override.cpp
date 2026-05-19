@@ -16,7 +16,7 @@
  */
 
 /**
- * @file casting-cluster-objects.cpp
+ * @file cluster-objects-override.cpp
  *
  * Slim replacement for the generated cluster-objects.cpp that only includes
  * the cluster implementations (Attributes/Commands/Events/Structs .ipp files)

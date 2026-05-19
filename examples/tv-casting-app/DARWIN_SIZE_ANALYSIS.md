@@ -75,7 +75,7 @@ chip_data_model_overrides_dir =
 ```
 
 This directs the build system to look for well-known override filenames in the
-`tv-casting-common/` directory. The slim `casting-cluster-objects.cpp` compiles
+`tv-casting-common/` directory. The slim `cluster-objects-override.cpp` compiles
 only ~36 casting-relevant clusters instead of the full ~200+ generated
 `cluster-objects.cpp`. This is the same slim file used by the Android
 size-optimized build.
@@ -224,7 +224,7 @@ bundles all transitive dependencies into a single `.a` file:
 
 -   Matter core (transport, crypto, secure channel, interaction model)
 -   Casting common C++ layer (CastingApp, CastingPlayer, Endpoint, etc.)
--   Cluster implementations (~36 via slim `casting-cluster-objects.cpp`)
+-   Cluster implementations (~36 via slim `cluster-objects-override.cpp`)
 -   App server, data model provider
 -   Darwin platform layer (BLE, DNS-SD via Bonjour, KeyValueStore)
 -   mbedTLS (crypto backend)
@@ -284,7 +284,7 @@ Android build because:
 
 1. The Objective-C cluster API is pre-scoped to casting clusters (no equivalent
    of the 200+ cluster `ChipClusters.java`)
-2. The slim `casting-cluster-objects.cpp` is already set in `args.gni`
+2. The slim `cluster-objects-override.cpp` is already set in `args.gni`
 3. There's no separate C++ stdlib shared library to worry about
 
 The main remaining opportunity is enabling `optimize_apk_size=true` to drop the
@@ -306,7 +306,7 @@ Darwin builds; others are Android-specific due to platform differences.
 
 | Optimization                   | Darwin applicability | Notes                                                                                                                                                                                                          |
 | ------------------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cluster trimming (10 clusters) | ✅ Applies           | The slim `casting-cluster-objects.cpp` is shared between Android and Darwin. Removing 10 non-essential infrastructure clusters reduces code in `libTvCastingCommon.a` identically.                             |
+| Cluster trimming (10 clusters) | ✅ Applies           | The slim `cluster-objects-override.cpp` is shared between Android and Darwin. Removing 10 non-essential infrastructure clusters reduces code in `libTvCastingCommon.a` identically.                             |
 | ICD client removal             | ✅ Applies           | The `tv-casting-common/BUILD.gn` conditional excluding `icd/client:handler` and `icd/client:manager` applies to all platforms when `optimize_apk_size=true`. Darwin casting builds do not use ICD client APIs. |
 
 ### Optimizations that are Android-specific
@@ -344,14 +344,14 @@ are Android-specific.
 
 | Optimization             | Darwin applicability | How to enable                                                                                                                                                                                                                                                                                                                                                                                       |
 | ------------------------ | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cluster server exclusion | ✅ Applies           | The `chip_data_model_overrides_dir` GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds set `chip_data_model_overrides_dir` in `darwin/args.gni` pointing to the `tv-casting-common/` directory, which contains `casting-cluster-servers.gni` to compile only the 13 required cluster server implementations instead of all ~44 discovered from the `.matter` file. |
-| Slim Accessors.cpp       | ✅ Applies           | The `chip_data_model_overrides_dir` GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds set `chip_data_model_overrides_dir` in `darwin/args.gni` pointing to the `tv-casting-common/` directory, which contains `casting-Accessors.cpp` to compile only the 29 casting-relevant cluster accessors instead of the full ~200+ cluster Accessors.cpp.                  |
+| Cluster server exclusion | ✅ Applies           | The `chip_data_model_overrides_dir` GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds set `chip_data_model_overrides_dir` in `darwin/args.gni` pointing to the `tv-casting-common/` directory, which contains `cluster-servers-override.gni` to compile only the 13 required cluster server implementations instead of all ~44 discovered from the `.matter` file. |
+| Slim Accessors.cpp       | ✅ Applies           | The `chip_data_model_overrides_dir` GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds set `chip_data_model_overrides_dir` in `darwin/args.gni` pointing to the `tv-casting-common/` directory, which contains `Accessors-override.cpp` to compile only the 29 casting-relevant cluster accessors instead of the full ~200+ cluster Accessors.cpp.                  |
 
 Both override files are resolved automatically from the
 `chip_data_model_overrides_dir` already set in `darwin/args.gni`. No additional
 args.gni changes are needed since the override directory already contains all
-well-known override filenames (`casting-cluster-objects.cpp`,
-`casting-Accessors.cpp`, `casting-cluster-servers.gni`, etc.).
+well-known override filenames (`cluster-objects-override.cpp`,
+`Accessors-override.cpp`, `cluster-servers-override.gni`, etc.).
 
 ### Optimizations that are Android-specific
 

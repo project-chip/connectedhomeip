@@ -106,7 +106,7 @@ def test_attr_decoder_contains_only_requested_case_blocks(subset):
     SHALL contain case blocks only for those clusters.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-CHIPAttributeTLVValueDecoder.cpp")
+        output_path = os.path.join(tmpdir, "CHIPAttributeTLVValueDecoder-override.cpp")
         generate_tlv_decoder(FULL_ATTR_DECODER, subset, output_path, "attribute")
 
         with open(output_path, "r") as f:
@@ -142,7 +142,7 @@ def test_attr_decoder_has_default_case(subset):
     default: case with CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-CHIPAttributeTLVValueDecoder.cpp")
+        output_path = os.path.join(tmpdir, "CHIPAttributeTLVValueDecoder-override.cpp")
         generate_tlv_decoder(FULL_ATTR_DECODER, subset, output_path, "attribute")
 
         with open(output_path, "r") as f:
@@ -173,7 +173,7 @@ def test_event_decoder_contains_only_requested_case_blocks(subset):
     SHALL contain case blocks only for those clusters.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-CHIPEventTLVValueDecoder.cpp")
+        output_path = os.path.join(tmpdir, "CHIPEventTLVValueDecoder-override.cpp")
         generate_tlv_decoder(FULL_EVENT_DECODER, subset, output_path, "event")
 
         with open(output_path, "r") as f:
@@ -207,7 +207,7 @@ def test_event_decoder_has_default_case(subset):
     default: case with CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-CHIPEventTLVValueDecoder.cpp")
+        output_path = os.path.join(tmpdir, "CHIPEventTLVValueDecoder-override.cpp")
         generate_tlv_decoder(FULL_EVENT_DECODER, subset, output_path, "event")
 
         with open(output_path, "r") as f:

@@ -69,14 +69,14 @@ source_set("android_chip_im_jni") {
   sources += [ "CHIPTLVValueDecoder-JNI.cpp" ]
 
   if (chip_data_model_overrides_dir != "") {
-    sources += [ "${chip_data_model_overrides_dir}/casting-CHIPAttributeTLVValueDecoder.cpp" ]
+    sources += [ "${chip_data_model_overrides_dir}/CHIPAttributeTLVValueDecoder-override.cpp" ]
   } else {
     sources += [ "zap-generated/CHIPAttributeTLVValueDecoder.cpp" ]
   }
 
   if (chip_data_model_overrides_dir != "") {
     sources += [
-      "${chip_data_model_overrides_dir}/casting-CHIPEventTLVValueDecoder.cpp",
+      "${chip_data_model_overrides_dir}/CHIPEventTLVValueDecoder-override.cpp",
     ]
   } else {
     sources += [ "zap-generated/CHIPEventTLVValueDecoder.cpp" ]

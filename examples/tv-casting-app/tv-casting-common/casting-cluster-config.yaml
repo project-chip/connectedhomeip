@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Clusters for cluster-objects.cpp and Accessors.cpp (29 clusters)
+# Clusters for cluster-objects-override.cpp and Accessors-override.cpp
 casting_clusters:
     # Infrastructure
     - AccessControl
@@ -47,7 +47,7 @@ casting_clusters:
     - TargetNavigator
     - WakeOnLan
 
-# Clusters for TLV decoders (18 clusters)
+# Clusters for TLV decoder overrides
 tlv_decoder_clusters:
     - AccountLogin
     - ApplicationBasic
@@ -68,7 +68,7 @@ tlv_decoder_clusters:
     - TargetNavigator
     - WakeOnLan
 
-# Cluster server directories (13 servers)
+# Cluster server directories
 cluster_servers:
     - access-control-server
     - administrator-commissioning-server

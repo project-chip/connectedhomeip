@@ -6,7 +6,7 @@ Feature: consolidate-overrides-and-generation-script
 **Validates: Requirements 9.7, 10.4**
 
 For any valid subset of cluster names from the full Accessors.cpp,
-the generation script SHALL produce a casting-Accessors.cpp that
+the generation script SHALL produce a Accessors-override.cpp that
 contains exactly the namespace blocks for the specified clusters,
 and no namespace blocks for clusters not in the subset.
 """
@@ -171,7 +171,7 @@ def test_accessors_contains_only_requested_namespace_blocks(subset):
     SHALL contain namespace blocks only for those clusters.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-Accessors.cpp")
+        output_path = os.path.join(tmpdir, "Accessors-override.cpp")
         generate_accessors(FULL_ACCESSORS, subset, output_path)
 
         with open(output_path, "r") as f:
@@ -207,7 +207,7 @@ def test_accessors_wrapped_in_chip_app_clusters_namespaces(subset):
     namespace blocks inside namespace chip { namespace app { namespace Clusters { }.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-Accessors.cpp")
+        output_path = os.path.join(tmpdir, "Accessors-override.cpp")
         generate_accessors(FULL_ACCESSORS, subset, output_path)
 
         with open(output_path, "r") as f:

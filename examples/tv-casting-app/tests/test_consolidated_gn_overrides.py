@@ -11,11 +11,11 @@ conditional logic for selecting that source file, and falls back to the
 default full generated source when the override dir is empty.
 
 Well-known filenames and their consumers:
-- casting-cluster-objects.cpp -> src/app/common/BUILD.gn
-- casting-CHIPAttributeTLVValueDecoder.cpp -> src/controller/java/BUILD.gn
-- casting-CHIPEventTLVValueDecoder.cpp -> src/controller/java/BUILD.gn
-- casting-Accessors.cpp -> src/app/chip_data_model.gni
-- casting-cluster-servers.gni -> src/app/chip_data_model.gni
+- cluster-objects-override.cpp -> src/app/common/BUILD.gn
+- CHIPAttributeTLVValueDecoder-override.cpp -> src/controller/java/BUILD.gn
+- CHIPEventTLVValueDecoder-override.cpp -> src/controller/java/BUILD.gn
+- Accessors-override.cpp -> src/app/chip_data_model.gni
+- cluster-servers-override.gni -> src/app/chip_data_model.gni
 """
 
 import os
@@ -40,11 +40,11 @@ CHIP_DATA_MODEL_GNI = os.path.join(REPO_ROOT, "src", "app", "chip_data_model.gni
 # ---------------------------------------------------------------------------
 
 OVERRIDE_ENTRIES = [
-    ("casting-cluster-objects.cpp", COMMON_BUILD_GN),
-    ("casting-CHIPAttributeTLVValueDecoder.cpp", JAVA_BUILD_GN),
-    ("casting-CHIPEventTLVValueDecoder.cpp", JAVA_BUILD_GN),
-    ("casting-Accessors.cpp", CHIP_DATA_MODEL_GNI),
-    ("casting-cluster-servers.gni", CHIP_DATA_MODEL_GNI),
+    ("cluster-objects-override.cpp", COMMON_BUILD_GN),
+    ("CHIPAttributeTLVValueDecoder-override.cpp", JAVA_BUILD_GN),
+    ("CHIPEventTLVValueDecoder-override.cpp", JAVA_BUILD_GN),
+    ("Accessors-override.cpp", CHIP_DATA_MODEL_GNI),
+    ("cluster-servers-override.gni", CHIP_DATA_MODEL_GNI),
 ]
 
 # ---------------------------------------------------------------------------
@@ -118,12 +118,12 @@ def test_gn_files_resolve_overrides_from_directory(override_entry):
 
 @given(
     override_entry=st.sampled_from([
-        ("casting-cluster-objects.cpp", COMMON_BUILD_GN, "cluster-objects.cpp"),
-        ("casting-CHIPAttributeTLVValueDecoder.cpp", JAVA_BUILD_GN,
+        ("cluster-objects-override.cpp", COMMON_BUILD_GN, "cluster-objects.cpp"),
+        ("CHIPAttributeTLVValueDecoder-override.cpp", JAVA_BUILD_GN,
          "CHIPAttributeTLVValueDecoder.cpp"),
-        ("casting-CHIPEventTLVValueDecoder.cpp", JAVA_BUILD_GN,
+        ("CHIPEventTLVValueDecoder-override.cpp", JAVA_BUILD_GN,
          "CHIPEventTLVValueDecoder.cpp"),
-        ("casting-Accessors.cpp", CHIP_DATA_MODEL_GNI, "Accessors.cpp"),
+        ("Accessors-override.cpp", CHIP_DATA_MODEL_GNI, "Accessors.cpp"),
     ]),
 )
 @settings(

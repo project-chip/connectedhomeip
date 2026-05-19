@@ -48,10 +48,10 @@ declare_args() {
 
   # Optional path to a directory containing well-known override source
   # files for the data model. When set to a non-empty path, the build
-  # system looks for files like casting-cluster-objects.cpp,
-  # casting-Accessors.cpp, casting-cluster-servers.gni,
-  # casting-CHIPAttributeTLVValueDecoder.cpp, and
-  # casting-CHIPEventTLVValueDecoder.cpp inside this directory and
+  # system looks for files like cluster-objects-override.cpp,
+  # Accessors-override.cpp, cluster-servers-override.gni,
+  # CHIPAttributeTLVValueDecoder-override.cpp, and
+  # CHIPEventTLVValueDecoder-override.cpp inside this directory and
   # compiles them instead of the full zap-generated sources.
   # When empty (default), the full generated sources are used.
   chip_data_model_overrides_dir = ""

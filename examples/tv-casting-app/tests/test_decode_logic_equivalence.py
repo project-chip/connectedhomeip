@@ -29,7 +29,7 @@ SLIM_ATTR_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPAttributeTLVValueDecoder.cpp",
+    "CHIPAttributeTLVValueDecoder-override.cpp",
 )
 
 FULL_ATTR_DECODER = os.path.join(
@@ -46,7 +46,7 @@ SLIM_EVENT_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPEventTLVValueDecoder.cpp",
+    "CHIPEventTLVValueDecoder-override.cpp",
 )
 
 FULL_EVENT_DECODER = os.path.join(

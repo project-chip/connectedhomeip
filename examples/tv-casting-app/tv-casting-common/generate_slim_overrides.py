@@ -265,7 +265,7 @@ def _reindent_case_block(block_text):
 
 
 def generate_cluster_objects(full_source_path, casting_clusters, output_path):
-    """Generate casting-cluster-objects.cpp from the full cluster-objects.cpp.
+    """Generate cluster-objects-override.cpp from the full cluster-objects.cpp.
 
     Extracts #include directives for casting clusters, plus shared/Structs.ipp,
     and the three Command* functions with only casting-relevant case blocks.
@@ -587,7 +587,7 @@ def _extract_cluster_namespace_blocks(full_text, cluster_names):
 
 
 def generate_accessors(full_source_path, casting_clusters, output_path):
-    """Generate casting-Accessors.cpp from the full Accessors.cpp.
+    """Generate Accessors-override.cpp from the full Accessors.cpp.
 
     Extracts namespace blocks for casting clusters.
     """
@@ -643,11 +643,11 @@ def generate_accessors(full_source_path, casting_clusters, output_path):
 # ---------------------------------------------------------------------------
 
 def generate_cluster_servers_gni(cluster_servers, output_path):
-    """Generate casting-cluster-servers.gni from the cluster_servers list."""
+    """Generate cluster-servers-override.gni from the cluster_servers list."""
     lines = []
     lines.append(GNI_COPYRIGHT_HEADER)
     lines.append("")
-    lines.append("casting_cluster_server_dirs = [")
+    lines.append("cluster_server_override_dirs = [")
     for server in cluster_servers:
         lines.append(f'  "{server}",')
     lines.append("]")
@@ -700,40 +700,40 @@ def main(argv=None):
     )
 
     # Generate each file
-    print("Generating casting-cluster-objects.cpp ...")
+    print("Generating cluster-objects-override.cpp ...")
     generate_cluster_objects(
         cluster_objects_path,
         casting_clusters,
-        os.path.join(output_dir, "casting-cluster-objects.cpp"),
+        os.path.join(output_dir, "cluster-objects-override.cpp"),
     )
 
-    print("Generating casting-CHIPAttributeTLVValueDecoder.cpp ...")
+    print("Generating CHIPAttributeTLVValueDecoder-override.cpp ...")
     generate_tlv_decoder(
         attr_decoder_path,
         tlv_decoder_clusters,
-        os.path.join(output_dir, "casting-CHIPAttributeTLVValueDecoder.cpp"),
+        os.path.join(output_dir, "CHIPAttributeTLVValueDecoder-override.cpp"),
         "attribute",
     )
 
-    print("Generating casting-CHIPEventTLVValueDecoder.cpp ...")
+    print("Generating CHIPEventTLVValueDecoder-override.cpp ...")
     generate_tlv_decoder(
         event_decoder_path,
         tlv_decoder_clusters,
-        os.path.join(output_dir, "casting-CHIPEventTLVValueDecoder.cpp"),
+        os.path.join(output_dir, "CHIPEventTLVValueDecoder-override.cpp"),
         "event",
     )
 
-    print("Generating casting-Accessors.cpp ...")
+    print("Generating Accessors-override.cpp ...")
     generate_accessors(
         accessors_path,
         casting_clusters,
-        os.path.join(output_dir, "casting-Accessors.cpp"),
+        os.path.join(output_dir, "Accessors-override.cpp"),
     )
 
-    print("Generating casting-cluster-servers.gni ...")
+    print("Generating cluster-servers-override.gni ...")
     generate_cluster_servers_gni(
         cluster_servers,
-        os.path.join(output_dir, "casting-cluster-servers.gni"),
+        os.path.join(output_dir, "cluster-servers-override.gni"),
     )
 
     print("Done.")

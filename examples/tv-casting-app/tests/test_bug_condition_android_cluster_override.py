@@ -34,7 +34,7 @@ SLIM_CLUSTER_FILE = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-cluster-objects.cpp",
+    "cluster-objects-override.cpp",
 )
 
 

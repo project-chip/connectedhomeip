@@ -6,7 +6,7 @@ Feature: consolidate-overrides-and-generation-script
 **Validates: Requirements 9.4, 10.4**
 
 For any valid subset of cluster names from the full cluster-objects.cpp,
-the generation script SHALL produce a casting-cluster-objects.cpp that
+the generation script SHALL produce a cluster-objects-override.cpp that
 contains exactly the #include <clusters/ClusterName/...> directives for
 the specified clusters (plus shared/Structs.ipp), and no includes for
 clusters not in the subset.
@@ -97,7 +97,7 @@ def test_cluster_objects_includes_only_requested_clusters(subset):
     SHALL contain #include directives only for those clusters plus shared.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-cluster-objects.cpp")
+        output_path = os.path.join(tmpdir, "cluster-objects-override.cpp")
         generate_cluster_objects(FULL_CLUSTER_OBJECTS, subset, output_path)
 
         with open(output_path, "r") as f:
@@ -141,7 +141,7 @@ def test_cluster_objects_always_includes_shared_structs(subset):
     SHALL always include shared/Structs.ipp.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-cluster-objects.cpp")
+        output_path = os.path.join(tmpdir, "cluster-objects-override.cpp")
         generate_cluster_objects(FULL_CLUSTER_OBJECTS, subset, output_path)
 
         with open(output_path, "r") as f:

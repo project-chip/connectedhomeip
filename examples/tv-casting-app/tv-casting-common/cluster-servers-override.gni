@@ -21,7 +21,7 @@
 # This excludes
 # ~31 unused server implementations, saving ~1.1 MB in the binary.
 
-casting_cluster_server_dirs = [
+cluster_server_override_dirs = [
   "access-control-server",
   "administrator-commissioning-server",
   "basic-information",

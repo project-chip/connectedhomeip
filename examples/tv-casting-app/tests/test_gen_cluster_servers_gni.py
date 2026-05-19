@@ -6,8 +6,8 @@ Feature: consolidate-overrides-and-generation-script
 **Validates: Requirements 12.1, 12.2, 12.3**
 
 For any list of server directory names, the generation script SHALL
-produce a casting-cluster-servers.gni file containing a GN list variable
-casting_cluster_server_dirs with exactly those directory names, formatted
+produce a cluster-servers-override.gni file containing a GN list variable
+cluster_server_override_dirs with exactly those directory names, formatted
 with the standard CHIP copyright header.
 """
 
@@ -70,9 +70,9 @@ server_lists = st.lists(
 
 
 def _extract_gni_list_entries(text):
-    """Extract directory names from the casting_cluster_server_dirs GN list."""
+    """Extract directory names from the cluster_server_override_dirs GN list."""
     # Find the list variable
-    m = re.search(r'casting_cluster_server_dirs\s*=\s*\[', text)
+    m = re.search(r'cluster_server_override_dirs\s*=\s*\[', text)
     if not m:
         return None
 
@@ -101,11 +101,11 @@ def test_gni_contains_exactly_requested_servers(servers):
     """
     **Validates: Requirements 12.1, 12.2, 12.3**
 
-    The generated .gni file SHALL contain a casting_cluster_server_dirs
+    The generated .gni file SHALL contain a cluster_server_override_dirs
     variable with exactly the requested directory names.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-cluster-servers.gni")
+        output_path = os.path.join(tmpdir, "cluster-servers-override.gni")
         generate_cluster_servers_gni(servers, output_path)
 
         with open(output_path, "r") as f:
@@ -113,7 +113,7 @@ def test_gni_contains_exactly_requested_servers(servers):
 
         entries = _extract_gni_list_entries(content)
         assert entries is not None, (
-            "Output must contain casting_cluster_server_dirs = [...]"
+            "Output must contain cluster_server_override_dirs = [...]"
         )
 
         assert entries == servers, (
@@ -135,7 +135,7 @@ def test_gni_has_copyright_header(servers):
     header.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-cluster-servers.gni")
+        output_path = os.path.join(tmpdir, "cluster-servers-override.gni")
         generate_cluster_servers_gni(servers, output_path)
 
         with open(output_path, "r") as f:
@@ -160,7 +160,7 @@ def test_gni_one_entry_per_line(servers):
     The generated .gni file SHALL have one directory entry per line.
     """
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = os.path.join(tmpdir, "casting-cluster-servers.gni")
+        output_path = os.path.join(tmpdir, "cluster-servers-override.gni")
         generate_cluster_servers_gni(servers, output_path)
 
         with open(output_path, "r") as f:
