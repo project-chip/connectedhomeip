@@ -21,6 +21,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <set>
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
 #include <lib/support/BitFlags.h>
 #include <platform/PlatformManager.h>
