@@ -62,6 +62,14 @@ public:
         }
     }
 
+    void OnFabricRemoved(FabricIndex fabricIndex) override
+    {
+        if (mDestination)
+        {
+            mDestination->OnFabricRemoved(fabricIndex);
+        }
+    }
+
     void SetDestination(OTARequestorCommandInterface * destination) { mDestination = destination; }
 
 private:
