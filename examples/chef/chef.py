@@ -886,6 +886,7 @@ def main() -> int:
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
                 'chip_app_data_model_target = "//:chef-data-model"',
+                'shell_use_all_clusters_data_model = false',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)

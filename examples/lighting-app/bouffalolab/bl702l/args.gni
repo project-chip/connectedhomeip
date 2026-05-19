@@ -34,3 +34,4 @@ pw_build_LINK_DEPS = [
 ]
 
 chip_app_data_model_target = "//:bouffalolab-lighting"
+shell_use_all_clusters_data_model = false

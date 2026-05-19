@@ -773,12 +773,6 @@ void WaterHeaterInit()
         WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
                                        to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
     VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
-
-    // WaterHeaterMode initialisation
-    uint32_t WaterHeaterModefeatureMap = 0;
-    static ModeBase::DefaultChefDelegate WaterHeaterModeDelegate(WaterHeaterMode::Chef::kSupportedModes);
-    static ModeBase::Instance WaterHeaterModeInstance(&WaterHeaterModeDelegate, 1, WaterHeaterMode::Id, WaterHeaterModefeatureMap);
-    VerifyOrDieWithMsg(WaterHeaterModeInstance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterMode instance.");
 #endif
 }
 

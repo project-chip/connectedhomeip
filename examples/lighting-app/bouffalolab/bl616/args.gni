@@ -24,3 +24,4 @@ chip_detail_logging = false
 # use -Os instead of -Og
 is_debug = false
 chip_app_data_model_target = "//:bouffalolab-lighting"
+shell_use_all_clusters_data_model = false
