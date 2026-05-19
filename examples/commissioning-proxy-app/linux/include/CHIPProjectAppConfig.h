@@ -119,3 +119,9 @@
 // #define CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL 5660
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
+
+// The Linux proxy reference runs on the same shared-radio hardware as the
+// lighting-app.  Enable the early-response path so a future PAF-commissioned
+// proxy benefits from the same fix.  See base config
+// (src/include/platform/CHIPDeviceConfig.h) for the tradeoff.
+#define CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 1
