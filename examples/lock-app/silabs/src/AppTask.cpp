@@ -208,8 +208,8 @@ void StartUnlatchTimer(uint32_t timeoutMs)
 } // namespace
 
 AppTask::LockRequest AppTask::sStagedLockRequest{};
-bool AppTask::sStagedLockRequestValid        = false;
-osMutexId_t AppTask::sStagedLockRequestMutex = nullptr;
+bool AppTask::sStagedLockRequestValid    = false;
+osMutexId_t AppTask::sLockSharedStateMutex = nullptr;
 
 CHIP_ERROR AppTask::AppInit()
 {
@@ -697,11 +697,11 @@ CHIP_ERROR AppTask::InitLockDomain(app::DataModel::Nullable<DlLockState> state, 
     );
     VerifyOrReturnError(mLockTimer != NULL, APP_ERROR_CREATE_TIMER_FAILED,
                         ChipLogError(NotSpecified, "mLockTimer timer create failed"));
-    if (sStagedLockRequestMutex == nullptr)
+    if (sLockSharedStateMutex == nullptr)
     {
-        sStagedLockRequestMutex = osMutexNew(nullptr);
-        VerifyOrReturnError(sStagedLockRequestMutex != nullptr, APP_ERROR_ALLOCATION_FAILED,
-                            ChipLogError(NotSpecified, "sStagedLockRequestMutex create failed"));
+        sLockSharedStateMutex = osMutexNew(nullptr);
+        VerifyOrReturnError(sLockSharedStateMutex != nullptr, APP_ERROR_ALLOCATION_FAILED,
+                            ChipLogError(NotSpecified, "sLockSharedStateMutex create failed"));
     }
     if (!state.IsNull() && state.Value() == DlLockState::kUnlocked)
     {
@@ -816,8 +816,18 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
     unlockRequest.userIndex          = ctx.mUserIndex;
     unlockRequest.credential         = ctx.mCredential;
     unlockRequest.hasCredential      = ctx.mHasCredential;
-    app.mActiveRemoteAction          = unlockRequest;
-    app.mHasActiveRemoteAction       = true;
+
+    VerifyOrReturn(sLockSharedStateMutex != nullptr,
+                   ChipLogError(Zcl, "Door Lock App: remote-action mutex not initialized; dropping unlatch-unlock"));
+    {
+        osStatus_t mutexStatus = osMutexAcquire(sLockSharedStateMutex, osWaitForever);
+        VerifyOrReturn(mutexStatus == osOK,
+                       ChipLogError(Zcl, "Door Lock App: remote-action mutex acquire failed (%d); dropping unlatch-unlock",
+                                    static_cast<int>(mutexStatus)));
+        app.mActiveRemoteAction    = unlockRequest;
+        app.mHasActiveRemoteAction = true;
+        osMutexRelease(sLockSharedStateMutex);
+    }
 
     ctx.mEndpointId = kInvalidEndpointId;
     ctx.mUserIndex.SetNull();
@@ -882,16 +892,30 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
             }
             lock->mSyncClusterToButtonAction = false;
         }
-        if (lock->mHasActiveRemoteAction)
+        // Consume the remote-action slot under the dedicated mutex (writer is `UnlockAfterUnlatch`
+        // on the chip thread and `HandleLockRequestOnAppTask` on this thread); then run the cluster
+        // push outside the mutex so we never hold both this mutex and the chip lock at once.
+        LockRequest remoteAction = {};
+        bool hasRemoteAction     = false;
+        if (sLockSharedStateMutex != nullptr &&
+            osMutexAcquire(sLockSharedStateMutex, osWaitForever) == osOK)
+        {
+            if (lock->mHasActiveRemoteAction)
+            {
+                remoteAction                 = lock->mActiveRemoteAction;
+                lock->mHasActiveRemoteAction = false;
+                hasRemoteAction              = true;
+            }
+            osMutexRelease(sLockSharedStateMutex);
+        }
+        if (hasRemoteAction)
         {
             DeviceLayer::PlatformMgr().LockChipStack();
-            lock->PushClusterLockState(lock->mActiveRemoteAction.endpointId, lock->mActiveRemoteAction.targetClusterState,
-                                       lock->mActiveRemoteAction.fabricIdx, lock->mActiveRemoteAction.nodeId,
-                                       lock->mActiveRemoteAction.userIndex,
-                                       lock->mActiveRemoteAction.hasCredential ? &lock->mActiveRemoteAction.credential : nullptr,
-                                       lock->mActiveRemoteAction.hasCredential);
+            lock->PushClusterLockState(remoteAction.endpointId, remoteAction.targetClusterState, remoteAction.fabricIdx,
+                                       remoteAction.nodeId, remoteAction.userIndex,
+                                       remoteAction.hasCredential ? &remoteAction.credential : nullptr,
+                                       remoteAction.hasCredential);
             DeviceLayer::PlatformMgr().UnlockChipStack();
-            lock->mHasActiveRemoteAction = false;
         }
         if (lock->mHasPendingRequest &&
             (lock->mLockActuatorState == LockActuatorState::kLockCompleted ||
@@ -921,16 +945,16 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
 
 void AppTask::EnqueueLockRequest(const LockRequest & request)
 {
-    VerifyOrReturn(sStagedLockRequestMutex != nullptr,
+    VerifyOrReturn(sLockSharedStateMutex != nullptr,
                    ChipLogError(Zcl, "Door Lock App: staging mutex not initialized; dropping LockRequest"));
 
-    osStatus_t mutexStatus = osMutexAcquire(sStagedLockRequestMutex, osWaitForever);
+    osStatus_t mutexStatus = osMutexAcquire(sLockSharedStateMutex, osWaitForever);
     VerifyOrReturn(
         mutexStatus == osOK,
         ChipLogError(Zcl, "Door Lock App: staging mutex acquire failed (%d); dropping LockRequest", static_cast<int>(mutexStatus)));
     sStagedLockRequest      = request;
     sStagedLockRequestValid = true;
-    osMutexRelease(sStagedLockRequestMutex);
+    osMutexRelease(sLockSharedStateMutex);
 
     AppEvent event                 = {};
     event.Type                     = AppEvent::kEventType_LockRequest;
@@ -941,15 +965,15 @@ void AppTask::EnqueueLockRequest(const LockRequest & request)
 
 bool AppTask::TryDrainStagedLockRequest(LockRequest & out)
 {
-    VerifyOrReturnValue(sStagedLockRequestMutex != nullptr, false);
-    VerifyOrReturnValue(osMutexAcquire(sStagedLockRequestMutex, osWaitForever) == osOK, false);
+    VerifyOrReturnValue(sLockSharedStateMutex != nullptr, false);
+    VerifyOrReturnValue(osMutexAcquire(sLockSharedStateMutex, osWaitForever) == osOK, false);
     bool drained = sStagedLockRequestValid;
     if (drained)
     {
         out                     = sStagedLockRequest;
         sStagedLockRequestValid = false;
     }
-    osMutexRelease(sStagedLockRequestMutex);
+    osMutexRelease(sLockSharedStateMutex);
     return drained;
 }
 
@@ -998,8 +1022,16 @@ void AppTask::HandleLockRequestOnAppTask(const LockRequest & request)
             PushClusterLockState(request.endpointId, DlLockState::kNotFullyLocked, request.fabricIdx, request.nodeId,
                                  request.userIndex, request.hasCredential ? &request.credential : nullptr, request.hasCredential);
             DeviceLayer::PlatformMgr().UnlockChipStack();
+
+            VerifyOrReturn(sLockSharedStateMutex != nullptr,
+                           ChipLogError(Zcl, "Door Lock App: remote-action mutex not initialized; dropping remote action"));
+            osStatus_t mutexStatus = osMutexAcquire(sLockSharedStateMutex, osWaitForever);
+            VerifyOrReturn(mutexStatus == osOK,
+                           ChipLogError(Zcl, "Door Lock App: remote-action mutex acquire failed (%d); dropping remote action",
+                                        static_cast<int>(mutexStatus)));
             mActiveRemoteAction    = request;
             mHasActiveRemoteAction = true;
+            osMutexRelease(sLockSharedStateMutex);
         }
     }
     else

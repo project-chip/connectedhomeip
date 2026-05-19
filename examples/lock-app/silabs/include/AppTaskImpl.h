@@ -52,10 +52,10 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockButtonActionHandlerImpl, aEvent);
     }
 
-    // FreeRTOS timer-task callback (unlatch timer expiry). Optional override: *Impl().
-    static void UnlatchCallback(TimerHandle_t xTimer)
+    // CMSIS osTimer expiry callback (unlatch timer). Optional override: *Impl().
+    static void UnlatchCallback(void * argument)
     {
-        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlatchCallbackImpl, xTimer);
+        CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlatchCallbackImpl, argument);
     }
 
     // AppTask-thread event handler (queued actuator-movement timer event). Optional override: *Impl().
@@ -217,7 +217,7 @@ private:
 
     void LockButtonActionHandlerImpl(AppEvent * aEvent) { AppTask::LockButtonActionHandler(aEvent); }
 
-    void UnlatchCallbackImpl(TimerHandle_t xTimer) { AppTask::UnlatchCallback(xTimer); }
+    void UnlatchCallbackImpl(void * argument) { AppTask::UnlatchCallback(argument); }
 
     void ActuatorMovementEventHandlerImpl(AppEvent * aEvent) { AppTask::ActuatorMovementEventHandler(aEvent); }
 

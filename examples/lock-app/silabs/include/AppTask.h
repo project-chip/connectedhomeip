@@ -393,7 +393,15 @@ private:
 
     static LockRequest sStagedLockRequest;
     static bool sStagedLockRequestValid;
-    static osMutexId_t sStagedLockRequestMutex;
+
+    // Guards cross-thread shared state for the lock app:
+    //   - `sStagedLockRequest` / `sStagedLockRequestValid` (chip-thread producer,
+    //     AppTask-thread consumer; newest-wins coalescing).
+    //   - `mActiveRemoteAction` / `mHasActiveRemoteAction` (written by both
+    //     `UnlockAfterUnlatch` on the chip thread and
+    //     `HandleLockRequestOnAppTask` / `ActuatorMovementEventHandler` on the AppTask thread).
+    // Non-recursive; never held across the chip stack lock from the AppTask thread.
+    static osMutexId_t sLockSharedStateMutex;
 
     osTimerId_t mLockTimer = nullptr;
 
