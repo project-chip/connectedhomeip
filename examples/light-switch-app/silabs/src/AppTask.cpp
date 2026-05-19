@@ -430,7 +430,7 @@ void AppTask::ProcessOnOffBindingCommand(CommandId commandId, const Binding::Tab
         case Clusters::OnOff::Commands::Toggle::Id: {
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
             RETURN_SAFELY_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand,
-                                                                      onSuccess, onFailure);
+                                                                   onSuccess, onFailure);
             break;
         }
         case Clusters::OnOff::Commands::On::Id: {
