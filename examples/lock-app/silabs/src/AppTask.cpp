@@ -208,7 +208,7 @@ void StartUnlatchTimer(uint32_t timeoutMs)
 } // namespace
 
 AppTask::LockRequest AppTask::sStagedLockRequest{};
-bool AppTask::sStagedLockRequestValid    = false;
+bool AppTask::sStagedLockRequestValid      = false;
 osMutexId_t AppTask::sLockSharedStateMutex = nullptr;
 
 CHIP_ERROR AppTask::AppInit()
@@ -897,8 +897,7 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
         // push outside the mutex so we never hold both this mutex and the chip lock at once.
         LockRequest remoteAction = {};
         bool hasRemoteAction     = false;
-        if (sLockSharedStateMutex != nullptr &&
-            osMutexAcquire(sLockSharedStateMutex, osWaitForever) == osOK)
+        if (sLockSharedStateMutex != nullptr && osMutexAcquire(sLockSharedStateMutex, osWaitForever) == osOK)
         {
             if (lock->mHasActiveRemoteAction)
             {
@@ -913,8 +912,7 @@ void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
             DeviceLayer::PlatformMgr().LockChipStack();
             lock->PushClusterLockState(remoteAction.endpointId, remoteAction.targetClusterState, remoteAction.fabricIdx,
                                        remoteAction.nodeId, remoteAction.userIndex,
-                                       remoteAction.hasCredential ? &remoteAction.credential : nullptr,
-                                       remoteAction.hasCredential);
+                                       remoteAction.hasCredential ? &remoteAction.credential : nullptr, remoteAction.hasCredential);
             DeviceLayer::PlatformMgr().UnlockChipStack();
         }
         if (lock->mHasPendingRequest &&
