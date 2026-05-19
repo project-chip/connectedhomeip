@@ -38,7 +38,7 @@ void BindingWorkerFunction(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
     auto * entry = reinterpret_cast<Binding::TableEntry *>(context);
-    TEMPORARY_RETURN_IGNORED AddBindingEntry(*entry);
+    RETURN_SAFELY_IGNORED AddBindingEntry(*entry);
     Platform::Delete(entry);
 }
 
