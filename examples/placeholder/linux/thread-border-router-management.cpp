@@ -84,3 +84,8 @@ void emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
         .emplace(endpoint, &gBorderRouterDelegate, Server::GetInstance().GetFailSafeContext())
         .Init();
 }
+
+void MatterThreadBorderRouterManagementClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType shutdownType)
+{
+    gThreadBorderRouterManagementServer.reset();
+}
