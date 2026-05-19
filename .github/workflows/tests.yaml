@@ -640,11 +640,6 @@ jobs:
               run: |
                 brew install coreutils
                 echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
-            - name: Install ccache
-              run: |
-                brew install ccache
-            - name: Verify ccache installation
-              run: which ccache
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
