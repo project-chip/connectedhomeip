@@ -21,7 +21,6 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <app/server/Server.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/Nullable.h>
@@ -32,6 +31,7 @@
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
@@ -567,9 +567,12 @@ TEST_F(TestOTARequestorCluster, OnFabricRemovedClearsTargetFabricAndNotifiesRequ
 
     // Sanity: both entries present.
     {
-        auto it = attributes.GetDefaultOtaProviderListIterator();
+        auto it      = attributes.GetDefaultOtaProviderListIterator();
         size_t count = 0;
-        while (it.Next()) { count++; }
+        while (it.Next())
+        {
+            count++;
+        }
         EXPECT_EQ(count, 2u);
     }
 
