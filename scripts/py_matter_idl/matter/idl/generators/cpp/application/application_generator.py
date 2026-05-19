@@ -17,10 +17,7 @@ from dataclasses import dataclass
 from typing import List, Mapping, Optional
 
 from matter.idl.generators import CodeGenerator
-from matter.idl.generators.cluster_selection import (
-    ember_af_cluster_init_callback_clusters,
-    server_side_clusters,
-)
+from matter.idl.generators.cluster_selection import ember_af_cluster_init_callback_clusters, server_side_clusters
 from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.generators.type_definitions import TypeLookupContext
 from matter.idl.matter_idl_types import Bitmap, Idl, ServerClusterInstantiation
