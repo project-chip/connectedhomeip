@@ -162,11 +162,14 @@ void BatteryApplicationManager::StopPeriodicUpdate()
 
 void BatteryApplicationManager::UpdateBatteryStatus()
 {
-    // Trigger battery measurement
-    SENSORS_TriggerBatteryMeasurement();
-
-    // Schedule refresh on CHIP task context to ensure thread safety
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t arg) { BatteryAppMgr().RefreshBatteryLevel(); }, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+        [](intptr_t arg) {
+            // Trigger battery measurement
+            SENSORS_TriggerBatteryMeasurement();
+            // Schedule refresh
+            BatteryAppMgr().RefreshBatteryLevel();
+        },
+        0);
 }
 
 void BatteryApplicationManager::RefreshBatteryLevel()
@@ -221,8 +224,8 @@ void BatteryApplicationManager::UpdatePowerSourceCluster(uint8_t batteryPercenta
     }
 
     // Update BatTimeRemaining attribute
-    // DUT can't estimate remaining time, set to max value (0xFFFF)
-    status = PowerSource::Attributes::BatTimeRemaining::Set(BATTERY_ENDPOINT_ID, 0xFFFF);
+    // DUT can't estimate remaining time, set to null value
+    status = PowerSource::Attributes::BatTimeRemaining::Set(BATTERY_ENDPOINT_ID, DataModel::NullNullable);
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(DeviceLayer, "Failed to update BatTimeRemaining: %x", to_underlying(status));
