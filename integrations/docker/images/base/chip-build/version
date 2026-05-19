@@ -1,1 +1,1 @@
-196 : [crosscompile] Don't duplicate minimization done by create_sysroot.py in the Dockerfile
+197 : [crosscompile] Bump {armhf,aarch64} sysroot tag to `version:build-2026.05.14`
