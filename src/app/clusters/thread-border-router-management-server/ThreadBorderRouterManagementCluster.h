@@ -44,7 +44,10 @@ public:
         AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate), mServerEndpointId(endpointId),
         mFailsafeContext(failSafeContext)
     {}
-    virtual ~ServerInstance() = default;
+    virtual ~ServerInstance()
+    {
+        DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    }
 
     CHIP_ERROR Init();
 

@@ -4241,49 +4241,33 @@ namespace ProximityRanging {
 namespace Attributes {
 
 namespace WiFiDevIK {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
 } // namespace WiFiDevIK
 
 namespace BLEDeviceID {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint64_t * value); // int64u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value); // int64u
 } // namespace BLEDeviceID
 
 namespace BLTDevIK {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
 } // namespace BLTDevIK
 
 namespace BLTCSSecurityLevel {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum * value); // BLTCSSecurityLevelEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum value,
-                                        MarkAttributeDirty markDirty);
+GetDefault(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum * value); // BLTCSSecurityLevelEnum
 } // namespace BLTCSSecurityLevel
 
 namespace BLTCSModeCapability {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ProximityRanging::BLTCSModeEnum * value); // BLTCSModeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::ProximityRanging::BLTCSModeEnum * value); // BLTCSModeEnum
 } // namespace BLTCSModeCapability
 
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ClusterRevision
 
 } // namespace Attributes
