@@ -40,8 +40,9 @@ public:
     GenericOpenThreadBorderRouterDelegate(PersistentStorageDelegate * storage) : mStorage(storage) {}
     ~GenericOpenThreadBorderRouterDelegate()
     {
-        // "Remove when not registered (i.e. without init)" is expected to be handled ok by RemoveEventHandler
-        // (since tracking some state of is initialized or not feels more annoying and uses more RAM).
+        // Note: It is safe to call RemoveEventHandler here even if Init() was not called or failed.
+        // RemoveEventHandler handles unregistered handlers gracefully, allowing us to avoid adding
+        // a state flag to track initialization.
         DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     }
 
