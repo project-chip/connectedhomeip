@@ -234,8 +234,8 @@ private:
     chip::System::Layer * mSystemLayer;
     bool mCancelPublishersOnTxIdle                 = false;
     OnCancelDeviceHandle mCancelPublishersCallback = nullptr;
-    OnTxIdleActionFunct mOnTxIdleAfterCb    = nullptr;
-    void * mOnTxIdleAfterCtx                = nullptr;
+    OnTxIdleActionFunct mOnTxIdleAfterCb           = nullptr;
+    void * mOnTxIdleAfterCtx                       = nullptr;
 };
 
 } /* namespace WiFiPAF */

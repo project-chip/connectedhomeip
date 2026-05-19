@@ -51,8 +51,7 @@ void PostOperationalNetworkEnabled()
         return;
     }
     sPostOpEventFired = true;
-    ChipDeviceEvent ev{ .Type               = DeviceEventType::kOperationalNetworkEnabled,
-                        .OperationalNetwork = { .network = 0 } };
+    ChipDeviceEvent ev{ .Type = DeviceEventType::kOperationalNetworkEnabled, .OperationalNetwork = { .network = 0 } };
     CHIP_ERROR err = PlatformMgr().PostEvent(&ev);
     if (err != CHIP_NO_ERROR)
     {
