@@ -93,7 +93,7 @@ public:
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
 protected:
-    Span<const GenericOperationalState> mOperationalStateList;
+    Span<const uint8_t> mOperationalStateIds;
     Span<const CharSpan> mOperationalPhaseList;
 };
 
@@ -101,11 +101,11 @@ protected:
 class OperationalStateDelegate : public GenericOperationalStateDelegateImpl
 {
 private:
-    const GenericOperationalState opStateList[4] = {
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
+    static constexpr uint8_t kOpStateIds[] = {
+        to_underlying(OperationalStateEnum::kStopped),
+        to_underlying(OperationalStateEnum::kRunning),
+        to_underlying(OperationalStateEnum::kPaused),
+        to_underlying(OperationalStateEnum::kError),
     };
 
     const uint32_t kExampleCountDown = 30;
@@ -113,7 +113,7 @@ private:
 public:
     OperationalStateDelegate()
     {
-        GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+        GenericOperationalStateDelegateImpl::mOperationalStateIds = Span<const uint8_t>(kOpStateIds);
     }
 
     /**
