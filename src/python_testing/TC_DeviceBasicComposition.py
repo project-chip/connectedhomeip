@@ -204,9 +204,11 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
+from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES
 from matter.testing.device_conformance_tests import get_supersets
-from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
-                                                 attribute_id_type, cluster_id_type, command_id_type)
+from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, DeviceTypeIdType,
+                                                 GlobalAttributeIds, attribute_id_type, cluster_id_type,
+                                                 command_id_type, device_type_id_type)
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
@@ -1167,10 +1169,29 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                       spec_location="Root node device type")
                     self.fail_current_test("Root node device type is listed on non zero endpoints")
 
-                # TODO : Step 1b.4.1, 1b.4.2 needs to be run manually as PIXIT.DESC.DeviceTypeConformanceList
-                #       is not availbale as of now. An issue is created : https://github.com/project-chip/connectedhomeip/issues/38640
-                self.print_step("1b.4.1", "Step 1b.4.1 is skipped, test is manually")
-                self.print_step("1b.4.2", "Step 1b.4.2 is skipped, test is manually")
+                self.print_step("1b.4.1", "DeviceType should be one of the DeviceTypes listed in PIXIT.DESC.DeviceTypeConformanceList for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
+                for device_type in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+                    if device_type_id_type(device_type.deviceType) != DeviceTypeIdType.kStandard:
+                        continue
+                    if device_type.deviceType not in self.xml_device_types:
+                        self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                          problem="Unknown standard device type 0x{:04X} on endpoint {}".format(device_type.deviceType, endpoint_id),
+                                          spec_location="9.5.4.1")
+                        self.fail_current_test("Unknown device type 0x{:04X} on endpoint {}".format(device_type.deviceType, endpoint_id))
+
+                self.print_step("1b.4.2", "Revision should match the revision of that Device Type in PIXIT.DESC.DeviceTypeConformanceList for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
+                for device_type in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+                    if device_type_id_type(device_type.deviceType) != DeviceTypeIdType.kStandard:
+                        continue
+                    if device_type.deviceType not in self.xml_device_types:
+                        continue
+                    expected_revision = self.xml_device_types[device_type.deviceType].revision
+                    if device_type.revision != expected_revision:
+                        self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                          problem="Device type 0x{:04X} revision mismatch on endpoint {}: expected {}, got {}".format(
+                                              device_type.deviceType, endpoint_id, expected_revision, device_type.revision),
+                                          spec_location="9.5.4.1")
+                        self.fail_current_test("Revision mismatch for device type 0x{:04X} on endpoint {}".format(device_type.deviceType, endpoint_id))
 
                 self.print_step("1b.4.3", "Revision should not be less than 1")
 
@@ -1180,10 +1201,37 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                     if not device_revision:
                         self.fail_current_test("Revision is less than 1")
 
-                # TODO : Step 2 and 3 needs to be run manually as PIXIT.DESC.DeviceTypeConformanceList
-                #       is not availbale as of now. An issue is created : https://github.com/project-chip/connectedhomeip/issues/38640
-                self.print_step("2", "Step 2 is skipped, test is manually")
-                self.print_step("3", "Step 3 is skipped, test is manually")
+                self.print_step("2", "TH reads ServerList attribute and verifies mandatory server clusters are present for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
+                server_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
+                for device_type in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+                    if device_type_id_type(device_type.deviceType) != DeviceTypeIdType.kStandard:
+                        continue
+                    if device_type.deviceType not in self.xml_device_types:
+                        continue
+                    xml_device = self.xml_device_types[device_type.deviceType]
+                    for cluster_id, cluster_requirement in xml_device.server_clusters.items():
+                        if cluster_requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).is_mandatory() and cluster_id not in server_list:
+                            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                              problem="Mandatory server cluster {} (0x{:04X}) for device type {} not in ServerList on endpoint {}".format(
+                                                  cluster_requirement.name, cluster_id, xml_device.name, endpoint_id),
+                                              spec_location="9.5.4.2")
+                            self.fail_current_test("Mandatory server cluster 0x{:04X} missing from ServerList on endpoint {}".format(cluster_id, endpoint_id))
+
+                self.print_step("3", "TH reads ClientList attribute and verifies mandatory client clusters are present for endpoint {endpoint_id}".format(endpoint_id=endpoint_id))
+                client_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ClientList]
+                for device_type in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+                    if device_type_id_type(device_type.deviceType) != DeviceTypeIdType.kStandard:
+                        continue
+                    if device_type.deviceType not in self.xml_device_types:
+                        continue
+                    xml_device = self.xml_device_types[device_type.deviceType]
+                    for cluster_id, cluster_requirement in xml_device.client_clusters.items():
+                        if cluster_requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).is_mandatory() and cluster_id not in client_list:
+                            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
+                                              problem="Mandatory client cluster {} (0x{:04X}) for device type {} not in ClientList on endpoint {}".format(
+                                                  cluster_requirement.name, cluster_id, xml_device.name, endpoint_id),
+                                              spec_location="9.5.4.3")
+                            self.fail_current_test("Mandatory client cluster 0x{:04X} missing from ClientList on endpoint {}".format(cluster_id, endpoint_id))
 
                 self.print_step("4", "TH reads PartsList attribute for each endpoint")
 
