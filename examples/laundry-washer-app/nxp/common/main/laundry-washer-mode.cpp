@@ -110,4 +110,5 @@ void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId,
     {
         gLaundryWasherModeInstance->Shutdown();
     }
+    LaundryWasherMode::Shutdown();
 }

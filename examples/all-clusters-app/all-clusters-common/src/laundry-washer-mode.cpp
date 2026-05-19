@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/af-types.h>
 #include <laundry-washer-mode.h>
 
 using namespace chip::app::Clusters;

@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/af-types.h>
 #include <lib/support/Span.h>
 #include <refrigerator-and-temperature-controlled-cabinet-mode.h>
 
@@ -137,4 +138,5 @@ void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallbac
     {
         gRefrigeratorAndTemperatureControlledCabinetModeInstance->Shutdown();
     }
+    RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
 }

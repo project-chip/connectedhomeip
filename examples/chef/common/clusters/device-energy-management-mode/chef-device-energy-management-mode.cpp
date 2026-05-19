@@ -63,6 +63,7 @@ void MatterDeviceEnergyManagementModeClusterShutdownCallback(EndpointId endpoint
         gDeviceEnergyManagementModeInstance->Shutdown();
         gDeviceEnergyManagementModeInstance.reset();
     }
+    DeviceEnergyManagementMode::Shutdown();
 }
 
 #endif // MATTER_DM_PLUGIN_DEVICE_ENERGY_MANAGEMENT_MODE_SERVER
