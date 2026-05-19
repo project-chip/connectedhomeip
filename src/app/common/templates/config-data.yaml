@@ -141,6 +141,7 @@ CodeDrivenClusters:
     - Oven Mode
     - Power Topology
     - Pressure Measurement
+    - Proximity Ranging
     - Push AV Stream Transport
     - RVC Clean Mode
     - RVC Run Mode
