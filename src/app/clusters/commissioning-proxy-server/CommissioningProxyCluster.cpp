@@ -46,12 +46,9 @@ constexpr bool HasExactlyOneBitSet(T v)
 
 // Masks of all spec-defined bits for each bitmap type.
 // Any bit outside these masks is a reserved bit and SHALL be rejected with InvalidCommand.
-constexpr uint8_t  kValidTransportBits =
-    static_cast<uint8_t>(CapabilitiesBitmap::kBle) |
-    static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF);
-constexpr uint16_t kValidWiFiBandBits =
-    static_cast<uint16_t>(WiFiBandBitmap::k2g4) |
-    static_cast<uint16_t>(WiFiBandBitmap::k5g);
+constexpr uint8_t kValidTransportBits =
+    static_cast<uint8_t>(CapabilitiesBitmap::kBle) | static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF);
+constexpr uint16_t kValidWiFiBandBits = static_cast<uint16_t>(WiFiBandBitmap::k2g4) | static_cast<uint16_t>(WiFiBandBitmap::k5g);
 
 // Reserved SessionId sentinel for ProxyDisconnectRequest: cancel any ongoing ProxyConnectRequest.
 inline constexpr uint16_t kCancelPendingConnectSessionId = 0xFFFF;
@@ -93,7 +90,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                           AttributeValueEncoder & encoder)
+                                                                       AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -139,8 +136,8 @@ chip::BitMask<CapabilitiesBitmap> CommissioningProxyCluster::GetSupportedTranspo
 }
 
 std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                          TLV::TLVReader & input_arguments,
-                                                                                          CommandHandler * handler)
+                                                                                      TLV::TLVReader & input_arguments,
+                                                                                      CommandHandler * handler)
 {
     using namespace Commands;
 
@@ -225,17 +222,16 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
             return Status::InvalidTransportType;
         }
 
-        wiFiBand = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
-            commandData.wiFiBand.Value().Raw());
+        wiFiBand = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(commandData.wiFiBand.Value().Raw());
     }
 
     // Delegate SHALL establish the transport connection and call commandObj->AddResponse()
     // with a ProxyConnectResponse containing the sessionId per spec.
     // State transition to kState_CPConnected happens in the delegate's async
     // success callback (OnPafConnectSuccess) once the transport is actually up.
-    auto delegateStatus = mDelegate.ProxyConnectRequest(
-        commandData.address, commandData.transport, commandData.discriminator,
-        commandData.vendorID, commandData.productID, commandData.timeout, wiFiBand, handler, request);
+    auto delegateStatus =
+        mDelegate.ProxyConnectRequest(commandData.address, commandData.transport, commandData.discriminator, commandData.vendorID,
+                                      commandData.productID, commandData.timeout, wiFiBand, handler, request);
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
 
@@ -244,7 +240,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request,
                                                                                       TLV::TLVReader & input_arguments,
-                                                                                     CommandHandler * handler)
+                                                                                      CommandHandler * handler)
 {
     Commands::ProxyDisconnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
@@ -272,7 +268,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest & request,
                                                                                 TLV::TLVReader & input_arguments,
-                                                                                 CommandHandler * handler)
+                                                                                CommandHandler * handler)
 {
     Commands::ProxyScanRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
@@ -312,21 +308,19 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(
             return Status::InvalidTransportType;
         }
 
-        wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
-            commandData.wiFiBands.Value().Raw());
+        wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
     }
 
     ReturnErrorOnFailure(
-        DataModel::ActionReturnStatus(mDelegate.ProxyScanRequest(
-            commandData.transport, wiFiBands, handler, request))
+        DataModel::ActionReturnStatus(mDelegate.ProxyScanRequest(commandData.transport, wiFiBands, handler, request))
             .GetUnderlyingError());
 
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel::InvokeRequest & request,
-                                                                                               TLV::TLVReader & input_arguments,
-                                                                                               CommandHandler * handler)
+DataModel::ActionReturnStatus
+CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel::InvokeRequest & request,
+                                                                 TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     Commands::ProxyBackGroundScanStartRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
@@ -371,16 +365,16 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
     chip::FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
     chip::NodeId nodeId           = request.subjectDescriptor.subject;
 
-    auto delegateStatus = mDelegate.ProxyBackgroundScanStartRequest(
-        commandData.transport, commandData.timeout, wiFiBands, fabricIndex, nodeId, handler, request);
+    auto delegateStatus = mDelegate.ProxyBackgroundScanStartRequest(commandData.transport, commandData.timeout, wiFiBands,
+                                                                    fabricIndex, nodeId, handler, request);
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
 
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
-                                                                                               TLV::TLVReader & input_arguments,
-                                                                                               CommandHandler * handler)
+DataModel::ActionReturnStatus
+CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
+                                                                TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     Commands::ProxyBackGroundScanStopRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
@@ -417,16 +411,15 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
     chip::FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
     chip::NodeId nodeId           = request.subjectDescriptor.subject;
 
-    auto delegateStatus = mDelegate.ProxyBackgroundScanStopRequest(
-        commandData.transport, wiFiBands, fabricIndex, nodeId);
+    auto delegateStatus = mDelegate.ProxyBackgroundScanStopRequest(commandData.transport, wiFiBands, fabricIndex, nodeId);
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
 
     return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageRequest(const DataModel::InvokeRequest & request,
-                                                                                               TLV::TLVReader & input_arguments,
-                                                                                               CommandHandler * handler)
+                                                                                   TLV::TLVReader & input_arguments,
+                                                                                   CommandHandler * handler)
 {
     Commands::ProxyMessageRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
@@ -437,22 +430,19 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageReque
         message.SetValue(commandData.message.Value());
     }
 
-    auto delegateStatus = mDelegate.ProxyMessageRequest(
-        commandData.sessionId, message, commandData.responseTimeout, handler, request);
+    auto delegateStatus =
+        mDelegate.ProxyMessageRequest(commandData.sessionId, message, commandData.responseTimeout, handler, request);
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
     return Status::Success;
 }
 
 CHIP_ERROR CommissioningProxyCluster::Attributes(const ConcreteClusterPath & path,
-                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                 ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     static constexpr DataModel::AttributeEntry optionalAttributes[] = {
-        MaxCachedResults::kMetadataEntry,
-        NumCachedResults::kMetadataEntry,
-        CacheTimeout::kMetadataEntry,
-        CachedResults::kMetadataEntry,
-        WiFiBand::kMetadataEntry,
+        MaxCachedResults::kMetadataEntry, NumCachedResults::kMetadataEntry, CacheTimeout::kMetadataEntry,
+        CachedResults::kMetadataEntry,    WiFiBand::kMetadataEntry,
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -461,14 +451,11 @@ CHIP_ERROR CommissioningProxyCluster::Attributes(const ConcreteClusterPath & pat
 }
 
 CHIP_ERROR CommissioningProxyCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.AppendElements({
-        Commands::ProxyConnectRequest::kMetadataEntry,
-        Commands::ProxyDisconnectRequest::kMetadataEntry,
-        Commands::ProxyScanRequest::kMetadataEntry,
-        Commands::ProxyMessageRequest::kMetadataEntry
-    }));
+    ReturnErrorOnFailure(
+        builder.AppendElements({ Commands::ProxyConnectRequest::kMetadataEntry, Commands::ProxyDisconnectRequest::kMetadataEntry,
+                                 Commands::ProxyScanRequest::kMetadataEntry, Commands::ProxyMessageRequest::kMetadataEntry }));
 
     if (mFeatureFlags.Has(Feature::kBackgroundScan))
     {
@@ -490,7 +477,6 @@ CommissioningProxyCluster::State_t CommissioningProxyCluster::GetCPState(void)
 {
     return mMainCommissioningProxyState;
 }
-
 
 } // namespace CommissioningProxy
 } // namespace Clusters

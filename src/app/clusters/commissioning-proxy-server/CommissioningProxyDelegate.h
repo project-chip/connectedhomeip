@@ -19,15 +19,23 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeValueEncoder.h>
+#include <app/CommandHandler.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <app/CommandHandler.h>
-#include <app/AttributeValueEncoder.h>
-#include <app/data-model-provider/OperationTypes.h>
 
 // Forward-declare to avoid include cycles
 // (Cluster includes Delegate, so Delegate must not include Cluster)
-namespace chip { namespace app { namespace Clusters { namespace CommissioningProxy { class CommissioningProxyCluster; }}}}
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace CommissioningProxy {
+class CommissioningProxyCluster;
+}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 namespace chip {
 namespace app {
@@ -46,7 +54,7 @@ public:
      * Optional back-pointer to the server cluster instance.
      * Default implementation is a no-op so existing delegates don't have to care.
      */
-    virtual void SetServer(CommissioningProxyCluster * ) {}
+    virtual void SetServer(CommissioningProxyCluster *) {}
     virtual CommissioningProxyCluster * GetServer() const { return nullptr; }
 
     /**
@@ -69,13 +77,9 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
-                        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                        uint16_t discriminator,
-                        chip::VendorId vendorid,
-                        uint16_t productid,
-                        uint16_t timeout,
-                        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
-                        app::CommandHandler * commandObj,
+                        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t discriminator,
+                        chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
+                        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand, app::CommandHandler * commandObj,
                         const DataModel::InvokeRequest & request) = 0;
 
     /**
@@ -91,8 +95,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     ProxyScanRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
-                     chip::app::CommandHandler * commandObj,
+                     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands, chip::app::CommandHandler * commandObj,
                      const DataModel::InvokeRequest & request) = 0;
 
     /**
@@ -106,12 +109,9 @@ public:
      *                       ProxyMessageResponse once the commissionee replies.
      * @param request        The invoke path.
      */
-    virtual Protocols::InteractionModel::Status
-    ProxyMessageRequest(uint16_t sessionId,
-                        chip::Optional<chip::ByteSpan> message,
-                        uint8_t responseTimeout,
-                        app::CommandHandler * commandObj,
-                        const DataModel::InvokeRequest & request) = 0;
+    virtual Protocols::InteractionModel::Status ProxyMessageRequest(uint16_t sessionId, chip::Optional<chip::ByteSpan> message,
+                                                                    uint8_t responseTimeout, app::CommandHandler * commandObj,
+                                                                    const DataModel::InvokeRequest & request) = 0;
 
     /**
      * @brief Disconnect and clean up a proxy session established by ProxyConnectRequest.
@@ -122,8 +122,10 @@ public:
      * @param sessionId  The proxy session ID from ProxyConnectResponse to disconnect.
      * @return Success if the session was found and cleaned up; NotFound if unknown.
      */
-    virtual Protocols::InteractionModel::Status
-    ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex) { return Protocols::InteractionModel::Status::UnsupportedCommand; }
+    virtual Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 
     /**
      * @brief Cancel any in-progress ProxyConnectRequest.
@@ -136,8 +138,10 @@ public:
      * @return Success if a pending connect was cancelled.
      *         InvalidInState if no connect is pending (connection already completed).
      */
-    virtual Protocols::InteractionModel::Status
-    CancelPendingConnect(chip::FabricIndex fabricIndex) { return Protocols::InteractionModel::Status::InvalidInState; }
+    virtual Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex fabricIndex)
+    {
+        return Protocols::InteractionModel::Status::InvalidInState;
+    }
 
     /**
      * @brief Start a continuous background scan for commissionable devices.
@@ -156,12 +160,9 @@ public:
      * @return Success, Busy (another caller's scan is running), or InvalidCommand.
      */
     virtual Protocols::InteractionModel::Status
-    ProxyBackgroundScanStartRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                                    uint16_t timeout,
+    ProxyBackgroundScanStartRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t timeout,
                                     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
-                                    chip::FabricIndex fabricIndex,
-                                    chip::NodeId nodeId,
-                                    app::CommandHandler * commandObj,
+                                    chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj,
                                     const DataModel::InvokeRequest & request) = 0;
 
     /**
@@ -178,23 +179,22 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     ProxyBackgroundScanStopRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                                   chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
-                                   chip::FabricIndex fabricIndex,
+                                   chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands, chip::FabricIndex fabricIndex,
                                    chip::NodeId nodeId) = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual uint8_t GetMaxSessions()        = 0;
-    virtual uint8_t GetScanMaxTime()        = 0;
-    virtual uint8_t GetMaxCachedResults()   = 0;
-    virtual uint8_t GetNumCachedResults()   = 0;
-    virtual uint16_t GetCacheTimeout()      = 0;
+    virtual uint8_t GetMaxSessions()                                                                       = 0;
+    virtual uint8_t GetScanMaxTime()                                                                       = 0;
+    virtual uint8_t GetMaxCachedResults()                                                                  = 0;
+    virtual uint8_t GetNumCachedResults()                                                                  = 0;
+    virtual uint16_t GetCacheTimeout()                                                                     = 0;
     virtual chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> GetSupportedWiFiBands() = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual void SetScanMaxTime(uint8_t seconds)    = 0;
-    virtual void SetCacheTimeout(uint16_t seconds)  = 0;
+    virtual void SetScanMaxTime(uint8_t seconds)   = 0;
+    virtual void SetCacheTimeout(uint16_t seconds) = 0;
 
     /**
      * @brief Encode the CachedResults attribute.

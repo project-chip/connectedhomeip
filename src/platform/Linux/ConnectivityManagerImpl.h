@@ -102,15 +102,15 @@ namespace DeviceLayer {
 struct NanPeerInfo
 {
     uint8_t mac[6]{};
-    uint16_t vid = 0;
-    uint16_t pid = 0;
+    uint16_t vid           = 0;
+    uint16_t pid           = 0;
     uint16_t discriminator = 0;
-    uint8_t  opcode = 0;
-    uint16_t srvProtoType = 0;
+    uint8_t opcode         = 0;
+    uint16_t srvProtoType  = 0;
 
-    std::vector<uint8_t> storage;   // ExtendedData storage
+    std::vector<uint8_t> storage; // ExtendedData storage
     bool hasExtendedData = false;
-    uint16_t band = 0;              // WiFiBandBitmap value derived from scan frequency; 0 = unknown
+    uint16_t band        = 0; // WiFiBandBitmap value derived from scan frequency; 0 = unknown
 
     // Used in the std::set<NanPeerInfo> to determine uniqueness
     bool operator<(const NanPeerInfo & o) const
@@ -255,17 +255,17 @@ public:
      */
     void WiFiPAFStopBackgroundScan();
 
-    private:
+private:
     std::set<NanPeerInfo> mNanScanPeers;
-    PafScanResultsCallback mScanCb        = nullptr;
-    void * mScanCbContext                 = nullptr;
-    uint32_t mActiveScanSubscribeId       = 0; // subscribe_id of the current one-shot scan
+    PafScanResultsCallback mScanCb  = nullptr;
+    void * mScanCbContext           = nullptr;
+    uint32_t mActiveScanSubscribeId = 0; // subscribe_id of the current one-shot scan
     void FinishWiFiPAFScan(ScanTimerCtx * ctx);
 
     BgScanDiscoveryCallback mBgScanCb = nullptr;
     void * mBgScanCbCtx               = nullptr;
-    uint32_t mBgScanSubscribeId        = 0;
-    uint32_t mScanFreq                 = 0; // freq (MHz) used for the current scan (one-shot or background)
+    uint32_t mBgScanSubscribeId       = 0;
+    uint32_t mScanFreq                = 0; // freq (MHz) used for the current scan (one-shot or background)
 
     // Handler IDs for the three scan GLib signals (nandiscovery-result, nanreceive,
     // nansubscribe-terminated).  Stored so DisconnectScanSignals() can remove exactly

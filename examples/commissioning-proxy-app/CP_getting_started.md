@@ -3,54 +3,53 @@
 This guide walks a first-time user through every step needed to build, deploy,
 and use the Matter Commissioning Proxy on Raspberry Pi hardware.
 
-The Commissioning Proxy (CP) acts as a tunnel between a commissioner
-(chip-tool) and a commissionee that is only reachable over a transport not
-directly available on the commissioner, or out of range.  This guide focuses on **Wi-Fi PAF
-(Wi-Fi Aware / NAN)** as the transport, but the Commissioning Proxy
+The Commissioning Proxy (CP) acts as a tunnel between a commissioner (chip-tool)
+and a commissionee that is only reachable over a transport not directly
+available on the commissioner, or out of range. This guide focuses on **Wi-Fi
+PAF (Wi-Fi Aware / NAN)** as the transport, but the Commissioning Proxy
 architecture also supports other transports such as BLE.
 
 ```
 chip-tool  ──Matter (TCP/IP)──►  Commissioning Proxy App  ──Wi-Fi PAF (NAN)──►  Commissionee
 ```
 
-> **What is Wi-Fi PAF?**
-> Wi-Fi PAF (Protocol for Announcement and Finding) is a Matter transport
-> built on Wi-Fi Aware (NAN — Neighbor Awareness Networking).  It enables
-> device discovery and commissioning without joining a Wi-Fi network first,
-> using short-range off-AP Wi-Fi signalling.  See **Section 8 of the Matter
-> Test-Harness User Guide** for full background on Wi-Fi PAF and its
+> **What is Wi-Fi PAF?** Wi-Fi PAF (Protocol for Announcement and Finding) is a
+> Matter transport built on Wi-Fi Aware (NAN — Neighbor Awareness Networking).
+> It enables device discovery and commissioning without joining a Wi-Fi network
+> first, using short-range off-AP Wi-Fi signalling. See **Section 8 of the
+> Matter Test-Harness User Guide** for full background on Wi-Fi PAF and its
 > hardware/software requirements.
 
 <hr>
 
-- [1. Components Needed](#1-components-needed)
-  - [1.1 Hardware](#11-hardware)
-  - [1.2 Software Prerequisites](#12-software-prerequisites)
-    - [1.2.1 USB dongle software](#121-usb-dongle-software)
-    - [1.2.2 Build machine](#122-on-the-build-machine-ubuntu-2204-2404-x86-64)
-- [2. Build wpa\_supplicant with the Matter NAN patch (Commissioning Proxy RPi only)](#2-build-wpa_supplicant-with-the-matter-nan-patch-commissioning-proxy-rpi-only)
-  - [2.1 What the patch does](#21-what-the-patch-does)
-    - [2.1.1 Create the patch file](#211-create-the-wpa-supplicant-matter-patch-patch-file)
-  - [2.2 Build steps](#22-build-steps)
-  - [2.3 Install on the Commissioning Proxy Raspberry Pi](#23-install-on-the-commissioning-proxy-raspberry-pi)
-- [3. Clone the connectedhomeip repository on the build machine](#3-clone-the-connectedhomeip-repository-on-the-build-machine)
-- [4. Build the Matter SDK (Raspberry Pi)](#4-build-the-matter-sdk-raspberry-pi)
-  - [4.1 One-time Docker image setup](#41-one-time-docker-image-setup)
-  - [4.2 Build the Commissioning Proxy app (RPi arm64)](#42-build-the-commissioning-proxy-app-rpi-arm64)
-  - [4.3 Build chip-tool (RPi arm64)](#43-build-chip-tool-rpi-arm64)
-  - [4.4 Build the End Device app (RPi arm64)](#44-build-the-end-device-app-rpi-arm64)
-- [5. Deploy to Raspberry Pi](#5-deploy-to-raspberry-pi)
-- [6. Configuring the Commissioning Proxy](#6-configuring-the-commissioning-proxy)
-  - [6.1 Start the Commissioning Proxy](#61-start-the-commissioning-proxy)
-  - [6.2 Add the Commissioning Proxy onto the Fabric](#62-add-the-commissioning-proxy-onto-the-fabric)
-- [7. Configuring the End Device (ED)](#7-configuring-the-end-device-ed)
-- [8. Scanning](#8-scanning)
-  - [8.1 Run a foreground scan](#81-run-a-foreground-scan)
-  - [8.2 Start a background scan](#82-start-a-background-scan)
-  - [8.3 Read cached results](#83-read-cached-results)
-  - [8.4 Stop a background scan](#84-stop-a-background-scan)
-- [9. Commissioning the End Device Through the Commissioning Proxy](#9-commissioning-the-end-device-through-the-commissioning-proxy)
-- [10. Troubleshooting](#10-troubleshooting)
+-   [1. Components Needed](#1-components-needed)
+    -   [1.1 Hardware](#11-hardware)
+    -   [1.2 Software Prerequisites](#12-software-prerequisites)
+        -   [1.2.1 USB dongle software](#121-usb-dongle-software)
+        -   [1.2.2 Build machine](#122-on-the-build-machine-ubuntu-2204-2404-x86-64)
+-   [2. Build wpa_supplicant with the Matter NAN patch (Commissioning Proxy RPi only)](#2-build-wpa_supplicant-with-the-matter-nan-patch-commissioning-proxy-rpi-only)
+    -   [2.1 What the patch does](#21-what-the-patch-does)
+        -   [2.1.1 Create the patch file](#211-create-the-wpa-supplicant-matter-patch-patch-file)
+    -   [2.2 Build steps](#22-build-steps)
+    -   [2.3 Install on the Commissioning Proxy Raspberry Pi](#23-install-on-the-commissioning-proxy-raspberry-pi)
+-   [3. Clone the connectedhomeip repository on the build machine](#3-clone-the-connectedhomeip-repository-on-the-build-machine)
+-   [4. Build the Matter SDK (Raspberry Pi)](#4-build-the-matter-sdk-raspberry-pi)
+    -   [4.1 One-time Docker image setup](#41-one-time-docker-image-setup)
+    -   [4.2 Build the Commissioning Proxy app (RPi arm64)](#42-build-the-commissioning-proxy-app-rpi-arm64)
+    -   [4.3 Build chip-tool (RPi arm64)](#43-build-chip-tool-rpi-arm64)
+    -   [4.4 Build the End Device app (RPi arm64)](#44-build-the-end-device-app-rpi-arm64)
+-   [5. Deploy to Raspberry Pi](#5-deploy-to-raspberry-pi)
+-   [6. Configuring the Commissioning Proxy](#6-configuring-the-commissioning-proxy)
+    -   [6.1 Start the Commissioning Proxy](#61-start-the-commissioning-proxy)
+    -   [6.2 Add the Commissioning Proxy onto the Fabric](#62-add-the-commissioning-proxy-onto-the-fabric)
+-   [7. Configuring the End Device (ED)](#7-configuring-the-end-device-ed)
+-   [8. Scanning](#8-scanning)
+    -   [8.1 Run a foreground scan](#81-run-a-foreground-scan)
+    -   [8.2 Start a background scan](#82-start-a-background-scan)
+    -   [8.3 Read cached results](#83-read-cached-results)
+    -   [8.4 Stop a background scan](#84-stop-a-background-scan)
+-   [9. Commissioning the End Device Through the Commissioning Proxy](#9-commissioning-the-end-device-through-the-commissioning-proxy)
+-   [10. Troubleshooting](#10-troubleshooting)
 
 <hr>
 
@@ -58,35 +57,36 @@ chip-tool  ──Matter (TCP/IP)──►  Commissioning Proxy App  ──Wi-Fi 
 
 ### 1.1 Hardware
 
-| Component | Role | Notes |
-|-----------|------|-------|
-| **Raspberry Pi 4 or 5** | DUT — Commissioning Proxy | Runs `chip-commissioning-proxy-app`. Requires a USB Wi-Fi dongle with NAN USD support (see note below — the on-board RPi Wi-Fi chipset does **not** support Wi-Fi PAF). |
-| **Raspberry Pi 4 or 5** | TH — Test Harness / Commissioner | Runs chip-tool and (optionally) Python certification tests.  Connected to the same IP network as the proxy RPi. Installation instructions are in section 4.1. TH Installation on Raspberry Pi of the Matter Test-Harness User Guide |
-| **Raspberry Pi 4 or 5** | ED — End Device / Commissionee | Runs `chip-lighting-app`. Also requires a USB Wi-Fi dongle with NAN USD support. |
-| **WLAN USB dongle** (×2) | DUT + ED | A USB Wi-Fi adapter that supports Wi-Fi Aware (NAN USD) with the latest hostapd/wpa\_supplicant.  Compatible models: See Section 8 of the Matter Test-Harness User Guide |
-| **Build machine** | — | Ubuntu 22.04 or 24.04 x86-64 with Docker installed.  Not needed at runtime — used only to cross-compile the binaries. |
-| **Ethernet switch / router** | — | Connects all RPis and the build machine on the same subnet for chip-tool to reach the Commissioning Proxy over IP. The ED does not need to be on the network |
+| Component                    | Role                             | Notes                                                                                                                                                                                                                              |
+| ---------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Raspberry Pi 4 or 5**      | DUT — Commissioning Proxy        | Runs `chip-commissioning-proxy-app`. Requires a USB Wi-Fi dongle with NAN USD support (see note below — the on-board RPi Wi-Fi chipset does **not** support Wi-Fi PAF).                                                            |
+| **Raspberry Pi 4 or 5**      | TH — Test Harness / Commissioner | Runs chip-tool and (optionally) Python certification tests. Connected to the same IP network as the proxy RPi. Installation instructions are in section 4.1. TH Installation on Raspberry Pi of the Matter Test-Harness User Guide |
+| **Raspberry Pi 4 or 5**      | ED — End Device / Commissionee   | Runs `chip-lighting-app`. Also requires a USB Wi-Fi dongle with NAN USD support.                                                                                                                                                   |
+| **WLAN USB dongle** (×2)     | DUT + ED                         | A USB Wi-Fi adapter that supports Wi-Fi Aware (NAN USD) with the latest hostapd/wpa_supplicant. Compatible models: See Section 8 of the Matter Test-Harness User Guide                                                             |
+| **Build machine**            | —                                | Ubuntu 22.04 or 24.04 x86-64 with Docker installed. Not needed at runtime — used only to cross-compile the binaries.                                                                                                               |
+| **Ethernet switch / router** | —                                | Connects all RPis and the build machine on the same subnet for chip-tool to reach the Commissioning Proxy over IP. The ED does not need to be on the network                                                                       |
 
 > **Why a USB dongle?** The on-board Broadcom Wi-Fi chipset on Raspberry Pi 4
 > and 5 does not support the Wi-Fi Aware NAN USD interface required by Wi-Fi
-> PAF.  A supported external USB dongle must be plugged into both the Proxy
-> RPi and the End Device RPi before starting either app.
-> 
+> PAF. A supported external USB dongle must be plugged into both the Proxy RPi
+> and the End Device RPi before starting either app.
 
 ### 1.2 Software Prerequisites
 
 ### 1.2.1 USB dongle software
-Instructions on how to configure the PAF devices can be found here 
-    https://groups.csa-iot.org/wg/members-all/document/43356
-  
-The instructions above miss the requirement that the following need installing, otherwise this error will be seen in the Commissioning Proxy log on start up.
+
+Instructions on how to configure the PAF devices can be found here
+https://groups.csa-iot.org/wg/members-all/document/43356
+
+The instructions above miss the requirement that the following need installing,
+otherwise this error will be seen in the Commissioning Proxy log on start up.
 `[PAF] Failed to start Wi-Fi PAF publish: src/platform/Linux/ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp:455: CHIP Error 0x00000003: Incorrect state`
 
 ```bash
 # Install these on RPi with PAF USB dongles to allow iwconfig
 sudo apt install net-tools
 sudo apt install wireless-tools
- ```
+```
 
 ### 1.2.2 On the **build machine** (Ubuntu 22.04/24.04 x86-64):
 
@@ -97,45 +97,48 @@ sudo apt-get install -y git docker.io python3 python3-pip \
     libdbus-1-dev build-essential
 sudo usermod -aG docker $USER   # log out and back in after this
 ```
+
 <hr>
 
-## 2. Build wpa\_supplicant with the Matter NAN patch (Commissioning Proxy RPi only)
+## 2. Build wpa_supplicant with the Matter NAN patch (Commissioning Proxy RPi only)
 
-The Proxy RPi requires a custom build of wpa\_supplicant.  The standard Ubuntu
+The Proxy RPi requires a custom build of wpa_supplicant. The standard Ubuntu
 package does not enable `CONFIG_NAN_USD` (Wi-Fi Aware Unsynchronized Service
-Discovery), and is missing a small extension needed for Commissioning Proxy scanning.
+Discovery), and is missing a small extension needed for Commissioning Proxy
+scanning.
 
-> **End Device (ED) wpa\_supplicant**: The End Device RPi uses the standard
-> Wi-Fi PAF wpa\_supplicant build described in **Section 8 of the Matter
-> Test-Harness User Guide**.  The patch below is only required on the
-> Proxy RPi.
+> **End Device (ED) wpa_supplicant**: The End Device RPi uses the standard Wi-Fi
+> PAF wpa_supplicant build described in **Section 8 of the Matter Test-Harness
+> User Guide**. The patch below is only required on the Proxy RPi.
 
 ### 2.1 What the patch does
 
-The patch file `wpa-supplicant-matter.patch`
-(in the same directory as this guide) is primarily about enabling a
-**NAN scan mechanism** for the Commissioning Proxy.
+The patch file `wpa-supplicant-matter.patch` (in the same directory as this
+guide) is primarily about enabling a **NAN scan mechanism** for the
+Commissioning Proxy.
 
-When the proxy performs a NAN scan to discover nearby commissionees,
-it subscribes to the Matter NAN service as a passive listener.  Without the
-patch, wpa\_supplicant automatically sends a NAN Follow-up frame back to every
-publisher it discovers — this would accidentally initiate a PAF session
-(i.e. a connection attempt) for every device found during a scan.  The patch
-adds a `discovery_only` flag that tells wpa\_supplicant to suppress those
-automatic Follow-up replies for scan-only subscriptions, so the proxy can
-observe which devices are present without triggering any connections.
+When the proxy performs a NAN scan to discover nearby commissionees, it
+subscribes to the Matter NAN service as a passive listener. Without the patch,
+wpa_supplicant automatically sends a NAN Follow-up frame back to every publisher
+it discovers — this would accidentally initiate a PAF session (i.e. a connection
+attempt) for every device found during a scan. The patch adds a `discovery_only`
+flag that tells wpa_supplicant to suppress those automatic Follow-up replies for
+scan-only subscriptions, so the proxy can observe which devices are present
+without triggering any connections.
 
 The four changes are:
 
-| File | Change |
-|------|--------|
-| `wpa_supplicant/defconfig` | Enables `CONFIG_NAN_USD=y` so NAN USD support is compiled in |
-| `src/common/nan_de.h` | Adds `discovery_only` boolean to `nan_subscribe_params` |
-| `src/common/nan_de.c` | Skips the automatic Follow-up reply to the publisher when `discovery_only` is set |
+| File                                      | Change                                                                                                           |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `wpa_supplicant/defconfig`                | Enables `CONFIG_NAN_USD=y` so NAN USD support is compiled in                                                     |
+| `src/common/nan_de.h`                     | Adds `discovery_only` boolean to `nan_subscribe_params`                                                          |
+| `src/common/nan_de.c`                     | Skips the automatic Follow-up reply to the publisher when `discovery_only` is set                                |
 | `wpa_supplicant/dbus/dbus_new_handlers.c` | Exposes `discovery_only` as a D-Bus parameter so the Matter stack can pass it from the background-scan call path |
 
 ### 2.1.1 Create the `wpa-supplicant-matter.patch` patch file.
+
 Save the following content as `/home/ubuntu/wpa-supplicant-matter.patch`:
+
 ```bash
 diff --git a/src/common/nan_de.c b/src/common/nan_de.c
 index 2af1afd73..1196ec617 100644
@@ -198,7 +201,7 @@ index 84ac8ba12..2a8f3e9f3 100644
 
 Run these steps on the **RPi build machine** (cross-compiling for arm64 is
 possible but building natively on the RPi itself is simplest for
-wpa\_supplicant):
+wpa_supplicant):
 
 ```bash
 # 1. Clone upstream hostap
@@ -237,7 +240,8 @@ strings wpa_supplicant | grep -c nan_usd
 
 ### 2.3 Install on the Commissioning Proxy Raspberry Pi
 
-Copy the binary to the **Commissioning Proxy RPi only** and replace the system binary:
+Copy the binary to the **Commissioning Proxy RPi only** and replace the system
+binary:
 
 ```bash
 # From the build machine
@@ -260,14 +264,18 @@ systemctl status wpa_supplicant
 
 ## 3. Clone the connectedhomeip repository on the build machine
 
-If you have not already cloned the `commissioning-proxy` forked branch, do so now on the **build machine**.
+If you have not already cloned the `commissioning-proxy` forked branch, do so
+now on the **build machine**.
 
-Note: If this is a new build machine you will need to set up appropriate SSH keys and upload to github
+Note: If this is a new build machine you will need to set up appropriate SSH
+keys and upload to github
+
 ```bash
 ssh-keygen -t ed25519 -C "build machine"
 cat ~/.ssh/id_ed25519.pub
 # Copy and Paste the certificate into github
 ```
+
 Clone connectedhomeip repository
 
 ```bash
@@ -287,16 +295,19 @@ sudo apt-get install git gcc g++ pkg-config cmake curl libssl-dev libdbus-1-dev 
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
      libevent-dev default-jre
 ```
+
 <hr>
 
 ## 4. Build the Matter SDK (Raspberry Pi)
 
-All Matter binaries for the RPi are cross-compiled on the build machine inside
-a Docker container that provides the arm64 toolchain and sysroot. Or they can be built natively on a RaspberryPi, but that requires at least 8GB of RAM.
+All Matter binaries for the RPi are cross-compiled on the build machine inside a
+Docker container that provides the arm64 toolchain and sysroot. Or they can be
+built natively on a RaspberryPi, but that requires at least 8GB of RAM.
 
 ### 4.1 One-time Docker image setup
 
 Create a `Dockerfile.chip-cross-aarch64` in `~/scripts/`:
+
 ```bash
 FROM ghcr.io/project-chip/chip-build-crosscompile:latest
 
@@ -356,19 +367,22 @@ docker build -t chip-cross-aarch64 \
     ~/scripts
 ```
 
-This only needs to be run once (or after a Docker image update).
-The build can take 10–20 minutes the first time.
+This only needs to be run once (or after a Docker image update). The build can
+take 10–20 minutes the first time.
 
 > The base image `chip-build-crosscompile` already contains Clang, GN, ninja,
 > and an Ubuntu 24.04 arm64 sysroot at `/opt/ubuntu-24.04-aarch64-sysroot`.
 
 ### 4.2 Build the Commissioning Proxy app (RPi arm64)
+
 Ensure other submodules are updated
+
 ```
 git submodule update --init --depth 1 third_party/uriparser/repo
 ```
 
 Create and run this bash script, ~/scripts/build-commissioning-proxy-rpi.sh
+
 ```bash
 
 #!/usr/bin/env bash
@@ -417,13 +431,15 @@ ninja -C out/rpi-arm64'
 ```
 
 Output binary:
+
 ```
 examples/commissioning-proxy-app/linux/out/rpi-arm64/chip-commissioning-proxy-app
 ```
+
 ### 4.3 Build chip-tool (RPi arm64)
 
-chip-tool runs on the **Test Harness RPi** (not the build machine).
-Create and run this bash script, ~/scripts/build-chip-tool-rpi.sh
+chip-tool runs on the **Test Harness RPi** (not the build machine). Create and
+run this bash script, ~/scripts/build-chip-tool-rpi.sh
 
 ```bash
 #!/usr/bin/env bash
@@ -469,13 +485,15 @@ ninja -C out/rpi-arm64'
 ```
 
 Output binary:
+
 ```
 examples/chip-tool/out/rpi-arm64/chip-tool
 ```
 
 ### 4.4 Build the End Device app (RPi arm64)
 
-It is not necessary to rebuild the ED, this is here for completeness and to pull in some of the optimisations made to PAF on this branch.
+It is not necessary to rebuild the ED, this is here for completeness and to pull
+in some of the optimisations made to PAF on this branch.
 
 Create and run this bash script, ~/scripts/build-lighting-app-rpi.sh
 
@@ -523,6 +541,7 @@ ninja -C out/rpi-arm64'
 ```
 
 Output binary:
+
 ```
 examples/lighting-app/linux/out/rpi-arm64/chip-lighting-app
 ```
@@ -542,7 +561,7 @@ ssh ubuntu@<th-rpi-ip>    'mkdir -p ~/apps'
 ### Copy the binaries
 
 > **Note**: `scp` will fail with "dest open: Failure" if the target binary is
-> currently running on the RPi.  Stop the app before copying.
+> currently running on the RPi. Stop the app before copying.
 
 ```bash
 # Commissioning Proxy → DUT RPi
@@ -572,8 +591,9 @@ ssh ubuntu@<th-rpi-ip>    'rm -f /tmp/chip_*'
 
 ### 6.1 Start the Commissioning Proxy
 
-On the **Proxy (DUT) RPi**, start the Commissioning Proxy.
-`freq_list=2437,5220` selects channel 6 (2.4 GHz) — the default Matter PAF channel and channel 44 (5GHz):
+On the **Proxy (DUT) RPi**, start the Commissioning Proxy. `freq_list=2437,5220`
+selects channel 6 (2.4 GHz) — the default Matter PAF channel and channel 44
+(5GHz):
 
 ```bash
 /home/ubuntu/apps/chip-commissioning-proxy-app \
@@ -584,23 +604,23 @@ On the **Proxy (DUT) RPi**, start the Commissioning Proxy.
 
 **Argument reference**
 
-| Argument | Description |
-|----------|-------------|
-| `--wifi` | Enables Wi-Fi management via wpa\_supplicant (required for PAF) |
+| Argument                      | Description                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------ |
+| `--wifi`                      | Enables Wi-Fi management via wpa_supplicant (required for PAF)                             |
 | `--wifipaf "freq_list=<MHz>"` | Sets the NAN channel(s). Use `2437` for CH6 (2.4 GHz). For 5 GHz add e.g. `2437,5745,5220` |
-| `--discriminator <value>` | 12-bit value used to identify the proxy during its own commissioning |
+| `--discriminator <value>`     | 12-bit value used to identify the proxy during its own commissioning                       |
 
 ### 6.2 Add the Commissioning Proxy onto the Fabric
 
-Before the proxy can tunnel commissioning messages it must itself
-join the Matter fabric.  Run this from the **TH RPi**:
+Before the proxy can tunnel commissioning messages it must itself join the
+Matter fabric. Run this from the **TH RPi**:
 
 ```bash
 /home/ubuntu/apps/chip-tool pairing onnetwork 1998 20202021
 ```
 
 `1998` is the node ID assigned to the proxy; `20202021` is the default PASE
-passcode.  You may use any non-zero node ID.
+passcode. You may use any non-zero node ID.
 
 After commissioning completes chip-tool prints:
 
@@ -608,17 +628,17 @@ After commissioning completes chip-tool prints:
 CHIP:TOO: Device commissioning completed with success
 ```
 
-> **Tip**: If you restart the proxy app it re-reads the stored fabric
-> credential automatically.  You do not need to run `pairing onnetwork` again
-> unless you have cleared `/tmp/chip_*`.
+> **Tip**: If you restart the proxy app it re-reads the stored fabric credential
+> automatically. You do not need to run `pairing onnetwork` again unless you
+> have cleared `/tmp/chip_*`.
 
 <hr>
 
 ## 7. Configuring the End Device (ED)
 
-On the **End Device RPi**, start the lighting app.
-The `freq_list` should match (or overlap) the proxy's. 
-The ED should not be on any network as it is being Commissioned
+On the **End Device RPi**, start the lighting app. The `freq_list` should match
+(or overlap) the proxy's. The ED should not be on any network as it is being
+Commissioned
 
 ```bash
 /home/ubuntu/apps/chip-lighting-app \
@@ -627,7 +647,7 @@ The ED should not be on any network as it is being Commissioned
     --discriminator 3840
 ```
 
-The end device advertises itself as a NAN publisher.  Check the log for:
+The end device advertises itself as a NAN publisher. Check the log for:
 
 ```
 WiFi-PAF: Starting NAN publish
@@ -640,9 +660,9 @@ WiFi-PAF: Starting NAN publish
 
 ## 8. Scanning
 
-The proxy supports scan and background NAN scanning so that commissioners
-can discover nearby devices. Background scan results are cached and can
-be subscribed to as needed.
+The proxy supports scan and background NAN scanning so that commissioners can
+discover nearby devices. Background scan results are cached and can be
+subscribed to as needed.
 
 For a concise command reference (syntax, argument tables, bitmaps) see
 `linux/README.md §Foreground Scanning` and `§Background Scanning`.
@@ -650,6 +670,7 @@ For a concise command reference (syntax, argument tables, bitmaps) see
 ### 8.1 Run a foreground scan
 
 Annotated form (for reference):
+
 ```bash
 /home/ubuntu/apps/chip-tool commissioningproxy \
     proxy-scan-request \
@@ -661,6 +682,7 @@ Annotated form (for reference):
 ```
 
 Copy-paste form:
+
 ```bash
 /home/ubuntu/apps/chip-tool commissioningproxy proxy-scan-request 8 1998 1 --allow-large-payload true --WiFiBands 5 --timeout 20
 ```
@@ -668,6 +690,7 @@ Copy-paste form:
 ### 8.2 Start a background scan
 
 Annotated form (for reference):
+
 ```bash
 /home/ubuntu/apps/chip-tool commissioningproxy \
     proxy-back-ground-scan-start-request \
@@ -678,6 +701,7 @@ Annotated form (for reference):
 ```
 
 Copy-paste form:
+
 ```bash
 /home/ubuntu/apps/chip-tool commissioningproxy proxy-back-ground-scan-start-request 8 0 5 1998 1
 ```
@@ -688,12 +712,13 @@ Copy-paste form:
 /home/ubuntu/apps/chip-tool commissioningproxy read cached-results 1998 1
 ```
 
-The output lists discovered commissionees with their peer descriptor
-(address, band, discriminator).
+The output lists discovered commissionees with their peer descriptor (address,
+band, discriminator).
 
 ### 8.4 Stop a background scan
 
 Annotated form (for reference):
+
 ```bash
 /home/ubuntu/apps/chip-tool commissioningproxy \
     proxy-back-ground-scan-stop-request \
@@ -703,6 +728,7 @@ Annotated form (for reference):
 ```
 
 Copy-paste form:
+
 ```bash
 /home/ubuntu/apps/chip-tool commissioningproxy proxy-back-ground-scan-stop-request 8 5 1998 1
 ```
@@ -711,19 +737,20 @@ Copy-paste form:
 
 ## 9. Commissioning the End Device Through the Commissioning Proxy
 
-For a concise command reference see `linux/README.md §Commissioning a Device via the Proxy`.
+For a concise command reference see
+`linux/README.md §Commissioning a Device via the Proxy`.
 
-With the Commissioning Proxy on the Fabric and the end device running, issue the `pairing proxy`
-command from the **TH RPi**:
+With the Commissioning Proxy on the Fabric and the end device running, issue the
+`pairing proxy` command from the **TH RPi**:
 
-| Argument | Description |
-|----------|-------------|
-| `node-id` | Node ID to assign to the newly commissioned device |
-| `wifi-ssid` | SSID of the Wi-Fi network to provision on the device |
-| `wifi-password` | Password for that Wi-Fi network |
-| `ed-passcode` | PASE passcode of the end device (default: `20202021`) |
-| `ed-discriminator` | Discriminator of the end device (e.g. `3840`) |
-| `proxy-node-id` | Node ID assigned to the proxy at commissioning time (e.g. `1998`) |
+| Argument                | Description                                                          |
+| ----------------------- | -------------------------------------------------------------------- |
+| `node-id`               | Node ID to assign to the newly commissioned device                   |
+| `wifi-ssid`             | SSID of the Wi-Fi network to provision on the device                 |
+| `wifi-password`         | Password for that Wi-Fi network                                      |
+| `ed-passcode`           | PASE passcode of the end device (default: `20202021`)                |
+| `ed-discriminator`      | Discriminator of the end device (e.g. `3840`)                        |
+| `proxy-node-id`         | Node ID assigned to the proxy at commissioning time (e.g. `1998`)    |
 | `proxy-connect-timeout` | How long (seconds) to wait for the NAN session to form (default: 30) |
 
 This commissions the device as node 1999, provisioning it onto `MyHomeWiFi`
@@ -747,17 +774,18 @@ Copy-paste form:
 ```bash
 /home/ubuntu/apps/chip-tool pairing proxy 1999 "MyHomeWiFi" "MyPassword123" 20202021 3840 1998 5
 ```
+
 ### What happens under the hood
 
 1. chip-tool establishes a CASE session to the proxy over Matter (TCP/UDP).
-2. chip-tool sends `ProxyConnectRequest` — the proxy starts a NAN subscribe
-   for the end device's discriminator.
+2. chip-tool sends `ProxyConnectRequest` — the proxy starts a NAN subscribe for
+   the end device's discriminator.
 3. The end device's NAN publisher responds; the proxy completes the PAF
    handshake and returns `ProxyConnectResponse` with a session ID.
 4. chip-tool runs PASE and commissioning, tunnelling every packet through
    `ProxyMessageRequest` / `ProxyMessageResponse`.
-5. The end device connects to Wi-Fi.  The proxy defers NAN teardown until
-   the PAFTP send queue is drained, which keeps mDNS latency low.
+5. The end device connects to Wi-Fi. The proxy defers NAN teardown until the
+   PAFTP send queue is drained, which keeps mDNS latency low.
 6. chip-tool sends `ProxyDisconnectRequest` to clean up the PAF session.
 
 **Expected total time**: 30–60 seconds depending on Wi-Fi join speed.
@@ -772,56 +800,57 @@ Copy-paste form:
 Error: WiFiPAF: NAN start failed
 ```
 
-- Confirm the USB Wi-Fi dongle is plugged in and visible: `lsusb` should
-  list the dongle; `ip link` should show a second `wlan1` interface.
-- Confirm the patched wpa\_supplicant is installed and running:
-  `systemctl status wpa_supplicant` must show `active (running)`.
-- Check that `CONFIG_NAN_USD` was compiled in:
-  `strings /usr/sbin/wpa_supplicant | grep -c nan_usd` should return > 0.
-- Do not use the on-board RPi Wi-Fi chipset for PAF — it does not support
-  NAN USD.  The USB dongle must be the interface wpa\_supplicant manages.
-- ensure iwconfig works, See Section 1.2.1 USB dongle software
-- Ensure `~/script/config_paf_env.sh comee` succeeds 
+-   Confirm the USB Wi-Fi dongle is plugged in and visible: `lsusb` should list
+    the dongle; `ip link` should show a second `wlan1` interface.
+-   Confirm the patched wpa_supplicant is installed and running:
+    `systemctl status wpa_supplicant` must show `active (running)`.
+-   Check that `CONFIG_NAN_USD` was compiled in:
+    `strings /usr/sbin/wpa_supplicant | grep -c nan_usd` should return > 0.
+-   Do not use the on-board RPi Wi-Fi chipset for PAF — it does not support NAN
+    USD. The USB dongle must be the interface wpa_supplicant manages.
+-   ensure iwconfig works, See Section 1.2.1 USB dongle software
+-   Ensure `~/script/config_paf_env.sh comee` succeeds
 
 ### Proxy Connect times out (commissioner gets `Status::Timeout`)
 
-The proxy waited for the connect timeout for the NAN session and gave up.
-Common causes:
+The proxy waited for the connect timeout for the NAN session and gave up. Common
+causes:
 
-- End device is not running or is on a different NAN channel.  Confirm both
-  sides use the same `freq_list` value.
-- End device RPi also needs a USB Wi-Fi dongle with NAN support (same
-  hardware requirement as the proxy).
-- NAN frequency not allowed by regulatory domain.  `freq_list=2437`
-  (channel 6, 2.4 GHz) is permitted in all regions.
+-   End device is not running or is on a different NAN channel. Confirm both
+    sides use the same `freq_list` value.
+-   End device RPi also needs a USB Wi-Fi dongle with NAN support (same hardware
+    requirement as the proxy).
+-   NAN frequency not allowed by regulatory domain. `freq_list=2437` (channel 6,
+    2.4 GHz) is permitted in all regions.
 
 ### PAF session closes mid-commissioning
 
-Look for `WiFiPAFCloseSession` in the proxy log.  The PAFTP ack-receive timer
-(30 s) fired.  The most common cause is the end device's radio going
-off-channel while it scans for and joins the Wi-Fi network — this can sometimes happen and the 30 s timeout is designed to survive it.  If it fires faster
-than ~15 s, RF range or wpa\_supplicant configuration is the likely cause. Try again.
+Look for `WiFiPAFCloseSession` in the proxy log. The PAFTP ack-receive timer (30
+s) fired. The most common cause is the end device's radio going off-channel
+while it scans for and joins the Wi-Fi network — this can sometimes happen and
+the 30 s timeout is designed to survive it. If it fires faster than ~15 s, RF
+range or wpa_supplicant configuration is the likely cause. Try again.
 
 ### `ConnectNetwork` takes a long time (step 6 slow)
 
-`ConnectNetwork` can take 10–15 s while the end device scans for and joins
-the Wi-Fi AP.  This is normal.  chip-tool's exchange timeout is automatically
-extended by the proxy for this step.
+`ConnectNetwork` can take 10–15 s while the end device scans for and joins the
+Wi-Fi AP. This is normal. chip-tool's exchange timeout is automatically extended
+by the proxy for this step.
 
 ### chip-tool `pairing proxy` command not found
 
 You are running an upstream chip-tool build that does not include the
-`commissioning-proxy` branch.  Build chip-tool from this repository
+`commissioning-proxy` branch. Build chip-tool from this repository
 (`commissioning-proxy` branch) using `~/scripts/build-chip-tool-rpi.sh`.
 
 ### Key log strings:
 
-| String | Where | Meaning |
-|--------|-------|---------|
-| `WiFiPAFMessageReceived` | Proxy | Received a PAF frame from the end device |
-| `OnProxyWiFiPAFMessageReceived` | Proxy | Routing PAF frame to `ProxyMessageResponse` |
-| `WiFiPAFCloseSession` | Proxy | PAF session closed — look for `ack-received timer` nearby |
-| `InvokeCommandResponse` | Proxy | Sent `ProxyMessageResponse` to commissioner |
-| `WiFi-PAF: Starting NAN publish` | ED | End device is advertising via NAN |
-| `Outbound message (N) done` | ED | wpa\_supplicant accepted a NAN frame for TX |
-| `Cluster=0x0031 Command=0x0006` | ED | `ConnectNetwork` command received |
+| String                           | Where | Meaning                                                   |
+| -------------------------------- | ----- | --------------------------------------------------------- |
+| `WiFiPAFMessageReceived`         | Proxy | Received a PAF frame from the end device                  |
+| `OnProxyWiFiPAFMessageReceived`  | Proxy | Routing PAF frame to `ProxyMessageResponse`               |
+| `WiFiPAFCloseSession`            | Proxy | PAF session closed — look for `ack-received timer` nearby |
+| `InvokeCommandResponse`          | Proxy | Sent `ProxyMessageResponse` to commissioner               |
+| `WiFi-PAF: Starting NAN publish` | ED    | End device is advertising via NAN                         |
+| `Outbound message (N) done`      | ED    | wpa_supplicant accepted a NAN frame for TX                |
+| `Cluster=0x0031 Command=0x0006`  | ED    | `ConnectNetwork` command received                         |

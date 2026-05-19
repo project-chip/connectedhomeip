@@ -111,12 +111,11 @@ Example — manual with physical WiFiPAF-only hardware:
 import asyncio
 import logging
 
-from matter.clusters.Types import NullValue
-from matter.interaction_model import InteractionModelError, Status
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
-import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 

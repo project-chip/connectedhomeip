@@ -57,7 +57,6 @@ import logging
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
-import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 

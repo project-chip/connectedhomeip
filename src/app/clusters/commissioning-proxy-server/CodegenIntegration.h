@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <app/server-cluster/ServerClusterInterface.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/support/LinkedList.h>
 

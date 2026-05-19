@@ -232,7 +232,7 @@ private:
     void CleanPafInfo(WiFiPAFSession & SessionInfo);
     WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
     chip::System::Layer * mSystemLayer;
-    bool mCancelPublishersOnTxIdle          = false;
+    bool mCancelPublishersOnTxIdle                 = false;
     OnCancelDeviceHandle mCancelPublishersCallback = nullptr;
     OnTxIdleActionFunct mOnTxIdleAfterCb    = nullptr;
     void * mOnTxIdleAfterCtx                = nullptr;

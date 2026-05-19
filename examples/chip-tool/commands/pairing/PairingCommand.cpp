@@ -858,17 +858,13 @@ CHIP_ERROR PairingCommand::PairViaProxy(NodeId remoteId)
 
     // Step 1: establish a CASE session to the proxy app.  The rest of the
     // flow continues in OnProxyDeviceConnected().
-    return CurrentCommissioner().GetConnectedDevice(
-        mProxyNodeId,
-        &mOnProxyConnectedCallback,
-        &mOnProxyConnectionFailureCallback,
-        chip::TransportPayloadCapability::kLargePayload);
+    return CurrentCommissioner().GetConnectedDevice(mProxyNodeId, &mOnProxyConnectedCallback, &mOnProxyConnectionFailureCallback,
+                                                    chip::TransportPayloadCapability::kLargePayload);
 }
 
 // static
-void PairingCommand::OnProxyDeviceConnected(void * context,
-                                             chip::Messaging::ExchangeManager & exchangeMgr,
-                                             const chip::SessionHandle & sessionHandle)
+void PairingCommand::OnProxyDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                            const chip::SessionHandle & sessionHandle)
 {
     auto * self = reinterpret_cast<PairingCommand *>(context);
 
@@ -896,9 +892,7 @@ void PairingCommand::OnProxyDeviceConnected(void * context,
     request.timeout       = self->mProxyConnectTimeout;
 
     chip::app::CommandPathParams pathParams(
-        /* endpoint */ 1,
-        chip::app::Clusters::CommissioningProxy::Id,
-        Commands::ProxyConnectRequest::Id,
+        /* endpoint */ 1, chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyConnectRequest::Id,
         chip::app::CommandPathFlags::kEndpointIdValid);
 
     if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR)
@@ -950,10 +944,8 @@ void PairingCommand::OnProxyConnected(uint16_t sessionId)
 
 // CommandSender::Callback — called when a response to ProxyConnectRequest or
 // ProxyMessageRequest arrives.
-void PairingCommand::OnResponse(chip::app::CommandSender * client,
-                                const chip::app::ConcreteCommandPath & path,
-                                const chip::app::StatusIB & status,
-                                chip::TLV::TLVReader * data)
+void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
+                                const chip::app::StatusIB & status, chip::TLV::TLVReader * data)
 {
     using namespace chip::app::Clusters::CommissioningProxy::Commands;
 
@@ -981,10 +973,8 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client,
             {
                 auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
                 auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
-                proxyTransport->OnProxyMessageReceived(
-                    response.sessionId,
-                    response.message.Value().data(),
-                    response.message.Value().size());
+                proxyTransport->OnProxyMessageReceived(response.sessionId, response.message.Value().data(),
+                                                       response.message.Value().size());
             }
         }
         else
@@ -1051,13 +1041,11 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
     request.sessionId = mProxySessionId;
 
     chip::app::CommandPathParams pathParams(
-        /* endpoint */ 1,
-        chip::app::Clusters::CommissioningProxy::Id,
-        Commands::ProxyDisconnectRequest::Id,
+        /* endpoint */ 1, chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyDisconnectRequest::Id,
         chip::app::CommandPathFlags::kEndpointIdValid);
 
     // Zero out the session ID now so a duplicate call is a no-op.
-    mProxySessionId = 0;
+    mProxySessionId         = 0;
     mProxyDisconnectExitErr = exitErr;
 
     if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR ||
@@ -1083,9 +1071,9 @@ CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan m
     using namespace chip::app::Clusters::CommissioningProxy;
 
     // Allow large payload so that commissioning messages fit inside ProxyMessageRequest.
-    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(
-        this, mProxyExchangeMgr, /* aIsTimedRequest */ false,
-        /* aSuppressResponse */ false, /* aAllowLargePayload */ true);
+    auto cmdSender =
+        chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr, /* aIsTimedRequest */ false,
+                                                             /* aSuppressResponse */ false, /* aAllowLargePayload */ true);
     VerifyOrReturnError(cmdSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     Commands::ProxyMessageRequest::Type request;
@@ -1096,9 +1084,7 @@ CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan m
     request.message.SetNonNull(message);
 
     chip::app::CommandPathParams pathParams(
-        /* endpoint */ 1,
-        chip::app::Clusters::CommissioningProxy::Id,
-        Commands::ProxyMessageRequest::Id,
+        /* endpoint */ 1, chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyMessageRequest::Id,
         chip::app::CommandPathFlags::kEndpointIdValid);
 
     ReturnErrorOnFailure(cmdSender->AddRequestData(pathParams, request));

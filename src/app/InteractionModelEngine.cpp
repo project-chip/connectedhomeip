@@ -1057,7 +1057,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
                                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     ChipLogProgress(AppServer, "===SHM %s()", __func__);
-    
+
     using namespace Protocols::InteractionModel;
 
     Protocols::InteractionModel::Status status = Status::Failure;
@@ -1940,8 +1940,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     (void) provider->AcceptedCommands(aCommandPath, acceptedCommands);
     for (auto & existing : acceptedCommands.TakeBuffer())
     {
-        ChipLogProgress(DataManagement, "===SHM %s() existing.commandId=0x%X aCommandPath.mCommandId=0x%X",
-            __func__, existing.commandId, aCommandPath.mCommandId);
+        ChipLogProgress(DataManagement, "===SHM %s() existing.commandId=0x%X aCommandPath.mCommandId=0x%X", __func__,
+                        existing.commandId, aCommandPath.mCommandId);
 
         if (existing.commandId == aCommandPath.mCommandId)
         {

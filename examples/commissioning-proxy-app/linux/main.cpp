@@ -18,12 +18,12 @@
 
 #include <AppMain.h>
 
+#include "NamedPipeCommands.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include "NamedPipeCommands.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #include <platform/Linux/ConnectivityManagerImpl.h>
@@ -193,27 +193,25 @@ bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #endif // #if 0
 
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <app/clusters/device-energy-management-server/CodegenIntegration.h>
-#include "commissioning-proxy-delegate-impl.h"
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include "CPAppCommandDelegate.h"
+#include "commissioning-proxy-delegate-impl.h"
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/clusters/device-energy-management-server/CodegenIntegration.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 // In a .cpp file
 CPAppCommandDelegate sCPAppCommandDelegate;
 // CommissioningProxyManager gCommissioningProxyManager;
 chip::app::Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
 
-chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature> gFeatures(
-    chip::app::Clusters::CommissioningProxy::Feature::kBackgroundScan,
-    chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
-);
+chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature>
+    gFeatures(chip::app::Clusters::CommissioningProxy::Feature::kBackgroundScan,
+              chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface);
 
-chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster> gCPCluster(
-    chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::Config(
-        CommissioningProxyEndpoint, gFeatures, gMyCPDelegate)
-);
+chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster>
+    gCPCluster(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::Config(CommissioningProxyEndpoint, gFeatures,
+                                                                                          gMyCPDelegate));
 
 void ApplicationInit()
 {
@@ -276,8 +274,7 @@ void ApplicationInit()
     }
 #endif
 
-    ChipLogProgress(AppServer, "%s(): Main function is Proxy Commissioner on endpoint %u",
-            __func__, CommissioningProxyEndpoint);
+    ChipLogProgress(AppServer, "%s(): Main function is Proxy Commissioner on endpoint %u", __func__, CommissioningProxyEndpoint);
 }
 
 void ApplicationShutdown()
@@ -287,7 +284,6 @@ void ApplicationShutdown()
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
     }
 }
-
 
 int main(int argc, char * argv[])
 {
