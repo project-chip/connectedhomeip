@@ -365,7 +365,7 @@ CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
 
 void TimeSynchronizationCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    mTimeSyncContext.platformManager.RemoveEventHandler(OnPlatformEventWrapper, 0);
+    mTimeSyncContext.platformManager.RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     mTimeSyncContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
