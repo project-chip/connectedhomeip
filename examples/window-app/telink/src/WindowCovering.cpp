@@ -50,7 +50,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    current = wc->GetCurrentPositionLiftPercentage100ths();
+    current = wc->GetCurrentPositionLiftPercent100ths();
     target  = wc->GetTargetPositionLiftPercent100ths();
 
     UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
@@ -61,7 +61,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     // assume single move completed
     Instance().mInLiftMove = false;
 
-    current = wc->GetCurrentPositionLiftPercentage100ths();
+    current = wc->GetCurrentPositionLiftPercent100ths();
 
     if (!TargetCompleted(WindowCoveringType::Lift, current, target))
     {
@@ -86,12 +86,12 @@ chip::Percent100ths WindowCovering::CalculateSingleStep(WindowCoveringType aMove
 
     if (aMoveType == WindowCoveringType::Lift)
     {
-        current = wc->GetCurrentPositionLiftPercentage100ths();
+        current = wc->GetCurrentPositionLiftPercent100ths();
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kLift);
     }
     else if (aMoveType == WindowCoveringType::Tilt)
     {
-        current = wc->GetCurrentPositionTiltPercentage100ths();
+        current = wc->GetCurrentPositionTiltPercent100ths();
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
@@ -160,7 +160,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    current = wc->GetCurrentPositionTiltPercentage100ths();
+    current = wc->GetCurrentPositionTiltPercent100ths();
     target  = wc->GetTargetPositionTiltPercent100ths();
 
     UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
@@ -171,7 +171,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     // assume single move completed
     Instance().mInTiltMove = false;
 
-    current = wc->GetCurrentPositionTiltPercentage100ths();
+    current = wc->GetCurrentPositionTiltPercent100ths();
 
     if (!TargetCompleted(WindowCoveringType::Tilt, current, target))
     {
@@ -254,7 +254,7 @@ void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
 
     if (aMoveType == WindowCoveringType::Lift)
     {
-        currentPosition = wc->GetCurrentPositionLiftPercentage100ths();
+        currentPosition = wc->GetCurrentPositionLiftPercent100ths();
         if (!currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Lift, currentPosition.Value());
@@ -262,7 +262,7 @@ void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
     }
     else if (aMoveType == WindowCoveringType::Tilt)
     {
-        currentPosition = wc->GetCurrentPositionTiltPercentage100ths();
+        currentPosition = wc->GetCurrentPositionTiltPercent100ths();
         if (!currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Tilt, currentPosition.Value());

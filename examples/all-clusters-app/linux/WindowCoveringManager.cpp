@@ -162,7 +162,7 @@ CHIP_ERROR WindowCoveringManager::HandleMovement(WindowCoveringType type)
         // Cancel ongoing window covering movement timer if any.
         DeviceLayer::SystemLayer().CancelTimer(HandleLiftMovementTimer, this);
 
-        mCurrentLiftPosition = wc->GetCurrentPositionLiftPercentage100ths();
+        mCurrentLiftPosition = wc->GetCurrentPositionLiftPercent100ths();
 
         mTargetLiftPosition = wc->GetTargetPositionLiftPercent100ths();
 
@@ -177,7 +177,7 @@ CHIP_ERROR WindowCoveringManager::HandleMovement(WindowCoveringType type)
         // Cancel ongoing window covering movement timer if any.
         DeviceLayer::SystemLayer().CancelTimer(HandleTiltMovementTimer, this);
 
-        mCurrentTiltPosition = wc->GetCurrentPositionTiltPercentage100ths();
+        mCurrentTiltPosition = wc->GetCurrentPositionTiltPercent100ths();
         mTargetTiltPosition  = wc->GetTargetPositionTiltPercent100ths();
 
         VerifyOrReturnError(!mCurrentTiltPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);

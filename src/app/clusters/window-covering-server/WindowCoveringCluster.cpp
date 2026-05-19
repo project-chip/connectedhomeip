@@ -86,7 +86,7 @@ namespace WindowCovering {
 
 Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 {
-    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
+    return ConvertValue(limits.open, limits.closed, kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, absolute);
 }
 
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
@@ -134,10 +134,10 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
         mCurrentPositionTiltPercentage, mCurrentPositionTiltPercentage);
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercent100ths::Id),
-        mCurrentPositionLiftPercentage100ths, mCurrentPositionLiftPercentage100ths);
+        mCurrentPositionLiftPercent100ths, mCurrentPositionLiftPercent100ths);
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercent100ths::Id),
-        mCurrentPositionTiltPercentage100ths, mCurrentPositionTiltPercentage100ths);
+        mCurrentPositionTiltPercent100ths, mCurrentPositionTiltPercent100ths);
 
     return CHIP_NO_ERROR;
 }
@@ -203,18 +203,18 @@ void WindowCoveringCluster::SetOperationalStatus(chip::BitMask<OperationalStatus
 void WindowCoveringCluster::SetTargetPositionLiftPercent100ths(NPercent100ths newTargetLift)
 {
     VerifyOrReturn(
-        SetAttributeValue(mTargetPositionLiftPercentage100ths, newTargetLift, Attributes::TargetPositionLiftPercent100ths::Id));
+        SetAttributeValue(mTargetPositionLiftPercent100ths, newTargetLift, Attributes::TargetPositionLiftPercent100ths::Id));
 
-    OperationalState opLift = ComputeOperationalState(mTargetPositionLiftPercentage100ths, mCurrentPositionLiftPercentage100ths);
+    OperationalState opLift = ComputeOperationalState(mTargetPositionLiftPercent100ths, mCurrentPositionLiftPercent100ths);
     UpdateOperationalStateForField(OperationalStatus::kLift, opLift);
 }
 
 void WindowCoveringCluster::SetTargetPositionTiltPercent100ths(NPercent100ths newTargetTilt)
 {
     VerifyOrReturn(
-        SetAttributeValue(mTargetPositionTiltPercentage100ths, newTargetTilt, Attributes::TargetPositionTiltPercent100ths::Id));
+        SetAttributeValue(mTargetPositionTiltPercent100ths, newTargetTilt, Attributes::TargetPositionTiltPercent100ths::Id));
 
-    OperationalState opTilt = ComputeOperationalState(mTargetPositionTiltPercentage100ths, mCurrentPositionTiltPercentage100ths);
+    OperationalState opTilt = ComputeOperationalState(mTargetPositionTiltPercent100ths, mCurrentPositionTiltPercent100ths);
     UpdateOperationalStateForField(OperationalStatus::kTilt, opTilt);
 }
 
@@ -223,41 +223,41 @@ void WindowCoveringCluster::SetEndProductType(EndProductType type)
     SetAttributeValue(mEndProductType, type, Attributes::EndProductType::Id);
 }
 
-void WindowCoveringCluster::SetCurrentPositionLiftPercentage100ths(NPercent100ths curLiftPercentage100ths)
+void WindowCoveringCluster::SetCurrentPositionLiftPercent100ths(NPercent100ths curLiftPercent100ths)
 {
-    VerifyOrReturn(SetAttributeValue(mCurrentPositionLiftPercentage100ths, curLiftPercentage100ths,
+    VerifyOrReturn(SetAttributeValue(mCurrentPositionLiftPercent100ths, curLiftPercent100ths,
                                      Attributes::CurrentPositionLiftPercent100ths::Id));
     VerifyOrReturn(mContext != nullptr);
 
     NumericAttributeTraits<Percent100ths>::StorageType storageValue;
-    DataModel::NullableToStorage(curLiftPercentage100ths, storageValue);
+    DataModel::NullableToStorage(curLiftPercent100ths, storageValue);
 
     LogErrorOnFailure(mContext->attributeStorage.WriteValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercent100ths::Id),
         ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
 
     OperationalState opLift = static_cast<OperationalState>(mOperationalStatus.GetField(OperationalStatus::kLift));
-    if ((OperationalState::Stall != opLift) && (mCurrentPositionLiftPercentage100ths == mTargetPositionLiftPercentage100ths))
+    if ((OperationalState::Stall != opLift) && (mCurrentPositionLiftPercent100ths == mTargetPositionLiftPercent100ths))
     {
         UpdateOperationalStateForField(OperationalStatus::kLift, OperationalState::Stall);
     }
 }
 
-void WindowCoveringCluster::SetCurrentPositionTiltPercentage100ths(NPercent100ths curTiltPercentage100ths)
+void WindowCoveringCluster::SetCurrentPositionTiltPercent100ths(NPercent100ths curTiltPercent100ths)
 {
-    VerifyOrReturn(SetAttributeValue(mCurrentPositionTiltPercentage100ths, curTiltPercentage100ths,
+    VerifyOrReturn(SetAttributeValue(mCurrentPositionTiltPercent100ths, curTiltPercent100ths,
                                      Attributes::CurrentPositionTiltPercent100ths::Id));
     VerifyOrReturn(mContext != nullptr);
 
     NumericAttributeTraits<Percent100ths>::StorageType storageValue;
-    DataModel::NullableToStorage(curTiltPercentage100ths, storageValue);
+    DataModel::NullableToStorage(curTiltPercent100ths, storageValue);
 
     LogErrorOnFailure(mContext->attributeStorage.WriteValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercent100ths::Id),
         ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
 
     OperationalState opTilt = static_cast<OperationalState>(mOperationalStatus.GetField(OperationalStatus::kTilt));
-    if ((OperationalState::Stall != opTilt) && (mCurrentPositionTiltPercentage100ths == mTargetPositionTiltPercentage100ths))
+    if ((OperationalState::Stall != opTilt) && (mCurrentPositionTiltPercent100ths == mTargetPositionTiltPercent100ths))
     {
         UpdateOperationalStateForField(OperationalStatus::kTilt, OperationalState::Stall);
     }
@@ -313,9 +313,9 @@ DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataMod
     case Attributes::EndProductType::Id:
         return encoder.Encode(GetEndProductType());
     case Attributes::CurrentPositionLiftPercent100ths::Id:
-        return encoder.Encode(GetCurrentPositionLiftPercentage100ths());
+        return encoder.Encode(GetCurrentPositionLiftPercent100ths());
     case Attributes::CurrentPositionTiltPercent100ths::Id:
-        return encoder.Encode(GetCurrentPositionTiltPercentage100ths());
+        return encoder.Encode(GetCurrentPositionTiltPercent100ths());
     case Attributes::Mode::Id:
         return encoder.Encode(GetMode());
     case Attributes::SafetyStatus::Id:
@@ -439,7 +439,7 @@ void WindowCoveringCluster::UpdateOperationalStateForField(chip::BitMask<Operati
     }
 }
 
-Status WindowCoveringCluster::GetMotionLockStatus() const
+std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::GetMotionLockStatus() const
 {
     // Is the device locked?
     if (!mConfigStatus.Has(ConfigStatus::kOperational))
@@ -508,7 +508,7 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
 
 bool IsPercent100thsValid(Percent100ths percent100ths)
 {
-    return (percent100ths >= WC_PERCENT100THS_MIN_OPEN) && (percent100ths <= WC_PERCENT100THS_MAX_CLOSED);
+    return (percent100ths >= kWcPercent100thsMinOpen) && (percent100ths <= kWcPercent100thsMaxClosed);
 }
 
 bool IsPercent100thsValid(NPercent100ths percent100ths)
@@ -523,7 +523,7 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
 
 uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
 {
-    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
+    return ConvertValue(kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, limits.open, limits.closed, relative);
 }
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
@@ -553,23 +553,23 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
     switch (direction)
     {
     case OperationalState::MovingDownOrClose:
-        if (percent100ths < (WC_PERCENT100THS_MAX_CLOSED - delta))
+        if (percent100ths < (kWcPercent100thsMaxClosed - delta))
         {
             percent100ths = static_cast<Percent100ths>(percent100ths + delta);
         }
         else
         {
-            percent100ths = WC_PERCENT100THS_MAX_CLOSED;
+            percent100ths = kWcPercent100thsMaxClosed;
         }
         break;
     case OperationalState::MovingUpOrOpen:
-        if (percent100ths > (WC_PERCENT100THS_MIN_OPEN + delta))
+        if (percent100ths > (kWcPercent100thsMinOpen + delta))
         {
             percent100ths = static_cast<Percent100ths>(percent100ths - delta);
         }
         else
         {
-            percent100ths = WC_PERCENT100THS_MIN_OPEN;
+            percent100ths = kWcPercent100thsMinOpen;
         }
         break;
     default:
@@ -577,22 +577,22 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
         break;
     }
 
-    if (percent100ths > WC_PERCENT100THS_MAX_CLOSED)
-        return WC_PERCENT100THS_MAX_CLOSED;
+    if (percent100ths > kWcPercent100thsMaxClosed)
+        return kWcPercent100thsMaxClosed;
 
     return percent100ths;
 }
 
-Status WindowCoveringCluster::HandleUpOrOpen()
+std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOpen()
 {
     ChipLogProgress(Zcl, "UpOrOpen command received");
 
-    Status lockStatus = GetMotionLockStatus();
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
     if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
-        SetTargetPositionLiftPercent100ths(NPercent100ths(WC_PERCENT100THS_MIN_OPEN));
+        SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
 }
 
@@ -615,20 +615,20 @@ Status GetMotionLockStatus(chip::EndpointId endpoint)
     return Status::Success;
 }
 
-Status WindowCoveringCluster::HandleDownOrClose()
+std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleDownOrClose()
 {
     ChipLogProgress(Zcl, "DownOrClose command received");
 
-    Status lockStatus = GetMotionLockStatus();
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
     if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
-        SetTargetPositionLiftPercent100ths(NPercent100ths(WC_PERCENT100THS_MAX_CLOSED));
+        SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMaxClosed));
     }
     if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
-        SetTargetPositionTiltPercent100ths(NPercent100ths(WC_PERCENT100THS_MAX_CLOSED));
+        SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMaxClosed));
     }
 
     WindowCoveringDelegate * delegate = GetDelegate();
@@ -651,11 +651,12 @@ Status WindowCoveringCluster::HandleDownOrClose()
     return Status::Success;
 }
 
-Status WindowCoveringCluster::HandleStopMotion(const Commands::StopMotion::DecodableType & fields)
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleStopMotion(const Commands::StopMotion::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "StopMotion command received");
 
-    Status lockStatus = GetMotionLockStatus();
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
     bool changeTarget = true;
@@ -683,24 +684,25 @@ Status WindowCoveringCluster::HandleStopMotion(const Commands::StopMotion::Decod
     {
         if (GetFeatureMap().Has(Feature::kPositionAwareLift))
         {
-            SetTargetPositionLiftPercent100ths(GetCurrentPositionLiftPercentage100ths());
+            SetTargetPositionLiftPercent100ths(GetCurrentPositionLiftPercent100ths());
         }
         if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
         {
-            SetTargetPositionTiltPercent100ths(GetCurrentPositionTiltPercentage100ths());
+            SetTargetPositionTiltPercent100ths(GetCurrentPositionTiltPercent100ths());
         }
     }
 
     return Status::Success;
 }
 
-Status WindowCoveringCluster::HandleGoToLiftValue(const Commands::GoToLiftValue::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleGoToLiftValue(const Commands::GoToLiftValue::DecodableType & commandData)
 {
     const auto & liftValue = commandData.liftValue;
 
     ChipLogProgress(Zcl, "GoToLiftValue %u command received", liftValue);
 
-    Status lockStatus = GetMotionLockStatus();
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
     VerifyOrReturnValue(GetFeatureMap().Has(Feature::kAbsolutePosition) && GetFeatureMap().Has(Feature::kPositionAwareLift),
@@ -721,13 +723,14 @@ Status WindowCoveringCluster::HandleGoToLiftValue(const Commands::GoToLiftValue:
     return Status::Success;
 }
 
-Status WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields)
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields)
 {
     const Percent100ths percent100ths = fields.liftPercent100thsValue;
 
     ChipLogProgress(Zcl, "GoToLiftPercentage %u command received", percent100ths);
 
-    Status lockStatus = GetMotionLockStatus();
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
     VerifyOrReturnValue(GetFeatureMap().Has(Feature::kPositionAwareLift), Status::Failure,
@@ -749,13 +752,14 @@ Status WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftP
     return Status::Success;
 }
 
-Status WindowCoveringCluster::HandleGoToTiltValue(const Commands::GoToTiltValue::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleGoToTiltValue(const Commands::GoToTiltValue::DecodableType & commandData)
 {
     const auto & tiltValue = commandData.tiltValue;
 
     ChipLogProgress(Zcl, "GoToTiltValue %u command received", tiltValue);
 
-    Status lockStatus = GetMotionLockStatus();
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
     VerifyOrReturnValue(GetFeatureMap().Has(Feature::kAbsolutePosition) && GetFeatureMap().Has(Feature::kPositionAwareTilt),
@@ -776,13 +780,14 @@ Status WindowCoveringCluster::HandleGoToTiltValue(const Commands::GoToTiltValue:
     return Status::Success;
 }
 
-Status WindowCoveringCluster::HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields)
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields)
 {
     const Percent100ths percent100ths = fields.tiltPercent100thsValue;
 
     ChipLogProgress(Zcl, "GoToTiltPercentage %u command received", percent100ths);
 
-    Status lockStatus = GetMotionLockStatus();
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
     VerifyOrReturnValue(GetFeatureMap().Has(Feature::kPositionAwareTilt), Status::Failure,
