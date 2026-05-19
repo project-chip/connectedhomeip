@@ -206,7 +206,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
     if (AppOptions::GetConfig().enableGroupcast)
     {
-        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate;
+        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegateImpl groupAuxDelegate;
         SuccessOrDie(groupAuxDelegate.Initialize(&gGroupDataProvider, &Server::GetInstance().GetFabricTable()));
         initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
         gGroupDataProvider.SetGroupcastEnabled(true);
