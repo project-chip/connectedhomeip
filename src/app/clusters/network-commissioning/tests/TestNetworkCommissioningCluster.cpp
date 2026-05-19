@@ -127,4 +127,61 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
+{
+    Testing::FakeWiFiDriver fakeWifiDriver;
+    
+    // Positive test: handler is active and reacts to event
+    {
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
+
+        fakeWifiDriver.mRevertConfigurationCalled = false;
+
+        // Post the event
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired };
+        
+        ASSERT_EQ(DeviceLayer::PlatformMgr().PostEvent(&event), CHIP_NO_ERROR);
+
+        // Run event loop to process the event
+        ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }, (intptr_t) nullptr), CHIP_NO_ERROR);
+        DeviceLayer::PlatformMgr().RunEventLoop();
+
+        EXPECT_TRUE(fakeWifiDriver.mRevertConfigurationCalled);
+        
+        cluster.Deinit();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Negative test: handler is removed and does not react to event.
+    // We prove that Deinit removed the handler by verifying that posting the event
+    // does NOT trigger RevertConfiguration, whereas it did in the positive test above.
+    {
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
+
+        cluster.Deinit();
+
+        fakeWifiDriver.mRevertConfigurationCalled = false;
+
+        // Post the event
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired };
+        ASSERT_EQ(DeviceLayer::PlatformMgr().PostEvent(&event), CHIP_NO_ERROR);
+
+        // Run event loop to process the event
+        ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }, (intptr_t) nullptr), CHIP_NO_ERROR);
+        DeviceLayer::PlatformMgr().RunEventLoop();
+
+        EXPECT_FALSE(fakeWifiDriver.mRevertConfigurationCalled);
+        
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
 } // namespace
