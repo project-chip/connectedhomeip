@@ -54,15 +54,16 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
     VerifyOrDie(config.maxSetpoint >= static_cast<chip::Percent>(config.minSetpoint + 1) && config.maxSetpoint <= 100);
     VerifyOrDie(config.step >= 1 && config.step <= static_cast<chip::Percent>(config.maxSetpoint - config.minSetpoint));
     VerifyOrDie((config.maxSetpoint - config.minSetpoint) % config.step == 0);
+    VerifyOrDie(IsMistTypeSupportable(config.mistType));
+    VerifyOrDie(IsMistTypeConsistentWithMode(mMode, config.mistType));
 
     // Snap initial setpoints to the valid step grid.
     mUserSetpoint   = SnapToNearestStep(mUserSetpoint);
     mTargetSetpoint = SnapToNearestStep(mTargetSetpoint);
 
-    // Spec: MistType SHALL be zero when Mode is not Humidifier.
-    if (mMode != ModeEnum::kHumidifier)
+    if (ShouldTargetSetpointMatchUserSetpoint())
     {
-        mMistType.ClearAll();
+        mTargetSetpoint = mUserSetpoint;
     }
 }
 
@@ -138,6 +139,11 @@ void HumidistatCluster::LoadPersistentAttributes()
         {
             loadedMistType.ClearAll();
         }
+        else if (!loadedMistType.HasAny())
+        {
+            ChipLogDetail(Zcl, "Humidistat: Loaded empty MistType in Humidifier mode, using startup default");
+            loadedMistType = mMistType;
+        }
         mMistType = loadedMistType;
     }
 
@@ -169,6 +175,11 @@ void HumidistatCluster::LoadPersistentAttributes()
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load Optimal attribute, using default");
         }
+    }
+
+    if (ShouldTargetSetpointMatchUserSetpoint())
+    {
+        mTargetSetpoint = mUserSetpoint;
     }
 }
 
@@ -206,6 +217,33 @@ bool HumidistatCluster::IsSystemStateSupported(Humidistat::SystemStateEnum syste
         return mFeatures.Has(Feature::kFanOnly);
     default:
         return false;
+    }
+}
+
+bool HumidistatCluster::IsMistTypeConsistentWithMode(Humidistat::ModeEnum mode,
+                                                     chip::BitMask<Humidistat::MistTypeBitmap> mistType) const
+{
+    if (mode == ModeEnum::kHumidifier)
+    {
+        return mistType.HasAny();
+    }
+
+    return !mistType.HasAny();
+}
+
+bool HumidistatCluster::ShouldTargetSetpointMatchUserSetpoint() const
+{
+    return mFeatures.Has(Feature::kSensor) && !mSleep && !mOptimal;
+}
+
+void HumidistatCluster::SyncTargetSetpointToUserSetpoint()
+{
+    VerifyOrReturn(ShouldTargetSetpointMatchUserSetpoint());
+    VerifyOrReturn(mActiveOptional.IsSet(TargetSetpoint::Id));
+
+    if (SetAttributeValue(mTargetSetpoint, mUserSetpoint, TargetSetpoint::Id) && (mDelegate != nullptr))
+    {
+        mDelegate->OnTargetSetpointChanged(mTargetSetpoint);
     }
 }
 
@@ -328,10 +366,6 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
 
 chip::Percent HumidistatCluster::SnapToNearestStep(chip::Percent value) const
 {
-    if (value < mMinSetpoint)
-    {
-        return mMinSetpoint;
-    }
     if (value > mMaxSetpoint)
     {
         return mMaxSetpoint;
@@ -374,14 +408,15 @@ CHIP_ERROR HumidistatCluster::SetUserSetpoint(chip::Percent userSetpoint)
         mDelegate->OnUserSetpointChanged(mUserSetpoint);
     }
 
+    SyncTargetSetpointToUserSetpoint();
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR HumidistatCluster::SetMistType(chip::BitMask<Humidistat::MistTypeBitmap> mistType)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kHumidifier), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
-    VerifyOrReturnError(mMode == ModeEnum::kHumidifier || !mistType.HasAny(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(IsMistTypeConsistentWithMode(mMode, mistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(IsMistTypeSupportable(mistType), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
     VerifyOrReturnValue(SetAttributeValue(mMistType, mistType, MistType::Id), CHIP_NO_ERROR);
@@ -402,8 +437,9 @@ CHIP_ERROR HumidistatCluster::SetMistType(chip::BitMask<Humidistat::MistTypeBitm
 
 CHIP_ERROR HumidistatCluster::SetTargetSetpoint(chip::Percent targetSetpoint)
 {
-    // TargetSetpoint is a device-firmware-controlled attribute requiring the SENSOR feature.
+    // TargetSetpoint is a device-firmware-controlled attribute requiring the SENSOR feature and must be active.
     VerifyOrReturnError(mFeatures.Has(Feature::kSensor), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    VerifyOrReturnError(mActiveOptional.IsSet(TargetSetpoint::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(targetSetpoint >= mMinSetpoint && targetSetpoint <= mMaxSetpoint, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     targetSetpoint = SnapToNearestStep(targetSetpoint);
@@ -455,6 +491,8 @@ CHIP_ERROR HumidistatCluster::SetSleep(bool sleep)
         mDelegate->OnSleepChanged(mSleep);
     }
 
+    SyncTargetSetpointToUserSetpoint();
+
     return CHIP_NO_ERROR;
 }
 
@@ -474,6 +512,8 @@ CHIP_ERROR HumidistatCluster::SetOptimal(bool optimal)
     {
         mDelegate->OnOptimalChanged(mOptimal);
     }
+
+    SyncTargetSetpointToUserSetpoint();
 
     return CHIP_NO_ERROR;
 }
@@ -577,7 +617,7 @@ DataModel::ActionReturnStatus HumidistatCluster::HandleSetSettings(chip::TLV::TL
     // Spec: "If the value of Mode is not set to Humidifier, all bits of MistType SHALL be set to zero."
     if (commandData.mistType.HasValue() && mFeatures.Has(Feature::kHumidifier))
     {
-        VerifyOrReturnError(effectiveMode == ModeEnum::kHumidifier || !commandData.mistType.Value().HasAny(),
+        VerifyOrReturnError(IsMistTypeConsistentWithMode(effectiveMode, commandData.mistType.Value()),
                             CHIP_IM_GLOBAL_STATUS(ConstraintError));
         // Spec: unsupported bits SHALL result in INVALID_IN_STATE.
         VerifyOrReturnError(IsMistTypeSupportable(commandData.mistType.Value()), CHIP_IM_GLOBAL_STATUS(InvalidInState));
@@ -585,8 +625,9 @@ DataModel::ActionReturnStatus HumidistatCluster::HandleSetSettings(chip::TLV::TL
 
     if (commandData.userSetpoint.HasValue() && mFeatures.Has(Feature::kSensor))
     {
-        chip::Percent snapped = SnapToNearestStep(commandData.userSetpoint.Value());
-        VerifyOrReturnError(snapped >= mMinSetpoint && snapped <= mMaxSetpoint, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        chip::Percent requested = commandData.userSetpoint.Value();
+        // Validate the raw requested value before snapping, to avoid partial application.
+        VerifyOrReturnError(requested >= mMinSetpoint && requested <= mMaxSetpoint, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
     if (commandData.mode.HasValue())
