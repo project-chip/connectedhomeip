@@ -3367,7 +3367,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 7601;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 10;
 
     handle command LockDoor;
     handle command UnlockDoor;
@@ -3390,5 +3390,3 @@ endpoint 1 {
     handle command UnboltDoor;
   }
 }
-
-
