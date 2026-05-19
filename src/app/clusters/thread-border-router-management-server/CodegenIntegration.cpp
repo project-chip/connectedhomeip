@@ -54,6 +54,7 @@ ServerInstance::ServerInstance(EndpointId endpointId, Delegate * delegate, FailS
 
 ServerInstance::~ServerInstance()
 {
+    mCluster.Cluster().Shutdown(ClusterShutdownType::kClusterShutdown);
     // Note: Unregister always errors out if Init() was never called.
     // We expect Init() to essentially be always called if the instance is used.
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
@@ -88,4 +89,10 @@ void MatterThreadBorderRouterManagementPluginServerShutdownCallback() {}
 
 void MatterThreadBorderRouterManagementClusterInitCallback(chip::EndpointId endpointId) {}
 void MatterThreadBorderRouterManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
-{}
+{
+    auto * cluster = CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(endpointId, Id));
+    if (cluster != nullptr)
+    {
+        cluster->Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
