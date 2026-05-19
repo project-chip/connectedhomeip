@@ -18,17 +18,17 @@ Casting App on Android (arm64-v8a).
 
 ### What drives the reduction
 
-| Optimization                           | Mechanism                                                                                               | Impact                                                                                                    |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Slim cluster-objects override          | Compile ~29 casting clusters instead of ~200+ via `chip_data_model_overrides_dir`                       | Major `.so` reduction                                                                                     |
-| Slim TLV decoder overrides             | Compile TLV decoders for 18 casting clusters only via `chip_data_model_overrides_dir`                   | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional |
-| Remove legacy chip-tool sources        | Exclude ~20 source files + tracing/JSON deps                                                            | Further `.so` reduction                                                                                   |
-| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                             | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                            |
-| Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                         | ~10–20 % further `.so` reduction                                                                          |
-| R8 Java shrinking                      | `minifyEnabled true` in Gradle debug build                                                              | Reduces DEX size (Java / Kotlin)                                                                          |
+| Optimization                           | Mechanism                                                                                                | Impact                                                                                                    |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Slim cluster-objects override          | Compile ~29 casting clusters instead of ~200+ via `chip_data_model_overrides_dir`                        | Major `.so` reduction                                                                                     |
+| Slim TLV decoder overrides             | Compile TLV decoders for 18 casting clusters only via `chip_data_model_overrides_dir`                    | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional |
+| Remove legacy chip-tool sources        | Exclude ~20 source files + tracing/JSON deps                                                             | Further `.so` reduction                                                                                   |
+| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                              | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                            |
+| Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                          | ~10–20 % further `.so` reduction                                                                          |
+| R8 Java shrinking                      | `minifyEnabled true` in Gradle debug build                                                               | Reduces DEX size (Java / Kotlin)                                                                          |
 | Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB `.o` savings                                                                                      |
 | Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_data_model_overrides_dir` + `Accessors-override.cpp`    | ~826 KB `.o` savings                                                                                      |
-| jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime         | ~350 KB (not achievable)                                                                                  |
+| jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime          | ~350 KB (not achievable)                                                                                  |
 
 ---
 
@@ -338,13 +338,13 @@ already-slim binary. All changes are gated behind `optimize_apk_size=true`.
 
 ### Phase 2 optimization summary
 
-| Optimization                     | Mechanism                                                                                                                                                                | Estimated savings |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
+| Optimization                     | Mechanism                                                                                                                                                                 | Estimated savings |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | Cluster trimming (10 clusters)   | Remove `.ipp` includes for 10 non-essential infrastructure clusters from `cluster-objects-override.cpp` and disable their server-side definitions in `tv-casting-app.zap` | ~400–500 KB       |
-| Disable extra data-model logging | Set `chip_data_model_extra_logging=false` — excludes verbose log-formatting code and string tables for attribute/command path names                                      | ~100–150 KB       |
-| Disable host unit-test hooks     | Set `CONFIG_BUILD_FOR_HOST_UNIT_TEST=0` — excludes test-only code paths in CASESession, ExchangeContext, FabricTable, and MRP configuration                              | ~50–100 KB        |
-| Disable RTTI                     | Set `enable_rtti=false` — removes `type_info` structures and vtable metadata generated by the C++ compiler                                                               | ~100–200 KB       |
-| Remove ICD client dependencies   | Exclude `src/app/icd/client:handler` and `src/app/icd/client:manager` from the tv-casting-common build target                                                            | ~50–100 KB        |
+| Disable extra data-model logging | Set `chip_data_model_extra_logging=false` — excludes verbose log-formatting code and string tables for attribute/command path names                                       | ~100–150 KB       |
+| Disable host unit-test hooks     | Set `CONFIG_BUILD_FOR_HOST_UNIT_TEST=0` — excludes test-only code paths in CASESession, ExchangeContext, FabricTable, and MRP configuration                               | ~50–100 KB        |
+| Disable RTTI                     | Set `enable_rtti=false` — removes `type_info` structures and vtable metadata generated by the C++ compiler                                                                | ~100–200 KB       |
+| Remove ICD client dependencies   | Exclude `src/app/icd/client:handler` and `src/app/icd/client:manager` from the tv-casting-common build target                                                             | ~50–100 KB        |
 
 ### Clusters removed in phase 2
 
@@ -431,13 +431,13 @@ non-casting-app targets remain unaffected.
 
 ### Phase 3 optimization summary
 
-| Optimization              | Mechanism                                                       | `.o` file savings | Status       |
-| ------------------------- | --------------------------------------------------------------- | ----------------- | ------------ |
+| Optimization              | Mechanism                                                        | `.o` file savings | Status       |
+| ------------------------- | ---------------------------------------------------------------- | ----------------- | ------------ |
 | Cluster server exclusion  | `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB           | Implemented  |
 | Slim Accessors.cpp        | `chip_data_model_overrides_dir` + `Accessors-override.cpp`       | ~826 KB           | Implemented  |
-| jsoncpp/jsontlv removal   | Conditional dep in `src/controller/java/BUILD.gn`               | ~350 KB           | Not feasible |
-| Controller code reduction | Requires controller library refactoring                         | ~1.3 MB           | Future work  |
-| **Total implemented**     |                                                                 | **~1.9 MB (.o)**  |              |
+| jsoncpp/jsontlv removal   | Conditional dep in `src/controller/java/BUILD.gn`                | ~350 KB           | Not feasible |
+| Controller code reduction | Requires controller library refactoring                          | ~1.3 MB           | Future work  |
+| **Total implemented**     |                                                                  | **~1.9 MB (.o)**  |              |
 
 The `.o` file savings represent uncompressed object file sizes before linking.
 After LTO (thin link-time optimization), ICF (identical code folding), and
@@ -677,8 +677,8 @@ following well-known filenames inside the directory and uses them as source
 overrides. When unset (empty string), all consumers fall back to the full
 zap-generated sources.
 
-| Well-known filename                        | Purpose                                     | Consumer                       |
-| ------------------------------------------ | ------------------------------------------- | ------------------------------ |
+| Well-known filename                         | Purpose                                     | Consumer                       |
+| ------------------------------------------- | ------------------------------------------- | ------------------------------ |
 | `cluster-objects-override.cpp`              | Slim cluster objects (~29 clusters)         | `src/app/common/BUILD.gn`      |
 | `CHIPAttributeTLVValueDecoder-override.cpp` | Slim attribute TLV decoder (18 clusters)    | `src/controller/java/BUILD.gn` |
 | `CHIPEventTLVValueDecoder-override.cpp`     | Slim event TLV decoder (18 clusters)        | `src/controller/java/BUILD.gn` |
@@ -690,8 +690,8 @@ are unaffected.
 
 ### Phase 3 override files
 
-| File                          | Location             | Purpose                                                  |
-| ----------------------------- | -------------------- | -------------------------------------------------------- |
+| File                           | Location             | Purpose                                                  |
+| ------------------------------ | -------------------- | -------------------------------------------------------- |
 | `cluster-servers-override.gni` | `tv-casting-common/` | Lists the 13 required cluster server directories         |
 | `Accessors-override.cpp`       | `tv-casting-common/` | Slim accessors for 29 casting-relevant clusters          |
 | `cluster-objects-override.cpp` | `tv-casting-common/` | (existing, phase 1) Slim cluster objects for 29 clusters |
