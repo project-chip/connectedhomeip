@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -53,13 +55,12 @@ class stm32Board(Enum):
 class stm32Builder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: stm32App = stm32App.LIGHT,
                  board: stm32Board = stm32Board.STM32WB55XX):
-        super(stm32Builder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super(stm32Builder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.board = board
         self.app = app
@@ -75,6 +76,7 @@ class stm32Builder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["bin", "elf"]
         if self.options.enable_link_map_file:

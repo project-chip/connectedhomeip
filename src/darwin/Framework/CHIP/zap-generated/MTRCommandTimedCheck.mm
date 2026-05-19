@@ -878,6 +878,15 @@ static BOOL CommandNeedsTimedInvokeInBallastConfigurationCluster(AttributeId aAt
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInDynamicLightingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DynamicLighting;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInIlluminanceMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::IlluminanceMeasurement;
@@ -1688,6 +1697,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::BallastConfiguration::Id: {
         return CommandNeedsTimedInvokeInBallastConfigurationCluster(commandID);
+    }
+    case Clusters::DynamicLighting::Id: {
+        return CommandNeedsTimedInvokeInDynamicLightingCluster(commandID);
     }
     case Clusters::IlluminanceMeasurement::Id: {
         return CommandNeedsTimedInvokeInIlluminanceMeasurementCluster(commandID);

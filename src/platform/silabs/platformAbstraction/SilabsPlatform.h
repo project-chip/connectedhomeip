@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "sl_component_catalog.h"
 #include <platform/silabs/platformAbstraction/SilabsPlatformBase.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -49,12 +50,14 @@ public:
 #endif
 
     // Buttons
+#if defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
     inline void SetButtonsCb(SilabsButtonCb callback) override { mButtonCallback = callback; }
     static SilabsButtonCb mButtonCallback;
     uint8_t GetButtonState(uint8_t button) override;
-#ifdef SL_ICD_ENABLED
+#if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED == 1
     void SleepButtonActionHandler(void) override;
-#endif // SL_ICD_ENABLED
+#endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED == 1
+#endif // defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
 
 #if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     void StartScheduler(void) override;
@@ -74,7 +77,7 @@ public:
 
     // Reboot
     void SoftwareReset(void) override;
-    inline uint32_t GetRebootCause() { return mRebootCause; }
+    inline uint32_t GetRebootCause() override { return mRebootCause; }
 
     /** VerifyIfUpdated
      * @brief Verify if the device has been updated by OTA.
@@ -87,13 +90,6 @@ public:
      * @brief Initialize the nvm driver (e.g., NVM3), and execute any needed migrations.
      */
     CHIP_ERROR NvmInit();
-
-#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
-    void WatchdogInit();
-    void WatchdogFeed();
-    void WatchdogEnable();
-    void WatchdogDisable();
-#endif
 
 private:
     friend SilabsPlatform & GetPlatform(void);

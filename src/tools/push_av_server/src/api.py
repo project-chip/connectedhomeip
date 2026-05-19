@@ -228,11 +228,11 @@ class PushAvServer:
     def certificate_details(self, hierarchy: str, name: str):
         """Get certificate details."""
         data = pathlib.Path(self.stream_service.wd.path("certs", hierarchy, name)).read_bytes()
-        type = "key" if name.endswith(".key") else "cert"
+        pem_type = "key" if name.endswith(".key") else "cert"
         key = None
         cert = None
 
-        if type == "key":
+        if pem_type == "key":
             key = serialization.load_pem_private_key(data, None)
             key = {
                 "key_size": key.key_size,
@@ -258,7 +258,7 @@ class PushAvServer:
                 "extensions": [str(ext) for ext in cert.extensions]
             }
 
-        return {"type": type, "key": key, "cert": cert}
+        return {"type": pem_type, "key": key, "cert": cert}
 
     def create_client_keypair(self, name: str, override: bool = True):
         """Create a client keypair."""
