@@ -240,7 +240,7 @@ CHIP_ERROR AppTask::AppInit()
 
     DlLockState bootState = appInstance().NextState() ? DlLockState::kUnlocked : DlLockState::kLocked;
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
-                                                                           static_cast<intptr_t>(to_underlying(bootState)));
+                                                                     static_cast<intptr_t>(to_underlying(bootState)));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -437,8 +437,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     using DlLockStateUnderlying = std::underlying_type_t<DlLockState>;
     DlLockState newState        = static_cast<DlLockState>(static_cast<DlLockStateUnderlying>(context));
 
-    Status status =
-        DoorLockServer::Instance().SetLockState(LOCK_ENDPOINT, newState, OperationSourceEnum::kManual)
+    Status status = DoorLockServer::Instance().SetLockState(LOCK_ENDPOINT, newState, OperationSourceEnum::kManual)
         ? Status::Success
         : Status::Failure;
     if (status != Status::Success)
@@ -601,9 +600,9 @@ bool emberAfPluginDoorLockGetCredential(EndpointId endpointId, uint16_t credenti
     return appInstance().DMDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential);
 }
 
-bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator,
-                                        FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                        CredentialTypeEnum credentialType, const ByteSpan & credentialData)
+bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
+                                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                                        const ByteSpan & credentialData)
 {
     return appInstance().DMDoorLockSetCredential(endpointId, credentialIndex, creator, modifier, credentialStatus, credentialType,
                                                  credentialData);
@@ -614,10 +613,9 @@ bool emberAfPluginDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Emb
     return appInstance().DMDoorLockGetUser(endpointId, userIndex, user);
 }
 
-bool emberAfPluginDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, FabricIndex creator,
-                                  FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId,
-                                  UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
-                                  const CredentialStruct * credentials, size_t totalCredentials)
+bool emberAfPluginDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, FabricIndex creator, FabricIndex modifier,
+                                  const CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
+                                  CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
     return appInstance().DMDoorLockSetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype,
                                            credentialRule, credentials, totalCredentials);
@@ -641,16 +639,16 @@ DlStatus emberAfPluginDoorLockGetSchedule(EndpointId endpointId, uint8_t holiday
     return appInstance().DMDoorLockGetHolidaySchedule(endpointId, holidayIndex, holidaySchedule);
 }
 
-DlStatus emberAfPluginDoorLockSetSchedule(EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
-                                          uint8_t endHour, uint8_t endMinute)
+DlStatus emberAfPluginDoorLockSetSchedule(EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                          DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
+                                          uint8_t endMinute)
 {
     return appInstance().DMDoorLockSetWeekDaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute,
                                                       endHour, endMinute);
 }
 
-DlStatus emberAfPluginDoorLockSetSchedule(EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
+DlStatus emberAfPluginDoorLockSetSchedule(EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                          uint32_t localStartTime, uint32_t localEndTime)
 {
     return appInstance().DMDoorLockSetYearDaySchedule(endpointId, yearDayIndex, userIndex, status, localStartTime, localEndTime);
 }
@@ -830,10 +828,9 @@ void AppTask::UnlockAfterUnlatch(intptr_t /* context */)
         return;
     }
 
-    Status status =
-        DoorLockServer::Instance().SetLockState(appInstance().mUnlatchContext.mEndpointId, DlLockState::kNotFullyLocked,
-                                                OperationSourceEnum::kRemote, NullNullable, NullNullable,
-                                                appInstance().mUnlatchContext.mFabricIdx, appInstance().mUnlatchContext.mNodeId)
+    Status status = DoorLockServer::Instance().SetLockState(
+                        appInstance().mUnlatchContext.mEndpointId, DlLockState::kNotFullyLocked, OperationSourceEnum::kRemote,
+                        NullNullable, NullNullable, appInstance().mUnlatchContext.mFabricIdx, appInstance().mUnlatchContext.mNodeId)
         ? Status::Success
         : Status::Failure;
     if (status != Status::Success)
@@ -865,7 +862,7 @@ void AppTask::UnlatchCallback(TimerHandle_t xTimer)
 {
     (void) xTimer;
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(&CustomerAppTask::UnlockAfterUnlatch,
-                                                                           reinterpret_cast<intptr_t>(nullptr));
+                                                                     reinterpret_cast<intptr_t>(nullptr));
 }
 
 void AppTask::ActuatorMovementEventHandler(AppEvent * aEvent)
@@ -1131,7 +1128,7 @@ bool AppTask::DMDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Ember
 
     // Get credential struct from nvm3
     StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
-    uint16_t credentialSize = static_cast<uint16_t>(kCredentialStructSize * userInStorage.currentCredentialCount);
+    uint16_t credentialSize      = static_cast<uint16_t>(kCredentialStructSize * userInStorage.currentCredentialCount);
     CredentialStruct credentials[kMaxCredentialsPerUser];
     error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), credentials, credentialSize);
     if (error == CHIP_NO_ERROR)
@@ -1162,10 +1159,9 @@ bool AppTask::DMDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Ember
     return true;
 }
 
-bool AppTask::DMDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, FabricIndex creator,
-                                FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId,
-                                UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
-                                const CredentialStruct * credentials, size_t totalCredentials)
+bool AppTask::DMDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, FabricIndex creator, FabricIndex modifier,
+                                const CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
+                                CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
     VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed
@@ -1225,7 +1221,7 @@ bool AppTask::DMDoorLockGetCredential(EndpointId endpointId, uint16_t credential
     StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
     LockCredentialInfo credentialInStorage;
     uint16_t size = kLockCredentialInfoSize;
-    error = mStorage->SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
+    error         = mStorage->SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
 
     // If no data is found at credential key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -1263,9 +1259,9 @@ bool AppTask::DMDoorLockGetCredential(EndpointId endpointId, uint16_t credential
     return true;
 }
 
-bool AppTask::DMDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator,
-                                      FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                      CredentialTypeEnum credentialType, const ByteSpan & credentialData)
+bool AppTask::DMDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
+                                      DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                                      const ByteSpan & credentialData)
 {
     CHIP_ERROR error;
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
@@ -1388,8 +1384,8 @@ DlStatus AppTask::DMDoorLockGetYearDaySchedule(EndpointId endpointId, uint8_t ye
 
     // Get schedule data from nvm3
     StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
-    uint16_t size = kYearDayScheduleInfoSize;
-    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
+    uint16_t size                  = kYearDayScheduleInfoSize;
+    error                          = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
 
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -1574,9 +1570,9 @@ bool AppTask::ValidatePin(EndpointId endpointId, const Optional<ByteSpan> & pin,
     return false;
 }
 
-void AppTask::PushClusterLockState(EndpointId endpointId, DlLockState lockState,
-                                   const Nullable<FabricIndex> & fabricIdx, const Nullable<NodeId> & nodeId,
-                                   const Nullable<uint16_t> & userIndex, const LockOpCredentials * cred, bool hasCred)
+void AppTask::PushClusterLockState(EndpointId endpointId, DlLockState lockState, const Nullable<FabricIndex> & fabricIdx,
+                                   const Nullable<NodeId> & nodeId, const Nullable<uint16_t> & userIndex,
+                                   const LockOpCredentials * cred, bool hasCred)
 {
     ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", LockStateToString(lockState),
                   endpointId);
