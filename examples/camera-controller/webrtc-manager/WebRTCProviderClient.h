@@ -33,7 +33,6 @@ struct ICECandidateInfo
     int mlineIndex;
 };
 
-
 /**
  * @brief This class handles sending CHIP commands for WebRTCTransportProvider cluster, including
  * sending a ProvideOffer command to a remote camera device.
