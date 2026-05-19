@@ -261,9 +261,9 @@ CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, siz
 #if CHIP_DISABLE_PLATFORM_KVS
     if (mConfigValueProvider != nullptr)
     {
-        size_t outLen = 0;
-        CHIP_ERROR err = mConfigValueProvider(PosixConfig::kConfigKey_DeviceName.Namespace,
-                                             PosixConfig::kConfigKey_DeviceName.Name, buf, bufSize, outLen);
+        size_t outLen  = 0;
+        CHIP_ERROR err = mConfigValueProvider(PosixConfig::kConfigKey_DeviceName.Namespace, PosixConfig::kConfigKey_DeviceName.Name,
+                                              buf, bufSize, outLen);
         if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
         {
             return err;
@@ -273,9 +273,9 @@ CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, siz
 #else  // CHIP_DISABLE_PLATFORM_KVS
     if (mConfigValueProvider != nullptr)
     {
-        size_t outLen = 0;
-        CHIP_ERROR err = mConfigValueProvider(PosixConfig::kConfigKey_DeviceName.Namespace,
-                                             PosixConfig::kConfigKey_DeviceName.Name, buf, bufSize, outLen);
+        size_t outLen  = 0;
+        CHIP_ERROR err = mConfigValueProvider(PosixConfig::kConfigKey_DeviceName.Namespace, PosixConfig::kConfigKey_DeviceName.Name,
+                                              buf, bufSize, outLen);
         if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
         {
             return err;

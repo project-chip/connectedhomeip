@@ -519,8 +519,8 @@ TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromConfig)
     EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
 }
 
-static CHIP_ERROR TestConfigValueProvider(const char * configNamespace, const char * name,
-                                          char * buf, size_t bufSize, size_t & outLen)
+static CHIP_ERROR TestConfigValueProvider(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                          size_t & outLen)
 {
     if (strcmp(name, "device-name") == 0)
     {
@@ -554,14 +554,14 @@ TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromProvider)
     EXPECT_STREQ(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
 }
 
-static CHIP_ERROR ProviderThatReturnsNotFound(const char * configNamespace, const char * name,
-                                              char * buf, size_t bufSize, size_t & outLen)
+static CHIP_ERROR ProviderThatReturnsNotFound(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                              size_t & outLen)
 {
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
-static CHIP_ERROR ProviderWithSmallBuffer(const char * configNamespace, const char * name,
-                                          char * buf, size_t bufSize, size_t & outLen)
+static CHIP_ERROR ProviderWithSmallBuffer(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                          size_t & outLen)
 {
     if (strcmp(name, "device-name") == 0)
     {

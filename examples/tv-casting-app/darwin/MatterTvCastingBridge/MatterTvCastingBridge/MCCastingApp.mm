@@ -37,7 +37,7 @@ namespace {
 __weak id<MCDeviceInstanceInfoProvider> sDeviceInstanceInfoDelegate = nil;
 
 CHIP_ERROR ConfigValueProviderCallback(const char * configNamespace, const char * name,
-                                       char * buf, size_t bufSize, size_t & outLen)
+    char * buf, size_t bufSize, size_t & outLen)
 {
     id<MCDeviceInstanceInfoProvider> delegate = sDeviceInstanceInfoDelegate;
     if (delegate == nil) {

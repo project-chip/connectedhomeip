@@ -54,8 +54,8 @@ public:
      * @return CHIP_NO_ERROR if a value was provided,
      *         CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND to fall through to the next source
      */
-    using ConfigValueProvider = CHIP_ERROR (*)(const char * configNamespace, const char * name,
-                                              char * buf, size_t bufSize, size_t & outLen);
+    using ConfigValueProvider = CHIP_ERROR (*)(const char * configNamespace, const char * name, char * buf, size_t bufSize,
+                                               size_t & outLen);
 
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
