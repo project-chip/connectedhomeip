@@ -87,7 +87,7 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
             ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionLiftPercent100ths");
             return CHIP_ERROR_READ_FAILED;
         }
-        windowCoveringCluster->SetCurrentPositionLiftPercentage100ths(current);
+        windowCoveringCluster->SetCurrentPositionLiftPercent100ths(current);
         MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
                                                WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id);
 
@@ -103,7 +103,7 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
         }
 
         // Instant update. No transition for now.
-        windowCoveringCluster->SetCurrentPositionTiltPercentage100ths(current);
+        windowCoveringCluster->SetCurrentPositionTiltPercent100ths(current);
 
         MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
                                                WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id);

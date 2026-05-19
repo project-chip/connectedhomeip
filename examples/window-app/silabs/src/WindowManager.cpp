@@ -311,7 +311,7 @@ void WindowManager::Cover::LiftUpdateWorker(intptr_t arg)
     NPercent100ths current, target;
 
     target  = wc->GetTargetPositionLiftPercent100ths();
-    current = wc->GetCurrentPositionLiftPercentage100ths();
+    current = wc->GetCurrentPositionLiftPercent100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -333,7 +333,7 @@ void WindowManager::Cover::LiftUpdateWorker(intptr_t arg)
         }
         else
         {
-            percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+            percent100ths = kWcPercent100thsMiddle; // set at middle by default
         }
 
         cover->PositionSet(cover->mEndpoint, percent100ths, ControlAction::Lift);
@@ -365,7 +365,7 @@ void WindowManager::Cover::TiltUpdateWorker(intptr_t arg)
     VerifyOrReturn(wc != nullptr);
     NPercent100ths current, target;
     target  = wc->GetTargetPositionTiltPercent100ths();
-    current = wc->GetCurrentPositionTiltPercentage100ths();
+    current = wc->GetCurrentPositionTiltPercent100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -387,7 +387,7 @@ void WindowManager::Cover::TiltUpdateWorker(intptr_t arg)
         }
         else
         {
-            percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+            percent100ths = kWcPercent100thsMiddle; // set at middle by default
         }
 
         cover->PositionSet(cover->mEndpoint, percent100ths, ControlAction::Tilt);
@@ -420,7 +420,7 @@ void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, Cont
 
     if (action == ControlAction::Tilt)
     {
-        current = wc->GetCurrentPositionTiltPercentage100ths();
+        current = wc->GetCurrentPositionTiltPercent100ths();
         if (!current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
@@ -429,7 +429,7 @@ void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, Cont
     }
     else
     {
-        current = wc->GetCurrentPositionLiftPercentage100ths();
+        current = wc->GetCurrentPositionLiftPercent100ths();
         if (!current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
@@ -633,12 +633,12 @@ void WindowManager::UpdateLED()
         LimitStatus liftLimit = LimitStatus::Intermediate;
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        current = wc->GetCurrentPositionLiftPercentage100ths();
+        current = wc->GetCurrentPositionLiftPercent100ths();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!current.IsNull())
         {
-            AbsoluteLimits limits = { .open = WC_PERCENT100THS_MIN_OPEN, .closed = WC_PERCENT100THS_MAX_CLOSED };
+            AbsoluteLimits limits = { .open = kWcPercent100thsMinOpen, .closed = kWcPercent100thsMaxClosed };
             liftLimit             = CheckLimitState(current.Value(), limits);
         }
 

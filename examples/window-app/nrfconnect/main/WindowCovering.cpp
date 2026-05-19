@@ -61,7 +61,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    current = wc->GetCurrentPositionLiftPercentage100ths();
+    current = wc->GetCurrentPositionLiftPercent100ths();
     target  = wc->GetTargetPositionLiftPercent100ths();
 
     OperationalState state = ComputeOperationalState(target, current);
@@ -87,7 +87,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     // assume single move completed
     Instance().mInLiftMove = false;
 
-    current = wc->GetCurrentPositionLiftPercentage100ths();
+    current = wc->GetCurrentPositionLiftPercent100ths();
 
     if (!TargetCompleted(MoveType::LIFT, current, target))
     {
@@ -111,19 +111,19 @@ chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
 
     if (aMoveType == MoveType::LIFT)
     {
-        current = wc->GetCurrentPositionLiftPercentage100ths();
+        current = wc->GetCurrentPositionLiftPercent100ths();
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kLift);
     }
     else if (aMoveType == MoveType::TILT)
     {
-        current = wc->GetCurrentPositionTiltPercentage100ths();
+        current = wc->GetCurrentPositionTiltPercent100ths();
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
     if (!current.IsNull())
     {
-        static constexpr auto sPercentDelta{ WC_PERCENT100THS_MAX_CLOSED / 20 };
+        static constexpr auto sPercentDelta{ kWcPercent100thsMaxClosed / 20 };
         percent100ths = ComputePercent100thsStep(opState, current.Value(), sPercentDelta);
     }
     else
@@ -156,11 +156,19 @@ void WindowCovering::MoveTimerTimeoutCallback(chip::System::Layer * systemLayer,
 
     if (*moveType == MoveType::LIFT)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentLiftPosition);
+        CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentLiftPosition);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to schedule DriveCurrentLiftPosition: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     else if (*moveType == MoveType::TILT)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
+        CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to schedule DriveCurrentLiftPosition: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     chip::Platform::Delete(moveType);
@@ -174,7 +182,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    current = wc->GetCurrentPositionTiltPercentage100ths();
+    current = wc->GetCurrentPositionTiltPercent100ths();
     target  = wc->GetTargetPositionTiltPercent100ths();
 
     OperationalState state = ComputeOperationalState(target, current);
@@ -200,7 +208,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     // assume single move completed
     Instance().mInTiltMove = false;
 
-    current = wc->GetCurrentPositionTiltPercentage100ths();
+    current = wc->GetCurrentPositionTiltPercent100ths();
     if (current.IsNull())
     {
         LOG_ERR("Cannot read the current tilt position");
@@ -342,7 +350,11 @@ void WindowCovering::SchedulePostAttributeChange(chip::EndpointId aEndpoint, chi
     data->mEndpoint    = aEndpoint;
     data->mAttributeId = aAttributeId;
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(DoPostAttributeChange, reinterpret_cast<intptr_t>(data));
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(DoPostAttributeChange, reinterpret_cast<intptr_t>(data));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to schedule DoPostAttributeChange: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void WindowCovering::DoPostAttributeChange(intptr_t aArg)

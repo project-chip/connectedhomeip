@@ -385,7 +385,7 @@ public:
                 ESP_LOGI(TAG, "Current position lift percent 100ths changed to : %d", n * 100);
                 if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
                 {
-                    wc->SetCurrentPositionLiftPercentage100ths(
+                    wc->SetCurrentPositionLiftPercent100ths(
                         app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(n * 100)));
                 }
             }
@@ -395,7 +395,7 @@ public:
                 ESP_LOGI(TAG, "Current position tilt percent 100ths changed to : %d", n * 100);
                 if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
                 {
-                    wc->SetCurrentPositionTiltPercentage100ths(
+                    wc->SetCurrentPositionTiltPercent100ths(
                         app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(n * 100)));
                 }
             }
@@ -771,12 +771,12 @@ void SetupPretendDevices()
     auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1);
     if (wc != nullptr)
     {
-        wc->SetCurrentPositionLiftPercentage100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
+        wc->SetCurrentPositionLiftPercent100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
     }
     AddAttribute("Current Tilt", "5");
     if (wc != nullptr)
     {
-        wc->SetCurrentPositionTiltPercentage100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
+        wc->SetCurrentPositionTiltPercent100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
     }
     AddAttribute("Opr Status", "0");
     if (wc != nullptr)

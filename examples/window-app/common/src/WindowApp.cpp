@@ -465,7 +465,7 @@ void WindowApp::Cover::LiftStepToward(OperationalState direction)
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         return;
     }
-    current = wc->GetCurrentPositionLiftPercentage100ths();
+    current = wc->GetCurrentPositionLiftPercent100ths();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (!current.IsNull())
@@ -474,7 +474,7 @@ void WindowApp::Cover::LiftStepToward(OperationalState direction)
     }
     else
     {
-        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+        percent100ths = kWcPercent100thsMiddle; // set at middle by default
     }
 
     LiftSchedulePositionSet(percent100ths);
@@ -489,7 +489,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     target  = wc->GetTargetPositionLiftPercent100ths();
-    current = wc->GetCurrentPositionLiftPercentage100ths();
+    current = wc->GetCurrentPositionLiftPercent100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -532,7 +532,7 @@ void WindowApp::Cover::TiltStepToward(OperationalState direction)
     NPercent100ths current;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    current = wc->GetCurrentPositionTiltPercentage100ths();
+    current = wc->GetCurrentPositionTiltPercent100ths();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (!current.IsNull())
@@ -541,7 +541,7 @@ void WindowApp::Cover::TiltStepToward(OperationalState direction)
     }
     else
     {
-        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+        percent100ths = kWcPercent100thsMiddle; // set at middle by default
     }
 
     TiltSchedulePositionSet(percent100ths);
@@ -556,7 +556,7 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     target  = wc->GetTargetPositionTiltPercent100ths();
-    current = wc->GetCurrentPositionTiltPercentage100ths();
+    current = wc->GetCurrentPositionTiltPercent100ths();
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -614,7 +614,7 @@ void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isT
 
     if (isTilt)
     {
-        current = wc->GetCurrentPositionTiltPercentage100ths();
+        current = wc->GetCurrentPositionTiltPercent100ths();
         if (!current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
@@ -623,7 +623,7 @@ void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isT
     }
     else
     {
-        current = wc->GetCurrentPositionLiftPercentage100ths();
+        current = wc->GetCurrentPositionLiftPercent100ths();
         if (!current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);

@@ -127,7 +127,7 @@ public:
             DataModel::Nullable<Percent100ths> percent100ths;
             if (Attributes::CurrentPositionLiftPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
-                cluster.SetCurrentPositionLiftPercentage100ths(percent100ths);
+                cluster.SetCurrentPositionLiftPercent100ths(percent100ths);
             }
             if (Attributes::TargetPositionLiftPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
@@ -149,7 +149,7 @@ public:
             DataModel::Nullable<Percent100ths> percent100ths;
             if (Attributes::CurrentPositionTiltPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
-                cluster.SetCurrentPositionTiltPercentage100ths(percent100ths);
+                cluster.SetCurrentPositionTiltPercent100ths(percent100ths);
             }
             if (Attributes::TargetPositionTiltPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
@@ -435,7 +435,7 @@ void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
         ChipLogProgress(Zcl, "Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
     cluster->SetCurrentPositionLiftPercentage(percent);
-    cluster->SetCurrentPositionLiftPercentage100ths(percent100ths);
+    cluster->SetCurrentPositionLiftPercent100ths(percent100ths);
 }
 
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
@@ -455,7 +455,7 @@ void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
         ChipLogProgress(Zcl, "Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
     cluster->SetCurrentPositionTiltPercentage(percent);
-    cluster->SetCurrentPositionTiltPercentage100ths(percent100ths);
+    cluster->SetCurrentPositionTiltPercent100ths(percent100ths);
 }
 
 void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
@@ -476,7 +476,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     {
     case Attributes::CurrentPositionLiftPercent100ths::Id:
         target  = cluster->GetTargetPositionLiftPercent100ths();
-        current = cluster->GetCurrentPositionLiftPercentage100ths();
+        current = cluster->GetCurrentPositionLiftPercent100ths();
         if ((OperationalState::Stall != opLift) && (current == target))
         {
             ChipLogProgress(Zcl, "Lift stop");
@@ -485,7 +485,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         break;
     case Attributes::CurrentPositionTiltPercent100ths::Id:
         target  = cluster->GetTargetPositionTiltPercent100ths();
-        current = cluster->GetCurrentPositionTiltPercentage100ths();
+        current = cluster->GetCurrentPositionTiltPercent100ths();
         if ((OperationalState::Stall != opTilt) && (current == target))
         {
             ChipLogProgress(Zcl, "Tilt stop");
@@ -494,13 +494,13 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         break;
     case Attributes::TargetPositionLiftPercent100ths::Id:
         target  = cluster->GetTargetPositionLiftPercent100ths();
-        current = cluster->GetCurrentPositionLiftPercentage100ths();
+        current = cluster->GetCurrentPositionLiftPercent100ths();
         opLift  = ComputeOperationalState(target, current);
         OperationalStateSet(endpoint, OperationalStatus::kLift, opLift);
         break;
     case Attributes::TargetPositionTiltPercent100ths::Id:
         target  = cluster->GetTargetPositionTiltPercent100ths();
-        current = cluster->GetCurrentPositionTiltPercentage100ths();
+        current = cluster->GetCurrentPositionTiltPercent100ths();
         opTilt  = ComputeOperationalState(target, current);
         OperationalStateSet(endpoint, OperationalStatus::kTilt, opTilt);
         break;
