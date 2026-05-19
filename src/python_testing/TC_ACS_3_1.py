@@ -224,7 +224,6 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # After the 3rd trigger, collect the event ID event to check the correct AmbientContextDetectEnded event reception later
             event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectStarted, timeout_sec=10)
-            start_event_id = event.event_id
 
             self.step("5")
             # check the subscription of AmbientContextType attribute
@@ -334,14 +333,14 @@ class TC_ACS_3_1(MatterBaseTest):
 
             self.step("7")
             # Check the boolean attributes are set to False
-            if (humanActivityDetected == True) & self.HumanActivitySupported:
+            if humanActivityDetected & self.HumanActivitySupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
                 log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
                 humanActivityDetected = subscription_bool_expected[0].value
                 log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
                 asserts.assert_true(not humanActivityDetected, "Failed to get HumanActivityDetected being False.")
 
-            if (objectIdentified == True) & self.ObjectIdentificationSupported:
+            if objectIdentified & self.ObjectIdentificationSupported:
                 # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
                 log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
@@ -349,7 +348,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 log.info(f"Rx'd objectIdentified: {objectIdentified}")
                 asserts.assert_true(not objectIdentified, "Failed to get ObjectIdentified being False.")
 
-            if (audioContextDetected == True) & self.SoundIdentificationSupported:
+            if audioContextDetected & self.SoundIdentificationSupported:
                 # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
                 log.info(f"Rx'd subscription_bool_expected: {subscription_bool_expected}")
