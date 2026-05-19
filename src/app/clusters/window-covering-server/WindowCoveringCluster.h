@@ -33,10 +33,10 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-static constexpr Percent100ths WC_PERCENT100THS_MIN_OPEN   = 0;
-static constexpr Percent100ths WC_PERCENT100THS_MAX_CLOSED = 10000;
-static constexpr Percent100ths WC_PERCENT100THS_MIDDLE     = 5000;
-static constexpr Percent100ths WC_PERCENT100THS_COEF       = 100;
+static constexpr Percent100ths kWcPercent100thsMinOpen   = 0;
+static constexpr Percent100ths kWcPercent100thsMaxClosed = 10000;
+static constexpr Percent100ths kWcPercent100thsMiddle    = 5000;
+static constexpr Percent100ths kWcPercent100thsCOEF      = 100;
 
 typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
@@ -137,64 +137,6 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    //    Commands
-    /**
-     * @brief Handles the UpOrOpen command.
-     *        Sets the target lift/tilt positions to fully open and requests movement from the delegate.
-     *
-     * @return Status::Success on successful handling.
-     *         Status::Busy if the device is in maintenance mode.
-     *         Status::Failure if the device is in calibration mode or otherwise not operational.
-     */
-    Protocols::InteractionModel::Status HandleUpOrOpen();
-
-    /**
-     * @brief Handles the DownOrClose command.
-     *        Sets the target lift/tilt positions to fully closed and requests movement from the delegate.
-     *
-     * @return Status::Success on successful handling.
-     *         Status::Busy if the device is in maintenance mode.
-     *         Status::Failure if the device is in calibration mode or otherwise not operational.
-     */
-    Protocols::InteractionModel::Status HandleDownOrClose();
-
-    /**
-     * @brief Handles the StopMotion command.
-     *        Asks the delegate to stop any ongoing motion and (unless the delegate reports motion is still in progress)
-     *        latches the current position as the new target.
-     */
-    Protocols::InteractionModel::Status HandleStopMotion(const Commands::StopMotion::DecodableType & fields);
-
-    /**
-     * @brief Handles the GoToLiftValue command.
-     *        Only supported when both AbsolutePosition and PositionAwareLift features are present.
-     */
-    Protocols::InteractionModel::Status HandleGoToLiftValue(const Commands::GoToLiftValue::DecodableType & commandData);
-
-    /**
-     * @brief Handles the GoToTiltValue command.
-     *        Only supported when both AbsolutePosition and PositionAwareTilt features are present.
-     */
-    Protocols::InteractionModel::Status HandleGoToTiltValue(const Commands::GoToTiltValue::DecodableType & commandData);
-
-    /**
-     * @brief Handles the GoToLiftPercentage command.
-     *        Validates the percent100ths value and requests lift movement from the delegate.
-     *
-     * @return Status::ConstraintError if the percentage is out of range.
-     *         Status::Failure if the PositionAwareLift feature is not supported.
-     */
-    Protocols::InteractionModel::Status HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields);
-
-    /**
-     * @brief Handles the GoToTiltPercentage command.
-     *        Validates the percent100ths value and requests tilt movement from the delegate.
-     *
-     * @return Status::ConstraintError if the percentage is out of range.
-     *         Status::Failure if the PositionAwareTilt feature is not supported.
-     */
-    Protocols::InteractionModel::Status HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields);
-
     // Setters and Getters
     BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
 
@@ -220,19 +162,19 @@ public:
     chip::BitMask<OperationalStatus> GetOperationalStatus() const { return mOperationalStatus; }
 
     void SetTargetPositionLiftPercent100ths(NPercent100ths newTargetLift);
-    NPercent100ths GetTargetPositionLiftPercent100ths() const { return mTargetPositionLiftPercentage100ths; }
+    NPercent100ths GetTargetPositionLiftPercent100ths() const { return mTargetPositionLiftPercent100ths; }
 
     void SetTargetPositionTiltPercent100ths(NPercent100ths newTargetLift);
-    NPercent100ths GetTargetPositionTiltPercent100ths() const { return mTargetPositionTiltPercentage100ths; }
+    NPercent100ths GetTargetPositionTiltPercent100ths() const { return mTargetPositionTiltPercent100ths; }
 
     void SetEndProductType(EndProductType type);
     EndProductType GetEndProductType() const { return mEndProductType; }
 
-    void SetCurrentPositionLiftPercentage100ths(NPercent100ths curLiftPercentage100ths);
-    NPercent100ths GetCurrentPositionLiftPercentage100ths() const { return mCurrentPositionLiftPercentage100ths; }
+    void SetCurrentPositionLiftPercent100ths(NPercent100ths curLiftPercent100ths);
+    NPercent100ths GetCurrentPositionLiftPercent100ths() const { return mCurrentPositionLiftPercent100ths; }
 
-    void SetCurrentPositionTiltPercentage100ths(NPercent100ths curTiltPercentage100ths);
-    NPercent100ths GetCurrentPositionTiltPercentage100ths() const { return mCurrentPositionTiltPercentage100ths; }
+    void SetCurrentPositionTiltPercent100ths(NPercent100ths curTiltPercent100ths);
+    NPercent100ths GetCurrentPositionTiltPercent100ths() const { return mCurrentPositionTiltPercent100ths; }
 
     void SetMode(chip::BitMask<Mode> mode);
     chip::BitMask<Mode> GetMode() const { return mMode; }
@@ -251,8 +193,67 @@ private:
      *         Status::Busy if maintenance mode is active.
      *         Status::Failure if calibration mode is active (or otherwise not operational).
      */
-    Protocols::InteractionModel::Status GetMotionLockStatus() const;
+    std::optional<DataModel::ActionReturnStatus> GetMotionLockStatus() const;
     void UpdateOperationalStateForField(chip::BitMask<OperationalStatus> field, OperationalState state);
+
+    /**
+     * @brief Handles the UpOrOpen command.
+     *        Sets the target lift/tilt positions to fully open and requests movement from the delegate.
+     *
+     * @return Status::Success on successful handling.
+     *         Status::Busy if the device is in maintenance mode.
+     *         Status::Failure if the device is in calibration mode or otherwise not operational.
+     */
+    std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen();
+
+    /**
+     * @brief Handles the DownOrClose command.
+     *        Sets the target lift/tilt positions to fully closed and requests movement from the delegate.
+     *
+     * @return Status::Success on successful handling.
+     *         Status::Busy if the device is in maintenance mode.
+     *         Status::Failure if the device is in calibration mode or otherwise not operational.
+     */
+    std::optional<DataModel::ActionReturnStatus> HandleDownOrClose();
+
+    /**
+     * @brief Handles the StopMotion command.
+     *        Asks the delegate to stop any ongoing motion and (unless the delegate reports motion is still in progress)
+     *        latches the current position as the new target.
+     */
+    std::optional<DataModel::ActionReturnStatus> HandleStopMotion(const Commands::StopMotion::DecodableType & fields);
+
+    /**
+     * @brief Handles the GoToLiftValue command.
+     *        Only supported when both AbsolutePosition and PositionAwareLift features are present.
+     */
+    std::optional<DataModel::ActionReturnStatus> HandleGoToLiftValue(const Commands::GoToLiftValue::DecodableType & commandData);
+
+    /**
+     * @brief Handles the GoToTiltValue command.
+     *        Only supported when both AbsolutePosition and PositionAwareTilt features are present.
+     */
+    std::optional<DataModel::ActionReturnStatus> HandleGoToTiltValue(const Commands::GoToTiltValue::DecodableType & commandData);
+
+    /**
+     * @brief Handles the GoToLiftPercentage command.
+     *        Validates the percent100ths value and requests lift movement from the delegate.
+     *
+     * @return Status::ConstraintError if the percentage is out of range.
+     *         Status::Failure if the PositionAwareLift feature is not supported.
+     */
+    std::optional<DataModel::ActionReturnStatus>
+    HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields);
+
+    /**
+     * @brief Handles the GoToTiltPercentage command.
+     *        Validates the percent100ths value and requests tilt movement from the delegate.
+     *
+     * @return Status::ConstraintError if the percentage is out of range.
+     *         Status::Failure if the PositionAwareTilt feature is not supported.
+     */
+    std::optional<DataModel::ActionReturnStatus>
+    HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields);
 
     EndpointId GetEndpointId() { return mPath.mEndpointId; }
 
@@ -261,18 +262,18 @@ private:
     const OptionalAttributeSet mOptionalAttributes;
 
     // Attributes
-    Type mType                       = Type::kRollerShade;
+    Type mType;
     uint16_t mNumberOfActuationsLift = 0;
     uint16_t mNumberOfActuationsTilt = 0;
     chip::BitMask<ConfigStatus> mConfigStatus;
     NPercent mCurrentPositionLiftPercentage;
     NPercent mCurrentPositionTiltPercentage;
-    NPercent100ths mTargetPositionLiftPercentage100ths;
-    NPercent100ths mTargetPositionTiltPercentage100ths;
+    NPercent100ths mTargetPositionLiftPercent100ths;
+    NPercent100ths mTargetPositionTiltPercent100ths;
     chip::BitMask<OperationalStatus> mOperationalStatus;
-    EndProductType mEndProductType = EndProductType::kRollerShade;
-    NPercent100ths mCurrentPositionLiftPercentage100ths;
-    NPercent100ths mCurrentPositionTiltPercentage100ths;
+    EndProductType mEndProductType;
+    NPercent100ths mCurrentPositionLiftPercent100ths;
+    NPercent100ths mCurrentPositionTiltPercent100ths;
     chip::BitMask<Mode> mMode;
     chip::BitMask<SafetyStatus> mSafetyStatus;
 };
