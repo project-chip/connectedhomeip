@@ -402,6 +402,27 @@ void DefaultOTARequestor::CancelImageUpdate()
     Reset();
 }
 
+void DefaultOTARequestor::OnFabricRemoved(FabricIndex fabricIndex)
+{
+    // mProviderLocation is set iff an OTA is in flight; if it points at a different fabric,
+    // leave it alone. The cluster has already cleared this fabric's DefaultOTAProviders entry.
+    if (!mProviderLocation.HasValue() || mProviderLocation.Value().fabricIndex != fabricIndex)
+    {
+        return;
+    }
+
+    ChipLogProgress(SoftwareUpdate, "OTA Requestor: tearing down in-flight update bound to removed fabric %u",
+                    static_cast<unsigned>(fabricIndex));
+
+    // EndDownload aborts the BDX exchange (a no-op if the downloader is not in kInProgress).
+    mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
+    // Cancel the driver's periodic-query / Apply / retry timers.
+    mOtaRequestorDriver->UpdateCancelled();
+    // Clear in-memory state and write the cleared values to the four global KVS keys
+    // (CurrentProviderLocation, UpdateToken, UpdateState, TargetVersion) via StoreCurrentUpdateInfo.
+    Reset();
+}
+
 CHIP_ERROR DefaultOTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, DataModel::Nullable<uint8_t> & progress)
 {
     if (mAttributes)

@@ -150,6 +150,18 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) = 0;
 
+    // Called by the cluster on FabricTable::Delegate::OnFabricRemoved so the requestor can drop
+    // in-flight / persisted state bound to the removed fabric. Default no-op for test doubles.
+    /**
+     * Called when a fabric is removed from the FabricTable so the requestor can drop any in-flight
+     * or persisted state bound to that fabric. Default no-op so test doubles need not override.
+     */
+    /**
+     * Called a fabric is removed from the FabricTable so the requestor can drop any in-flight
+     * or persisted state bound to the removed fabric.
+     */
+    virtual void OnFabricRemoved(FabricIndex fabricIndex) {}
+
     virtual ~OTARequestorCommandInterface() = default;
 };
 

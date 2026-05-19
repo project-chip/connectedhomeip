@@ -68,13 +68,14 @@ void OTARequestorCluster::Shutdown(ClusterShutdownType shutdownType)
 
 void OTARequestorCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    (void) fabricTable;
+    // Clear the fabric-scoped attribute, then notify the requestor.
     CHIP_ERROR err = mAttributes.RemoveDefaultOtaProvider(fabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "OTA Requestor: failed to clear DefaultOTAProviders for removed fabric %u: %" CHIP_ERROR_FORMAT,
                      static_cast<unsigned>(fabricIndex), err.Format());
     }
+    mOtaCommands.OnFabricRemoved(fabricIndex);
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
