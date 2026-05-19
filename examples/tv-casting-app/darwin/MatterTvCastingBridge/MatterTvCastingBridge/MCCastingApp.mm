@@ -97,8 +97,9 @@
     _serverInitParamsProvider = new MCCommonCaseDeviceServerInitParamsProvider();
 
     // Initialize MCDeviceInstanceInfoProviderBridge if the dataSource provides a delegate
+    id<MCDeviceInstanceInfoProvider> infoProvider = nil;
     if ([dataSource respondsToSelector:@selector(castingAppDidReceiveRequestForDeviceInstanceInfoProvider:)]) {
-        id<MCDeviceInstanceInfoProvider> infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
+        infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
         if (infoProvider != nil) {
             ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting up pull-based MCDeviceInstanceInfoProviderBridge");
             delete _deviceInstanceInfoProvider;
@@ -127,13 +128,19 @@
 
         // Write deviceName into PosixConfig so ConfigurationManagerImpl::GetCommissionableDeviceName()
         // returns it at runtime for UDC requests and mDNS advertisements.
-        id<MCDeviceInstanceInfoProvider> infoProvider = [dataSource castingAppDidReceiveRequestForDeviceInstanceInfoProvider:self];
         if (infoProvider != nil && [infoProvider respondsToSelector:@selector(deviceName)]) {
             NSString * deviceName = [infoProvider deviceName];
+            CHIP_ERROR err = CHIP_NO_ERROR;
             if (deviceName != nil) {
                 ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting commissionable device name");
-                chip::DeviceLayer::Internal::PosixConfig::WriteConfigValueStr(
+                err = chip::DeviceLayer::Internal::PosixConfig::WriteConfigValueStr(
                     chip::DeviceLayer::Internal::PosixConfig::kConfigKey_DeviceName, [deviceName UTF8String]);
+            } else {
+                err = chip::DeviceLayer::Internal::PosixConfig::ClearConfigValue(
+                    chip::DeviceLayer::Internal::PosixConfig::kConfigKey_DeviceName);
+            }
+            if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) {
+                ChipLogError(AppServer, "MCCastingApp.initializeWithDataSource() failed to update device name: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }

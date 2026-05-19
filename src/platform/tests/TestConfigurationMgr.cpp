@@ -31,7 +31,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/TxtFields.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/BuildTime.h>
@@ -481,7 +480,7 @@ TEST_F(TestConfigurationMgr, GetProductId)
 
 TEST_F(TestConfigurationMgr, GetCommissionableDeviceName)
 {
-    char buf[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
+    char buf[64];
 
     if (!ConfigurationMgr().IsCommissionableDeviceNameEnabled())
     {
@@ -500,7 +499,7 @@ TEST_F(TestConfigurationMgr, GetCommissionableDeviceNameFromConfig)
 {
     using namespace chip::DeviceLayer::Internal;
 
-    char buf[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
+    char buf[64];
     const char * testName = "My Test Device";
 
     // Write a device name to PosixConfig
