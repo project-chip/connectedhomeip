@@ -255,7 +255,7 @@ CHIP_ERROR AppTask::AppInit()
 CHIP_ERROR AppTask::InitLock()
 {
     chip::app::DataModel::Nullable<DlLockState> state;
-    chip::EndpointId endpointId{ kLockEndpointId };
+    chip::EndpointId endpointId = chip::EndpointId(LOCK_ENDPOINT);
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
 
@@ -388,7 +388,7 @@ void AppTask::LockButtonActionHandler(AppEvent * aEvent)
     }
 
     LockRequest req;
-    req.endpointId     = kLockEndpointId;
+    req.endpointId     = LOCK_ENDPOINT;
     req.action         = appInstance().NextState() ? LockAction::kLock : LockAction::kUnlock;
     req.isButtonAction = true;
 
@@ -444,7 +444,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     DlLockState newState        = static_cast<DlLockState>(static_cast<DlLockStateUnderlying>(context));
 
     Protocols::InteractionModel::Status status =
-        DoorLockServer::Instance().SetLockState(kLockEndpointId, newState, OperationSourceEnum::kManual)
+        DoorLockServer::Instance().SetLockState(LOCK_ENDPOINT, newState, OperationSourceEnum::kManual)
         ? Protocols::InteractionModel::Status::Success
         : Protocols::InteractionModel::Status::Failure;
 
@@ -480,9 +480,9 @@ bool AppTask::DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nul
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
 
-    VerifyOrReturnValue(endpointId == kLockEndpointId, false,
-                        ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %u (only %u supported)",
-                                     endpointId, kLockEndpointId);
+    VerifyOrReturnValue(endpointId == LOCK_ENDPOINT, false,
+                        ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %d (only %d supported)",
+                                     endpointId, LOCK_ENDPOINT);
                         err = OperationErrorEnum::kUnspecified);
 
     Nullable<uint16_t> userIndex;
@@ -514,9 +514,9 @@ bool AppTask::DMDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const N
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
 
-    VerifyOrReturnValue(endpointId == kLockEndpointId, false,
-                        ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %u (only %u supported)",
-                                     endpointId, kLockEndpointId);
+    VerifyOrReturnValue(endpointId == LOCK_ENDPOINT, false,
+                        ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %d (only %d supported)",
+                                     endpointId, LOCK_ENDPOINT);
                         err = OperationErrorEnum::kUnspecified);
 
     const bool supportsUnbolt = DoorLockServer::Instance().SupportsUnbolt(endpointId);
@@ -550,9 +550,9 @@ bool AppTask::DMDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const N
 {
     ChipLogProgress(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
 
-    VerifyOrReturnValue(endpointId == kLockEndpointId, false,
-                        ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %u (only %u supported)",
-                                     endpointId, kLockEndpointId);
+    VerifyOrReturnValue(endpointId == LOCK_ENDPOINT, false,
+                        ChipLogError(Zcl, "Door Lock App: rejecting command on unsupported endpoint %d (only %d supported)",
+                                     endpointId, LOCK_ENDPOINT);
                         err = OperationErrorEnum::kUnspecified);
 
     Nullable<uint16_t> userIndex;

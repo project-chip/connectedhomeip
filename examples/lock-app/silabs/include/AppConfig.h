@@ -23,11 +23,6 @@
 
 // ---- Door lock Example App Config ----
 
-#ifdef __cplusplus
-#include <lib/core/DataModelTypes.h>
-inline constexpr chip::EndpointId kLockEndpointId = 1;
-#endif // __cplusplus
-
 #define APP_TASK_NAME "Lock"
 
 #define BLE_DEV_NAME "SL-" APP_TASK_NAME
@@ -35,6 +30,8 @@ inline constexpr chip::EndpointId kLockEndpointId = 1;
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 10
+
+#define LOCK_ENDPOINT 1
 
 // Time the device will be left in the unlatched state before sending it back to the unlocked state.
 // Left at 100 ms for testing purposes.

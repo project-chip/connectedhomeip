@@ -89,33 +89,33 @@ public:
     public:
         ParamBuilder & SetNumberOfUsers(uint16_t numberOfUsers)
         {
-            lockParam_.numberOfUsers = numberOfUsers;
+            mLockParam.numberOfUsers = numberOfUsers;
             return *this;
         }
         ParamBuilder & SetNumberOfCredentialsPerUser(uint8_t numberOfCredentialsPerUser)
         {
-            lockParam_.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
+            mLockParam.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
             return *this;
         }
         ParamBuilder & SetNumberOfWeekdaySchedulesPerUser(uint8_t numberOfWeekdaySchedulesPerUser)
         {
-            lockParam_.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
+            mLockParam.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
             return *this;
         }
         ParamBuilder & SetNumberOfYeardaySchedulesPerUser(uint8_t numberOfYeardaySchedulesPerUser)
         {
-            lockParam_.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
+            mLockParam.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
             return *this;
         }
         ParamBuilder & SetNumberOfHolidaySchedules(uint8_t numberOfHolidaySchedules)
         {
-            lockParam_.numberOfHolidaySchedules = numberOfHolidaySchedules;
+            mLockParam.numberOfHolidaySchedules = numberOfHolidaySchedules;
             return *this;
         }
-        LockParam GetLockParam() { return lockParam_; }
+        LockParam GetLockParam() { return mLockParam; }
 
     private:
-        LockParam lockParam_;
+        LockParam mLockParam;
     };
 
     // ---------------------------------------------------------------------
