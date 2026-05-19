@@ -31,7 +31,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/examples/evse-app/evse-common:evse-common-lib",
+    "${chip_root}/examples/evse-app/evse-common:evse-charging-targets-lib",
     "${chip_root}/examples/evse-app/linux:test-evse-targets-store",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",

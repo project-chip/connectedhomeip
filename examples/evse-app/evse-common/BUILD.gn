@@ -25,21 +25,33 @@ chip_data_model("evse-common") {
   is_server = true
 }
 
-source_set("evse-common-lib") {
-  sources = [
-    "src/ChargingTargetsMemMgr.cpp",
-    "src/energy-evse-mode.cpp",
-  ]
+# Charging-targets helpers without ModeBase glue. Used by unit tests that link
+# evse-common-lib indirectly but not the evse-common chip_data_model.
+source_set("evse-charging-targets-lib") {
+  sources = [ "src/ChargingTargetsMemMgr.cpp" ]
 
   public_configs = [ ":config" ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+# Application mode delegate; requires evse-common chip_data_model for
+# ModeBase::Instance (CodegenIntegration.cpp from mode-base-server cluster).
+source_set("evse-common-lib") {
+  sources = [ "src/energy-evse-mode.cpp" ]
+
+  public_configs = [ ":config" ]
+
+  public_deps = [
+    ":evse-charging-targets-lib",
     "${chip_root}/examples/energy-management/device-energy-management:device-energy-management",
     "${chip_root}/examples/energy-management/electrical-sensor:electrical-sensor",
     "${chip_root}/examples/energy-management/utils:energy-management-utils",
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/energy-evse-server",
-    "${chip_root}/src/app/clusters/mode-base-server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/system",
