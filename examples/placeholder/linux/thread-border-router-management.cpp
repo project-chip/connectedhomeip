@@ -79,10 +79,10 @@ FakeBorderRouterDelegate gBorderRouterDelegate{};
 std::optional<ThreadBorderRouterManagement::ServerInstance> gThreadBorderRouterManagementServer;
 void emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
 {
-    VerifyOrDie(!gThreadBorderRouterManagementServer);
-    TEMPORARY_RETURN_IGNORED gThreadBorderRouterManagementServer
-        .emplace(endpoint, &gBorderRouterDelegate, Server::GetInstance().GetFailSafeContext())
-        .Init();
+    // VerifyOrDie(!gThreadBorderRouterManagementServer);
+    // TEMPORARY_RETURN_IGNORED gThreadBorderRouterManagementServer
+    //     .emplace(endpoint, &gBorderRouterDelegate, Server::GetInstance().GetFailSafeContext())
+    //     .Init();
 }
 
 void MatterThreadBorderRouterManagementClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType shutdownType)
