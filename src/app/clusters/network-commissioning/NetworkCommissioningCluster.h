@@ -185,6 +185,11 @@ public:
 
     virtual ~NetworkCommissioningCluster()
     {
+        if (mEventHandlerRegistered)
+        {
+            mClusterContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+            mEventHandlerRegistered = false;
+        }
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         if (IsInList())
         {
@@ -247,6 +252,7 @@ private:
     bool mConnectNetworkResponseSentEarly = false;
 #endif
     Context mClusterContext;
+    bool mEventHandlerRegistered = false;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
     void SetLastConnectErrorValue(NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);

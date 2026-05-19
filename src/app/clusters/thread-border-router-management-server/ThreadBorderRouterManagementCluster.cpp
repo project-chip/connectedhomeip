@@ -131,6 +131,11 @@ ThreadBorderRouterManagementCluster::ThreadBorderRouterManagementCluster(Endpoin
 
 ThreadBorderRouterManagementCluster::~ThreadBorderRouterManagementCluster()
 {
+    if (mEventHandlerRegistered)
+    {
+        mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+        mEventHandlerRegistered = false;
+    }
     sInstances.erase(this);
 }
 
@@ -149,15 +154,17 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & c
     if (mRegisterEventHandler)
     {
         ReturnErrorOnFailure(mPlatformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+        mEventHandlerRegistered = true;
     }
     return CHIP_NO_ERROR;
 }
 
 void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
 {
-    if (mRegisterEventHandler)
+    if (mEventHandlerRegistered)
     {
         mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+        mEventHandlerRegistered = false;
     }
     // clearing the delegate MUST always succeed.
     RETURN_SAFELY_IGNORED mDelegate.Init(nullptr);

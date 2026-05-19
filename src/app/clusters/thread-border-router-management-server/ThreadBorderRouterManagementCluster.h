@@ -92,6 +92,7 @@ protected:
 
     static std::set<ThreadBorderRouterManagementCluster *> sInstances;
     bool mRegisterEventHandler = true;
+    bool mEventHandlerRegistered = false;
 };
 
 } // namespace chip::app::Clusters

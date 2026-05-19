@@ -190,6 +190,7 @@ NetworkCommissioningCluster::NetworkInstanceList NetworkCommissioningCluster::sI
 CHIP_ERROR NetworkCommissioningCluster::Init()
 {
     ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    mEventHandlerRegistered = true;
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
@@ -205,6 +206,11 @@ CHIP_ERROR NetworkCommissioningCluster::Init()
 
 void NetworkCommissioningCluster::Deinit()
 {
+    if (mEventHandlerRegistered)
+    {
+        mClusterContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+        mEventHandlerRegistered = false;
+    }
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (sInstances.Contains(this))
     {

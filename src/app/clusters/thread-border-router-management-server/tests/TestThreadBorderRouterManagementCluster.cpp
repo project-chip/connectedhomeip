@@ -234,7 +234,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSuppo
 
     ThreadBorderRouterManagementCluster::Config localConfig(delegate, failSafeContext, breadcrumbTracker,
                                                             DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster localCluster(kTestEndpointId, localConfig);
+    ThreadBorderRouterManagementCluster localCluster(kTestEndpointId, localConfig.WithRegisterEventHandler(false));
 
     chip::Testing::ClusterTester tester(localCluster);
     EXPECT_EQ(localCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -242,6 +242,8 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSuppo
     uint32_t featureMap;
     EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
     EXPECT_EQ(featureMap, 0u);
+
+    localCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestGetActiveDatasetRequest)
