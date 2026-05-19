@@ -36,17 +36,26 @@
 namespace {
 __weak id<MCDeviceInstanceInfoProvider> sDeviceInstanceInfoDelegate = nil;
 
-CHIP_ERROR DeviceNameProviderCallback(char * buf, size_t bufSize)
+CHIP_ERROR ConfigValueProviderCallback(const char * configNamespace, const char * name,
+                                       char * buf, size_t bufSize, size_t & outLen)
 {
     id<MCDeviceInstanceInfoProvider> delegate = sDeviceInstanceInfoDelegate;
-    if (delegate != nil && [delegate respondsToSelector:@selector(deviceName)]) {
-        NSString * name = [delegate deviceName];
-        if (name != nil) {
-            chip::Platform::CopyString(buf, bufSize, [name UTF8String]);
-            return CHIP_NO_ERROR;
-        }
+    if (delegate == nil) {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+    NSString * value = nil;
+    if (strcmp(name, "device-name") == 0 && [delegate respondsToSelector:@selector(deviceName)]) {
+        value = [delegate deviceName];
+    }
+
+    if (value == nil) {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+
+    chip::Platform::CopyString(buf, bufSize, [value UTF8String]);
+    outLen = strlen(buf);
+    return CHIP_NO_ERROR;
 }
 } // namespace
 
@@ -144,12 +153,10 @@ CHIP_ERROR DeviceNameProviderCallback(char * buf, size_t bufSize)
         ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() setting custom DeviceInstanceInfoProvider");
         chip::DeviceLayer::SetDeviceInstanceInfoProvider(_deviceInstanceInfoProvider);
 
-        // Register the runtime device name provider so GetCommissionableDeviceName()
-        // queries the delegate on every call (matching Android's pull-based model).
-        if (infoProvider != nil && [infoProvider respondsToSelector:@selector(deviceName)]) {
-            sDeviceInstanceInfoDelegate = infoProvider;
-            chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance().SetDeviceNameProvider(DeviceNameProviderCallback);
-        }
+        // Register the general-purpose config value provider so platform queries
+        // (e.g. GetCommissionableDeviceName) call through to the delegate at runtime.
+        sDeviceInstanceInfoDelegate = infoProvider;
+        chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance().SetConfigValueProvider(ConfigValueProviderCallback);
     }
 
     // Get and store the CHIP Work queue
