@@ -242,9 +242,9 @@ void AppTask::TemperatureUpdateEventHandler(AppEvent * /* aEvent */)
 
     int16_t temperature = 0;
     CHIP_ERROR err      = appInstance().GetTemperature(temperature);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "GetTemperature() failed: %" CHIP_ERROR_FORMAT ", skipping LocalTemperature::Set",
-                                err.Format()));
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(AppServer, "GetTemperature() failed: %" CHIP_ERROR_FORMAT ", skipping LocalTemperature::Set", err.Format()));
 
     ChipLogDetail(AppServer, "Sensor Temp is : %d", temperature);
 
