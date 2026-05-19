@@ -21,10 +21,10 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <set>
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
 #include <lib/support/BitFlags.h>
 #include <platform/PlatformManager.h>
+#include <set>
 
 namespace chip::app::Clusters {
 
@@ -43,7 +43,11 @@ public:
         {}
 
         bool mRegisterEventHandler = true;
-        Config & WithRegisterEventHandler(bool v) { mRegisterEventHandler = v; return *this; }
+        Config & WithRegisterEventHandler(bool v)
+        {
+            mRegisterEventHandler = v;
+            return *this;
+        }
 
     private:
         friend class ThreadBorderRouterManagementCluster;
@@ -91,7 +95,7 @@ protected:
     Optional<uint64_t> mBreadcrumb;
 
     static std::set<ThreadBorderRouterManagementCluster *> sInstances;
-    bool mRegisterEventHandler = true;
+    bool mRegisterEventHandler   = true;
     bool mEventHandlerRegistered = false;
 };
 
