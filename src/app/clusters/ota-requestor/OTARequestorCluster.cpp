@@ -20,7 +20,6 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Server.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
@@ -39,17 +38,17 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 } // namespace
 
 OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands,
-                                         OTARequestorAttributes & attributes) :
+                                         OTARequestorAttributes & attributes, FabricTable & fabricTable) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
-    mOtaCommands(otaCommands), mAttributes(attributes)
+    mOtaCommands(otaCommands), mAttributes(attributes), mFabricTable(fabricTable)
 {}
 
 OTARequestorCluster::~OTARequestorCluster()
 {
-    // Defensive: ensure we're unregistered from the global FabricTable even if Shutdown()
-    // was never called (LazyRegisteredServerCluster::Destroy calls the destructor directly
-    // without first calling Shutdown). RemoveFabricDelegate is a no-op if not registered.
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    // Defensive: ensure we're unregistered even if Shutdown() was never called
+    // (LazyRegisteredServerCluster::Destroy calls the destructor directly without
+    // first calling Shutdown). RemoveFabricDelegate is a no-op if not registered.
+    mFabricTable.RemoveFabricDelegate(this);
 }
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
@@ -57,12 +56,12 @@ CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(
         mAttributes.SetInteractionModelContext(mPath.mEndpointId, *this, context.interactionContext.eventsGenerator));
-    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    return mFabricTable.AddFabricDelegate(this);
 }
 
 void OTARequestorCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mFabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
 

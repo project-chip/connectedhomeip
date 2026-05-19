@@ -32,7 +32,8 @@ class OTARequestorCluster : public DefaultServerCluster,
                             public FabricTable::Delegate
 {
 public:
-    OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands, OTARequestorAttributes & attributes);
+    OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands, OTARequestorAttributes & attributes,
+                        FabricTable & fabricTable);
     ~OTARequestorCluster() override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -66,6 +67,7 @@ private:
 
     OTARequestorCommandInterface & mOtaCommands;
     OTARequestorAttributes & mAttributes;
+    FabricTable & mFabricTable;
 };
 
 } // namespace chip::app::Clusters
