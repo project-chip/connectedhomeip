@@ -86,10 +86,6 @@ CustomerAppTask & appInstance()
     return CustomerAppTask::GetAppTask();
 }
 
-// `CredentialStruct` is the spec/cluster type from `door-lock-server.h`; the
-// AppTask-nested `*Size` constants live with their record types in `AppTask.h`.
-static constexpr uint16_t CredentialStructSize = sizeof(CredentialStruct);
-
 LEDWidget sLockLED;
 TimerHandle_t sUnlatchTimer;
 
@@ -1125,7 +1121,7 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
     // Get User struct from nvm3
     chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
 
-    uint16_t size = LockUserInfoSize;
+    uint16_t size = kLockUserInfoSize;
 
     LockUserInfo userInStorage;
 
@@ -1140,7 +1136,7 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
         return true;
     }
 
-    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == LockUserInfoSize, false);
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kLockUserInfoSize, false);
 
     user.userStatus = userInStorage.userStatus;
 
@@ -1173,7 +1169,7 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
     // Get credential struct from nvm3
     chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-    uint16_t credentialSize = static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount);
+    uint16_t credentialSize = static_cast<uint16_t>(kCredentialStructSize * userInStorage.currentCredentialCount);
 
     CredentialStruct credentials[kMaxCredentialsPerUser];
 
@@ -1182,7 +1178,7 @@ bool AppTask::DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex,
     if (error == CHIP_NO_ERROR)
     {
         // Check size out param matches what we expect to read
-        VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount),
+        VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(kCredentialStructSize * userInStorage.currentCredentialCount),
                             false);
 
         // Copy credentials attached to user from storage to the output parameter
@@ -1249,14 +1245,14 @@ bool AppTask::DMDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex,
     // Save credential struct in nvm3
     chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-    VerifyOrReturnValue(mStorage->SyncSetKeyValue(credentialKey.KeyName(), credentials, CredentialStructSize * totalCredentials) ==
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(credentialKey.KeyName(), credentials, kCredentialStructSize * totalCredentials) ==
                             CHIP_NO_ERROR,
                         false);
 
     // Save user in nvm3
     chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
 
-    VerifyOrReturnValue(mStorage->SyncSetKeyValue(userKey.KeyName(), &userInStorage, LockUserInfoSize) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(userKey.KeyName(), &userInStorage, kLockUserInfoSize) == CHIP_NO_ERROR, false);
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -1281,7 +1277,7 @@ bool AppTask::DMDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cred
 
     LockCredentialInfo credentialInStorage;
 
-    uint16_t size = LockCredentialInfoSize;
+    uint16_t size = kLockCredentialInfoSize;
 
     error = mStorage->SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
 
@@ -1293,7 +1289,7 @@ bool AppTask::DMDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cred
     }
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == LockCredentialInfoSize, false);
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kLockCredentialInfoSize, false);
 
     credential.status = credentialInStorage.status;
     ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
@@ -1356,7 +1352,7 @@ bool AppTask::DMDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cred
 
     chip::StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
 
-    error = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, LockCredentialInfoSize);
+    error = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, kLockCredentialInfoSize);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -1390,7 +1386,7 @@ DlStatus AppTask::DMDoorLockGetWeekDaySchedule(chip::EndpointId endpointId, uint
     // Get schedule data from nvm3
     chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(endpointId, userIndex, weekdayIndex);
 
-    uint16_t size = WeekDayScheduleInfoSize; // Create a non-const variable
+    uint16_t size = kWeekDayScheduleInfoSize; // Create a non-const variable
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, size);
 
@@ -1402,7 +1398,7 @@ DlStatus AppTask::DMDoorLockGetWeekDaySchedule(chip::EndpointId endpointId, uint
     }
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == WeekDayScheduleInfoSize, DlStatus::kFailure);
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kWeekDayScheduleInfoSize, DlStatus::kFailure);
 
     if (weekDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
     {
@@ -1442,7 +1438,7 @@ DlStatus AppTask::DMDoorLockSetWeekDaySchedule(chip::EndpointId endpointId, uint
     // Save schedule data in nvm3
     chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(endpointId, userIndex, weekdayIndex);
 
-    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, WeekDayScheduleInfoSize) ==
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, kWeekDayScheduleInfoSize) ==
                             CHIP_NO_ERROR,
                         DlStatus::kFailure);
 
@@ -1470,7 +1466,7 @@ DlStatus AppTask::DMDoorLockGetYearDaySchedule(chip::EndpointId endpointId, uint
     // Get schedule data from nvm3
     chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
 
-    uint16_t size = YearDayScheduleInfoSize;
+    uint16_t size = kYearDayScheduleInfoSize;
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
 
@@ -1482,7 +1478,7 @@ DlStatus AppTask::DMDoorLockGetYearDaySchedule(chip::EndpointId endpointId, uint
     }
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == YearDayScheduleInfoSize, DlStatus::kFailure);
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kYearDayScheduleInfoSize, DlStatus::kFailure);
 
     if (yearDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
     {
@@ -1518,7 +1514,7 @@ DlStatus AppTask::DMDoorLockSetYearDaySchedule(chip::EndpointId endpointId, uint
     // Save schedule data in nvm3
     chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
 
-    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, YearDayScheduleInfoSize) ==
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, kYearDayScheduleInfoSize) ==
                             CHIP_NO_ERROR,
                         DlStatus::kFailure);
 
@@ -1543,7 +1539,7 @@ DlStatus AppTask::DMDoorLockGetHolidaySchedule(chip::EndpointId endpointId, uint
     // Get schedule data from nvm3
     chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(endpointId, holidayIndex);
 
-    uint16_t size = HolidayScheduleInfoSize;
+    uint16_t size = kHolidayScheduleInfoSize;
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, size);
 
@@ -1555,7 +1551,7 @@ DlStatus AppTask::DMDoorLockGetHolidaySchedule(chip::EndpointId endpointId, uint
     }
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == HolidayScheduleInfoSize, DlStatus::kFailure);
+    VerifyOrReturnValue(error == CHIP_NO_ERROR && size == kHolidayScheduleInfoSize, DlStatus::kFailure);
 
     if (holidayScheduleInStorage.status == DlScheduleStatus::kAvailable)
     {
@@ -1589,7 +1585,7 @@ DlStatus AppTask::DMDoorLockSetHolidaySchedule(chip::EndpointId endpointId, uint
     // Save schedule data in nvm3
     chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(endpointId, holidayIndex);
 
-    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, HolidayScheduleInfoSize) ==
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, kHolidayScheduleInfoSize) ==
                             CHIP_NO_ERROR,
                         DlStatus::kFailure);
 

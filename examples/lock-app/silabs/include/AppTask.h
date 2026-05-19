@@ -282,11 +282,12 @@ protected:
         uint32_t credentialDataSize;
     };
 
-    static constexpr uint16_t LockUserInfoSize        = sizeof(LockUserInfo);
-    static constexpr uint16_t LockCredentialInfoSize  = sizeof(LockCredentialInfo);
-    static constexpr uint16_t WeekDayScheduleInfoSize = sizeof(WeekDayScheduleInfo);
-    static constexpr uint16_t YearDayScheduleInfoSize = sizeof(YearDayScheduleInfo);
-    static constexpr uint16_t HolidayScheduleInfoSize = sizeof(HolidayScheduleInfo);
+    static constexpr uint16_t kLockUserInfoSize        = sizeof(LockUserInfo);
+    static constexpr uint16_t kLockCredentialInfoSize  = sizeof(LockCredentialInfo);
+    static constexpr uint16_t kCredentialStructSize    = sizeof(CredentialStruct);
+    static constexpr uint16_t kWeekDayScheduleInfoSize = sizeof(WeekDayScheduleInfo);
+    static constexpr uint16_t kYearDayScheduleInfoSize = sizeof(YearDayScheduleInfo);
+    static constexpr uint16_t kHolidayScheduleInfoSize = sizeof(HolidayScheduleInfo);
 
     /** Override of `BaseApplication::AppInit()`. */
     CHIP_ERROR AppInit() override;
