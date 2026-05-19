@@ -146,10 +146,14 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
         ASSERT_EQ(DeviceLayer::PlatformMgr().PostEvent(&event), CHIP_NO_ERROR);
 
         // Run event loop to process the event
-        ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
-                      [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); },
-                      (intptr_t) nullptr),
-                  CHIP_NO_ERROR);
+        // Run event loop to process the event
+        CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void {
+                CHIP_ERROR stopErr = DeviceLayer::PlatformMgr().StopEventLoopTask();
+                EXPECT_EQ(stopErr, CHIP_NO_ERROR);
+            },
+            (intptr_t) nullptr);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
         DeviceLayer::PlatformMgr().RunEventLoop();
 
         EXPECT_TRUE(fakeWifiDriver.mRevertConfigurationCalled);
@@ -176,10 +180,14 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
         ASSERT_EQ(DeviceLayer::PlatformMgr().PostEvent(&event), CHIP_NO_ERROR);
 
         // Run event loop to process the event
-        ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
-                      [](intptr_t) -> void { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); },
-                      (intptr_t) nullptr),
-                  CHIP_NO_ERROR);
+        // Run event loop to process the event
+        CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void {
+                CHIP_ERROR stopErr = DeviceLayer::PlatformMgr().StopEventLoopTask();
+                EXPECT_EQ(stopErr, CHIP_NO_ERROR);
+            },
+            (intptr_t) nullptr);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
         DeviceLayer::PlatformMgr().RunEventLoop();
 
         EXPECT_FALSE(fakeWifiDriver.mRevertConfigurationCalled);
