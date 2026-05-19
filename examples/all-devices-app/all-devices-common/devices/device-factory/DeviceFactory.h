@@ -24,6 +24,7 @@
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -176,6 +177,15 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
+        {
+            RegisterCreator("proximity-ranger", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
+                                                               Span<Clusters::ProximityRanging::RangingAdapter * const>());
+            });
         }
 
         // at least one device type MUST be enabled
