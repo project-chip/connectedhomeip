@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -104,8 +106,9 @@ class ASRBoard(Enum):
 class ASRBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: ASRApp = ASRApp.LIGHT,
                  board: ASRBoard = ASRBoard.ASR582X,
                  chip_build_libshell: bool = False,
@@ -116,7 +119,8 @@ class ASRBuilder(GnBuilder):
                  enable_lwip_ip6_hook: bool = False):
         super(ASRBuilder, self).__init__(
             root=app.BuildRoot(root),
-            runner=runner)
+            runner=runner,
+            output_dir_lock=output_dir_lock)
 
         self.board = board
         self.app = app
@@ -177,6 +181,7 @@ class ASRBuilder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out"]
         if self.options.enable_link_map_file:

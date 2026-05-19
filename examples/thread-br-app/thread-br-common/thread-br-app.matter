@@ -1715,7 +1715,7 @@ cluster ThreadBorderRouterManagement = 1106 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1895,7 +1895,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_thread_border_router = 145, version 1;
+  device type ma_thread_border_router = 145, version 2;
 
 
   server cluster Descriptor {

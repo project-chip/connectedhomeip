@@ -192,7 +192,7 @@ class AccessChecker(BasicCompositionTests):
                 else:
                     # discard MEI attributes as we do not have access information for them.
                     attrs[cluster_id].update(
-                        {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
+                        set(filter(is_standard_attribute_id, device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID])))
 
                 if GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID not in device_cluster_data:
                     location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
@@ -200,10 +200,10 @@ class AccessChecker(BasicCompositionTests):
                                       problem="Cluster does not have the AcceptedCommandList attribute")
                 else:
                     cmds[cluster_id].update(
-                        {id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)})
+                        set(filter(is_standard_command_id, device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID])))
 
         # Remove MEI clusters - we don't have information available to check these.
-        all_clusters = [id for id in all_clusters if is_standard_cluster_id(id)]
+        all_clusters = list(filter(is_standard_cluster_id, all_clusters))
         for cluster_id in all_clusters:
             location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
             if cluster_id not in self.xml_clusters:

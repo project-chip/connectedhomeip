@@ -1,6 +1,7 @@
-/**
+/*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,25 +16,23 @@
  *    limitations under the License.
  */
 
-/****************************************************************************
- * @file
- * @brief APIs for the  Thermostat cluster.
- *
- *******************************************************************************
- ******************************************************************************/
-
 #pragma once
 
-#include <app/clusters/thermostat-server/thermostat-delegate.h>
+#include <app/server/Server.h>
+#include <lib/core/CHIPError.h>
+
+#include <string>
 
 namespace chip {
 namespace app {
-namespace Clusters {
-namespace Thermostat {
+namespace all_devices {
 
-bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & presetHandleToMatch);
+bool IsServerStarted();
 
-} // namespace Thermostat
-} // namespace Clusters
+CHIP_ERROR InitAllDevicesServer(CommonCaseDeviceServerInitParams & initParams);
+
+CHIP_ERROR StartAllDevicesServer(const std::string & deviceType);
+
+} // namespace all_devices
 } // namespace app
 } // namespace chip
