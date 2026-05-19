@@ -72,9 +72,9 @@ CHROMECAST_SETUP_SERVICE = CBUUID.UUIDWithString_(
 CHROMECAST_SETUP_SERVICE_SHORT = CBUUID.UUIDWithString_(u"FEA0")
 
 
-def _VoidPtrToCBUUID(ptr, len):
+def _VoidPtrToCBUUID(ptr, length):
     try:
-        ptr = ChipUtility.VoidPtrToByteArray(ptr, len)
+        ptr = ChipUtility.VoidPtrToByteArray(ptr, length)
         ptr = ChipUtility.Hexlify(ptr)
         ptr = (
             ptr[:8]
@@ -415,14 +415,14 @@ class CoreBluetoothManager(ChipBleBase):
         """Called by CoreBluetooth via runloop when a new characteristic value is received for a
         characteristic to which this device has subscribed."""
         # len = characteristic.value().length()
-        bytes = bytearray(characteristic.value().bytes().tobytes())
+        buf = bytearray(characteristic.value().bytes().tobytes())
         charId = bytearray(characteristic.UUID().data().bytes().tobytes())
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
 
         # Kick Chip thread to retrieve the saved packet.
         if self.devCtrl:
             # Save buffer, length, service UUID and characteristic UUID
-            rxEvent = BleRxEvent(charId=charId, svcId=svcId, buffer=bytes)
+            rxEvent = BleRxEvent(charId=charId, svcId=svcId, buffer=buf)
             self.chip_queue.put(rxEvent)
             self.devCtrl.DriveBleIO()
 
@@ -531,6 +531,6 @@ class CoreBluetoothManager(ChipBleBase):
 
         return True
 
-    def updateCharacteristic(self, bytes, svcId, charId):
+    def updateCharacteristic(self, buf, svcId, charId):
         # TODO: implement this for Peripheral support.
         return False

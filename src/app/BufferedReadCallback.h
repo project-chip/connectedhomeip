@@ -65,7 +65,7 @@ private:
     /*
      * Buffer up list data as they arrive.
      */
-    CHIP_ERROR BufferData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apReader);
+    CHIP_ERROR BufferData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData);
 
     //
     // ReadClient::Callback

@@ -50,7 +50,7 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device on-off-light:1 --discriminator 1234
+#     app-args: --device on-off-light:1 --discriminator 1234 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network

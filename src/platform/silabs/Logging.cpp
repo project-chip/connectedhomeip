@@ -10,10 +10,18 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+// Quick fix for SLCP projects in which
+// we combine generic OT components with Matter
+// Set this define to 0 in your .slcp to prevent double definition of otPlatLog
+#ifndef SL_MATTER_FORWARD_OT_LOGS
+#define SL_MATTER_FORWARD_OT_LOGS 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS
 #include <openthread/platform/logging.h>
 #endif
 
+#include <cinttypes>
 #include <stdio.h>
 #include <string.h>
 
@@ -119,13 +127,13 @@ size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
 
     // Derive the hours, minutes, seconds and milliseconds since boot time millisecond counter
     uint16_t milliseconds = timestampMillis % 1000;
-    uint32_t totalSeconds = timestampMillis / 1000;
+    uint32_t totalSeconds = static_cast<uint32_t>(timestampMillis / 1000);
     uint8_t seconds       = totalSeconds % 60;
     totalSeconds /= 60;
     uint8_t minutes = totalSeconds % 60;
     uint32_t hours  = totalSeconds / 60;
 
-    int chWritten = snprintf(buffer, maxSize, "[%04lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    int chWritten = snprintf(buffer, maxSize, "[%04" PRIu32 ":%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
     return (chWritten > 0) ? static_cast<size_t>(chWritten) : 0;
 }
 
@@ -158,7 +166,14 @@ void HandleLog(const char * module, LogCategory category, const char * aFormat, 
         prefixLen = sizeof formattedMsg - 1; // prevent overflow
     }
 
+#if !defined(__clang__)
     size_t len = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
+#else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+    size_t len = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
+#pragma clang diagnostic pop
+#endif
 
     if (len >= sizeof formattedMsg - prefixLen)
     {
@@ -302,7 +317,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 /**
  * Platform logging function for OpenThread
  */
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     (void) aLogRegion;
@@ -338,4 +353,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 #endif // SILABS_LOG_ENABLED
     va_end(v);
 }
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS
