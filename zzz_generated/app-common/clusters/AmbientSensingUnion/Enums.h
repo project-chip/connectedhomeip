@@ -28,8 +28,8 @@ namespace app {
 namespace Clusters {
 namespace AmbientSensingUnion {
 
-// Enum for UnionContributorHealthEum
-enum class UnionContributorHealthEum : uint8_t
+// Enum for UnionContributorHealthEnum
+enum class UnionContributorHealthEnum : uint8_t
 {
     kUnionContributorOnline  = 0x00,
     kUnionContributorOffline = 0x01,

@@ -25,9 +25,9 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-static auto __attribute__((unused)) EnsureKnownEnumValue(AmbientSensingUnion::UnionContributorHealthEum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(AmbientSensingUnion::UnionContributorHealthEnum val)
 {
-    using EnumType = AmbientSensingUnion::UnionContributorHealthEum;
+    using EnumType = AmbientSensingUnion::UnionContributorHealthEnum;
     switch (val)
     {
     case EnumType::kUnionContributorOnline:

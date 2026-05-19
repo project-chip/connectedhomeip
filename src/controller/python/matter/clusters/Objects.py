@@ -43768,7 +43768,7 @@ class AmbientSensingUnion(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
-        class UnionContributorHealthEum(MatterIntEnum):
+        class UnionContributorHealthEnum(MatterIntEnum):
             kUnionContributorOnline = 0x00
             kUnionContributorOffline = 0x01
             # All received enum values that are not listed above will be mapped
@@ -43797,13 +43797,13 @@ class AmbientSensingUnion(Cluster):
                         ClusterObjectFieldDescriptor(Label="contributorNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="contributorEndpointID", Tag=1, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorHealthEum),
+                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorHealthEnum),
                     ])
 
             contributorNodeID: 'typing.Union[Nullable, uint]' = NullValue
             contributorEndpointID: 'typing.Union[Nullable, uint]' = NullValue
             contributorName: 'typing.Optional[str]' = None
-            contributorHealth: 'AmbientSensingUnion.Enums.UnionContributorHealthEum' = 0
+            contributorHealth: 'AmbientSensingUnion.Enums.UnionContributorHealthEnum' = 0
 
     class Attributes:
         @dataclass
