@@ -383,38 +383,32 @@ void AppTask::GenericSwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "GenericSwitchWorkerFunction - Invalid work"));
 
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
+    auto switchCluster              = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
 
-    switch (data->event)
+    if (switchCluster != nullptr)
     {
-    case Switch::Events::InitialPress::Id: {
-        uint8_t currentPosition = 1;
-
-        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
-        if (switchCluster != nullptr)
+        switch (data->event)
         {
+        case Switch::Events::InitialPress::Id: {
+            const uint8_t currentPosition = 1;
             if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
             {
                 RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(currentPosition);
             }
+            break;
         }
-        break;
-    }
-    case Switch::Events::ShortRelease::Id: {
-        uint8_t previousPosition = 1;
-        uint8_t currentPosition  = 0;
-
-        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
-        if (switchCluster != nullptr)
-        {
+        case Switch::Events::ShortRelease::Id: {
+            const uint8_t previousPosition = 1;
+            const uint8_t currentPosition  = 0;
             if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
             {
                 RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
             }
+            break;
         }
-        break;
-    }
-    default:
-        break;
+        default:
+            break;
+        }
     }
 
     Platform::Delete(data);
