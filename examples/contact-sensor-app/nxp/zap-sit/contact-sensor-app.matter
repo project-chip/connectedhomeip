@@ -431,7 +431,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -545,7 +545,7 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  provisional fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
     nullable node_id adminNodeID = 0;
     fabric_idx fabricIndex = 254;
   }
@@ -557,7 +557,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -667,8 +667,8 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
-  provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -678,9 +678,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** This cluster implements the Provider role in the OTA process. */
+/** Provides an interface for providing OTA software updates */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1;
+  revision 1; // NOTE: Default/not specifically set
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -716,18 +716,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional long_octet_string<512> metadataForProvider = 7;
+    optional octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional long_char_string<256> imageURI = 2;
+    optional char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional long_octet_string<512> metadataForRequestor = 7;
+    optional octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -745,17 +745,17 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
+  /** Determine availability of a new Software Image */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** This command requests the specified version be installed on the device. */
+  /** Determine next action to take for a downloaded Software Image */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** This command tells the Provider that the specified update has been applied. */
+  /** Notify OTA Provider that an update was applied */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** This cluster implements the Requestor role in the OTA process. */
+/** Provides an interface for downloading and applying OTA software updates */
 cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1;
+  revision 1; // NOTE: Default/not specifically set
 
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
@@ -822,11 +822,11 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
     AnnouncementReasonEnum announcementReason = 2;
-    optional long_octet_string<512> metadataForNode = 3;
+    optional octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  /** This command MAY be invoked by Administrators to announce the presence of a particular OTA Provider. */
+  /** Announce the presence of an OTA Provider */
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
@@ -2018,7 +2018,7 @@ cluster GroupKeyManagement = 63 {
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
+  attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2173,7 +2173,7 @@ cluster IcdManagement = 70 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -2236,14 +2236,14 @@ endpoint 0 {
     emits event VersionApplied;
     emits event DownloadError;
     callback attribute defaultOTAProviders;
-    callback attribute updatePossible;
-    callback attribute updateState;
-    callback attribute updateStateProgress;
+    ram      attribute updatePossible default = 1;
+    ram      attribute updateState default = 0;
+    ram      attribute updateStateProgress default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
 
     handle command AnnounceOTAProvider;
   }
@@ -2333,6 +2333,8 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
+    callback attribute totalOperationalHours;
+    callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
@@ -2495,7 +2497,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_contactsensor = 21, version 1;
+  device type ma_contactsensor = 21, version 2;
 
 
   server cluster Identify {
