@@ -383,7 +383,7 @@ void AppTask::GenericSwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "GenericSwitchWorkerFunction - Invalid work"));
 
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
-    auto switchCluster              = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
+    auto switchCluster            = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
 
     if (switchCluster != nullptr)
     {
