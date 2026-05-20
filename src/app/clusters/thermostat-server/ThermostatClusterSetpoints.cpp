@@ -39,7 +39,7 @@ namespace Clusters {
 namespace Thermostat {
 
 Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, int16_t temperature,
-                            chip::BitFlags<SetpointAttributes> & affectedAttributes)
+                            SetpointAttributes & changedAttributes)
 {
     Status status = Status::Success;
     switch (attributeId)
@@ -51,7 +51,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         }
         auto range = setpoints.GetRange(OccupancyBitmap::kOccupied);
         status     = setpoints.ChangeRange(range, chip::Optional(temperature), chip::Optional<int16_t>::Missing(), Setpoints::ClampMode::kDontClamp,
-                                           affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case OccupiedCoolingSetpoint::Id: {
@@ -61,7 +61,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         }
         auto range = setpoints.GetRange(OccupancyBitmap::kOccupied);
         status     = setpoints.ChangeRange(range, chip::Optional<int16_t>::Missing(), chip::Optional(temperature), Setpoints::ClampMode::kDontClamp,
-                                           affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case UnoccupiedHeatingSetpoint::Id: {
@@ -71,7 +71,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         }
         auto range = setpoints.GetRange(OccupancyBitmap(0));
         status     = setpoints.ChangeRange(range, chip::Optional(temperature), chip::Optional<int16_t>::Missing(), Setpoints::ClampMode::kDontClamp,
-                                           affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case UnoccupiedCoolingSetpoint::Id: {
@@ -81,7 +81,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
         }
         auto range = setpoints.GetRange(OccupancyBitmap(0));
         status     = setpoints.ChangeRange(range, chip::Optional<int16_t>::Missing(), chip::Optional(temperature), Setpoints::ClampMode::kDontClamp,
-                                           affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case MinHeatSetpointLimit::Id: {
@@ -90,7 +90,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
             return Status::UnsupportedAttribute;
         }
         status = setpoints.ChangeLimits(setpoints.userHeatLimits, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
-                               affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case MaxHeatSetpointLimit::Id: {
@@ -99,7 +99,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
             return Status::UnsupportedAttribute;
         }
         status = setpoints.ChangeLimits(setpoints.userHeatLimits, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
-                               affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case MinCoolSetpointLimit::Id: {
@@ -108,7 +108,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
             return Status::UnsupportedAttribute;
         }
         status = setpoints.ChangeLimits(setpoints.userCoolLimits, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
-                               affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case MaxCoolSetpointLimit::Id: {
@@ -117,7 +117,7 @@ Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId
             return Status::UnsupportedAttribute;
         }
         status = setpoints.ChangeLimits(setpoints.userCoolLimits, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
-                               affectedAttributes);
+                                           changedAttributes);
     }
     break;
     case MinSetpointDeadBand::Id: {
@@ -195,11 +195,11 @@ Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointR
     }
     if (heat.HasValue() || cool.HasValue())
     {
-        chip::BitFlags<SetpointAttributes> affectedAttributes;
-        status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, affectedAttributes);
+        SetpointAttributes changedAttributes;
+        status = setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
         if (status == Status::Success)
         {
-            return SaveSetpoints(endpointId, setpoints, affectedAttributes);
+            return SaveSetpoints(endpointId, setpoints, changedAttributes);
         }
     }
 

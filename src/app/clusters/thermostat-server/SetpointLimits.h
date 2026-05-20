@@ -48,10 +48,14 @@ struct SetpointLimits
 
     virtual bool IsValid() { return Minimum() <= Maximum(); }
 
-    bool Valid(temperature value) const {
-        ChipLogProgress(Zcl, "Limit Valid: %" PRId16 " <= %" PRId16 " <= %" PRId16,
-                        Minimum(), value, Maximum());
-        return Minimum() <= value && value <= Maximum();
+    bool Valid(chip::AttributeId id, temperature value) const {
+        if (Minimum() <= value && value <= Maximum()) {
+            ChipLogProgress(Zcl, "%s Limit Valid: %" PRId16 " <= %" PRId16 " <= %" PRId16, SetpointAttributeName(id), Minimum(), value, Maximum());
+            return true;
+        }
+        ChipLogError(Zcl, "%s Limit Invalid: %" PRId16 " <= %" PRId16 " <= %" PRId16,
+                        SetpointAttributeName(id), Minimum(), value, Maximum());
+        return false;
     };
 
     temperature Clamp(temperature value) const { return std::clamp(value, Minimum(), Maximum()); };
@@ -81,8 +85,8 @@ struct UserSetpointLimits : SetpointLimits
     temperature Minimum() const override { return userMinimum.HasValue() ? userMinimum.Value() : absoluteLimits.Minimum(); };
     temperature Maximum() const override { return userMaximum.HasValue() ? userMaximum.Value() : absoluteLimits.Maximum(); }    ;
 
-    SetpointAttributes MinimumAttribute() {return absoluteLimits.mode == SystemModeEnum::kHeat ? SetpointAttributes::kMinHeatSetpointLimit : SetpointAttributes::kMinCoolSetpointLimit; }
-    SetpointAttributes MaximumAttribute() {return absoluteLimits.mode == SystemModeEnum::kHeat ? SetpointAttributes::kMaxHeatSetpointLimit : SetpointAttributes::kMaxCoolSetpointLimit; }
+    chip::AttributeId MinimumAttribute() {return absoluteLimits.mode == SystemModeEnum::kHeat ? Attributes::MinHeatSetpointLimit::Id : Attributes::MinCoolSetpointLimit::Id; }
+    chip::AttributeId MaximumAttribute() {return absoluteLimits.mode == SystemModeEnum::kHeat ? Attributes::MaxHeatSetpointLimit::Id : Attributes::MaxCoolSetpointLimit::Id; }
 };
 
 } // namespace Thermostat

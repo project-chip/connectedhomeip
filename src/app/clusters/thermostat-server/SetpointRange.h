@@ -34,18 +34,25 @@ class Setpoints;
 
 struct SetpointRange
 {
-    SetpointAttributes heatingAttribute;
-    SetpointAttributes coolingAttribute;
+    bool occupied;
     temperature heating;
     temperature cooling;
 
-    SetpointRange(SetpointAttributes heatAtt, SetpointAttributes coolAtt, temperature heat, temperature cool) :
-        heatingAttribute(heatAtt), coolingAttribute(coolAtt), heating(heat), cooling(cool)
+    SetpointRange(bool occupied, temperature heat, temperature cool) :
+        occupied(occupied), heating(heat), cooling(cool)
     {}
 
     SetpointRange(const SetpointRange & spr) :
-        heatingAttribute(spr.heatingAttribute), coolingAttribute(spr.coolingAttribute), heating(spr.heating), cooling(spr.cooling)
+        occupied(spr.occupied), heating(spr.heating), cooling(spr.cooling)
     {}
+
+    chip::AttributeId HeatingAttribute() {
+        return occupied ? Attributes::OccupiedHeatingSetpoint::Id : Attributes::UnoccupiedHeatingSetpoint::Id;
+    }
+
+    chip::AttributeId CoolingAttribute() {
+        return occupied ? Attributes::OccupiedCoolingSetpoint::Id : Attributes::UnoccupiedCoolingSetpoint::Id;
+    }
 };
 
 } // namespace Thermostat

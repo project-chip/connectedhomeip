@@ -17,28 +17,77 @@
 
 #pragma once
 
+#include <stdint.h>
+#include <type_traits>
+#include <utility>
+
 #include <app/ConcreteAttributePath.h>
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
+
+using namespace chip::app::Clusters::Thermostat::Attributes;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-enum class SetpointAttributes : uint16_t
-{
-    kNone                 = 0,
-    kOccupiedHeating      = 1 << 0,
-    kOccupiedCooling      = 1 << 1,
-    kUnoccupiedHeating    = 1 << 2,
-    kUnoccupiedCooling    = 1 << 3,
-    kMinSetpointDeadBand  = 1 << 4,
-    kMinHeatSetpointLimit = 1 << 5,
-    kMaxHeatSetpointLimit = 1 << 6,
-    kMinCoolSetpointLimit = 1 << 7,
-    kMaxCoolSetpointLimit = 1 << 8,
+class SetpointAttributes {
+
+    public:
+    SetpointAttributes & Set(chip::AttributeId attribute)
+    {
+        mValue |= static_cast<uint32_t>(1 << attribute);
+        return *this;
+    }
+
+    SetpointAttributes & Set(const SetpointAttributes & other)
+    {
+        mValue |= other.mValue;
+        return *this;
+    }
+
+    bool Has(chip::AttributeId attribute) const
+    {
+        return (mValue & static_cast<uint32_t>(1 << attribute)) != 0;
+    }
+
+    template<typename... Args>
+    bool HasAny(Args ... args) const
+    {
+        return (mValue & Or(std::forward<chip::AttributeId>(args)...)) != 0;
+    }
+
+    SetpointAttributes & Clear(chip::AttributeId attribute)
+    {
+        mValue &= ~static_cast<uint32_t>(1 << attribute);
+        return *this;
+    }
+
+    SetpointAttributes & ClearAll()
+    {
+        mValue = 0;
+        return *this;
+    }
+
+    uint32_t Raw() const { return mValue; }
+    
+    private:
+
+    template<typename... Args>
+    static constexpr uint32_t Or(chip::AttributeId attribute, Args ... args)
+    {
+        return static_cast<uint32_t>(1 << attribute) | Or(args...);
+    }
+    static constexpr uint32_t Or()
+    {
+        return 0;
+    }
+
+    uint32_t mValue = 0;
 };
+
+char const * SetpointAttributeName(chip::AttributeId id);
 
 }
 } // namespace Clusters

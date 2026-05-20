@@ -15,6 +15,7 @@ app_config_dependent_sources = [
   "PresetStructWithOwnedMembers.cpp",
   "PresetStructWithOwnedMembers.h",
   "SetpointAttributes.h",
+  "SetpointAttributes.cpp",
   "SetpointLimits.cpp",
   "SetpointLimits.h",
   "SetpointRange.h",

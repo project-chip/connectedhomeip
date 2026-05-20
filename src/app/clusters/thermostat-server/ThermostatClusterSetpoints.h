@@ -29,7 +29,7 @@ namespace Clusters {
 namespace Thermostat {
 
 Protocols::InteractionModel::Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, int16_t temperature,
-                                                         chip::BitFlags<SetpointAttributes> & affectedAttributes);
+                                                         SetpointAttributes & changedAttributes);
 
 Protocols::InteractionModel::Status SetpointRaiseLower(const EndpointId endpointId,
                                                        const Commands::SetpointRaiseLower::DecodableType & commandData);

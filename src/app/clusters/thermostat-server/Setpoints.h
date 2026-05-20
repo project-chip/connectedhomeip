@@ -62,8 +62,8 @@ public:
         absoluteHeatLimits(SystemModeEnum::kHeat, kDefaultAbsMinHeatSetpointLimit, kDefaultAbsMaxHeatSetpointLimit),
         absoluteCoolLimits(SystemModeEnum::kCool, kDefaultAbsMinCoolSetpointLimit, kDefaultAbsMaxCoolSetpointLimit),
         userHeatLimits(absoluteHeatLimits), userCoolLimits(absoluteCoolLimits),
-        occupied(SetpointAttributes::kOccupiedHeating, SetpointAttributes::kOccupiedCooling, kDefaultHeatingSetpoint, kDefaultCoolingSetpoint),
-        unoccupied(SetpointAttributes::kUnoccupiedHeating, SetpointAttributes::kUnoccupiedCooling, kDefaultHeatingSetpoint, kDefaultCoolingSetpoint), 
+        occupied(true, kDefaultHeatingSetpoint, kDefaultCoolingSetpoint),
+        unoccupied(false, kDefaultHeatingSetpoint, kDefaultCoolingSetpoint), 
         deadBand(kDefaultDeadBand)
     {}
 
@@ -79,37 +79,80 @@ public:
 
     bool Valid();
 
+    /**
+     * Get the current setpoint range, based on occupancy.
+     *
+     * @param occupancy  The current occupancy status.
+     * @return A reference to the current setpoint range.
+     */
     SetpointRange & GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy);
 
-    Protocols::InteractionModel::Status ChangeRange(SetpointRange range, chip::Optional<int16_t> heat, chip::Optional<int16_t> cool,
-                                                    ClampMode clamp, chip::BitFlags<SetpointAttributes> & affectedAttributes);
+    /**
+     * Change the values of a given setpoint range.
+     *
+     * @param range The setpoint range to modify.
+     * @param heat The new heating setpoint value to set for the given range.
+     * @param cool The new cooling setpoint value to set for the given range.
+     * @param clamp Whether to clamp the setpoint range.
+     * @param changedAttributes The set of attributes changed by this operation.
+     * @return The status of the operation.
+     */
+    Protocols::InteractionModel::Status ChangeRange(SetpointRange & range, chip::Optional<int16_t> heat, chip::Optional<int16_t> cool,
+                                                    ClampMode clamp, SetpointAttributes & changedAttributes);
 
-    Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limitOverride, chip::Optional<int16_t> min,
+    /**
+     * Change the min and max values of a given setpoint limit
+     *
+     * @param limits The setpoint limits to modify.
+     * @param min The new minimum setpoint value to set for the given limits.
+     * @param max The new maximum setpoint value to set for the given limits.
+     * @param changedAttributes The set of attributes changed by this operation.
+     * @return The status of the operation.
+     */
+    Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, chip::Optional<int16_t> min,
                                                      chip::Optional<int16_t> max,
-                                                     chip::BitFlags<SetpointAttributes> & affectedAttributes);
+                                                     SetpointAttributes & changedAttributes);
+
+    /**
+    * Attempt to fix any violations of the setpoint rules
+    * @param changedAttributes The set of attributes that were changed prior to this operation.
+    * @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
+    */
+    Protocols::InteractionModel::Status Fix(SetpointAttributes & changedAttributes);
 
 private: 
-Protocols::InteractionModel::Status Fix(chip::BitFlags<SetpointAttributes> & changedAttributes);
-void FixUserLimitDeadband( 
-    Optional<temperature> & heatLimit, 
-    Optional<temperature> & coolLimit,
-    temperature absoluteHeatLimit,
-    temperature absoluteCoolLimit,
-    SetpointAttributes heatAttribute,
-    SetpointAttributes coolAttribute,
-    chip::BitFlags<SetpointAttributes> & changedAttributes,
-    chip::BitFlags<SetpointAttributes> & fixedAttributes);
-Protocols::InteractionModel::Status FixUserLimits(SetpointLimits & absoluteLimits, 
-    UserSetpointLimits & userLimits, 
-    SetpointAttributes minAttribute,
-    SetpointAttributes maxAttribute,
-    chip::BitFlags<SetpointAttributes> & changedAttributes,
-    chip::BitFlags<SetpointAttributes> & fixedAttributes);
+
+
+    void FixUserLimitDeadband( 
+        Optional<temperature> & heatLimit, 
+        Optional<temperature> & coolLimit,
+        temperature absoluteHeatLimit,
+        temperature absoluteCoolLimit,
+        chip::AttributeId heatLimitAttribute,
+        chip::AttributeId coolLimitAttribute,
+        SetpointAttributes & changedAttributes,
+        SetpointAttributes & fixedAttributes);
+
+    void FixUserLimits(SetpointLimits & absoluteLimits, 
+        UserSetpointLimits & userLimits, 
+        chip::AttributeId minAttribute,
+        chip::AttributeId maxAttribute,
+        SetpointAttributes & changedAttributes,
+        SetpointAttributes & fixedAttributes);
+
+    void FixRange(SetpointRange & range,
+        chip::AttributeId heatingAttribute,
+        chip::AttributeId coolingAttribute,
+        SetpointAttributes & changedAttributes,
+        SetpointAttributes & fixedAttributes);
+
+
 };
 
 Protocols::InteractionModel::Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints);
-Protocols::InteractionModel::Status SaveSetpoints(EndpointId endpoint, Setpoints setpoints,
-                                                  chip::BitFlags<SetpointAttributes> affectedAttributes);
+Protocols::InteractionModel::Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & changedAttributes);
+
+
 
 } // namespace Thermostat
 } // namespace Clusters
