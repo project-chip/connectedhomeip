@@ -128,7 +128,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         return device_clusters
 
     # Test configuration
-    min_interval_floor_sec: int = 1
+    min_interval_floor_sec: int = 0
     max_interval_ceiling_sec: int = 3
     root_node_endpoint: int = 0
 
