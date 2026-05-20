@@ -25,7 +25,6 @@
 #include <clusters/ThreadBorderRouterManagement/Metadata.h>
 #include <lib/support/BitMask.h>
 
-
 namespace chip::app::Clusters {
 
 using namespace ThreadBorderRouterManagement;
@@ -126,11 +125,7 @@ ThreadBorderRouterManagementCluster::ThreadBorderRouterManagementCluster(Endpoin
     }
 }
 
-ThreadBorderRouterManagementCluster::~ThreadBorderRouterManagementCluster()
-{
-}
-
-
+ThreadBorderRouterManagementCluster::~ThreadBorderRouterManagementCluster() {}
 
 CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & context)
 {
@@ -302,19 +297,19 @@ void ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(uint32_t seq
 void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     auto * cluster = reinterpret_cast<ThreadBorderRouterManagementCluster *>(arg);
-    
+
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         (void) cluster->mDelegate.RevertActiveDataset();
 
         auto commandHandleRef = std::move(cluster->mAsyncCommandHandle);
         auto commandHandle    = commandHandleRef.Get();
-            if (commandHandle != nullptr)
-            {
-                commandHandle->AddStatus(ConcreteCommandPath(cluster->mPath.mEndpointId, cluster->mPath.mClusterId,
-                                                             ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id),
-                                         Protocols::InteractionModel::Status::Timeout);
-            }
+        if (commandHandle != nullptr)
+        {
+            commandHandle->AddStatus(ConcreteCommandPath(cluster->mPath.mEndpointId, cluster->mPath.mClusterId,
+                                                         ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id),
+                                     Protocols::InteractionModel::Status::Timeout);
+        }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
