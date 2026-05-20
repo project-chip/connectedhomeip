@@ -19,6 +19,7 @@ accessor
 Accessors
 acdbc
 ack
+acknowledgements
 ACKed
 ACL
 ACLs
@@ -297,6 +298,7 @@ commissionee
 CommissioningFlow
 commondatastorage
 Compat
+COMPRO
 CONF
 CONFIG
 ConfigDescription
@@ -347,6 +349,7 @@ csu
 csv
 ctl
 ctrl
+ctx
 CTS
 ctypes
 CurrentHue
@@ -799,6 +802,7 @@ itemName
 iterable
 itsfoss
 IW
+iwconfig
 JCM
 JDK
 jf
@@ -1474,6 +1478,7 @@ substeps
 subtype
 subtypes
 sudo
+sudoers
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
 suppressResponse
@@ -1692,6 +1697,7 @@ whitespace
 whitespaces
 whl
 wic
+wifipaf
 WiFiNetworkDiagnostics
 WindowCovering
 WindowCoveringGoToLiftPercentage

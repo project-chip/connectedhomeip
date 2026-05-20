@@ -58,7 +58,7 @@ same L2 broadcast domain — see §7 for why this matters):
 | ED    | `172.16.62.110` | `chip-lighting-app` + cert helper scripts               |
 
 Both Proxy and ED need a NAN-capable USB Wi-Fi dongle (see
-`../CP_getting_started.md §1.1`). The on-board Pi Wi-Fi chipset does not support
+`../CP_getting_started.md §1.1`). The on-board Pi Wi-Fi does not support
 NAN.
 
 > If any of those IPs are different on your rig, edit them in two places: the
@@ -163,7 +163,7 @@ Nothing cert-test-specific. The proxy needs:
 -   The patched wpa_supplicant (`../CP_getting_started.md §2`).
 -   The `chip-commissioning-proxy-app` binary in `~/apps/`
     (`../CP_getting_started.md §5`).
--   Passwordless SSH from the TH for `run-cert-test.sh` to restart the proxy
+-   Password less SSH from the TH for `run-cert-test.sh` to restart the proxy
     between iterations.
 
 `run-cert-test.sh` starts and stops the proxy on every iteration with the flags
@@ -222,7 +222,7 @@ What happens on every iteration:
 3. **ED start + eth0 block engaged** (networked mode only). The Python
    `EDFixture` in `compro_support.py` launches the ED over SSH and, _before_ the
    launch, runs `sudo ~/scripts/block-eth0-from-commissioner.sh up` on the ED.
-4. **Test runs.** Python `TC_COMPRO_2_X` executes; output is tee'd to
+4. **Test runs.** Python `TC_COMPRO_2_X` executes; output is tee to
    `/tmp/matter_run_<test>_<N>.log` on the TH.
 5. **ED stop + eth0 block cleared.** `EDFixture.stop()` calls `... block down`
    in a `finally`, so the block is cleared even if the test raises.
@@ -325,14 +325,14 @@ ssh ubuntu@<ed-ip> 'grep "state is .completed" /tmp/ed_app.log'
 
 Save this script as `setup-cert-test-rig.sh` **on your workstation** (the
 machine that has SSH access to TH/Proxy/ED). It writes every helper to
-`/tmp/cert-rig-staging/`, scp's them to the right host, sets permissions,
+`/tmp/cert-rig-staging/`, scp them to the right host, sets permissions,
 installs the sudoers file with `visudo -c`, and verifies. Re-running it is safe
 — every step is idempotent.
 
 ```bash
 #!/usr/bin/env bash
 # setup-cert-test-rig.sh — install Commissioning Proxy cert-test helpers
-# Run from a workstation with passwordless SSH to TH/Proxy/ED.
+# Run from a workstation with password less SSH to TH/Proxy/ED.
 
 set -euo pipefail
 
@@ -348,7 +348,7 @@ mkdir -p "$STAGE"
 
 # ============================================================
 # Write all helpers into the staging dir.
-# Copy each block from §9 below verbatim into a heredoc here.
+# Copy each block from §9 below verbatim.
 # ============================================================
 
 cat > "$STAGE/block-eth0-from-commissioner.sh" <<'BLOCK_EOF'
@@ -422,7 +422,7 @@ bash setup-cert-test-rig.sh
 
 > The script intentionally leaves the helper bodies as `# >>> paste …`
 > placeholders so you can audit each script before deploying. Copy each block
-> from §9 between the matching heredoc delimiters.
+> from §9 between the matching delimiters.
 
 <hr>
 

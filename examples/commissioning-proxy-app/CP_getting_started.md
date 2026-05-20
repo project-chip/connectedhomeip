@@ -66,7 +66,7 @@ chip-tool  ──Matter (TCP/IP)──►  Commissioning Proxy App  ──Wi-Fi 
 | **Build machine**            | —                                | Ubuntu 22.04 or 24.04 x86-64 with Docker installed. Not needed at runtime — used only to cross-compile the binaries.                                                                                                               |
 | **Ethernet switch / router** | —                                | Connects all RPis and the build machine on the same subnet for chip-tool to reach the Commissioning Proxy over IP. The ED does not need to be on the network                                                                       |
 
-> **Why a USB dongle?** The on-board Wi-Fi chipset on Raspberry Pi 4 and 5 does
+> **Why a USB dongle?** The on-board Wi-Fi on Raspberry Pi 4 and 5 does
 > not support the Wi-Fi Aware NAN USD interface required by Wi-Fi PAF. A
 > supported external USB dongle must be plugged into both the Proxy RPi and the
 > End Device RPi before starting either app.
@@ -117,7 +117,7 @@ The patch file `wpa-supplicant-matter.patch` (in the same directory as this
 guide) is primarily about enabling a **NAN scan mechanism** for the
 Commissioning Proxy.
 
-When the proxy performs a NAN scan to discover nearby commissionees, it
+When the proxy performs a NAN scan to discover nearby commissionee, it
 subscribes to the Matter NAN service as a passive listener. Without the patch,
 wpa_supplicant automatically sends a NAN Follow-up frame back to every publisher
 it discovers — this would accidentally initiate a PAF session (i.e. a connection
@@ -493,7 +493,7 @@ examples/chip-tool/out/rpi-arm64/chip-tool
 ### 4.4 Build the End Device app (RPi arm64)
 
 It is not necessary to rebuild the ED, this is here for completeness and to pull
-in some of the optimisations made to PAF on this branch.
+in some of the optimizations made to PAF on this branch.
 
 Create and run this bash script, ~/scripts/build-lighting-app-rpi.sh
 
@@ -560,7 +560,7 @@ ssh ubuntu@<th-rpi-ip>    'mkdir -p ~/apps'
 
 ### Copy the binaries
 
-> **Note**: `scp` will fail with "dest open: Failure" if the target binary is
+> **Note**: `scp` will fail with "destination open: Failure" if the target binary is
 > currently running on the RPi. Stop the app before copying.
 
 ```bash
@@ -712,7 +712,7 @@ Copy-paste form:
 /home/ubuntu/apps/chip-tool commissioningproxy read cached-results 1998 1
 ```
 
-The output lists discovered commissionees with their peer descriptor (address,
+The output lists discovered commissionee with their peer descriptor (address,
 band, discriminator).
 
 ### 8.4 Stop a background scan
