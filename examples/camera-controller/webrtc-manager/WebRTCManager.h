@@ -26,13 +26,6 @@
 #include <webrtc-manager/WebRTCProviderClient.h>
 #include <webrtc-manager/WebRTCRequestorDelegate.h>
 
-struct ICECandidateInfo
-{
-    std::string candidate;
-    std::string mid;
-    int mlineIndex;
-};
-
 class WebRTCManager
 {
 public:
