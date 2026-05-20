@@ -1732,7 +1732,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
 {
     // 1. Prepare data with non-zero referenceCount
     VideoStreamStruct stream;
-    stream.videoStreamID = 1;
+    stream.videoStreamID  = 1;
     stream.referenceCount = 5; // Non-zero
 
     uint8_t buffer[kMaxAllocatedVideoStreamsSerializedSize];
