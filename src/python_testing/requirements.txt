@@ -7,3 +7,5 @@ langcodes
 requests
 pycountry
 validators
+graphviz
+rich

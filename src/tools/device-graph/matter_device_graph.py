@@ -230,10 +230,26 @@ def create_graph(wildcardResponse, xml_device_types, xml_namespaces=None, outfil
     subgraph = {}
     currentAggregator = deviceGraph
 
+    ROOT_NODE_DEVICE_TYPE_ID = 0x0016
+
+    def is_root_node(endpoint: int) -> bool:
+        device_types = wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.DeviceTypeList]
+        return any(dt.deviceType == ROOT_NODE_DEVICE_TYPE_ID for dt in device_types)
+
     def create_subgraph(endpoint: int):
         nonlocal currentAggregator
-        if tree[endpoint].is_aggregator_or_root:
-            # For aggregators, just open a container
+        # The Root Node carries the is_aggregator_or_root flag but has no application children
+        # of its own, it collects every other endpoint underneath it. Nesting all the
+        # children inside a cluster_EP0 subgraph makes the root box visually swallow the rest
+        # of the device, so render the root label and recurse children at the top level.
+        if is_root_node(endpoint):
+            print(f"adding root on EP {endpoint}")
+            AddNodeLabel(deviceGraph, endpoint, wildcardResponse, xml_device_types, True, xml_namespaces)
+            for c in tree[endpoint].children:
+                create_subgraph(c)
+            for c in tree[endpoint].children:
+                deviceGraph.edge(f"ep{endpoint}", f'ep{c}', style='invis')
+        elif tree[endpoint].is_aggregator_or_root:
             print(f"adding aggregator on EP {endpoint}")
             with currentAggregator.subgraph(name=f'cluster_EP{endpoint}') as subgraph[endpoint]:
                 AddNodeLabel(subgraph[endpoint], endpoint, wildcardResponse, xml_device_types, True, xml_namespaces)
