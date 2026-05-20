@@ -479,32 +479,32 @@ Status HandleSetpointWrite(const ConcreteAttributePath & attributePath)
     {
         return status;
     }
-    temperature temp = 0;
+    temperature temp;
     switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id:
-        temp = setpoints.occupied.heating;
+        temp = setpoints.occupied.heating.Temperature();
         break;
     case OccupiedCoolingSetpoint::Id:
-        temp = setpoints.occupied.cooling;
+        temp = setpoints.occupied.cooling.Temperature();
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        temp = setpoints.unoccupied.heating;
+        temp = setpoints.unoccupied.heating.Temperature();
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        temp = setpoints.unoccupied.cooling;
+        temp = setpoints.unoccupied.cooling.Temperature();
         break;
     case MinHeatSetpointLimit::Id:
-        temp = setpoints.userHeatLimits.userMinimum.Value();
+        temp = setpoints.userHeatLimits.minimum.Temperature();
         break;
     case MaxHeatSetpointLimit::Id:
-        temp = setpoints.userHeatLimits.userMaximum.Value();
+        temp = setpoints.userHeatLimits.maximum.Temperature();
         break;
     case MinCoolSetpointLimit::Id:
-        temp = setpoints.userCoolLimits.userMinimum.Value();
+        temp = setpoints.userCoolLimits.minimum.Temperature();
         break;
     case MaxCoolSetpointLimit::Id:
-        temp = setpoints.userCoolLimits.userMaximum.Value();
+        temp = setpoints.userCoolLimits.maximum.Temperature();
         break;
     default:
         return Status::Failure;

@@ -15,33 +15,38 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-storage.h>
-#include <protocols/interaction_model/Constants.h>
-
 #include "Setpoint.h"
-#include "SetpointAttributes.h"
-#include "Temperature.h"
 
+using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Thermostat::Attributes;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class Setpoints;
-
-struct SetpointRange
+chip::app::Clusters::Thermostat::SystemModeEnum BaseSetpoint::Mode() const
 {
-    AbsoluteSetpoint heating;
-    AbsoluteSetpoint cooling;
-
-    SetpointRange(AbsoluteSetpoint heat, AbsoluteSetpoint cool) : heating(heat), cooling(cool) {}
-
-    SetpointRange(const SetpointRange & spr) : heating(spr.heating), cooling(spr.cooling) {}
-};
+    switch (mAttributeId)
+    {
+    case AbsMinHeatSetpointLimit::Id:
+    case AbsMaxHeatSetpointLimit::Id:
+    case MinHeatSetpointLimit::Id:
+    case MaxHeatSetpointLimit::Id:
+    case OccupiedHeatingSetpoint::Id:
+    case UnoccupiedHeatingSetpoint::Id:
+        return SystemModeEnum::kHeat;
+    case AbsMinCoolSetpointLimit::Id:
+    case AbsMaxCoolSetpointLimit::Id:
+    case MinCoolSetpointLimit::Id:
+    case MaxCoolSetpointLimit::Id:
+    case OccupiedCoolingSetpoint::Id:
+    case UnoccupiedCoolingSetpoint::Id:
+        return SystemModeEnum::kCool;
+    default:
+        return SystemModeEnum::kOff;
+    }
+}
 
 } // namespace Thermostat
 } // namespace Clusters

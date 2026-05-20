@@ -21,6 +21,7 @@
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
+#include "Setpoint.h"
 #include "Setpoints.h"
 
 namespace chip {
@@ -28,7 +29,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Protocols::InteractionModel::Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, int16_t temperature,
+Protocols::InteractionModel::Status HandleSetpointChange(Setpoints & setpoints, chip::AttributeId attributeId, temperature value,
                                                          SetpointAttributes & changedAttributes);
 
 Protocols::InteractionModel::Status SetpointRaiseLower(const EndpointId endpointId,

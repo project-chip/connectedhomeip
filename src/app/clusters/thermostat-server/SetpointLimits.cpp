@@ -36,13 +36,13 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-EffectiveSetpointLimits::EffectiveSetpointLimits(const Setpoints & sp, SystemModeEnum systemMode) :
+/*EffectiveSetpointLimits::EffectiveSetpointLimits(const Setpoints & sp, SystemModeEnum systemMode) :
     SetpointLimits(systemMode), setpoints(sp)
 {
-    int16_t minHeat = setpoints.userHeatLimits.Minimum();
-    int16_t maxHeat = setpoints.userHeatLimits.Maximum();
-    int16_t minCool = setpoints.userCoolLimits.Minimum();
-    int16_t maxCool = setpoints.userCoolLimits.Maximum();
+    temperature minHeat = setpoints.userHeatLimits.Minimum();
+    temperature maxHeat = setpoints.userHeatLimits.Maximum();
+    temperature minCool = setpoints.userCoolLimits.Minimum();
+    temperature maxCool = setpoints.userCoolLimits.Maximum();
 
     switch (systemMode)
     {
@@ -55,7 +55,7 @@ EffectiveSetpointLimits::EffectiveSetpointLimits(const Setpoints & sp, SystemMod
         maximum = maxCool;
         break;
     }
-}
+}*/
 
 } // namespace Thermostat
 } // namespace Clusters

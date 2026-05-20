@@ -510,8 +510,8 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         return status;
     }
 
-    auto heatLimits = EffectiveSetpointLimits(setpoints, SystemModeEnum::kHeat);
-    auto coolLimits = EffectiveSetpointLimits(setpoints, SystemModeEnum::kCool);
+    auto heatLimits = setpoints.GetLimits(SystemModeEnum::kHeat);
+    auto coolLimits = setpoints.GetLimits(SystemModeEnum::kCool);
 
     // For each preset in the pending presets list, check that the preset does not violate any spec constraints.
     for (uint8_t i = 0; true; i++)

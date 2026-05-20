@@ -16,6 +16,8 @@
  */
 
 #include "ThermostatClusterSetpoints.h"
+#include "Setpoint.h"
+#include "Temperature.h"
 #include "ThermostatCluster.h"
 
 #include "Setpoints.h"
@@ -38,93 +40,48 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, int16_t temperature,
+Status HandleSetpointChange(Setpoints & setpoints, chip::AttributeId attributeId, temperature value,
                             SetpointAttributes & changedAttributes)
 {
-    Status status = Status::Success;
     switch (attributeId)
     {
-    case OccupiedHeatingSetpoint::Id: {
+    case OccupiedHeatingSetpoint::Id:
+        return setpoints.ChangeRangeHeating(setpoints.occupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+    case OccupiedCoolingSetpoint::Id:
+        return setpoints.ChangeRangeCooling(setpoints.occupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+    case UnoccupiedHeatingSetpoint::Id:
+        if (!setpoints.occupancySupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return setpoints.ChangeRangeHeating(setpoints.unoccupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+    case UnoccupiedCoolingSetpoint::Id:
+        if (!setpoints.occupancySupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return setpoints.ChangeRangeCooling(setpoints.unoccupied, value, Setpoints::ClampMode::kDontClamp, changedAttributes);
+    case MinHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
-        {
             return Status::UnsupportedAttribute;
-        }
-        auto range = setpoints.GetRange(OccupancyBitmap::kOccupied);
-        status     = setpoints.ChangeRange(range, chip::Optional(temperature), chip::Optional<int16_t>::Missing(), Setpoints::ClampMode::kDontClamp,
-                                           changedAttributes);
-    }
-    break;
-    case OccupiedCoolingSetpoint::Id: {
-        if (!setpoints.coolSupported)
-        {
-            return Status::UnsupportedAttribute;
-        }
-        auto range = setpoints.GetRange(OccupancyBitmap::kOccupied);
-        status     = setpoints.ChangeRange(range, chip::Optional<int16_t>::Missing(), chip::Optional(temperature), Setpoints::ClampMode::kDontClamp,
-                                           changedAttributes);
-    }
-    break;
-    case UnoccupiedHeatingSetpoint::Id: {
-        if (!setpoints.heatSupported || !setpoints.occupancySupported)
-        {
-            return Status::UnsupportedAttribute;
-        }
-        auto range = setpoints.GetRange(OccupancyBitmap(0));
-        status     = setpoints.ChangeRange(range, chip::Optional(temperature), chip::Optional<int16_t>::Missing(), Setpoints::ClampMode::kDontClamp,
-                                           changedAttributes);
-    }
-    break;
-    case UnoccupiedCoolingSetpoint::Id: {
-        if (!setpoints.coolSupported || !setpoints.occupancySupported)
-        {
-            return Status::UnsupportedAttribute;
-        }
-        auto range = setpoints.GetRange(OccupancyBitmap(0));
-        status     = setpoints.ChangeRange(range, chip::Optional<int16_t>::Missing(), chip::Optional(temperature), Setpoints::ClampMode::kDontClamp,
-                                           changedAttributes);
-    }
-    break;
-    case MinHeatSetpointLimit::Id: {
+        return setpoints.ChangeLimitMinimum(setpoints.userHeatLimits, value, changedAttributes);
+    case MaxHeatSetpointLimit::Id:
         if (!setpoints.heatSupported)
-        {
             return Status::UnsupportedAttribute;
-        }
-        status = setpoints.ChangeLimits(setpoints.userHeatLimits, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
-                                           changedAttributes);
-    }
-    break;
-    case MaxHeatSetpointLimit::Id: {
-        if (!setpoints.heatSupported)
-        {
-            return Status::UnsupportedAttribute;
-        }
-        status = setpoints.ChangeLimits(setpoints.userHeatLimits, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
-                                           changedAttributes);
-    }
-    break;
-    case MinCoolSetpointLimit::Id: {
+        return setpoints.ChangeLimitMaximum(setpoints.userHeatLimits, value, changedAttributes);
+    case MinCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
-        {
             return Status::UnsupportedAttribute;
-        }
-        status = setpoints.ChangeLimits(setpoints.userCoolLimits, MakeOptional(temperature), chip::Optional<int16_t>::Missing(),
-                                           changedAttributes);
-    }
-    break;
-    case MaxCoolSetpointLimit::Id: {
+        return setpoints.ChangeLimitMinimum(setpoints.userCoolLimits, value, changedAttributes);
+    case MaxCoolSetpointLimit::Id:
         if (!setpoints.coolSupported)
-        {
             return Status::UnsupportedAttribute;
-        }
-        status = setpoints.ChangeLimits(setpoints.userCoolLimits, chip::Optional<int16_t>::Missing(), MakeOptional(temperature),
-                                           changedAttributes);
+        return setpoints.ChangeLimitMaximum(setpoints.userCoolLimits, value, changedAttributes);
+    case MinSetpointDeadBand::Id:
+        return Status::Success;
+    default:
+        return Status::UnsupportedAttribute;
     }
-    break;
-    case MinSetpointDeadBand::Id: {
-        status = Status::Success;
-    }
-    }
-    return status;
 }
 
 Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointRaiseLower::DecodableType & commandData)
@@ -158,31 +115,31 @@ Status SetpointRaiseLower(const EndpointId endpointId, const Commands::SetpointR
 
     auto range = setpoints.GetRange(isOccupied);
 
-    chip::Optional<int16_t> heat;
-    chip::Optional<int16_t> cool;
+    chip::Optional<temperature> heat;
+    chip::Optional<temperature> cool;
 
     switch (mode)
     {
     case SetpointRaiseLowerModeEnum::kBoth:
         if (setpoints.heatSupported)
         {
-            heat.SetValue(static_cast<int16_t>(range.heating + amount));
+            heat.SetValue(static_cast<temperature>(range.heating.Temperature() + amount));
         }
         if (setpoints.coolSupported)
         {
-            cool.SetValue(static_cast<int16_t>(range.cooling + amount));
+            cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + amount));
         }
         break;
     case SetpointRaiseLowerModeEnum::kHeat:
         if (setpoints.heatSupported)
         {
-            heat.SetValue(static_cast<int16_t>(range.heating + amount));
+            heat.SetValue(static_cast<temperature>(range.heating.Temperature() + amount));
         }
         break;
     case SetpointRaiseLowerModeEnum::kCool:
         if (setpoints.coolSupported)
         {
-            cool.SetValue(static_cast<int16_t>(range.cooling + amount));
+            cool.SetValue(static_cast<temperature>(range.cooling.Temperature() + amount));
         }
         break;
     default:

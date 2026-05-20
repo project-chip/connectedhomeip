@@ -18,6 +18,8 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/PresetStructWithOwnedMembers.cpp"
     "${CLUSTER_DIR}/PresetStructWithOwnedMembers.h"
+    "${CLUSTER_DIR}/Setpoint.cpp"
+    "${CLUSTER_DIR}/Setpoint.h"
     "${CLUSTER_DIR}/SetpointAttributes.h"
     "${CLUSTER_DIR}/SetpointAttributes.cpp"
     "${CLUSTER_DIR}/SetpointLimits.cpp"
