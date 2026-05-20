@@ -26,7 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
-#include "ESP32/ESP32Utils.h"
+#include "ESP32Utils.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
