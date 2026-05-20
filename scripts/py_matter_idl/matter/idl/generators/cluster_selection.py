@@ -18,6 +18,7 @@ from typing import List
 
 from matter.idl.matter_idl_types import Cluster, Idl
 
+
 def server_side_clusters(idl: Idl) -> List[Cluster]:
     """
     Return a list of clusters that are instantiated in at least one endpoint
