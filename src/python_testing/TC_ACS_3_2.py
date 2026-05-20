@@ -36,6 +36,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import ast
 import asyncio
 import logging
 import time
@@ -43,11 +44,9 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.clusters import Globals
-from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -85,7 +84,7 @@ class TC_ACS_3_2(MatterBaseTest):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
-    
+
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
 
@@ -194,7 +193,7 @@ class TC_ACS_3_2(MatterBaseTest):
             objectIdentified = subscription_expected2[0].value
             log.info(f"Rx'd objectIdentified: {objectIdentified}")
             asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-        
+
         elif namespaceID1 == SOUNDIDENTIFICATIONNAMESPACEID:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
@@ -226,7 +225,7 @@ class TC_ACS_3_2(MatterBaseTest):
         self.step("6") ####################################################################################
         # Trigger the sensor with same ambient context within HoldTime duration
         # Human activity walking for ci
-        log.info("\n\n Re-triger another same type ambient sensing event \n\n");
+        log.info("\n\n Re-triger another same type ambient sensing event \n\n")
 
         # CI call to trigger on
         if self.is_ci:
@@ -272,7 +271,7 @@ class TC_ACS_3_2(MatterBaseTest):
             objectIdentified = subscription_expected2[0].value
             log.info(f"Rx'd objectIdentified: {objectIdentified}")
             asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-        
+
         elif namespaceID1 == SOUNDIDENTIFICATIONNAMESPACEID:
             # AmbientContextType attribute subscription check for PIXIT.ACS.AmbientContextSensed_2 = Object identification person
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
@@ -296,7 +295,7 @@ class TC_ACS_3_2(MatterBaseTest):
 
         attrib_listener.reset()
 
-        self.step("8") #################################################################################### 
+        self.step("8") ####################################################################################
         # make sure to wait until HoldTime duration expires
         # CI call to trigger on
         if self.is_ci:
@@ -311,7 +310,7 @@ class TC_ACS_3_2(MatterBaseTest):
         asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
 
         # check boolean attributes
-        if (humanActivityDetected == True) & self.HumanActivitySupported:
+        if humanActivityDetected & self.HumanActivitySupported:
             humanActivityDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
             )
@@ -322,7 +321,7 @@ class TC_ACS_3_2(MatterBaseTest):
             humanActivityDetected = subscription_expected1[0].value
             log.info(f"Rx'd humanActivityDetected: {humanActivityDetected}")
             asserts.assert_true(humanActivityDetected is False, "Failed to get HumanActivityDetected being False.")
-        elif (objectIdentified == True) & self.ObjectIdentificationSupported:
+        elif objectIdentified & self.ObjectIdentificationSupported:
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
             )
@@ -334,7 +333,7 @@ class TC_ACS_3_2(MatterBaseTest):
             objectIdentified = subscription_expected2[0].value
             log.info(f"Rx'd objectIdentified: {objectIdentified}")
             asserts.assert_true(objectIdentified is False, "Failed to get ObjectIdentified being False.")
-        elif (audioContextDetected == True) & self.SoundIdentificationSupported:
+        elif audioContextDetected & self.SoundIdentificationSupported:
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
