@@ -42,12 +42,7 @@ public:
             mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker), mPlatformManager(platformManager)
         {}
 
-        bool mRegisterEventHandler = true;
-        Config & WithRegisterEventHandler(bool v)
-        {
-            mRegisterEventHandler = v;
-            return *this;
-        }
+
 
     private:
         friend class ThreadBorderRouterManagementCluster;
@@ -95,7 +90,6 @@ protected:
     Optional<uint64_t> mBreadcrumb;
 
     static std::set<ThreadBorderRouterManagementCluster *> sInstances;
-    bool mRegisterEventHandler   = true;
     bool mEventHandlerRegistered = false;
 };
 

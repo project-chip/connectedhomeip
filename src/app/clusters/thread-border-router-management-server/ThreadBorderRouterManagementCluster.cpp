@@ -120,7 +120,7 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::GeneratedCommands(const Concrete
 ThreadBorderRouterManagementCluster::ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config) :
     DefaultServerCluster({ endpoint, ThreadBorderRouterManagement::Id }), mDelegate(config.mDelegate),
     mFailSafeContext(config.mFailSafeContext), mBreadcrumbTracker(config.mBreadcrumbTracker),
-    mPlatformManager(config.mPlatformManager), mRegisterEventHandler(config.mRegisterEventHandler)
+    mPlatformManager(config.mPlatformManager)
 {
     if (mDelegate.GetPanChangeSupported())
     {
@@ -151,11 +151,8 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & c
 {
     ReturnErrorOnFailure(app::DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(mDelegate.Init(static_cast<ThreadBorderRouterManagementDelegate::AttributeChangeCallback *>(this)));
-    if (mRegisterEventHandler)
-    {
-        ReturnErrorOnFailure(mPlatformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
-        mEventHandlerRegistered = true;
-    }
+    ReturnErrorOnFailure(mPlatformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    mEventHandlerRegistered = true;
     return CHIP_NO_ERROR;
 }
 

@@ -123,7 +123,7 @@ struct TestThreadBorderRouterManagementCluster : public ::testing::Test
 
     TestThreadBorderRouterManagementCluster() :
         config(delegate, failSafeContext, breadcrumbTracker, DeviceLayer::PlatformMgr()),
-        cluster(kTestEndpointId, config.WithRegisterEventHandler(false))
+        cluster(kTestEndpointId, config)
     {}
 
     void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
@@ -234,7 +234,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSuppo
 
     ThreadBorderRouterManagementCluster::Config localConfig(delegate, failSafeContext, breadcrumbTracker,
                                                             DeviceLayer::PlatformMgr());
-    ThreadBorderRouterManagementCluster localCluster(kTestEndpointId, localConfig.WithRegisterEventHandler(false));
+    ThreadBorderRouterManagementCluster localCluster(kTestEndpointId, localConfig);
 
     chip::Testing::ClusterTester tester(localCluster);
     EXPECT_EQ(localCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
