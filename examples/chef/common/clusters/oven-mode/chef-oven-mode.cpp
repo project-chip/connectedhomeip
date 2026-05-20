@@ -113,7 +113,6 @@ void MatterOvenModeClusterInitCallback(chip::EndpointId endpointId)
 void MatterOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     ChefOvenMode::ShutdownOvenModeForEndpoint(endpointId);
-    ChefOvenMode::Shutdown();
 }
 
 CHIP_ERROR OvenMode::ChefDelegate::Init()
