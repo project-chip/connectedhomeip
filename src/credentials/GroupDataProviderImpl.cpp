@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <credentials/GroupDataProviderImpl.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
@@ -1654,7 +1655,11 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(in_keyset.num_keys_used >= 1 && in_keyset.num_keys_used <= KeySet::kEpochKeysMax,
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(in_keyset.policy == SecurityPolicy::kTrustFirst, CHIP_ERROR_INVALID_ARGUMENT);
+    if (in_keyset.policy != SecurityPolicy::kTrustFirst)
+    {
+        ChipLogError(NotSpecified, "Unsupported group key security policy: %d", static_cast<int>(in_keyset.policy));
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     FabricData fabric(fabric_index);
     KeySetData keyset;
 
