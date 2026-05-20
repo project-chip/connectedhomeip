@@ -279,25 +279,25 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
 
     // Instantiate the CameraAVStreamMgmt Server
     CameraAVStreamManagementCluster::InitArguments args{
-        .context = CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
-        .delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate(),
-        .endpointId = mEndpoint,
-        .features = avsmFeatures,
-        .optionalAttrs = avsmOptionalAttrs,
-        .maxConcurrentEncoders = static_cast<uint8_t>(maxConcurrentVideoEncoders),
-        .maxEncodedPixelRate = maxEncodedPixelRate,
-        .videoSensorParams = sensorParams,
-        .nightVisionUsesInfrared = nightVisionUsesInfrared,
-        .minViewPort = minViewport,
+        .context                      = CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
+        .delegate                     = mCameraDevice->GetCameraAVStreamMgmtDelegate(),
+        .endpointId                   = mEndpoint,
+        .features                     = avsmFeatures,
+        .optionalAttrs                = avsmOptionalAttrs,
+        .maxConcurrentEncoders        = static_cast<uint8_t>(maxConcurrentVideoEncoders),
+        .maxEncodedPixelRate          = maxEncodedPixelRate,
+        .videoSensorParams            = sensorParams,
+        .nightVisionUsesInfrared      = nightVisionUsesInfrared,
+        .minViewPort                  = minViewport,
         .rateDistortionTradeOffPoints = std::move(rateDistortionTradeOffPoints),
-        .maxContentBufferSize = maxContentBufferSize,
-        .microphoneCapabilities = micCapabilities,
-        .spkrCapabilities = spkrCapabilities,
-        .twoWayTalkSupport = twowayTalkSupport,
-        .snapshotCapabilities = std::move(snapshotCapabilities),
-        .maxNetworkBandwidth = maxNetworkBandwidth,
-        .supportedStreamUsages = std::move(supportedStreamUsages),
-        .streamUsagePriorities = std::move(streamUsagePriorities)
+        .maxContentBufferSize         = maxContentBufferSize,
+        .microphoneCapabilities       = micCapabilities,
+        .spkrCapabilities             = spkrCapabilities,
+        .twoWayTalkSupport            = twowayTalkSupport,
+        .snapshotCapabilities         = std::move(snapshotCapabilities),
+        .maxNetworkBandwidth          = maxNetworkBandwidth,
+        .supportedStreamUsages        = std::move(supportedStreamUsages),
+        .streamUsagePriorities        = std::move(streamUsagePriorities)
     };
     mAVStreamMgmtServer.Create(std::move(args));
 
