@@ -188,9 +188,9 @@ When the `kWiFiNetworkInterface` feature is enabled the delegate interacts with
 (NAN) sessions:
 
 -   `ProxyConnectRequest` — calls `WiFiPAFLayer::WiFiPAFSubscribe()` to open a
-    PAF session identified by the commissionee's discriminator and peer address.
+    PAF session identified by the commissionee discriminator and peer address.
 -   `ProxyMessageRequest` — calls `WiFiPAFLayer::SendMessage()` to send the
-    tunnelled commissioning packet over PAFTP.
+    tunneled commissioning packet over PAFTP.
 -   `ProxyDisconnectRequest` — calls `WiFiPAFLayer::RmPafSession()` to release
     the PAF session.
 

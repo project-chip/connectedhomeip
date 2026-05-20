@@ -161,7 +161,7 @@ $ ./chip-tool commissioningproxy proxy-scan-request \
 
 | Argument                     | Description                                                     |
 | ---------------------------- | --------------------------------------------------------------- |
-| `Transport`                  | Transport bitmap: `2` = BLE, `8` = WiFiPAF                      |
+| `Transport`                  | Transport bitmap: `2` = BLE, `8` = WiFi-PAF                      |
 | `proxy-node-id`              | Node ID of the proxy                                            |
 | `endpoint-id`                | Endpoint hosting the CommissioningProxy cluster (typically `1`) |
 | `--allow-large-payload true` | Required — forces TCP for this command (spec `L` quality)       |
@@ -171,7 +171,7 @@ $ ./chip-tool commissioningproxy proxy-scan-request \
 The scan runs for the duration configured by the proxy's `ScanMaxTime`
 attribute. Results are returned inline in the `ProxyScanResponse`.
 
-### Example — foreground WiFiPAF scan on both bands
+### Example — foreground WiFi-PAF scan on both bands
 
 ```
 $ ./chip-tool commissioningproxy proxy-scan-request 8 0x7ce 1 --allow-large-payload true --WiFiBands 5 --timeout 20
@@ -196,7 +196,7 @@ $ ./chip-tool commissioningproxy proxy-back-ground-scan-start-request \
 
 | Argument        | Description                                                     |
 | --------------- | --------------------------------------------------------------- |
-| `Transport`     | Transport bitmap: `2` = BLE, `8` = WiFiPAF                      |
+| `Transport`     | Transport bitmap: `2` = BLE, `8` = WiFi-PAF                      |
 | `Timeout`       | Scan lifetime in seconds; `0` for no expiry                     |
 | `WiFiBands`     | Wi-Fi band bitmap: `1` = 2.4 GHz, `4` = 5 GHz, `5` = both       |
 | `proxy-node-id` | Node ID of the proxy                                            |
@@ -207,7 +207,7 @@ the `CachedResults` attribute. Results are pushed to subscribers via attribute
 reporting. Multiple fabrics may each call start independently; the hardware scan
 runs as long as at least one fabric has an active request.
 
-### Example — background WiFiPAF scan on both bands, no expiry
+### Example — background WiFi-PAF scan on both bands, no expiry
 
 ```
 $ ./chip-tool commissioningproxy proxy-back-ground-scan-start-request 8 0 5 0x7ce 1
