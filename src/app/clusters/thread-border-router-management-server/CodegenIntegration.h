@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024-2026 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,21 +18,29 @@
 
 #pragma once
 
-// NOTE: This file exists for backward compatibility only.
-// New code should include the new CodeDriven files directly:
-// #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
-
-#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
+#include <app/FailSafeContext.h>
+#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
+#include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ThreadBorderRouterManagement {
 
-using Delegate = chip::app::Clusters::ThreadBorderRouterManagementDelegate;
+class ServerInstance
+{
+public:
+    ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext);
+    ~ServerInstance();
 
-constexpr size_t kBorderRouterNameMaxLength = chip::app::Clusters::ThreadBorderRouterManagementDelegate::kBorderRouterNameMaxLength;
-constexpr size_t kBorderAgentIdLength       = chip::app::Clusters::ThreadBorderRouterManagementDelegate::kBorderAgentIdLength;
+    CHIP_ERROR Init();
+
+private:
+    chip::app::RegisteredServerCluster<ThreadBorderRouterManagementCluster> mCluster;
+};
 
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters

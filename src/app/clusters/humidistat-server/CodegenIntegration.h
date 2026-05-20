@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2024-2026 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,11 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-// NOTE: This file exists for backward compatibility only.
-// New code should include the new CodeDriven files directly:
-// #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
+#include <app/clusters/humidistat-server/HumidistatCluster.h>
+#include <lib/core/DataModelTypes.h>
 
-#include <app/clusters/thread-border-router-management-server/CodegenIntegration.h>
+namespace chip::app::Clusters::Humidistat {
+
+/**
+ * Returns a pointer to the HumidistatCluster instance registered on the given
+ * endpoint, or nullptr if none is registered.
+ */
+HumidistatCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+} // namespace chip::app::Clusters::Humidistat
