@@ -209,11 +209,15 @@ class OTAProviderSubprocess(AppServerSubprocess):
                          extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=log_file, f_stderr=err_log_file)
 
     def terminate(self):
-        if self._log_file is not None:
-            self._log_file.close()
-        if self._err_log_file is not None:
-            self._err_log_file.close()
-        return super().terminate()
+        try:
+            super().terminate()
+        finally:
+            if self._log_file is not None:
+                self._log_file.close()
+                self._log_file = None
+            if self._err_log_file is not None:
+                self._err_log_file.close()
+                self._err_log_file = None
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)

@@ -172,6 +172,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[] = { P
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottomTagList[] = { PostionSemanticTag::kBottom,
                                                                                   NumberSemanticTag::kTwo };
 // These are representative tags.
+// Note: this tries to emulate data as seen in a real product, hence using the namespace.
 namespace BilresaRotary {
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRotaryTagList[] = {
     { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },

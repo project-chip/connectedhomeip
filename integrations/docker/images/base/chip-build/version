@@ -1,1 +1,1 @@
-192 : [nrfconnect] Update nRF Connect SDK version to 3.3.0
+197 : [crosscompile] Bump {armhf,aarch64} sysroot tag to `version:build-2026.05.14`

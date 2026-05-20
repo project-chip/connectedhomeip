@@ -94,8 +94,8 @@ static_library("nxp_platform") {
     "../common/NetworkProvisioningServerImpl.h",
     "../common/PlatformManagerImpl.h",
     "../common/SoftwareUpdateManagerImpl.h",
-    "../mcxw71/ConfigurationManagerImpl.cpp",
     "CHIPDevicePlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
   deps = [ "${chip_root}/src/app:app_config" ]
@@ -137,7 +137,7 @@ static_library("nxp_platform") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (nxp_use_low_power) {
-    sources += [ "../mcxw71/LowPowerHooks.cpp" ]
+    sources += [ "LowPowerHooks.cpp" ]
   }
 
   deps += [
@@ -183,7 +183,7 @@ static_library("nxp_platform") {
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
 
   public_deps += [
-    "${chip_root}/examples/platform/nxp/mcxw71/app/support:freertos_memory_utils",
+    "${chip_root}/examples/platform/nxp/mcxw72/app/support:freertos_memory_utils",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",

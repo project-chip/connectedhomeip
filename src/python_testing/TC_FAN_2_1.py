@@ -83,15 +83,16 @@ class TC_FAN_2_1(MatterBaseTest):
                             f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
         return write_status
 
-    async def verify_setting(self, attribute, type, range):
+    async def verify_setting(self, attribute, expected_type, expected_range):
         # Read attribute value
         value = await self.read_setting(attribute)
 
-        asserts.assert_is_instance(value, type,
-                                   f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
+        asserts.assert_is_instance(value, expected_type,
+                                   f"[FC] {attribute.__name__} result ({value}) isn't of type {expected_type.__name__}")
 
         # Verify response is valid (value is within expected range)
-        asserts.assert_in(value, range, f"[FC] {attribute.__name__} result ({value}) is out of range")
+        asserts.assert_in(value, expected_range,
+                          f"[FC] {attribute.__name__} result ({value}) is out of range (expected {expected_range})")
 
         return value
 

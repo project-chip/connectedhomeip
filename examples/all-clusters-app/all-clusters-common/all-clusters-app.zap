@@ -62,7 +62,7 @@
       ],
       "deviceVersions": [
         1,
-        5
+        4
       ],
       "deviceIdentifiers": [
         17,
@@ -6429,7 +6429,7 @@
         }
       ],
       "deviceVersions": [
-        4,
+        3,
         1
       ],
       "deviceIdentifiers": [
@@ -13847,7 +13847,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x19",
+              "defaultValue": "0x14",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -16420,10 +16420,10 @@
               "side": "server",
               "type": "int16s",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -16468,7 +16468,7 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -16484,7 +16484,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0004",
@@ -21671,7 +21671,7 @@
         }
       ],
       "deviceVersions": [
-        4,
+        3,
         1
       ],
       "deviceIdentifiers": [
