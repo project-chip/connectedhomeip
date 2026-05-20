@@ -23,7 +23,23 @@ get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-
 
 include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
+set(ALL_DEVICES_ENABLED_DEVICES
+    chime
+    contact-sensor
+    dimmable-light
+    occupancy-sensor
+    on-off-light
+    proximity-ranger
+    soil-sensor
+    speaker
+    temperature-sensor
+    water-leak-detector
+)
+
 include(${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake)
+
+# Remove NIM device sources as they are not supported on Telink (requires Linux/Border Router support)
+list(REMOVE_ITEM ALL_DEVICES_DEVICE_SOURCES "${ALL_DEVICES_COMMON_DIR}/devices/nim/NimDevice.cpp")
 
 add_compile_definitions(IDENTIFY_CLUSTER_DISABLED=1)
 
