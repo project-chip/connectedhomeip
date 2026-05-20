@@ -1827,10 +1827,12 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     ChipLogProgress(Zcl, "Loaded %u %s streams", static_cast<unsigned int>(streams.size()),
                     StreamTypeToString(Traits::kStreamType));
 
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+
     // Persist the zeroed reference counts back to KVS without sending notifications
     ReturnErrorOnFailure(StoreAllocatedStreams<attributeId>());
 
-    return reader.VerifyEndOfContainer();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
