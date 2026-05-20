@@ -95,6 +95,12 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/tcc-mode.cpp
 )
 
 if (CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
