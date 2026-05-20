@@ -2994,7 +2994,7 @@ endpoint 0 {
     ram      attribute status;
     ram      attribute order;
     ram      attribute description;
-    ram      attribute wiredCurrentType default = 0;
+    ram      attribute wiredCurrentType;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

@@ -2971,7 +2971,7 @@ endpoint 0 {
     ram      attribute batReplaceability;
     ram      attribute batReplacementDescription;
     ram      attribute batCommonDesignation;
-    ram      attribute batQuantity default = 1;
+    ram      attribute batQuantity;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

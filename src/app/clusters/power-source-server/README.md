@@ -11,9 +11,8 @@ the data model when an attribute changes in the way that the spec mandates.
 
 ## Usage
 
-For new applications using `CodeDrivenDataModelProvider`, we strongly recommend
-creating and registering the cluster directly. This can be done using
-`RegisteredServerCluster` and `LazyRegisteredServerCluster` in
+The cluster needs to be created manually and registered directly using `CodeDrivenDataModelProvider`.
+Creation can be done using `RegisteredServerCluster` and `LazyRegisteredServerCluster` in
 `src/app/server-cluster/SingleEndpointServerClusterRegistry.h`.
 
 ### How does the cluster work
@@ -277,47 +276,3 @@ clusters creation, because they are `Fixed` attributes.
 Again, all this is to have the cluster to be the smallest possible type for the
 functionality needed. So if you do not have any FLASH restrictions, you can use
 `Full*PowerSourceCluster`s for everything.
-
-## Legacy Usage (Not Recommended)
-
-For backwards compatibility with applications that rely on older ZAP-generated
-patterns (like the `all-clusters-app`), a compatibility layer is provided in
-`CodegenIntegration.h` and `CodegenIntegration.cpp`.
-
-In this model, you configure the Power Source cluster in your `.zap` file. The
-ZAP tool generates `MatterPowerSourceClusterInitCallback`, which is implemented
-by our `CodegenIntegration` layer to automatically instantiate and configure the
-cluster based on your ZAP configuration.
-
-Note that it will be enforced that it is possible to create a valid cluster from
-the configuration with the ZAP tool. This means that you will need to specify
-the type of the power source (wired or battery) with the ZAP tool, otherwise the
-initial startup will fail.
-
-To use the cluster in this mode, your application can get a pointer to the
-cluster instance and call its methods directly using
-`PowerSource::FindWiredClusterOnEndpoint(endpointId)` or
-`PowerSource::FindBatteryClusterOnEndpoint(endpointId)` depending the
-configuration.
-
-If there is a wired configuration on some endpoint,
-`FindBatteryClusterOnEndpoint` will return nullptr.
-
-Note that this method is for backwards compatibility only and is not recommended
-for new applications.
-
-```cpp
-void BatPercentRemainingChangedCallback(uint8_t newValue)
-{
-    // or just use auto *
-    chip::app::Clusters::PowerSource::EmberBatteryPowerSourceCluster * cluster = chip::app::Clusters::PowerSource::FindBatteryClusterOnEndpoint(endpointId);
-    if (cluster != nullptr)
-    {
-        LogErrorOnFailure(cluster->SetBatPercentRemaining(newValue));
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Battery PowerSourceCluster not found on endpoint %u", static_cast<unsigned>(endpointId));
-    }
-}
-```

@@ -6605,15 +6605,11 @@ endpoint 0 {
     ram      attribute status default = 0;
     ram      attribute order default = 3;
     ram      attribute description default = "B1";
-    ram      attribute batPercentRemaining;
-    ram      attribute batChargeLevel;
-    ram      attribute batReplacementNeeded;
-    ram      attribute batReplaceability;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -6916,15 +6912,11 @@ endpoint 1 {
     ram      attribute status default = 0;
     ram      attribute order default = 2;
     ram      attribute description default = "B2";
-    ram      attribute batPercentRemaining;
-    ram      attribute batChargeLevel;
-    ram      attribute batReplacementNeeded;
-    ram      attribute batReplaceability;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -7429,15 +7421,11 @@ endpoint 2 {
     ram      attribute status default = 0;
     ram      attribute order default = 1;
     ram      attribute description default = "B3";
-    ram      attribute batPercentRemaining;
-    ram      attribute batChargeLevel;
-    ram      attribute batReplacementNeeded;
-    ram      attribute batReplaceability;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 

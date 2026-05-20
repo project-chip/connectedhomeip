@@ -1155,22 +1155,6 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveWiredFaults",
-              "code": 10,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "EndpointList",
               "code": 31,
               "mfgCode": null,

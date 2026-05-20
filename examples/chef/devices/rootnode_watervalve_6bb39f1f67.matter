@@ -1976,7 +1976,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 6;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 

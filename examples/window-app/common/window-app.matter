@@ -2546,16 +2546,13 @@ endpoint 0 {
     ram      attribute batPercentRemaining;
     ram      attribute batTimeRemaining;
     ram      attribute batChargeLevel;
-    ram      attribute batReplacementNeeded;
-    ram      attribute batReplaceability;
     callback attribute activeBatFaults;
     ram      attribute batChargeState;
-    ram      attribute batFunctionalWhileCharging;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 6;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 

@@ -68,10 +68,6 @@ void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
-void MatterPowerSourceClusterInitCallback(chip::EndpointId endpointId);
-
-void MatterPowerSourceClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
-
 void MatterGeneralCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

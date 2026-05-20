@@ -32,9 +32,6 @@
 
 #include "App_Battery.h"
 
-// TODO: In the future we would like to use `PowerSourceCluster.h` instead of this to not have dependency on ember
-#include <app/clusters/power-source-server/CodegenIntegration.h>
-
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::TLV;
@@ -89,18 +86,11 @@ using namespace chip::app::Clusters;
 void SetBatteryVoltage(uint32_t voltage)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([voltage] {
-        CHIP_ERROR err;
-        if (EmberBatteryPowerSourceCluster * cluster = FindBatteryClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
+        Protocols::InteractionModel::Status status =
+            PowerSource::Attributes::BatVoltage::Set(QPG_BATTERY_ENDPOINT_ID, (uint32_t) voltage);
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
-        else
-        {
-            err = cluster->SetBatVoltage(voltage);
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "ERR: updating voltage %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(NotSpecified, "ERR: updating voltage %x", to_underlying(status));
         }
     });
 }
@@ -108,18 +98,11 @@ void SetBatteryVoltage(uint32_t voltage)
 void SetBatteryPercentageRemaining(DoubledPercentage value)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([value] {
-        CHIP_ERROR err;
-        if (EmberBatteryPowerSourceCluster * cluster = FindBatteryClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
+        Protocols::InteractionModel::Status status =
+            PowerSource::Attributes::BatPercentRemaining::Set(QPG_BATTERY_ENDPOINT_ID, value);
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
-        else
-        {
-            err = cluster->SetBatPercentRemaining(value);
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "ERR: updating percentage %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(NotSpecified, "ERR: updating percentage %x", to_underlying(status));
         }
     });
 }
@@ -127,18 +110,10 @@ void SetBatteryPercentageRemaining(DoubledPercentage value)
 void SetBatChargeLevel(BatChargeLevelEnum level)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([level] {
-        CHIP_ERROR err;
-        if (EmberBatteryPowerSourceCluster * cluster = FindBatteryClusterOnEndpoint(QPG_BATTERY_ENDPOINT_ID); cluster == nullptr)
+        Protocols::InteractionModel::Status status = PowerSource::Attributes::BatChargeLevel::Set(QPG_BATTERY_ENDPOINT_ID, level);
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
-        else
-        {
-            err = cluster->SetBatChargeLevel(level);
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "ERR: updating BatChargeLevel %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(NotSpecified, "ERR: updating BatChargeLevel %x", to_underlying(status));
         }
     });
 }
