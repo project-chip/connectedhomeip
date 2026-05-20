@@ -111,16 +111,10 @@ protected:
      *  wpa_supplicant D-Bus signals (for example, scan results,
      *  connection state changes).
      *
-     *  This method may only be called once. Subsequent calls
-     *  return #CHIP_ERROR_ALREADY_INITIALIZED.
-     *
      *  @param[in]  inConnectivityManagerImpl
      *    A reference to the platform Connectivity Manager
      *    implementation to which wpa_supplicant events will be
      *    dispatched.
-     *
-     *  @retval #CHIP_NO_ERROR                  On success.
-     *  @retval #CHIP_ERROR_ALREADY_INITIALIZED If already initialized.
      *
      *  @sa Shutdown
      *  @sa Reset

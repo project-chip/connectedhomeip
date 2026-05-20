@@ -35,6 +35,20 @@ void WpaSupplicantClient::GDBusWpaSupplicant::Reset()
 
 CHIP_ERROR WpaSupplicantClient::Init(ConnectivityManagerImpl & inConnectivityManagerImpl) noexcept
 {
+    // Initially, and again at some future point, this should have an
+    // assertion that mConnectivityManagerImpl is null and otherwise
+    // return CHIP_ERROR_ALREADY_INITIALIZED to indicate to the caller
+    // that 'Init' has been double-tripped without a bookending call
+    // to Shutdown. However, the ConnectivityManager stack of which
+    // this is a part has no peer 'Shutdown' method to go with its
+    // 'Init' and subsequently, there is not yet a reasonable place to
+    // hook the 'Shutdown' for this class.
+    //
+    // At some point, revisit the top-down Init/Shutdown in
+    // ConnectivityManager. When that happens, plumb the call
+    // propagation through to this client 'Shutdown' and re-add the
+    // assertion.
+
     mConnectivityManagerImpl = &inConnectivityManagerImpl;
 
     return CHIP_NO_ERROR;
