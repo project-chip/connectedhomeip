@@ -25,9 +25,9 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <crypto/CHIPCryptoPAL.h>
 #include "DiagnosticDataProviderImpl.h"
 #include "ESP32/ESP32Utils.h"
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
