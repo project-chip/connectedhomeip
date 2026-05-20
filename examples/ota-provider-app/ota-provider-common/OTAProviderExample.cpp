@@ -376,6 +376,7 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     mRequestorSoftwareVersion = commandData.softwareVersion;
     mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
 
+    memset(mLocation, 0, sizeof(mLocation));
     if (commandData.location.HasValue())
     {
         chip::CharSpan loc = commandData.location.Value();
@@ -387,12 +388,7 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
         else
         {
             ChipLogError(AppServer, "Location field size=%zu, expected 2; clearing", loc.size());
-            memset(mLocation, 0, sizeof(mLocation));
         }
-    }
-    else
-    {
-        memset(mLocation, 0, sizeof(mLocation));
     }
 
     size_t i  = 0;
