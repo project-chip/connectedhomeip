@@ -47,10 +47,7 @@ public:
     virtual ~ServerInstance() = default;
 
     CHIP_ERROR Init();
-    void Shutdown()
-    {
-        DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
-    }
+    void Shutdown() { DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)); }
 
     // CommandHanlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
