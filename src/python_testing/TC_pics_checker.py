@@ -23,9 +23,9 @@ from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.pics import (BASE_PICS_CODES_DERIVED, accepted_cmd_pics_str, attribute_pics_str,
-                                 base_pics_facts_to_pics_codes, derive_base_pics_facts_from_device_wildcard,
-                                 event_pics_str, feature_pics_str, generated_cmd_pics_str)
+from matter.testing.pics import (BASE_PICS_CODES_DERIVED, accepted_cmd_pics_str, attribute_pics_str, base_pics_facts_to_pics_codes,
+                                 derive_base_pics_facts_from_device_wildcard, event_pics_str, feature_pics_str,
+                                 generated_cmd_pics_str)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                             FeaturePathLocation, UnknownProblemLocation)
 from matter.testing.runner import TestStep, default_matter_test_main
