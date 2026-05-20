@@ -90,6 +90,31 @@ if CHIP_APP_BLE_MANAGER
 
 endif # CHIP_APP_BLE_MANAGER
 
+config CHIP_APP_BATTERY_MANAGER
+    bool "App Battery Manager"
+    default n
+    help
+        Enable Application Battery Manager Implementation.
+
+if CHIP_APP_BATTERY_MANAGER
+    choice CHIP_APP_BATTERY_MANAGER_SELECTION
+        prompt "Select Application Battery Manager"
+        default CHIP_APP_BATTERY_MANAGER_EMPTY
+
+        config CHIP_APP_BATTERY_MANAGER_FREERTOS
+            bool "App FreeRTOS Battery Manager"
+            help
+                Enable application battery manager FreeRTOS implementation.
+
+        config CHIP_APP_BATTERY_MANAGER_EMPTY
+            bool "App Battery Manager Empty"
+            help
+                Enable application battery manager empty implementation.
+
+    endchoice # CHIP_APP_BATTERY_MANAGER_SELECTION
+
+endif # CHIP_APP_BATTERY_MANAGER
+
 config CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
     bool "Enable customization of GATT service on MCXW platform"
     default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
