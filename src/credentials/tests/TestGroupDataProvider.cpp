@@ -125,10 +125,10 @@ static const GroupKey kGroup3Keyset1(kGroup3, kKeysetId1);
 static const GroupKey kGroup3Keyset2(kGroup3, kKeysetId2);
 static const GroupKey kGroup3Keyset3(kGroup3, kKeysetId3);
 
-static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kCacheAndSync, 3);
+static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kTrustFirst, 3);
 static KeySet kKeySet1(kKeysetId1, SecurityPolicy::kTrustFirst, 1);
 static KeySet kKeySet2(kKeysetId2, SecurityPolicy::kTrustFirst, 2);
-static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kCacheAndSync, 3);
+static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kTrustFirst, 3);
 static KeySet kKeySet4(kKeysetId4, SecurityPolicy::kTrustFirst, 1);
 
 uint8_t kZeroKey[EpochKey::kLengthBytes] = { 0 };

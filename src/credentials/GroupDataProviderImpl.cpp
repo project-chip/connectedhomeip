@@ -650,7 +650,7 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
     bool first                     = true;
 
     uint16_t keyset_id                       = 0;
-    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kCacheAndSync;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kTrustFirst;
     uint8_t keys_count                       = 0;
     Crypto::GroupOperationalCredentials operational_keys[KeySet::kEpochKeysMax];
 
@@ -670,7 +670,7 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
+        policy     = GroupDataProvider::SecurityPolicy::kTrustFirst;
         keys_count = 0;
         Crypto::ClearSecretData(reinterpret_cast<uint8_t *>(operational_keys), sizeof(operational_keys));
         next = kInvalidKeysetId;
@@ -1654,6 +1654,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(in_keyset.num_keys_used >= 1 && in_keyset.num_keys_used <= KeySet::kEpochKeysMax,
                         CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(in_keyset.policy == SecurityPolicy::kTrustFirst, CHIP_ERROR_INVALID_ARGUMENT);
     FabricData fabric(fabric_index);
     KeySetData keyset;
 
