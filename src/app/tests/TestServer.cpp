@@ -36,6 +36,8 @@ public:
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+        // Clear any leaked fail-safe state from previous test suites
+        Server::GetInstance().GetFailSafeContext().DisarmFailSafe();
     }
     static void TearDownTestSuite()
     {
