@@ -24,7 +24,7 @@
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
 #include <lib/support/BitFlags.h>
 #include <platform/PlatformManager.h>
-#include <set>
+
 
 namespace chip::app::Clusters {
 
