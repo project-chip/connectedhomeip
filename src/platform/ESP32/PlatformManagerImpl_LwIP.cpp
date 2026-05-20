@@ -18,8 +18,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ESP32/ESP32Utils.h>
-#include <platform/ESP32/PlatformManagerImpl.h>
+#include "ESP32Utils.h"
+#include "PlatformManagerImpl.h"
 
 #include "esp_event.h"
 #include "esp_netif.h"
