@@ -41,6 +41,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/nim/NimDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
@@ -98,6 +99,7 @@ foreach(_key
         chime
         contact-sensor
         dimmable-light
+        nim
         occupancy-sensor
         on-off-light
         proximity-ranger

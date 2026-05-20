@@ -55,6 +55,10 @@ _available_devices = [
     "DIMMABLE_LIGHT",
   ],
   [
+    "nim",
+    "NIM",
+  ],
+  [
     "occupancy-sensor",
     "OCCUPANCY_SENSOR",
   ],

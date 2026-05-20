@@ -160,7 +160,7 @@ jobs:
              --app-path bridge:./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
              --app-path microwave-oven:./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
              --app-path rvc:./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-             --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+             --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT}/all-devices-app \
              --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
              --app-path evse:./objdir-clone/darwin-${{matrix.arch}}-evse-${BUILD_VARIANT}/chip-evse-app \
              --app-path water-heater:./objdir-clone/darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT}/matter-water-heater-app \

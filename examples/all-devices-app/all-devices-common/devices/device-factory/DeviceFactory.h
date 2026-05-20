@@ -23,6 +23,7 @@
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
+#include <devices/nim/NimDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
@@ -149,6 +150,13 @@ private:
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_NIM)
+        {
+            RegisterCreator("nim", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<NimDevice>();
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
