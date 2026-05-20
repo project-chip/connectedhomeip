@@ -16,8 +16,8 @@ chip-tool  ──Matter (TCP/IP)──►  Commissioning Proxy App  ──Wi-Fi 
 > **What is Wi-Fi PAF?** Wi-Fi PAF (Protocol for Announcement and Finding) is a
 > Matter transport built on Wi-Fi Aware (NAN — Neighbor Awareness Networking).
 > It enables device discovery and commissioning without joining a Wi-Fi network
-> first, using short-range off-AP Wi-Fi signaling. See **Section 8 of the
-> Matter Test-Harness User Guide** for full background on Wi-Fi PAF and its
+> first, using short-range off-AP Wi-Fi signaling. See **Section 8 of the Matter
+> Test-Harness User Guide** for full background on Wi-Fi PAF and its
 > hardware/software requirements.
 
 <hr>
@@ -59,17 +59,17 @@ chip-tool  ──Matter (TCP/IP)──►  Commissioning Proxy App  ──Wi-Fi 
 
 | Component                    | Role                             | Notes                                                                                                                                                                                                                              |
 | ---------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Raspberry Pi 4 or 5**      | DUT — Commissioning Proxy        | Runs `chip-commissioning-proxy-app`. Requires a USB Wi-Fi dongle with NAN USD support (see note below — the on-board RPi Wi-Fi does **not** support Wi-Fi PAF).                                                            |
+| **Raspberry Pi 4 or 5**      | DUT — Commissioning Proxy        | Runs `chip-commissioning-proxy-app`. Requires a USB Wi-Fi dongle with NAN USD support (see note below — the on-board RPi Wi-Fi does **not** support Wi-Fi PAF).                                                                    |
 | **Raspberry Pi 4 or 5**      | TH — Test Harness / Commissioner | Runs chip-tool and (optionally) Python certification tests. Connected to the same IP network as the proxy RPi. Installation instructions are in section 4.1. TH Installation on Raspberry Pi of the Matter Test-Harness User Guide |
 | **Raspberry Pi 4 or 5**      | ED — End Device / Commissionee   | Runs `chip-lighting-app`. Also requires a USB Wi-Fi dongle with NAN USD support.                                                                                                                                                   |
 | **WLAN USB dongle** (×2)     | DUT + ED                         | A USB Wi-Fi adapter that supports Wi-Fi Aware (NAN USD) with the latest hostapd/wpa_supplicant. Compatible models: See Section 8 of the Matter Test-Harness User Guide                                                             |
 | **Build machine**            | —                                | Ubuntu 22.04 or 24.04 x86-64 with Docker installed. Not needed at runtime — used only to cross-compile the binaries.                                                                                                               |
 | **Ethernet switch / router** | —                                | Connects all RPis and the build machine on the same subnet for chip-tool to reach the Commissioning Proxy over IP. The ED does not need to be on the network                                                                       |
 
-> **Why a USB dongle?** The on-board Wi-Fi chipset on Raspberry Pi 4
-> and 5 does not support the Wi-Fi Aware NAN USD interface required by Wi-Fi
-> PAF. A supported external USB dongle must be plugged into both the Proxy RPi
-> and the End Device RPi before starting either app.
+> **Why a USB dongle?** The on-board Wi-Fi chipset on Raspberry Pi 4 and 5 does
+> not support the Wi-Fi Aware NAN USD interface required by Wi-Fi PAF. A
+> supported external USB dongle must be plugged into both the Proxy RPi and the
+> End Device RPi before starting either app.
 
 ### 1.2 Software Prerequisites
 
@@ -790,10 +790,10 @@ Copy-paste form:
    `IMPLEMENTATION_README.md §Network Commissioning`), the ED sends
    `ConnectNetworkResponse(Success)` over NAN **before** starting Wi-Fi
    association, then defers the blocking D-Bus join.
-6. The end device associates with Wi-Fi. The ED then closes its NAN publisher
-   at PAFTP tx-idle and posts `kOperationalNetworkEnabled`, which triggers
-   mDNS / operational advertisement; tearing down publish at the same time
-   closes the PAFTP session per Matter spec §4.20.3.10 [4.780].
+6. The end device associates with Wi-Fi. The ED then closes its NAN publisher at
+   PAFTP tx-idle and posts `kOperationalNetworkEnabled`, which triggers mDNS /
+   operational advertisement; tearing down publish at the same time closes the
+   PAFTP session per Matter spec §4.20.3.10 [4.780].
 7. chip-tool sends `ProxyDisconnectRequest` to clean up the PAF session.
 
 **Expected total time**: 30–60 seconds depending on Wi-Fi join speed.
@@ -814,8 +814,8 @@ Error: WiFiPAF: NAN start failed
     `systemctl status wpa_supplicant` must show `active (running)`.
 -   Check that `CONFIG_NAN_USD` was compiled in:
     `strings /usr/sbin/wpa_supplicant | grep -c nan_usd` should return > 0.
--   Do not use the on-board RPi Wi-Fi for PAF — it does not support NAN
-    USD. The USB dongle must be the interface wpa_supplicant manages.
+-   Do not use the on-board RPi Wi-Fi for PAF — it does not support NAN USD. The
+    USB dongle must be the interface wpa_supplicant manages.
 -   ensure iwconfig works, See Section 1.2.1 USB dongle software
 -   Ensure `~/script/config_paf_env.sh comee` succeeds
 
@@ -853,10 +853,9 @@ recovers from association failure via fail-safe expiry.
 The proxy enforces a hard per-message deadline equal to the spec-defined
 `responseTimeout` (`HandleProxyMessageRequest` →
 `ProxyMessageResponseTimeoutCallback`). If the ED never replies, the proxy
-returns `Status::Failure` to chip-tool instead of waiting for the longer
-PAFTP ack-receive timeout. Check the ED log: if the ED is busy with WiFi
-association and not draining its PAFTP receive queue, the request will not
-complete in time.
+returns `Status::Failure` to chip-tool instead of waiting for the longer PAFTP
+ack-receive timeout. Check the ED log: if the ED is busy with WiFi association
+and not draining its PAFTP receive queue, the request will not complete in time.
 
 ### chip-tool `pairing proxy` command not found
 

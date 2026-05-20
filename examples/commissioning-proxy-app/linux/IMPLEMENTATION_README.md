@@ -52,8 +52,8 @@ In this model:
     storage is used.
 4.  `InvokeCommand()` dispatches to per-command handlers that decode the TLV
     payload and call the delegate. Commands whose responses are produced
-    asynchronously return null to prevent the framework from
-    generating a duplicate response.
+    asynchronously return null to prevent the framework from generating a
+    duplicate response.
 
 ### ProxyTransport — Virtual Transport Layer
 
@@ -122,29 +122,29 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 ### Cluster Server (`src/app/clusters/commissioning-proxy-server/`)
 
-| File                                          | Change                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| File                                          | Change                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CommissioningProxyCluster.cpp`               | New: full code-driven cluster implementation — attribute R/W, command dispatch, async null pattern, `HandleProxyBackGroundScanStartRequest` / `HandleProxyBackGroundScanStopRequest` handlers, `MaxCachedResults` / `NumCachedResults` / `CacheTimeout` / `CachedResults` / `WiFiBand` / `MaxSessions` attribute reads, `MarkCachedResultsDirty()`; WiFiBand and MaxSessions delegate validation in scan/connect handlers |
-| `CommissioningProxyCluster.h`                 | New: `CommissioningProxyCluster` class and `Config` struct                                                                                                                                                                                                                                                                                                                                                                   |
-| `CommissioningProxyDelegate.h`                | New: abstract `Delegate` interface with `ProxyConnectRequest`, `ProxyDisconnectRequest`, `ProxyMessageRequest`, `ProxyScanRequest`, `ProxyBackgroundScanStartRequest`, `ProxyBackgroundScanStopRequest`, `CancelPendingConnect`, cache attribute accessors, `GetMaxSessions()`, `GetSupportedWiFiBands()`, and `EncodeCachedResults()`                                                                                       |
-| `CodegenIntegration.h/.cpp`                   | New: thin compatibility shim for ZAP-based apps                                                                                                                                                                                                                                                                                                                                                                              |
-| `CommissioningProxyTestEventTriggerHandler.h` | New: test-event trigger handler stub. Carries a single `kTemplateNotUsed` placeholder keyed off the CommissioningProxy cluster ID 0x0455; no real triggers are defined yet.                                                                                                                                                                                                                                                  |
-| `BUILD.gn` / `*.cmake` / `*.gni`              | Updated: build rules to include the new cluster source files                                                                                                                                                                                                                                                                                                                                                                 |
-| `tests/`                                      | New: `TestCommissioningProxyCluster.cpp` (session management, fabric isolation, MaxSessions, scan, timeout), `TestCommissioningProxyClusterBackwardsCompatibility.cpp`, `CommissioningProxyMockDelegate.cpp/.h`                                                                                                                                                                                                              |
-| `README.md`                                   | New: cluster server documentation                                                                                                                                                                                                                                                                                                                                                                                            |
+| `CommissioningProxyCluster.h`                 | New: `CommissioningProxyCluster` class and `Config` struct                                                                                                                                                                                                                                                                                                                                                                |
+| `CommissioningProxyDelegate.h`                | New: abstract `Delegate` interface with `ProxyConnectRequest`, `ProxyDisconnectRequest`, `ProxyMessageRequest`, `ProxyScanRequest`, `ProxyBackgroundScanStartRequest`, `ProxyBackgroundScanStopRequest`, `CancelPendingConnect`, cache attribute accessors, `GetMaxSessions()`, `GetSupportedWiFiBands()`, and `EncodeCachedResults()`                                                                                    |
+| `CodegenIntegration.h/.cpp`                   | New: thin compatibility shim for ZAP-based apps                                                                                                                                                                                                                                                                                                                                                                           |
+| `CommissioningProxyTestEventTriggerHandler.h` | New: test-event trigger handler stub. Carries a single `kTemplateNotUsed` placeholder keyed off the CommissioningProxy cluster ID 0x0455; no real triggers are defined yet.                                                                                                                                                                                                                                               |
+| `BUILD.gn` / `*.cmake` / `*.gni`              | Updated: build rules to include the new cluster source files                                                                                                                                                                                                                                                                                                                                                              |
+| `tests/`                                      | New: `TestCommissioningProxyCluster.cpp` (session management, fabric isolation, MaxSessions, scan, timeout), `TestCommissioningProxyClusterBackwardsCompatibility.cpp`, `CommissioningProxyMockDelegate.cpp/.h`                                                                                                                                                                                                           |
+| `README.md`                                   | New: cluster server documentation                                                                                                                                                                                                                                                                                                                                                                                         |
 
 ### Linux Platform Delegate (`examples/commissioning-proxy-app/linux/`)
 
-| File                                    | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| File                                    | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CommissioningProxyCommandDelegate.cpp` | Replaced: full PAF delegate implementation — session tracking, `ProxyWiFiPAFDelegate`, async connect/message/disconnect flow, `OnProxyConnectTimeout` (cancels NAN subscribe, returns `Status::Timeout`), `ProxyMessageResponseTimeoutCallback` (hard `responseTimeout` deadline returning `Status::Failure`), `ProxyBackgroundScanStartRequest` / `ProxyBackgroundScanStopRequest` (multi-fabric `sBgScanFabrics` map, per-fabric lifetime timer, NAN discovery cache, band encoding), `ProxyScanRequest` (async `WiFiPAFScan`, Busy guard), MaxSessions enforcement, fabric isolation (NOT_FOUND on cross-fabric access) |
-| `CommissioningProxyCommandDelegate.h`   | Removed: replaced by `commissioning-proxy-delegate-impl.h`                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `CPAppCommandDelegate.cpp/.h`           | New: named-pipe command handler for the proxy app                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `main.cpp`                              | Updated: registers `CommissioningProxyCluster` via `CodegenDataModelProvider`; cancels the proxy's own NAN publish on commissioning complete via `CancelWiFiPAFPublish()` / `OnChipDeviceEvent()`; derives `WiFiBand` attribute value from `--wifipaf freq_list=` and passes to `MyCPDelegate::SetSupportedWiFiBands()`                                                                                                                                                                                               |
-| `args.gni`                              | Updated: enables TCP endpoint (`chip_inet_config_enable_tcp_endpoint`)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `BUILD.gn`                              | Updated: adds `ProxyTransport` and cluster server as build dependencies                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `include/CHIPProjectAppConfig.h`        | Updated: project-level CHIP config overrides. Sets `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY=1` and `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE=1` for shared-radio hardware.                                                                                                                                                                                                                                                                                                                      |
-| `entrypoint.sh`                         | Updated: fix `comissioning` typo so the container launches `chip-commissioning-proxy-app` under `--thread`.                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `CommissioningProxyCommandDelegate.h`   | Removed: replaced by `commissioning-proxy-delegate-impl.h`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `CPAppCommandDelegate.cpp/.h`           | New: named-pipe command handler for the proxy app                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `main.cpp`                              | Updated: registers `CommissioningProxyCluster` via `CodegenDataModelProvider`; cancels the proxy's own NAN publish on commissioning complete via `CancelWiFiPAFPublish()` / `OnChipDeviceEvent()`; derives `WiFiBand` attribute value from `--wifipaf freq_list=` and passes to `MyCPDelegate::SetSupportedWiFiBands()`                                                                                                                                                                                                                                                                                                    |
+| `args.gni`                              | Updated: enables TCP endpoint (`chip_inet_config_enable_tcp_endpoint`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `BUILD.gn`                              | Updated: adds `ProxyTransport` and cluster server as build dependencies                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `include/CHIPProjectAppConfig.h`        | Updated: project-level CHIP config overrides. Sets `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY=1` and `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE=1` for shared-radio hardware.                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `entrypoint.sh`                         | Updated: fix `comissioning` typo so the container launches `chip-commissioning-proxy-app` under `--thread`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ### Commissioning Proxy Common (`examples/commissioning-proxy-app/commissioning-proxy-common/`)
 
@@ -167,28 +167,28 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 ### WiFi-PAF Subsystem (`src/wifipaf/`)
 
-| File                                    | Change                                                                                                                                                                                                                                                                           |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WiFiPAFConfig.h`                       | `PAFTP_ACK_TIMEOUT_MS` increased from 15 000 ms to 30 000 ms to prevent premature session closure during WiFi join                                                                                                                                                                                                                                                                                            |
+| File                                    | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `WiFiPAFConfig.h`                       | `PAFTP_ACK_TIMEOUT_MS` increased from 15 000 ms to 30 000 ms to prevent premature session closure during WiFi join                                                                                                                                                                                                                                                                                                                                                                   |
 | `WiFiPAFLayer.cpp`                      | `RmPafSession` handles `kAccNodeInfo` lookup in addition to `kAccSessionId`; `CloseEndPoint()` forcibly closes a PAFTP endpoint by session; `ScheduleCancelPublishersOnTxIdle()` / `CancelAllPublisherSessions()` implement deferred NAN publisher teardown after WiFi connect; tx-idle hook now also fires an optional `OnTxIdleActionFunct` after publisher cancel so callers can defer follow-up work (e.g. posting `kOperationalNetworkEnabled`) until PAFTP traffic has drained |
-| `WiFiPAFLayer.h`                        | Declares `CloseEndPoint()`, `CancelAllPublisherSessions()`, `ScheduleCancelPublishersOnTxIdle(cancelCb, afterCb, afterCtx)` with the new `OnTxIdleActionFunct` typedef and optional `afterCb`/`afterCtx`; private fields `mCancelPublishersOnTxIdle`, `mCancelPublishersCallback`, `mOnTxIdleAfterCb`, `mOnTxIdleAfterCtx`                                                                                                                                                          |
-| `WiFiPAFTP.cpp` / `WiFiPAFEndPoint.cpp` | Sequence-number progress logging for PAFTP fragment debugging                                                                                                                                                                                                                                                                                                                                                 |
+| `WiFiPAFLayer.h`                        | Declares `CloseEndPoint()`, `CancelAllPublisherSessions()`, `ScheduleCancelPublishersOnTxIdle(cancelCb, afterCb, afterCtx)` with the new `OnTxIdleActionFunct` typedef and optional `afterCb`/`afterCtx`; private fields `mCancelPublishersOnTxIdle`, `mCancelPublishersCallback`, `mOnTxIdleAfterCb`, `mOnTxIdleAfterCtx`                                                                                                                                                           |
+| `WiFiPAFTP.cpp` / `WiFiPAFEndPoint.cpp` | Sequence-number progress logging for PAFTP fragment debugging                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ### Server Commissioning Path (`src/app/server/`, `src/platform/`)
 
-| File                                                            | Change                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CommissioningWindowManager.cpp` / `.h`                         | `StopAdvertisement()` gains an `aKeepPAFPublish` parameter; `OnSessionEstablished()` now passes `aKeepPAFPublish = true` so the WiFi-PAF publisher carrying the post-PASE data path is not torn down at PASE completion. Publisher is still canceled on shutdown, RevokeCommissioning, and fail-safe expiry (regression fix vs. earlier early-cancel behavior).                                                       |
-| `DeviceControlServer.cpp`                                       | `PostConnectedToOperationalNetworkEvent()` no longer arms a blind 5 s timer to defer mDNS; instead, when a PAF session is active, it hooks `WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle()` with a callback (`OnPafTxIdle`) that posts `kOperationalNetworkEnabled` once the PAFTP send queue has drained and acks have been received. A 5 s `OnPostOpEventWatchdog` timer guards against a silent PAFTP peer.       |
+| File                                    | Change                                                                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CommissioningWindowManager.cpp` / `.h` | `StopAdvertisement()` gains an `aKeepPAFPublish` parameter; `OnSessionEstablished()` now passes `aKeepPAFPublish = true` so the WiFi-PAF publisher carrying the post-PASE data path is not torn down at PASE completion. Publisher is still canceled on shutdown, RevokeCommissioning, and fail-safe expiry (regression fix vs. earlier early-cancel behavior).                                                  |
+| `DeviceControlServer.cpp`               | `PostConnectedToOperationalNetworkEvent()` no longer arms a blind 5 s timer to defer mDNS; instead, when a PAF session is active, it hooks `WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle()` with a callback (`OnPafTxIdle`) that posts `kOperationalNetworkEnabled` once the PAFTP send queue has drained and acks have been received. A 5 s `OnPostOpEventWatchdog` timer guards against a silent PAFTP peer. |
 
 ### Network Commissioning (`src/app/clusters/network-commissioning/`)
 
-| File                                | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NetworkCommissioningCluster.cpp`   | Adds an early-response path for ConnectNetwork over WiFi-PAF, gated on `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE`. `HandleConnectNetwork` detects the PAF transport, sends `ConnectNetworkResponse(Success)` while NAN is still primary, then defers the blocking `ConnectWiFiNetworkAsync` D-Bus call via `PlatformMgr().ScheduleWork(StartWiFiConnectAfterPafAck, ...)` so the IM-queued response flushes through PAFTP first. `OnResult()` finalizes the post-success path; failure recovery is via fail-safe expiry. |
-| `NetworkCommissioningCluster.h`     | Adds `SendEarlyConnectNetworkResponseForWiFiPAF()` and static `StartWiFiConnectAfterPafAck()`. Repurposes `mConnectNetworkResponseSentEarly` to cover both the existing non-concurrent path and the new PAF-concurrent early-response path.                                                                                                                                                                                                                                                                                |
-| `src/include/platform/CHIPDeviceConfig.h` | Adds `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE` (default `0`). Set to `1` for shared-radio devices where post-association NAN TX is unreliable. Only active when both `CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF` and `CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION` are `1`.                                                                                                                                                                                                                          |
-| `examples/lighting-app/linux/include/CHIPProjectAppConfig.h` | Sets `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 1` (lighting-app End Device is the shared-radio target).                                                                                                                                                                                                                                                                                                                                                       |
+| File                                                         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NetworkCommissioningCluster.cpp`                            | Adds an early-response path for ConnectNetwork over WiFi-PAF, gated on `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE`. `HandleConnectNetwork` detects the PAF transport, sends `ConnectNetworkResponse(Success)` while NAN is still primary, then defers the blocking `ConnectWiFiNetworkAsync` D-Bus call via `PlatformMgr().ScheduleWork(StartWiFiConnectAfterPafAck, ...)` so the IM-queued response flushes through PAFTP first. `OnResult()` finalizes the post-success path; failure recovery is via fail-safe expiry. |
+| `NetworkCommissioningCluster.h`                              | Adds `SendEarlyConnectNetworkResponseForWiFiPAF()` and static `StartWiFiConnectAfterPafAck()`. Repurposes `mConnectNetworkResponseSentEarly` to cover both the existing non-concurrent path and the new PAF-concurrent early-response path.                                                                                                                                                                                                                                                                                               |
+| `src/include/platform/CHIPDeviceConfig.h`                    | Adds `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE` (default `0`). Set to `1` for shared-radio devices where post-association NAN TX is unreliable. Only active when both `CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF` and `CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION` are `1`.                                                                                                                                                                                                                                               |
+| `examples/lighting-app/linux/include/CHIPProjectAppConfig.h` | Sets `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 1` (lighting-app End Device is the shared-radio target).                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ### Controller / chip-tool (`src/controller/`, `examples/chip-tool/`)
 
@@ -212,7 +212,7 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 | File                          | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ConnectivityManagerImpl.cpp` | `ScanDiscoveryResult()` and PAF scanning helpers; debug logging in `_WiFiPAFShutdown`; `WiFiPAFDisconnectPublishReceiveHandler()` tears down the GLib `nanreceive` handler; `WiFiPAFStartBackgroundScan()` / `WiFiPAFStopBackgroundScan()` for background NAN scanning; `WiFiPAFScan()` for foreground one-shot scanning (TTL = scanMaxTime); `GetPendingConnectSubscribeId()` accessor; `PostNetworkConnect()` calls `ScheduleCancelPublishersOnTxIdle()` to defer NAN publisher teardown until PAFTP tx-idle |
-| `ConnectivityManagerImpl.h`   | Declares `WiFiPAFDisconnectPublishReceiveHandler()`, `BgScanDiscoveryCallback` , `WiFiPAFStartBackgroundScan()`, `WiFiPAFStopBackgroundScan()`, `WiFiPAFScan()`, `PafScanResultsCallback` , `GetPendingConnectSubscribeId()`; `mScanFreq` field; `NanPeerInfo` struct extended with `band`, `vid`, `pid` fields                                                                                                                                                                                  |
+| `ConnectivityManagerImpl.h`   | Declares `WiFiPAFDisconnectPublishReceiveHandler()`, `BgScanDiscoveryCallback` , `WiFiPAFStartBackgroundScan()`, `WiFiPAFStopBackgroundScan()`, `WiFiPAFScan()`, `PafScanResultsCallback` , `GetPendingConnectSubscribeId()`; `mScanFreq` field; `NanPeerInfo` struct extended with `band`, `vid`, `pid` fields                                                                                                                                                                                                |
 
 <hr>
 
@@ -234,8 +234,8 @@ The cluster is implemented as a `DefaultServerCluster` subclass.
     `Status::UnsupportedWrite`.
 -   **`InvokeCommand()`** — dispatches to per-command handlers.
     `ProxyConnectRequest`, `ProxyScanRequest`, and `ProxyMessageRequest` return
-    null on success so the framework does not emit a duplicate IM
-    status after the delegate has already queued an asynchronous response.
+    null on success so the framework does not emit a duplicate IM status after
+    the delegate has already queued an asynchronous response.
 
 **`HandleProxyConnectRequest`** validates that exactly one transport bit is set
 (`HasExactlyOneBitSet`), checks that `kWiFiPAF` is only selected when the
@@ -335,25 +335,26 @@ timeout is extended to `responseTimeout + 10` seconds so the proxy's IM exchange
 stays alive while the device processes a slow command (e.g. `ConnectNetwork`
 takes ~15 s on Linux).
 
-**`ProxyMessageRequest` hard response timer** (`ProxyMessageResponseTimeoutCallback`):
-in addition to the exchange-timeout extension above, `HandleProxyMessageRequest`
-starts a per-session `System::Timer` for `responseTimeout` seconds keyed by
-`sessionId`. If the timer fires before the End Device replies, the proxy:
+**`ProxyMessageRequest` hard response timer**
+(`ProxyMessageResponseTimeoutCallback`): in addition to the exchange-timeout
+extension above, `HandleProxyMessageRequest` starts a per-session
+`System::Timer` for `responseTimeout` seconds keyed by `sessionId`. If the timer
+fires before the End Device replies, the proxy:
 
 1.  Removes the pending `ProxyMsgCtx` from `sPendingProxyMsgCtx`.
 2.  Calls `cmd->AddStatus(path, Status::Failure)` so the commissioner gets a
     deterministic failure rather than waiting for `PAFTP_ACK_TIMEOUT_MS`.
 
-The timer is canceled (via `CancelProxyMessageResponseTimer(sessionId)`) on
-the success path (`OnProxyWiFiPAFMessageReceived`), on stale-ctx cleanup at
-the start of the next `ProxyMessageRequest`, on a PAF close
+The timer is canceled (via `CancelProxyMessageResponseTimer(sessionId)`) on the
+success path (`OnProxyWiFiPAFMessageReceived`), on stale-ctx cleanup at the
+start of the next `ProxyMessageRequest`, on a PAF close
 (`ProxyWiFiPAFDelegate::WiFiPAFCloseSession`), and on `ProxyDisconnectRequest`.
 
 **Reason**: the End Device's periodic PAFTP standalone-acks reset the
 ack-receive timer (`PAFTP_ACK_TIMEOUT_MS = 30 s`) and could keep the PAFTP
 endpoint alive longer than the commissioner's interaction timeout, causing
-TC_COMPRO_2_6 step 11 to hang. The hard timer guarantees the commissioner
-always gets a response within the spec-defined `responseTimeout` window.
+TC_COMPRO_2_6 step 11 to hang. The hard timer guarantees the commissioner always
+gets a response within the spec-defined `responseTimeout` window.
 
 **`ProxyConnectRequest` timeout**: a per-connect `OnProxyConnectTimeout` timer
 is started at the beginning of `HandleProxyConnectRequest` using the `timeout`
@@ -381,9 +382,9 @@ The subscribe ID is captured into `ProxyConnectCtx::subscribeId` after
     started; on expiry the fabric is removed from the map and the hardware scan
     is stopped if no other fabrics remain.
 -   When `OnBgScanDiscovery` fires, the `NanPeerInfo` result is appended to
-    `sCachedResults` (by `peer_id`). The WiFi band is derived from
-    the scan frequency (`FreqToBand()`). `MarkCachedResultsDirty()` is called to
-    push an attribute-report update to subscribed commissioners.
+    `sCachedResults` (by `peer_id`). The WiFi band is derived from the scan
+    frequency (`FreqToBand()`). `MarkCachedResultsDirty()` is called to push an
+    attribute-report update to subscribed commissioners.
 
 **`ProxyBackgroundScanStopRequest`**: erases the requesting fabric from
 `sBgScanFabrics`; cancels its lifetime timer; stops the hardware scan if the map
@@ -531,16 +532,17 @@ publish at the same point also closes the PAFTP session per Matter spec
 
 ### Server Commissioning Path (shared with End Device)
 
-These changes live in shared core SDK files but are written for the
-WiFi-PAF / shared-radio scenario the Commissioning Proxy and lighting-app
-End Device both rely on.
+These changes live in shared core SDK files but are written for the WiFi-PAF /
+shared-radio scenario the Commissioning Proxy and lighting-app End Device both
+rely on.
 
 #### `src/app/server/CommissioningWindowManager.cpp` / `.h`
 
 `StopAdvertisement()` now takes an additional `aKeepPAFPublish` parameter
 (default `false`). When `true`, the WiFi-PAF publisher (`mPublishId`) is left
-running even though the commissioning window is closing. `OnSessionEstablished()`
-calls `StopAdvertisement(/* aShuttingDown = */ false, /* aKeepPAFPublish = */ true)`
+running even though the commissioning window is closing.
+`OnSessionEstablished()` calls
+`StopAdvertisement(/* aShuttingDown = */ false, /* aKeepPAFPublish = */ true)`
 so that the PAFTP session carrying the post-PASE data path (ArmFailSafe /
 OpCreds / ConnectNetwork) is not torn down at PASE completion.
 
@@ -551,7 +553,8 @@ OpCreds / ConnectNetwork) is not torn down at PASE completion.
 The implementation hooks the explicit PAFTP tx-idle signal:
 
 1.  If `WiFiPAFLayer::GetWiFiPAFState() == State::kConnected`, the function
-    calls `paf.ScheduleCancelPublishersOnTxIdle(CancelPafPublisher, OnPafTxIdle, null)`.
+    calls
+    `paf.ScheduleCancelPublishersOnTxIdle(CancelPafPublisher, OnPafTxIdle, null)`.
 2.  `CancelPafPublisher(id, role)` calls
     `ConnectivityMgr().WiFiPAFShutdown(id, role)` to tear down the publisher.
 3.  `OnPafTxIdle()` posts `kOperationalNetworkEnabled` so mDNS / operational
@@ -561,8 +564,8 @@ The implementation hooks the explicit PAFTP tx-idle signal:
     (e.g. the proxy has already disconnected). Whichever fires first posts the
     event; a `sPostOpEventFired` one-shot guard prevents a double post.
 
-If WiFi-PAF is not active, the function falls through to the original
-behavior and posts the event immediately.
+If WiFi-PAF is not active, the function falls through to the original behavior
+and posts the event immediately.
 
 ---
 
@@ -572,12 +575,11 @@ behavior and posts the event immediately.
 
 The standard concurrent-connection path replies to `ConnectNetwork` from the
 wireless driver's `OnResult()` callback — i.e. after WiFi association either
-succeeded or failed. That ordering is unsafe on hardware that shares the
-radio between NAN and the WiFi station: once `wpa_supplicant` starts the
-association the radio camps on the AP channel, and PAFTP frames that need
-to leave on the NAN channel either fail to transmit or transmit on the
-wrong channel. The `ConnectNetworkResponse` then never reaches the
-commissioner.
+succeeded or failed. That ordering is unsafe on hardware that shares the radio
+between NAN and the WiFi station: once `wpa_supplicant` starts the association
+the radio camps on the AP channel, and PAFTP frames that need to leave on the
+NAN channel either fail to transmit or transmit on the wrong channel. The
+`ConnectNetworkResponse` then never reaches the commissioner.
 
 Behind the new build option
 `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE` (default `0`),
@@ -587,24 +589,23 @@ carried over a WiFi-PAF secure session:
 1.  `IsConnectNetworkRequestOverWiFiPAF(handler)` — peeks at the exchange's
     `Transport::Type` to detect the PAF transport.
 2.  `SendEarlyConnectNetworkResponseForWiFiPAF()` — sends
-    `ConnectNetworkResponse{ networkingStatus = Success }` immediately while
-    NAN is still primary on the shared radio.
-3.  `PlatformMgr().ScheduleWork(StartWiFiConnectAfterPafAck, this)` — defers
-    the blocking `mpWirelessDriver->ConnectNetwork()` call to the next event
-    loop iteration, so the IM-queued response has time to flush through the
-    PAFTP TX queue first.
+    `ConnectNetworkResponse{ networkingStatus = Success }` immediately while NAN
+    is still primary on the shared radio.
+3.  `PlatformMgr().ScheduleWork(StartWiFiConnectAfterPafAck, this)` — defers the
+    blocking `mpWirelessDriver->ConnectNetwork()` call to the next event loop
+    iteration, so the IM-queued response has time to flush through the PAFTP TX
+    queue first.
 4.  `HandleConnectNetwork` returns `std::nullopt` to suppress the framework's
     default IM response (the early response is the only response).
 
-`mConnectNetworkResponseSentEarly` is set to mark that the response has
-already been emitted. `OnResult()` checks this flag and, instead of sending
-a second response, either calls
-`PostConnectedToOperationalNetworkEvent()` on success or logs the failure
-(recovery is then driven by fail-safe expiry).
+`mConnectNetworkResponseSentEarly` is set to mark that the response has already
+been emitted. `OnResult()` checks this flag and, instead of sending a second
+response, either calls `PostConnectedToOperationalNetworkEvent()` on success or
+logs the failure (recovery is then driven by fail-safe expiry).
 
 The option only activates when both `CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF` and
-`CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION` are `1`. It is enabled
-in `examples/lighting-app/linux/include/CHIPProjectAppConfig.h` and
+`CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION` are `1`. It is enabled in
+`examples/lighting-app/linux/include/CHIPProjectAppConfig.h` and
 `examples/commissioning-proxy-app/linux/include/CHIPProjectAppConfig.h`.
 
 #### `src/include/platform/CHIPDeviceConfig.h`
@@ -670,8 +671,8 @@ GLib thread; read in `ScanDiscoveryResult()` to derive a `WiFiBandBitmap` value
 `mPafChannelAvailable = true`, calls
 `WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle()` with a lambda that calls
 `_WiFiPAFShutdown(id, role)` for each publisher session, deferring the cancel
-until the PAFTP send queue is drained and all outstanding acknowledgements
-have been received.
+until the PAFTP send queue is drained and all outstanding acknowledgements have
+been received.
 
 ---
 

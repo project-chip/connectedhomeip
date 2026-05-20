@@ -161,7 +161,7 @@ $ ./chip-tool commissioningproxy proxy-scan-request \
 
 | Argument                     | Description                                                     |
 | ---------------------------- | --------------------------------------------------------------- |
-| `Transport`                  | Transport bitmap: `2` = BLE, `8` = WiFi-PAF                      |
+| `Transport`                  | Transport bitmap: `2` = BLE, `8` = WiFi-PAF                     |
 | `proxy-node-id`              | Node ID of the proxy                                            |
 | `endpoint-id`                | Endpoint hosting the CommissioningProxy cluster (typically `1`) |
 | `--allow-large-payload true` | Required — forces TCP for this command (spec `L` quality)       |
@@ -196,7 +196,7 @@ $ ./chip-tool commissioningproxy proxy-back-ground-scan-start-request \
 
 | Argument        | Description                                                     |
 | --------------- | --------------------------------------------------------------- |
-| `Transport`     | Transport bitmap: `2` = BLE, `8` = WiFi-PAF                      |
+| `Transport`     | Transport bitmap: `2` = BLE, `8` = WiFi-PAF                     |
 | `Timeout`       | Scan lifetime in seconds; `0` for no expiry                     |
 | `WiFiBands`     | Wi-Fi band bitmap: `1` = 2.4 GHz, `4` = 5 GHz, `5` = both       |
 | `proxy-node-id` | Node ID of the proxy                                            |
