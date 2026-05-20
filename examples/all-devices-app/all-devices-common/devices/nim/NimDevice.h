@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
+#include <optional>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
@@ -45,6 +46,8 @@ public:
     NimDevice();
     ~NimDevice() override = default;
 
+    static void SetStorageDelegate(PersistentStorageDelegate * storage) { sStorageDelegate = storage; }
+
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
@@ -52,12 +55,15 @@ public:
 protected:
     FakeBorderRouterDelegate mBorderRouterDelegate;
     SimpleBreadCrumbTracker mBreadCrumbTracker;
-    DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
+    std::optional<DefaultThreadNetworkDirectoryStorage> mThreadNetworkDirectoryStorage;
 
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
+
+private:
+    static PersistentStorageDelegate * sStorageDelegate;
 };
 
 } // namespace app

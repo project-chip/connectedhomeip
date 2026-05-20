@@ -26,14 +26,15 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
+PersistentStorageDelegate * NimDevice::sStorageDelegate = nullptr;
+
 inline ByteSpan ByteSpanFromCharSpan(CharSpan span)
 {
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
 }
 
 NimDevice::NimDevice() :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
-    mThreadNetworkDirectoryStorage(Server::GetInstance().GetPersistentStorage())
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1))
 {}
 
 CHIP_ERROR NimDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -55,7 +56,9 @@ CHIP_ERROR NimDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
         ByteSpanFromCharSpan("MatterAP"_span), ByteSpanFromCharSpan("Setec Astronomy"_span)));
 
     // 3. Thread Network Directory
-    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
+    VerifyOrReturnError(sStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mThreadNetworkDirectoryStorage.emplace(*sStorageDelegate);
+    mThreadNetworkDirectoryCluster.Create(endpoint, *mThreadNetworkDirectoryStorage);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
 
     // 4. Thread Network Diagnostics

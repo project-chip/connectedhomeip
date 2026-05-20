@@ -37,6 +37,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
+#include <devices/nim/NimDevice.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -260,6 +261,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
+    NimDevice::SetStorageDelegate(initParams.persistentStorageDelegate);
     SuccessOrDie(devices.Startup());
 
     initParams.dataModelProvider      = &devices.DataModelProvider();
