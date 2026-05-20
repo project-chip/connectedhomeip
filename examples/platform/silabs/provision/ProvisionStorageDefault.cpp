@@ -61,8 +61,8 @@ namespace Provision {
 namespace {
 // Miss-aligned certificates is a common error, and printing the first few bytes is
 // useful to verify proper alignment. Eight bytes is enough for this purpose.
-constexpr size_t kDebugLength = 8;
-size_t sCredentialsOffset     = 0;
+[[maybe_unused]] constexpr size_t kDebugLength = 8;
+size_t sCredentialsOffset                      = 0;
 
 CHIP_ERROR ErasePage(uint32_t addr)
 {

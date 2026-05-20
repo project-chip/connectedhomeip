@@ -47,8 +47,6 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip::app::Clusters {
 namespace {
 
-[[maybe_unused]] constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast = 4;
-
 void NotifyGroupTableChanged(ServerClusterContext * context)
 {
     // TODO: This seems a bit coupled: we are notifying in this cluster that ANOTHER cluster
@@ -218,7 +216,7 @@ DataModel::ActionReturnStatus GroupsCluster::ReadAttribute(const DataModel::Read
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
-        return encoder.Encode(mGroupDataProvider.IsGroupcastEnabled() ? kRevision : kGroupsClusterRevisionBeforeGroupcast);
+        return encoder.Encode(kRevision);
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);

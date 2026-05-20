@@ -29,7 +29,11 @@ config("mbedtls_config") {
 }
 
 config("warnings") {
-  cflags = [ "-Wno-shadow" ]
+  cflags = [
+    "-Wno-deprecated",
+    "-Wno-deprecated-this-capture",
+    "-Wno-shadow",
+  ]
 }
 
 config("public") {

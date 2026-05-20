@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <cstdio>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
