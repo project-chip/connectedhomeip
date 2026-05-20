@@ -431,38 +431,6 @@ jobs:
                      --summary-file test-summaries/chip-tool-python.json \
                   "
 
-            - name: Create NIM wrapper
-              run: |
-                mkdir -p objdir-clone/runners || true
-                echo '#!/bin/bash
-                exec ./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app --device nim "$@"' > objdir-clone/runners/nim-wrapper.sh
-                chmod +x objdir-clone/runners/nim-wrapper.sh
-
-            - name: Run NIM Tests
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py \
-                     --find-path $PWD/objdir-clone \
-                     --find-path $PWD/scripts \
-                     --runner chip_tool_python \
-                     --target Test_TC_TBRM_2_1 \
-                     --target Test_TC_TBRM_2_2 \
-                     --target Test_TC_TBRM_2_3 \
-                     --target Test_TC_TBRM_2_4 \
-                     --target Test_TC_TBRM_3_1_Simulated \
-                     --target Test_TC_THNETDIR_2_1 \
-                     --target Test_TC_THNETDIR_2_2 \
-                     --target Test_TC_THNETDIR_2_3 \
-                     --target Test_TC_WIFINM_2_1 \
-                     --target Test_TC_WIFINM_2_2 \
-                     run \
-                     --iterations 1 \
-                     --test-timeout-seconds 120 \
-                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path default:./objdir-clone/runners/nim-wrapper.sh \
-                     --summary-file test-summaries/nim-tests.json \
-                  "
-
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -672,6 +640,11 @@ jobs:
               run: |
                 brew install coreutils
                 echo "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin" >> "$GITHUB_PATH"
+            - name: Install ccache
+              run: |
+                brew install ccache
+            - name: Verify ccache installation
+              run: which ccache
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |

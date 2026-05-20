@@ -87,3 +87,6 @@ tests:
 CI:
     - name: network-manager
       app: network-manager
+    - name: nim-device
+      app: all-devices
+      args: ["--device", "nim"]
