@@ -1,46 +1,48 @@
 # Commissioning Proxy — Certification Test Rig
 
-This document covers how to **configure and run the Python certification
-tests** (`TC_COMPRO_2_*`) for the Commissioning Proxy cluster on a three-RPi
-test rig, and how to install the supporting helper scripts on the End Device.
+This document covers how to **configure and run the Python certification tests**
+(`TC_COMPRO_2_*`) for the Commissioning Proxy cluster on a three-RPi test rig,
+and how to install the supporting helper scripts on the End Device.
 
 Scope of this document:
 
-- Wiring up the three-RPi cert-test rig (TH commissioner / Proxy / End Device).
-- Installing and configuring the test-runner wrapper
-  `~/scripts/run-cert-test.sh` on the TH RPi.
-- Installing the **End-Device cert helpers** that prevent eth0 from masking
-  real WiFi-PAF commissioning, plus the watchdog and recovery scripts.
-- All helper scripts are reproduced verbatim below — they are **not** checked
-  into the repo. A one-shot installer at the end of this document writes and
-  deploys every file to the right host.
+-   Wiring up the three-RPi cert-test rig (TH commissioner / Proxy / End
+    Device).
+-   Installing and configuring the test-runner wrapper
+    `~/scripts/run-cert-test.sh` on the TH RPi.
+-   Installing the **End-Device cert helpers** that prevent eth0 from masking
+    real WiFi-PAF commissioning, plus the watchdog and recovery scripts.
+-   All helper scripts are reproduced verbatim below — they are **not** checked
+    into the repo. A one-shot installer at the end of this document writes and
+    deploys every file to the right host.
 
 Not in scope (covered elsewhere — see references):
 
-- Hardware list, USB dongle requirements: `../CP_getting_started.md §1`.
-- wpa_supplicant NAN patch (Proxy RPi): `../CP_getting_started.md §2`.
-- Cross-compiling the three binaries: `../CP_getting_started.md §4`.
-- Manually commissioning the proxy / end device: `../CP_getting_started.md §6–9`.
-- The Python test list and what each test exercises:
-  `IMPLEMENTATION_README.md §Python Certification Tests`.
+-   Hardware list, USB dongle requirements: `../CP_getting_started.md §1`.
+-   wpa_supplicant NAN patch (Proxy RPi): `../CP_getting_started.md §2`.
+-   Cross-compiling the three binaries: `../CP_getting_started.md §4`.
+-   Manually commissioning the proxy / end device:
+    `../CP_getting_started.md §6–9`.
+-   The Python test list and what each test exercises:
+    `IMPLEMENTATION_README.md §Python Certification Tests`.
 
 <hr>
 
-- [1. Rig topology](#1-rig-topology)
-- [2. One-time TH setup](#2-one-time-th-setup)
-  - [2.1 Python venv and wheels](#21-python-venv-and-wheels)
-  - [2.2 Test scripts and PAA trust store](#22-test-scripts-and-paa-trust-store)
-  - [2.3 Install the test-runner wrapper](#23-install-the-test-runner-wrapper)
-- [3. One-time ED setup](#3-one-time-ed-setup)
-  - [3.1 What the ED cert helpers do](#31-what-the-ed-cert-helpers-do)
-  - [3.2 Install the ED helpers](#32-install-the-ed-helpers)
-- [4. One-time Proxy setup](#4-one-time-proxy-setup)
-- [5. Configure `run-cert-test.sh`](#5-configure-run-cert-testsh)
-- [6. Running tests](#6-running-tests)
-- [7. The eth0 block — what it is, when it engages, how to recover](#7-the-eth0-block--what-it-is-when-it-engages-how-to-recover)
-- [8. One-shot installer](#8-one-shot-installer)
-- [9. Helper scripts (verbatim)](#9-helper-scripts-verbatim)
-- [10. Troubleshooting](#10-troubleshooting)
+-   [1. Rig topology](#1-rig-topology)
+-   [2. One-time TH setup](#2-one-time-th-setup)
+    -   [2.1 Python venv and wheels](#21-python-venv-and-wheels)
+    -   [2.2 Test scripts and PAA trust store](#22-test-scripts-and-paa-trust-store)
+    -   [2.3 Install the test-runner wrapper](#23-install-the-test-runner-wrapper)
+-   [3. One-time ED setup](#3-one-time-ed-setup)
+    -   [3.1 What the ED cert helpers do](#31-what-the-ed-cert-helpers-do)
+    -   [3.2 Install the ED helpers](#32-install-the-ed-helpers)
+-   [4. One-time Proxy setup](#4-one-time-proxy-setup)
+-   [5. Configure `run-cert-test.sh`](#5-configure-run-cert-testsh)
+-   [6. Running tests](#6-running-tests)
+-   [7. The eth0 block — what it is, when it engages, how to recover](#7-the-eth0-block--what-it-is-when-it-engages-how-to-recover)
+-   [8. One-shot installer](#8-one-shot-installer)
+-   [9. Helper scripts (verbatim)](#9-helper-scripts-verbatim)
+-   [10. Troubleshooting](#10-troubleshooting)
 
 <hr>
 
@@ -49,15 +51,15 @@ Not in scope (covered elsewhere — see references):
 Three Raspberry Pis on the same LAN, 172.16.62.x is used as an examples (and the
 same L2 broadcast domain — see §7 for why this matters):
 
-| Role | Default IP      | Runs                                                    |
-| ---- | --------------- | ------------------------------------------------------- |
-| TH   | `172.16.62.53`  | Python tests + `chip-tool`; the **commissioner**        |
-| Proxy| `172.16.62.86`  | `chip-commissioning-proxy-app` (patched wpa_supplicant) |
-| ED   | `172.16.62.110` | `chip-lighting-app` + cert helper scripts               |
+| Role  | Default IP      | Runs                                                    |
+| ----- | --------------- | ------------------------------------------------------- |
+| TH    | `172.16.62.53`  | Python tests + `chip-tool`; the **commissioner**        |
+| Proxy | `172.16.62.86`  | `chip-commissioning-proxy-app` (patched wpa_supplicant) |
+| ED    | `172.16.62.110` | `chip-lighting-app` + cert helper scripts               |
 
 Both Proxy and ED need a NAN-capable USB Wi-Fi dongle (see
-`../CP_getting_started.md §1.1`). The on-board Pi Wi-Fi chipset does not
-support NAN.
+`../CP_getting_started.md §1.1`). The on-board Pi Wi-Fi chipset does not support
+NAN.
 
 > If any of those IPs are different on your rig, edit them in two places: the
 > defaults at the top of `~/scripts/run-cert-test.sh` (on the TH) and
@@ -69,11 +71,11 @@ support NAN.
 
 ### 2.1 Python venv and wheels
 
-The Python test framework runs from a venv with two locally-built Matter
-wheels (`matter` core and `matter-clusters`) plus its dependencies. The
-wheels are produced by the same SDK build that produces the proxy/ED
-binaries — see the wheel build memory note for the full
-`ninja python_wheels` recipe and the file transfer sequence.
+The Python test framework runs from a venv with two locally-built Matter wheels
+(`matter` core and `matter-clusters`) plus its dependencies. The wheels are
+produced by the same SDK build that produces the proxy/ED binaries — see the
+wheel build memory note for the full `ninja python_wheels` recipe and the file
+transfer sequence.
 
 On the TH RPi:
 
@@ -88,8 +90,8 @@ pip install mobly
 
 ### 2.2 Test scripts and PAA trust store
 
-The Python tests and a small `compro_support` module run on the TH. Copy
-them out of the repo to a working directory:
+The Python tests and a small `compro_support` module run on the TH. Copy them
+out of the repo to a working directory:
 
 ```bash
 mkdir -p ~/matter_tests/support_modules ~/matter_tests/paa-trust-store
@@ -105,9 +107,9 @@ scp credentials/test/attestation/*.pem \
 
 ### 2.3 Install the test-runner wrapper
 
-`run-cert-test.sh` is the wrapper that orchestrates a single test or the
-entire suite. It is reproduced verbatim in §9; the one-shot installer in §8
-deploys it for you.
+`run-cert-test.sh` is the wrapper that orchestrates a single test or the entire
+suite. It is reproduced verbatim in §9; the one-shot installer in §8 deploys it
+for you.
 
 Manual install:
 
@@ -125,17 +127,17 @@ chmod +x ~/scripts/run-cert-test.sh
 
 Three helpers live on the ED RPi:
 
-| Helper                              | Purpose                                                                                           |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `factory-reset.sh`                  | Kill `chip-lighting-app`, clear KVS, drop any WiFi `network={}` blocks left over from a prior run |
-| `block-eth0-from-commissioner.sh`   | Engage / disengage the eth0 block (see §7) with a self-disarming watchdog                         |
-| `unblock-eth0.sh`                   | One-line wrapper around `... down` for keyboard recovery                                          |
+| Helper                            | Purpose                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `factory-reset.sh`                | Kill `chip-lighting-app`, clear KVS, drop any WiFi `network={}` blocks left over from a prior run |
+| `block-eth0-from-commissioner.sh` | Engage / disengage the eth0 block (see §7) with a self-disarming watchdog                         |
+| `unblock-eth0.sh`                 | One-line wrapper around `... down` for keyboard recovery                                          |
 
 In addition the installer drops a login banner
 (`/etc/update-motd.d/99-matter-test-rig`) and a NOPASSWD sudoers entry
-(`/etc/sudoers.d/matter-test`) so the TH's `EDFixture` can engage the block
-over SSH without a password prompt, and a human SSHing in sees a yellow
-warning if the block is stuck on.
+(`/etc/sudoers.d/matter-test`) so the TH's `EDFixture` can engage the block over
+SSH without a password prompt, and a human SSHing in sees a yellow warning if
+the block is stuck on.
 
 ### 3.2 Install the ED helpers
 
@@ -158,14 +160,14 @@ sudo visudo -c -f /etc/sudoers.d/matter-test     # must print "parsed OK"
 
 Nothing cert-test-specific. The proxy needs:
 
-- The patched wpa_supplicant (`../CP_getting_started.md §2`).
-- The `chip-commissioning-proxy-app` binary in `~/apps/`
-  (`../CP_getting_started.md §5`).
-- Passwordless SSH from the TH for `run-cert-test.sh` to restart the proxy
-  between iterations.
+-   The patched wpa_supplicant (`../CP_getting_started.md §2`).
+-   The `chip-commissioning-proxy-app` binary in `~/apps/`
+    (`../CP_getting_started.md §5`).
+-   Passwordless SSH from the TH for `run-cert-test.sh` to restart the proxy
+    between iterations.
 
-`run-cert-test.sh` starts and stops the proxy on every iteration with the
-flags configured in §5.
+`run-cert-test.sh` starts and stops the proxy on every iteration with the flags
+configured in §5.
 
 <hr>
 
@@ -173,23 +175,23 @@ flags configured in §5.
 
 Edit the constants at the top of `~/scripts/run-cert-test.sh` on the TH:
 
-| Variable                | Meaning                                                | Default            |
-| ----------------------- | ------------------------------------------------------ | ------------------ |
-| `PROXY_IP`              | Proxy RPi IP                                           | `172.16.62.86`     |
-| `PROXY_DISCRIMINATOR`   | Discriminator the proxy advertises during its own PASE | `3947`             |
-| `PROXY_PASSCODE`        | Proxy's PASE passcode                                  | `20202021`         |
-| `PROXY_WIFIPAF_FREQ`    | NAN channel(s) for the proxy                           | `2437` (CH 6)      |
-| `PROXY_APP`             | Path to the proxy binary on the proxy RPi              | `~/apps/chip-commissioning-proxy-app` |
-| `ED_IP`                 | ED RPi IP                                              | `172.16.62.110`    |
-| `ED_APP`                | Path to the lighting app on the ED RPi                 | `~/apps/chip-lighting-app` |
-| `ED_DISCRIMINATOR`      | Discriminator the ED advertises                        | `3840`             |
-| `ED_PASSCODE`           | ED PASE passcode                                       | `20202021`         |
-| `ED_WIFIPAF_FREQ`       | NAN channel(s) for the ED                              | `2437`             |
-| `WIFI_SSID`             | Test WiFi SSID used by TC_COMPRO_2_4 `ConnectNetwork`  | `YOUR_SSID`           |
-| `WIFI_PASSWORD`         | Password for `YOUR_SSID`                               | _set per rig_      |
-| `PAA_TRUST_STORE`       | PAA cert dir on the TH                                 | `~/matter_tests/paa-trust-store` |
-| `STORAGE_PATH`          | chip-tool persistent storage path                      | `/tmp/compro_admin_storage.json` |
-| `ENDPOINT`              | Cluster endpoint                                       | `1`                |
+| Variable              | Meaning                                                | Default                               |
+| --------------------- | ------------------------------------------------------ | ------------------------------------- |
+| `PROXY_IP`            | Proxy RPi IP                                           | `172.16.62.86`                        |
+| `PROXY_DISCRIMINATOR` | Discriminator the proxy advertises during its own PASE | `3947`                                |
+| `PROXY_PASSCODE`      | Proxy's PASE passcode                                  | `20202021`                            |
+| `PROXY_WIFIPAF_FREQ`  | NAN channel(s) for the proxy                           | `2437` (CH 6)                         |
+| `PROXY_APP`           | Path to the proxy binary on the proxy RPi              | `~/apps/chip-commissioning-proxy-app` |
+| `ED_IP`               | ED RPi IP                                              | `172.16.62.110`                       |
+| `ED_APP`              | Path to the lighting app on the ED RPi                 | `~/apps/chip-lighting-app`            |
+| `ED_DISCRIMINATOR`    | Discriminator the ED advertises                        | `3840`                                |
+| `ED_PASSCODE`         | ED PASE passcode                                       | `20202021`                            |
+| `ED_WIFIPAF_FREQ`     | NAN channel(s) for the ED                              | `2437`                                |
+| `WIFI_SSID`           | Test WiFi SSID used by TC_COMPRO_2_4 `ConnectNetwork`  | `YOUR_SSID`                           |
+| `WIFI_PASSWORD`       | Password for `YOUR_SSID`                               | _set per rig_                         |
+| `PAA_TRUST_STORE`     | PAA cert dir on the TH                                 | `~/matter_tests/paa-trust-store`      |
+| `STORAGE_PATH`        | chip-tool persistent storage path                      | `/tmp/compro_admin_storage.json`      |
+| `ENDPOINT`            | Cluster endpoint                                       | `1`                                   |
 
 Keep `PROXY_WIFIPAF_FREQ == ED_WIFIPAF_FREQ` so NAN can rendezvous.
 
@@ -213,30 +215,28 @@ bash ~/scripts/run-cert-test.sh 2.4 standalone
 
 What happens on every iteration:
 
-1. **Reset.** TH clears its own `/tmp/chip_*` and the proxy's. If the test
-   uses the ED, `~/scripts/factory-reset.sh` runs on the ED via SSH.
-2. **Proxy start.** Proxy is killed (anchored `pkill`) and re-launched with
-   the configured flags.
+1. **Reset.** TH clears its own `/tmp/chip_*` and the proxy's. If the test uses
+   the ED, `~/scripts/factory-reset.sh` runs on the ED via SSH.
+2. **Proxy start.** Proxy is killed (anchored `pkill`) and re-launched with the
+   configured flags.
 3. **ED start + eth0 block engaged** (networked mode only). The Python
-   `EDFixture` in `compro_support.py` launches the ED over SSH and, *before*
-   the launch, runs
-   `sudo ~/scripts/block-eth0-from-commissioner.sh up` on the ED.
+   `EDFixture` in `compro_support.py` launches the ED over SSH and, _before_ the
+   launch, runs `sudo ~/scripts/block-eth0-from-commissioner.sh up` on the ED.
 4. **Test runs.** Python `TC_COMPRO_2_X` executes; output is tee'd to
    `/tmp/matter_run_<test>_<N>.log` on the TH.
-5. **ED stop + eth0 block cleared.** `EDFixture.stop()` calls
-   `... block down` in a `finally`, so the block is cleared even if the
-   test raises.
+5. **ED stop + eth0 block cleared.** `EDFixture.stop()` calls `... block down`
+   in a `finally`, so the block is cleared even if the test raises.
 6. **Summary.** `run-cert-test.sh` prints a per-test table and an overall
    pass/fail count.
 
 Artifacts:
 
-| Path                                                | Where  | Contents                              |
-| --------------------------------------------------- | ------ | ------------------------------------- |
-| `/tmp/matter_run_<test>_<N>.log`                    | TH     | Per-iteration test capture            |
-| `/tmp/matter_testing/logs/MatterTest/<timestamp>/`  | TH     | Full Matter framework log dir         |
-| `/tmp/cp_test.log`                                  | Proxy  | Proxy stdout/stderr                   |
-| `/tmp/ed_app.log`                                   | ED     | Lighting-app stdout/stderr            |
+| Path                                               | Where | Contents                      |
+| -------------------------------------------------- | ----- | ----------------------------- |
+| `/tmp/matter_run_<test>_<N>.log`                   | TH    | Per-iteration test capture    |
+| `/tmp/matter_testing/logs/MatterTest/<timestamp>/` | TH    | Full Matter framework log dir |
+| `/tmp/cp_test.log`                                 | Proxy | Proxy stdout/stderr           |
+| `/tmp/ed_app.log`                                  | ED    | Lighting-app stdout/stderr    |
 
 <hr>
 
@@ -244,27 +244,26 @@ Artifacts:
 
 ### Why the block exists
 
-All three RPis sit on the same `172.16.62.0/24` LAN, and the test WiFi
-network (`YOUR_SSID`) is bridged onto the same L2 segment. After a successful
-`ConnectNetwork`, the commissioner is supposed to reach the ED on its
-**WiFi** IP — but because the ED's eth0 is on the same segment, CASE can
-silently establish over eth0 instead, and a bug where WiFi association
-never happens still shows green.
+All three RPis sit on the same `172.16.62.0/24` LAN, and the test WiFi network
+(`YOUR_SSID`) is bridged onto the same L2 segment. After a successful
+`ConnectNetwork`, the commissioner is supposed to reach the ED on its **WiFi**
+IP — but because the ED's eth0 is on the same segment, CASE can silently
+establish over eth0 instead, and a bug where WiFi association never happens
+still shows green.
 
 ### What the block actually drops
 
 `block-eth0-from-commissioner.sh up` installs four iptables-rule layers, all
 interface-scoped to eth0:
 
-1. **IPv4 INPUT** from the commissioner IP → `MATTER_BLOCK` chain
-   (ACCEPT tcp/22, DROP rest). Commissioner can still SSH; nothing else.
-2. **IPv6 INPUT** (any source) → `MATTER_BLOCK` chain (ACCEPT tcp/22 +
-   NDP types 133/134/135/136, DROP rest). Broad because the commissioner's
-   v6 link-local isn't stable.
+1. **IPv4 INPUT** from the commissioner IP → `MATTER_BLOCK` chain (ACCEPT
+   tcp/22, DROP rest). Commissioner can still SSH; nothing else.
+2. **IPv6 INPUT** (any source) → `MATTER_BLOCK` chain (ACCEPT tcp/22 + NDP types
+   133/134/135/136, DROP rest). Broad because the commissioner's v6 link-local
+   isn't stable.
 3. **IPv4 + IPv6 OUTPUT** udp `--sport 5353` **and** `--dport 5353` → DROP.
-   Stops mDNS announcements *and* unicast mDNS responses (which use
-   `sport 5353 → requester-port` — a leak that `--dport`-only doesn't
-   catch).
+   Stops mDNS announcements _and_ unicast mDNS responses (which use
+   `sport 5353 → requester-port` — a leak that `--dport`-only doesn't catch).
 4. SSH from non-commissioner hosts is untouched — the v4 rule is
    `-s <commissioner>`-scoped and the v6 chain ACCEPTs tcp/22 first.
 
@@ -272,12 +271,12 @@ interface-scoped to eth0:
 
 Every `up` call refreshes `/tmp/matter_eth0_block.deadline` to `now + 20 min`
 and ensures a singleton background watchdog
-(`/tmp/matter_eth0_block.watchdog.pid`) is running. The watchdog ticks every
-30 s and runs `... down` once `now > deadline`.
+(`/tmp/matter_eth0_block.watchdog.pid`) is running. The watchdog ticks every 30
+s and runs `... down` once `now > deadline`.
 
-`run-cert-test.sh all` re-arms the deadline on every test's
-`EDFixture.start()`, so the watchdog **never fires mid-suite**. It only
-fires if the test runner dies and stops refreshing.
+`run-cert-test.sh all` re-arms the deadline on every test's `EDFixture.start()`,
+so the watchdog **never fires mid-suite**. It only fires if the test runner dies
+and stops refreshing.
 
 Override the window for long debug sessions:
 
@@ -288,8 +287,8 @@ sudo WATCHDOG_DEADLINE_MIN=120 \
 
 ### Recovery from a stuck block
 
-The login banner prints a yellow warning if the block is engaged. To clear
-it manually (from the ED keyboard or any SSH-reachable host):
+The login banner prints a yellow warning if the block is engaged. To clear it
+manually (from the ED keyboard or any SSH-reachable host):
 
 ```bash
 sudo ~/scripts/unblock-eth0.sh
@@ -313,9 +312,8 @@ ssh ubuntu@<ed-ip> echo ok                     # prints "ok"
 ```
 
 The post-test ED log should contain
-`wpa_supplicant: Interface properties changed, state is 'completed'` —
-that's the canary confirming WiFi actually associated, not just an eth0
-fall-through:
+`wpa_supplicant: Interface properties changed, state is 'completed'` — that's
+the canary confirming WiFi actually associated, not just an eth0 fall-through:
 
 ```bash
 ssh ubuntu@<ed-ip> 'grep "state is .completed" /tmp/ed_app.log'
@@ -328,8 +326,8 @@ ssh ubuntu@<ed-ip> 'grep "state is .completed" /tmp/ed_app.log'
 Save this script as `setup-cert-test-rig.sh` **on your workstation** (the
 machine that has SSH access to TH/Proxy/ED). It writes every helper to
 `/tmp/cert-rig-staging/`, scp's them to the right host, sets permissions,
-installs the sudoers file with `visudo -c`, and verifies. Re-running it is
-safe — every step is idempotent.
+installs the sudoers file with `visudo -c`, and verifies. Re-running it is safe
+— every step is idempotent.
 
 ```bash
 #!/usr/bin/env bash
@@ -423,8 +421,8 @@ bash setup-cert-test-rig.sh
 ```
 
 > The script intentionally leaves the helper bodies as `# >>> paste …`
-> placeholders so you can audit each script before deploying. Copy each
-> block from §9 between the matching heredoc delimiters.
+> placeholders so you can audit each script before deploying. Copy each block
+> from §9 between the matching heredoc delimiters.
 
 <hr>
 
@@ -1074,9 +1072,9 @@ esac
 
 ### 9.6 `~/scripts/factory-reset.sh` (on the ED)
 
-Already present on most rigs; reproduced here for completeness. Adjust
-`IFACE` to match your USB Wi-Fi dongle and `~/script/config_paf_env.sh` to
-whatever PAF-environment script your dongle vendor ships with.
+Already present on most rigs; reproduced here for completeness. Adjust `IFACE`
+to match your USB Wi-Fi dongle and `~/script/config_paf_env.sh` to whatever
+PAF-environment script your dongle vendor ships with.
 
 ```bash
 #!/usr/bin/env bash
@@ -1109,36 +1107,34 @@ ip a show "$IFACE"
 
 ### "Cannot reach ED" / SSH from TH stalls
 
-If `run-cert-test.sh` hangs at "Factory resetting ED" the SSH from TH is
-being dropped. The eth0 block exempts tcp/22 from the commissioner, so the
-likely culprits are:
+If `run-cert-test.sh` hangs at "Factory resetting ED" the SSH from TH is being
+dropped. The eth0 block exempts tcp/22 from the commissioner, so the likely
+culprits are:
 
-- Block engaged for a different commissioner IP. Check
-  `sudo cat /tmp/matter_eth0_block.commissioner_ip` on the ED — if it
-  doesn't match the TH, run `sudo ~/scripts/unblock-eth0.sh` and re-arm
-  with the correct IP.
-- Workstation IP changed between deploy and run. The TH IP is the only one
-  the block treats specially; SSH from any other host always works.
+-   Block engaged for a different commissioner IP. Check
+    `sudo cat /tmp/matter_eth0_block.commissioner_ip` on the ED — if it doesn't
+    match the TH, run `sudo ~/scripts/unblock-eth0.sh` and re-arm with the
+    correct IP.
+-   Workstation IP changed between deploy and run. The TH IP is the only one the
+    block treats specially; SSH from any other host always works.
 
 ### Test passes but no `state is 'completed'` in `/tmp/ed_app.log`
 
-The eth0 fallback masked a real WiFi-association failure. Verify the block
-was actually engaged during the test by checking the iteration's start
-banner — `EDFixture.start()` will have run `... block up` over SSH. Also
-re-check the four sanity probes in §7 ("Verifying the block is working").
+The eth0 fallback masked a real WiFi-association failure. Verify the block was
+actually engaged during the test by checking the iteration's start banner —
+`EDFixture.start()` will have run `... block up` over SSH. Also re-check the
+four sanity probes in §7 ("Verifying the block is working").
 
 ### Step 6 (`CommissionViaProxy`) intermittently times out
 
 Known PAFTP handshake-data readiness race — the `EDFixture._start_remote`
-already sleeps 5 s after launching the ED to give wpa_supplicant's NAN
-context time to settle, but the race still surfaces occasionally. Re-run
-the test; the second iteration almost always passes. This is unrelated to
-the eth0 block.
+already sleeps 5 s after launching the ED to give wpa_supplicant's NAN context
+time to settle, but the race still surfaces occasionally. Re-run the test; the
+second iteration almost always passes. This is unrelated to the eth0 block.
 
 ### `sudo` prompts for a password during a test run
 
-The NOPASSWD sudoers entry didn't get installed or didn't validate. On the
-ED:
+The NOPASSWD sudoers entry didn't get installed or didn't validate. On the ED:
 
 ```bash
 sudo visudo -c -f /etc/sudoers.d/matter-test       # must print "parsed OK"
