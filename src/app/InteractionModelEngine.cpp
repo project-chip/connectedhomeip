@@ -1111,18 +1111,11 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         auto & testing = Groupcast::GetTesting();
         if (testing.IsEnabled() && testing.IsFabricUnderTest(apExchangeContext->GetSessionHandle()->GetFabricIndex()))
         {
-            Clusters::Groupcast::Events::GroupcastTesting::Type event;
             if ((testing.GetTestResultEnum() == Groupcast::Testing::Result::kSuccess) && (status != Status::Success))
             {
                 testing.SetTestResult(Groupcast::Testing::Result::kGeneralError);
             }
-            // Convert to event type
-            testing.ToEventType(event);
-            testing.Clear();
-            // Generate event
-            DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
-            eventGenerator.GenerateEvent(event, kRootEndpointId);
-            eventGenerator.ScheduleUrgentEventDeliverySync();
+            testing.NotifyDelegate();
         }
     }
 

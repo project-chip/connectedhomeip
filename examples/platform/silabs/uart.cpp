@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 #include "uart.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include <stddef.h>
 #include <string.h>
 
@@ -189,7 +189,7 @@ static uint32_t sMissedLogCount = 0; // Count of logs that were not sent to the 
 
 namespace SilabsCoreLogs = chip::Logging::Platform;
 // sizeof struct on arm is 4+8 +sizeof(data) so 12 + number of character in the string
-typedef struct
+typedef struct UartTxStruct_t
 {
     uint8_t data[UART_TX_MAX_BUF_LEN];
     uint64_t timestamp                   = 0;

@@ -52653,14 +52653,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_epochStartTime2ClassName.c_str(), newElement_0_epochStartTime2CtorSignature.c_str(),
                         jninewElement_0_epochStartTime2, newElement_0_epochStartTime2);
                 }
-                jobject newElement_0_groupKeyMulticastPolicy;
-                std::string newElement_0_groupKeyMulticastPolicyClassName     = "java/lang/Integer";
-                std::string newElement_0_groupKeyMulticastPolicyCtorSignature = "(I)V";
-                jint jninewElement_0_groupKeyMulticastPolicy                  = static_cast<jint>(entry_0.groupKeyMulticastPolicy);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_groupKeyMulticastPolicyClassName.c_str(),
-                    newElement_0_groupKeyMulticastPolicyCtorSignature.c_str(), jninewElement_0_groupKeyMulticastPolicy,
-                    newElement_0_groupKeyMulticastPolicy);
 
                 {
                     jclass datastoreGroupKeySetStructStructClass_1;
@@ -52676,8 +52668,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID datastoreGroupKeySetStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, datastoreGroupKeySetStructStructClass_1, "<init>",
-                        "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;[BLjava/lang/Long;[BLjava/lang/Long;Ljava/lang/"
-                        "Integer;)V",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;[BLjava/lang/Long;[BLjava/lang/Long;)V",
                         &datastoreGroupKeySetStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || datastoreGroupKeySetStructStructCtor_1 == nullptr)
                     {
@@ -52686,11 +52677,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(datastoreGroupKeySetStructStructClass_1, datastoreGroupKeySetStructStructCtor_1,
-                                       newElement_0_groupKeySetID, newElement_0_groupKeySecurityPolicy, newElement_0_epochKey0,
-                                       newElement_0_epochStartTime0, newElement_0_epochKey1, newElement_0_epochStartTime1,
-                                       newElement_0_epochKey2, newElement_0_epochStartTime2, newElement_0_groupKeyMulticastPolicy);
+                    newElement_0 = env->NewObject(
+                        datastoreGroupKeySetStructStructClass_1, datastoreGroupKeySetStructStructCtor_1, newElement_0_groupKeySetID,
+                        newElement_0_groupKeySecurityPolicy, newElement_0_epochKey0, newElement_0_epochStartTime0,
+                        newElement_0_epochKey1, newElement_0_epochStartTime1, newElement_0_epochKey2, newElement_0_epochStartTime2);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

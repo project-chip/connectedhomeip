@@ -50,7 +50,7 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device on-off-light:1 --discriminator 1234
+#     app-args: --device on-off-light:1 --discriminator 1234 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -81,6 +81,10 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+# NOTE: WARNING - Multicast is not always reliable when testing over Wi-Fi, and the test currently does not
+# implement retries. If the test fails (likely due to timeouts on operations such as receiving events),
+# Try the test again from factory reset a few times.
+
 
 class TC_ACE_1_6(MatterBaseTest):
 
@@ -106,7 +110,13 @@ class TC_ACE_1_6(MatterBaseTest):
             TestStep(8, "TH subscribes to the Groupcast cluster's events on the RootNode endpoint"),
             TestStep(9, "TH sends GroupcastTesting command with TestOperation field set to EnableListenerTesting and DurationSeconds field set to 300"),
             TestStep(10, "TH sends a command from the cluster identified in the Targets field of the ACL entry at step 4. The command is sent as a group command using GroupID 0x0103."),
-            TestStep(11, "TH waits for and verifies the GroupcastTesting event from DUT. (AccessAllowed: true)"),
+            TestStep("11a", "TH waits for and verifies the GroupcastTesting event from DUT. (AccessAllowed: true)"),
+            TestStep("11b", "TH writes empty GroupKeyMap attribute"),
+            TestStep("11c", "TH sends a command using GroupID 0x0103 after GroupKeyMap is empty"),
+            TestStep("11d", "TH waits for and verifies the GroupcastTesting event from DUT (Result: kNoAvailableKey)"),
+            TestStep("11e", "TH writes GroupKeyMap attribute to restore entries"),
+            TestStep("11f", "TH sends a command using GroupID 0x0103 after GroupKeyMap is restored"),
+            TestStep("11g", "TH waits for and verifies the GroupcastTesting event from DUT (AccessAllowed: true)"),
             TestStep(12, "TH sends a command from the cluster identified in the Targets field of the ACL entry at step 4. The command is sent as a group command using GroupID 0x0102."),
             TestStep(13, "TH waits for and verifies the GroupcastTesting event from DUT. (AccessAllowed: false)"),
             TestStep(14, "TH writes The ACL attribute to revoke groups Management access and restore full access over CASE"),
@@ -126,6 +136,7 @@ class TC_ACE_1_6(MatterBaseTest):
             TestStep(28, "TH resets the GroupKeyMap attribute list"),
             TestStep(29, "TH resets the key set 0x01a3"),
             TestStep(30, "TH resets the key set 0x01a1"),
+            TestStep(31, "TH writes The ACL attribute to restore full access over CASE"),
         ]
 
     @async_test_body
@@ -317,13 +328,16 @@ class TC_ACE_1_6(MatterBaseTest):
 
         acl_entries = [acl_admin, acl_group]
         if gc_on_root:
-            groupcast_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            acl_groupcast_groupkey_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[th1_nodeid],
-                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groupcast.id)]
+                targets=[
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groupcast.id),
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.GroupKeyManagement.id),
+                ]
             )
-            acl_entries.append(groupcast_admin)
+            acl_entries.append(acl_groupcast_groupkey_admin)
 
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl_entries))])
 
@@ -371,8 +385,76 @@ class TC_ACE_1_6(MatterBaseTest):
             await asyncio.sleep(3)
 
             # Step 11: Verify GroupcastTesting event (AccessAllowed: true)
-            self.step(11)
+            self.step("11a")
             event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
+            asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
+            asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
+
+            # Step 11b: Write empty key map
+            self.step("11b")
+            await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
+
+            # Verify that GroupKeyMap is empty
+            groupKeyMap = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap)
+            asserts.assert_equal(len(groupKeyMap), 0, "GroupKeyMap should be empty")
+
+            # Verify that all entries in Membership have kInvalidKeysetId (0xFFFF)
+            # This is because clearing GroupKeyMap removes the link between GroupID and KeySetID,
+            # but the groups themselves still exist in the Groupcast cluster's view.
+            kInvalidKeysetId = 0xFFFF
+            membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
+            for entry in membership:
+                asserts.assert_equal(entry.keySetID, kInvalidKeysetId,
+                                     f"Group {entry.groupID} should have invalid keyset ID (0xFFFF)")
+
+            # Step 11c: Group command to Group 0x0103 after group keys are empty
+            self.step("11c")
+            self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
+
+            # Step 11d: Check for groupcast testing event, ensure its result is kNoAvailableKey
+            self.step("11d")
+            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect destination IP address in event")
+
+            # Step 11e: Re-add GroupKeyMap
+            self.step("11e")
+            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID1),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID1),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID3),
+            ]))])
+            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap attribute write failed")
+
+            # Step 11f: Group command to Group 0x0103 after re-adding keys
+            self.step("11f")
+            self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
+
+            # Step 11g: Verify GroupcastTesting event is emitted the same as in step 11a (AccessAllowed: true)
+            self.step("11g")
+
+            def previous_event_filter(data) -> bool:
+                return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey
+
+            def current_event_filter(data) -> bool:
+                return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess
+
+            # Duplicate events could occur from step 11d, as this is an event emitted from a point where the message cannot
+            # be decrypted (because of no group keys being present). Without the message being decrypted, logic to filter out
+            # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases
+            # (i.e. when testing over multiple networks). This safely filters through potential duplicate events from the
+            # previous steps.
+            event_data = event_sub.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=current_event_filter,
+                previous_event_filter_func=previous_event_filter,
+                timeout_sec=30
+            )
+
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -490,7 +572,13 @@ class TC_ACE_1_6(MatterBaseTest):
         self.step(30)
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
 
-        # TODO(#71506): A step should be added in this test to restore a wildcard ACL entry.
+        self.step(31)
+        acl_admin_full = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[th1_nodeid],
+            targets=NullValue)
+        await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin_full]))])
 
 
 if __name__ == "__main__":

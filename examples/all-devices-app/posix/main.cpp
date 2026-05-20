@@ -197,17 +197,21 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .timerDelegate     = gTimerDelegate,                         //
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate);
-
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
+    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
+
 #if CHIP_CONFIG_ENABLE_GROUPCAST
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
-                                                                                        &Server::GetInstance().GetFabricTable());
-    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
-    gGroupDataProvider.SetGroupcastEnabled(true);
+    // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
+    if (AppOptions::GetConfig().enableGroupcast)
+    {
+        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(
+            &gGroupDataProvider, &Server::GetInstance().GetFabricTable());
+        initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+        gGroupDataProvider.SetGroupcastEnabled(true);
+    }
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
@@ -399,7 +403,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
 #if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
-    ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, false));
+    ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(AppOptions::GetConfig().bleController, false));
     ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
 #endif
 

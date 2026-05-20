@@ -23,8 +23,15 @@
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <controller/CHIPDeviceController.h>
 
+#include <string>
+
 // Forward declaration
-struct ICECandidateInfo;
+struct ICECandidateInfo
+{
+    std::string candidate;
+    std::string mid;
+    int mlineIndex;
+};
 
 /**
  * @brief This class handles sending CHIP commands for WebRTCTransportProvider cluster, including
