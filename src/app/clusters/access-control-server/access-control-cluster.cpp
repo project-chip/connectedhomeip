@@ -66,7 +66,7 @@ namespace {
 using EntryProvider = CHIP_ERROR (Access::AccessControl::*)(FabricIndex, AccessControl::EntryIterator &) const;
 
 CHIP_ERROR ReadAclEntries(FabricTable & fabricTable, Access::AccessControl & accessControl, AttributeValueEncoder & aEncoder,
-                          EntryProvider provider)
+                          EntryProvider provider, bool ensureTargetsNotEmpty = false)
 {
     AccessControl::EntryIterator iterator;
     AccessControl::Entry entry;
@@ -79,6 +79,12 @@ CHIP_ERROR ReadAclEntries(FabricTable & fabricTable, Access::AccessControl & acc
             CHIP_ERROR err = CHIP_NO_ERROR;
             while ((err = iterator.Next(entry)) == CHIP_NO_ERROR)
             {
+                if (ensureTargetsNotEmpty)
+                {
+                    size_t targetCount = 0;
+                    ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
+                    VerifyOrReturnError(targetCount > 0, CHIP_ERROR_INCORRECT_STATE);
+                }
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));
             }
             VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_SENTINEL, err);
@@ -474,7 +480,7 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
         return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder, &Access::AccessControl::Entries);
     case AccessControl::Attributes::AuxiliaryACL::Id:
         return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder,
-                              &Access::AccessControl::AuxiliaryEntries);
+                              &Access::AccessControl::AuxiliaryEntries, true);
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case AccessControl::Attributes::Extension::Id:
         return ReadExtension(mClusterContext.persistentStorage, mClusterContext.fabricTable, encoder);
