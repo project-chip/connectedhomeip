@@ -2931,7 +2931,7 @@ cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
   device type ma_powersource = 17, version 1;
   device type ma_otarequestor = 18, version 1;
 
@@ -3367,7 +3367,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 7601;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 10;
 
     handle command LockDoor;
     handle command UnlockDoor;

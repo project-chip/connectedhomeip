@@ -19,7 +19,9 @@ import shlex
 import subprocess
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 log = logging.getLogger(__name__)
@@ -184,8 +186,9 @@ class Efr32Board(Enum):
 class Efr32Builder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: Efr32App = Efr32App.LIGHT,
                  board: Efr32Board = Efr32Board.BRD4187C,
                  chip_build_libshell: bool = False,
@@ -209,9 +212,7 @@ class Efr32Builder(GnBuilder):
                  enable_917_soc: bool = False,
                  use_rps_extension: bool = True
                  ):
-        super(Efr32Builder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super(Efr32Builder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
         self.dotfile = ''
@@ -303,6 +304,7 @@ class Efr32Builder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def _bundle(self):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
         if self.app == Efr32App.UNIT_TEST:
@@ -325,6 +327,7 @@ class Efr32Builder(GnBuilder):
             with open(flash_bundle_path, 'w') as bundle_file:
                 bundle_file.write("\n".join(files))
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out", "hex"]
         if self.options.enable_link_map_file:
@@ -350,6 +353,7 @@ class Efr32Builder(GnBuilder):
                         os.path.join(root, file),
                         os.path.join("chip_pw_test_runner_wheels", file))
 
+    @lock_output_dir
     def bundle_outputs(self):
         # If flashbundle creation is enabled, the outputs will include the s37 and flash.py files, plus the two firmware utils scripts that support flash.py.
         # For the unit-test example, there will be a s37 and flash.py file for each unit test source.
@@ -363,6 +367,7 @@ class Efr32Builder(GnBuilder):
                     sourcepath,
                     os.path.join("flashbundle", name))
 
+    @lock_output_dir
     def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',

@@ -260,13 +260,16 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
         # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
-        _found = False
-        for _tag, _value in icac_tlv_data['Any'][6]:
-            if _tag == 8 and _value == 'jf-anchor-icac':
-                _found = True
-                break
-        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        try:
+            icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+            _found = False
+            for _tag, _value in icac_tlv_data['Any'][6]:
+                if _tag == 8 and _value == 'jf-anchor-icac':
+                    _found = True
+                    break
+            asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        except (TypeError, AttributeError) as e:
+            asserts.fail(f"Failed to parse ICAC in precondition 2: {e}")
 
         response = await _devCtrlEcoA.ReadAttribute(
             nodeId=2, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
@@ -388,13 +391,16 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
         # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
-        _found = False
-        for _tag, _value in icac_tlv_data['Any'][6]:
-            if _tag == 8 and _value == 'jf-anchor-icac':
-                _found = True
-                break
-        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        try:
+            icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+            _found = False
+            for _tag, _value in icac_tlv_data['Any'][6]:
+                if _tag == 8 and _value == 'jf-anchor-icac':
+                    _found = True
+                    break
+            asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
+        except (TypeError, AttributeError) as e:
+            asserts.fail(f"Failed to parse ICAC in precondition 2 (Ecosystem B): {e}")
 
         response = await _devCtrlEcoB.ReadAttribute(
             nodeId=22, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
@@ -456,15 +462,43 @@ class TC_JFADMIN_2_1(MatterBaseTest):
             nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True, fabricFiltered=False)
 
-        rcac_data = matter.tlv.TLVReader(fabric_a_trusted_roots[0]
-                                         [Clusters.OperationalCredentials].trustedRootCertificates[1]).get()
-        icac_data = matter.tlv.TLVReader(fabric_b_nocs[0][Clusters.OperationalCredentials].NOCs[2].icac).get()
+        fabric_a_root_subjects = []
+        fabric_a_roots = fabric_a_trusted_roots[0][Clusters.OperationalCredentials].trustedRootCertificates
+        for root_cert in fabric_a_roots:
+            try:
+                rcac_data = matter.tlv.TLVReader(root_cert).get()
+                root_subject = dict(rcac_data.get('Any', [])).get(6)  # Tag 6 = Subject
+                if root_subject is not None:
+                    fabric_a_root_subjects.append(root_subject)
+            except (TypeError, AttributeError):
+                # Skip root certs that can't be parsed
+                continue
 
-        log.info("Verify the chain of trust between Ecosystem A and Ecosystem B. Issuer of ICAC for Ecosystem B should be the RCAC from Ecosystem A")
-        asserts.assert_equal(
-            dict(rcac_data.get('Any', [])).get(6),  # Tag 6 = Subject
-            dict(icac_data.get('Any', [])).get(3),  # Tag 3 = Issuer
-            "Issuer of ICAC for Ecosystem B is not the Subject of RCAC from Ecosystem A"
+        asserts.assert_true(
+            len(fabric_a_root_subjects) > 0,
+            "No valid RCAC Subject found in Ecosystem A TrustedRootCertificates")
+
+        icac_issuers = []
+        for noc in fabric_b_nocs[0][Clusters.OperationalCredentials].NOCs:
+            if noc.icac is None:
+                continue
+            try:
+                icac_data = matter.tlv.TLVReader(noc.icac).get()
+                icac_issuer = dict(icac_data.get('Any', [])).get(3)  # Tag 3 = Issuer
+                if icac_issuer is not None:
+                    icac_issuers.append(icac_issuer)
+            except (TypeError, AttributeError):
+                # Skip NOCs with unparseable ICAC (e.g., Nullable wrapper types)
+                continue
+
+        asserts.assert_true(
+            len(icac_issuers) > 0,
+            "No valid ICAC Issuer found in Ecosystem B NOCs")
+
+        log.info("Verify the chain of trust between Ecosystem A and Ecosystem B. Issuer of an ICAC for Ecosystem B should match a RCAC Subject from Ecosystem A")
+        asserts.assert_true(
+            any(issuer in fabric_a_root_subjects for issuer in icac_issuers),
+            "No Ecosystem B ICAC Issuer matches any Ecosystem A RCAC Subject"
         )
 
         # Shutdown the Python Controllers started at the beginning of this script

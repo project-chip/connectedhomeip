@@ -48,6 +48,7 @@ source_set("clusters") {
     "on-off-server",
     "operational-credentials-server",
     "pressure-measurement-server",
+    "proximity-ranging-server",
     "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
