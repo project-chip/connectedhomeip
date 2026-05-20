@@ -753,7 +753,9 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
         // If a KeySet was saved with this policy, we re-map it here to be TrustFirst.
         if (policy == GroupDataProvider::SecurityPolicy::kCacheAndSync)
         {
-            ChipLogProgress(NotSpecified, "Re-mapping security policy from CacheAndSync to TrustFirst for keyset %u (fabric index %u)", keyset_id, fabric_index);
+            ChipLogProgress(NotSpecified,
+                            "Re-mapping security policy from CacheAndSync to TrustFirst for keyset %u (fabric index %u)", keyset_id,
+                            fabric_index);
             policy = GroupDataProvider::SecurityPolicy::kTrustFirst;
         }
         // keys_count
