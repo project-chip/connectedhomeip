@@ -174,7 +174,7 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
     # writing the parsed tree. Matches the style used by GenerateDevicePicsXmlFiles.
     output_file_path = Path(outputPathStr) / _BASE_PICS_TEMPLATE_FILENAME
     with (open(template_path) as inputFile,
-        open(output_file_path, "wb") as outputFile):
+          open(output_file_path, "wb") as outputFile):
         header = ""
         line = inputFile.readline()
         while line and 'generalPICS' not in line:
