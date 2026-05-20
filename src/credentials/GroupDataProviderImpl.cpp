@@ -749,6 +749,13 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
         // policy
         ReturnErrorOnFailure(reader.Next(TagPolicy()));
         ReturnErrorOnFailure(reader.Get(policy));
+        // CacheAndSync is unimplemented, and should not have been used as the default security policy.
+        // If a KeySet was saved with this policy, we re-map it here to be TrustFirst.
+        if (policy == GroupDataProvider::SecurityPolicy::kCacheAndSync)
+        {
+            ChipLogProgress(NotSpecified, "Re-mapping security policy from CacheAndSync to TrustFirst for keyset %u (fabric index %u)", keyset_id, fabric_index);
+            policy = GroupDataProvider::SecurityPolicy::kTrustFirst;
+        }
         // keys_count
         ReturnErrorOnFailure(reader.Next(TagNumKeys()));
         ReturnErrorOnFailure(reader.Get(keys_count));
@@ -1658,7 +1665,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     if (in_keyset.policy != SecurityPolicy::kTrustFirst)
     {
         ChipLogError(NotSpecified, "Unsupported group key security policy: %d", static_cast<int>(in_keyset.policy));
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
     FabricData fabric(fabric_index);
     KeySetData keyset;
