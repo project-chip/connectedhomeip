@@ -55,15 +55,13 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
     def steps_TC_IDM_9_1(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
-            TestStep("1a", "Send a command with a uint16 parameter value out of range in the Invoke Request message to the DUT from the TH. Example: Command - ColorControl.MoveToColorTemperature, field - ColorTemperatureMireds, Constraint Max Value - 65279, Test Value - 65280",
+            TestStep("1a", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is larger than the constraint allowed. Example: Command - GeneralDiagnostics.TestEventTrigger, data field - EnableKey, Constraint - 16 bytes exactly, Test Value - 17 bytes",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
-            TestStep("1b", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is larger than the constraint allowed. Example: Command - GeneralDiagnostics.TestEventTrigger, data field - EnableKey, Constraint - 16 bytes exactly, Test Value - 17 bytes",
+            TestStep("1b", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is smaller than the constraint allowed. Example: Command - GeneralDiagnostics.TestEventTrigger, data field - EnableKey, Constraint - 16 bytes exactly, Test Value - 15 bytes",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
-            TestStep("1c", "Set the data field of a command of data type octstr to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the octstr to a value that is smaller than the constraint allowed. Example: Command - GeneralDiagnostics.TestEventTrigger, data field - EnableKey, Constraint - 16 bytes exactly, Test Value - 15 bytes",
+            TestStep("1c", "Set the data field of a command of data type string to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the string to a value that is larger than the maximum length allowed. Example: Command - SetRegulatoryConfig, data field - CountryCode, Constraint - 2",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
-            TestStep("1d", "Set the data field of a command of data type string to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the string to a value that is larger than the maximum length allowed. Example: Command - SetRegulatoryConfig, data field - CountryCode, Constraint - 2",
-                     "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
-            TestStep("1e", "Set the data field of a command of data type string to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the string to a value that is smaller than the minimum length allowed. Example: Command - SetRegulatoryConfig, data field - CountryCode, Constraint - 2",
+            TestStep("1d", "Set the data field of a command of data type string to an out of range value in the Invoke Request message to the DUT from the TH. Set the length of the string to a value that is smaller than the minimum length allowed. Example: Command - SetRegulatoryConfig, data field - CountryCode, Constraint - 2",
                      "Verify on the TH that the DUT sends a Status Response with a CONSTRAINT_ERROR Status Code."),
             TestStep(2, "Read every attribute that is writable with bounds from all the clusters from all the endpoints. For every writable attribute read, set the data field  to an out of bounds value in the Write Request message to the DUT from the TH.",
                      "Verify on the TH that the DUT sends a Status Response Action with a CONSTRAINT_ERROR Status Code."),
@@ -76,24 +74,10 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
         self.build_spec_xmls()
         self.endpoint = MatterBaseTest.get_endpoint(self)
 
-        # Step 1a: Test uint16 constraint validation using ColorControl clusters MoveToColorTemperature command
-        # TODO: Follow-Up PR #https://github.com/project-chip/connectedhomeip/issues/71864 to do dynamic command testing for constraints based on available commands on endpoint being tested.
-        self.step("1a")
-        if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.ColorControl.Commands.MoveToColorTemperature):
-            try:
-                cmd = Clusters.ColorControl.Commands.MoveToColorTemperature(
-                    colorTemperatureMireds=65280  # Max value is 65279 for this uint16 attribute according to XML spec
-                )
-                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
-                asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError,
-                                     f"Expected CONSTRAINT_ERROR, but got {e.status}")
-
-        # Step 1b: Test octstr max length constraint violation using GeneralDiagnostics TestEventTrigger command.
+        # Step 1a: Test octstr max length constraint violation using GeneralDiagnostics TestEventTrigger command.
         # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 17-byte value violates the length constraint.
         # TestEventTrigger lives on the root node (endpoint 0).
-        self.step("1b")
+        self.step("1a")
         if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
             try:
                 cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
@@ -106,10 +90,10 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
-        # Step 1c: Test octstr min length constraint violation using GeneralDiagnostics TestEventTrigger command.
+        # Step 1b: Test octstr min length constraint violation using GeneralDiagnostics TestEventTrigger command.
         # EnableKey is an octstr with allowed=16 (must be exactly 16 bytes); a 15-byte value violates the length constraint.
         # TestEventTrigger lives on the root node (endpoint 0).
-        self.step("1c")
+        self.step("1b")
         if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
             try:
                 cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
@@ -122,8 +106,8 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
-        # Step 1d: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
-        self.step("1d")
+        # Step 1c: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
+        self.step("1c")
         try:
             # CountryCode field is string with constraint length=2
             cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
@@ -136,8 +120,8 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Expected CONSTRAINT_ERROR, got {e.status}")
 
-        # Step 1e: Test string min length constraint violation
-        self.step("1e")
+        # Step 1d: Test string min length constraint violation
+        self.step("1d")
         try:
             # CountryCode field is string with constraint length=2
             cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
