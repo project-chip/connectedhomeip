@@ -23,7 +23,6 @@
 #include <clusters/CameraAvStreamManagement/Attributes.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 
-#include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
 #include <optional>
@@ -387,18 +386,9 @@ enum class OptionalAttribute : uint32_t
 class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
-    struct Context
-    {
-        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
-    };
-
     /**
      * @brief Creates a Camera AV Stream Management cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
-     *
-     * @param aContext                          Context providing injected dependencies (e.g., SafeAttributePersistenceProvider).
-     *                                          Note: the caller must ensure that the provided SafeAttributePersistenceProvider
-     *                                          outlives this instance.
      *
      * @param aDelegate                         A pointer to the delegate to be used by this server.
      *                                          Note: the caller must ensure that the delegate lives throughout the instance's
@@ -431,7 +421,7 @@ public:
      * for the transmission of its media streams.
      *
      */
-    CameraAVStreamManagementCluster(const Context & aContext, CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
+    CameraAVStreamManagementCluster(CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
                                     const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
                                     uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
                                     const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
@@ -454,6 +444,8 @@ public:
      * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR Init();
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -702,7 +694,6 @@ private:
     template <AttributeId TAttributeId>
     friend struct StreamTraits;
 
-    Context mContext;
     CameraAVStreamManagementDelegate & mDelegate;
     const BitFlags<Feature> mEnabledFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
@@ -765,7 +756,8 @@ private:
             auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
-                ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, currentValue));
+                ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
+                    path, ByteSpan(reinterpret_cast<const uint8_t *>(&currentValue), sizeof(currentValue))));
             }
             mDelegate.OnAttributeChanged(attributeId);
             NotifyAttributeChanged(attributeId);

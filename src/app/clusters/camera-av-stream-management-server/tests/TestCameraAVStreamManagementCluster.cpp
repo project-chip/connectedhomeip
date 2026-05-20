@@ -18,8 +18,6 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/CommandHandler.h>
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
@@ -281,7 +279,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(CameraAvStreamManagement::CameraAVStreamManagementCluster::Context{ mPersistenceProvider }, mMockDelegate,
+        mServer(mMockDelegate,
                 kTestEndpointId,
                 chip::BitFlags<CameraAvStreamManagement::Feature>(
                     CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
@@ -305,7 +303,6 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     void SetUp() override
     {
-        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(InitializeCameraAVSMDefaults(mServer), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
@@ -315,7 +312,6 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     std::vector<AudioStreamStruct> mAudioStreams;
     std::vector<SnapshotStreamStruct> mSnapshotStreams;
     MockCameraAVStreamManagementDelegate mMockDelegate;
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
     CameraAvStreamManagement::CameraAVStreamManagementCluster mServer;
     ClusterTester mClusterTester;
 };
