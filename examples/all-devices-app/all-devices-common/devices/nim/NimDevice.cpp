@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#include <devices/nim/NimDevice.h>
-#include <devices/Types.h>
 #include <app/server/Server.h>
-#include <platform/PlatformManager.h>
+#include <devices/Types.h>
+#include <devices/nim/NimDevice.h>
 #include <lib/support/Span.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip::app::Clusters;
 
@@ -49,10 +49,10 @@ CHIP_ERROR NimDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     // 2. Wi-Fi Network Management
     mWiFiNetworkManagementCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mWiFiNetworkManagementCluster.Registration()));
-    
+
     // Set default credentials to match network-manager-app behavior
-    ReturnErrorOnFailure(mWiFiNetworkManagementCluster.Cluster().SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                                 ByteSpanFromCharSpan("Setec Astronomy"_span)));
+    ReturnErrorOnFailure(mWiFiNetworkManagementCluster.Cluster().SetNetworkCredentials(
+        ByteSpanFromCharSpan("MatterAP"_span), ByteSpanFromCharSpan("Setec Astronomy"_span)));
 
     // 3. Thread Network Directory
     mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
@@ -68,7 +68,7 @@ CHIP_ERROR NimDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 void NimDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
-    
+
     if (mThreadNetworkDiagnosticsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDiagnosticsCluster.Cluster()));
