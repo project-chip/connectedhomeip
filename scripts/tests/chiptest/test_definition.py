@@ -267,7 +267,7 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     'lit-icd': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='lit-icd-app'),
     'lock': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-lock-app'),
     'microwave-oven': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-microwave-oven-app'),
-    'network-manager': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='all-devices-app'),
+    'network-manager': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='matter-network-manager-app'),
     'ota-provider': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-ota-provider-app'),
     'ota-requestor': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-ota-requestor-app'),
     'rvc': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-rvc-app'),
@@ -505,14 +505,10 @@ class TestDefinition:
                         continue
 
                     # For the app indicated by target, give it the 'default' key to add to the register
-                    orig_key = key
                     if key == target.command:
                         key = 'default'
                         for arg in target.arguments:
                             subproc = subproc.with_args(arg)
-
-                    if orig_key == 'network-manager' and subproc.path.name == 'all-devices-app':
-                        subproc = subproc.with_args('--device', 'nim')
 
                     if op_network == 'Thread':
                         # The node id must not conflict with ThreadBorderRouter.NODE_ID

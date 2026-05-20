@@ -968,19 +968,9 @@ def python_tests(
     override_binaries = dict(override_binary_path or [])
 
     with open("./out/test_env.yaml", "wt") as f:
-        target_prefix = _get_native_machine_target()
-        suffix = _get_variants(coverage)
         for target in _get_targets(coverage):
             if target.env_key in override_binaries:
                 run_path = as_runner(override_binaries[target.env_key])
-            elif target.env_key == "NETWORK_MANAGEMENT_APP":
-                real_binary_path = f"./out/{target_prefix}-all-devices-{suffix}/all-devices-app"
-                wrapper_script_path = f"./out/runners/nim_wrapper.sh"
-                os.makedirs("./out/runners", exist_ok=True)
-                with open(wrapper_script_path, "wt") as wf:
-                    wf.write(f"#!/bin/bash\nexec {real_binary_path} --device nim \"$@\"\n")
-                os.chmod(wrapper_script_path, 0o755)
-                run_path = wrapper_script_path
             else:
                 run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.env_key}: {run_path}\n")

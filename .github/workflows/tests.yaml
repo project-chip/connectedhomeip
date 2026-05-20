@@ -424,11 +424,43 @@ jobs:
                      --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
                      --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
+                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
                      --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                      --summary-file test-summaries/chip-tool-python.json \
+                  "
+
+            - name: Create NIM wrapper
+              run: |
+                mkdir -p objdir-clone/runners || true
+                echo '#!/bin/bash
+                exec ./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app --device nim "$@"' > objdir-clone/runners/nim-wrapper.sh
+                chmod +x objdir-clone/runners/nim-wrapper.sh
+
+            - name: Run NIM Tests
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
+                     --runner chip_tool_python \
+                     --target Test_TC_TBRM_2_1 \
+                     --target Test_TC_TBRM_2_2 \
+                     --target Test_TC_TBRM_2_3 \
+                     --target Test_TC_TBRM_2_4 \
+                     --target Test_TC_TBRM_3_1_Simulated \
+                     --target Test_TC_THNETDIR_2_1 \
+                     --target Test_TC_THNETDIR_2_2 \
+                     --target Test_TC_THNETDIR_2_3 \
+                     --target Test_TC_WIFINM_2_1 \
+                     --target Test_TC_WIFINM_2_2 \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path default:./objdir-clone/runners/nim-wrapper.sh \
+                     --summary-file test-summaries/nim-tests.json \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -523,7 +555,7 @@ jobs:
                      --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
                      --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
+                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
                      --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
@@ -551,7 +583,7 @@ jobs:
                      --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
                      --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
+                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
                      --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
@@ -724,7 +756,7 @@ jobs:
                      --app-path lit-icd:./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --app-path microwave-oven:./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
                      --app-path rvc:./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT}/all-devices-app \
+                     --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/darwin-${{matrix.arch}}-evse-${BUILD_VARIANT}/chip-evse-app \
                      --app-path water-heater:./objdir-clone/darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
@@ -1158,7 +1190,7 @@ jobs:
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app-${BUILD_VARIANT}-clang/jfc-app" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-data-model-no-unique-id-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-clang-test/lit-icd-app" >> /tmp/test_env.yaml
-                  echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
+                  echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
                   echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-clang-test-unified/chip-ota-provider-app" >> /tmp/test_env.yaml
                   echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/src/server.py" >> /tmp/test_env.yaml
