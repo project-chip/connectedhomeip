@@ -434,9 +434,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     default:
         break;
     }
-
-    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-    return;
 }
 
 static int OnUnsubscribeCharComplete(uint16_t conn_handle, const struct ble_gatt_error * error, struct ble_gatt_attr * attr,

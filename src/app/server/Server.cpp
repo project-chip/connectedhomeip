@@ -814,8 +814,8 @@ void Server::RejoinExistingMulticastGroups()
                 }
 
                 const Transport::PeerAddress & address = use_iana_addr
-                    ? Transport::PeerAddress::Groupcast()
-                    : Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
+                    ? Transport::PeerAddress::BuildMatterIanaMulticastAddress()
+                    : Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric.GetFabricId(), groupInfo.group_id);
 
                 err = mTransports.MulticastGroupJoinLeave(address, true);
                 if (err != CHIP_NO_ERROR)
@@ -881,7 +881,7 @@ void Server::ScheduleFactoryReset()
 void Server::Shutdown()
 {
     assertChipStackLockedByCurrentThread();
-    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER

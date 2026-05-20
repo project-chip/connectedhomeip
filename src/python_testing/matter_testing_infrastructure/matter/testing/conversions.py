@@ -26,7 +26,7 @@ from binascii import hexlify, unhexlify
 import matter.clusters as Clusters
 
 
-def bytes_from_hex(hex: str) -> bytes:
+def bytes_from_hex(s: str) -> bytes:
     """ Converts hex string to bytes, handling various formats (colons, spaces, newlines).
 
     Examples:
@@ -39,7 +39,7 @@ def bytes_from_hex(hex: str) -> bytes:
         >>> bytes_from_hex("01\\nab\\ncd")
         b'\\x01\\xab\\xcd'
     """
-    return unhexlify("".join(hex.replace(":", "").replace(" ", "").split()))
+    return unhexlify("".join(s.replace(":", "").replace(" ", "").split()))
 
 
 def hex_from_bytes(b: bytes) -> str:
@@ -90,14 +90,14 @@ def format_decimal_and_hex(number):
         return f'{number}'
 
 
-def cluster_id_with_name(id):
+def cluster_id_with_name(cid):
     """ Formats a Matter cluster ID with its name and numeric representation.
 
     Uses format_decimal_and_hex() for numeric formatting and looks up cluster name from registry.
     Falls back to "Unknown cluster" if ID not recognized.
 
     Args:
-        id: int, the Matter cluster identifier
+        cid: int, the Matter cluster identifier
 
     Returns:
         str: A formatted string containing the ID and cluster name
@@ -108,11 +108,11 @@ def cluster_id_with_name(id):
         >>> cluster_id_with_name(999999)  # Unknown cluster
         '999999 (0xf423f) Unknown cluster'
     """
-    if id in Clusters.ClusterObjects.ALL_CLUSTERS:
-        s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
+    if cid in Clusters.ClusterObjects.ALL_CLUSTERS:
+        s = Clusters.ClusterObjects.ALL_CLUSTERS[cid].__name__
     else:
         s = "Unknown cluster"
-    return f'{format_decimal_and_hex(id)} {s}'
+    return f'{format_decimal_and_hex(cid)} {s}'
 
 
 if __name__ == "__main__":

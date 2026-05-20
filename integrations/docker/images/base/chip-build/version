@@ -1,1 +1,1 @@
-193 : [Tizen] Update installer script for Tizen 10.0
+197 : [crosscompile] Bump {armhf,aarch64} sysroot tag to `version:build-2026.05.14`
