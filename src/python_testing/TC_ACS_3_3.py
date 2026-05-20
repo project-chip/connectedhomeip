@@ -267,10 +267,10 @@ class TC_ACS_3_3(MatterBaseTest):
 #            event = event_listener.wait_for_event_report(
 #                cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
 # .................................................................
-            # Exp: 
+            # Exp:
             event = event_listener.get_last_event()
             log.info(f"eventheader: {event}")
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID1, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag1, "Wrong Tag")
             event_start_time = event.Header.Timestamp
@@ -295,7 +295,7 @@ class TC_ACS_3_3(MatterBaseTest):
             #log.info(f"eventtime: {event.eventStartTime}")
             #asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
             # asserts.assert_true(event.startEventNumber == event_number, "Not matching Start event number")
-            
+
         else:
             log.info("HumanActivity Feature not supported. Test steps skipped")
             self.skip_step("3a")
@@ -367,11 +367,11 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("4d") ####################################################################################
             # Exp:
-            event = event_listener.get_last_event();
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
+            event = event_listener.get_last_event()
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID2, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag2, "Wrong Tag")
-            # event start time 
+            # event start time
             event_start_time = event.Header.Timestamp
 
             self.step("4e") ####################################################################################
@@ -404,7 +404,7 @@ class TC_ACS_3_3(MatterBaseTest):
 
         if self.SoundIdentificationSupported:
             self.step("5a") ####################################################################################
-            # initial 
+            # initial
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
@@ -458,8 +458,8 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("5d") ####################################################################################
             # Exp:
-            event = event_listener.get_last_event();
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
+            event = event_listener.get_last_event()
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID3, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag3, "Wrong Tag")
             # event start time
@@ -495,8 +495,8 @@ class TC_ACS_3_3(MatterBaseTest):
 
         if self.ObjectCountingSupported and self.ObjectIdentificationSupported:
             objectcount_input = 2
-            self.step("6a") ####################################################################################         
-            
+            self.step("6a") ####################################################################################
+
             # check the boolean state is cleared as False
             objectCountReached = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountReached
@@ -520,9 +520,8 @@ class TC_ACS_3_3(MatterBaseTest):
                 log.info(f"user input: {namespaceID4} {tag4}")
 
             semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID4, tag=tag4, label=None)
-                objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
-                    countingObject=semantic_tag,
-                    objectCountThreshold=objectcountthreshold_input)
+            objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
+                countingObject=semantic_tag, objectCountThreshold=objectcountthreshold_input)
 
             # write object counting threshold
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
@@ -568,14 +567,14 @@ class TC_ACS_3_3(MatterBaseTest):
                 log.info("Received attribute report for ObjectCountReached.")
 
             self.step("6f") ####################################################################################
-            event = event_listener.get_last_event();
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
+            event = event_listener.get_last_event()
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             asserts.assert_equal(event.Data.objectCountReached, True, "Wrong objectCountReached")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID4, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag4, "Wrong Tag")
             if event.Data.objectCount != NullValue:
                 asserts.assert_equal(event.Data.objectCount, objectcount_input, "Wrong ObjectCount")
-            # event start time 
+            # event start time
             event_start_time = event.Header.Timestamp
 
             self.step("6g") ####################################################################################
@@ -606,7 +605,6 @@ class TC_ACS_3_3(MatterBaseTest):
         attrib_listener.reset()
         event_listener.reset()
         log.info("Cleared accumulated reports. Restarting accumulation.")
-
 
 if __name__ == "__main__":
     default_matter_test_main()
