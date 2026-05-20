@@ -25,7 +25,6 @@
 #include <lib/support/BitFlags.h>
 #include <platform/PlatformManager.h>
 
-
 namespace chip::app::Clusters {
 
 class ThreadBorderRouterManagementCluster : public DefaultServerCluster,
