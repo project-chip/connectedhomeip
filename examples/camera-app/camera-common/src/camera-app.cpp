@@ -278,26 +278,27 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
-    CameraAVStreamManagementCluster::InitArguments args{ CameraAVStreamManagementCluster::Context{
-                                                             *app::GetSafeAttributePersistenceProvider() },
-                                                         mCameraDevice->GetCameraAVStreamMgmtDelegate(),
-                                                         mEndpoint,
-                                                         avsmFeatures,
-                                                         avsmOptionalAttrs,
-                                                         static_cast<uint8_t>(maxConcurrentVideoEncoders),
-                                                         maxEncodedPixelRate,
-                                                         sensorParams,
-                                                         nightVisionUsesInfrared,
-                                                         minViewport,
-                                                         std::move(rateDistortionTradeOffPoints),
-                                                         maxContentBufferSize,
-                                                         micCapabilities,
-                                                         spkrCapabilities,
-                                                         twowayTalkSupport,
-                                                         std::move(snapshotCapabilities),
-                                                         maxNetworkBandwidth,
-                                                         std::move(supportedStreamUsages),
-                                                         std::move(streamUsagePriorities) };
+    CameraAVStreamManagementCluster::InitArguments args{
+        .context = CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
+        .delegate = mCameraDevice->GetCameraAVStreamMgmtDelegate(),
+        .endpointId = mEndpoint,
+        .features = avsmFeatures,
+        .optionalAttrs = avsmOptionalAttrs,
+        .maxConcurrentEncoders = static_cast<uint8_t>(maxConcurrentVideoEncoders),
+        .maxEncodedPixelRate = maxEncodedPixelRate,
+        .videoSensorParams = sensorParams,
+        .nightVisionUsesInfrared = nightVisionUsesInfrared,
+        .minViewPort = minViewport,
+        .rateDistortionTradeOffPoints = std::move(rateDistortionTradeOffPoints),
+        .maxContentBufferSize = maxContentBufferSize,
+        .microphoneCapabilities = micCapabilities,
+        .spkrCapabilities = spkrCapabilities,
+        .twoWayTalkSupport = twowayTalkSupport,
+        .snapshotCapabilities = std::move(snapshotCapabilities),
+        .maxNetworkBandwidth = maxNetworkBandwidth,
+        .supportedStreamUsages = std::move(supportedStreamUsages),
+        .streamUsagePriorities = std::move(streamUsagePriorities)
+    };
     mAVStreamMgmtServer.Create(std::move(args));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAVStreamMgmtServer.Registration());

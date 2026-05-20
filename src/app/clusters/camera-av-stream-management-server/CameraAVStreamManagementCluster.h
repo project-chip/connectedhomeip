@@ -394,8 +394,18 @@ public:
 
     struct InitArguments
     {
-        const Context & context;
+        /**
+         * Context providing injected dependencies.
+         * Note: the caller must ensure that the SafeAttributePersistenceProvider referenced by the context outlives this instance.
+         */
+        Context context;
+
+        /**
+         * A reference to the delegate to be used by this server.
+         * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+         */
         CameraAVStreamManagementDelegate & delegate;
+
         EndpointId endpointId;
         BitFlags<Feature> features;
         BitFlags<OptionalAttribute> optionalAttrs;
@@ -420,6 +430,8 @@ public:
      * to be registered and called by the interaction model at the appropriate times.
      *
      * @param aArgs                             Initialization arguments.
+     *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate
+     *                                          and the SafeAttributePersistenceProvider in context) outlive this cluster instance.
      *
      */
     CameraAVStreamManagementCluster(InitArguments && aArgs);
