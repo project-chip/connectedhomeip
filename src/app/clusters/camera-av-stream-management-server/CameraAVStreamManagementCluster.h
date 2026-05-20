@@ -419,7 +419,7 @@ public:
         uint8_t maxConcurrentEncoders = 0;
 
         /** The maximum data rate (encoded pixels/sec) supported by camera. */
-        uint32_t maxEncodedPixelRate  = 0;
+        uint32_t maxEncodedPixelRate = 0;
 
         /** The set of video sensor parameters for the camera. */
         VideoSensorParamsStruct videoSensorParams;
@@ -436,19 +436,23 @@ public:
         /** The maximum size of the content buffer containing data for all streams, including pre-roll. */
         uint32_t maxContentBufferSize = 0;
 
-        /** Indicates the audio capabilities of the microphone in terms of the codec used, supported sample rates and the number of channels. */
+        /** Indicates the audio capabilities of the microphone in terms of the codec used, supported sample rates and the number of
+         * channels. */
         AudioCapabilitiesStruct microphoneCapabilities;
 
-        /** Indicates the audio capabilities of the speaker in terms of the codec used, supported sample rates and the number of channels. */
+        /** Indicates the audio capabilities of the speaker in terms of the codec used, supported sample rates and the number of
+         * channels. */
         AudioCapabilitiesStruct spkrCapabilities;
 
         /** Indicates the type of two-way talk support the device has, e.g., half-duplex, full-duplex, etc. */
         TwoWayTalkSupportTypeEnum twoWayTalkSupport = TwoWayTalkSupportTypeEnum::kNotSupported;
 
-        /** Indicates the set of supported snapshot capabilities by the device, e.g., the image codec, the resolution and the maximum frame rate. */
+        /** Indicates the set of supported snapshot capabilities by the device, e.g., the image codec, the resolution and the
+         * maximum frame rate. */
         std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities;
 
-        /** Indicates the maximum network bandwidth (in bps) that the device would consume for the transmission of its media streams. */
+        /** Indicates the maximum network bandwidth (in bps) that the device would consume for the transmission of its media
+         * streams. */
         uint32_t maxNetworkBandwidth = 0;
 
         /** Indicates the possible stream types available. */
