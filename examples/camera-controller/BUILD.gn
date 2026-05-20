@@ -23,8 +23,20 @@ import("${chip_root}/src/lib/core/core.gni")
 
 assert(chip_build_tools)
 
+if (current_os == "mac") {
+  import("${build_root}/config/linux/pkg_config.gni")
+
+  pkg_config("openssl") {
+    packages = [ "openssl" ]
+  }
+}
+
 config("config") {
   cflags = [ "-Wno-shadow" ]
+
+  if (current_os == "mac") {
+    cflags_cc = [ "-Wno-implicit-int-conversion" ]
+  }
 
   include_dirs = [
     ".",
@@ -134,6 +146,10 @@ executable("chip-camera-controller") {
     "${chip_root}/src/platform/logging:stdio",
     "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
+
+  if (current_os == "mac") {
+    configs += [ ":openssl" ]
+  }
 
   output_dir = root_out_dir
 }
