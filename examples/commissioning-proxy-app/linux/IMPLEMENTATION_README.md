@@ -171,8 +171,8 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `WiFiPAFConfig.h`                       | `PAFTP_ACK_TIMEOUT_MS` increased from 15 000 ms to 30 000 ms to prevent premature session closure during WiFi join                                                                                                                                                                                                                                                                                                                                                                   |
 | `WiFiPAFLayer.cpp`                      | `RmPafSession` handles `kAccNodeInfo` lookup in addition to `kAccSessionId`; `CloseEndPoint()` forcibly closes a PAFTP endpoint by session; `ScheduleCancelPublishersOnTxIdle()` / `CancelAllPublisherSessions()` implement deferred NAN publisher teardown after WiFi connect; tx-idle hook now also fires an optional `OnTxIdleActionFunct` after publisher cancel so callers can defer follow-up work (e.g. posting `kOperationalNetworkEnabled`) until PAFTP traffic has drained |
-| `WiFiPAFLayer.h`                        | Declares `CloseEndPoint()`, `CancelAllPublisherSessions()`, `ScheduleCancelPublishersOnTxIdle(cancelCb, afterCb, afterCtx)` with the new `OnTxIdleActionFunct` and optional `afterCb`/`afterCtx`; private fields `mCancelPublishersOnTxIdle`, `mCancelPublishersCallback`, `mOnTxIdleAfterCb`, `mOnTxIdleAfterCtx`                                                                                                                                                          |
-| `WiFiPAFTP.cpp` / `WiFiPAFEndPoint.cpp` | Sequence-number progress logging for PAFTP fragment debugging                                                                                                                                                                                                                                                                                                                                                 |
+| `WiFiPAFLayer.h`                        | Declares `CloseEndPoint()`, `CancelAllPublisherSessions()`, `ScheduleCancelPublishersOnTxIdle(cancelCb, afterCb, afterCtx)` with the new `OnTxIdleActionFunct` and optional `afterCb`/`afterCtx`; private fields `mCancelPublishersOnTxIdle`, `mCancelPublishersCallback`, `mOnTxIdleAfterCb`, `mOnTxIdleAfterCtx`                                                                                                                                                                   |
+| `WiFiPAFTP.cpp` / `WiFiPAFEndPoint.cpp` | Sequence-number progress logging for PAFTP fragment debugging                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ### Server Commissioning Path (`src/app/server/`, `src/platform/`)
 
@@ -523,10 +523,10 @@ advertising by ~35 s. Canceling NAN immediately after `ConnectNetwork` would
 risk tearing down the link before the `ConnectNetworkResponse` PAFTP frame is
 acknowledged by the proxy. The tx-idle trigger ensures all in-flight PAFTP data
 has been confirmed by the peer before NAN is torn down. With this fix mDNS
-resolves in ~3 s and CASE completes without MRP retransmit. Tearing down
-publish at the same point also closes the PAFTP session per Matter spec
-§4.20.3.10 [4.780] and discharges any pending standalone-ACK obligation per
-§4.20.3.8 [4.771].
+resolves in ~3 s and CASE completes without MRP retransmit. Tearing down publish
+at the same point also closes the PAFTP session per Matter spec §4.20.3.10
+[4.780] and discharges any pending standalone-ACK obligation per §4.20.3.8
+[4.771].
 
 ---
 

@@ -66,10 +66,10 @@ chip-tool  ──Matter (TCP/IP)──►  Commissioning Proxy App  ──Wi-Fi 
 | **Build machine**            | —                                | Ubuntu 22.04 or 24.04 x86-64 with Docker installed. Not needed at runtime — used only to cross-compile the binaries.                                                                                                               |
 | **Ethernet switch / router** | —                                | Connects all RPis and the build machine on the same subnet for chip-tool to reach the Commissioning Proxy over IP. The ED does not need to be on the network                                                                       |
 
-> **Why a USB dongle?** The on-board Wi-Fi on Raspberry Pi 4 and 5 does
-> not support the Wi-Fi Aware NAN USD interface required by Wi-Fi PAF. A
-> supported external USB dongle must be plugged into both the Proxy RPi and the
-> End Device RPi before starting either app.
+> **Why a USB dongle?** The on-board Wi-Fi on Raspberry Pi 4 and 5 does not
+> support the Wi-Fi Aware NAN USD interface required by Wi-Fi PAF. A supported
+> external USB dongle must be plugged into both the Proxy RPi and the End Device
+> RPi before starting either app.
 
 ### 1.2 Software Prerequisites
 
@@ -560,8 +560,8 @@ ssh ubuntu@<th-rpi-ip>    'mkdir -p ~/apps'
 
 ### Copy the binaries
 
-> **Note**: `scp` will fail with "destination open: Failure" if the target binary is
-> currently running on the RPi. Stop the app before copying.
+> **Note**: `scp` will fail with "destination open: Failure" if the target
+> binary is currently running on the RPi. Stop the app before copying.
 
 ```bash
 # Commissioning Proxy → DUT RPi

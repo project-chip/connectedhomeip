@@ -126,8 +126,8 @@ $ ./chip-tool pairing proxy <node-id> <ssid> <password> <setup-pin-code> <discri
 | `node-id`               | Node ID to assign to the new device                          |
 | `ssid`                  | Wi-Fi network SSID to configure on the device                |
 | `password`              | Wi-Fi network password                                       |
-| `setup-pin-code`        | Commissionee PASE setup PIN code                           |
-| `discriminator`         | Commissionee discriminator                                 |
+| `setup-pin-code`        | Commissionee PASE setup PIN code                             |
+| `discriminator`         | Commissionee discriminator                                   |
 | `proxy-node-id`         | Node ID of the already-commissioned commissioning proxy      |
 | `proxy-connect-timeout` | Timeout in seconds for `ProxyConnectRequest` (default: 30 s) |
 

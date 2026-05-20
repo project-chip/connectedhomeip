@@ -58,8 +58,7 @@ same L2 broadcast domain — see §7 for why this matters):
 | ED    | `172.16.62.110` | `chip-lighting-app` + cert helper scripts               |
 
 Both Proxy and ED need a NAN-capable USB Wi-Fi dongle (see
-`../CP_getting_started.md §1.1`). The on-board Pi Wi-Fi does not support
-NAN.
+`../CP_getting_started.md §1.1`). The on-board Pi Wi-Fi does not support NAN.
 
 > If any of those IPs are different on your rig, edit them in two places: the
 > defaults at the top of `~/scripts/run-cert-test.sh` (on the TH) and
@@ -325,9 +324,9 @@ ssh ubuntu@<ed-ip> 'grep "state is .completed" /tmp/ed_app.log'
 
 Save this script as `setup-cert-test-rig.sh` **on your workstation** (the
 machine that has SSH access to TH/Proxy/ED). It writes every helper to
-`/tmp/cert-rig-staging/`, scp them to the right host, sets permissions,
-installs the sudoers file with `visudo -c`, and verifies. Re-running it is safe
-— every step is idempotent.
+`/tmp/cert-rig-staging/`, scp them to the right host, sets permissions, installs
+the sudoers file with `visudo -c`, and verifies. Re-running it is safe — every
+step is idempotent.
 
 ```bash
 #!/usr/bin/env bash
