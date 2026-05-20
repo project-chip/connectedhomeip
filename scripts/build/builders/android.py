@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput, BuildProfile
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, BuildProfile, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -119,12 +121,11 @@ class AndroidApp(Enum):
 
 class AndroidBuilder(Builder):
     def __init__(self,
-                 root,
-                 runner,
-                 board: AndroidBoard,
-                 app: AndroidApp,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock, board: AndroidBoard, app: AndroidApp,
                  optimize_size: bool = False):
-        super(AndroidBuilder, self).__init__(root, runner)
+        super(AndroidBuilder, self).__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.optimize_size = optimize_size
@@ -391,6 +392,7 @@ class AndroidBuilder(Builder):
                 title="Building Example " + self.identifier,
             )
 
+    @lock_output_dir
     def generate(self):
         self._Execute(
             ["python3", "third_party/android_deps/set_up_android_deps.py"],
@@ -508,6 +510,7 @@ class AndroidBuilder(Builder):
             # Handle SDK manager license acceptance
             self._handle_sdk_license_acceptance()
 
+    @lock_output_dir
     def stripSymbols(self):
         output_libs_dir = os.path.join(
             self.output_dir,
@@ -524,6 +527,7 @@ class AndroidBuilder(Builder):
                     "Stripping symbols from " + lib
                 )
 
+    @lock_output_dir
     def _build(self):
         if self.board.IsIde():
             # App compilation IDE
@@ -656,6 +660,7 @@ class AndroidBuilder(Builder):
             if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE] or self.optimize_size:
                 self.stripSymbols()
 
+    @lock_output_dir
     def build_outputs(self):
         if self.board.IsIde():
             yield BuilderOutput(

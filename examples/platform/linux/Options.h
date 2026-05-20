@@ -69,6 +69,7 @@ struct LinuxDeviceOptions
     bool cameraTestAudiosrc  = false;
     bool cameraAudioPlayback = false;
     chip::Optional<std::string> cameraVideoDevice;
+    chip::Optional<uint16_t> cameraFramerate;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
     const char * mWiFiPAFExtCmds = nullptr;

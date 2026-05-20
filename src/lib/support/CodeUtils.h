@@ -326,6 +326,31 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def SuccessOrShutdown(expr, ...)
+ *
+ *  @brief
+ *    This is expected to be called from within a class that implements a Shutdown method.
+ *    It checks for the specified error, which is expected to commonly be successful (CHIP_NO_ERROR),
+ *    on failure, it calls the statements to be executed before shutdown if provided,
+ *    then calls the Shutdown method of the class and returns the error.
+ *
+ *  @param[in]  expr  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
+ *  @param[in]  ...     Statements to execute before shutdown. Optional.
+ *
+ */
+#define SuccessOrShutdown(expr, ...)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
+            this->Shutdown();                                                                                                      \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
  *  @def SuccessOrExit(error)
  *
  *  @brief
