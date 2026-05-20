@@ -83,7 +83,7 @@ CHIP_ERROR ReadAclEntries(FabricTable & fabricTable, Access::AccessControl & acc
                 {
                     size_t targetCount = 0;
                     ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
-                    VerifyOrReturnError(targetCount > 0, CHIP_ERROR_INCORRECT_STATE);
+                    VerifyOrReturnError(targetCount > 0, CHIP_ERROR_INVALID_LIST_LENGTH);
                 }
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));
             }
