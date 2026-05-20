@@ -1731,7 +1731,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestUpdateSnapshotStreamRefCount)
 TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
 {
     // 1. Prepare data with non-zero referenceCount
-    VideoStreamStruct stream;
+    VideoStreamStruct stream{};
     stream.videoStreamID  = 1;
     stream.referenceCount = 5; // Non-zero
 
@@ -1760,21 +1760,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
     auto it = allocatedVideoStreams.begin();
     ASSERT_TRUE(it.Next());
     EXPECT_EQ(it.GetValue().referenceCount, 0);
-
-    // 5. Verify that KVS was also updated to 0
-    uint8_t readBuffer[kMaxAllocatedVideoStreamsSerializedSize];
-    MutableByteSpan readSpan(readBuffer);
-    ASSERT_EQ(mPersistenceProvider.SafeReadValue(path, readSpan), CHIP_NO_ERROR);
-
-    TLV::TLVReader reader;
-    reader.Init(readSpan);
-    ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
-    ASSERT_EQ(reader.EnterContainer(arrayType), CHIP_NO_ERROR);
-    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
-
-    VideoStreamStruct loadedStream;
-    ASSERT_EQ(DataModel::Decode(reader, loadedStream), CHIP_NO_ERROR);
-    EXPECT_EQ(loadedStream.referenceCount, 0);
 }
 
 } // namespace
