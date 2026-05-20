@@ -44,12 +44,13 @@ public:
         AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate), mServerEndpointId(endpointId),
         mFailsafeContext(failSafeContext)
     {}
-    virtual ~ServerInstance()
+    virtual ~ServerInstance() = default;
+
+    CHIP_ERROR Init();
+    void Shutdown()
     {
         DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     }
-
-    CHIP_ERROR Init();
 
     // CommandHanlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
