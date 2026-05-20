@@ -130,21 +130,16 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
 
 void ChefFanControlManager::OnFanDriveStateChanged(const FanDriveState & newState)
 {
-    mPercentCurrent = newState.percentCurrent;
-    mSpeedCurrent   = newState.speedCurrent;
+    mSpeedCurrent = newState.speedCurrent;
 
     FanModeWriteCallback(newState.mode);
-    SetPercentCurrent(newState.percentSetting.ValueOr(0));
+    SetPercentCurrent(newState.percentCurrent);
 
     uint32_t featureMap = 0;
     if (FanControl::Attributes::FeatureMap::Get(mEndpoint, &featureMap) == Status::Success &&
         BitFlags<FanControl::Feature>(featureMap).Has(FanControl::Feature::kMultiSpeed))
     {
-        DataModel::Nullable<uint8_t> speed;
-        if (FanControl::Attributes::SpeedSetting::Get(mEndpoint, speed) == Status::Success)
-        {
-            SetSpeedCurrent(speed.ValueOr(0));
-        }
+        SetSpeedCurrent(newState.speedCurrent);
         const FanControl::FanModeEnum derivedMode = SpeedToFanMode(mSpeedCurrent);
         FanControl::FanModeEnum currentMode       = FanControl::FanModeEnum::kOff;
         if (FanControl::Attributes::FanMode::Get(mEndpoint, &currentMode) == Status::Success && currentMode != derivedMode)
