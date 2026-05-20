@@ -400,7 +400,7 @@ public:
         BitFlags<Feature> features;
         BitFlags<OptionalAttribute> optionalAttrs;
         uint8_t maxConcurrentEncoders = 0;
-        uint32_t maxEncodedPixelRate = 0;
+        uint32_t maxEncodedPixelRate  = 0;
         VideoSensorParamsStruct videoSensorParams;
         bool nightVisionUsesInfrared = false;
         VideoResolutionStruct minViewPort;

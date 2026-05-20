@@ -52,11 +52,11 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(InitArguments && aArgs) :
-    DefaultServerCluster({ aArgs.endpointId, CameraAvStreamManagement::Id }),
-    mContext(aArgs.context), mDelegate(aArgs.delegate), mEnabledFeatures(aArgs.features), mOptionalAttrs(aArgs.optionalAttrs),
-    mMaxConcurrentEncoders(aArgs.maxConcurrentEncoders), mMaxEncodedPixelRate(aArgs.maxEncodedPixelRate),
-    mVideoSensorParams(std::move(aArgs.videoSensorParams)), mNightVisionUsesInfrared(aArgs.nightVisionUsesInfrared),
-    mMinViewPortResolution(std::move(aArgs.minViewPort)), mRateDistortionTradeOffPointsList(std::move(aArgs.rateDistortionTradeOffPoints)),
+    DefaultServerCluster({ aArgs.endpointId, CameraAvStreamManagement::Id }), mContext(aArgs.context), mDelegate(aArgs.delegate),
+    mEnabledFeatures(aArgs.features), mOptionalAttrs(aArgs.optionalAttrs), mMaxConcurrentEncoders(aArgs.maxConcurrentEncoders),
+    mMaxEncodedPixelRate(aArgs.maxEncodedPixelRate), mVideoSensorParams(std::move(aArgs.videoSensorParams)),
+    mNightVisionUsesInfrared(aArgs.nightVisionUsesInfrared), mMinViewPortResolution(std::move(aArgs.minViewPort)),
+    mRateDistortionTradeOffPointsList(std::move(aArgs.rateDistortionTradeOffPoints)),
     mMaxContentBufferSize(aArgs.maxContentBufferSize), mMicrophoneCapabilities(std::move(aArgs.microphoneCapabilities)),
     mSpeakerCapabilities(std::move(aArgs.spkrCapabilities)), mTwoWayTalkSupport(aArgs.twoWayTalkSupport),
     mSnapshotCapabilitiesList(std::move(aArgs.snapshotCapabilities)), mMaxNetworkBandwidth(aArgs.maxNetworkBandwidth),
