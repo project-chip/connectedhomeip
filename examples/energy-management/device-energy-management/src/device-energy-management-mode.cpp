@@ -110,3 +110,8 @@ void MatterDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId en
     }
     DeviceEnergyManagementMode::Shutdown();
 }
+
+void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpointId)
+{
+    DeviceEnergyManagementMode::Shutdown();
+}

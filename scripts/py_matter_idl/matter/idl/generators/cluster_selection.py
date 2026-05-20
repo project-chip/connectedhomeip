@@ -14,26 +14,9 @@
 #    limitations under the License.
 #
 
-from typing import List, Set
+from typing import List
 
 from matter.idl.matter_idl_types import Cluster, Idl
-
-# Clusters implemented via mode-base-server use Matter*ClusterInitCallback in
-# CodeDrivenInitShutdown.cpp and do not declare emberAf*ClusterInitCallback in
-# callback.h. Keep in sync with mode-base entries in src/app/zap_cluster_list.json.
-_MODE_BASE_SERVER_CLUSTER_NAMES: Set[str] = {
-    "DeviceEnergyManagementMode",
-    "DishwasherMode",
-    "EnergyEvseMode",
-    "LaundryWasherMode",
-    "MicrowaveOvenMode",
-    "OvenMode",
-    "RefrigeratorAndTemperatureControlledCabinetMode",
-    "RvcCleanMode",
-    "RvcRunMode",
-    "WaterHeaterMode",
-}
-
 
 def server_side_clusters(idl: Idl) -> List[Cluster]:
     """
@@ -47,20 +30,6 @@ def server_side_clusters(idl: Idl) -> List[Cluster]:
             cluster_names.add(item.name)
 
     return [c for c in idl.clusters if c.name in cluster_names]
-
-
-def ember_af_cluster_init_callback_clusters(idl: Idl) -> List[Cluster]:
-    """
-    Return server-side clusters that use emberAf*ClusterInitCallback dispatch
-    in cluster-callbacks.cpp.
-
-    Mode-base-server clusters are excluded; they use Matter*ClusterInitCallback
-    via CodeDrivenInitShutdown.cpp instead.
-    """
-    return [
-        c for c in server_side_clusters(idl)
-        if c.name not in _MODE_BASE_SERVER_CLUSTER_NAMES
-    ]
 
 
 def binding_clusters(idl: Idl) -> List[Cluster]:
