@@ -323,9 +323,9 @@ protected:
         uint32_t credentialDataSize;
     };
 
-    static constexpr uint16_t kLockUserInfoSize = sizeof(LockUserInfo);
-    static constexpr uint16_t kLockCredentialInfoSize = sizeof(LockCredentialInfo);
-    static constexpr uint16_t kCredentialStructSize = sizeof(CredentialStruct);
+    static constexpr uint16_t kLockUserInfoSize        = sizeof(LockUserInfo);
+    static constexpr uint16_t kLockCredentialInfoSize  = sizeof(LockCredentialInfo);
+    static constexpr uint16_t kCredentialStructSize    = sizeof(CredentialStruct);
     static constexpr uint16_t kWeekDayScheduleInfoSize = sizeof(WeekDayScheduleInfo);
     static constexpr uint16_t kYearDayScheduleInfoSize = sizeof(YearDayScheduleInfo);
     static constexpr uint16_t kHolidayScheduleInfoSize = sizeof(HolidayScheduleInfo);
@@ -392,7 +392,7 @@ protected:
     /** @brief Context for the in-flight remote lock operation driving cluster updates. */
     LockRequest mActiveRemoteAction;
     /** @brief True when `mActiveRemoteAction` is valid for cluster attribution. */
-    bool mHasActiveRemoteAction          = false;
+    bool mHasActiveRemoteAction = false;
     /** @brief Current actuator phase for the lock hardware state machine. */
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
 
