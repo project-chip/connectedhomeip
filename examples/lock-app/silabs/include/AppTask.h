@@ -40,17 +40,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <timers.h>
 
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+/** @brief Lock-app-specific application error codes*/
+/** @{ */
 #define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
 #if defined(ENABLE_CHIP_SHELL)
 #define APP_ERROR_TOO_MANY_SHELL_ARGUMENTS CHIP_APPLICATION_ERROR(0x08)
 #endif // ENABLE_CHIP_SHELL
+/** @} */
 
 /**
  * @brief Door-lock application task.
@@ -63,6 +59,7 @@
 class AppTask : public BaseApplication
 {
 public:
+    /** @brief Default-constructed application task; use `GetAppTask()` for the live instance. */
     AppTask() = default;
 
     /** @brief Singleton accessor; returns the active `CustomerAppTask` instance. */
@@ -74,7 +71,7 @@ public:
     // resource limits without reaching into the door-lock cluster directly.
     // ---------------------------------------------------------------------
 
-    /** Cluster resource limits captured from ZAP attributes at AppInit time. */
+    /** @brief Cluster resource limits captured from ZAP attributes at AppInit time. */
     struct LockParam
     {
         uint16_t numberOfUsers                  = 0;
@@ -84,35 +81,41 @@ public:
         uint8_t numberOfHolidaySchedules        = 0;
     };
 
-    /** Fluent builder for `LockParam`. */
+    /** @brief Fluent builder for `LockParam`. */
     class ParamBuilder
     {
     public:
+        /** @brief Sets `numberOfUsers`; returns `*this` for chaining. */
         ParamBuilder & SetNumberOfUsers(uint16_t numberOfUsers)
         {
             mLockParam.numberOfUsers = numberOfUsers;
             return *this;
         }
+        /** @brief Sets `numberOfCredentialsPerUser`; returns `*this` for chaining. */
         ParamBuilder & SetNumberOfCredentialsPerUser(uint8_t numberOfCredentialsPerUser)
         {
             mLockParam.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
             return *this;
         }
+        /** @brief Sets `numberOfWeekdaySchedulesPerUser`; returns `*this` for chaining. */
         ParamBuilder & SetNumberOfWeekdaySchedulesPerUser(uint8_t numberOfWeekdaySchedulesPerUser)
         {
             mLockParam.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
             return *this;
         }
+        /** @brief Sets `numberOfYeardaySchedulesPerUser`; returns `*this` for chaining. */
         ParamBuilder & SetNumberOfYeardaySchedulesPerUser(uint8_t numberOfYeardaySchedulesPerUser)
         {
             mLockParam.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
             return *this;
         }
+        /** @brief Sets `numberOfHolidaySchedules`; returns `*this` for chaining. */
         ParamBuilder & SetNumberOfHolidaySchedules(uint8_t numberOfHolidaySchedules)
         {
             mLockParam.numberOfHolidaySchedules = numberOfHolidaySchedules;
             return *this;
         }
+        /** @brief Returns the assembled `LockParam`. */
         LockParam GetLockParam() { return mLockParam; }
 
     private:
@@ -123,7 +126,7 @@ public:
     // Lock-action types (referenced by member functions below).
     // ---------------------------------------------------------------------
 
-    /** Door-lock actuator / cluster actions. */
+    /** @brief Door-lock actuator / cluster actions. */
     enum class LockAction : uint8_t
     {
         kLock = 0,
@@ -132,6 +135,7 @@ public:
         kInvalid,
     };
 
+    /** @brief Work item for a lock/unlock/unlatch operation and its cluster attribution. */
     struct LockRequest
     {
         chip::EndpointId endpointId                                   = chip::kInvalidEndpointId;
@@ -272,24 +276,28 @@ protected:
     // Persistent-storage record layouts.
     // ---------------------------------------------------------------------
 
+    /** @brief Serialized weekday schedule record layout for persistent storage. */
     struct WeekDayScheduleInfo
     {
         DlScheduleStatus status;
         EmberAfPluginDoorLockWeekDaySchedule schedule;
     };
 
+    /** @brief Serialized year-day schedule record layout for persistent storage. */
     struct YearDayScheduleInfo
     {
         DlScheduleStatus status;
         EmberAfPluginDoorLockYearDaySchedule schedule;
     };
 
+    /** @brief Serialized holiday schedule record layout for persistent storage. */
     struct HolidayScheduleInfo
     {
         DlScheduleStatus status;
         EmberAfPluginDoorLockHolidaySchedule schedule;
     };
 
+    /** @brief Serialized door-lock user record layout for persistent storage. */
     struct LockUserInfo
     {
         char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
@@ -304,6 +312,7 @@ protected:
         uint16_t currentCredentialCount;
     };
 
+    /** @brief Serialized credential record layout for persistent storage. */
     struct LockCredentialInfo
     {
         DlCredentialStatus status;
@@ -314,19 +323,20 @@ protected:
         uint32_t credentialDataSize;
     };
 
-    static constexpr uint16_t kLockUserInfoSize        = sizeof(LockUserInfo);
-    static constexpr uint16_t kLockCredentialInfoSize  = sizeof(LockCredentialInfo);
-    static constexpr uint16_t kCredentialStructSize    = sizeof(CredentialStruct);
+    static constexpr uint16_t kLockUserInfoSize = sizeof(LockUserInfo);
+    static constexpr uint16_t kLockCredentialInfoSize = sizeof(LockCredentialInfo);
+    static constexpr uint16_t kCredentialStructSize = sizeof(CredentialStruct);
     static constexpr uint16_t kWeekDayScheduleInfoSize = sizeof(WeekDayScheduleInfo);
     static constexpr uint16_t kYearDayScheduleInfoSize = sizeof(YearDayScheduleInfo);
     static constexpr uint16_t kHolidayScheduleInfoSize = sizeof(HolidayScheduleInfo);
 
-    /** Override of `BaseApplication::AppInit()`. */
+    /** @brief Override of `BaseApplication::AppInit()`. */
     CHIP_ERROR AppInit() override;
 
-    /** Bring up the lock domain: cluster limits, storage, timers, LED. */
+    /** @brief Bring up the lock domain: cluster limits, storage, timers, LED. */
     CHIP_ERROR InitLock();
 
+    /** @brief Actuator transition phase inside the lock state machine. */
     enum class LockActuatorState : uint8_t
     {
         kLockInitiated = 0,
@@ -349,6 +359,7 @@ protected:
     /** @brief Snapshot the staged `LockRequest` into `out` and clear it; returns true iff drained. */
     static bool TryDrainStagedLockRequest(LockRequest & out);
 
+    /** @brief Attribution carried across unlatch hold timing into the unlock leg. */
     struct UnlatchContext
     {
         chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
@@ -358,6 +369,7 @@ protected:
         LockOpCredentials mCredential{};
         bool mHasCredential = false;
 
+        /** @brief Copies attribution fields into this context. */
         void Update(chip::EndpointId endpointId, const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                     const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
                     const chip::app::DataModel::Nullable<uint16_t> & userIndex, const LockOpCredentials & cred, bool hasCred)
@@ -371,11 +383,17 @@ protected:
         }
     };
 
+    /** @brief Attribution used when scheduling `UnlockAfterUnlatch` after unlatch. */
     UnlatchContext mUnlatchContext;
+    /** @brief Lock request queued while the actuator is busy. */
     LockRequest mPendingRequest;
+    /** @brief True when `mPendingRequest` contains a valid staged request. */
     bool mHasPendingRequest = false;
+    /** @brief Context for the in-flight remote lock operation driving cluster updates. */
     LockRequest mActiveRemoteAction;
+    /** @brief True when `mActiveRemoteAction` is valid for cluster attribution. */
     bool mHasActiveRemoteAction          = false;
+    /** @brief Current actuator phase for the lock hardware state machine. */
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
 
 private:
