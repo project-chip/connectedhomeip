@@ -165,19 +165,19 @@ resolved by last-writer wins.
 
 #### Layout: directory and zip structure (`--PICS` only)
 
-<<<<<<< HEAD
-There is **no** separate flag for a **per-endpoint PICS folder tree.** How files
-are grouped is expressed only by directory (or zip) structure under the single
-`--PICS` path. The existing `--endpoint` flag still selects which **device**
-endpoint the test talks to over Matter; it does **not** select which subfolder
-to read for PICS (all XML under `--PICS` is merged into one map).
-=======
-There is **no** separate flag for a **per-endpoint PICS folder tree.** How
-files are grouped is expressed only by directory (or zip) structure under
-the single `--PICS` path. The existing `--endpoint` flag still selects which
-**device** endpoint the test talks to over Matter; it does **not** select which
-subdirectory to read for PICS (all XML under `--PICS` is merged into one map).
->>>>>>> b5d9d79449 (typo)
+<<<<<<< HEAD There is **no** separate flag for a **per-endpoint PICS folder
+tree.** How files are grouped is expressed only by directory (or zip) structure
+under the single `--PICS` path. The existing `--endpoint` flag still selects
+which **device** endpoint the test talks to over Matter; it does **not** select
+which subfolder to read for PICS (all XML under `--PICS` is merged into one
+map). ======= There is **no** separate flag for a **per-endpoint PICS folder
+tree.** How files are grouped is expressed only by directory (or zip) structure
+under the single `--PICS` path. The existing `--endpoint` flag still selects
+which **device** endpoint the test talks to over Matter; it does **not** select
+which subdirectory to read for PICS (all XML under `--PICS` is merged into one
+map).
+
+> > > > > > > b5d9d79449 (typo)
 
 **Single endpoint (typical):** put all cluster PICS XML exports for that
 endpoint in the `--PICS` directory root (only `*.xml` **directly** in that
@@ -223,19 +223,17 @@ suffix; nothing inside the XML marks “this file belongs to endpoint N.”
 ### Test Harness (TH) integration
 
 CSA Matter Test Harness and similar runners should pass the user’s PICS export
-<<<<<<< HEAD
-**directly** as the `--PICS` argument: path to the CI text file, a
+<<<<<<< HEAD **directly** as the `--PICS` argument: path to the CI text file, a
 single-endpoint XML directory, a directory with **per-endpoint subfolders** of
 XML, or a zip of that tree. The harness does **not** need to flatten that XML
 layout into the CI text format first; the SDK merges XML into the same internal
-map used by `check_pics()`.
-=======
-**directly** as the `--PICS` argument: path to the CI text file, a single-endpoint
-XML directory, a directory with **per-endpoint subdirectories** of XML, or a zip of
-that tree. The harness does **not** need to flatten that XML layout into the CI
-text format first; the SDK merges XML into the same internal map used by
-`check_pics()`.
->>>>>>> b5d9d79449 (typo)
+map used by `check_pics()`. ======= **directly** as the `--PICS` argument: path
+to the CI text file, a single-endpoint XML directory, a directory with
+**per-endpoint subdirectories** of XML, or a zip of that tree. The harness does
+**not** need to flatten that XML layout into the CI text format first; the SDK
+merges XML into the same internal map used by `check_pics()`.
+
+> > > > > > > b5d9d79449 (typo)
 
 ## Setting PIXITs for Matter devices
 
