@@ -88,6 +88,6 @@ void MatterThreadBorderRouterManagementPluginServerInitCallback() {}
 void MatterThreadBorderRouterManagementPluginServerShutdownCallback() {}
 
 void MatterThreadBorderRouterManagementClusterInitCallback(chip::EndpointId endpointId) {}
-__attribute__((weak)) void MatterThreadBorderRouterManagementClusterShutdownCallback(chip::EndpointId endpointId,
-                                                                                     MatterClusterShutdownType shutdownType)
+void MatterThreadBorderRouterManagementClusterShutdownCallback(chip::EndpointId endpointId,
+                                                               MatterClusterShutdownType shutdownType)
 {}
