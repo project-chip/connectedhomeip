@@ -353,7 +353,7 @@ class CommissioningMethod(enum.StrEnum):
     default="src/app/tests/suites/certification/ci-pics-values",
     show_default=True,
     help=('PICS input for test runs: CI key=value file, directory of PICS XML (single endpoint '
-          'or per-endpoint subfolders of XML), or a .zip of that directory layout.'))
+          'or per-endpoint subdirectories of XML), or a .zip of that directory layout.'))
 @click.option(
     '--keep-going',
     is_flag=True,

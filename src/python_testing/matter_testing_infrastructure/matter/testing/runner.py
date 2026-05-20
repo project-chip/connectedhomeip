@@ -1063,7 +1063,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     basic_group.add_argument(
         "--PICS",
         help=("PICS input path: CI key=value file, directory of cluster XML (single endpoint), "
-              "directory with per-endpoint subfolders of XML, or a .zip of that layout"),
+              "directory with per-endpoint subdirectories of XML, or a .zip of that layout"),
         type=str)
 
     basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,

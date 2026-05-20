@@ -466,8 +466,13 @@ See
 -   PICS
     -   use `--PICS` on the command line to specify PICS input: CI `KEY=0|1`
         text file, a directory of cluster XML for one endpoint, a directory with
+<<<<<<< HEAD
         **per-endpoint** XML subfolders, or a `.zip` with that layout (see
         [PICS and PIXITs](./pics_and_pixit.md), including
+=======
+        **per-endpoint** XML subdirectories, or a `.zip` with that layout
+        (see [PICS and PIXITs](./pics_and_pixit.md), including
+>>>>>>> b5d9d79449 (typo)
         [directory / zip layout](./pics_and_pixit.md#pics-input-layout))
     -   use check_pics to gate steps in a file
 -   have_whatever = check_pics(“PICS.S.WHATEVER”)
