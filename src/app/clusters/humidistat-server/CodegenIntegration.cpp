@@ -67,37 +67,37 @@ public:
 
         if (features.Has(Feature::kSensor))
         {
-            VerifyOrDie(MinSetpoint::Get(endpointId, &config.minSetpoint) == Status::Success);
-            VerifyOrDie(MaxSetpoint::Get(endpointId, &config.maxSetpoint) == Status::Success);
-            VerifyOrDie(Step::Get(endpointId, &config.step) == Status::Success);
+            VerifyOrDie(MinSetpoint::GetDefault(endpointId, &config.minSetpoint) == Status::Success);
+            VerifyOrDie(MaxSetpoint::GetDefault(endpointId, &config.maxSetpoint) == Status::Success);
+            VerifyOrDie(Step::GetDefault(endpointId, &config.step) == Status::Success);
 
             chip::Percent percentVal{};
-            VerifyOrDie(UserSetpoint::Get(endpointId, &percentVal) == Status::Success);
+            VerifyOrDie(UserSetpoint::GetDefault(endpointId, &percentVal) == Status::Success);
             config.userSetpoint = percentVal;
 
-            if (TargetSetpoint::Get(endpointId, &percentVal) == Status::Success)
+            if (TargetSetpoint::GetDefault(endpointId, &percentVal) == Status::Success)
             {
                 config.targetSetpoint = percentVal;
             }
         }
 
-        VerifyOrDie(Mode::Get(endpointId, &config.mode) == Status::Success);
-        VerifyOrDie(SystemState::Get(endpointId, &config.systemState) == Status::Success);
+        VerifyOrDie(Mode::GetDefault(endpointId, &config.mode) == Status::Success);
+        VerifyOrDie(SystemState::GetDefault(endpointId, &config.systemState) == Status::Success);
 
         if (features.Has(Feature::kHumidifier))
         {
-            VerifyOrDie(MistType::Get(endpointId, &config.mistType) == Status::Success);
+            VerifyOrDie(MistType::GetDefault(endpointId, &config.mistType) == Status::Success);
             VerifyOrDie((config.mode == ModeEnum::kHumidifier) ? config.mistType.HasAny() : !config.mistType.HasAny());
         }
 
         if (features.Has(Feature::kContinuous))
         {
-            VerifyOrDie(Continuous::Get(endpointId, &config.continuous) == Status::Success);
+            VerifyOrDie(Continuous::GetDefault(endpointId, &config.continuous) == Status::Success);
         }
 
         if (optionalAttributes.IsSet(Sleep::Id))
         {
-            if (Sleep::Get(endpointId, &config.sleep) != Status::Success)
+            if (Sleep::GetDefault(endpointId, &config.sleep) != Status::Success)
             {
                 config.sleep = false;
             }
@@ -105,9 +105,9 @@ public:
 
         if (features.Has(Feature::kOptimal))
         {
-            VerifyOrDie(Optimal::Get(endpointId, &config.optimal) == Status::Success);
+            VerifyOrDie(Optimal::GetDefault(endpointId, &config.optimal) == Status::Success);
             chip::Percent percentVal{};
-            VerifyOrDie(TargetSetpoint::Get(endpointId, &percentVal) == Status::Success);
+            VerifyOrDie(TargetSetpoint::GetDefault(endpointId, &percentVal) == Status::Success);
             config.targetSetpoint = percentVal;
         }
 
