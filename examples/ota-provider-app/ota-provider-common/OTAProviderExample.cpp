@@ -25,6 +25,7 @@
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/TLV.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <protocols/bdx/BdxUri.h>
 
@@ -69,12 +70,12 @@ constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                        
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
-    const uint8_t * tokenData = static_cast<const uint8_t *>(token.data());
-    size_t minLength          = std::min(token.size(), bufSize);
-    for (size_t i = 0; i < (minLength / 2) - 1; ++i)
+    if (buf == nullptr || bufSize == 0)
     {
-        snprintf(&buf[i * 2], bufSize, "%02X", tokenData[i]);
+        return;
     }
+    CHIP_ERROR err = chip::Encoding::BytesToUppercaseHexString(token.data(), token.size(), buf, bufSize);
+    ReturnOnFailure(err, buf[0] = '\0');
 }
 
 void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
