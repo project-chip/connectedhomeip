@@ -57,7 +57,7 @@ source_set("clusters") {
     "soil-measurement-server",
     "temperature-control-server",
     "temperature-measurement-server",
-    "thread-border-router-management-server",
+    # TODO: Add thread-border-router-management-server here once build issues on Ameba, nRF, and NXP are resolved.
     "thread-network-directory-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
