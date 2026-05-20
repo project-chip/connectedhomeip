@@ -33,7 +33,7 @@ class BatteryPowerSourceDevice : public SingleEndpointDevice
 public:
     using SimpleBatteryPowerSourceCluster = Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(), OptionalAttributeSet<BatPercentRemainingId>::All()>;
     // Takes delegates for the clusters.
-    BatteryPowerSourceDevice(CharSpan desc, Clusters::PowerSource::BatReplaceabilityEnum replaceability, TimerDelegate & timerDelegate);
+    BatteryPowerSourceDevice(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability, TimerDelegate & timerDelegate);
     ~BatteryPowerSourceDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

@@ -24,9 +24,9 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan desc, Clusters::PowerSource::BatReplaceabilityEnum replaceability, TimerDelegate & timerDelegate) :
+BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability, TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
-    mTimerDelegate(timerDelegate), desc(desc), replability(replaceability)
+    mTimerDelegate(timerDelegate), desc(description), replability(replaceability)
 {}
 
 CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -40,7 +40,7 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
     config.order = 0;
 
     mBatteryPowerSourceCluster.Create(config);
-    mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(&endpoint, 1));
+    LogErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(&endpoint, 1)));
     ReturnErrorOnFailure(provider.AddCluster(mBatteryPowerSourceCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
