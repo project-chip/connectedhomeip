@@ -1060,7 +1060,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     basic_group.add_argument('--debug', action="store_true", default=False,
                              help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
-    basic_group.add_argument("--PICS", help="PICS file path", type=str)
+    basic_group.add_argument(
+        "--PICS",
+        help=("PICS input path: CI key=value file, directory of cluster XML (single endpoint), "
+              "directory with per-endpoint subfolders of XML, or a .zip of that layout"),
+        type=str)
 
     basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
                              help="Send test event triggers with endpoint 0 for older devices")

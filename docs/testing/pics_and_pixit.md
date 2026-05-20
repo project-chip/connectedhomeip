@@ -148,6 +148,78 @@ Note that you can run tests locally against the PICS XMLs for an endpoint by
 supplying the name of the directory containing the set of PICS XML files for
 that endpoint.
 
+You can also pass:
+
+-   **PICS grouped by endpoint folder**: each **immediate** subdirectory (for example
+    `0`, `1`, …) holds that endpoint’s PICS XML files (at any depth under that
+    folder). Top-level `*.xml` files in the root directory are still merged in,
+    so you can mix node-wide XML with per-endpoint folders.
+-   A **`.zip` archive** with the same layout as that directory (any `*.xml`
+    entries are merged; macOS `__MACOSX` metadata is ignored).
+
+The Matter Python test runner (`--PICS`) accepts all of the above in addition
+to the CI `KEY=0|1` text file. Duplicate PICS keys from multiple XML sources are
+resolved by last-writer wins.
+
+<a id="pics-input-layout"></a>
+
+#### Layout: directory and zip structure (`--PICS` only)
+
+There is **no** separate flag for a **per-endpoint PICS folder tree.** How
+files are grouped is expressed only by directory (or zip) structure under
+the single `--PICS` path. The existing `--endpoint` flag still selects which
+**device** endpoint the test talks to over Matter; it does **not** select which
+subfolder to read for PICS (all XML under `--PICS` is merged into one map).
+
+**Single endpoint (typical):** put all cluster PICS XML exports for that endpoint
+in the `--PICS` directory root (only `*.xml` **directly** in that folder are read
+from the “flat” pass). That matches “one directory = one endpoint” in
+TC-IDM-10.4-style runs.
+
+```text
+pics_ep1/
+  On Off Cluster Test Plan.xml
+  Descriptor Cluster Test Plan.xml
+  …
+```
+
+**Per-endpoint folder layout (recommended when you have more than one
+endpoint’s XML):** use **one immediate subdirectory per device endpoint** (by
+convention `0`, `1`, … so sorting matches endpoint ids). Under each folder,
+place that endpoint’s cluster XML (any depth). The loader **also** reads
+`*.xml` from **every** other immediate subdirectory the same way (it does not
+require numeric names; numbers only affect **merge order**). Optional `*.xml`
+files may sit **next to** those folders (merged together with everything else).
+
+```text
+device_pics/
+  MCORE.xml                    ← optional: top-level *.xml
+  0/
+    On Off Cluster Test Plan.xml
+    Descriptor Cluster Test Plan.xml
+  1/
+    Door Lock Cluster Test Plan.xml
+    some_vendor_folder/
+      Another Cluster Test Plan.xml
+```
+
+**Zip:** use the **same paths inside the archive** as in the directory example
+(e.g. `0/…xml`, `1/…xml`). The loader only cares about path names and `*.xml`
+suffix; nothing inside the XML marks “this file belongs to endpoint N.”
+
+**Inside each XML file:** the runner collects `picsItem` entries (`itemNumber`
++ `support`). That is the same cluster export shape the PICS tool produces,
+whether the file lives at the root of `--PICS` or under `0/`, `1/`, etc.
+
+### Test Harness (TH) integration
+
+CSA Matter Test Harness and similar runners should pass the user’s PICS export
+**directly** as the `--PICS` argument: path to the CI text file, a single-endpoint
+XML directory, a directory with **per-endpoint subfolders** of XML, or a zip of
+that tree. The harness does **not** need to flatten that XML layout into the CI
+text format first; the SDK merges XML into the same internal map used by
+`check_pics()`.
+
 ## Setting PIXITs for Matter devices
 
 Matter tests do not currently have support to read PIXIT values from the PICS
@@ -190,5 +262,12 @@ be used.
 
 ## CI PICS format
 
-Placeholder for information about the CI PICS format, CI-only PICS and the
-gotchas there.
+CI uses a single text file (for example `src/app/tests/suites/certification/ci-pics-values`)
+where each non-comment line is `PICS_CODE=0` or `PICS_CODE=1`. That file
+aggregates many clusters for automated runs. Certification exports are normally
+cluster XML files from the PICS tool; the Python runner can load those from a
+directory or zip as described above, so CI text and certification XML are both
+valid `--PICS` inputs.
+
+`PICS_SDK_CI_ONLY` and other CI-only flags should not appear in certification
+submissions; see TC-IDM-10.4 step 7.
