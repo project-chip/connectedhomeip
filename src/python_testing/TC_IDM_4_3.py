@@ -476,8 +476,7 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         attr_handler_step1.cancel()
 
-        # New Step 2: Basic attribute change and report timing
-        # (This was originally test step 2 in the test plan)
+        # Step 2: Basic attribute change and report timing
         self.step(2)
 
         attr_handler_step2 = AttributeSubscriptionHandler(
@@ -537,7 +536,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step2.cancel()
 
         # Step 3: Multiple subscriptions with KeepSubscriptions=False
-        # (This was originally test step 11 in the test plan)
         self.step(3)
 
         # First subscription with handler
@@ -597,7 +595,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step3_second.cancel()
 
         # Step 4: MinInterval/MaxInterval timing
-        # (This was originally test steps 12 and 13 in the test plan, just appears to have been combined into one test step, which was a wise design decision)
         self.step(4)
 
         min_interval_step4 = 5
@@ -688,7 +685,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step4.cancel()
 
         # Step 5: KeepSubscriptions=True preserves first subscription
-        # (This was originally test step 14 in the test plan)
         self.step(5)
 
         # Find a second writable attribute for testing
@@ -743,7 +739,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step5_second.cancel()
 
         # Step 6: KeepSubscriptions=False cancels first subscription
-        # (This was originally test step 15 in the test plan)
         self.step(6)
 
         # First subscription with KeepSubscriptions=False
@@ -794,7 +789,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step6_second.cancel()
 
         # Step 7: Subscription to attribute and events
-        # (This was originally test step 16 in the test plan)
         self.step(7)
 
         # Subscribe to attribute using handler
@@ -837,7 +831,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step7.cancel()
 
         # Step 8: Attribute wildcard subscription
-        # (This was originally test step 17 in the test plan)
         self.step(8)
 
         # Subscribe to all attributes in BasicInformation cluster on endpoint 0
@@ -880,7 +873,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 9: Attribute on cluster from all endpoints
-        # (This was originally test step 18 in the test plan)
         self.step(9)
 
         # Subscribe to NodeLabel attribute from BasicInformation cluster on ALL endpoints
@@ -914,7 +906,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 10: All attributes from all clusters from all endpoints
-        # (This was originally test step 19 in the test plan)
         self.step(10)
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
         all_cluster_ids = set()
@@ -977,7 +968,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 11: All attributes from all clusters on an endpoint
-        # (This was originally test step 20 in the test plan)
         self.step(11)
 
         # Subscribe to all attributes from all clusters on endpoint 0
@@ -1030,7 +1020,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 12: All attributes from specific cluster on all endpoints
-        # (This was originally test step 21 in the test plan)
         self.step(12)
 
         # Subscribe to all attributes of BasicInformation cluster on ALL endpoints
