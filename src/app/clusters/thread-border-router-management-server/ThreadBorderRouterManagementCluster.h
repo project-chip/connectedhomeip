@@ -42,8 +42,6 @@ public:
             mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker), mPlatformManager(platformManager)
         {}
 
-
-
     private:
         friend class ThreadBorderRouterManagementCluster;
         ThreadBorderRouterManagementDelegate & mDelegate;
