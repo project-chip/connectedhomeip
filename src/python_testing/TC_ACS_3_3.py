@@ -61,9 +61,9 @@ min_value_uint32 = np.iinfo(np.uint32).min
 max_value_uint32 = np.iinfo(np.uint32).max
 
 # Namespace in integer (not hex)
-HUMANACTIVITYNAMESPACEID = 75 # 0x4B
-OBJECTIDENTIFICATIONNAMESPACEID = 73 # 0x49
-SOUNDIDENTIFICATIONNAMESPACEID = 74 # 0x4A
+HUMANACTIVITYNAMESPACEID = 75  # 0x4B
+OBJECTIDENTIFICATIONNAMESPACEID = 73  # 0x49
+SOUNDIDENTIFICATIONNAMESPACEID = 74  # 0x4A
 
 
 class TC_ACS_3_3(MatterBaseTest):
@@ -132,6 +132,7 @@ class TC_ACS_3_3(MatterBaseTest):
                      "Verify that the StartEventTime field contains the event time stored from the step 6f.")
         ]
     # Sends and out-of-band command to the all-clusters-app
+
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
@@ -166,7 +167,7 @@ class TC_ACS_3_3(MatterBaseTest):
         post_prompt_settle_delay_seconds = 10  # seconds
         # ---------------------------------------------------------------
 
-        self.step("1") ####################################################################################
+        self.step("1")
         # Commission DUT - already done
 
         # Implicit step to get the feature map to ensure attribute operations are performed on supported features
@@ -186,9 +187,10 @@ class TC_ACS_3_3(MatterBaseTest):
         # Add AmbientContextSupported elements based on DUT capability for ci
         # Human activity walking, Object identification person, Audio identification barking
         if self.is_ci:
-            self.write_to_app_pipe('{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
+            self.write_to_app_pipe(
+                '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
 
-        self.step("2") ####################################################################################
+        self.step("2")
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AttributeList)
 
@@ -202,20 +204,21 @@ class TC_ACS_3_3(MatterBaseTest):
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=90)
 
         # Wait user to input capabilities
-        self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a desired ambient sensing capability has inputed.")
+        self.wait_for_user_input(
+            prompt_msg="Type any letter and press ENTER after a desired ambient sensing capability has inputed.")
 
         # Shrink the HoldTime to make the test faster
         await self.write_single_attribute(attr.HoldTime(holdtime_dut))
 
         if self.HumanActivitySupported:
 
-            self.step("3a") ####################################################################################
+            self.step("3a")
             humanActivityDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
             )
             asserts.assert_true(humanActivityDetected == False, "Expected False Boolean value.")
 
-            self.step("3b") ####################################################################################
+            self.step("3b")
             # Human activity walking for ci
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -224,9 +227,9 @@ class TC_ACS_3_3(MatterBaseTest):
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
                 user_data = self.wait_for_user_input(
-                prompt_msg="Type in namespace ID and tag ID of a desired ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
+                    prompt_msg="Type in namespace ID and tag ID of a desired ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
                 # user_data = "[0x4B, 0x03]"
-                list_dec = ast.literal_eval(user_data) # convert string hex to decimal
+                list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
                 namespaceID1 = list_dec[0]
                 tag1 = list_dec[1]
                 log.info(f"user input: {namespaceID1} {tag1}")
@@ -234,7 +237,7 @@ class TC_ACS_3_3(MatterBaseTest):
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
-            self.step("3c") ####################################################################################
+            self.step("3c")
             # subscription check - boolean attribute
             subscription_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
             humanActivityDetected = subscription_expected1[0].value
@@ -261,41 +264,44 @@ class TC_ACS_3_3(MatterBaseTest):
             attrib_listener.reset()
             log.info("Received attribute report for AmbientContextType.")
 
-            self.step("3d") ####################################################################################
+            self.step("3d")
             # Start event
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #            event = event_listener.wait_for_event_report(
 #                cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
 # .................................................................
-            # Exp: 
+            # Exp:
             event = event_listener.get_last_event()
             log.info(f"eventheader: {event}")
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
-            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID1, "Wrong NamespaceID")
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
+                                 f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
+            asserts.assert_equal(
+                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID1, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag1, "Wrong Tag")
             event_start_time = event.Header.Timestamp
             # DetectionStartTime is not mandatory
-            #event_start_time=event.Data.ambientContextDetected.detectionStartTime
+            # event_start_time=event.Data.ambientContextDetected.detectionStartTime
             # store the event number
-            #event_number = event.event_id
-            #log.info(f"eventtime: {event_start_time}")
+            # event_number = event.event_id
+            # log.info(f"eventtime: {event_start_time}")
 
-            self.step("3e") ####################################################################################
+            self.step("3e")
             # Let HoldTime pass by
             if self.is_ci:
                 await asyncio.sleep(holdtime_dut)
             else:
-                self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 3b has passed.")
+                self.wait_for_user_input(
+                    prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 3b has passed.")
 
-            self.step("3f") ####################################################################################
+            self.step("3f")
             # check AmbientContextDetectEnded event
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
             asserts.assert_true(event.eventStartTime == event_start_time, "Not matching EventStartTime")
-            #log.info(f"eventtime: {event.eventStartTime}")
-            #asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
+            # log.info(f"eventtime: {event.eventStartTime}")
+            # asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
             # asserts.assert_true(event.startEventNumber == event_number, "Not matching Start event number")
-            
+
         else:
             log.info("HumanActivity Feature not supported. Test steps skipped")
             self.skip_step("3a")
@@ -313,13 +319,13 @@ class TC_ACS_3_3(MatterBaseTest):
         log.info("Cleared accumulated reports. Restarting accumulation.")
 
         if self.ObjectIdentificationSupported:
-            self.step("4a") ####################################################################################
+            self.step("4a")
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
             )
             asserts.assert_true(objectIdentified == False, "Expected False Boolean value.")
 
-            self.step("4b") ####################################################################################
+            self.step("4b")
             # Object Identification person for ci
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -327,11 +333,11 @@ class TC_ACS_3_3(MatterBaseTest):
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
-                #self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a desired ambient sensing is actuated.")
+                # self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a desired ambient sensing is actuated.")
                 user_data = self.wait_for_user_input(
-                prompt_msg="Type in namespace ID and tag ID of a desired ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
+                    prompt_msg="Type in namespace ID and tag ID of a desired ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
                 # user_data = "[0x4B, 0x03]"
-                list_dec = ast.literal_eval(user_data) # convert string hex to decimal
+                list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
                 namespaceID2 = list_dec[0]
                 tag2 = list_dec[1]
                 log.info(f"user input: {namespaceID2} {tag2}")
@@ -339,7 +345,7 @@ class TC_ACS_3_3(MatterBaseTest):
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
-            self.step("4c") ####################################################################################
+            self.step("4c")
             # subscription check - boolean attribute
             subscription_expected1 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
             objectIdentified = subscription_expected1[0].value
@@ -365,26 +371,29 @@ class TC_ACS_3_3(MatterBaseTest):
                                 f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag2}")
             log.info("Received attribute report for AmbientContextType.")
 
-            self.step("4d") ####################################################################################
+            self.step("4d")
             # Exp:
-            event = event_listener.get_last_event();
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
-            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID2, "Wrong NamespaceID")
+            event = event_listener.get_last_event()
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
+                                 f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
+            asserts.assert_equal(
+                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID2, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag2, "Wrong Tag")
-            # event start time 
+            # event start time
             event_start_time = event.Header.Timestamp
 
-            self.step("4e") ####################################################################################
+            self.step("4e")
             # Let HoldTime pass by
             if self.is_ci:
                 await asyncio.sleep(holdtime_dut)
             else:
-                self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 4b has passed.")
+                self.wait_for_user_input(
+                    prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 4b has passed.")
 
-            self.step("4f") ####################################################################################
+            self.step("4f")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            #asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
+            # asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
             asserts.assert_true(event.eventStartTime == event_start_time, "Not matching EventStartTime")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
@@ -403,14 +412,14 @@ class TC_ACS_3_3(MatterBaseTest):
         log.info("Cleared accumulated reports. Restarting accumulation.")
 
         if self.SoundIdentificationSupported:
-            self.step("5a") ####################################################################################
-            # initial 
+            self.step("5a")
+            # initial
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
             asserts.assert_true(audioContextDetected == False, "Expected False Boolean value.")
 
-            self.step("5b") ####################################################################################
+            self.step("5b")
             # PSound Identification barking for ci
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -418,11 +427,11 @@ class TC_ACS_3_3(MatterBaseTest):
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
-                #self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a desired ambient sensing is actuated.")
+                # self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a desired ambient sensing is actuated.")
                 user_data = self.wait_for_user_input(
-                prompt_msg="Type in namespace ID and tag ID of a desired ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
+                    prompt_msg="Type in namespace ID and tag ID of a desired ambient sensing event (ex [0x4B, 0x03]) and press ENTER after the desired ambient sensing is actuated.")
                 # user_data = "[0x4B, 0x03]"
-                list_dec = ast.literal_eval(user_data) # convert string hex to decimal
+                list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
                 namespaceID3 = list_dec[0]
                 tag3 = list_dec[1]
                 log.info(f"user input: {namespaceID3} {tag3}")
@@ -430,7 +439,7 @@ class TC_ACS_3_3(MatterBaseTest):
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
-            self.step("5c") ####################################################################################
+            self.step("5c")
             # subscription check - boolean attribute
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
             audioContextDetected = subscription_expected3[0].value
@@ -456,26 +465,29 @@ class TC_ACS_3_3(MatterBaseTest):
                                 f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag3}")
             log.info("Received attribute report for AmbientContextType.")
 
-            self.step("5d") ####################################################################################
+            self.step("5d")
             # Exp:
-            event = event_listener.get_last_event();
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
-            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID3, "Wrong NamespaceID")
+            event = event_listener.get_last_event()
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
+                                 f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
+            asserts.assert_equal(
+                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID3, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag3, "Wrong Tag")
             # event start time
             event_start_time = event.Header.Timestamp
 
-            self.step("5e") ####################################################################################
+            self.step("5e")
             # Let HoldTime pass by
             if self.is_ci:
                 await asyncio.sleep(holdtime_dut)
             else:
-                self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 5b has passed.")
+                self.wait_for_user_input(
+                    prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 5b has passed.")
 
-            self.step("5f") ####################################################################################
+            self.step("5f")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            #asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
+            # asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
             asserts.assert_true(event.eventStartTime == event_start_time, "Not matching EventStartTime")
         else:
             log.info("SoundIdentification Feature not supported. Test steps skipped")
@@ -495,15 +507,15 @@ class TC_ACS_3_3(MatterBaseTest):
 
         if self.ObjectCountingSupported and self.ObjectIdentificationSupported:
             objectcount_input = 2
-            self.step("6a") ####################################################################################         
-            
+            self.step("6a")
+
             # check the boolean state is cleared as False
             objectCountReached = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountReached
             )
             asserts.assert_true(objectCountReached is False, "Expected False Boolean value.")
 
-            self.step("6b") ####################################################################################
+            self.step("6b")
             objectcountthreshold_input = 2
             # set object counting object to detect
             if self.is_ci:
@@ -512,23 +524,23 @@ class TC_ACS_3_3(MatterBaseTest):
             else:
                 # Ask a tester what object is being counted.
                 user_data = self.wait_for_user_input(
-                prompt_msg="Type in namespace ID and tag ID of a desired object (ex [0x4B, 0x03]) to be counted and press ENTER.")
+                    prompt_msg="Type in namespace ID and tag ID of a desired object (ex [0x4B, 0x03]) to be counted and press ENTER.")
                 # user_data = "[0x4B, 0x03]"
-                list_dec = ast.literal_eval(user_data) # convert string hex to decimal
+                list_dec = ast.literal_eval(user_data)  # convert string hex to decimal
                 namespaceID4 = list_dec[0]
                 tag4 = list_dec[1]
                 log.info(f"user input: {namespaceID4} {tag4}")
 
             semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID4, tag=tag4, label=None)
-                objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
-                    countingObject=semantic_tag,
-                    objectCountThreshold=objectcountthreshold_input)
+            objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
+                countingObject=semantic_tag,
+                objectCountThreshold=objectcountthreshold_input)
 
             # write object counting threshold
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
             await asyncio.sleep(1)
 
-            self.step("6c") ####################################################################################
+            self.step("6c")
             # subscription check for ObjectCountConfig
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectCountConfig][0].value
             asserts.assert_true(subscription_expected.countingObject.namespaceID == namespaceID4,
@@ -538,9 +550,9 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(subscription_expected.objectCountThreshold == objectcountthreshold_input,
                                 f"Unexpected tag, {subscription_expected.objectCountThreshold}, exp {objectcountthreshold_input}")
             log.info("Received attribute report for ObjectCountConfig.")
-            #attrib_listener.reset()
+            # attrib_listener.reset()
 
-            self.step("6d") ####################################################################################
+            self.step("6d")
             # trigger the counting sensing event
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -553,7 +565,7 @@ class TC_ACS_3_3(MatterBaseTest):
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
 
-            self.step("6e") ####################################################################################
+            self.step("6e")
             # subscription check - boolean attribute
             subscription_expected4 = attrib_listener.attribute_reports[cluster.Attributes.ObjectCountReached]
             objectCountReached = subscription_expected4[0].value
@@ -567,25 +579,28 @@ class TC_ACS_3_3(MatterBaseTest):
                 asserts.assert_true(objectCount > 1, "Failed to get ObjectCount value correct.")
                 log.info("Received attribute report for ObjectCountReached.")
 
-            self.step("6f") ####################################################################################
-            event = event_listener.get_last_event();
-            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id, f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}");
+            self.step("6f")
+            event = event_listener.get_last_event()
+            asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
+                                 f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             asserts.assert_equal(event.Data.objectCountReached, True, "Wrong objectCountReached")
-            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID4, "Wrong NamespaceID")
+            asserts.assert_equal(
+                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID4, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag4, "Wrong Tag")
             if event.Data.objectCount != NullValue:
                 asserts.assert_equal(event.Data.objectCount, objectcount_input, "Wrong ObjectCount")
-            # event start time 
+            # event start time
             event_start_time = event.Header.Timestamp
 
-            self.step("6g") ####################################################################################
+            self.step("6g")
             # Let HoldTime pass by
             if self.is_ci:
                 await asyncio.sleep(holdtime_dut)
             else:
-                self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 6d has passed.")
+                self.wait_for_user_input(
+                    prompt_msg="Type any letter and press ENTER after HoldTime duration from the step 6d has passed.")
 
-            self.step("6h") ####################################################################################
+            self.step("6h")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
             # asserts.assert_equal(event.startEventNumber, event_number, "Not matching Start event number")
