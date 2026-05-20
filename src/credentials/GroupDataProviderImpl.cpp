@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 #include <credentials/GroupDataProviderImpl.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
@@ -23,6 +22,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdlib.h>
 
 namespace chip {
