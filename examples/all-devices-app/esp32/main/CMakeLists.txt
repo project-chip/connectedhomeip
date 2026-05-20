@@ -24,7 +24,23 @@ get_filename_component(CHIP_ROOT "${CMAKE_SOURCE_DIR}/third_party/connectedhomei
 # always points to the actual source location of this file.
 get_filename_component(ALL_DEVICES_COMMON_DIR "${CMAKE_CURRENT_LIST_DIR}/../../all-devices-common" REALPATH)
 
+set(ALL_DEVICES_ENABLED_DEVICES
+    chime
+    contact-sensor
+    dimmable-light
+    occupancy-sensor
+    on-off-light
+    proximity-ranger
+    soil-sensor
+    speaker
+    temperature-sensor
+    water-leak-detector
+)
+
 include("${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake")
+
+# Remove NIM device sources as they are not supported on ESP32 (requires Linux/Border Router support)
+list(REMOVE_ITEM ALL_DEVICES_DEVICE_SRCDIRS "${ALL_DEVICES_COMMON_DIR}/devices/nim")
 
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
