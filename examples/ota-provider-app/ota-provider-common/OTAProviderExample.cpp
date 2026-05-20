@@ -277,7 +277,14 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         // provider supplying the response is not the provider supplying the OTA image.
         FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
         const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-        NodeId nodeId                 = fabricInfo->GetPeerId().GetNodeId();
+        if (fabricInfo == nullptr)
+        {
+            ChipLogError(SoftwareUpdate, "No fabric for index %u, cannot send QueryImageResponse",
+                         static_cast<unsigned>(fabricIndex));
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return;
+        }
+        NodeId nodeId = fabricInfo->GetPeerId().GetNodeId();
 
         // Generate the ImageURI if one is not already preset
         if (strlen(mImageUri) == 0)
