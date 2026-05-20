@@ -67,6 +67,10 @@ _available_devices = [
     "ON_OFF_LIGHT",
   ],
   [
+    "proximity-ranger",
+    "PROXIMITY_RANGER",
+  ],
+  [
     "soil-sensor",
     "SOIL_SENSOR",
   ],

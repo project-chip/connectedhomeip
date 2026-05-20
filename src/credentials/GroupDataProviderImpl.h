@@ -113,8 +113,8 @@ public:
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
     // Groupcast configurations
-    uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
-    uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
+    uint16_t getMaxMembershipCount() const override { return kMaxMembershipCount; }
+    uint16_t getMaxMcastAddrCount() const override { return kMaxMcastAddrCount; }
 
     bool ConsumeAuxAclNotificationNeeded() override
     {
