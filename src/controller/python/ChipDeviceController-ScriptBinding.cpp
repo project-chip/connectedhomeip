@@ -826,8 +826,9 @@ PyChipError pychip_DeviceController_CommissionViaProxy(chip::Controller::DeviceC
     sPythonProxyCommissioner.Init(devCtrl, pairingDelegate, proxyNodeId, remoteNodeId, proxySessionId, proxyEndpoint, discriminator,
                                   setupPinCode);
     return ToPyChipError(sPythonProxyCommissioner.Start(sCommissioningParameters));
+}
 
-    PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::DeviceCommissioner * devCtrl,
+PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::DeviceCommissioner * devCtrl,
                                                                 chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                                 uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
                                                                 const char * borderAgentIPAddrStr, uint16_t borderAgentPort)

@@ -10719,7 +10719,9 @@ PICS:
     #
     # Commissioning Proxy Cluster
     #
-    - label: "Does the device implement the Commissioning Proxy Cluster as a server?"
+    - label:
+          "Does the device implement the Commissioning Proxy Cluster as a
+          server?"
       id: COMPRO.S
 
     # Features
@@ -10757,32 +10759,42 @@ PICS:
       id: COMPRO.S.A0007
 
     # Commands received (mandatory)
-    - label: "Does the device implement receiving the ProxyConnectRequest command?"
+    - label:
+          "Does the device implement receiving the ProxyConnectRequest command?"
       id: COMPRO.S.C00.Rsp
 
-    - label: "Does the device implement receiving the ProxyDisconnectRequest command?"
+    - label:
+          "Does the device implement receiving the ProxyDisconnectRequest
+          command?"
       id: COMPRO.S.C02.Rsp
 
     - label: "Does the device implement receiving the ProxyScanRequest command?"
       id: COMPRO.S.C03.Rsp
 
     # Commands received (BGS feature)
-    - label: "Does the device implement receiving the ProxyBackGroundScanStartRequest command?"
+    - label:
+          "Does the device implement receiving the
+          ProxyBackGroundScanStartRequest command?"
       id: COMPRO.S.C05.Rsp
 
-    - label: "Does the device implement receiving the ProxyBackGroundScanStopRequest command?"
+    - label:
+          "Does the device implement receiving the
+          ProxyBackGroundScanStopRequest command?"
       id: COMPRO.S.C06.Rsp
 
     # Commands received (mandatory)
-    - label: "Does the device implement receiving the ProxyMessageRequest command?"
+    - label:
+          "Does the device implement receiving the ProxyMessageRequest command?"
       id: COMPRO.S.C07.Rsp
 
     # Commands generated
-    - label: "Does the device implement sending the ProxyConnectResponse command?"
+    - label:
+          "Does the device implement sending the ProxyConnectResponse command?"
       id: COMPRO.S.C01.Tx
 
     - label: "Does the device implement sending the ProxyScanResponse command?"
       id: COMPRO.S.C04.Tx
 
-    - label: "Does the device implement sending the ProxyMessageResponse command?"
+    - label:
+          "Does the device implement sending the ProxyMessageResponse command?"
       id: COMPRO.S.C08.Tx

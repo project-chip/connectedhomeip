@@ -45,8 +45,7 @@ chip_test_suite("tests-backwards-compatibility") {
 
   output_name = "TestCommissioningProxyClusterBackwardsCompatibility"
 
-  test_sources =
-      [ "TestCommissioningProxyClusterBackwardsCompatibility.cpp" ]
+  test_sources = [ "TestCommissioningProxyClusterBackwardsCompatibility.cpp" ]
 
   # Prefix app_config_dependent_sources with "../" and add to the sources list
   sources = []

@@ -179,14 +179,14 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 | File                                    | Change                                                                                                                                                                                                                                                                                                                                                                                                           |
 | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CommissioningWindowManager.cpp` / `.h` | `StopAdvertisement()` gains an `aKeepPAFPublish` parameter; `OnSessionEstablished()` now passes `aKeepPAFPublish = true` so the WiFi-PAF publisher carrying the post-PASE data path is not torn down at PASE completion. Publisher is still canceled on shutdown, RevokeCommissioning, and fail-safe expiry (regression fix vs. earlier early-cancel behavior).                                                  |
-| `DeviceControlServer.cpp`               | `PostConnectedToOperationalNetworkEvent()` no longer arms a blind 5 s timer to defer mDNS; instead, when a PAF session is active, it hooks `WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle()` with a callback (`OnPafTxIdle`) that posts `kOperationalNetworkEnabled` once the PAFTP send queue has drained and acks have been received. A 5 s `OnPostOpEventWatchdog` timer guards against a silent PAFTP peer. |
+| `DeviceControlServer.cpp`               | `PostConnectedToOperationalNetworkEvent()` no longer arms a blind 5 s timer to defer mDNS; instead, when a PAF session is active, it hooks `WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle()` with a callback (`OnPafTxIdle`) that posts `kOperationalNetworkEnabled` once the PAFTP send queue has drained and ack have been received. A 5 s `OnPostOpEventWatchdog` timer guards against a silent PAFTP peer. |
 
 ### Network Commissioning (`src/app/clusters/network-commissioning/`)
 
 | File                                                         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NetworkCommissioningCluster.cpp`                            | Adds an early-response path for ConnectNetwork over WiFi-PAF, gated on `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE`. `HandleConnectNetwork` detects the PAF transport, sends `ConnectNetworkResponse(Success)` while NAN is still primary, then defers the blocking `ConnectWiFiNetworkAsync` D-Bus call via `PlatformMgr().ScheduleWork(StartWiFiConnectAfterPafAck, ...)` so the IM-queued response flushes through PAFTP first. `OnResult()` finalizes the post-success path; failure recovery is via fail-safe expiry. |
-| `NetworkCommissioningCluster.h`                              | Adds `SendEarlyConnectNetworkResponseForWiFiPAF()` and static `StartWiFiConnectAfterPafAck()`. Repurposes `mConnectNetworkResponseSentEarly` to cover both the existing non-concurrent path and the new PAF-concurrent early-response path.                                                                                                                                                                                                                                                                                               |
+| `NetworkCommissioningCluster.h`                              | Adds `SendEarlyConnectNetworkResponseForWiFiPAF()` and static `StartWiFiConnectAfterPafAck()`. Repurpose `mConnectNetworkResponseSentEarly` to cover both the existing non-concurrent path and the new PAF-concurrent early-response path.                                                                                                                                                                                                                                                                                               |
 | `src/include/platform/CHIPDeviceConfig.h`                    | Adds `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE` (default `0`). Set to `1` for shared-radio devices where post-association NAN TX is unreliable. Only active when both `CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF` and `CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION` are `1`.                                                                                                                                                                                                                                               |
 | `examples/lighting-app/linux/include/CHIPProjectAppConfig.h` | Sets `CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 1` (lighting-app End Device is the shared-radio target).                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
@@ -350,7 +350,7 @@ success path (`OnProxyWiFiPAFMessageReceived`), on stale-ctx cleanup at the
 start of the next `ProxyMessageRequest`, on a PAF close
 (`ProxyWiFiPAFDelegate::WiFiPAFCloseSession`), and on `ProxyDisconnectRequest`.
 
-**Reason**: the End Device's periodic PAFTP standalone-acks reset the
+**Reason**: the End Device's periodic PAFTP standalone-ack reset the
 ack-receive timer (`PAFTP_ACK_TIMEOUT_MS = 30 s`) and could keep the PAFTP
 endpoint alive longer than the commissioner's interaction timeout, causing
 TC_COMPRO_2_6 step 11 to hang. The hard timer guarantees the commissioner always
@@ -523,10 +523,9 @@ advertising by ~35 s. Canceling NAN immediately after `ConnectNetwork` would
 risk tearing down the link before the `ConnectNetworkResponse` PAFTP frame is
 acknowledged by the proxy. The tx-idle trigger ensures all in-flight PAFTP data
 has been confirmed by the peer before NAN is torn down. With this fix mDNS
-resolves in ~3 s and CASE completes without MRP retransmit. Tearing down publish
-at the same point also closes the PAFTP session per Matter spec §4.20.3.10
-[4.780] and discharges any pending standalone-ACK obligation per §4.20.3.8
-[4.771].
+resolves in ~3 s and CASE completes without MRP retransmissions. Tearing down
+publish at the same point also closes the PAFTP session and discharges any
+pending standalone-ACK obligation.
 
 ---
 
@@ -544,7 +543,7 @@ running even though the commissioning window is closing.
 `OnSessionEstablished()` calls
 `StopAdvertisement(/* aShuttingDown = */ false, /* aKeepPAFPublish = */ true)`
 so that the PAFTP session carrying the post-PASE data path (ArmFailSafe /
-OpCreds / ConnectNetwork) is not torn down at PASE completion.
+Operational Credentials / ConnectNetwork) is not torn down at PASE completion.
 
 #### `src/platform/DeviceControlServer.cpp`
 

@@ -3397,6 +3397,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 lambda: self._dmLib.pychip_DeviceController_CommissionViaProxy(
                     self.devCtrl, self.pairingDelegate,
                     proxyNodeId, remoteNodeId, proxySessionId, proxyEndpoint, discriminator, setupPinCode)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionThreadMeshcop(self, nodeId: int, setupPinCode: int,
                                       discriminator: int, borderAgentIPAddr: str,
