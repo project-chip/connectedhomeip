@@ -20,7 +20,6 @@
 #include "app/clusters/window-covering-server/CodegenIntegration.h"
 #include "app/clusters/window-covering-server/window-covering-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
@@ -88,8 +87,6 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
             return CHIP_ERROR_READ_FAILED;
         }
         windowCoveringCluster->SetCurrentPositionLiftPercent100ths(current);
-        MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
-                                               WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id);
 
         return CHIP_NO_ERROR;
     }
@@ -104,9 +101,6 @@ CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
 
         // Instant update. No transition for now.
         windowCoveringCluster->SetCurrentPositionTiltPercent100ths(current);
-
-        MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
-                                               WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id);
 
         return CHIP_NO_ERROR;
     }
