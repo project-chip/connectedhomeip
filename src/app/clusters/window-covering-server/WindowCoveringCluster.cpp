@@ -584,23 +584,18 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 
 Status GetMotionLockStatus(chip::EndpointId endpoint)
 {
-    BitMask<Mode> mode                 = ModeGet(endpoint);
-    BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
+    BitMask<Mode> mode = ModeGet(endpoint);
 
-    // Is the device locked?
-    if (!configStatus.Has(ConfigStatus::kOperational))
+    if (mode.Has(Mode::kMaintenanceMode))
     {
-        if (mode.Has(Mode::kMaintenanceMode))
-        {
-            // Mainterance Mode
-            return Status::Busy;
-        }
+        // Mainterance Mode
+        return Status::Busy;
+    }
 
-        if (mode.Has(Mode::kCalibrationMode))
-        {
-            // Calibration Mode
-            return Status::Failure;
-        }
+    if (mode.Has(Mode::kCalibrationMode))
+    {
+        // Calibration Mode
+        return Status::Failure;
     }
 
     return Status::Success;

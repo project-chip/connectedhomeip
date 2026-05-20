@@ -14,10 +14,11 @@
 
 import shlex
 
+from .runner import Runner
 from .command_dedup import CommandDedup
 
 
-class PrintOnlyRunner:
+class PrintOnlyRunner(Runner):
     def __init__(self, output_file, root: str):
         self.output_file = output_file
         self.dry_run = True
@@ -29,7 +30,7 @@ class PrintOnlyRunner:
             "# Commands will be run in CHIP project root.\n")
         self.output_file.write('cd "%s"\n\n' % self.root)
 
-    def Run(self, cmd, title=None, dedup=False, quiet=False):
+    def Run(self, cmd: list[str], title: str | None = None, dedup: bool = False, quiet: bool = False):
         if title and not quiet:
             self.output_file.write("# " + title + "\n")
 

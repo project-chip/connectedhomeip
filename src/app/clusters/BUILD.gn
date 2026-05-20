@@ -48,6 +48,7 @@ source_set("clusters") {
     "on-off-server",
     "operational-credentials-server",
     "pressure-measurement-server",
+    "proximity-ranging-server",
     "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
@@ -56,6 +57,8 @@ source_set("clusters") {
     "soil-measurement-server",
     "temperature-control-server",
     "temperature-measurement-server",
+
+    # TODO: Add thread-border-router-management-server here once build issues on Ameba, nRF, and NXP are resolved.
     "thread-network-directory-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
