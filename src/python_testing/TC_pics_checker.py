@@ -19,12 +19,15 @@ import math
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
-from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                            UnknownProblemLocation)
+from matter.testing.pics import (BASE_PICS_CODES_DERIVED, accepted_cmd_pics_str, attribute_pics_str,
+                                 base_pics_facts_to_pics_codes, derive_base_pics_facts_from_device_wildcard,
+                                 event_pics_str, feature_pics_str, generated_cmd_pics_str)
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
+                                            FeaturePathLocation, UnknownProblemLocation)
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
@@ -97,7 +100,11 @@ class TC_PICS_Checker(BasicCompositionTests):
                          "PICS is set if root node is present"),
                 TestStep(9, "If the device has any onboarding payload (MCORE.DD.QR or MCORE.DD.NFC), it has the manual pairing code PICS set (MCORE.DD.MANUAL_PC)",
                          "Manual pairing code PICS is set if QR or NFC is set"),
-                TestStep(10, "If any of the checks failed, fail the test")]
+                TestStep(10, "For every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, Wi-Fi bands, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Codes the device reports false for must not be set in the PICS file; codes the device reports true for must be set.",
+                         "Base/MCORE PICS exactly match the device for derivable items."),
+                TestStep(11, "If --assert-mandatory-events is set: for every event the spec marks MANDATORY for the device's cluster feature set, ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file. Skipped by default.",
+                         "Event PICS match spec conformance for the device's featureset."),
+                TestStep(12, "If any of the checks failed, fail the test")]
 
     def test_TC_IDM_10_4(self):
         # wildcard read is done in setup_class
@@ -211,6 +218,38 @@ class TC_PICS_Checker(BasicCompositionTests):
             self.success = False
 
         self.step(10)
+        # Build a ReadResponse from the wildcard already cached by
+        # BasicCompositionTests so the shared helper can derive the same
+        # MCORE codes PICSGenerator writes into Base.xml.
+        wildcard = AsyncReadTransaction.ReadResponse(
+            attributes=self.endpoints, events=[], tlvAttributes=self.endpoints_tlv)
+        base_facts, base_problems = derive_base_pics_facts_from_device_wildcard(wildcard, self.xml_clusters)
+        for problem in base_problems:
+            self.problems.append(problem)
+        derived_codes = base_pics_facts_to_pics_codes(base_facts)
+        # Two halves of the consistency check: codes the device reports
+        # must be set in the PICS file, codes the device does not report
+        # must not be set. Both halves drain through _check_and_record_errors
+        # so failures surface in the standard PICS-mismatch summary.
+        for code in BASE_PICS_CODES_DERIVED:
+            location = UnknownProblemLocation()
+            self._check_and_record_errors(location, code in derived_codes, code)
+
+        self.step(11)
+        # Default off: enabling this turns the spec-conformance event rules
+        # into an assertion. Generator already writes these into the
+        # per-cluster PICS XML; the assertion is opt-in until the certification
+        # team confirms they want IDM_10_4 to enforce it.
+        if self.user_params.get("assert_mandatory_events", False):
+            for endpoint_id, by_cluster in base_facts.mandatory_events_by_cluster.items():
+                for cluster_id, event_ids in by_cluster.items():
+                    pics_base = self.xml_clusters[cluster_id].pics
+                    for event_id in event_ids:
+                        location = EventPathLocation(
+                            endpoint_id=endpoint_id, cluster_id=cluster_id, event_id=event_id)
+                        self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
+
+        self.step(12)
         if not self.success:
             self.fail_current_test("At least one PICS error was found for this endpoint")
 
