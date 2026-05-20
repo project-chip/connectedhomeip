@@ -1816,6 +1816,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     {
         typename Traits::StreamStructType stream;
         ReturnErrorOnFailure(DataModel::Decode(reader, stream));
+        // Zero out the referenceCount and allow it to be updated based on how
+        // the stream gets used by the transports.
         stream.referenceCount = 0;
         streams.push_back(stream);
     }
@@ -1827,12 +1829,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     ChipLogProgress(Zcl, "Loaded %u %s streams", static_cast<unsigned int>(streams.size()),
                     StreamTypeToString(Traits::kStreamType));
 
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-    // Persist the zeroed reference counts back to KVS without sending notifications
-    ReturnErrorOnFailure(StoreAllocatedStreams<attributeId>());
-
-    return CHIP_NO_ERROR;
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
