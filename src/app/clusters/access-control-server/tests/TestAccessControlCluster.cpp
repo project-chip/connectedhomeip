@@ -25,9 +25,8 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
-#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/testing/FabricTestFixture.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/AccessControl/Enums.h>
 #include <clusters/AccessControl/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -35,6 +34,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -281,7 +281,7 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
 
 TEST_F(TestAccessControlCluster, ReadAuxiliaryAclEmptyTargetsError)
 {
-    // Create mock classes to setup a group aux delegate that will return an aux ACL entry 
+    // Create mock classes to setup a group aux delegate that will return an aux ACL entry
     // with no targets (an empty endpoint list)
     class MockEntryDelegate : public Access::AccessControl::Entry::Delegate
     {
@@ -317,7 +317,9 @@ TEST_F(TestAccessControlCluster, ReadAuxiliaryAclEmptyTargetsError)
     class MockGroupAuxDelegate : public Access::AccessControl::Delegate
     {
     public:
-        MockGroupAuxDelegate(Access::AccessControl::EntryIterator::Delegate & iteratorDelegate) : mIteratorDelegate(iteratorDelegate) {}
+        MockGroupAuxDelegate(Access::AccessControl::EntryIterator::Delegate & iteratorDelegate) :
+            mIteratorDelegate(iteratorDelegate)
+        {}
 
         CHIP_ERROR AuxiliaryEntries(Access::AccessControl::EntryIterator & iterator, const FabricIndex * fabricIndex) const override
         {
@@ -326,7 +328,7 @@ TEST_F(TestAccessControlCluster, ReadAuxiliaryAclEmptyTargetsError)
         }
 
         void Release() override {}
-    
+
     private:
         Access::AccessControl::EntryIterator::Delegate & mIteratorDelegate;
     };
