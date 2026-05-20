@@ -1639,9 +1639,10 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
                           to_underlying(mStatusLightBrightness));
         }
         else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
                       mPath.mEndpointId, to_underlying(mStatusLightBrightness));
+        }
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
