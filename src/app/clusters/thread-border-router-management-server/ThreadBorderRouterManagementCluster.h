@@ -88,7 +88,7 @@ protected:
     Optional<uint64_t> mBreadcrumb;
 
     static std::set<ThreadBorderRouterManagementCluster *> sInstances;
-    bool mEventHandlerRegistered = false;
+
 };
 
 } // namespace chip::app::Clusters
