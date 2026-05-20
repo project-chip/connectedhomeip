@@ -75,6 +75,10 @@ _available_devices = [
     "ON_OFF_LIGHT",
   ],
   [
+    "power-source",
+    "POWER_SOURCE",
+  ],
+  [
     "proximity-ranger",
     "PROXIMITY_RANGER",
   ],
